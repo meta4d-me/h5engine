@@ -23,6 +23,7 @@ declare namespace gd3d.framework {
         private doNotify(trans, type);
         checkFilter(trans: any): boolean;
         showFps(): void;
+        closeFps(): void;
         beStepNumber: number;
         private update(delta);
         private beginTimer;
@@ -665,9 +666,9 @@ declare namespace gd3d.framework {
         loadScene(sceneName: string, onComplete: () => void): void;
         parseEffect(effectConfig: string, onComplete: (data: EffectSystemData) => void): void;
         private loadEffectDependAssets(dependAssets, path, onFinish);
-        saveScene(fun: (data: SaveInfo) => void): void;
+        saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
+        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[]) => void): void;
         saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;
-        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo) => void): void;
         loadSingleResImmediate(url: string, type: AssetTypeEnum): any;
         loadImmediate(url: string, type?: AssetTypeEnum): any;
         getFileName(url: string): string;
@@ -1247,6 +1248,7 @@ declare namespace gd3d.framework {
         private effectBatchers;
         private particles;
         private matDataGroups;
+        setEffect(effectConfig: string): void;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
@@ -1258,7 +1260,6 @@ declare namespace gd3d.framework {
         private updateEffectBatcher(effectBatcher, curAttrsData, initFrameData, vertexStartIndex);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         clone(): effectSystem;
-        setEffect(effectConfig: string): void;
         play(speed?: number): void;
         pause(): void;
         stop(): void;
@@ -1565,14 +1566,17 @@ declare namespace gd3d.io {
     function stringToUtf8Array(str: string): number[];
 }
 declare namespace gd3d.io {
+    class SerializeDependent {
+        static resoursePaths: string[];
+    }
     function SerializeForInspector(obj: any): string;
     function serializeObjForInspector(instanceObj: any, beComponent: boolean, serializedObj?: any): any;
     function serializeOtherTypeOrArrayForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean): void;
     function serializeOtherTypeForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean, arrayInst?: any): void;
-    function Serialize(obj: any): string;
-    function serializeObj(instanceObj: any, serializedObj?: any): any;
-    function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string): void;
-    function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst?: any): void;
+    function Serialize(obj: any, assetMgr?: any): string;
+    function serializeObj(instanceObj: any, serializedObj?: any, assetMgr?: any): any;
+    function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string, assetMgr?: any): void;
+    function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst?: any, assetMgr?: any): void;
     function deSerialize(serializedObj: string, instanceObj: any, assetMgr: any, bundlename?: string): void;
     function fillReference(serializedObj: any, instanceObj: any): void;
     function dofillReferenceOrArray(serializedObj: any, instanceObj: any, key: string): void;
@@ -2340,6 +2344,7 @@ declare namespace gd3d.framework {
         static parseEffectUVSpeed(value: any): UVSpeedNode;
         static lookat(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, up?: gd3d.math.vector3): void;
         static RotateVector3(source: gd3d.math.vector3, direction: gd3d.math.vector3, out: gd3d.math.vector3): void;
+        static bindAxisBillboard(localAxis: gd3d.math.vector3, out: gd3d.math.quaternion): void;
         static lookatVerticalBillboard(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, up?: gd3d.math.vector3): void;
         static quatLookatZ(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, forward?: gd3d.math.vector3): void;
         static quatLookatX(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, right?: gd3d.math.vector3): void;
@@ -2872,6 +2877,7 @@ declare namespace gd3d.framework {
         computeBoxExtents(axis: gd3d.math.vector3, box: obb): math.vector3;
         axisOverlap(axis: gd3d.math.vector3, box0: obb, box1: obb): boolean;
         extentsOverlap(min0: number, max0: number, min1: number, max1: number): boolean;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
