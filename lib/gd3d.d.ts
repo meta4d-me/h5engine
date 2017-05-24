@@ -1,4 +1,4 @@
-/// <reference path="Reflect.d.ts" />
+/// <reference path="../engine/lib/Reflect.d.ts" />
 declare namespace gd3d.framework {
     interface INotify {
         notify(trans: any, type: NotifyType): any;
