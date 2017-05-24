@@ -251,11 +251,11 @@ namespace gd3d.framework
                     if (!subEffectBatcher.beBufferInited)
                     {
                         mesh.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
+                        mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
+                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo); 
                         subEffectBatcher.beBufferInited = true;
                     }
                     mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                    mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
-                    mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
                     mesh.submesh = [];
                     {
                         var sm = new subMeshInfo();
