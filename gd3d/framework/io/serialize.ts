@@ -351,7 +351,7 @@ namespace gd3d.io
         {
             if (instanceObj[key]["__gdmeta__"])
             {
-                serializeOtherType(instanceObj, serializedObj, key, assetMgr);
+                serializeOtherType(instanceObj, serializedObj, key, null, assetMgr);
             }
             else if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"])
             {
