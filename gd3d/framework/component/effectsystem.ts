@@ -251,22 +251,20 @@ namespace gd3d.framework
                     if (!subEffectBatcher.beBufferInited)
                     {
                         mesh.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                        mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
+                        if(mesh.glMesh.ebos.length == 0)
+                        {
+                            mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
+                        }
+                        else
+                        {
+                            mesh.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
+                        }
                         mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo); 
+                        mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
                         subEffectBatcher.beBufferInited = true;
                     }
                     mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                    mesh.submesh = [];
-                    {
-                        var sm = new subMeshInfo();
-                        sm.matIndex = 0;
-                        sm.useVertexIndex = 0;
-                        sm.start = 0;
-                        sm.size = subEffectBatcher.dataForEbo.length;
-                        sm.line = false;
-                        mesh.submesh.push(sm);
-                    }
-                    subEffectBatcher.mat.draw(context, mesh, sm, "base");
+                    subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base");//只有一个submesh
                 }
                 if (this.particles != undefined)
                 {
@@ -398,6 +396,17 @@ namespace gd3d.framework
                 subEffectBatcher.mesh.data = new render.meshData();
                 subEffectBatcher.mesh.glMesh = new render.glMesh();
                 subEffectBatcher.mat = new material();
+                subEffectBatcher.mesh.submesh = [];
+                {
+                    var sm = new subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = 0;
+                    sm.line = false;
+                    subEffectBatcher.mesh.submesh.push(sm);
+                }
+
                 vertexStartIndex = 0;
                 index = 0;
                 if (_initFrameData.attrsData.mat.shader == null)
@@ -485,23 +494,6 @@ namespace gd3d.framework
             }
             this.effectBatchers[index].beBufferInited = false;
 
-            if (elementData.type == EffectElementTypeEnum.SingleMeshType)
-            {
-                //单个mesh的处理
-
-                // for (let key in _initFrameData.attrs)
-                // {
-                //     switch (key)
-                //     {
-                //         // case ""
-                //     }
-                // }
-
-            } else if (elementData.type == EffectElementTypeEnum.EmissionType)
-            {
-
-
-            }
             element.curAttrData = elementData.initFrameData.attrsData.clone();
         }
 

@@ -163,6 +163,7 @@ namespace gd3d.framework
         public mesh: mesh;
         public mat: material;
         public beBufferInited: boolean = false;
+        public beAddParticle:boolean = false;
 
         public dataForVbo: Float32Array;
         public dataForEbo: Uint16Array;
@@ -191,6 +192,16 @@ namespace gd3d.framework
             this.mesh = new mesh();
             this.mesh.data = new render.meshData();
             this.mesh.glMesh = new render.glMesh();
+            this.mesh.submesh = [];
+            {
+                var sm = new subMeshInfo();
+                sm.matIndex = 0;
+                sm.useVertexIndex = 0;
+                sm.start = 0;
+                sm.size = 0;
+                sm.line = false;
+                this.mesh.submesh.push(sm);
+            }
 
             //初始化材质信息
             this.mat = new material();
@@ -222,6 +233,7 @@ namespace gd3d.framework
             this.curVerCount += this.data.mesh.data.pos.length;
             this.curIndexCount += p.dataForEbo.length;
             this.particles.push(p);
+            this.beAddParticle = true;
         }
         /**
          * 当前总的顶点数量
@@ -293,30 +305,22 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            // for (let i in this.effectBatchers)
+            let mesh = this.mesh;
+            if (!this.beBufferInited)
             {
-                // let subEffectBatcher = this.effectBatchers[i];
-                let mesh = this.mesh;
-                if (!this.beBufferInited)
-                {
-                    mesh.glMesh.initBuffer(context.webgl, this.formate, this.curTotalVertexCount);
-                    this.beBufferInited = true;
-                }
-                mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+                mesh.glMesh.initBuffer(context.webgl, this.formate, this.curTotalVertexCount);
                 mesh.glMesh.addIndex(context.webgl, this.dataForEbo.length);
-                mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
-                mesh.submesh = [];
-                {
-                    var sm = new subMeshInfo();
-                    sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
-                    sm.start = 0;
-                    sm.size = this.dataForEbo.length;
-                    sm.line = false;
-                    mesh.submesh.push(sm);
-                }
-                this.mat.draw(context, mesh, sm, "base");
+                this.beBufferInited = true;
             }
+            if(this.beAddParticle)
+            {
+                this.beAddParticle = false;
+                mesh.submesh[0].size = this.dataForEbo.length;//如果顶点上限要动态管理  也需要resetvbosize
+                mesh.glMesh.resetEboSize(context.webgl, 0, this.dataForEbo.length);
+                mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
+            }
+            mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+            this.mat.draw(context, mesh, mesh.submesh[0], "base");
         }
         dispose()
         {
