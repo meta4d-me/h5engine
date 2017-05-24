@@ -191,6 +191,10 @@ namespace gd3d.framework
             {
                 this.subTran.dispose();
             }
+            if (this.obb)
+            {
+                this.obb.dispose();
+            }
         }
         clone()
         {

@@ -101,6 +101,18 @@ namespace gd3d.framework
                 this.stats.container.style.top = '0px';
                 this.container.appendChild(this.stats.container);
             }
+            else
+            {
+                this.container.appendChild(this.stats.container);
+            }
+        }
+
+        closeFps()
+        {
+            if (this.stats != null)
+            {
+                this.container.removeChild(this.stats.container);
+            }
         }
         beStepNumber = 0;
         //delta 单位秒
@@ -224,8 +236,8 @@ namespace gd3d.framework
         private _editorCode: IUserCode[] = [];
         private _editorCodeNew: IUserCode[] = [];
         private _bePlay: boolean = false;
-        be2dstate:boolean=false;
-        public curcameraindex:number=-1;
+        be2dstate: boolean = false;
+        public curcameraindex: number = -1;
         public get bePlay()
         {
             return this._bePlay;

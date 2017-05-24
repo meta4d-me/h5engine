@@ -156,7 +156,10 @@ namespace gd3d.framework
 
             if (axis.x == 0 && axis.y == 0 && axis.z == 0)
             {
-                axis = new gd3d.math.vector3(1, 0, 0);
+                // axis = new gd3d.math.vector3(1, 0, 0);
+                axis.x = 1;
+                axis.y = 0;
+                axis.z = 0;
             }
 
             let cos = math.vec3Dot(forward, direction);
@@ -170,6 +173,39 @@ namespace gd3d.framework
             let quatertion = gd3d.math.pool.new_quaternion();
             gd3d.math.quatFromAxisAngle(axis, angle, quatertion);
             gd3d.math.quatTransformVector(quatertion, source, out);
+            gd3d.math.pool.delete_vector3(axis);
+            gd3d.math.pool.delete_quaternion(quatertion);
+        }
+
+        public static bindAxisBillboard(localAxis:gd3d.math.vector3,out:gd3d.math.quaternion)
+        {
+            math.vec3Normalize(localAxis, localAxis);
+
+            let yAxis = gd3d.math.pool.vector3_up;
+            let normal = gd3d.math.pool.new_vector3();
+
+            math.vec3Cross(yAxis, localAxis, normal);
+            math.vec3Normalize(normal, normal);
+
+            if (normal.x == 0 && normal.y == 0 && normal.z == 0)
+            {
+                // axis = new gd3d.math.vector3(1, 0, 0);
+                normal.x = 1;
+                normal.y = 0;
+                normal.z = 0;
+            }
+
+            let cos = math.vec3Dot(yAxis, localAxis);
+
+            let angle = Math.acos(cos) * 180 / Math.PI;
+            if (cos < 0)
+            {
+                angle = -angle;
+            }
+
+            // let quatertion = gd3d.math.pool.new_quaternion();
+            gd3d.math.quatFromAxisAngle(normal, angle, out);
+
         }
 
 

@@ -163,6 +163,11 @@
         {
             return !(min0 > max1 || min1 > max0);
         }
+        dispose()
+        {
+            this.vectors.length = 0;
+            this.directions.length = 0;
+        }
     }
 
 }

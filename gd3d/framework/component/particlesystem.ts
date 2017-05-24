@@ -109,7 +109,6 @@
 
         public render(context: gd3d.framework.renderContext, assetmgr: gd3d.framework.assetMgr, camera: gd3d.framework.camera)
         {
-            if (!(camera.CullingMask & this.renderLayer)) return;
             if (this.timer < this.delayTime)
             {
                 return;

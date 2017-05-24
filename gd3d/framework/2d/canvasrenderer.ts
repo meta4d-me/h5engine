@@ -248,7 +248,7 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            if (!(camera.CullingMask & this.renderLayer)) return;
+           // if (!(camera.CullingMask & this.renderLayer)) return;
             context.updateModel(this.gameObject.transform);
             this.canvas.render(context, assetmgr);
         }

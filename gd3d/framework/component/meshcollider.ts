@@ -91,7 +91,10 @@
         }
         remove()
         {
-
+            if(this.subTran)
+            {
+                this.subTran.dispose();
+            }
         }
         clone()
         {

@@ -51,7 +51,7 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
             if (!this.canvas.getRoot().visible) return;
-            if (!(camera.CullingMask & this.renderLayer)) return;
+           // if (!(camera.CullingMask & this.renderLayer)) return;
             if (this.camera == null || this.camera == undefined)
                 return;
             if (this.autoAsp)

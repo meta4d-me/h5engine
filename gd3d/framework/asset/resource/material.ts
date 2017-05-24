@@ -71,7 +71,7 @@ namespace gd3d.framework
                 switch (this.mapUniform[id].type)
                 {
                     case render.UniformTypeEnum.Texture:
-                        if (this.mapUniform[id] != null)
+                        if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
                             this.mapUniform[id].value.unuse(true);
                         break;
                 }

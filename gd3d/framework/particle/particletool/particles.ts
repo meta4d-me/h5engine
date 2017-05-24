@@ -486,9 +486,13 @@ namespace gd3d.framework
 
                 if (this.data.particleStartData.shapeType != ParticleSystemShape.NORMAL)
                 {
-                        let localOrgin = gd3d.math.pool.new_vector3();
-                        gd3d.math.quatLookat(localOrgin, localRandomDirection, this.rotationByShape);
-                        gd3d.math.pool.delete_vector3(localOrgin);
+                    let localOrgin = gd3d.math.pool.vector3_zero;
+                    gd3d.math.quatLookat(localOrgin, localRandomDirection, this.rotationByShape);
+
+                    let initRot = gd3d.math.pool.new_quaternion();
+                    gd3d.math.quatFromEulerAngles(90, 0, 0, initRot);
+                    gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
+                    gd3d.math.pool.delete_quaternion(initRot);
                 }
             }
         }
@@ -526,7 +530,8 @@ namespace gd3d.framework
 
         private _updateElementRotation()
         {
-            let cameraTransform = gd3d.framework.sceneMgr.app.getScene().mainCamera.gameObject.transform;
+            var cam=gd3d.framework.sceneMgr.app.getScene().mainCamera;
+            let cameraTransform = cam.gameObject.transform;
             let translation = gd3d.math.pool.new_vector3();
             let worldRotation = gd3d.math.pool.new_quaternion();
             let worldTranslation = gd3d.math.pool.new_vector3();
@@ -561,11 +566,30 @@ namespace gd3d.framework
                 }
                 else if (this.renderModel == RenderModel.StretchedBillBoard)
                 {
-                    let rightTarget = gd3d.math.pool.new_vector3();
-                    gd3d.math.vec3Clone(cameraTransform.getWorldTranslate(), rightTarget);
-                    rightTarget.x = worldTranslation.x;
-                    gd3d.math.quatLookat(worldTranslation, rightTarget, worldRotation);
-                    gd3d.math.pool.delete_vector3(rightTarget);
+                    gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
+                    gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
+
+
+                    gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+
+                    let lookRot = new gd3d.math.quaternion();
+                    gd3d.math.quatClone(this.gameObject.transform.getWorldRotate(), invTransformRotation);
+                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
+
+                    let inverRot = gd3d.math.pool.new_quaternion();
+                    gd3d.math.quatInverse(this.localRotation, inverRot);
+                    gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
+
+                    let angle = gd3d.math.pool.new_vector3();
+                    gd3d.math.quatToEulerAngles(lookRot, angle);
+                    gd3d.math.quatFromEulerAngles(0, angle.y, 0, lookRot);
+                    gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
+
+                    gd3d.math.pool.delete_quaternion(inverRot);
+                    gd3d.math.pool.delete_vector3(angle);
+                    gd3d.math.pool.delete_quaternion(lookRot);
+                    return;
                 }
                 gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);
                 //消除transform组件对粒子本身的影响
@@ -577,8 +601,6 @@ namespace gd3d.framework
                 gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
                 gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
             }
-
-
             gd3d.math.pool.delete_vector3(translation);
             gd3d.math.pool.delete_quaternion(worldRotation);
             gd3d.math.pool.delete_vector3(worldTranslation);

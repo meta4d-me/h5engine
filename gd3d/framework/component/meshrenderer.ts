@@ -46,7 +46,7 @@ namespace gd3d.framework
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            if (!(camera.CullingMask & this.renderLayer)) return;
+            //if (!(camera.CullingMask & this.renderLayer)) return;
             if (this.materials == null || this.materials.length == 0)
             {
                 this.materials = [];

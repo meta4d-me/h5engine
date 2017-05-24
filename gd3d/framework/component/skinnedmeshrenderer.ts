@@ -279,7 +279,7 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            if (!(camera.CullingMask & this.renderLayer)) return;
+           // if (!(camera.CullingMask & this.renderLayer)) return;
             // if (this.materials == null)
             // {
             //     this.materials = [];
@@ -345,6 +345,7 @@ namespace gd3d.framework
         {
             if(this.mesh)
                 this.mesh.unuse(true);
+            this.bones.length = 0;
         }
 
         clone()

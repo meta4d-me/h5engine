@@ -116,7 +116,7 @@ namespace gd3d.framework
          * @memberof EmissionNew
          */
         life: ValueData;
-        renderModel: RenderModel;
+        renderModel: RenderModel=RenderModel.None;
         mesh: mesh;
 
         particleStartData: gd3d.framework.ParticleStartData = new gd3d.framework.ParticleStartData();

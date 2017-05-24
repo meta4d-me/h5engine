@@ -27,8 +27,13 @@ namespace gd3d.framework
         private particles: Particles;//粒子系统 发射器统一管理
         private matDataGroups: EffectMatData[] = [];
 
-        jsonData:textasset;
-        setJsonData(_jsonData:textasset)
+        setEffect(effectConfig: string)
+        {
+            this.data = this.parser.Parse(effectConfig, gd3d.framework.sceneMgr.app.getAssetMgr());
+        }
+        @gd3d.reflect.Field("textasset")
+        jsonData: textasset;
+        setJsonData(_jsonData: textasset)
         {
             this.jsonData = _jsonData;
             this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
@@ -235,6 +240,7 @@ namespace gd3d.framework
          */
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
+            //if (!(camera.CullingMask & this.renderLayer)) return;
             if (this.state == EffectPlayStateEnum.Play)
             {
                 context.updateModel(this.gameObject.transform);
@@ -274,17 +280,6 @@ namespace gd3d.framework
             effect.data = this.data.clone();
             return effect;
 
-        }
-        /**
-         * 用特效的配置内容加载一个特效
-         * 
-         * @param {string} effectConfig 
-         * 
-         * @memberof effectSystem
-         */
-        setEffect(effectConfig: string)
-        {
-            this.data = this.parser.Parse(effectConfig, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
         /**
          * 播放特效

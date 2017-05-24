@@ -279,7 +279,14 @@ namespace gd3d.framework
 
         remove()
         {
-
+            this.clips.length = 0;
+            this.bones.length = 0;
+            this.startPos.length = 0;
+            delete this.tpose;
+            delete this.nowpose;
+            delete this.lerppose;
+            delete this.carelist;
+            delete this._clipnames;
         }
         clone()
         {

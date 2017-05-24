@@ -660,6 +660,7 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null }
                 var img = new Image();
                 img.src = url;
+                img.crossOrigin = "anonymous";
                 img.onerror = (error) =>
                 {
                     if (error != null)
@@ -722,6 +723,7 @@ namespace gd3d.framework
                     state.resstate[filename] = { state: 0, res: null }
                     var img = new Image();
                     img.src = _textureSrc;
+                    img.crossOrigin = "anonymous";
                     img.onerror = (error) =>
                     {
                         if (error != null)
@@ -1183,11 +1185,13 @@ namespace gd3d.framework
          * @version gd3d 1.0
          * @param fun 回调
          */
-        saveScene(fun: (data: SaveInfo) => void)
+        saveScene(fun: (data: SaveInfo, resourses?: string[]) => void)
         {
+            io.SerializeDependent.resoursePaths = [];//先清空下资源引用
+
             let info: SaveInfo = new SaveInfo();
             let _scene = {};
-            let _rootNode = io.serializeObj(this.app.getScene().getRoot());
+            let _rootNode = io.serializeObj(this.app.getScene().getRoot(), this);
 
             let _lightmaps = [];
             let lightmaps = this.app.getScene().lightmaps;
@@ -1209,8 +1213,37 @@ namespace gd3d.framework
 
             info.files[url] = _sceneStr;
 
-            fun(info);
+            fun(info, io.SerializeDependent.resoursePaths);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * 保存场景
+         * 这里只是把场景序列化
+         * 具体保存要编辑器来进行
+         * 保存的地址和内容通过回调返回
+         * @version gd3d 1.0
+         * @param fun 回调
+         */
+        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[]) => void)
+        {
+            io.SerializeDependent.resoursePaths = [];//先清空下资源引用
+
+            let info: SaveInfo = new SaveInfo();
+
+            var _prefab: prefab = this.getAssetByName(prefabName) as prefab;
+            _prefab.apply(trans);
+            let _rootTrans = io.serializeObj(trans, null, this);
+
+            let url = this.getAssetUrl(_prefab);
+            info.files[url] = JSON.stringify(_rootTrans);
+
+            fun(info, io.SerializeDependent.resoursePaths);
+        }
+
+
+
 
         /**
          * @language zh_CN
@@ -1255,31 +1288,6 @@ namespace gd3d.framework
             fun(info);
         }
 
-
-
-        /**
-         * @public
-         * @language zh_CN
-         * 保存场景
-         * 这里只是把场景序列化
-         * 具体保存要编辑器来进行
-         * 保存的地址和内容通过回调返回
-         * @version gd3d 1.0
-         * @param fun 回调
-         */
-        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo) => void)
-        {
-            let info: SaveInfo = new SaveInfo();
-
-            var _prefab: prefab = this.getAssetByName(prefabName) as prefab;
-            _prefab.apply(trans);
-            let _rootTrans = io.serializeObj(trans);
-
-            let url = this.getAssetUrl(_prefab);
-            info.files[url] = JSON.stringify(_rootTrans);
-
-            fun(info);
-        }
 
         /**
          * @public

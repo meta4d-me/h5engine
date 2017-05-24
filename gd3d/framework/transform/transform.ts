@@ -200,6 +200,7 @@ namespace gd3d.framework
         }
         removeAllChild()
         {
+            if(this.children==undefined) return;
             while (this.children.length > 0)
             {
                 this.removeChild(this.children[0]);

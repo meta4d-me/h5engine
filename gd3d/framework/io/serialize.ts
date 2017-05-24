@@ -2,6 +2,13 @@
 
 namespace gd3d.io
 {
+    //依赖的资源路径
+    export class SerializeDependent
+    {
+        static resoursePaths: string[] = [];
+    }
+
+
     export function SerializeForInspector(obj: any): string
     {
         var str = JSON.stringify(serializeObjForInspector(obj, false));
@@ -267,16 +274,17 @@ namespace gd3d.io
 
         }
     }
+
     /**
      * 序列化
      */
-    export function Serialize(obj: any): string
+    export function Serialize(obj: any, assetMgr: any = null): string
     {
-        return JSON.stringify(serializeObj(obj));
+        return JSON.stringify(serializeObj(obj, null, assetMgr));
     }
 
     //根据反射类型将对象进行序列化
-    export function serializeObj(instanceObj: any, serializedObj: any = undefined): any
+    export function serializeObj(instanceObj: any, serializedObj: any = undefined, assetMgr: any = null): any
     {
         //过滤掉不需要序列化的对象
         let _flag: gd3d.framework.HideFlags = gd3d.framework.HideFlags.None;
@@ -330,20 +338,20 @@ namespace gd3d.io
                     serializedObj["value"][key] = info;
                     break;
                 default:
-                    serializeOtherTypeOrArray(instanceObj, serializedObj["value"], key);
+                    serializeOtherTypeOrArray(instanceObj, serializedObj["value"], key, assetMgr);
                     break;
             }
         }
         return serializedObj;
     }
 
-    export function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string)
+    export function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string, assetMgr: any = null)
     {
         if (instanceObj[key])
         {
             if (instanceObj[key]["__gdmeta__"])
             {
-                serializeOtherType(instanceObj, serializedObj, key);
+                serializeOtherType(instanceObj, serializedObj, key, assetMgr);
             }
             else if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"])
             {
@@ -364,7 +372,7 @@ namespace gd3d.io
                         }
                         else
                         {
-                            serializeOtherType(instanceObj[key], serializedObj[key]["value"], newkey, instanceObj);
+                            serializeOtherType(instanceObj[key], serializedObj[key]["value"], newkey, instanceObj, assetMgr);
                         }
                     }
                     else
@@ -398,7 +406,7 @@ namespace gd3d.io
         }
     }
 
-    export function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst: any = null)
+    export function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst: any = null, assetMgr: any = null)
     {
         let _meta = instanceObj[key]["__gdmeta__"];
         if (_meta["class"] && _meta["class"]["custom"] && (_meta["class"]["custom"]["SerializeType"] || _meta["class"]["custom"]["nodecomp"] || _meta["class"]["custom"]["2dcomp"]))
@@ -415,6 +423,15 @@ namespace gd3d.io
                     if (_defaultAsset)
                     {
                         _assetName = "SystemDefaultAsset-" + _assetName;
+                    }
+                    else
+                    {
+                        if (assetMgr)
+                        {
+                            let url = assetMgr.getAssetUrl(instanceObj[key]);
+                            if (url)
+                                SerializeDependent.resoursePaths.push(url);
+                        }
                     }
                     if (isArray)
                     {
@@ -465,7 +482,7 @@ namespace gd3d.io
                 }
                 else
                 {
-                    let _serializeObj = serializeObj(instanceObj[key], serializedObj[key]);
+                    let _serializeObj = serializeObj(instanceObj[key], serializedObj[key], assetMgr);
 
                     if (_serializeObj != null)
                     {

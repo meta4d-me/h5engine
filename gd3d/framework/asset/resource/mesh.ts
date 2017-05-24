@@ -48,7 +48,10 @@ namespace gd3d.framework
         {
             let total = 0;
             total += this.glMesh.caclByteLength();
-            total += this.data.caclByteLength();
+            if (this.data)
+            {
+                total += this.data.caclByteLength();
+            }
             return total;
         }
         glMesh: gd3d.render.glMesh;

@@ -486,7 +486,10 @@ namespace gd3d.framework
 
                 for (var j = 0; j < list.length; j++)
                 {
-                    list[j].render(context, assetmgr, this);
+                    if (this.CullingMask & list[j].renderLayer)
+                    {
+                        list[j].render(context, assetmgr, this);
+                    }
                 }
             }
 
