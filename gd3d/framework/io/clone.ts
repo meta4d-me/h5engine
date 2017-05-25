@@ -2,7 +2,159 @@
 
 namespace gd3d.io
 {
+    
     export function cloneObj(instanceObj: any, clonedObj: any = undefined): any
+    {
+        referenceInfo.oldmap = {};
+        clonedObj = _cloneObj(instanceObj, clonedObj);
+        referenceInfo.oldmap[instanceObj["insId"].getInsID()] = clonedObj;
+        fillCloneReference(instanceObj, clonedObj);
+        return clonedObj;
+    }
+
+    export function fillCloneReference(instanceObj: any, clonedObj: any): any
+    {
+        //过滤掉不需要序列化的对象
+        let _flag: gd3d.framework.HideFlags = gd3d.framework.HideFlags.None;
+        let _type: string;
+        if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"])
+        {
+            _type = reflect.getClassName(instanceObj);
+        }
+        if (_type == "transform")
+        {
+            _flag = instanceObj["gameObject"].hideFlags;
+        }
+        else if (_type == "transform2D")
+        {
+            _flag = instanceObj.hideFlags;
+        }
+        if ((_flag & gd3d.framework.HideFlags.DontSaveInBuild) || (_flag & gd3d.framework.HideFlags.DontSaveInEditor) || (_flag & gd3d.framework.HideFlags.HideInHierarchy))
+        {
+            return null;
+        }
+
+        for (let key in instanceObj["__gdmeta__"])
+        {
+            let t = instanceObj["__gdmeta__"][key];
+
+            if (t["custom"] == null)
+                continue;
+            if (t["custom"]["SerializeField"] == null && t["custom"]["nodecomp"] == null && t["custom"]["2dcomp"] == null)
+                continue;
+            let valueType: string = t["custom"]["valueType"];
+            if (valueType == null)
+            {
+                continue;
+            }
+
+            //基本类型和定义为SerializeType的类型才会关心
+            switch (valueType.toLowerCase())
+            {
+                case "number":
+                case "string":
+                case "boolean":
+                    break;
+                default:
+                    fillCloneReferenceTypeOrArray(instanceObj, clonedObj, key);
+                    break;
+            }
+        }
+        return clonedObj;
+    }
+
+    export function fillCloneReferenceTypeOrArray(instanceObj: any, clonedObj: any, key: string)
+    {
+        if (instanceObj[key])
+        {
+            if (instanceObj[key]["__gdmeta__"])
+            {
+                fillCloneReferenceType(instanceObj, clonedObj, key);
+            }
+            else if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"])
+            {
+                for (var newkey in instanceObj[key])
+                {
+                    let field = instanceObj[key][newkey];
+                   
+                    if (field&&field["__gdmeta__"])
+                    {
+                        let _meta = field["__gdmeta__"];
+                        if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && field.type == 3)
+                        {
+                            //排除掉Matrix类型的序列化
+                        }
+                        else
+                        {
+                            fillCloneReferenceType(instanceObj[key], clonedObj[key], newkey, instanceObj, clonedObj, key);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    export function fillCloneReferenceType(instanceObj: any, clonedObj: any, key: string, instanceParent: any = null, clonedParent: any = null, instanceKey: string = "")
+    {
+        let _meta = instanceObj[key]["__gdmeta__"];
+        if (_meta["class"] && _meta["class"]["custom"] && (_meta["class"]["custom"]["SerializeType"] || _meta["class"]["custom"]["nodecomp"] || _meta["class"]["custom"]["2dcomp"]))
+        {
+            let isArray: boolean = instanceObj instanceof Array;
+
+            let type: string = _meta["class"]["typename"];
+            if (isAsset(type))
+            {
+                
+            }
+            else
+            {
+                let isreference = false;
+                let insid = -1;
+                if ((isArray && instanceParent["__gdmeta__"] && instanceParent["__gdmeta__"]["class"] && instanceParent["__gdmeta__"]["class"]["custom"] && (instanceParent["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceParent["__gdmeta__"]["class"]["custom"]["2dcomp"])) ||
+                    (!isArray && instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"] && instanceObj["__gdmeta__"]["class"]["custom"] && (instanceObj["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceObj["__gdmeta__"]["class"]["custom"]["2dcomp"])))
+                {
+                    //当前instance是组件
+                    if (_meta["class"]["custom"]["nodecomp"])
+                    {
+                        //属性是组件
+                        insid = instanceObj[key]["gameObject"]["transform"]["insId"].getInsID();
+                        isreference = true;
+                    }
+                    else if (_meta["class"]["custom"]["2dcomp"])
+                    {
+                        insid = instanceObj[key]["transform"]["insId"].getInsID();
+                        isreference = true;
+                    }
+                    else if (type == "transform" || type == "transform2D")
+                    {
+                        //属性是tranform
+                        insid = instanceObj[key]["insId"].getInsID();
+                        isreference = true;
+                    }
+                }
+                if (isreference)
+                {
+                    let instance = referenceInfo.oldmap[insid];
+                    if (isArray)
+                    {
+                        clonedObj.push(instance);
+                    }
+                    else
+                    {
+                        clonedObj[key] = instance;
+                    }
+                }
+                else
+                {
+                    fillCloneReference(instanceObj[key], clonedObj[key]);
+                }
+
+            }
+
+        }
+    }
+
+    export function _cloneObj(instanceObj: any, clonedObj: any = undefined): any
     {
         //过滤掉不需要序列化的对象
         let _flag: gd3d.framework.HideFlags = gd3d.framework.HideFlags.None;
@@ -26,7 +178,21 @@ namespace gd3d.io
 
         if (clonedObj == undefined)
         {
+            let insid = -1;
             clonedObj = reflect.createInstance(instanceObj, null);
+            if (instanceObj["__gdmeta__"]["class"]["custom"]["nodecomp"])
+            {
+                insid = instanceObj["gameObject"]["transform"]["insId"].getInsID();
+            }
+            else if (instanceObj["__gdmeta__"]["class"]["custom"]["2dcomp"])
+            {
+                insid = instanceObj["transform"]["insId"].getInsID();
+            }
+            else if (instanceObj["__gdmeta__"]["class"]["typename"] == "transform" || instanceObj["__gdmeta__"]["class"]["typename"] == "transform2D")
+            {
+                insid = instanceObj["insId"].getInsID();
+            }
+            referenceInfo.oldmap[insid] = clonedObj;
         }
         for (let key in instanceObj["__gdmeta__"])
         {
@@ -146,7 +312,6 @@ namespace gd3d.io
                 if ((isArray && instanceParent["__gdmeta__"] && instanceParent["__gdmeta__"]["class"] && instanceParent["__gdmeta__"]["class"]["custom"] && (instanceParent["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceParent["__gdmeta__"]["class"]["custom"]["2dcomp"])) ||
                     (!isArray && instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"] && instanceObj["__gdmeta__"]["class"]["custom"] && (instanceObj["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceObj["__gdmeta__"]["class"]["custom"]["2dcomp"])))
                 {
-                    //当前instance是组件
                     if (_meta["class"]["custom"]["nodecomp"] || _meta["class"]["custom"]["2dcomp"] || type == "transform" || type == "transform2D")
                     {
                         isreference = true;
@@ -156,11 +321,11 @@ namespace gd3d.io
                 {
                     if (isArray)
                     {
-                        clonedObj.push(instanceObj[key]);
+                        // clonedObj.push(instanceObj[key]);
                     }
                     else
                     {
-                        clonedObj[key] = instanceObj[key];
+                        // clonedObj[key] = instanceObj[key];
                     }
                 }
                 else
@@ -172,7 +337,7 @@ namespace gd3d.io
                     }
                     else
                     {
-                        _clonedObj = cloneObj(instanceObj[key], clonedObj[key]);
+                        _clonedObj = _cloneObj(instanceObj[key], clonedObj[key]);
                     }
 
                     if (_clonedObj != null)
