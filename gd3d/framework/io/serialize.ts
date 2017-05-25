@@ -6,6 +6,46 @@ namespace gd3d.io
     export class SerializeDependent
     {
         static resoursePaths: string[] = [];
+
+        static GetAssetUrl(asset: any, assetMgr: any)
+        {
+            if (!assetMgr || !asset)
+                return;
+            let url: string = assetMgr.getAssetUrl(asset);
+            if (!url)
+                return;
+            SerializeDependent.resoursePaths.push(url);
+
+            if (asset instanceof gd3d.framework.material)
+            {
+                let _mapUniform = (asset as gd3d.framework.material).mapUniform;
+                if (!_mapUniform)
+                    return;
+                for (let newKey in _mapUniform)
+                {
+                    if (!_mapUniform[newKey])
+                        continue;
+                    if (_mapUniform[newKey].type != render.UniformTypeEnum.Texture)
+                        continue;
+                    let _texture = _mapUniform[newKey].value;
+                    if (!_texture)
+                        continue;
+                    url = assetMgr.getAssetUrl(_texture);
+                    if (!url)
+                        continue;
+                    SerializeDependent.resoursePaths.push(url);
+
+                    if (url.indexOf(".imgdesc.json") < 0)
+                        continue;
+
+                    if (!_texture.realName)
+                        continue;
+
+                    url = url.replace(_texture.getName(), _texture.realName);
+                    SerializeDependent.resoursePaths.push(url);
+                }
+            }
+        }
     }
 
 
@@ -428,9 +468,7 @@ namespace gd3d.io
                     {
                         if (assetMgr)
                         {
-                            let url = assetMgr.getAssetUrl(instanceObj[key]);
-                            if (url)
-                                SerializeDependent.resoursePaths.push(url);
+                            SerializeDependent.GetAssetUrl(instanceObj[key], assetMgr);
                         }
                     }
                     if (isArray)

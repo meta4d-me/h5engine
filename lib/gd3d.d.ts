@@ -1007,6 +1007,8 @@ declare namespace gd3d.framework {
         dispose(): void;
         glTexture: gd3d.render.ITexture;
         caclByteLength(): number;
+        private _realName;
+        realName: string;
     }
 }
 declare namespace gd3d.framework {
@@ -1568,6 +1570,7 @@ declare namespace gd3d.io {
 declare namespace gd3d.io {
     class SerializeDependent {
         static resoursePaths: string[];
+        static GetAssetUrl(asset: any, assetMgr: any): void;
     }
     function SerializeForInspector(obj: any): string;
     function serializeObjForInspector(instanceObj: any, beComponent: boolean, serializedObj?: any): any;

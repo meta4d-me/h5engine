@@ -25,6 +25,7 @@ namespace gd3d.framework
         {
             return this.name.getText();
         }
+
         getGUID(): number
         {
             return this.id.getID();
@@ -50,5 +51,17 @@ namespace gd3d.framework
                 return this.glTexture.caclByteLength();
             }
         }
+
+        //如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
+        private _realName: string;
+        get realName(): string
+        {
+            return this._realName;
+        }
+        set realName(name: string)
+        {
+            this._realName = name;
+        }
+        
     }
 }
