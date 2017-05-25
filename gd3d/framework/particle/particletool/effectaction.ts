@@ -133,6 +133,56 @@ namespace gd3d.framework
             }
         }
     }
+    export class UVRollAction implements IEffectAction
+    {
+        type: string;
+        params: any;
+        startFrame: number;
+        endFrame: number;
+        elements: EffectElement;
+
+        speedu:number = 0;
+        speedv:number = 0;
+        startu:number = 0;
+        startv:number = 0;
+        init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement)
+        {
+            this.startFrame = _startFrame;
+            this.endFrame = _endFrame;
+            this.params = _params;
+            this.elements = _elements;
+            if (this.params["speedu"] != undefined)
+            {
+                this.speedu = <number>this.params["speedu"];
+            }
+            if (this.params["speedv"] != undefined)
+            {
+                this.speedv = <number>this.params["speedv"];
+            }
+            if (this.params["startu"] != undefined)
+            {
+                this.startu = <number>this.params["startu"];
+            }
+            if (this.params["startv"] != undefined)
+            {
+                this.startv = <number>this.params["startv"];
+            }
+        }
+        
+        update(frameIndex: number)
+        {
+            if (this.startFrame > frameIndex || this.endFrame < frameIndex) return;
+            if(this.startFrame == frameIndex)
+            {
+                //init
+                this.elements.curAttrData.uv.x = this.startu;
+                this.elements.curAttrData.uv.y = this.startv;
+                return;
+            }
+            this.elements.curAttrData.uv.x += this.speedu;
+            this.elements.curAttrData.uv.y += this.speedv;
+        }
+    }
     export class UVSpriteAnimationAction implements IEffectAction
     {
         type: string;

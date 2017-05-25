@@ -429,6 +429,7 @@ namespace gd3d.framework
             }
             element.effectBatcher = subEffectBatcher;
             element.startIndex = vertexStartIndex;
+            element.curAttrData = elementData.initFrameData.attrsData.clone();
             let vertexSize = subEffectBatcher.vertexSize;
             let vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
             element.update();
@@ -443,7 +444,7 @@ namespace gd3d.framework
                     vertex.y = vertexArr[i * vertexSize + 1];
                     vertex.z = vertexArr[i * vertexSize + 2];
 
-                    gd3d.math.matrixTransformVector3(vertex, _initFrameData.attrsData.matrix, vertex);
+                    gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
 
                     subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 0] = vertex.x;
                     subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 1] = vertex.y;
@@ -463,10 +464,10 @@ namespace gd3d.framework
                 }
                 {//color
                     //处理一下颜色，以防灰度值 > 1\
-                    let r = math.floatClamp(vertexArr[i * vertexSize + 9], 0, 1);
-                    let g = math.floatClamp(vertexArr[i * vertexSize + 10], 0, 1);
-                    let b = math.floatClamp(vertexArr[i * vertexSize + 11], 0, 1);
-                    let a = math.floatClamp(vertexArr[i * vertexSize + 12], 0, 1);
+                    let r = math.floatClamp(element.curAttrData.color.x, 0, 1);
+                    let g = math.floatClamp(element.curAttrData.color.y, 0, 1);
+                    let b = math.floatClamp(element.curAttrData.color.z, 0, 1);
+                    let a = math.floatClamp(element.curAttrData.alpha, 0, 1);
 
 
                     subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
@@ -476,8 +477,8 @@ namespace gd3d.framework
 
                 }
                 {//uv
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13];
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14];
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = element.curAttrData.uv.x
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = element.curAttrData.uv.x;
                     //  this.dataForVbo[(this._vercount + i) * total + 13] = vertexArr[i * total + 13] * materialData.tiling.x + materialData.offset.x;
                     // this.dataForVbo[(this._vercount + i) * total + 14] = vertexArr[i * total + 14] * materialData.tiling.y + materialData.offset.y;
                 }
@@ -494,7 +495,6 @@ namespace gd3d.framework
             }
             this.effectBatchers[index].beBufferInited = false;
 
-            element.curAttrData = elementData.initFrameData.attrsData.clone();
         }
 
 
