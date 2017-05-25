@@ -530,6 +530,7 @@ namespace gd3d.framework
 
         private _updateElementRotation()
         {
+            
             var cam=gd3d.framework.sceneMgr.app.getScene().mainCamera;
             let cameraTransform = cam.gameObject.transform;
             let translation = gd3d.math.pool.new_vector3();
