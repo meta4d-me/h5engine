@@ -163,6 +163,9 @@ namespace gd3d.framework
                     case "breath":
                         action = new BreathAction();
                         break;
+                    case "uvroll":
+                        action = new UVRollAction();
+                        break;
                 }
                 action.init(actiondata.startFrame, actiondata.endFrame, actiondata.params, this);
                 this.actions.push(action);
