@@ -116,7 +116,7 @@ namespace gd3d.framework {
         }
 
         private notRender: boolean = false;
-        private speed: number = 0.3;
+        public speed: number = 1;
         private updateTrail(curTime: number) 
         {
             var length = this.vertexcount / 2;
