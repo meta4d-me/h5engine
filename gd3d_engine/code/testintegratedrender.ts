@@ -13,7 +13,7 @@ namespace t {
         }
 
         private loadText(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-            this.app.getAssetMgr().load("res/trailtest_yellow.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
+            this.app.getAssetMgr().load("res/trailtest2_00000.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
                 if (s.isfinish) {
                     state.finish = true;
                 }
@@ -164,10 +164,11 @@ namespace t {
                     trailtrans.markDirty();
                     var trailrender = trailtrans.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
                     //trailrender.color=new gd3d.math.color(1.0,0,0,1.0);
-                    trailrender.speed = 1;
+                    //trailrender.speed = 1;
+                    trailrender.setWidth(1);
                     var mat = new gd3d.framework.material();
-                    let shader = this.app.getAssetMgr().getShader("transparent-diffuse.shader.json") as gd3d.framework.shader;
-                    var tex = this.app.getAssetMgr().getAssetByName("trailtest_yellow.png") as gd3d.framework.texture;
+                    let shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json") as gd3d.framework.shader;
+                    var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json") as gd3d.framework.texture;
                     mat.setShader(shader);
                     mat.setTexture("_MainTex", tex)
 
@@ -202,7 +203,7 @@ namespace t {
             {
                 let btn2 = this.addbtn("160px", "0px", "playAttackAni");
                 btn2.onclick = () => {
-                    let name = "attack_01.FBAni.aniclip.bin";
+                    let name = "attack_04.FBAni.aniclip.bin";
                     this.aniplayer.playCross(name, 0.2);
                 }
             }
