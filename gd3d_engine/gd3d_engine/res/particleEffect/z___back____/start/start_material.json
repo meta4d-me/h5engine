@@ -1,0 +1,7 @@
+[
+  {
+    "name": "mat",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "particleimg.png"
+  }
+]

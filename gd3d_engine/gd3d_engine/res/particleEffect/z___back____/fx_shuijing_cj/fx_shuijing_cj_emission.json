@@ -1,0 +1,38 @@
+[
+  {
+    "name": "glow",
+    "type": "burst",
+    "time": 0,
+    "count": 1
+  },
+  {
+    "name": "xiru",
+    "type": "continue",
+    "time": 1,
+    "count": 3
+  },
+  {
+    "name": "xingxing",
+    "type": "continue",
+    "time": 1,
+    "count": 25
+  },
+  {
+    "name": "caihong",
+    "type": "burst",
+    "time": 0,
+    "count": 1
+  },
+  {
+    "name": "kuosan",
+    "type": "burst",
+    "time": 0,
+    "count":1 
+  },
+  {
+    "name": "kuosan2",
+    "type": "burst",
+    "time": 4,
+    "count":1 
+  }
+]

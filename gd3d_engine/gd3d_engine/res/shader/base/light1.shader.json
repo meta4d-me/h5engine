@@ -1,0 +1,27 @@
+{
+    "layer": "transparent",
+    "passes": {
+        "base": [
+            {
+                "showface": "ccw",
+                "vs": "light1",
+                "fs": "light1"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "ccw",
+                "vs": "bone_eff",
+                "fs": "diffuse"
+            }
+        ],
+        "base_depth": [
+            {
+                "showface": "ccw",
+                "vs": "post_depth",
+                "fs": "post_depth"
+            }
+        ],
+        "shadowuse": []
+    }
+}

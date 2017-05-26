@@ -1,0 +1,20 @@
+{
+  "files": {
+    "emission": "start_emission.json",
+    "material": "start_material.json",
+    "particle": "start_particlelist.json"
+  },
+  "dependImg": [
+    "particleimg.png"
+  ],
+  "effectsystem": {
+    "name": "start",
+    "particlelist": [
+      {
+        "emission": "emission",
+        "material": "mat",
+        "particle": "particle"
+      }
+    ]
+  }
+}

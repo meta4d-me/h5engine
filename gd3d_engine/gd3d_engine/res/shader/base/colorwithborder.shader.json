@@ -1,0 +1,19 @@
+{
+    "layer": "transparent",
+    "passes": {
+        "base": [
+            {
+                "showface": "all",
+                "vs": "color",
+                "fs": "color"
+            },
+            {
+                "vs": "color",
+                "fs": "white"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}

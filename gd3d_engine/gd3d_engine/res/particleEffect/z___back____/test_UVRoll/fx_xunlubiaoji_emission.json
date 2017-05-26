@@ -1,0 +1,23 @@
+[
+	{
+    "name": "guangquan",
+		"type":"burst",
+		"time":0,
+		"count":1
+	},
+   { "name":"glow",
+		"type":"burst",
+		"time":0,
+		"count":1
+	},
+   { "name":"jiantou",
+		"type":"burst",
+		"time":0,
+		"count":1
+	},
+   { "name":"wenli",
+		"type":"burst",
+		"time":0,
+		"count":1
+	}
+]

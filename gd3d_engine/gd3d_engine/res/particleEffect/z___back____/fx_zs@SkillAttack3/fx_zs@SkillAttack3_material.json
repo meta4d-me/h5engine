@@ -1,0 +1,27 @@
+  [
+    {
+      "name": "dun",
+      "shader":"particles_additive.shader",
+      "diffuseTexture": "dun.png"
+    },
+    {
+       "name": "E_glow002",
+      "shader":"particles_additive.shader",
+      "diffuseTexture": "E_glow002.png"
+    },
+    {
+      "name": "g_fissure051a",
+      "shader":"particles_additive.shader",
+      "diffuseTexture": "g_fissure051a.png"
+    },
+    {    
+      "name": "light0029",
+      "shader":"particles_additive.shader",
+      "diffuseTexture": "light0029.png"
+    }, 
+    {
+      "name": "light00101",
+      "shader":"particles_additive.shader",
+      "diffuseTexture": "light00101.png"
+    }
+]

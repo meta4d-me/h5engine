@@ -1,0 +1,59 @@
+[
+  {
+    "name": "suduxian",
+    "rendermodel": {
+            "type": "billboard",
+            "value": 0
+        },
+    "loop": true,
+    "life": {
+      "value": 1
+    },
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "direction": [
+        1,
+        0,
+        0
+      ]
+    },
+    "scale": {
+      "x": 0.3,
+      "y": 0.3,
+      "rangez": [
+        0.001,
+        0.01
+      ]
+    },
+    "color": {
+      "x": 1,
+      "y": 0,
+      "z": 0
+    },
+    "posnode": [
+      {
+        "x": 2,
+        "y": 5,
+        "z": 0,
+        "key": 0.33
+      },
+      {
+        "x": 4,
+        "y": -5,
+        "z": 0,
+        "key": 0.66
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "z": 0,
+        "key": 1
+      }
+    ]
+  }
+]

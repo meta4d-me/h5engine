@@ -1,0 +1,38 @@
+[
+  {
+    "name": "dun",
+    "type": "transparent",
+    "diffuseTexture": "dun.png",
+    "bothside": true
+  },
+  {
+    "name": "g_fissure051a",
+    "type": "transparent",
+    "diffuseTexture": "g_fissure051a.png",
+    "bothside": true
+  },
+  {
+    "name": "light0029",
+    "type": "transparent",
+    "diffuseTexture": "light0029.png",
+    "bothside": true
+  },
+  {
+    "name": "light00101",
+    "type": "transparent",
+    "diffuseTexture": "light00101.png",
+    "bothside": true
+  },
+  {
+    "name": "E_glow001",
+    "type": "transparent",
+    "diffuseTexture": "E_glow001.png",
+    "bothside": true
+  },
+  {
+    "name": "E_glow002",
+    "type": "transparent",
+    "diffuseTexture": "E_glow002.png",
+    "bothside": true
+  }
+]

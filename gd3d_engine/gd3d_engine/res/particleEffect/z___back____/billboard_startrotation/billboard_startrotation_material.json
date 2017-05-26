@@ -1,0 +1,7 @@
+[
+  {
+    "name": "kuosan",
+	"shader":"particles_additive.shader",
+    "diffuseTexture": "arcaneTorrent_ring.png"
+  }
+]

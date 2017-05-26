@@ -1,0 +1,8 @@
+[
+ 
+   {
+    "name": "PA",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "fs_1.png"
+  }
+]

@@ -1,0 +1,17 @@
+{
+    "layer": "transparent",
+    "properties": {},
+    "passes": {
+        "base": [
+            {
+                "blendmode": "add",
+                "showface": "all",
+                "vs": "effect_uvroll",
+                "fs": "effect_uvroll"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}

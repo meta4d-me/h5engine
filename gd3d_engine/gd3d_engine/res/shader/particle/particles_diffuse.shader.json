@@ -1,0 +1,17 @@
+{
+  "layer": "common",
+  "queue":  0,
+    "passes": {
+        "base": [
+          {
+            "blendmode":"close",
+            "showface": "all",
+            "vs": "particles_diffuse",
+            "fs": "particles_diffuse"
+          }
+        ],
+        "shadowgen": [],  
+        "bone": [],
+        "shadowuse": []
+    }
+}

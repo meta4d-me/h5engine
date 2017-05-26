@@ -1,0 +1,33 @@
+[
+  {
+    "name": "glow",
+	"shader":"particles_additive.shader",
+    "diffuseTexture": "E_glow001.png"
+  },
+  {
+    "name": "xingxing",
+	"shader":"particles_additive.shader",
+    "diffuseTexture": "c_point03a.png"
+  },
+  {
+    "name": "xiru",
+	"shader":"particles_additive.shader",
+    "diffuseTexture": "c_point077a.png"
+  },
+  {
+    "name": "caihong",
+	"shader":"particles_additive.shader",
+    "diffuseTexture": "028_guangyun.png"
+  },
+  {
+    "name": "kuosan",
+	"shader":"particles_additive.shader",
+    "diffuseTexture": "arcaneTorrent_ring.png"
+  },
+  {
+    "name": "kuosan2",
+	"shader":"particles_additive.shader",
+    "diffuseTexture": "arcaneTorrent_ring.png"
+  }
+  
+]

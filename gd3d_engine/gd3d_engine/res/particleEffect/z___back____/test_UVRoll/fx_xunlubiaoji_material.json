@@ -1,0 +1,32 @@
+[
+  {
+    "name": "jiantou",
+    "type": "uvroll",
+    "diffuseTexture": "jiantou.png",
+     "blendMode": "soft_add",
+    "bothside": true,
+    "speedU": -50,
+    "speedV": 0
+  },
+  {
+    "name": "glow",
+    "type": "base",
+    "diffuseTexture": "E_glow001.png",
+    "blendMode": "add",
+    "bothside": true
+  },
+  {
+    "name": "wenli",
+    "type": "base",
+    "diffuseTexture": "golw0005.png",
+    "blendMode": "add",
+    "bothside": true
+  },
+  {
+    "name": "guangquan",
+    "type": "base",
+    "diffuseTexture": "p_halo024a.png",
+    "blendMode": "add",
+    "bothside": true
+  }
+]

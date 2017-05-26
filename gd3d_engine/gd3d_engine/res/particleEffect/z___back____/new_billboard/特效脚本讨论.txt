@@ -1,0 +1,72 @@
+﻿{
+    "life": 5,
+    "elements": [
+        {
+            "name": "kuosan0",
+            "life": 3,
+            "mesh": "plane",
+            "emmision": {
+                "type": "continue",
+                "time": 1,
+                "count": 5
+            },
+            "mat": {
+                "shader": "diffuse.shader.json",
+                "diffuseTexture": "rock256.png"
+            },
+            "billboard": "billboard", //分为公告板，水平，竖直，锁两轴拉伸
+            "timeline": [
+                { //一帧
+                    "frame": 0,
+                    "attrs": {
+                        "pos": "0,0,0",
+                        "euler": "0,0,0",
+                        "scale": "1,2,1",
+                        "shaderproperty": {
+                            "u": 1,
+                            "v": 1
+                        }
+                    },
+                    //插值实现（同一属性与非插值实现2选1）
+                    "lerp": {
+                        "type": "linear",
+                        "to": 30,
+                        "attribute": [
+                            "scale:1,2,1",
+                            "pos:3,0,0"
+                        ]
+                    },
+                    //非插值实现（同一属性与插值实现2选1）
+                    "actions": [
+                        {
+                            "action": "linear", //线性，贝塞尔，sin，cons，ln。。。。
+                            "end": 30,
+                            "param": [
+                                "scale:0.2" //0-30帧率内的缩放速率
+                            ]
+                        },
+                        {
+                            "action": "sin", //线性，贝塞尔，sin，cons，ln。。。。
+                            "end": 20,
+                            "param": [
+                                "pos:0.1,0.1,0.1" //0-30帧率内x轴的移动速率
+                            ]
+                        },
+                        {
+                            "action": "linear", //线性，贝塞尔，sin，cons，ln。。。。
+                            "end": 30,
+                            "param": [
+                                "uv:0.1,0.1"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "kuosan1",
+            "ref": "kuosan0",
+            "life": 5 //重写kuosan0中的life属性
+        }
+    ]
+}

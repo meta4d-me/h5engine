@@ -1,0 +1,248 @@
+[
+  {
+    "name": "kuosan",
+    "rendermodel": {
+    "type": "mesh",
+    "value":
+    {
+      "type": "plane"
+    }
+    },
+    "loop": false,
+    "life": {
+      "value": 0.5
+    },
+    "scale": {
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.5
+    },
+    "scalenode": [
+      {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "key": 0
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "z": 5,
+        "key": 1
+      }
+    ],
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        1,
+        0
+      ]
+    },
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "color": {
+      "x": 2,
+      "y": 1.2,
+      "z": 0.3
+    }
+  },
+  {
+    "name": "fazhen",
+    "rendermodel": {
+    "type": "mesh",
+    "value":
+    {
+      "type": "plane",
+      "angularvelocity": {
+      "z": {
+        "value": 100
+      }
+    }
+    }
+    },
+    "loop": false,
+    "life": {
+      "value": 0.8
+    },
+    "scale": {
+      "x": 2,
+      "y": 2,
+      "z": 0
+    },
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        0,
+        0
+      ]
+    },
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "color": {
+      "x": 1.5,
+      "y": 1,
+      "z": 0.3
+    }
+  },
+  {
+    "name": "chibang",
+    "rendermodel": {
+    "type": "billboard"
+    },
+    "loop": false,
+    "life": {
+      "value": 1
+    },
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        1.2,
+        0
+      ]
+    },
+    "scale": {
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0
+    },
+    "scalenode": [
+      {
+        "x": 3.4,
+        "y": 3.4,
+        "z": 0,
+        "key": 0.2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "z": 0,
+        "key": 1
+      }
+    ],
+    "color": {
+      "x": 1,
+      "y": 0.8,
+      "z": 0.3
+    },
+    "alpha": {
+      "value": 0.8
+    }
+  },
+  {
+    "name": "glow",
+    "rendermodel": {
+    "type": "billboard"
+    },
+    "loop": false,
+    "life": {
+      "value": 1.5
+    },
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        1,
+        0
+      ]
+    },
+    "scale": {
+      "x": 4,
+      "y": 4,
+      "z": 0
+    },
+    "colornode": [
+      {
+        "x": 2,
+        "y": 1.2,
+        "z": 0.3,
+        "key": 0
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "key": 1
+      }
+    ],
+    "alpha": {
+      "value": 0.3
+    }
+  },
+  {
+    "name": "shangsheng",
+    "rendermodel": {
+    "type": "mesh",
+    "value":
+    {
+      "type": "plane"
+    }
+    },
+    "loop": false,
+    "life": {
+      "value": 0.5
+    },
+    "scale": {
+      "x": 2,
+      "y": 2,
+      "z": 2
+    },
+    "speed": {
+      "value": 1
+    },
+    "scalenode": [
+      {
+        "x": 4,
+        "y": 4,
+        "z": 4,
+        "key": 0.5
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "z": 2,
+        "key": 1
+      }
+    ],
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        0,
+        0
+      ]
+    },
+    "posnode": [
+      {
+        "x": 0,
+        "y": 1.5,
+        "z": 0,    
+        "key": 0.8
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "z": 0,
+        "key": 1
+      }
+    ],
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "color": {
+      "x": 2,
+      "y": 1.2,
+      "z": 0.3
+    }
+  }
+]

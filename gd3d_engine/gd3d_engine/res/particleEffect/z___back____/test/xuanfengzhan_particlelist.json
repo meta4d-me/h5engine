@@ -1,0 +1,252 @@
+[
+  {
+    "name": "particle1",
+    "type": "E645D5D6C8B3550EA5870353E1D45EDA64909D4D.mesh.bin",
+    "life": {
+      "value": 2.5
+    },
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "angularvelocity": {
+      "z": {
+        "valuerange": [
+          -800,
+          -1300
+        ]
+      }
+    },
+    "alpha": {
+      "value": 0
+    },
+    "scale": {
+      "x": 0.7,
+      "y": 0.7,
+      "z": 0.7
+    },
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        -1.5,
+        0
+      ]
+    }
+  },
+  {
+    "name": "particle2",
+    "type": "plane",
+    "life": {
+      "value": 2.3
+    },
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "angularvelocity": {
+      "z": {
+        "value": -1600
+      }
+    },
+    "scale": {
+      "x": 4,
+      "y": 4,
+      "z": 4
+    },
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "name": "particle3",
+    "type": "plane",
+    "life": {
+      "value": 2.6
+    },
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "alphanode": [
+      {
+        "value": 0.8,
+        "key": 0.85
+      },
+      {
+        "value": 0,
+        "key": 1
+      }
+    ],
+    "angularvelocity": {
+      "z": {
+        "value": -1600
+      }
+    },
+    "scale": {
+      "x": 4,
+      "y": 4,
+      "z": 0
+    },
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  {
+    "name": "particle4",
+    "lookatcam": true,
+    "type": "plane",
+    "life": {
+      "valuerange": [
+        0.5,
+        0.8
+      ]
+    },
+    "scale": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "scalenode": [
+      {
+        "x": 2,
+        "y": 2,
+        "z": 0,
+        "key": 0.5
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "z": 3,
+        "key": 1
+      }
+    ],
+    "alpha": {
+      "value": 1
+    },
+    "alphanode": [
+      {
+        "value": 1,
+        "key": 0.3
+      },
+      {
+        "value": 1,
+        "key": 0.6
+      },
+      {
+        "value": 0,
+        "key": 1
+      }
+    ],
+    "color": {
+      "x": 0.12,
+      "y": 0.12,
+      "z": 0.12
+    },
+    "colornode": [
+      {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "key": 0.5
+      }
+    ],
+    "startpos": {
+      "type": "noraml",
+      "center": [
+        0,
+        0.5,
+        0
+      ],
+      "width": 1,
+      "height": 1,
+      "depth": 0
+    }
+  },
+  {
+    "name": "particle5",
+    "lookatcam": true,
+    "type": "plane",
+    "life": {
+      "valuerange": [
+        1,
+        1.5
+      ]
+    },
+    "scale": {
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0
+    },
+    "scalenode": [
+      {
+        "x": 1,
+        "y": 1,
+        "z": 1,
+        "key": 1
+      }
+    ],
+    "alpha": {
+      "value": 0
+    },
+    "alphanode": [
+      {
+        "value": 1,
+        "key": 0.3
+      },
+      {
+        "value": 1,
+        "key": 0.6
+      },
+      {
+        "value": 0,
+        "key": 1
+      }
+    ],
+    "color": {
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "colornode": [
+      {
+        "x": 0.38,
+        "y": 0.33,
+        "z": 0.26,
+        "key": 1
+      }
+    ],
+    "startpos": {
+      "type": "box",
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "width": 1,
+      "height": 1,
+      "depth": 1
+    },
+    "angularvelocity": {
+      "z": {
+        "valuerange": [
+          -45,
+          45
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,28 @@
+{
+    "files": [
+        {
+            "name": "resources/GJ.png",
+            "length": 49589
+        },
+        {
+            "name": "resources/gj.mesh.bin",
+            "length": 41722
+        },
+           {
+            "name": "resources/duochongjiantou.mesh.bin",
+            "length": 41722
+        },
+           {
+            "name": "resources/q_nois01a.png",
+            "length": 41722
+        },
+        {
+            "name": "resources/E_glow001.png",
+            "length": 41722
+        },
+        {
+            "name": "fx_ss_female@attack_02.effect.json",
+            "length": 41722
+        }
+    ]
+}

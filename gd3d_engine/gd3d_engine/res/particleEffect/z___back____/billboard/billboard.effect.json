@@ -1,0 +1,21 @@
+{
+  "files": {
+    "emission": "billboard_emission.json",
+    "material": "billboard_material.json",
+    "particle": "billboard_particlelist.json"
+  },
+  "dependImg": [
+    "billboard.png",
+	"rock256.png"
+  ],
+  "effectsystem": {
+    "name": "billboard",
+    "particlelist": [
+      {
+        "emission": "fazhen",
+        "material": "fazhen",
+        "particle": "fazhen"
+      }
+    ]
+  }
+}

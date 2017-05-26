@@ -1,0 +1,15 @@
+{
+    "layer": "transparent",
+    "passes": {
+        "base": [
+            {
+                "showface": "cw",
+                "vs": "light3",
+                "fs": "light3"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}

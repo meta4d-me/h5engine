@@ -1,0 +1,15 @@
+{
+    "layer": "transparent",
+    "passes": {
+        "base": [
+            {
+                "showface": "cw",
+                "vs": "speculartexture",
+                "fs": "speculartexture"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}

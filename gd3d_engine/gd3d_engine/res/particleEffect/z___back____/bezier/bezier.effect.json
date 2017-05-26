@@ -1,0 +1,22 @@
+{
+  "files": {
+    "emission": "z_bezier_emission.json",
+    "material": "z_bezier_material.json",
+    "particle": "z_bezier_particlelist.json"
+  },
+  "dependImg": [
+    "dajiguang_1.png"
+  ],
+  "effectsystem": 
+  {
+    "name": "z_bezier",
+    "particlelist": [
+      {
+        "emission": "suduxian",
+        "material": "suduxian",
+        "particle": "suduxian"
+      }
+      
+    ]
+  }
+}

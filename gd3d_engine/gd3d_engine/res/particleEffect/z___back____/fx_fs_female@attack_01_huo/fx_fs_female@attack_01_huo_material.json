@@ -1,0 +1,22 @@
+[
+  {
+    "name": "huoqiu",
+    "shader": "particles_additive.shader",
+    "diffuseTexture": "huoqiu.png"
+  },
+  {
+    "name": "glow",
+    "shader": "particles_additive.shader",
+    "diffuseTexture": "arcaneTorrent_ring.png"
+  },
+   {
+    "name": "tuowei",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "d_knife106a.png"
+  },
+   {
+    "name": "tuowei2",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "tex_eff_yanhuo_00100.png"
+  }
+]

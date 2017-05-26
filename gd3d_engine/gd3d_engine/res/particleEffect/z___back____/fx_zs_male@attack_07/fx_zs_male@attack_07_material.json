@@ -1,0 +1,7 @@
+[
+  {
+    "name": "daoguang",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "daoguang_01.png"
+  }
+]

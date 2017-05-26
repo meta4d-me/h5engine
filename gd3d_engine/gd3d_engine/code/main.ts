@@ -1,0 +1,111 @@
+/// <reference path="../lib/gd3d.d.ts" />
+/// <reference path="../lib_launcher/htmlui.d.ts" />
+/// <reference path="../lib_launcher/localsave.d.ts" />
+
+interface IState
+{
+    start(app: gd3d.framework.application);
+    update(delta: number);
+}
+//需加上这个反射标记，场景才能通过名字找到这个类，并自动创建他
+@gd3d.reflect.userCode
+class main implements gd3d.framework.IUserCode
+{
+    app: gd3d.framework.application;
+    state: IState;
+    onStart(app: gd3d.framework.application)
+    {
+
+        console.log("i am here.");
+        this.app = app;
+
+        // this.addBtn("test_01", () => new test_01());//最早是做加载测试。现在已经没价值了
+        this.addBtn("show_effect_main", () => new effectshow.test_effectmain());
+        this.addBtn("test_ui", () => new t.test_ui());
+        this.addBtn("test_load", () => new test_load());
+        this.addBtn("test_loadimmediate", () => new testloadImmediate());
+        this.addBtn("test_loadprefab", () => new test_loadprefab());
+        this.addBtn("test_loadScene", () => new test_loadScene());
+        this.addBtn("test_pick", () => new test_pick());
+        this.addBtn("test_effect_1", () => new test_effect_1());
+
+        this.addBtn("test_anim", () => new test_anim());
+        this.addBtn("test_multipleplayer_anim", () => new test_multipleplayer_anim());
+        this.addBtn("test_reload", () => new testReload());
+        this.addBtn("test_uvroll", () => new t.test_uvroll());
+
+        this.addBtn("test_light1", () => new t.test_light1());
+        this.addBtn("test_light_d1", () => new t.light_d1());
+
+        this.addBtn("test_changeshader", () => new t.test_changeshader());
+        this.addBtn("test_normalmap", () => new t.Test_NormalMap());
+        this.addBtn("test_assestmgr", () => new test_assestmgr());
+
+        this.addBtn("test_posteffect", () => new t.test_posteffect());
+        this.addBtn("test_streamlight", () => new test_streamlight());
+
+        this.addBtn("test_trailRender", () => new t.test_trailrender());
+        this.addBtn("test_rendertexture", () => new t.test_rendertexture());
+        this.addBtn("test_sound", () => new t.test_sound());
+        this.addBtn("test_cleardepth", () => new t.test_clearDepth0());
+        this.addBtn("test_fakepbr", () => new test_fakepbr());
+        this.addBtn("test_metalModel", () => new t.test_metal());
+        this.addBtn("test_tank", () => new demo.TankGame());
+
+        this.addBtn("test_lookAt", () => new t.TestRotate());
+        this.addBtn("test_skillsystem", () => new t.test_skillsystem());
+        this.addBtn("test_LevelUpWithRoleMove", () => new t.test_LevelUpWithRoleMove());
+        this.addBtn("test_integratedsystem", () => new test_integratedsystem());
+        this.addBtn("test_integratedrender", () => new t.test_integratedrender());
+        this.addBtn("test_blend", () => new t.test_blend());
+        
+
+
+    }
+    private x: number = 0;
+    private y: number = 100;
+    private btns: HTMLButtonElement[] = [];
+    private addBtn(text: string, act: () => IState)
+    {
+        var btn = document.createElement("button");
+        this.btns.push(btn);
+        btn.textContent = text;
+        btn.onclick = () =>
+        {
+            this.clearBtn();
+            this.state = act();
+            this.state.start(this.app);
+        }
+        btn.style.top = this.y + "px";
+        btn.style.left = this.x + "px";
+        if (this.y + 24 > 400)
+        {
+            this.y = 100;
+            this.x += 200;
+        }
+        else
+        {
+            this.y += 24;
+        }
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+
+    }
+    private clearBtn()
+    {
+        for (var i = 0; i < this.btns.length; i++)
+        {
+            this.app.container.removeChild(this.btns[i]);
+        }
+        this.btns.length = 0;
+    }
+    onUpdate(delta: number)
+    {
+        if (this.state != null)
+            this.state.update(delta);
+    }
+    isClosed(): boolean
+    {
+        return false;
+    }
+}

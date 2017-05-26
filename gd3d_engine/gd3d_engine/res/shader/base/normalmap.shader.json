@@ -1,0 +1,15 @@
+{
+	"layer": "transparent",
+	"passes": {
+		"base": [
+			{
+				"showface": "all",
+				"vs": "normalmap",
+				"fs": "normalmap"
+			}
+		],
+		"shadowgen": [],
+		"bone": [],
+		"shadowuse": []
+	}
+}

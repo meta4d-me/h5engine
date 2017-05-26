@@ -1,0 +1,26 @@
+[
+  {
+    "name": "emission1",
+    "type": "burst",
+    "time": 0,
+    "count": 3
+  },
+  {
+    "name": "emission2",
+    "type": "burst",
+    "time": 0,
+    "count": 2
+  },
+  {
+    "name": "emission3",
+    "type": "timespace",
+    "time": 0.2,
+    "count": 13
+  },
+  {
+    "name": "emission4",
+    "type": "timespace",
+    "time": 0.23,
+    "count": 10
+  }
+]

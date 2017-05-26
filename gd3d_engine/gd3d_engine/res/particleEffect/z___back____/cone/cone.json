@@ -1,0 +1,21 @@
+{
+  "files": {
+    "emission": "fx_zs_male@attack_04_emission.json",
+    "material": "fx_zs_male@attack_04_material.json",
+    "particle": "fx_zs_male@attack_04_particlelist.json"
+  },
+  "dependImg": [
+    "dajiguang_1.png"
+  ],
+  "effectsystem": 
+  {
+    "name": "fx_zs_male@attack_04",
+    "particlelist": [
+      {
+        "emission": "suduxian",
+        "material": "suduxian",
+        "particle": "suduxian"
+      }
+    ]
+  }
+}

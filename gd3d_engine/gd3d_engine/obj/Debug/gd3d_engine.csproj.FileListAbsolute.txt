@@ -1,0 +1,6 @@
+C:\Users\赵丹\Desktop\gd3d_engine\gd3d_engine\bin\gd3d_engine.dll.config
+C:\Users\赵丹\Desktop\gd3d_engine\gd3d_engine\bin\gd3d_engine.dll
+C:\Users\赵丹\Desktop\gd3d_engine\gd3d_engine\bin\gd3d_engine.pdb
+C:\Users\赵丹\Desktop\gd3d_engine\gd3d_engine\obj\Debug\gd3d_engine.csprojResolveAssemblyReference.cache
+C:\Users\赵丹\Desktop\gd3d_engine\gd3d_engine\obj\Debug\gd3d_engine.dll
+C:\Users\赵丹\Desktop\gd3d_engine\gd3d_engine\obj\Debug\gd3d_engine.pdb

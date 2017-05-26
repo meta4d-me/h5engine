@@ -1,0 +1,45 @@
+{
+  "files": {
+    "emission": "fx_shuijing_cj_emission.json",
+    "material": "fx_shuijing_cj_material.json",
+    "particle": "fx_shuijing_cj_particlelist.json"
+  },
+  "dependImg": [
+    "E_glow001.png",
+    "c_point077a.png",
+    "c_point03a.png",
+    "028_guangyun.png",
+    "arcaneTorrent_ring.png"
+  ],
+  "effectsystem": {
+    "name": "fx_shuijing_cj",
+    "particlelist": [
+      {
+        "emission": "glow",
+        "material": "glow",
+        "particle": "glow"
+      },
+      {
+        "emission": "glow",
+        "material": "glow",
+        "particle": "glow2"
+      },
+      {
+        "emission": "xiru",
+        "material": "xiru",
+        "particle": "xiru"
+      },
+      {
+        "emission": "kuosan",
+        "material": "kuosan",
+        "particle": "kuosan"
+      },
+      {
+        "emission": "kuosan2",
+        "material": "kuosan2",
+        "particle": "kuosan2"
+      }
+    
+    ]
+  }
+}

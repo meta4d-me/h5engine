@@ -1,0 +1,16 @@
+{
+    "layer": "geometry",
+    "properties": [],
+    "passes": {
+        "base": [
+            {
+                "showface": "ccw",
+                "vs": "uvroll",
+                "fs": "uvroll"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}
