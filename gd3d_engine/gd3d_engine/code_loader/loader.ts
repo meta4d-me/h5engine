@@ -1,4 +1,4 @@
-/// <reference path="../lib_launcher/plugineditor.d.ts" />
+/// <reference path="../lib/gd3d_jsloader.d.ts" />
 ///<reference path="../lib_user/app.d.ts" />
 window.onload = () =>
 {
@@ -6,7 +6,6 @@ window.onload = () =>
     //gd system lib
     gd3d.jsLoader.instance().addImportScript("lib/Reflect.js"); //微软反射库
     gd3d.jsLoader.instance().addImportScript("lib/gd3d.js");
-    gd3d.jsLoader.instance().addImportScript("lib_launcher/plugineditor.js");
 
 
     //user code
@@ -57,14 +56,8 @@ window.onload = () =>
             gdapp.start(div);
             gdapp.showFps();
             gdapp.bePlay = true;
-            let type = gd3d.editor.getQueryStringByName("type");
-            let classname = "main";
-            if(type == "1")
-            {
-                //effecteditor
-                classname = "effecteditor";
-            }
-            gdapp.addUserCode(classname);
+            gdapp.addUserCode("main");
+            
         }
         ,
         //进度变化

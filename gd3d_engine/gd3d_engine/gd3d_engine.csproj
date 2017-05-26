@@ -419,21 +419,14 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="code\controller\cameracontroller.ts" />
-    <TypeScriptCompile Include="code\effecteditor.ts" />
-    <TypeScriptCompile Include="code\effect_main.ts" />
     <TypeScriptCompile Include="code\light_d1.ts" />
     <TypeScriptCompile Include="code\main.ts" />
-    <TypeScriptCompile Include="code\teseffect_2_tlevelupwithrolemove.ts" />
     <TypeScriptCompile Include="code\test1.ts" />
     <TypeScriptCompile Include="code\testanim.ts" />
     <TypeScriptCompile Include="code\testassestmgr.ts" />
     <TypeScriptCompile Include="code\testchangeshader.ts" />
     <TypeScriptCompile Include="code\testcleardepth0.ts" />
-    <TypeScriptCompile Include="code\testeffect.ts" />
-    <TypeScriptCompile Include="code\testeffecteditor.ts" />
-    <TypeScriptCompile Include="code\testeffect_1.ts" />
     <TypeScriptCompile Include="code\testintegratedrender.ts" />
-    <TypeScriptCompile Include="code\testintegratedsystem .ts" />
     <TypeScriptCompile Include="code\testlight1.ts" />
     <TypeScriptCompile Include="code\testloadimmediate.ts" />
     <TypeScriptCompile Include="code\testLoadScene.ts" />

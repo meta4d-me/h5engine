@@ -2,7 +2,6 @@ window.onload = function () {
     console.log("version 0001");
     gd3d.jsLoader.instance().addImportScript("lib/Reflect.js");
     gd3d.jsLoader.instance().addImportScript("lib/gd3d.js");
-    gd3d.jsLoader.instance().addImportScript("lib_launcher/plugineditor.js");
     gd3d.jsLoader.instance().addImportScript("lib_user/app.js");
     document.body.style.msUserSelect = "none";
     document.body.style.webkitUserSelect = "none";
@@ -34,12 +33,7 @@ window.onload = function () {
         gdapp.start(div);
         gdapp.showFps();
         gdapp.bePlay = true;
-        var type = gd3d.editor.getQueryStringByName("type");
-        var classname = "main";
-        if (type == "1") {
-            classname = "effecteditor";
-        }
-        gdapp.addUserCode(classname);
+        gdapp.addUserCode("main");
     }, function (total, left) {
         loadtxt.textContent = "total js file:" + total + "  还剩多少个:" + left;
     });

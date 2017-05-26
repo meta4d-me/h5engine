@@ -1,4 +1,5 @@
-﻿namespace t
+﻿/// <reference path="../lib/gd3d.d.ts" />
+namespace t
 {
     export class test_uvroll implements IState
     {

@@ -1,6 +1,4 @@
 /// <reference path="../lib/gd3d.d.ts" />
-/// <reference path="../lib_launcher/htmlui.d.ts" />
-/// <reference path="../lib_launcher/localsave.d.ts" />
 
 interface IState
 {
@@ -20,14 +18,12 @@ class main implements gd3d.framework.IUserCode
         this.app = app;
 
         // this.addBtn("test_01", () => new test_01());//最早是做加载测试。现在已经没价值了
-        this.addBtn("show_effect_main", () => new effectshow.test_effectmain());
         this.addBtn("test_ui", () => new t.test_ui());
         this.addBtn("test_load", () => new test_load());
         this.addBtn("test_loadimmediate", () => new testloadImmediate());
         this.addBtn("test_loadprefab", () => new test_loadprefab());
         this.addBtn("test_loadScene", () => new test_loadScene());
         this.addBtn("test_pick", () => new test_pick());
-        this.addBtn("test_effect_1", () => new test_effect_1());
 
         this.addBtn("test_anim", () => new test_anim());
         this.addBtn("test_multipleplayer_anim", () => new test_multipleplayer_anim());
@@ -54,8 +50,6 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("test_lookAt", () => new t.TestRotate());
         this.addBtn("test_skillsystem", () => new t.test_skillsystem());
-        this.addBtn("test_LevelUpWithRoleMove", () => new t.test_LevelUpWithRoleMove());
-        this.addBtn("test_integratedsystem", () => new test_integratedsystem());
         this.addBtn("test_integratedrender", () => new t.test_integratedrender());
         this.addBtn("test_blend", () => new t.test_blend());
         
