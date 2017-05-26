@@ -7,6 +7,6 @@
     "removeComments": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outFile": "../lib/gd3d.js"
+    "outFile": "../../lib/gd3d.js"
   }
 }

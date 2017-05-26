@@ -163,6 +163,9 @@ namespace gd3d.framework
                     case "breath":
                         action = new BreathAction();
                         break;
+                    case "uvroll":
+                        action = new UVRollAction();
+                        break;
                 }
                 action.init(actiondata.startFrame, actiondata.endFrame, actiondata.params, this);
                 this.actions.push(action);
@@ -191,6 +194,9 @@ namespace gd3d.framework
 
         private updateElementRotation() 
         {
+
+
+
             let cameraTransform = gd3d.framework.sceneMgr.app.getScene().mainCamera.gameObject.transform;
             let worldRotation = gd3d.math.pool.new_quaternion();
 
@@ -200,9 +206,9 @@ namespace gd3d.framework
                 let worldTranslation = gd3d.math.pool.new_vector3();
                 let translation = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(this.curAttrData.pos, translation);
-                if (this.gameobject.parent != undefined)
+                if (this.gameobject != undefined)
                 {
-                    gd3d.math.matrixTransformVector3(translation, this.gameobject.parent.getWorldMatrix(), worldTranslation);
+                    gd3d.math.matrixTransformVector3(translation, this.gameobject.getWorldMatrix(), worldTranslation);
                 }
                 if (this.curAttrData.renderModel == RenderModel.BillBoard) 
                 {
@@ -225,18 +231,41 @@ namespace gd3d.framework
                 }
                 else if (this.curAttrData.renderModel == RenderModel.StretchedBillBoard) 
                 {
-                    let rightTarget = gd3d.math.pool.new_vector3();
-                    gd3d.math.vec3Clone(cameraTransform.getWorldTranslate(), rightTarget);
-                    rightTarget.x = worldTranslation.x;
-                    gd3d.math.quatLookat(worldTranslation, rightTarget, worldRotation);
-                    gd3d.math.pool.delete_vector3(rightTarget);
 
+                    gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
+
+                    gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+
+                    let lookRot = new gd3d.math.quaternion();
+                    gd3d.math.quatClone(this.gameobject.getWorldRotate(), invTransformRotation);
+                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
+
+                    let inverRot = gd3d.math.pool.new_quaternion();
+                    gd3d.math.quatInverse(this.curAttrData.localRotation, inverRot);
+                    gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
+
+                    let angle = gd3d.math.pool.new_vector3();
+                    gd3d.math.quatToEulerAngles(lookRot, angle);
+                    gd3d.math.quatFromEulerAngles(0, angle.y, 0, lookRot);
+                    gd3d.math.quatMultiply(this.curAttrData.localRotation, lookRot, this.curAttrData.localRotation);
+
+                    gd3d.math.pool.delete_quaternion(inverRot);
+                    gd3d.math.pool.delete_vector3(angle);
+                    gd3d.math.pool.delete_quaternion(lookRot);
+                    return;
+                }else if(this.curAttrData.renderModel == RenderModel.Mesh)
+                {
+                    {
+                        EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    }
                 }
                 gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, worldRotation);
                 //消除transform组件对粒子本身的影响
-                gd3d.math.quatClone(this.gameobject.parent.gameObject.transform.getWorldRotate(), invTransformRotation);
+                gd3d.math.quatClone(this.gameobject.gameObject.transform.getWorldRotate(), invTransformRotation);
                 gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                 gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.curAttrData.localRotation);
+
                 gd3d.math.pool.delete_vector3(translation);
                 gd3d.math.pool.delete_vector3(worldTranslation);
                 gd3d.math.pool.delete_quaternion(invTransformRotation);

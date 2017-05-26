@@ -52,10 +52,10 @@
         }
         apply(trans: transform)
         {
-            if (this.trans)
-            {
-                this.trans.dispose();
-            }
+            // if (this.trans)
+            // {
+            //     this.trans.dispose();
+            // }
             this.trans = trans;
         }
         jsonstr: string;

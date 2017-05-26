@@ -736,7 +736,8 @@ namespace gd3d.framework
                     img.onload = () =>
                     {
                         var _texture = new texture(filename);
-                        this.assetUrlDic[_texture.getGUID()] = _textureSrc;
+                        _texture.realName = _name;
+                        this.assetUrlDic[_texture.getGUID()] = url;
 
                         var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
                         t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
