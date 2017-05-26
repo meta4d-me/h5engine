@@ -7488,12 +7488,16 @@ var gd3d;
             };
             effectSystem.prototype.updateEffectBatcher = function (effectBatcher, curAttrsData, initFrameData, vertexStartIndex) {
                 var mesh = curAttrsData.mesh;
-                if (mesh == undefined)
+                if (mesh == undefined) {
                     mesh = initFrameData.attrsData.mesh;
+                }
                 if (mesh == undefined)
                     return;
+                if (curAttrsData.meshdataVbo == undefined) {
+                    curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
+                }
                 var vertexCount = mesh.data.pos.length;
-                var vertexArr = mesh.data.genVertexDataArray(this.vf);
+                var vertexArr = curAttrsData.meshdataVbo;
                 var vertexSize = effectBatcher.vertexSize;
                 for (var i = 0; i < vertexCount; i++) {
                     {
@@ -7518,7 +7522,7 @@ var gd3d;
                             b = gd3d.math.floatClamp(curAttrsData.color.z, 0, 1);
                         }
                         if (curAttrsData.alpha != undefined)
-                            a = gd3d.math.floatClamp(curAttrsData.alpha, 0, 1);
+                            a = gd3d.math.floatClamp(curAttrsData.alpha * a, 0, 1);
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
@@ -7697,7 +7701,7 @@ var gd3d;
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(element.curAttrData.alpha, 0, 1);
+                        var a = gd3d.math.floatClamp(vertexArr[i_3 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
                         subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 9] = r;
                         subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 10] = g;
                         subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 11] = b;
@@ -12943,6 +12947,8 @@ var gd3d;
                     data.rotationByEuler = gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                 if (this.localRotation != undefined)
                     data.localRotation = gd3d.math.pool.clone_quaternion(this.localRotation);
+                if (this.meshdataVbo != undefined)
+                    data.meshdataVbo = this.meshdataVbo;
                 data.alpha = this.alpha;
                 data.renderModel = this.renderModel;
                 data.mesh = this.mesh;
@@ -18068,6 +18074,15 @@ var gd3d;
             };
             obb.prototype.extentsOverlap = function (min0, max0, min1, max1) {
                 return !(min0 > max1 || min1 > max0);
+            };
+            obb.prototype.clone = function () {
+                var _obb = new obb();
+                _obb.center = gd3d.math.pool.clone_vector3(this.center);
+                _obb.halfsize = this.halfsize;
+                for (var key in this.directions) {
+                    _obb.directions[key] = gd3d.math.pool.clone_vector3(this.directions[key]);
+                }
+                return _obb;
             };
             obb.prototype.dispose = function () {
                 this.vectors.length = 0;

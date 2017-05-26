@@ -179,11 +179,17 @@ namespace gd3d.framework
         {
             let mesh = curAttrsData.mesh;
             if (mesh == undefined)
+            {
                 mesh = initFrameData.attrsData.mesh;
+            }
             if (mesh == undefined)
                 return;
+            if(curAttrsData.meshdataVbo == undefined)
+            {
+                curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
+            }
             let vertexCount = mesh.data.pos.length;//顶点数量
-            let vertexArr = mesh.data.genVertexDataArray(this.vf);
+            let vertexArr = curAttrsData.meshdataVbo;
             let vertexSize = effectBatcher.vertexSize;
             for (let i = 0; i < vertexCount; i++)
             {
@@ -214,7 +220,7 @@ namespace gd3d.framework
                         b = math.floatClamp(curAttrsData.color.z, 0, 1);
                     }
                     if (curAttrsData.alpha != undefined)
-                        a = math.floatClamp(curAttrsData.alpha, 0, 1);
+                        a = math.floatClamp(curAttrsData.alpha * a, 0, 1);//配置的alpha作为整体的百分比使用 源alpha依然是具体顶点的
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
@@ -467,7 +473,7 @@ namespace gd3d.framework
                     let r = math.floatClamp(element.curAttrData.color.x, 0, 1);
                     let g = math.floatClamp(element.curAttrData.color.y, 0, 1);
                     let b = math.floatClamp(element.curAttrData.color.z, 0, 1);
-                    let a = math.floatClamp(element.curAttrData.alpha, 0, 1);
+                    let a = math.floatClamp(vertexArr[i * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
 
 
                     subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;

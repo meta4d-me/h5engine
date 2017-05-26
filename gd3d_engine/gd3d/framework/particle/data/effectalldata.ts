@@ -388,6 +388,7 @@ namespace gd3d.framework
          */
         public localRotation: math.quaternion = new math.quaternion();
         public mesh: mesh;
+        public meshdataVbo:Float32Array;
 
         // public localAxisX:gd3d.math.vector3 = new gd3d.math.vector3(1,0,0);
         // public localAxisY:gd3d.math.vector3 = new gd3d.math.vector3(0,1,0);
@@ -509,6 +510,8 @@ namespace gd3d.framework
                 data.rotationByEuler = math.pool.clone_quaternion(this.rotationByEuler);
             if (this.localRotation != undefined)
                 data.localRotation = math.pool.clone_quaternion(this.localRotation);
+            if(this.meshdataVbo != undefined)
+                data.meshdataVbo = this.meshdataVbo;//这个数组不会被改变，可以直接引用
             // if (this.startRotation != undefined)
             //     data.startRotation = math.pool.clone_quaternion(this.startRotation);
             // if (this.localAxisX != undefined)

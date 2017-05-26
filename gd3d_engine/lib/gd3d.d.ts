@@ -1962,6 +1962,7 @@ declare namespace gd3d.framework {
         startRotation: math.quaternion;
         localRotation: math.quaternion;
         mesh: mesh;
+        meshdataVbo: Float32Array;
         setLerpAttribute(attribute: string, val: any): void;
         getAttribute(attribute: string): any;
         initAttribute(attribute: string): void;
@@ -2967,6 +2968,7 @@ declare namespace gd3d.framework {
         computeBoxExtents(axis: gd3d.math.vector3, box: obb): math.vector3;
         axisOverlap(axis: gd3d.math.vector3, box0: obb, box1: obb): boolean;
         extentsOverlap(min0: number, max0: number, min1: number, max1: number): boolean;
+        clone(): obb;
         dispose(): void;
     }
 }
