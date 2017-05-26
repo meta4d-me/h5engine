@@ -208,6 +208,10 @@ namespace gd3d.reflect
     {
         regType(constructorObj.prototype, { "boxcollider": "1" });
     }
+    export function nodeSphereCollider(constructorObj: any)
+    {
+        regType(constructorObj.prototype, { "spherecollider": "1" });
+    }
     export function nodeEffectBatcher(constructorObj: any)
     {
         regType(constructorObj.prototype, { "effectbatcher": "1" });
