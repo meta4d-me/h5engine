@@ -163,6 +163,18 @@
         {
             return !(min0 > max1 || min1 > max0);
         }
+
+        clone():obb
+        {
+            let _obb = new obb();
+            _obb.center = math.pool.clone_vector3(this.center);
+            _obb.halfsize = this.halfsize;
+            for(let key in this.directions)
+            {
+                 _obb.directions[key] = math.pool.clone_vector3(this.directions[key]);
+            }
+            return _obb;
+        }
         dispose()
         {
             this.vectors.length = 0;

@@ -322,6 +322,12 @@
         out.rawData[2] = 0.0; out.rawData[3] = 1.0;
         out.rawData[4] = x; out.rawData[5] = y;
     }
+    export function matrixGetScale(src:matrix, scale:vector3):void
+    {
+        scale.x = src.rawData[0];
+        scale.y = src.rawData[5];
+        scale.z = src.rawData[10];
+    }
     export function matrixMakeScale(xScale: number, yScale: number, zScale: number, out: matrix): void
     {
 
