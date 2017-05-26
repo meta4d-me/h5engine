@@ -164,7 +164,7 @@ namespace gd3d.framework {
 
         render(context: renderContext, assetmgr: assetMgr, camera: camera) {
             if (this.notRender) return;
-
+            this.layer = this.material.getLayer();
             context.updateModeTrail();
             //this.mesh.glMesh.uploadIndexSubData(this.webgl, 0, this.dataForEbo);
             this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
