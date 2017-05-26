@@ -596,6 +596,10 @@ namespace gd3d.framework
                     gd3d.math.pool.delete_quaternion(lookRot);
                     return;
                 }
+                else if (this.renderModel == RenderModel.Mesh) 
+                {
+                        EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                }
                 gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);
                 //消除transform组件对粒子本身的影响
                 gd3d.math.quatClone(this.gameObject.transform.getWorldRotate(), invTransformRotation);
