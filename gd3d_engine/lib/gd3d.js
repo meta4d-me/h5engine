@@ -9632,23 +9632,26 @@ var gd3d;
                 else {
                     var isreference = false;
                     var insid = -1;
+                    var instance = void 0;
                     if ((isArray_1 && instanceParent["__gdmeta__"] && instanceParent["__gdmeta__"]["class"] && instanceParent["__gdmeta__"]["class"]["custom"] && (instanceParent["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceParent["__gdmeta__"]["class"]["custom"]["2dcomp"])) ||
                         (!isArray_1 && instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"] && instanceObj["__gdmeta__"]["class"]["custom"] && (instanceObj["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceObj["__gdmeta__"]["class"]["custom"]["2dcomp"]))) {
                         if (_meta["class"]["custom"]["nodecomp"]) {
                             insid = instanceObj[key]["gameObject"]["transform"]["insId"].getInsID();
                             isreference = true;
+                            instance = io.referenceInfo.oldmap[insid].gameObject.getComponent(type);
                         }
                         else if (_meta["class"]["custom"]["2dcomp"]) {
                             insid = instanceObj[key]["transform"]["insId"].getInsID();
                             isreference = true;
+                            instance = io.referenceInfo.oldmap[insid].getComponent(type);
                         }
                         else if (type == "transform" || type == "transform2D") {
                             insid = instanceObj[key]["insId"].getInsID();
                             isreference = true;
+                            instance = io.referenceInfo.oldmap[insid];
                         }
                     }
                     if (isreference) {
-                        var instance = io.referenceInfo.oldmap[insid];
                         if (isArray_1) {
                             clonedObj.push(instance);
                         }
@@ -9690,8 +9693,8 @@ var gd3d;
                 }
                 else if (instanceObj["__gdmeta__"]["class"]["typename"] == "transform" || instanceObj["__gdmeta__"]["class"]["typename"] == "transform2D") {
                     insid = instanceObj["insId"].getInsID();
+                    io.referenceInfo.oldmap[insid] = clonedObj;
                 }
-                io.referenceInfo.oldmap[insid] = clonedObj;
             }
             for (var key in instanceObj["__gdmeta__"]) {
                 var t = instanceObj["__gdmeta__"][key];
@@ -10527,10 +10530,6 @@ var gd3d;
             }
             else {
                 if (serializedObj[key].parse == "reference") {
-                    if (_isArray) {
-                    }
-                    else {
-                    }
                 }
                 else {
                     var _newInstance = void 0;

@@ -110,6 +110,7 @@ namespace gd3d.io
             {
                 let isreference = false;
                 let insid = -1;
+                let instance;
                 if ((isArray && instanceParent["__gdmeta__"] && instanceParent["__gdmeta__"]["class"] && instanceParent["__gdmeta__"]["class"]["custom"] && (instanceParent["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceParent["__gdmeta__"]["class"]["custom"]["2dcomp"])) ||
                     (!isArray && instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"] && instanceObj["__gdmeta__"]["class"]["custom"] && (instanceObj["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceObj["__gdmeta__"]["class"]["custom"]["2dcomp"])))
                 {
@@ -119,22 +120,24 @@ namespace gd3d.io
                         //属性是组件
                         insid = instanceObj[key]["gameObject"]["transform"]["insId"].getInsID();
                         isreference = true;
+                        instance = referenceInfo.oldmap[insid].gameObject.getComponent(type);
                     }
                     else if (_meta["class"]["custom"]["2dcomp"])
                     {
                         insid = instanceObj[key]["transform"]["insId"].getInsID();
                         isreference = true;
+                        instance = referenceInfo.oldmap[insid].getComponent(type);
                     }
                     else if (type == "transform" || type == "transform2D")
                     {
                         //属性是tranform
                         insid = instanceObj[key]["insId"].getInsID();
                         isreference = true;
+                        instance = referenceInfo.oldmap[insid];
                     }
                 }
                 if (isreference)
                 {
-                    let instance = referenceInfo.oldmap[insid];
                     if (isArray)
                     {
                         clonedObj.push(instance);
@@ -191,8 +194,8 @@ namespace gd3d.io
             else if (instanceObj["__gdmeta__"]["class"]["typename"] == "transform" || instanceObj["__gdmeta__"]["class"]["typename"] == "transform2D")
             {
                 insid = instanceObj["insId"].getInsID();
+                referenceInfo.oldmap[insid] = clonedObj;
             }
-            referenceInfo.oldmap[insid] = clonedObj;
         }
         for (let key in instanceObj["__gdmeta__"])
         {

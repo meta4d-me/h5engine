@@ -852,15 +852,7 @@ namespace gd3d.io
         {
             if (serializedObj[key].parse == "reference")
             {
-                if (_isArray)
-                {
-                    //instanceObj.push(new referenceInfo(serializedObj[key].value));
-                }
-                else
-                {
-                    // instanceObj[key] = new referenceInfo(serializedObj[key].value);
-                    // referenceInfo.map[serializedObj[key].value] = instanceObj[key];
-                }
+                
             }
             else
             {
