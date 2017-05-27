@@ -7529,8 +7529,8 @@ var gd3d;
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 12] = a;
                     }
                     {
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] / curAttrsData.tilling.x + curAttrsData.uv.x;
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] / curAttrsData.tilling.y + curAttrsData.uv.y;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * curAttrsData.tilling.x + curAttrsData.uv.x;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * curAttrsData.tilling.y + curAttrsData.uv.y;
                     }
                 }
             };
@@ -14102,8 +14102,8 @@ var gd3d;
                     this.spriteIndex %= (this.colum * this.row);
                     this.elements.curAttrData.uv.x = (this.spriteIndex % this.colum) / this.colum;
                     this.elements.curAttrData.uv.y = Math.floor((this.spriteIndex / this.colum)) / this.row;
-                    this.elements.curAttrData.tilling.x = this.colum;
-                    this.elements.curAttrData.tilling.y = this.row;
+                    this.elements.curAttrData.tilling.x = 1 / this.colum;
+                    this.elements.curAttrData.tilling.y = 1 / this.row;
                 }
             };
             return UVSpriteAnimationAction;

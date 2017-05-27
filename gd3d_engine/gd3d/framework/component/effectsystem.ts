@@ -228,8 +228,8 @@ namespace gd3d.framework
                 }
                 {
                     //uv
-                    effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] / curAttrsData.tilling.x + curAttrsData.uv.x;
-                    effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] / curAttrsData.tilling.y + curAttrsData.uv.y;
+                    effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * curAttrsData.tilling.x + curAttrsData.uv.x;
+                    effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * curAttrsData.tilling.y + curAttrsData.uv.y;
                     // console.log(effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] + "   " + effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14]);
                 }
             }

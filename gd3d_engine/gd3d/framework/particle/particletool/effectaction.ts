@@ -242,8 +242,8 @@ namespace gd3d.framework
                 this.spriteIndex %= (this.colum * this.row);
                 this.elements.curAttrData.uv.x = (this.spriteIndex % this.colum) / this.colum;
                 this.elements.curAttrData.uv.y = Math.floor((this.spriteIndex / this.colum)) / this.row;
-                this.elements.curAttrData.tilling.x = this.colum;
-                this.elements.curAttrData.tilling.y = this.row;
+                this.elements.curAttrData.tilling.x = 1 / this.colum;
+                this.elements.curAttrData.tilling.y = 1 / this.row;
             }
         }
     }
