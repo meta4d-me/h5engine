@@ -492,7 +492,6 @@
     <TypeScriptCompile Include="gd3d\framework\component\particlesystem.ts" />
     <TypeScriptCompile Include="gd3d\framework\component\skinnedmeshrenderer.ts" />
     <TypeScriptCompile Include="gd3d\framework\component\trailrender.ts" />
-    <TypeScriptCompile Include="gd3d\framework\component\trailrender2.ts" />
     <TypeScriptCompile Include="gd3d\framework\input\inputmgr.ts" />
     <TypeScriptCompile Include="gd3d\framework\io\binBuffer.ts" />
     <TypeScriptCompile Include="gd3d\framework\io\clone.ts" />

@@ -1825,7 +1825,7 @@ var t;
             });
         };
         test_integratedrender.prototype.loadText = function (laststate, state) {
-            this.app.getAssetMgr().load("res/trailtest_yellow.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            this.app.getAssetMgr().load("res/trailtest2_00000.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     state.finish = true;
                 }
@@ -1935,10 +1935,10 @@ var t;
                     gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 90, trailtrans.localRotate);
                     trailtrans.markDirty();
                     var trailrender = trailtrans.gameObject.addComponent("trailRender");
-                    trailrender.speed = 1;
+                    trailrender.setWidth(1);
                     var mat = new gd3d.framework.material();
-                    var shader = this.app.getAssetMgr().getShader("transparent-diffuse.shader.json");
-                    var tex = this.app.getAssetMgr().getAssetByName("trailtest_yellow.png");
+                    var shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json");
+                    var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json");
                     mat.setShader(shader);
                     mat.setTexture("_MainTex", tex);
                     trailrender.material = mat;
@@ -1968,7 +1968,7 @@ var t;
             {
                 var btn2 = this.addbtn("160px", "0px", "playAttackAni");
                 btn2.onclick = function () {
-                    var name = "attack_01.FBAni.aniclip.bin";
+                    var name = "attack_04.FBAni.aniclip.bin";
                     _this.aniplayer.playCross(name, 0.2);
                 };
             }
@@ -4347,7 +4347,7 @@ var t;
                 cube.addChild(trailtrans);
                 gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, 90, trailtrans.localRotate);
                 trailtrans.markDirty();
-                var trailrender = trailtrans.gameObject.addComponent("trailRender2");
+                var trailrender = trailtrans.gameObject.addComponent("trailRender");
                 var mat = new gd3d.framework.material();
                 var shader = this.app.getAssetMgr().getShader("particles_additive_premultiply.shader.json");
                 var tex = this.app.getAssetMgr().getAssetByName("trailtest2.png");

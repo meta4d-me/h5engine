@@ -271,6 +271,11 @@
         {
             "name": "shader/example/selftimer_uvroll.vs.glsl",
             "length": 0
+        },
+        {
+            "name": "shader/base/transparent_bothside.shader.json",
+            "length": 0
         }
+
     ]
 }

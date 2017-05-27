@@ -1455,13 +1455,9 @@ declare namespace gd3d.framework {
         layer: RenderLayerEnum;
         renderLayer: gd3d.framework.CullingMask;
         queue: number;
-        startWidth: number;
-        endWidth: number;
-        time: number;
-        material: gd3d.framework.material;
-        color: gd3d.math.color;
-        private trailTrans;
-        private nodes;
+        private width;
+        private _material;
+        private _color;
         private mesh;
         private vertexcount;
         private dataForVbo;
@@ -1472,45 +1468,14 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
-        private initmesh();
-        private notRender;
-        speed: number;
-        private updateTrail(curTime);
-        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        clone(): void;
-    }
-    class trailNode {
-        location: gd3d.math.vector3;
-        updir: gd3d.math.vector3;
-        time: number;
-        constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
-    }
-}
-declare namespace gd3d.framework {
-    class trailRender2 implements IRenderer {
-        layer: RenderLayerEnum;
-        renderLayer: gd3d.framework.CullingMask;
-        queue: number;
-        startWidth: number;
-        endWidth: number;
-        time: number;
         material: gd3d.framework.material;
         color: gd3d.math.color;
-        private trailTrans;
-        private nodes;
-        private mesh;
-        private dataForVbo;
-        private dataForEbo;
-        start(): void;
-        private app;
-        private webgl;
-        update(delta: number): void;
-        gameObject: gameObject;
-        remove(): void;
-        private recordTrailNode(time);
-        private notRender;
-        private updateTrail(curTime);
-        private checkBufferSize();
+        setspeed(upspeed: number, lowspeed?: number): void;
+        setWidth(Width: number): void;
+        private initmesh();
+        private speed;
+        private lowspeed;
+        private updateTrail();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
     }
