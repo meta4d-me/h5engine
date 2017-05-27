@@ -7427,6 +7427,9 @@ var gd3d;
                             this.reset();
                             this.play();
                         }
+                        else {
+                            this.stop();
+                        }
                     }
                     this._update(delta);
                 }
@@ -7576,8 +7579,8 @@ var gd3d;
                 this.state = framework.EffectPlayStateEnum.Pause;
             };
             effectSystem.prototype.stop = function () {
-                this.state = framework.EffectPlayStateEnum.Stop;
                 this.reset();
+                this.state = framework.EffectPlayStateEnum.Stop;
             };
             effectSystem.prototype.reset = function () {
                 this.state = framework.EffectPlayStateEnum.BeReady;
@@ -7708,8 +7711,8 @@ var gd3d;
                         subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 13] = element.curAttrData.uv.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 14] = element.curAttrData.uv.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 13] = vertexArr[i_3 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 14] = vertexArr[i_3 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -12843,6 +12846,7 @@ var gd3d;
         framework.EffectElementData = EffectElementData;
         var EffectAttrsData = (function () {
             function EffectAttrsData() {
+                this.uv = new gd3d.math.vector2(0, 0);
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
                 this.tilling = new gd3d.math.vector2(1, 1);
@@ -12887,8 +12891,8 @@ var gd3d;
                         return this.alpha;
                     case "color":
                         return gd3d.math.pool.clone_vector3(this.color);
-                    case "uv":
-                        return gd3d.math.pool.clone_vector2(this.uv);
+                    case "tilling":
+                        return gd3d.math.pool.clone_vector2(this.tilling);
                     case "mat":
                         return this.mat.clone();
                     case "renderModel":
@@ -12918,9 +12922,6 @@ var gd3d;
                     case "color":
                         this.color = new gd3d.math.vector3(0, 0, 0);
                         break;
-                    case "uv":
-                        this.uv = new gd3d.math.vector2(1, 1);
-                        break;
                     default:
                         console.log("不支持的属性：" + attribute);
                         break;
@@ -12940,7 +12941,7 @@ var gd3d;
                 if (this.scale != undefined)
                     data.scale = gd3d.math.pool.clone_vector3(this.scale);
                 if (this.uv != undefined)
-                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
+                    data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
                 if (this.mat != undefined)
                     data.mat = this.mat.clone();
                 if (this.rotationByEuler != undefined)
@@ -14321,8 +14322,8 @@ var gd3d;
                                     frame.attrsData.alpha = val.getValue();
                                     ;
                                 }
-                                else if (key == "uv") {
-                                    frame.attrsData.uv = val.getValue();
+                                else if (key == "tilling") {
+                                    frame.attrsData.tilling = val.getValue();
                                 }
                                 else if (key == "billboard") {
                                     frame.attrsData.renderModel = val;
@@ -14604,8 +14605,8 @@ var gd3d;
                     case "alpha":
                     case "simulationSpeed":
                         return framework.EffectUtil.parseEffectNum(content);
-                    case "uv":
-                        return framework.EffectUtil.parseEffectUVSpeed(content);
+                    case "tilling":
+                        return framework.EffectUtil.parseEffectVec2(content);
                     case "mat":
                         var mat = new framework.EffectMatData();
                         if (content != undefined) {

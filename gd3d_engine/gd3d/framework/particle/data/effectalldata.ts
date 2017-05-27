@@ -362,7 +362,7 @@ namespace gd3d.framework
         public euler: math.vector3;
         public color: math.vector3;
         public scale: math.vector3;
-        public uv: math.vector2;
+        public uv: math.vector2 = new math.vector2(0, 0);
         public alpha: number;
         public mat: EffectMatData;
         public renderModel: RenderModel = RenderModel.None;
@@ -443,8 +443,8 @@ namespace gd3d.framework
                     return this.alpha;
                 case "color":
                     return gd3d.math.pool.clone_vector3(this.color);
-                case "uv":
-                    return gd3d.math.pool.clone_vector2(this.uv);
+                case "tilling":
+                    return gd3d.math.pool.clone_vector2(this.tilling);
                 case "mat":
                     return this.mat.clone();
                 case "renderModel":
@@ -479,9 +479,6 @@ namespace gd3d.framework
                 case "color":
                     this.color = new gd3d.math.vector3(0, 0, 0);
                     break;
-                case "uv":
-                    this.uv = new gd3d.math.vector2(1, 1);
-                    break;
                 default:
                     console.log("不支持的属性：" + attribute);
                     break;
@@ -503,7 +500,7 @@ namespace gd3d.framework
             if (this.scale != undefined)
                 data.scale = math.pool.clone_vector3(this.scale);
             if (this.uv != undefined)
-                data.uv = math.pool.clone_vector2(this.uv);
+                data.tilling = math.pool.clone_vector2(this.tilling);
             if (this.mat != undefined)
                 data.mat = this.mat.clone();
             if (this.rotationByEuler != undefined)

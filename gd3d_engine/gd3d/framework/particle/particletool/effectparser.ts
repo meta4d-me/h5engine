@@ -103,7 +103,8 @@ namespace gd3d.framework
                             else if (key == "euler")
                             {
                                 frame.attrsData.euler = (val as ParticleNode).getValue();
-                            } else if (key == "mesh")
+                            } 
+                            else if (key == "mesh")
                             {
                                 frame.attrsData.mesh = val as mesh;
                             }
@@ -115,10 +116,11 @@ namespace gd3d.framework
                             {
                                 frame.attrsData.alpha = (val as ParticleNodeNumber).getValue();;
                             }
-                            else if (key == "uv")
+                            else if (key == "tilling")
                             {
-                                frame.attrsData.uv = (val as UVSpeedNode).getValue();
-                            } else if (key == "billboard")
+                                frame.attrsData.tilling = (val as ParticleNodeVec2).getValue();
+                            } 
+                            else if (key == "billboard")
                             {
                                 frame.attrsData.renderModel = val;
                             }
@@ -479,8 +481,8 @@ namespace gd3d.framework
                 case "alpha":
                 case "simulationSpeed":
                     return EffectUtil.parseEffectNum(content);
-                case "uv":
-                    return EffectUtil.parseEffectUVSpeed(content);
+                case "tilling":
+                    return EffectUtil.parseEffectVec2(content);
                 case "mat":
                     let mat = new EffectMatData();
                     if (content != undefined)

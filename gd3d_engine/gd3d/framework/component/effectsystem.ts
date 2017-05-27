@@ -67,6 +67,10 @@ namespace gd3d.framework
                         this.reset();
                         this.play();
                     }
+                    else 
+                    {
+                        this.stop();
+                    }
                 }
                 this._update(delta);
             }
@@ -309,8 +313,8 @@ namespace gd3d.framework
          */
         stop()
         {
-            this.state = EffectPlayStateEnum.Stop;
             this.reset();
+            this.state = EffectPlayStateEnum.Stop;
         }
         /**
          * 重置到初始状态
@@ -483,8 +487,8 @@ namespace gd3d.framework
 
                 }
                 {//uv
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = element.curAttrData.uv.x
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = element.curAttrData.uv.x;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * element.curAttrData.tilling.x;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * element.curAttrData.tilling.y;
                     //  this.dataForVbo[(this._vercount + i) * total + 13] = vertexArr[i * total + 13] * materialData.tiling.x + materialData.offset.x;
                     // this.dataForVbo[(this._vercount + i) * total + 14] = vertexArr[i * total + 14] * materialData.tiling.y + materialData.offset.y;
                 }
