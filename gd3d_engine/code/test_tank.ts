@@ -467,6 +467,8 @@ namespace demo
         gunRotateSpeed: gd3d.math.vector3 = new gd3d.math.vector3(0, 150, 0);
         angleLimit: number = 5;
 
+        colVisible: boolean = false;
+
         private label: HTMLDivElement;
 
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
@@ -506,7 +508,7 @@ namespace demo
                     var col = this.heroTank.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
                     col.center = new gd3d.math.vector3(0, 0.2, 0);
                     col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = true;
+                    col.colliderVisible = this.colVisible;
 
                     this.heroGun = this.heroTank.find("tank_up");
                     this.heroSlot = this.heroGun.find("slot");
@@ -531,7 +533,7 @@ namespace demo
                     var col = this.enemyTank.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
                     col.center = new gd3d.math.vector3(0, 0.2, 0);
                     col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = true;
+                    col.colliderVisible = this.colVisible;
 
                     this.enemyGun = this.enemyTank.find("tank_up");
                     this.enemySlot = this.enemyGun.find("slot");
@@ -555,7 +557,7 @@ namespace demo
                     {
                         var tran = _root.find("wall" + i);
                         var col = tran.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
-                        col.colliderVisible = true;
+                        col.colliderVisible = this.colVisible;
                         this.walls.push(tran);
                     }
 
@@ -618,28 +620,6 @@ namespace demo
 
         private addObject(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
-            // {//add a ground
-            //     let plane = new gd3d.framework.transform();
-            //     plane.name = "ground";
-            //     plane.localScale = new gd3d.math.vector3(50, 0.1, 50);
-            //     plane.localTranslate = new gd3d.math.vector3(0, -0.05, 0);
-            //     this.scene.addChild(plane);
-            //     let filter = plane.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-            //     let smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-            //     filter.mesh = smesh;
-            //     let renderer = plane.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            //     var shader = this.app.getAssetMgr().getShader("light1.shader.json");
-            //     if (shader != null)
-            //     {
-            //         renderer.materials = [];
-            //         renderer.materials.push(new gd3d.framework.material());
-            //         renderer.materials[0].setShader(shader);
-            //         let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
-            //         renderer.materials[0].setTexture("_MainTex", texture);
-            //     }
-            //     this.ground = plane;
-            //     this.ground.markDirty();
-            // }
             {//add some puppets
                 var n = 2;
                 for (var i = 0; i < n; i++)
@@ -664,7 +644,7 @@ namespace demo
                     }
                     let col = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
                     // col.size = new gd3d.math.vector3(1, 1, 1);
-                    col.colliderVisible = true;
+                    col.colliderVisible = this.colVisible;
                     cube.markDirty();
                     this.cubes.push(cube);
                 }
@@ -673,6 +653,7 @@ namespace demo
             state.finish = true;
         }
 
+        private keyMap: { [id: number]: boolean } = {};
         start(app: gd3d.framework.application)
         {
             this.label = document.getElementById("Label") as HTMLDivElement;
@@ -689,6 +670,7 @@ namespace demo
             this.taskmgr.addTaskCall(this.addObject.bind(this));
             this.taskmgr.addTaskCall(this.addJoystick.bind(this));
 
+            document.addEventListener("keydown", (e) => { this.keyMap[e.keyCode] = true; });
         }
 
         update(delta: number)
@@ -722,58 +704,35 @@ namespace demo
             this.fireTick += delta;
         }
 
-        checkTankCol(): gd3d.framework.transform
-        {
-            let col = this.heroTank.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
-            for (var i = 0; i < this.cubes.length; i++)
-            {
-                let c = this.cubes[i];
-                if (c != null && col.intersectsTransform(c))
-                {
-                    return this.cubes[i];
-                }
-            }
-            for (var i = 0; i < this.walls.length; i++)
-            {
-                let w = this.walls[i];
-                if (w != null && col.intersectsTransform(w))
-                {
-                    return this.walls[i];
-                }
-            }
-            if (this.enemyTank != null && col.intersectsTransform(this.enemyTank))
-            {
-                return this.enemyTank;
-            }
-            return null;
-        }
-
         testTankCol(tran: gd3d.framework.transform): boolean
         {
             var col = tran.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
+
             for (var i = 0; i < this.cubes.length; i++)
             {
-                let c = this.cubes[i];
-                if (c != null && col.intersectsTransform(c))
+                let c = this.cubes[i].gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
+                if (col.obb.intersects(c.obb))
                 {
                     return true;
                 }
             }
             for (var i = 0; i < this.walls.length; i++)
             {
-                let w = this.walls[i];
-                if (w != null && col.intersectsTransform(w))
+                let c = this.walls[i].gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
+                if (col.obb.intersects(c.obb))
                 {
                     return true;
                 }
             }
-            if (this.enemyTank != null && col.intersectsTransform(this.enemyTank))
+            let c = this.enemyTank.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
+            if (col.obb.intersects(c.obb))
             {
                 return true;
             }
             return false;
         }
 
+        tempTran: gd3d.framework.transform;
         tankControl(delta: number)
         {
             if (this.joystick != null)
@@ -822,23 +781,23 @@ namespace demo
                         {
                             gd3d.math.vec3Add(this.heroTank.localEulerAngles, rotateSpeed, vec);
                         }
-                        var temp = new gd3d.math.vector3();
-                        gd3d.math.vec3Clone(this.heroTank.localEulerAngles, temp);
+                        // var temp = new gd3d.math.vector3();
+                        // gd3d.math.vec3Clone(this.heroTank.localEulerAngles, temp);
                         this.heroTank.localEulerAngles = vec;
-                        if (this.checkTankCol() != null)
-                        {
-                            this.heroTank.localEulerAngles = temp;
-                        }
+                        // if (this.testTankCol(this.heroTank))
+                        // {
+                        //     this.heroTank.localEulerAngles = temp;
+                        // }
                     }
                     else
                     {
-                        var temp = new gd3d.math.vector3();
-                        gd3d.math.vec3Clone(this.heroTank.localEulerAngles, temp);
+                        // var temp = new gd3d.math.vector3();
+                        // gd3d.math.vec3Clone(this.heroTank.localEulerAngles, temp);
                         this.heroTank.localEulerAngles = targetAngle;
-                        if (this.checkTankCol() != null)
-                        {
-                            this.heroTank.localEulerAngles = temp;
-                        }
+                        // if (this.testTankCol(this.heroTank))
+                        // {
+                        //     this.heroTank.localEulerAngles = temp;
+                        // }
                     }
                     this.heroTank.markDirty();
                 }
@@ -856,62 +815,48 @@ namespace demo
                     let v = new gd3d.math.vector3();
                     this.heroTank.getForwardInWorld(v);
                     gd3d.math.vec3ScaleByNum(v, speed, v);
-                    if (goForward)
+                    if (!goForward)
                     {
-                        // gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        // var tran = this.checkTankCol();
-                        // if (tran != null)
-                        // {
-                        //     gd3d.math.vec3Subtract(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        //     var v2 = new gd3d.math.vector3();
-                        //     gd3d.math.vec3Subtract(this.heroTank.getWorldTranslate(), tran.getWorldTranslate(), v2);
-                        //     v2.y = 0;
-                        //     gd3d.math.vec3Normalize(v2, v2);
-                        //     gd3d.math.vec3ScaleByNum(v2, speed, v2);
-                        //     gd3d.math.vec3Add(this.heroTank.localTranslate, v2, this.heroTank.localTranslate);
-                        // }
-                        var tran = this.heroTank.clone();
-                        this.scene.addChild(tran);
-                        var v2 = new gd3d.math.vector3();
-                        gd3d.math.vec3ScaleByNum(v, 50, v2);
-                        gd3d.math.vec3Add(tran.localTranslate, v2, tran.localTranslate);
-                        tran.markDirty();
-                        tran.updateWorldTran();
-                        if (!this.testTankCol(tran))
-                        {
-                            gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        }
-                        // this.scene.removeChild(tran);
-                        // tran.dispose();
+                        gd3d.math.vec3ScaleByNum(v, -1, v);
                     }
-                    else
+                    let col = this.heroTank.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
+                    let f = false;
+                    let r = false;
+                    let l = false;
+                    gd3d.math.vec3Add(col.obb.center, v, col.obb.center);
+                    f = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v, col.obb.center);
+
+                    let q = new gd3d.math.quaternion();
+                    let v1 = new gd3d.math.vector3();
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 45, q);
+                    gd3d.math.quatTransformVector(q, v, v1);
+                    gd3d.math.vec3ScaleByNum(v1, 0.5, v1);
+                    gd3d.math.vec3Add(col.obb.center, v1, col.obb.center);
+                    r = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v1, col.obb.center);
+
+                    let v2 = new gd3d.math.vector3();
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, -45, q);
+                    gd3d.math.quatTransformVector(q, v, v2);
+                    gd3d.math.vec3ScaleByNum(v2, 0.5, v2);
+                    gd3d.math.vec3Add(col.obb.center, v2, col.obb.center);
+                    l = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v2, col.obb.center);
+
+                    if (!f)
                     {
-                        // gd3d.math.vec3Subtract(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        // var tran = this.checkTankCol();
-                        // if (tran != null)
-                        // {
-                        //     gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        //     var v2 = new gd3d.math.vector3();
-                        //     gd3d.math.vec3Subtract(this.heroTank.getWorldTranslate(), tran.getWorldTranslate(), v2);
-                        //     v2.y = 0;
-                        //     gd3d.math.vec3Normalize(v2, v2);
-                        //     gd3d.math.vec3ScaleByNum(v2, speed, v2);
-                        //     gd3d.math.vec3Add(this.heroTank.localTranslate, v2, this.heroTank.localTranslate);
-                        // }
-                        var tran = this.heroTank.clone();
-                        this.scene.addChild(tran);
-                        var v2 = new gd3d.math.vector3();
-                        gd3d.math.vec3ScaleByNum(v, 50, v2);
-                        gd3d.math.vec3Add(tran.localTranslate, v2, tran.localTranslate);
-                        tran.markDirty();
-                        tran.updateWorldTran();
-                        if (!this.testTankCol(tran))
-                        {
-                            gd3d.math.vec3Subtract(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        }
-                        // this.scene.removeChild(tran);
-                        // tran.dispose();
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
                     }
+                    else if (!r && l)
+                    {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v1, this.heroTank.localTranslate);
+                    }
+                    else if (r && !l)
+                    {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v2, this.heroTank.localTranslate);
+                    }
+
                     this.heroTank.markDirty();
                 }
                 if (gd3d.math.vec2Length(this.joystick.rightAxis) > 0.2)
@@ -991,7 +936,7 @@ namespace demo
             }
             var col = tran.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
             col.size = new gd3d.math.vector3(0.2, 0.2, 0.2);
-            col.colliderVisible = true;
+            col.colliderVisible = this.colVisible;
             tran.markDirty();
 
             var dir = new gd3d.math.vector3();

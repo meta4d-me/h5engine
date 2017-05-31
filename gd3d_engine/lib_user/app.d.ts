@@ -136,6 +136,7 @@ declare namespace demo {
         tankRotateSpeed: gd3d.math.vector3;
         gunRotateSpeed: gd3d.math.vector3;
         angleLimit: number;
+        colVisible: boolean;
         private label;
         private loadShader(laststate, state);
         private loadTexture(laststate, state);
@@ -145,10 +146,11 @@ declare namespace demo {
         private addCameraAndLight(laststate, state);
         private addJoystick(laststate, state);
         private addObject(laststate, state);
+        private keyMap;
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
-        checkTankCol(): gd3d.framework.transform;
         testTankCol(tran: gd3d.framework.transform): boolean;
+        tempTran: gd3d.framework.transform;
         tankControl(delta: number): void;
         bulletId: number;
         bulletList: any[];

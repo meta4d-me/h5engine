@@ -955,6 +955,8 @@ var demo;
             this.tankRotateSpeed = new gd3d.math.vector3(0, 72, 0);
             this.gunRotateSpeed = new gd3d.math.vector3(0, 150, 0);
             this.angleLimit = 5;
+            this.colVisible = false;
+            this.keyMap = {};
             this.bulletId = 0;
             this.bulletList = [];
             this.bulletSpeed = 30;
@@ -987,7 +989,7 @@ var demo;
                     var col = _this.heroTank.gameObject.addComponent("boxcollider");
                     col.center = new gd3d.math.vector3(0, 0.2, 0);
                     col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = true;
+                    col.colliderVisible = _this.colVisible;
                     _this.heroGun = _this.heroTank.find("tank_up");
                     _this.heroSlot = _this.heroGun.find("slot");
                     state.finish = true;
@@ -1006,7 +1008,7 @@ var demo;
                     var col = _this.enemyTank.gameObject.addComponent("boxcollider");
                     col.center = new gd3d.math.vector3(0, 0.2, 0);
                     col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = true;
+                    col.colliderVisible = _this.colVisible;
                     _this.enemyGun = _this.enemyTank.find("tank_up");
                     _this.enemySlot = _this.enemyGun.find("slot");
                     state.finish = true;
@@ -1024,7 +1026,7 @@ var demo;
                     for (var i = 0; i < 8; i++) {
                         var tran = _root.find("wall" + i);
                         var col = tran.gameObject.getComponent("boxcollider");
-                        col.colliderVisible = true;
+                        col.colliderVisible = _this.colVisible;
                         _this.walls.push(tran);
                     }
                     _this.app.getScene().lightmaps = [];
@@ -1095,7 +1097,7 @@ var demo;
                         renderer.materials[0].setTexture("_MainTex", texture);
                     }
                     var col = cube.gameObject.addComponent("boxcollider");
-                    col.colliderVisible = true;
+                    col.colliderVisible = this.colVisible;
                     cube.markDirty();
                     this.cubes.push(cube);
                 }
@@ -1103,6 +1105,7 @@ var demo;
             state.finish = true;
         };
         TankGame.prototype.start = function (app) {
+            var _this = this;
             this.label = document.getElementById("Label");
             this.app = app;
             this.scene = app.getScene();
@@ -1114,6 +1117,7 @@ var demo;
             this.taskmgr.addTaskCall(this.addCameraAndLight.bind(this));
             this.taskmgr.addTaskCall(this.addObject.bind(this));
             this.taskmgr.addTaskCall(this.addJoystick.bind(this));
+            document.addEventListener("keydown", function (e) { _this.keyMap[e.keyCode] = true; });
         };
         TankGame.prototype.update = function (delta) {
             this.taskmgr.move(delta);
@@ -1136,40 +1140,22 @@ var demo;
             }
             this.fireTick += delta;
         };
-        TankGame.prototype.checkTankCol = function () {
-            var col = this.heroTank.gameObject.getComponent("boxcollider");
-            for (var i = 0; i < this.cubes.length; i++) {
-                var c = this.cubes[i];
-                if (c != null && col.intersectsTransform(c)) {
-                    return this.cubes[i];
-                }
-            }
-            for (var i = 0; i < this.walls.length; i++) {
-                var w = this.walls[i];
-                if (w != null && col.intersectsTransform(w)) {
-                    return this.walls[i];
-                }
-            }
-            if (this.enemyTank != null && col.intersectsTransform(this.enemyTank)) {
-                return this.enemyTank;
-            }
-            return null;
-        };
         TankGame.prototype.testTankCol = function (tran) {
             var col = tran.gameObject.getComponent("boxcollider");
             for (var i = 0; i < this.cubes.length; i++) {
-                var c = this.cubes[i];
-                if (c != null && col.intersectsTransform(c)) {
+                var c_1 = this.cubes[i].gameObject.getComponent("boxcollider");
+                if (col.obb.intersects(c_1.obb)) {
                     return true;
                 }
             }
             for (var i = 0; i < this.walls.length; i++) {
-                var w = this.walls[i];
-                if (w != null && col.intersectsTransform(w)) {
+                var c_2 = this.walls[i].gameObject.getComponent("boxcollider");
+                if (col.obb.intersects(c_2.obb)) {
                     return true;
                 }
             }
-            if (this.enemyTank != null && col.intersectsTransform(this.enemyTank)) {
+            var c = this.enemyTank.gameObject.getComponent("boxcollider");
+            if (col.obb.intersects(c.obb)) {
                 return true;
             }
             return false;
@@ -1211,20 +1197,10 @@ var demo;
                         else {
                             gd3d.math.vec3Add(this.heroTank.localEulerAngles, rotateSpeed, vec);
                         }
-                        var temp = new gd3d.math.vector3();
-                        gd3d.math.vec3Clone(this.heroTank.localEulerAngles, temp);
                         this.heroTank.localEulerAngles = vec;
-                        if (this.checkTankCol() != null) {
-                            this.heroTank.localEulerAngles = temp;
-                        }
                     }
                     else {
-                        var temp = new gd3d.math.vector3();
-                        gd3d.math.vec3Clone(this.heroTank.localEulerAngles, temp);
                         this.heroTank.localEulerAngles = targetAngle;
-                        if (this.checkTankCol() != null) {
-                            this.heroTank.localEulerAngles = temp;
-                        }
                     }
                     this.heroTank.markDirty();
                 }
@@ -1239,29 +1215,39 @@ var demo;
                     var v = new gd3d.math.vector3();
                     this.heroTank.getForwardInWorld(v);
                     gd3d.math.vec3ScaleByNum(v, speed, v);
-                    if (goForward) {
-                        var tran = this.heroTank.clone();
-                        this.scene.addChild(tran);
-                        var v2 = new gd3d.math.vector3();
-                        gd3d.math.vec3ScaleByNum(v, 50, v2);
-                        gd3d.math.vec3Add(tran.localTranslate, v2, tran.localTranslate);
-                        tran.markDirty();
-                        tran.updateWorldTran();
-                        if (!this.testTankCol(tran)) {
-                            gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        }
+                    if (!goForward) {
+                        gd3d.math.vec3ScaleByNum(v, -1, v);
                     }
-                    else {
-                        var tran = this.heroTank.clone();
-                        this.scene.addChild(tran);
-                        var v2 = new gd3d.math.vector3();
-                        gd3d.math.vec3ScaleByNum(v, 50, v2);
-                        gd3d.math.vec3Add(tran.localTranslate, v2, tran.localTranslate);
-                        tran.markDirty();
-                        tran.updateWorldTran();
-                        if (!this.testTankCol(tran)) {
-                            gd3d.math.vec3Subtract(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                        }
+                    var col = this.heroTank.gameObject.getComponent("boxcollider");
+                    var f = false;
+                    var r = false;
+                    var l = false;
+                    gd3d.math.vec3Add(col.obb.center, v, col.obb.center);
+                    f = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v, col.obb.center);
+                    var q = new gd3d.math.quaternion();
+                    var v1 = new gd3d.math.vector3();
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 45, q);
+                    gd3d.math.quatTransformVector(q, v, v1);
+                    gd3d.math.vec3ScaleByNum(v1, 0.5, v1);
+                    gd3d.math.vec3Add(col.obb.center, v1, col.obb.center);
+                    r = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v1, col.obb.center);
+                    var v2 = new gd3d.math.vector3();
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, -45, q);
+                    gd3d.math.quatTransformVector(q, v, v2);
+                    gd3d.math.vec3ScaleByNum(v2, 0.5, v2);
+                    gd3d.math.vec3Add(col.obb.center, v2, col.obb.center);
+                    l = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v2, col.obb.center);
+                    if (!f) {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
+                    }
+                    else if (!r && l) {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v1, this.heroTank.localTranslate);
+                    }
+                    else if (r && !l) {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v2, this.heroTank.localTranslate);
                     }
                     this.heroTank.markDirty();
                 }
@@ -1324,7 +1310,7 @@ var demo;
             }
             var col = tran.gameObject.addComponent("boxcollider");
             col.size = new gd3d.math.vector3(0.2, 0.2, 0.2);
-            col.colliderVisible = true;
+            col.colliderVisible = this.colVisible;
             tran.markDirty();
             var dir = new gd3d.math.vector3();
             this.heroGun.getForwardInWorld(dir);
