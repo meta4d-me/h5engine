@@ -1455,29 +1455,41 @@ declare namespace gd3d.framework {
         layer: RenderLayerEnum;
         renderLayer: gd3d.framework.CullingMask;
         queue: number;
-        private width;
+        private _startWidth;
+        private _endWidth;
+        lifetime: number;
+        minvertexDistance: number;
+        maxvertexCout: number;
         private _material;
-        private _color;
+        private _startColor;
+        private _endColor;
+        private trailTrans;
+        private nodes;
         private mesh;
-        private vertexcount;
         private dataForVbo;
         private dataForEbo;
+        material: gd3d.framework.material;
+        startColor: gd3d.math.color;
+        endColor: gd3d.math.color;
+        setWidth(startWidth: number, endWidth?: number): void;
         start(): void;
         private app;
         private webgl;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
-        material: gd3d.framework.material;
-        color: gd3d.math.color;
-        setspeed(upspeed: number, lowspeed?: number): void;
-        setWidth(Width: number): void;
-        private initmesh();
-        private speed;
-        private lowspeed;
-        private updateTrail();
+        private refreshTrailNode(curTime);
+        private notRender;
+        private updateTrailData(curTime);
+        private checkBufferSize();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
+    }
+    class trailNode {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
+        time: number;
+        constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
     }
 }
 declare namespace gd3d.framework {
@@ -3128,6 +3140,12 @@ declare namespace gd3d.math {
         static clone_vector4(src: vector4): vector4;
         static delete_vector4(v: vector4): void;
         static collect_vector4(): void;
+        private static _color_one;
+        static readonly color_one: color;
+        private static unused_color;
+        static new_color(): color;
+        static delete_color(v: color): void;
+        static collect_color(): void;
         private static _vector3_up;
         static readonly vector3_up: vector3;
         private static _vector3_right;

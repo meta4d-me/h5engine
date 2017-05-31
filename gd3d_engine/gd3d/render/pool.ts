@@ -9,6 +9,7 @@ namespace gd3d.math
             pool.collect_vector2();
             pool.collect_matrix();
             pool.collect_quaternion();
+            pool.collect_color();
         }
         //需要用啥照着这个加
         //for vector4
@@ -60,6 +61,43 @@ namespace gd3d.math
         {
             pool.unused_vector4.length = 0;//清除未使用的vector 池子
         }
+
+        //for color
+        private static _color_one: color;
+        static get color_one(): color
+        {
+            if (pool._color_one == null)
+            {
+                pool._color_one = new color(1, 1, 1, 1);
+            }
+            return pool._color_one;
+        }
+
+        private static unused_color: color[] = [];
+        static new_color(): color
+        {
+            if (pool.unused_color.length > 0)
+                return pool.unused_color.pop();
+            else
+                return new color();
+        }
+        static delete_color(v: color): void
+        {
+            if (v == null) return;
+            if (v instanceof color)
+            {
+                v.r = v.g = v.b = 0;
+                v.a = 1;
+                pool.unused_color.push(v);
+            }
+            else
+                console.error("kindding me?确定你要回收的是color吗？");
+        }
+        static collect_color()
+        {
+            pool.unused_color.length = 0;//清除未使用的vector 池子
+        }
+
         //for vector3
         private static _vector3_up: vector3;
         static get vector3_up(): vector3

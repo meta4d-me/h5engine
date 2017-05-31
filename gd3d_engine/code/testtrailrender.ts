@@ -20,7 +20,7 @@ namespace t
         private loadText(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             var i=2;
-            this.app.getAssetMgr().load("res/trailtest2.png", gd3d.framework.AssetTypeEnum.Auto, (s) => 
+            this.app.getAssetMgr().load("res/swingFX.png", gd3d.framework.AssetTypeEnum.Auto, (s) => 
             {
                 if (s.isfinish) 
                 {
@@ -36,7 +36,7 @@ namespace t
                 }
             }
             );
-            this.app.getAssetMgr().load("res/cube_texture_1.png", gd3d.framework.AssetTypeEnum.Auto, (s) => 
+            this.app.getAssetMgr().load("res/trailtest2_00000.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, (s) => 
             {
                 if (s.isfinish) 
                 {
@@ -65,7 +65,7 @@ namespace t
             this.camera.near = 0.01;
             this.camera.far = 100;
             this.camera.fov = Math.PI * 0.3;
-            //this.camera.backgroundColor = new gd3d.math.color(0, 0, 0, 1);
+            this.camera.backgroundColor = new gd3d.math.color(0, 0, 0, 1);
             objCam.localTranslate = new gd3d.math.vector3(0, 20, -20);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();//标记为需要刷新
@@ -117,15 +117,18 @@ namespace t
                 var trailrender = trailtrans.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
                 //trailrender.color=new gd3d.math.color(1.0,0,0,1.0);
                 //particles_blend_premultiply.shader.json
-                
+                //particles_additive.shader.json
+                //particles_additive_premultiply.shader.json
                 var mat = new gd3d.framework.material();
-                var shader = this.app.getAssetMgr().getShader("particles_additive_premultiply.shader.json") as gd3d.framework.shader;
-                var tex = this.app.getAssetMgr().getAssetByName("trailtest2.png") as gd3d.framework.texture;
+                var shader = this.app.getAssetMgr().getShader("particles_blend_premultiply.shader.json") as gd3d.framework.shader;
+                var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json") as gd3d.framework.texture;
                 mat.setShader(shader);
                 mat.setTexture("_MainTex", tex)
 
                 trailrender.material = mat;
-
+                // trailrender.lifetime=3;
+                // trailrender.minvertexDistance=1;
+                
             }
             state.finish = true;
 
@@ -178,7 +181,7 @@ namespace t
                 // this.cube.localTranslate.z = z * 5;
 
                 // this.cube.markDirty();
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.timer, this.org.localRotate);
+                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.timer*5, this.org.localRotate);
                 this.org.markDirty();
             }
 

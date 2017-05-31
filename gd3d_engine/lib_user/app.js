@@ -1827,6 +1827,14 @@ var t;
                     state.error = true;
                 }
             });
+            this.app.getAssetMgr().load("res/swingFX.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+                else {
+                    state.error = true;
+                }
+            });
         };
         test_integratedrender.prototype.loadRole = function (laststate, state) {
             var _this = this;
@@ -1918,7 +1926,7 @@ var t;
                     var trailtrans = new gd3d.framework.transform();
                     trailtrans.localTranslate.z = 0.5;
                     this.weapon.addChild(trailtrans);
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 90, trailtrans.localRotate);
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
                     trailtrans.markDirty();
                     var trailrender = trailtrans.gameObject.addComponent("trailRender");
                     trailrender.setWidth(1);
@@ -1943,13 +1951,15 @@ var t;
             this.taskmgr.addTaskCall(this.loadRole.bind(this));
             this.taskmgr.addTaskCall(this.loadWeapon.bind(this));
             this.taskmgr.addTaskCall(this.initscene.bind(this));
-            var tbn1 = this.addbtn("80px", "0px", "start");
+            var tbn1 = this.addbtn("80px", "0px", "attack_01");
             tbn1.onclick = function () {
-                _this.play = true;
+                var name = "attack_01.FBAni.aniclip.bin";
+                _this.aniplayer.playCross(name, 0.2);
             };
-            var btn = this.addbtn("120px", "0px", "stop");
+            var btn = this.addbtn("120px", "0px", "attack_02");
             btn.onclick = function () {
-                _this.play = false;
+                var name = "attack_02.FBAni.aniclip.bin";
+                _this.aniplayer.playCross(name, 0.2);
             };
             {
                 var btn2 = this.addbtn("160px", "0px", "playAttackAni");
@@ -4275,7 +4285,7 @@ var t;
         };
         test_trailrender.prototype.loadText = function (laststate, state) {
             var i = 2;
-            this.app.getAssetMgr().load("res/trailtest2.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            this.app.getAssetMgr().load("res/swingFX.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     i--;
                     if (i == 0) {
@@ -4286,7 +4296,7 @@ var t;
                     state.error = true;
                 }
             });
-            this.app.getAssetMgr().load("res/cube_texture_1.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            this.app.getAssetMgr().load("res/trailtest2_00000.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     i--;
                     if (i == 0) {
@@ -4306,6 +4316,7 @@ var t;
             this.camera.near = 0.01;
             this.camera.far = 100;
             this.camera.fov = Math.PI * 0.3;
+            this.camera.backgroundColor = new gd3d.math.color(0, 0, 0, 1);
             objCam.localTranslate = new gd3d.math.vector3(0, 20, -20);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
@@ -4335,8 +4346,8 @@ var t;
                 trailtrans.markDirty();
                 var trailrender = trailtrans.gameObject.addComponent("trailRender");
                 var mat = new gd3d.framework.material();
-                var shader = this.app.getAssetMgr().getShader("particles_additive_premultiply.shader.json");
-                var tex = this.app.getAssetMgr().getAssetByName("trailtest2.png");
+                var shader = this.app.getAssetMgr().getShader("particles_blend_premultiply.shader.json");
+                var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json");
                 mat.setShader(shader);
                 mat.setTexture("_MainTex", tex);
                 trailrender.material = mat;
@@ -4365,7 +4376,7 @@ var t;
             this.taskmgr.move(delta);
             if (this.org != undefined && this.play) {
                 this.timer++;
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.timer, this.org.localRotate);
+                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.timer * 5, this.org.localRotate);
                 this.org.markDirty();
             }
         };
