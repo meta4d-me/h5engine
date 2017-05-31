@@ -1,0 +1,32 @@
+[
+  {
+    "name": "kuosan",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "light0029.png"
+  },
+  {
+    "name": "fazhen",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "Effects_Textures_232-1.png"
+  },
+  {
+    "name": "chibang",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "chibang.png"
+  },
+  {
+    "name": "shangsheng",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "p_halo024a.png"
+  },
+  {
+    "name": "light00101",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "light00101.png"
+  },
+  {
+    "name": "glow",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "E_glow001.png"
+  }
+]

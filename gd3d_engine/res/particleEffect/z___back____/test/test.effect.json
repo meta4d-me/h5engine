@@ -1,0 +1,47 @@
+{
+    "files": {
+        "emission": "xuanfengzhan_emission.json",
+        "material": "xuanfengzhan_material.json",
+        "particle": "xuanfengzhan_particlelist.json"
+    },
+    "dependImg": [
+        "zwlxf_1.png",
+        "dy_lan.png",
+        "dg_xf_2.png",
+        "smoke_dq_1.png",
+        "smoke_3_1.png"
+    ],
+    "dependShape": [
+        "E645D5D6C8B3550EA5870353E1D45EDA64909D4D.mesh.bin"
+    ],
+    "effectsystem": {
+        "name": "xuanfengzhan",
+        "particlelist": [
+            {
+                "emission": "emission1",
+                "material": "mat1",
+                "particle": "particle1"
+            },
+            {
+                "emission": "emission2",
+                "material": "mat2",
+                "particle": "particle2"
+            },
+            {
+                "emission": "emission2",
+                "material": "mat3",
+                "particle": "particle3"
+            },
+            {
+                "emission": "emission3",
+                "material": "mat4",
+                "particle": "particle4"
+            },
+            {
+                "emission": "emission4",
+                "material": "mat5",
+                "particle": "particle5"
+            }
+        ]
+    }
+}

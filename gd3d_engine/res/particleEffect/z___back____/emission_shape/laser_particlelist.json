@@ -1,0 +1,40 @@
+[
+  {
+    "name": "laser",
+    "type": "plane",
+    "loop": true,
+    "life": {
+      "value": 1
+    },
+    "startpos": {
+      "type": "cone",
+      "width": 2.3,
+      "height": 2.3,
+      "depth": 2.5,
+      "angle": 30,
+      "radius": 1,
+      "bottomradius": 2,
+      "center": [ -4.5, 0, 0 ],
+      "direction": [ 1, 0, 0]
+    },
+    "isrotation": true,
+    "speed": {
+      "valuerange": [ 0.1, 0.36 ]
+    },
+    "startrot": {
+      "y": {
+        "value": 90
+      }
+    },
+    "scale": {
+      "x":2,
+      "y":0.1,
+      "z": 0
+    },
+    "color": {
+      "x": 1,
+      "y": 0,
+      "z": 0
+    }
+  }
+]

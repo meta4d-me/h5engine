@@ -1,0 +1,58 @@
+[
+  {
+    "name": "kuosan",
+    "rendermodel": {
+      "type": "billboard",
+      "value":1
+    },
+    "loop": true,
+    "life": {
+      "value": 0.7
+    },
+    "scale": {
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.5
+    },
+    "scalenode": [
+      {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "key": 0
+      },
+      {
+        "x": 1.5,
+        "y": 1.5,
+        "z": 1.5,
+        "key": 0.3
+      }
+    ],
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        0,
+        0
+      ]
+    },
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "color": {
+      "x": 1.5,
+      "y": 0.7,
+      "z": 0.3
+    },
+    "colornode": [
+      {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "key": 0.8
+      }
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {
+    "name": "jiantou",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "jiantou.png"
+  },
+  {
+    "name": "glow",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "E_glow001.png"
+  },
+  {
+    "name": "wenli",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "golw0005.png"
+  },
+  {
+    "name": "guangquan",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "p_halo024a.png"
+  }
+]

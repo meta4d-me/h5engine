@@ -1,0 +1,32 @@
+[
+	{
+		"name": "xuanzhuanmoxing",
+		"shader":"particles_additive.shader",
+		"diffuseTexture": "zwlxf_1.png"
+	},
+	{
+		"name": "daoguang",
+		"shader":"particles_additive.shader",
+		"diffuseTexture": "dy_lan.png"
+	},
+	{
+		"name": "xuanzhuan",
+		"shader":"particles_additive.shader",
+		"diffuseTexture": "dg_xf_2.png"
+	},
+	{
+		"name": "yanchen",
+		"shader":"particles_additive.shader",
+		"diffuseTexture": "smoke_dq_1.png"
+	},
+  {
+    "name": "yanchen2",
+    "shader":"particles_additive.shader",
+    "diffuseTexture": "smoke_3_1.png"
+  },
+  {
+		"name": "wenli",
+		"shader":"particles_additive.shader",
+		"diffuseTexture": "b44053ab.png"
+	}
+]

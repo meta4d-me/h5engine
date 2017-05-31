@@ -1,0 +1,22 @@
+{
+    "name":"Sphere",
+    "id":-3560,
+    "components":[
+        {
+            "type":"transform",
+            "transmove":"0,0,0",
+            "transquat":"0,0,0,1",
+            "transscale":"1,1,1"
+            },
+        {
+            "type":"meshfilter",
+            "mesh":"Sphere.mesh.bin"
+            },
+        {
+            "type":"meshrenderer",
+            "mats":[
+                "Default-Material.mat.json"
+                ]
+            }
+        ]
+    }

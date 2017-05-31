@@ -1,0 +1,37 @@
+attribute vec3 _glesVertex;
+attribute vec2 _glesMultiTexCoord0;
+attribute vec3 _glesNormal;
+
+uniform highp vec4 glstate_eyepos;
+uniform highp mat4 glstate_matrix_mvp;
+uniform highp mat4 glstate_matrix_model;
+uniform highp vec4 _base_ST;
+uniform highp vec4 _asm_ST;
+uniform highp vec4 _streamlight_ST;
+uniform highp float _speedu;
+uniform highp float _speedv;
+uniform highp float glstate_timer;
+
+varying highp vec2 _base_uv;
+varying highp vec2 _asm_uv;
+varying highp vec2 _light_uv;
+
+
+void main()
+{
+	_base_uv = _glesMultiTexCoord0.xy * _base_ST.xy + _base_ST.zw;
+	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + _asm_ST.zw;
+	highp vec2 _speed;
+    _speed = vec2(_speedu,_speedv);
+    _light_uv = (_glesMultiTexCoord0.xy * _streamlight_ST.xy + _streamlight_ST.zw)  + _speed * glstate_timer;
+
+	    //求世界空间法线
+    // highp mat3 normalmat = mat3(glstate_matrix_model);
+    // Normalinworld =normalize(normalmat*_glesNormal);
+
+    // worldpos =(glstate_matrix_model * vec4(_glesVertex.xyz, 1.0)).xyz;
+	// eyedir = glstate_eyepos.xyz - worldpos;
+
+	gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
+}
+

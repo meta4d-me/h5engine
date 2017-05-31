@@ -1,0 +1,28 @@
+[
+  {
+    "name": "fazhen",
+    "type": "plane",
+    "infinite": false,
+    "lookatcam":true,
+    "loop": true,
+    "life": {
+      "value": 10
+    },
+    "color": {
+      "x": 0.2,
+      "y": 0.2,
+      "z": 1.5
+    },
+    "angularvelocity": {
+      "z_axis": {
+        "value": 900
+      }
+    },
+    "startrot":
+    {
+      "x_axis": {
+        "value": -45
+      }
+    }
+  }
+]

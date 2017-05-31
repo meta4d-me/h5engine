@@ -1,0 +1,72 @@
+[
+  {
+    "name": "daoguang",
+    "rendermodel": {
+      "type": "mesh",
+      "value":
+      {
+        "type": "plane",
+        "angularvelocity": {
+          "z": {
+            "value": 700
+          }
+        }       
+      }
+    },
+    "loop": false,
+    "life": {
+      "value": 0.15
+    },
+    "scale": {
+      "x": 0.5,
+      "y": 0.5,
+      "z": 0.5
+    },
+    "scalenode": [
+      {
+        "x": 1.3,
+        "y": 1.3,
+        "z": 1.3,
+        "key": 0.3
+      },
+      {
+        "x": 1.5,
+        "y": 1.5,
+        "z": 1.5,
+        "key": 0.8
+      }, 
+       {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5,
+        "key": 1
+      }
+    ],
+    "startpos": {
+      "type": "normal",
+      "center": [
+        0,
+        0,
+        0
+      ]
+    },
+    "startrot": {
+      "x": {
+        "value": -90
+      }
+    },
+    "color": {
+     "x": 2,
+     "y": 1.2,
+     "z": 0.3
+    },
+    "colornode": [
+      {
+        "x": 1,
+        "y": 0,
+        "z": 0.3,
+        "key": 0.8
+      }
+    ]
+  }
+]

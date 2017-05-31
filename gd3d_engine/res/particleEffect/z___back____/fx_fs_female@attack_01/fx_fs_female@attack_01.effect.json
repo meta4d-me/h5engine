@@ -1,0 +1,25 @@
+{
+  "files": {
+    "emission": "fx_fs_female@attack_01_emission.json",
+    "material": "fx_fs_female@attack_01_material.json",
+    "particle": "fx_fs_female@attack_01_particlelist.json"
+  },
+  "dependImg": [
+    "fs_1.png"
+  ],
+     "dependShape": [
+        "fs_01.mesh.bin"
+    ],
+  "effectsystem": 
+  {
+    "name": "fx_fs_female@attack_01",
+    "particlelist": [
+      {
+        "emission": "PA",
+        "material": "PA",
+        "particle": "PA"
+      }
+      
+    ]
+  }
+}

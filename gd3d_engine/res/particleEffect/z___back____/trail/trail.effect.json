@@ -1,0 +1,20 @@
+{
+  "files": {
+    "emission": "trail_emission.json",
+    "material": "trail_material.json",
+    "particle": "trail_particlelist.json"
+  },
+  "dependImg": [
+    "billboard.png"
+  ],
+  "effectsystem": {
+    "name": "trail",
+    "particlelist": [
+      {
+        "emission": "fazhen",
+        "material": "fazhen",
+        "particle": "fazhen"
+      }
+    ]
+  }
+}

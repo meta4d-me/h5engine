@@ -1,0 +1,28 @@
+[
+	{
+    "name": "kuosan",
+		"type":"burst",
+		"time":0.1,
+		"count":2
+	},
+   { "name":"dilie",
+		"type":"burst",
+		"time":0.1,
+		"count":2
+	},
+   { "name":"guangshu",
+		"type":"burst",
+		"time":0,
+		"count":1
+	},
+   { "name":"glow",
+		"type":"burst",
+		"time":0.1,
+		"count":1
+	},
+   { "name":"dun",
+		"type":"burst",
+		"time":0.15,
+		"count":2
+	}
+]

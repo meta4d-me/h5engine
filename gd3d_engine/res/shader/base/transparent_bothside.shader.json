@@ -1,0 +1,16 @@
+{
+    "layer": "transparent",
+    "passes": {
+        "base": [
+            {
+                "blendmode":  "blend",
+                "showface": "all",
+                "vs": "transparent",
+                "fs": "transparent"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}

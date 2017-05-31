@@ -1,0 +1,9 @@
+[
+  {
+    "name": "fazhen",
+    "type": "base",
+    "diffuseTexture": "light0088.png",
+    "blendMode": "add",
+    "bothside": true
+  }
+]

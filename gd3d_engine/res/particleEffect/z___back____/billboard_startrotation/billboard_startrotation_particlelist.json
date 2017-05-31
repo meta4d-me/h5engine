@@ -1,0 +1,30 @@
+[
+    {
+        "name": "kuosan",
+        "type": "plane",
+        "loop": true,
+        "life": {
+            "value": 3
+        },
+        "lookatcam": true,
+        "scale": {
+            "x": 1,
+            "y":1,
+            "z": 0
+        },
+        
+        "startpos": {
+            "type": "normal",
+            "center": [
+                0,
+                0,
+                0
+            ]
+        },
+        "color": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        }
+    }
+]

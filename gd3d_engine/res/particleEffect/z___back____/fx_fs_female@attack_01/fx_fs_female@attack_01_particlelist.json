@@ -1,0 +1,32 @@
+[
+  {
+    "name": "PA",
+    "rendermodel": {
+      "type": "mesh",
+      "value":
+      {
+        "type": "fs_01.mesh.bin",
+        "lookatcam": true
+      }
+    },
+    "loop": true,
+    "life": {
+      "value": 0.3
+    },
+    
+    "scale": {
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "color": {
+      "x": 1,
+      "y": 1,
+      "z": 1
+    },
+    "passalpha": false,
+    "alpha": {
+      "value": 1
+    }
+  }
+]

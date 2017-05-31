@@ -1,0 +1,32 @@
+[
+  {
+    "name": "kuosan",
+    "type": "burst",
+    "time": 0,
+    "count": 2
+  },
+  {
+    "name": "fazhen",
+    "type": "burst",
+    "time": 0,
+    "count": 1
+  },
+  {
+    "name": "chibang",
+    "type": "burst",
+    "time": 0.2,
+    "count": 1
+  },
+  {
+    "name": "glow",
+    "type": "burst",
+    "time": 0.1,
+    "count": 1
+  },
+  {
+    "name": "shangsheng",
+    "type": "continue",
+    "time": 0.8,
+    "count": 5
+  }
+]

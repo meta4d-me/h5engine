@@ -1,0 +1,8 @@
+[
+  {
+    "name": "kuosan",
+	  "shader":"particles_diffuse.shader",
+    "diffuseTexture": "11.png",
+	  "alphacut":0.5
+  }
+]

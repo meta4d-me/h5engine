@@ -1,0 +1,16 @@
+{
+    "files": [
+        {
+            "name": "resources/f_fire035a_5x2.png",
+            "length": 10000
+        },
+        {
+            "name": "resources/E_huo01.png",
+            "length": 10000
+        },
+        {
+            "name": "uvsprite.effect.json",
+            "length": 41722
+        }
+    ]
+}

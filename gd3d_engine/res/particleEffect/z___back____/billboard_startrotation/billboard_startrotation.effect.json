@@ -1,0 +1,24 @@
+{
+  "files": {
+    "emission": "billboard_startrotation_emission.json",
+    "material": "billboard_startrotation_material.json",
+    "particle": "billboard_startrotation_particlelist.json"
+  },
+  "dependImg": [
+    "E_glow001.png",
+    "c_point077a.png",
+    "c_point03a.png",
+    "028_guangyun.png",
+    "arcaneTorrent_ring.png"
+  ],
+  "effectsystem": {
+    "name": "hjx",
+    "particlelist": [
+      {
+        "emission": "kuosan",
+        "material": "kuosan",
+        "particle": "kuosan"
+      }
+    ]
+  }
+}

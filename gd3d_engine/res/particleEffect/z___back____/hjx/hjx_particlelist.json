@@ -1,0 +1,41 @@
+[
+    {
+        "name": "kuosan",
+        "type": "plane",
+        "loop": true,
+        "life": {
+            "value": 100
+        },
+        "scale": {
+            "x": 5,
+            "y": 5,
+            "z": 5
+        },
+        "lookatcam": false,
+        "startpos": {
+            "type": "normal",
+            "center": [
+                0,
+                0,
+                0
+            ]
+        },
+        "startrot": {
+            "x": {
+                "value": 45
+            }
+        },
+        "color": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+        },
+		"speed": {
+		  "valuerange": [0.01, 0.02]
+		},
+        "rendermodel": {
+            "type": "stretched",
+            "value": 100
+        }
+    }
+]
