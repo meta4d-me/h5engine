@@ -1926,7 +1926,7 @@ var t;
                     var trailtrans = new gd3d.framework.transform();
                     trailtrans.localTranslate.z = 0.5;
                     this.weapon.addChild(trailtrans);
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 90, trailtrans.localRotate);
                     trailtrans.markDirty();
                     var trailrender = trailtrans.gameObject.addComponent("trailRender");
                     trailrender.setWidth(1);

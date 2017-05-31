@@ -1451,7 +1451,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class trailRender implements IRenderer {
+    class trailRender_recorde implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: gd3d.framework.CullingMask;
         queue: number;
@@ -1490,6 +1490,36 @@ declare namespace gd3d.framework {
         updir: gd3d.math.vector3;
         time: number;
         constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
+    }
+}
+declare namespace gd3d.framework {
+    class trailRender implements IRenderer {
+        layer: RenderLayerEnum;
+        renderLayer: gd3d.framework.CullingMask;
+        queue: number;
+        private width;
+        private _material;
+        private _color;
+        private mesh;
+        private vertexcount;
+        private dataForVbo;
+        private dataForEbo;
+        start(): void;
+        private app;
+        private webgl;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        material: gd3d.framework.material;
+        color: gd3d.math.color;
+        setspeed(upspeed: number, lowspeed?: number): void;
+        setWidth(Width: number): void;
+        private initmesh();
+        private speed;
+        private lowspeed;
+        private updateTrail();
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        clone(): void;
     }
 }
 declare namespace gd3d.framework {
