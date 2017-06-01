@@ -161,6 +161,33 @@ declare namespace demo {
         private updateBullet(delta);
     }
 }
+declare namespace t {
+    class test_three_leaved_rose_curve implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        cube: gd3d.framework.transform;
+        parts: gd3d.framework.transform;
+        timer: number;
+        cube2: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        count: number;
+        counttimer: number;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        aniplayer: gd3d.framework.aniplayer;
+        role: gd3d.framework.transform;
+        private roleLength;
+        private loadRole(laststate, state);
+        private addcam(laststate, state);
+        private addcube(laststate, state);
+        start(app: gd3d.framework.application): void;
+        private angularVelocity;
+        private eulerAngle;
+        private zeroPoint;
+        update(delta: number): void;
+    }
+}
 declare class test_01 implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -235,6 +262,26 @@ declare namespace t {
         timer: number;
         update(delta: number): void;
     }
+}
+declare class test_effect implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    effect: gd3d.framework.effectSystem;
+    label: HTMLLabelElement;
+    private loadShader(laststate, state);
+    private loadText(laststate, state);
+    private addcube(laststate, state);
+    private dragon;
+    private loadModel(laststate, state);
+    start(app: gd3d.framework.application): void;
+    private loadEffect(laststate, state);
+    _loadEffect(assetbundleName: string, name: string): void;
+    private addcam(laststate, state);
+    beclone: boolean;
+    update(delta: number): void;
 }
 declare namespace t {
     class test_integratedrender implements IState {
