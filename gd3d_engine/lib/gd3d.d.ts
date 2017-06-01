@@ -1451,6 +1451,49 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class trailRender_recorde implements IRenderer {
+        layer: RenderLayerEnum;
+        renderLayer: gd3d.framework.CullingMask;
+        queue: number;
+        private _startWidth;
+        private _endWidth;
+        lifetime: number;
+        minvertexDistance: number;
+        maxvertexCout: number;
+        private _material;
+        private _startColor;
+        private _endColor;
+        private trailTrans;
+        private nodes;
+        private mesh;
+        private dataForVbo;
+        private dataForEbo;
+        interpolate: boolean;
+        material: gd3d.framework.material;
+        startColor: gd3d.math.color;
+        endColor: gd3d.math.color;
+        setWidth(startWidth: number, endWidth?: number): void;
+        start(): void;
+        private app;
+        private webgl;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        private refreshTrailNode(curTime);
+        private notRender;
+        private updateTrailData(curTime);
+        private checkBufferSize();
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        clone(): void;
+    }
+    class trailNode {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
+        time: number;
+        constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
+    }
+}
+declare namespace gd3d.framework {
     class trailRender implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: gd3d.framework.CullingMask;
@@ -1462,9 +1505,11 @@ declare namespace gd3d.framework {
         private vertexcount;
         private dataForVbo;
         private dataForEbo;
+        private sticks;
         start(): void;
         private app;
         private webgl;
+        private path;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
@@ -1475,9 +1520,25 @@ declare namespace gd3d.framework {
         private initmesh();
         private speed;
         private lowspeed;
-        private updateTrail();
+        private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
+    }
+    class trailStick {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
+        follow: trailPathNode;
+        speed: number;
+        followMove(delta: number): void;
+    }
+    class trailPathNode {
+        pos: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
+        next: trailPathNode;
+    }
+    class trailPath {
+        add(): trailPathNode;
+        end: trailPathNode;
     }
 }
 declare namespace gd3d.framework {
