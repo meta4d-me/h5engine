@@ -1928,7 +1928,7 @@ var t;
                     this.weapon.addChild(trailtrans);
                     gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
                     trailtrans.markDirty();
-                    var trailrender = trailtrans.gameObject.addComponent("trailRender_recorde");
+                    var trailrender = trailtrans.gameObject.addComponent("trailRender");
                     trailrender.setWidth(1);
                     var mat = new gd3d.framework.material();
                     var shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json");
@@ -1936,9 +1936,6 @@ var t;
                     mat.setShader(shader);
                     mat.setTexture("_MainTex", tex);
                     trailrender.material = mat;
-                    trailrender.lifetime = 0.4;
-                    trailrender.minvertexDistance = 0.01;
-                    trailrender.setWidth(1, 1);
                 }
             }
             state.finish = true;

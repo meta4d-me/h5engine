@@ -171,7 +171,7 @@ namespace t {
                     this.weapon.addChild(trailtrans);               
                     gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
                     trailtrans.markDirty();
-                    var trailrender = trailtrans.gameObject.addComponent("trailRender_recorde") as gd3d.framework.trailRender_recorde;
+                    var trailrender = trailtrans.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
                     //trailrender.color=new gd3d.math.color(1.0,0,0,1.0);
                     //trailrender.speed = 1;
                     trailrender.setWidth(1);
@@ -185,9 +185,9 @@ namespace t {
                     mat.setTexture("_MainTex", tex)
 
                     trailrender.material = mat;
-                    trailrender.lifetime=0.4;
-                    trailrender.minvertexDistance=0.01;
-                    trailrender.setWidth(1,1);
+                    //trailrender.lifetime=0.4;
+                    //trailrender.minvertexDistance=0.01;
+                    //trailrender.setWidth(1,1);
                 }
 
             }

@@ -8864,7 +8864,15 @@ var gd3d;
                 this.initmesh();
             };
             trailRender.prototype.update = function (delta) {
-                this.updateTrail();
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), this.sticks[0].location);
+                this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
+                gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
+                var length = this.sticks.length;
+                for (var i = 1; i < length; i++) {
+                    gd3d.math.vec3SLerp(this.sticks[i].location, this.sticks[i - 1].location, 0.5, this.sticks[i].location);
+                    gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, 0.5, this.sticks[i].updir);
+                }
+                this.updateTrailData();
             };
             trailRender.prototype.remove = function () {
             };
@@ -8909,6 +8917,15 @@ var gd3d;
                 this.width = Width;
             };
             trailRender.prototype.initmesh = function () {
+                this.sticks = [];
+                for (var i = 0; i < this.vertexcount / 2; i++) {
+                    var ts = new trailStick();
+                    this.sticks.push(ts);
+                    ts.location = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), ts.location);
+                    ts.updir = new gd3d.math.vector3();
+                    this.gameObject.transform.getUpInWorld(ts.updir);
+                }
                 this.mesh = new gd3d.framework.mesh();
                 this.mesh.data = new gd3d.render.meshData();
                 this.mesh.glMesh = new gd3d.render.glMesh();
@@ -8972,59 +8989,17 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(uppos);
                 gd3d.math.pool.delete_vector3(downpos);
             };
-            trailRender.prototype.updateTrail = function () {
+            trailRender.prototype.updateTrailData = function () {
                 var length = this.vertexcount / 2;
-                var pos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
-                var updir = gd3d.math.pool.new_vector3();
-                this.gameObject.transform.getUpInWorld(updir);
-                gd3d.math.vec3ScaleByNum(updir, this.width, updir);
-                var uppos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Add(pos, updir, uppos);
-                var downpos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(pos, updir, downpos);
-                this.dataForVbo[0] = uppos.x;
-                this.dataForVbo[1] = uppos.y;
-                this.dataForVbo[2] = uppos.z;
-                this.dataForVbo[9] = downpos.x;
-                this.dataForVbo[9 + 1] = downpos.y;
-                this.dataForVbo[9 + 2] = downpos.z;
-                gd3d.math.pool.delete_vector3(updir);
-                gd3d.math.pool.delete_vector3(pos);
-                gd3d.math.pool.delete_vector3(uppos);
-                gd3d.math.pool.delete_vector3(downpos);
-                for (var i = 1; i < length; i++) {
-                    var xx = this.dataForVbo[(i - 1) * 2 * 9] - this.dataForVbo[i * 2 * 9];
-                    var yy = this.dataForVbo[(i - 1) * 2 * 9 + 1] - this.dataForVbo[i * 2 * 9 + 1];
-                    var zz = this.dataForVbo[(i - 1) * 2 * 9 + 2] - this.dataForVbo[i * 2 * 9 + 2];
-                    var curspeed = (this.speed - this.lowspeed) * (length - i) / length + this.lowspeed;
-                    var xxOff = xx * curspeed;
-                    var yyOff = yy * curspeed;
-                    var zzOff = zz * curspeed;
-                    var mark = Math.sqrt(xx * xx + yy * yy + zz * zz);
-                    if (mark < 0.01) {
-                        xxOff = xx;
-                        yyOff = yy;
-                        zzOff = zz;
-                    }
-                    this.dataForVbo[i * 2 * 9] += xxOff;
-                    this.dataForVbo[i * 2 * 9 + 1] += yyOff;
-                    this.dataForVbo[i * 2 * 9 + 2] += zzOff;
-                    var xx1 = this.dataForVbo[((i - 1) * 2 + 1) * 9] - this.dataForVbo[(i * 2 + 1) * 9];
-                    var yy1 = this.dataForVbo[((i - 1) * 2 + 1) * 9 + 1] - this.dataForVbo[(i * 2 + 1) * 9 + 1];
-                    var zz1 = this.dataForVbo[((i - 1) * 2 + 1) * 9 + 2] - this.dataForVbo[(i * 2 + 1) * 9 + 2];
-                    var xx1Off = xx1 * curspeed;
-                    var yy1Off = yy1 * curspeed;
-                    var zz1Off = zz1 * curspeed;
-                    var mark1 = Math.sqrt(xx1 * xx1 + yy1 * yy1 + zz1 * zz1);
-                    if (mark1 < 0.01) {
-                        xx1Off = xx1;
-                        yy1Off = yy1;
-                        zz1Off = zz1;
-                    }
-                    this.dataForVbo[(i * 2 + 1) * 9] += xx1Off;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 1] += yy1Off;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 2] += zz1Off;
+                for (var i = 0; i < length; i++) {
+                    var pos = this.sticks[i].location;
+                    var up = this.sticks[i].updir;
+                    this.dataForVbo[i * 2 * 9] = pos.x;
+                    this.dataForVbo[i * 2 * 9 + 1] = pos.y;
+                    this.dataForVbo[i * 2 * 9 + 2] = pos.z;
+                    this.dataForVbo[(i * 2 + 1) * 9] = pos.x;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 1] += pos.y;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 2] += pos.z;
                 }
             };
             trailRender.prototype.render = function (context, assetmgr, camera) {
@@ -9041,6 +9016,12 @@ var gd3d;
             gd3d.reflect.nodeComponent
         ], trailRender);
         framework.trailRender = trailRender;
+        var trailStick = (function () {
+            function trailStick() {
+            }
+            return trailStick;
+        }());
+        framework.trailStick = trailStick;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
