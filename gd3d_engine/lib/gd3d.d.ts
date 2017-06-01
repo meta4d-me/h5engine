@@ -1468,6 +1468,7 @@ declare namespace gd3d.framework {
         private mesh;
         private dataForVbo;
         private dataForEbo;
+        interpolate: boolean;
         material: gd3d.framework.material;
         startColor: gd3d.math.color;
         endColor: gd3d.math.color;

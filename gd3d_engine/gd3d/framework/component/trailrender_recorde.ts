@@ -25,6 +25,7 @@ namespace gd3d.framework {
         private dataForVbo: Float32Array;
         private dataForEbo: Uint16Array;
 
+        interpolate:boolean=false;
 
         //-----------------------------------------------------------------------------------------------
         public set material(material: gd3d.framework.material) {

@@ -8649,6 +8649,7 @@ var gd3d;
                 this.minvertexDistance = 0.1;
                 this.maxvertexCout = 12;
                 this.nodes = [];
+                this.interpolate = false;
                 this.notRender = false;
             }
             Object.defineProperty(trailRender_recorde.prototype, "material", {
