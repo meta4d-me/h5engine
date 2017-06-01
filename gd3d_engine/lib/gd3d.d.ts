@@ -1924,6 +1924,7 @@ declare namespace gd3d.framework {
         matrix: math.matrix;
         tilling: math.vector2;
         rotationByEuler: math.quaternion;
+        startEuler: math.vector3;
         startRotation: math.quaternion;
         localRotation: math.quaternion;
         mesh: mesh;
@@ -2354,6 +2355,40 @@ declare namespace gd3d.framework {
         elements: EffectElement;
         velocity: any;
         frameInternal: number;
+        init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
+        update(frameIndex: number): void;
+    }
+    class RoseCurveAction implements IEffectAction {
+        type: string;
+        params: any;
+        startFrame: number;
+        endFrame: number;
+        elements: EffectElement;
+        radius: number;
+        polar: any;
+        level: number;
+        frameInternal: number;
+        speed: number;
+        init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
+        update(frameIndex: number): void;
+    }
+    class TrailAction implements IEffectAction {
+        type: string;
+        params: any;
+        startFrame: number;
+        endFrame: number;
+        elements: EffectElement;
+        radius: number;
+        position: any;
+        eular: any;
+        width: number;
+        frameInternal: number;
+        speed: number;
+        transform: gd3d.framework.transform;
+        startRotation: gd3d.math.quaternion;
+        color: any;
+        alpha: number;
+        offsetTransalte: gd3d.math.vector3;
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
         update(frameIndex: number): void;
     }

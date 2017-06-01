@@ -52,8 +52,9 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_skillsystem", () => new t.test_skillsystem());
         this.addBtn("test_integratedrender", () => new t.test_integratedrender());
         this.addBtn("test_blend", () => new t.test_blend());
+        this.addBtn("test_curve",()=>new t.test_three_leaved_rose_curve());
+        this.addBtn("test_effect",()=>new test_effect());
         
-
 
     }
     private x: number = 0;

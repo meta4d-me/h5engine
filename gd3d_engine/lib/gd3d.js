@@ -7676,6 +7676,9 @@ var gd3d;
                 element.curAttrData = elementData.initFrameData.attrsData.clone();
                 var vertexSize = subEffectBatcher.vertexSize;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
+                if (element.curAttrData.startEuler) {
+                    gd3d.math.quatFromEulerAngles(element.curAttrData.startEuler.x, element.curAttrData.startEuler.y, element.curAttrData.startEuler.z, element.curAttrData.startRotation);
+                }
                 element.update();
                 subEffectBatcher.effectElements.push(element);
                 for (var i_3 = 0; i_3 < vertexCount; i_3++) {
@@ -12610,6 +12613,12 @@ var gd3d;
                         case "uvroll":
                             action = new framework.UVRollAction();
                             break;
+                        case "rosepath":
+                            action = new framework.RoseCurveAction();
+                            break;
+                        case "trail":
+                            action = new framework.TrailAction();
+                            break;
                     }
                     action.init(actiondata.startFrame, actiondata.endFrame, actiondata.params, this);
                     this.actions.push(action);
@@ -12632,6 +12641,7 @@ var gd3d;
             EffectElement.prototype.updateElementRotation = function () {
                 var cameraTransform = gd3d.framework.sceneMgr.app.getScene().mainCamera.gameObject.transform;
                 var worldRotation = gd3d.math.pool.new_quaternion();
+                var localRotation = gd3d.math.pool.new_quaternion();
                 if (this.curAttrData.renderModel != framework.RenderModel.None) {
                     var invTransformRotation = gd3d.math.pool.new_quaternion();
                     var worldTranslation = gd3d.math.pool.new_vector3();
@@ -12676,21 +12686,22 @@ var gd3d;
                         return;
                     }
                     else if (this.curAttrData.renderModel == framework.RenderModel.Mesh) {
-                        {
-                            framework.EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
-                        }
+                        framework.EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
                     }
                     gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, worldRotation);
                     gd3d.math.quatClone(this.gameobject.gameObject.transform.getWorldRotate(), invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.curAttrData.localRotation);
+                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, localRotation);
+                    gd3d.math.quatMultiply(this.curAttrData.startRotation, localRotation, this.curAttrData.localRotation);
                     gd3d.math.pool.delete_vector3(translation);
                     gd3d.math.pool.delete_vector3(worldTranslation);
                     gd3d.math.pool.delete_quaternion(invTransformRotation);
                 }
                 else {
-                    gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
+                    gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, localRotation);
+                    gd3d.math.quatMultiply(localRotation, this.curAttrData.startRotation, this.curAttrData.localRotation);
                 }
+                gd3d.math.pool.delete_quaternion(localRotation);
                 gd3d.math.pool.delete_quaternion(worldRotation);
             };
             EffectElement.prototype.isActiveFrame = function (frameIndex) {
@@ -12731,12 +12742,18 @@ var gd3d;
                 elementdata.ref = this.ref;
                 if (this.initFrameData)
                     elementdata.initFrameData = this.initFrameData.clone();
-                elementdata.emissionData = this.emissionData.clone();
+                if (this.emissionData) {
+                    elementdata.emissionData = this.emissionData.clone();
+                }
                 for (var key in this.timelineFrame) {
-                    elementdata.timelineFrame[key] = this.initFrameData[key].clone();
+                    if (this.initFrameData[key]) {
+                        elementdata.timelineFrame[key] = this.initFrameData[key].clone();
+                    }
                 }
                 for (var key in this.actionData) {
-                    elementdata.actionData[key] = this.actionData[key].clone();
+                    if (this.actionData[key]) {
+                        elementdata.actionData[key] = this.actionData[key].clone();
+                    }
                 }
                 return elementdata;
             };
@@ -12755,6 +12772,7 @@ var gd3d;
         framework.EffectElementData = EffectElementData;
         var EffectAttrsData = (function () {
             function EffectAttrsData() {
+                this.euler = new gd3d.math.vector3();
                 this.uv = new gd3d.math.vector2(0, 0);
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
@@ -12859,6 +12877,10 @@ var gd3d;
                     data.localRotation = gd3d.math.pool.clone_quaternion(this.localRotation);
                 if (this.meshdataVbo != undefined)
                     data.meshdataVbo = this.meshdataVbo;
+                if (this.startEuler != undefined)
+                    data.startEuler = gd3d.math.pool.clone_vector3(this.startEuler);
+                if (this.startRotation != undefined)
+                    data.startRotation = gd3d.math.pool.clone_quaternion(this.startRotation);
                 data.alpha = this.alpha;
                 data.renderModel = this.renderModel;
                 data.mesh = this.mesh;
@@ -14042,6 +14064,143 @@ var gd3d;
             return RotationAction;
         }());
         framework.RotationAction = RotationAction;
+        var RoseCurveAction = (function () {
+            function RoseCurveAction() {
+            }
+            RoseCurveAction.prototype.init = function (_startFrame, _endFrame, _params, _elements) {
+                this.startFrame = _startFrame;
+                this.endFrame = _endFrame;
+                this.params = _params;
+                this.elements = _elements;
+                if (this.params["radius"] != undefined) {
+                    this.radius = this.params["radius"];
+                }
+                if (this.params["level"] != undefined) {
+                    this.level = this.params["radius"];
+                }
+                if (this.params["speed"] != undefined) {
+                    this.speed = this.params["speed"];
+                }
+                if (this.params["polar"] != undefined) {
+                    this.polar = framework.EffectUtil.parseEffectVec3(this.params["polar"]);
+                }
+                this.frameInternal = 1 / framework.effectSystem.fps;
+            };
+            RoseCurveAction.prototype.update = function (frameIndex) {
+                var curAttrData = this.elements.data.initFrameData.attrsData.clone();
+                var radius = this.radius;
+                var curFrame = frameIndex % 360;
+                var x = this.polar.x.getValue();
+                var y = this.polar.y.getValue();
+                var z = this.polar.z.getValue();
+                {
+                    var theta = frameIndex * this.speed;
+                    this.elements.curAttrData.pos.x = curAttrData.pos.x + radius * Math.cos(3 * theta + x) * Math.cos(theta);
+                    this.elements.curAttrData.pos.z = curAttrData.pos.z + radius * Math.cos(3 * theta + x) * Math.sin(theta);
+                    this.elements.curAttrData.pos.y = curAttrData.pos.y + y * Math.cos(frameIndex * this.speed);
+                }
+                {
+                    var deltaTheta = frameIndex * this.speed + 0.001;
+                    var targetPoint = gd3d.math.pool.new_vector3();
+                    targetPoint.x = curAttrData.pos.x + radius * Math.cos(3 * deltaTheta + x) * Math.cos(deltaTheta);
+                    targetPoint.z = curAttrData.pos.z + radius * Math.cos(3 * deltaTheta + x) * Math.sin(deltaTheta);
+                    targetPoint.y = curAttrData.pos.y + y * Math.cos(frameIndex * this.speed);
+                    var rotation = gd3d.math.pool.new_quaternion();
+                    gd3d.math.quatLookat(this.elements.curAttrData.pos, targetPoint, rotation);
+                    gd3d.math.quatToEulerAngles(rotation, this.elements.curAttrData.euler);
+                    gd3d.math.pool.delete_vector3(targetPoint);
+                    gd3d.math.pool.delete_quaternion(rotation);
+                }
+            };
+            return RoseCurveAction;
+        }());
+        framework.RoseCurveAction = RoseCurveAction;
+        var TrailAction = (function () {
+            function TrailAction() {
+                this.offsetTransalte = new gd3d.math.vector3();
+            }
+            TrailAction.prototype.init = function (_startFrame, _endFrame, _params, _elements) {
+                this.startFrame = _startFrame;
+                this.endFrame = _endFrame;
+                this.params = _params;
+                this.elements = _elements;
+                if (this.params["pos"] != undefined) {
+                    this.position = framework.EffectUtil.parseEffectVec3(this.params["pos"]);
+                }
+                this.offsetTransalte.x = this.position.x.getValue();
+                this.offsetTransalte.y = this.position.y.getValue();
+                this.offsetTransalte.z = this.position.z.getValue();
+                if (this.params["eular"] != undefined) {
+                    this.eular = framework.EffectUtil.parseEffectVec3(this.params["eular"]);
+                }
+                if (this.params["color"] != undefined) {
+                    this.color = framework.EffectUtil.parseEffectVec3(this.params["color"]);
+                }
+                if (this.params["width"] != undefined) {
+                    this.width = this.params["width"];
+                }
+                if (this.params["speed"] != undefined) {
+                    this.speed = this.params["speed"];
+                }
+                if (this.params["speed"] != undefined) {
+                    this.speed = this.params["speed"];
+                }
+                if (this.params["alpha"] != undefined) {
+                    this.alpha = this.params["alpha"];
+                }
+                var mat = new gd3d.framework.material();
+                var shader = new gd3d.framework.shader();
+                var texture = new gd3d.framework.texture();
+                if (this.params["shader"] != undefined)
+                    shader = framework.sceneMgr.app.getAssetMgr().getShader(this.params["shader"]);
+                else
+                    shader = framework.sceneMgr.app.getAssetMgr().getShader("shader/def");
+                mat.setShader(shader);
+                if (this.params["diffuseTexture"] != undefined)
+                    texture = framework.sceneMgr.app.getAssetMgr().getAssetByName(this.params["diffuseTexture"]);
+                mat.setTexture("_MainTex", texture);
+                this.frameInternal = 1 / framework.effectSystem.fps;
+                this.transform = new gd3d.framework.transform();
+                framework.sceneMgr.scene.addChild(this.transform);
+                var curAttrData = this.elements.data.initFrameData.attrsData.clone();
+                var worldTranslate = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Clone(curAttrData.pos, worldTranslate);
+                if (this.elements.gameobject != undefined) {
+                    gd3d.math.matrixTransformVector3(worldTranslate, this.elements.gameobject.getWorldMatrix(), worldTranslate);
+                }
+                gd3d.math.vec3Clone(worldTranslate, this.transform.localTranslate);
+                gd3d.math.pool.delete_vector3(worldTranslate);
+                var trailTransform = new gd3d.framework.transform();
+                this.transform.addChild(trailTransform);
+                var x = this.eular.x.getValue();
+                var y = this.eular.y.getValue();
+                var z = this.eular.z.getValue();
+                this.startRotation = new gd3d.math.quaternion();
+                gd3d.math.quatFromEulerAngles(x, y, z, this.startRotation);
+                gd3d.math.quatMultiply(this.startRotation, curAttrData.localRotation, this.transform.localRotate);
+                this.transform.markDirty();
+                trailTransform.markDirty();
+                var trailrender = trailTransform.gameObject.addComponent("trailRender");
+                trailrender.color = new gd3d.math.color(this.color.x.getValue(), this.color.y.getValue(), this.color.z.getValue(), this.alpha);
+                trailrender.setspeed(this.speed);
+                trailrender.setWidth(this.width);
+                trailrender.material = mat;
+            };
+            TrailAction.prototype.update = function (frameIndex) {
+                var worldTranslate = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Clone(this.elements.curAttrData.pos, worldTranslate);
+                if (this.elements.gameobject != undefined) {
+                    gd3d.math.matrixTransformVector3(worldTranslate, this.elements.gameobject.getWorldMatrix(), worldTranslate);
+                }
+                gd3d.math.vec3Clone(worldTranslate, this.transform.localTranslate);
+                gd3d.math.vec3Add(this.transform.localTranslate, this.offsetTransalte, this.transform.localTranslate);
+                gd3d.math.pool.delete_vector3(worldTranslate);
+                gd3d.math.quatMultiply(this.startRotation, this.elements.curAttrData.localRotation, this.transform.localRotate);
+                this.transform.markDirty();
+            };
+            return TrailAction;
+        }());
+        framework.TrailAction = TrailAction;
         var BreathAction = (function () {
             function BreathAction() {
             }
@@ -14219,7 +14378,7 @@ var gd3d;
                                     frame.attrsData.scale = val.getValue();
                                 }
                                 else if (key == "euler") {
-                                    frame.attrsData.euler = val.getValue();
+                                    frame.attrsData.startEuler = val.getValue();
                                 }
                                 else if (key == "mesh") {
                                     frame.attrsData.mesh = val;

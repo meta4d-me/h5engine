@@ -2,63 +2,90 @@
     "life": 1000,
     "elements": [
         {
-            "name": "kuosan0",
+            "name": "rotation1",
             "type": "singlemesh",
             "timeline": [
                 {
                     "frame": -1,
                     "attrs": {
                         "pos": {
-                            "x": 0,
+                            "x": 1,
                             "y": 0,
                             "z": 0
                         },
                         "euler": {
-                            "x": 0,
+                            "x": -90,
                             "y": 0,
                             "z": 0
                         },
                         "scale": {
-                            "x": 1,
-                            "y": 1,
-                            "z": 1
+                            "x": 87.35994,
+                            "y": 96.09596,
+                            "z": 87.35996
                         },
-                        "alpha": 0.5,
+                        "alpha": 1,
                         "uv": {
-                            "u": 2,
-                            "v": 3
+                            "u": 1,
+                            "v": 1
                         },
                         "color": {
                             "x": 1,
                             "y": 1,
                             "z": 1
                         },
-                        "mesh": "quad",
+                        "mesh": "Art_Effects_Skill_Effects_magian_hei_long_bo_FBX_dragon.FBX_long_tou_1.mesh.bin",
                         "mat": {
-                            "shader": "particles_additive.shader.json",
-                            "diffuseTexture": "onepiece.png"
-                        },
-                        "billboard": "horizontal"
+                            "shader": "diffuse_bothside.shader.json",
+                            "diffuseTexture": "dragon.png"
+                        }
                     }
                 },
                 {
                     "frame": 0,
                     "actions": [
                         {
-                            "action": "rotation",
+                            "action": "rosepath",
                             "param": {
-                                "velocity": {
-                                    "x": 0,
-                                    "y": 0,
-                                    "z": 100
+                                "radius": 5,
+                                "level": 1,
+                                "speed": 0.02,
+                                "polar": {
+                                    "x": 180,
+                                    "y": 1,
+                                    "z": 180
                                 }
+                            }
+                        },
+                        {
+                            "action": "trail",
+                            "param": {
+                                "pos": {
+                                    "x": 0.2,
+                                    "y": 0,
+                                    "z": 0
+                                }, 
+                                "eular": {
+                                    "x": 90,
+                                    "y": 0,
+                                    "z": 90
+                                },
+                                "speed": 0.15,
+                                "width": 0.25,
+                                "alpha": 1,
+                                "color": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                },
+                                "shader": "particles_additive.shader.json",
+                                "diffuseTexture": "sd_hlb_1.png"
                             }
                         }
                     ]
                 }
             ]
         },
-        {
+                {
             "name": "rotation2",
             "type": "singlemesh",
             "timeline": [
@@ -116,20 +143,26 @@
                         {
                             "action": "trail",
                             "param": {
-                                "positon":
-                                {
+                                "pos": {
                                     "x": 0.2,
-                                    "y": 1,
-                                    "z": 0
-                                },
-                                "rotation":
-                                {
-                                    "x":90,
                                     "y": 0,
                                     "z": 0
+                                }, 
+                                "eular": {
+                                    "x": 90,
+                                    "y": 0,
+                                    "z": 90
                                 },
-                                "speed":0.35,
-                                "width":0.25
+                                "speed": 0.15,
+                                "width": 0.25,
+                                "alpha": 1,
+                                "color": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                },
+                                "shader": "particles_additive.shader.json",
+                                "diffuseTexture": "sd_hlb_1.png"
                             }
                         }
                     ]
@@ -194,20 +227,26 @@
                         {
                             "action": "trail",
                             "param": {
-                                "positon":
-                                {
+                                "pos": {
                                     "x": 0.2,
-                                    "y": 1,
-                                    "z": 0
-                                },
-                                "rotation":
-                                {
-                                    "x":90,
                                     "y": 0,
                                     "z": 0
+                                }, 
+                                "eular": {
+                                    "x": 90,
+                                    "y": 0,
+                                    "z": 90
                                 },
-                                "speed":0.35,
-                                "width":0.25
+                                "speed": 0.15,
+                                "width": 0.25,
+                                "alpha": 1,
+                                "color": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                },
+                                "shader": "particles_additive.shader.json",
+                                "diffuseTexture": "sd_hlb_1.png"
                             }
                         }
                     ]
@@ -272,20 +311,26 @@
                         {
                             "action": "trail",
                             "param": {
-                                "positon":
-                                {
+                                "pos": {
                                     "x": 0.2,
-                                    "y": 1,
-                                    "z": 0
-                                },
-                                "rotation":
-                                {
-                                    "x":90,
                                     "y": 0,
                                     "z": 0
+                                }, 
+                                "eular": {
+                                    "x": 90,
+                                    "y": 0,
+                                    "z": 90
                                 },
-                                "speed":0.35,
-                                "width":0.25
+                                "speed": 0.15,
+                                "width": 0.5,
+                                "alpha": 1,
+                                "color": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                },
+                                "shader": "particles_additive.shader.json",
+                                "diffuseTexture": "sd_hlb_1.png"
                             }
                         }
                     ]
@@ -350,20 +395,26 @@
                         {
                             "action": "trail",
                             "param": {
-                                "positon":
-                                {
+                                "pos": {
                                     "x": 0.2,
-                                    "y": 1,
+                                    "y": 0,
                                     "z": 0
-                                },
-                                "rotation":
-                                {
-                                    "x":0,
+                                }, 
+                                "eular": {
+                                    "x": 90,
                                     "y": 0,
                                     "z": 90
                                 },
-                                "speed":0.35,
-                                "width":0.25
+                                "speed": 0.15,
+                                "width": 0.5,
+                                "alpha": 1,
+                                "color": {
+                                    "x": 1,
+                                    "y": 1,
+                                    "z": 1
+                                },
+                                "shader": "particles_additive.shader.json",
+                                "diffuseTexture": "sd_hlb_1.png"
                             }
                         }
                     ]

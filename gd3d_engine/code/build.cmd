@@ -1,1 +1,2 @@
-@tsc
+@call tsc
+@call pause
