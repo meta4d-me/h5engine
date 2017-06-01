@@ -114,7 +114,7 @@ namespace t
                 cube.addChild(trailtrans);
                 gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, 90, trailtrans.localRotate);
                 trailtrans.markDirty();
-                var trailrender = trailtrans.gameObject.addComponent("trailRender_recorde") as gd3d.framework.trailRender_recorde;
+                var trailrender = trailtrans.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
                 //trailrender.color=new gd3d.math.color(1.0,0,0,1.0);
                 //particles_blend_premultiply.shader.json
                 //particles_additive.shader.json
@@ -126,8 +126,8 @@ namespace t
                 mat.setTexture("_MainTex", tex)
 
                 trailrender.material = mat;
-                trailrender.lifetime=1;
-                trailrender.minvertexDistance=0.5;
+                // trailrender.lifetime=1;
+                // trailrender.minvertexDistance=0.5;
                 
             }
             state.finish = true;

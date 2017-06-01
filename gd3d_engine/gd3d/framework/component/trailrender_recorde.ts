@@ -13,7 +13,7 @@ namespace gd3d.framework {
 
         lifetime: number = 0.35;
         minvertexDistance: number = 0.1;
-        maxvertexCout:number=12;
+        maxvertexCout: number = 12;
         private _material: gd3d.framework.material;
         private _startColor: gd3d.math.color;
         private _endColor: gd3d.math.color;
@@ -25,8 +25,9 @@ namespace gd3d.framework {
         private dataForVbo: Float32Array;
         private dataForEbo: Uint16Array;
 
-        interpolate:boolean=false;
-
+        interpolate: boolean = false;//是否中间插点完成平滑
+        interpNumber:number=3;
+        interpPath:trailNode[]=[];
         //-----------------------------------------------------------------------------------------------
         public set material(material: gd3d.framework.material) {
             this._material = material;
@@ -107,12 +108,8 @@ namespace gd3d.framework {
         remove() {
 
         }
-
         private refreshTrailNode(curTime: number) {
-            //移除死掉的粒子
-            while (this.nodes.length > 0 && curTime > this.nodes[this.nodes.length - 1].time + this.lifetime) {
-                this.nodes.pop();
-            }
+
             //插入新粒子
             var pos = new gd3d.math.vector3();
             gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
@@ -124,21 +121,65 @@ namespace gd3d.framework {
 
             var updir = new gd3d.math.vector3();
             this.gameObject.transform.getUpInWorld(updir);
-
+            
             var newNode = new trailNode(pos, updir, curTime);
             this.nodes.unshift(newNode);
-
-            //控制粒子数量
-            while(this.nodes.length>this.maxvertexCout)
+            if(this.interpolate)
             {
-                this.nodes.pop();
+                if(this.nodes.length>2)
+                {
+                    this.nodes[1].handle=new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(this.nodes[2].location,this.nodes[0].location,this.nodes[1].handle);
+                    if(this.nodes[2].handle==undefined)
+                    {
+                        this.nodes[2].handle=new gd3d.math.vector3();
+                        gd3d.math.vec3Subtract(this.nodes[1].location,this.nodes[2].location,this.nodes[2].handle);
+                    }
+
+                    this.nodes[1].trailNodes=[];
+                    for(var i=this.interpNumber;i>0;i--)
+                    {
+                        
+                        var lerp=(i+1)/(this.interpNumber+1);                        
+                        var inter_pos=new gd3d.math.vector3();
+                        gd3d.math.GetPointAlongCurve(this.nodes[1].location,this.nodes[1].handle,this.nodes[2].location,this.nodes[2].handle,(i+1)/(this.interpNumber+1),inter_pos);
+                        var inter_updir = new gd3d.math.vector3();
+                        gd3d.math.vec3SLerp(this.nodes[1].updir,this.nodes[2].updir,lerp,inter_updir);
+                        var inter_node=new trailNode(inter_pos,inter_updir,curTime);
+                        this.interpPath.unshift(inter_node);
+                    }
+
+                    this.interpPath.unshift(newNode);
+                }
             }
+            //移除死掉的粒子
+            while (this.nodes.length > 0 && curTime > this.nodes[this.nodes.length - 1].time + this.lifetime) {
+                this.nodes.pop();
+                if(this.interpolate)
+                {
+                    for(var i=0;i<this.interpNumber+1;i++)
+                    {
+                        this.interpPath.pop();
+                    }
+                }
+            }
+            //控制粒子数量
+            while (this.nodes.length > this.maxvertexCout) {
+                this.nodes.pop();
+                if(this.interpolate)
+                {
+                    for(var i=0;i<this.interpNumber+1;i++)
+                    {
+                        this.interpPath.pop();
+                    }
+                }
+            }
+
+
         }
         private notRender: boolean = false;
 
         private updateTrailData(curTime: number) {
-
-
 
             if (this.nodes.length < 2) {
                 this.notRender = true;
@@ -149,15 +190,24 @@ namespace gd3d.framework {
             }
 
             this.checkBufferSize();
-            for (var i = 0; i < this.nodes.length; i++) {
-                var curNode = this.nodes[i];
-                var u = i / this.nodes.length;
+            var stick:trailNode[];
+            if(this.interpolate)
+            {
+                stick=this.interpPath;
+            }
+            else
+            {
+                stick=this.nodes;
+            }
+            for (var i = 0; i < stick.length; i++) {
+                var curNode = stick[i];
+                var u = i / stick.length;
 
                 var timeAlong = (curTime - curNode.time) / this.lifetime;
 
                 var _updir = new gd3d.math.vector3();
                 gd3d.math.vec3Clone(curNode.updir, _updir);
-                var _width: number = this._startWidth + (this._endWidth-this._startWidth) * timeAlong;
+                var _width: number = this._startWidth + (this._endWidth - this._startWidth) * timeAlong;
                 gd3d.math.vec3ScaleByNum(_updir, _width, _updir);
 
 
@@ -208,12 +258,20 @@ namespace gd3d.framework {
         }
 
         private checkBufferSize() {
-            if (this.nodes.length * 2 * 9 > this.dataForVbo.length) {
+            var stickNumber=0;
+            if(this.interpolate)
+            {
+                stickNumber=this.interpPath.length;
+            }
+            else{
+                stickNumber=this.nodes.length;
+            }
+            if (stickNumber * 2 * 9 > this.dataForVbo.length) {
                 var length = this.dataForVbo.length;
                 this.mesh.glMesh.resetVboSize(this.webgl, length * 2);
                 this.dataForVbo = new Float32Array(length * 2);
             }
-            if ((this.nodes.length - 1) * 6 > this.dataForEbo.length) {
+            if ((stickNumber - 1) * 6 > this.dataForEbo.length) {
                 var length = this.dataForEbo.length;
                 this.mesh.glMesh.resetEboSize(this.webgl, 0, length * 2);
                 this.dataForEbo = new Uint16Array(length * 2);
@@ -240,6 +298,9 @@ namespace gd3d.framework {
         location: gd3d.math.vector3;
         updir: gd3d.math.vector3;
         time: number;
+        handle:gd3d.math.vector3;
+
+        trailNodes:trailNode[];
 
         constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number) {
             this.location = p;

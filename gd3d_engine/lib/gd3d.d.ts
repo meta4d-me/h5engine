@@ -1469,6 +1469,8 @@ declare namespace gd3d.framework {
         private dataForVbo;
         private dataForEbo;
         interpolate: boolean;
+        interpNumber: number;
+        interpPath: trailNode[];
         material: gd3d.framework.material;
         startColor: gd3d.math.color;
         endColor: gd3d.math.color;
@@ -1490,6 +1492,8 @@ declare namespace gd3d.framework {
         location: gd3d.math.vector3;
         updir: gd3d.math.vector3;
         time: number;
+        handle: gd3d.math.vector3;
+        trailNodes: trailNode[];
         constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
     }
 }
@@ -1509,6 +1513,7 @@ declare namespace gd3d.framework {
         start(): void;
         private app;
         private webgl;
+        private path;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
@@ -1516,6 +1521,9 @@ declare namespace gd3d.framework {
         color: gd3d.math.color;
         setspeed(upspeed: number, lowspeed?: number): void;
         setWidth(Width: number): void;
+        private active;
+        play(): void;
+        stop(): void;
         private initmesh();
         private speed;
         private lowspeed;
@@ -1526,6 +1534,21 @@ declare namespace gd3d.framework {
     class trailStick {
         location: gd3d.math.vector3;
         updir: gd3d.math.vector3;
+        follow: trailPathNode;
+        speed: number;
+        activeTime: number;
+        delay: number;
+        followMove(delta: number): void;
+    }
+    function traillerp(startdir: math.vector3, enddir: math.vector3, lerp: number, outdir: math.vector3): void;
+    class trailPathNode {
+        pos: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
+        next: trailPathNode;
+    }
+    class trailPath {
+        add(): trailPathNode;
+        end: trailPathNode;
     }
 }
 declare namespace gd3d.framework {
@@ -1861,6 +1884,7 @@ declare namespace gd3d.math {
 }
 declare namespace gd3d.math {
     function spriteAnimation(row: number, column: number, index: number, out: vector4): void;
+    function GetPointAlongCurve(curveStart: vector3, curveStartHandle: vector3, curveEnd: vector3, curveEndHandle: vector3, t: number, out: vector3, crease?: number): void;
 }
 declare namespace gd3d.math {
     function vec2Subtract(a: vector2, b: vector2, out: vector2): void;

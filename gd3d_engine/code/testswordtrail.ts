@@ -1,6 +1,6 @@
 namespace t {
 
-    export class test_integratedrender implements IState {
+    export class test_trailrenderrecorde implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
@@ -134,6 +134,9 @@ namespace t {
                 }
 
                 {
+
+
+
                     var cube = new gd3d.framework.transform();
                     cube.name = "cube";
                     this.cube = cube;
@@ -168,7 +171,7 @@ namespace t {
                     this.weapon.addChild(trailtrans);               
                     gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
                     trailtrans.markDirty();
-                    var trailrender = trailtrans.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
+                    var trailrender = trailtrans.gameObject.addComponent("trailRender_recorde") as gd3d.framework.trailRender_recorde;
                     //trailrender.color=new gd3d.math.color(1.0,0,0,1.0);
                     //trailrender.speed = 1;
                     trailrender.setWidth(1);
@@ -182,7 +185,8 @@ namespace t {
                     mat.setTexture("_MainTex", tex)
 
                     trailrender.material = mat;
-                    this.trailrender=trailrender;
+                    trailrender.interpolate=true;
+                    //this.trailrender=trailrender;
                     //trailrender.lifetime=0.4;
                     //trailrender.minvertexDistance=0.01;
                     //trailrender.setWidth(1,1);
@@ -210,13 +214,11 @@ namespace t {
             tbn1.onclick = () => {
                     let name = "attack_01.FBAni.aniclip.bin";
                     this.aniplayer.playCross(name, 0.2);
-                    this.trailrender.play();
             }
             var btn = this.addbtn("120px", "0px", "attack_02");
             btn.onclick = () => {
                     let name = "attack_02.FBAni.aniclip.bin";
                     this.aniplayer.playCross(name, 0.2);
-                    this.trailrender.play();
             }
             // var btn3 = this.addbtn("160px", "0px", "attack_03");
             // btn3.onclick = () => {
@@ -229,7 +231,6 @@ namespace t {
                 btn2.onclick = () => {
                     let name = "attack_04.FBAni.aniclip.bin";
                     this.aniplayer.playCross(name, 0.2);
-                    this.trailrender.play();
                 }
             }
         }

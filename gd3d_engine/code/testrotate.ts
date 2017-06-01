@@ -113,11 +113,23 @@
                     }
                     this.cube2 = ref_cube;
                 }
+
+                {
+                    this.cubetrail=new gd3d.framework.transform();
+                    this.cubetrail.localScale.x=this.cubetrail.localScale.y=this.cubetrail.localScale.z=0.2;
+                    this.cubetrail.localTranslate.x=-3;
+                    var mesh=this.cubetrail.gameObject.addComponent("meshFilter")as gd3d.framework.meshFilter;
+                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                    mesh.mesh = smesh;
+                    this.cubetrail.gameObject.addComponent("meshRenderer")as gd3d.framework.meshRenderer;
+                    this.scene.addChild(this.cubetrail);
+                    this.cubetrail.markDirty();
+                }
             }
             state.finish = true;
         }
 
-
+        cubetrail:gd3d.framework.transform;
         start(app: gd3d.framework.application)
         {
             console.log("i am here.");
@@ -135,6 +147,12 @@
         private eulerAngle = gd3d.math.pool.new_vector3();
 
         private  zeroPoint=new gd3d.math.vector3(0,0,0);
+
+        //--------------------
+        private startdir=new gd3d.math.vector3(-1,0,0);
+        private enddir=new gd3d.math.vector3(0,0,-1);
+        private targetdir=new gd3d.math.vector3();
+        //-------------
         update(delta: number)
         {
             this.taskmgr.move(delta);
@@ -154,6 +172,17 @@
                 //this.cube2.lookat(this.cube);
                 this.cube2.lookatPoint(this.cube.getWorldTranslate());
                 this.cube2.markDirty();
+            }
+            if(this.cubetrail)
+            {
+                var cube= this.cubetrail.clone();
+                this.scene.addChild(cube);
+                gd3d.framework.traillerp(this.startdir,this.enddir,this.timer*0.1,this.targetdir);
+                gd3d.math.vec3ScaleByNum(this.targetdir,3,this.targetdir);
+                gd3d.math.vec3Clone(this.targetdir,cube.localTranslate);
+               cube.markDirty();
+
+               
             }
         }
     }
