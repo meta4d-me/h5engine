@@ -32,17 +32,23 @@ namespace gd3d.framework
         }
         private app: application;
         private webgl: WebGLRenderingContext;
+        private path: trailPath;
         update(delta: number)
         {
-            gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), this.sticks[0].location);
-            this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
-            gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
+            var endnode = this.path.add();
+            gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), endnode.pos);
+            this.gameObject.transform.getUpInWorld(endnode.updir);
+            gd3d.math.vec3ScaleByNum(endnode.updir, this.width, endnode.updir);
+            //增加路径
+
+            //第零个点不用跟踪
+            gd3d.math.vec3Clone(endnode.pos, this.sticks[0].location);
+            gd3d.math.vec3Clone(endnode.updir, this.sticks[0].updir);
 
             var length = this.sticks.length;
             for (var i = 1; i < length; i++)
             {
-                gd3d.math.vec3SLerp(this.sticks[i].location, this.sticks[i - 1].location, 0.5, this.sticks[i].location);
-                gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, 0.5, this.sticks[i].updir);
+                this.sticks[i].followMove(delta);
             }
             this.updateTrailData();
         }
@@ -98,17 +104,26 @@ namespace gd3d.framework
         //------------------------------------------------------------------------------------------------------
         private initmesh()
         {
+            this.path = new trailPath();
+            var endnode = this.path.add();
+            gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), endnode.pos);
+            this.gameObject.transform.getUpInWorld(endnode.updir);
+            gd3d.math.vec3ScaleByNum(endnode.updir, this.width, endnode.updir);
+
             //用棍子去刷顶点
             //用逻辑去刷棍子
             this.sticks = [];
+            var length = this.vertexcount / 2;
             for (var i = 0; i < this.vertexcount / 2; i++)
             {
                 var ts = new trailStick();
                 this.sticks.push(ts);
                 ts.location = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), ts.location);
+                gd3d.math.vec3Clone(endnode.pos, ts.location);
                 ts.updir = new gd3d.math.vector3();
-                this.gameObject.transform.getUpInWorld(ts.updir);
+                gd3d.math.vec3Clone(endnode.updir, ts.updir);
+                ts.follow = endnode;
+                ts.speed = (this.speed - this.lowspeed) * (length - i) / length + this.lowspeed;
             }
 
             this.mesh = new gd3d.framework.mesh();
@@ -219,8 +234,8 @@ namespace gd3d.framework
                 this.dataForVbo[i * 2 * 9 + 2] = pos.z;
 
                 this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
-                this.dataForVbo[(i * 2 + 1) * 9 + 1] += pos.y + up.y;
-                this.dataForVbo[(i * 2 + 1) * 9 + 2] += pos.z + up.z;
+                this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
+                this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
             }
         }
 
@@ -241,7 +256,54 @@ namespace gd3d.framework
     }
     export class trailStick
     {
-        location: gd3d.math.vector3;
-        updir: gd3d.math.vector3;
+        location: gd3d.math.vector3;//近点
+        updir: gd3d.math.vector3;//向远点的向量
+        follow: trailPathNode = null;
+        speed: number;
+        followMove(delta: number)
+        {
+            var dist = gd3d.math.vec3Distance(this.follow.pos, this.location);
+            if (dist < 0.01)
+            {
+                if (this.follow.next != null)
+                    this.follow = this.follow.next;
+            }
+            else
+            {
+                var dir = new gd3d.math.vector3();
+                gd3d.math.vec3Subtract( this.follow.pos,this.location,dir);
+                var distadd = 1500 * this.speed * delta;
+                if(distadd>dist)distadd=dist;
+                // gd3d.math.vec3Normalize(dir,dir);
+                // this.location.x +=dir.x*distadd;
+                // this.location.y +=dir.y*distadd;
+                // this.location.z +=dir.z*distadd;
+                var lerpv = distadd / dist;
+                gd3d.math.vec3SLerp(this.location, this.follow.pos, lerpv, this.location);
+                gd3d.math.vec3SLerp(this.updir, this.follow.updir, lerpv, this.updir);
+            }
+        }
     }
+    export class trailPathNode
+    {
+        pos: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
+        next: trailPathNode = null;//用个链表的形式一直向后加
+    }
+    export class trailPath
+    {
+        add(): trailPathNode
+        {
+            var node = new trailPathNode();
+            node.pos = gd3d.math.pool.new_vector3();
+            node.updir = gd3d.math.pool.new_vector3();
+
+            if (this.end != null)
+                this.end.next = node;
+            this.end = node;
+            return node;
+        }
+        end: trailPathNode = null;//终点
+    }
+
 }
