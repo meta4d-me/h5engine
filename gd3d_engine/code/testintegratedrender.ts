@@ -31,6 +31,15 @@ namespace t {
                 }
             }
             );
+            this.app.getAssetMgr().load("res/swingFX.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+                else {
+                    state.error = true;
+                }
+            }
+            );
         }
         aniplayer: gd3d.framework.aniplayer;
         role: gd3d.framework.transform;
@@ -160,19 +169,25 @@ namespace t {
                     trailtrans.localTranslate.z = 0.5;
                     
                     this.weapon.addChild(trailtrans);               
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 90, trailtrans.localRotate);
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
                     trailtrans.markDirty();
                     var trailrender = trailtrans.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
                     //trailrender.color=new gd3d.math.color(1.0,0,0,1.0);
                     //trailrender.speed = 1;
                     trailrender.setWidth(1);
                     var mat = new gd3d.framework.material();
+                    //particles_additive.shader.json
+                    //transparent_bothside.shader.json
+                    //particles_additive_premultiply.shader.json
                     let shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json") as gd3d.framework.shader;
                     var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json") as gd3d.framework.texture;
                     mat.setShader(shader);
                     mat.setTexture("_MainTex", tex)
 
                     trailrender.material = mat;
+                    //trailrender.lifetime=0.4;
+                    //trailrender.minvertexDistance=0.01;
+                    //trailrender.setWidth(1,1);
                 }
 
             }
@@ -191,14 +206,21 @@ namespace t {
             this.taskmgr.addTaskCall(this.loadRole.bind(this));
             this.taskmgr.addTaskCall(this.loadWeapon.bind(this));
             this.taskmgr.addTaskCall(this.initscene.bind(this));
-            var tbn1 = this.addbtn("80px", "0px", "start");
+            var tbn1 = this.addbtn("80px", "0px", "attack_01");
             tbn1.onclick = () => {
-                this.play = true;
+                    let name = "attack_01.FBAni.aniclip.bin";
+                    this.aniplayer.playCross(name, 0.2);
             }
-            var btn = this.addbtn("120px", "0px", "stop");
+            var btn = this.addbtn("120px", "0px", "attack_02");
             btn.onclick = () => {
-                this.play = false;
+                    let name = "attack_02.FBAni.aniclip.bin";
+                    this.aniplayer.playCross(name, 0.2);
             }
+            // var btn3 = this.addbtn("160px", "0px", "attack_03");
+            // btn3.onclick = () => {
+            //         let name = "attack_03.FBAni.aniclip.bin";
+            //         this.aniplayer.playCross(name, 0.2);
+            // }
 
             {
                 let btn2 = this.addbtn("160px", "0px", "playAttackAni");

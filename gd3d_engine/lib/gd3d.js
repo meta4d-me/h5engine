@@ -16901,22 +16901,20 @@ var gd3d;
                             }
                         }
                     }
+                    var duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                     if (this.tempStartNode instanceof framework.ParticleNode) {
-                        var duration = this.tempEndNode.key - this.tempStartNode.key;
                         if (duration > 0) {
-                            gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key) / duration, out);
+                            gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
                         }
                     }
                     else if (this.tempStartNode instanceof framework.ParticleNodeNumber) {
-                        var duration = this.tempEndNode.key - this.tempStartNode.key;
                         if (duration > 0) {
-                            out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key) / duration);
+                            out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
                         }
                     }
                     else if (this.tempStartNode instanceof framework.UVSpeedNode) {
-                        var duration = this.tempEndNode.key - this.tempStartNode.key;
                         if (duration > 0) {
-                            gd3d.math.vec2SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key) / duration, out);
+                            gd3d.math.vec2SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
                         }
                     }
                 }
@@ -19195,6 +19193,7 @@ var gd3d;
                 pool.collect_vector2();
                 pool.collect_matrix();
                 pool.collect_quaternion();
+                pool.collect_color();
             };
             Object.defineProperty(pool, "vector4_one", {
                 get: function () {
@@ -19237,6 +19236,36 @@ var gd3d;
             };
             pool.collect_vector4 = function () {
                 pool.unused_vector4.length = 0;
+            };
+            Object.defineProperty(pool, "color_one", {
+                get: function () {
+                    if (pool._color_one == null) {
+                        pool._color_one = new math.color(1, 1, 1, 1);
+                    }
+                    return pool._color_one;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            pool.new_color = function () {
+                if (pool.unused_color.length > 0)
+                    return pool.unused_color.pop();
+                else
+                    return new math.color();
+            };
+            pool.delete_color = function (v) {
+                if (v == null)
+                    return;
+                if (v instanceof math.color) {
+                    v.r = v.g = v.b = 0;
+                    v.a = 1;
+                    pool.unused_color.push(v);
+                }
+                else
+                    console.error("kindding me?确定你要回收的是color吗？");
+            };
+            pool.collect_color = function () {
+                pool.unused_color.length = 0;
             };
             Object.defineProperty(pool, "vector3_up", {
                 get: function () {
@@ -19485,6 +19514,7 @@ var gd3d;
             return pool;
         }());
         pool.unused_vector4 = [];
+        pool.unused_color = [];
         pool.unused_vector3 = [];
         pool.unused_vector2 = [];
         pool.unused_matrix3x2 = [];

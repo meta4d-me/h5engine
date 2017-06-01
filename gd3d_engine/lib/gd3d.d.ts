@@ -3163,6 +3163,12 @@ declare namespace gd3d.math {
         static clone_vector4(src: vector4): vector4;
         static delete_vector4(v: vector4): void;
         static collect_vector4(): void;
+        private static _color_one;
+        static readonly color_one: color;
+        private static unused_color;
+        static new_color(): color;
+        static delete_color(v: color): void;
+        static collect_color(): void;
         private static _vector3_up;
         static readonly vector3_up: vector3;
         private static _vector3_right;
