@@ -185,9 +185,9 @@ namespace t {
                     mat.setTexture("_MainTex", tex)
 
                     trailrender.material = mat;
-                    // trailrender.lifetime=0.4;
-                    // trailrender.minvertexDistance=0.01;
-                    // trailrender.setWidth(1,1);
+                    //trailrender.lifetime=0.4;
+                    //trailrender.minvertexDistance=0.01;
+                    //trailrender.setWidth(1,1);
                 }
 
             }

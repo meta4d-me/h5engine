@@ -4344,13 +4344,15 @@ var t;
                 cube.addChild(trailtrans);
                 gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, 90, trailtrans.localRotate);
                 trailtrans.markDirty();
-                var trailrender = trailtrans.gameObject.addComponent("trailRender");
+                var trailrender = trailtrans.gameObject.addComponent("trailRender_recorde");
                 var mat = new gd3d.framework.material();
-                var shader = this.app.getAssetMgr().getShader("particles_blend_premultiply.shader.json");
-                var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json");
+                var shader = this.app.getAssetMgr().getShader("particles_additive_premultiply.shader.json");
+                var tex = this.app.getAssetMgr().getAssetByName("swingFX.png");
                 mat.setShader(shader);
                 mat.setTexture("_MainTex", tex);
                 trailrender.material = mat;
+                trailrender.lifetime = 1;
+                trailrender.minvertexDistance = 0.5;
             }
             state.finish = true;
         };
