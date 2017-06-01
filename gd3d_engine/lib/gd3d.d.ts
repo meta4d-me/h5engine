@@ -1505,6 +1505,7 @@ declare namespace gd3d.framework {
         private vertexcount;
         private dataForVbo;
         private dataForEbo;
+        private sticks;
         start(): void;
         private app;
         private webgl;
@@ -1518,9 +1519,13 @@ declare namespace gd3d.framework {
         private initmesh();
         private speed;
         private lowspeed;
-        private updateTrail();
+        private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
+    }
+    class trailStick {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
     }
 }
 declare namespace gd3d.framework {
