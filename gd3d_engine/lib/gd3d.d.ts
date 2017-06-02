@@ -1512,6 +1512,7 @@ declare namespace gd3d.framework {
         private dataForEbo;
         private sticks;
         private active;
+        private reInit;
         start(): void;
         private app;
         private webgl;
@@ -1557,7 +1558,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.io {
     class binBuffer {
-        private _buf;
+        _buf: Uint8Array[];
         private _seekWritePos;
         private _seekWriteIndex;
         private _seekReadPos;
@@ -1645,6 +1646,7 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.io {

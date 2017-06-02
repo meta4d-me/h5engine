@@ -8905,6 +8905,7 @@ var gd3d;
                 this.width = 1.0;
                 this.vertexcount = 24;
                 this.active = false;
+                this.reInit = false;
                 this.speed = 0.5;
             }
             trailRender.prototype.start = function () {
@@ -8915,6 +8916,10 @@ var gd3d;
             trailRender.prototype.update = function (delta) {
                 if (!this.active)
                     return;
+                if (this.reInit) {
+                    this.intidata();
+                    this.reInit = false;
+                }
                 gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), this.sticks[0].location);
                 this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
                 gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
@@ -8966,7 +8971,7 @@ var gd3d;
                 this.width = Width;
             };
             trailRender.prototype.play = function () {
-                this.intidata();
+                this.reInit = true;
                 this.active = true;
             };
             trailRender.prototype.stop = function () {
@@ -9793,6 +9798,9 @@ var gd3d;
             };
             binTool.prototype.writeInt = function (num) {
                 this.write(converter.Int32ToArray(num));
+            };
+            binTool.prototype.dispose = function () {
+                this._buf.splice(0);
             };
             return binTool;
         }(binBuffer));

@@ -20,6 +20,7 @@ namespace gd3d.framework
         private sticks: trailStick[];
         // private targetpos:Float32Array;
         private active:boolean=false;
+        private reInit:boolean=false;
         start()
         {
             this.app = this.gameObject.getScene().app;
@@ -31,6 +32,11 @@ namespace gd3d.framework
         update(delta: number)
         {
             if(!this.active) return;
+            if(this.reInit)
+            {
+                this.intidata();
+                this.reInit=false;
+            }
             gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), this.sticks[0].location);
             this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
             gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
@@ -93,7 +99,8 @@ namespace gd3d.framework
         //播放
         public play()
         {
-            this.intidata();
+            //this.intidata();//项目喜欢添加组件后立刻播放，会报错，此时组件的start还没走
+            this.reInit=true;
             this.active=true;
         }
         //停止
