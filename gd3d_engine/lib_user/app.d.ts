@@ -161,6 +161,33 @@ declare namespace demo {
         private updateBullet(delta);
     }
 }
+declare namespace t {
+    class test_three_leaved_rose_curve implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        cube: gd3d.framework.transform;
+        parts: gd3d.framework.transform;
+        timer: number;
+        cube2: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        count: number;
+        counttimer: number;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        aniplayer: gd3d.framework.aniplayer;
+        role: gd3d.framework.transform;
+        private roleLength;
+        private loadRole(laststate, state);
+        private addcam(laststate, state);
+        private addcube(laststate, state);
+        start(app: gd3d.framework.application): void;
+        private angularVelocity;
+        private eulerAngle;
+        private zeroPoint;
+        update(delta: number): void;
+    }
+}
 declare class test_01 implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -236,6 +263,26 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_effect implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    effect: gd3d.framework.effectSystem;
+    label: HTMLLabelElement;
+    private loadShader(laststate, state);
+    private loadText(laststate, state);
+    private addcube(laststate, state);
+    private dragon;
+    private loadModel(laststate, state);
+    start(app: gd3d.framework.application): void;
+    private loadEffect(laststate, state);
+    _loadEffect(assetbundleName: string, name: string): void;
+    private addcam(laststate, state);
+    beclone: boolean;
+    update(delta: number): void;
+}
 declare namespace t {
     class test_integratedrender implements IState {
         app: gd3d.framework.application;
@@ -251,6 +298,7 @@ declare namespace t {
         sh: gd3d.framework.shader;
         cube2: gd3d.framework.transform;
         private initscene(laststate, state);
+        trailrender: gd3d.framework.trailRender;
         start(app: gd3d.framework.application): void;
         org: gd3d.framework.transform;
         cube: gd3d.framework.transform;
@@ -509,10 +557,14 @@ declare namespace t {
         private loadText(laststate, state);
         private addcam(laststate, state);
         private addcube(laststate, state);
+        cubetrail: gd3d.framework.transform;
         start(app: gd3d.framework.application): void;
         private angularVelocity;
         private eulerAngle;
         private zeroPoint;
+        private startdir;
+        private enddir;
+        private targetdir;
         update(delta: number): void;
     }
 }
@@ -583,6 +635,37 @@ declare class test_streamlight implements IState {
     cube3: gd3d.framework.transform;
     timer: number;
     update(delta: number): void;
+}
+declare namespace t {
+    class test_trailrenderrecorde implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        aniplayer: gd3d.framework.aniplayer;
+        role: gd3d.framework.transform;
+        private roleLength;
+        private loadRole(laststate, state);
+        private weapon;
+        private loadWeapon(laststate, state);
+        sh: gd3d.framework.shader;
+        cube2: gd3d.framework.transform;
+        private initscene(laststate, state);
+        trailrender: gd3d.framework.trailRender;
+        start(app: gd3d.framework.application): void;
+        org: gd3d.framework.transform;
+        cube: gd3d.framework.transform;
+        camera: gd3d.framework.camera;
+        timer: number;
+        taskmgr: gd3d.framework.taskMgr;
+        grassMat: gd3d.framework.material;
+        private wind;
+        private WaveFrequency;
+        private WaveAmplitude;
+        play: boolean;
+        update(delta: number): void;
+        private addbtn(top, left, text);
+    }
 }
 declare namespace t {
     class test_trailrender implements IState {

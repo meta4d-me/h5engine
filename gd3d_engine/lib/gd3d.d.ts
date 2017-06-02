@@ -1458,8 +1458,8 @@ declare namespace gd3d.framework {
         private _startWidth;
         private _endWidth;
         lifetime: number;
-        minvertexDistance: number;
-        maxvertexCout: number;
+        minStickDistance: number;
+        maxStickCout: number;
         private _material;
         private _startColor;
         private _endColor;
@@ -1469,6 +1469,9 @@ declare namespace gd3d.framework {
         private dataForVbo;
         private dataForEbo;
         interpolate: boolean;
+        interpNumber: number;
+        interpPath: trailNode[];
+        private targetPath;
         material: gd3d.framework.material;
         startColor: gd3d.math.color;
         endColor: gd3d.math.color;
@@ -1490,6 +1493,8 @@ declare namespace gd3d.framework {
         location: gd3d.math.vector3;
         updir: gd3d.math.vector3;
         time: number;
+        handle: gd3d.math.vector3;
+        trailNodes: trailNode[];
         constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
     }
 }
@@ -1506,20 +1511,22 @@ declare namespace gd3d.framework {
         private dataForVbo;
         private dataForEbo;
         private sticks;
+        private active;
         start(): void;
         private app;
         private webgl;
-        private path;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
         material: gd3d.framework.material;
         color: gd3d.math.color;
-        setspeed(upspeed: number, lowspeed?: number): void;
+        setspeed(upspeed: number): void;
         setWidth(Width: number): void;
+        play(): void;
+        stop(): void;
         private initmesh();
+        private intidata();
         private speed;
-        private lowspeed;
         private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
@@ -1527,18 +1534,6 @@ declare namespace gd3d.framework {
     class trailStick {
         location: gd3d.math.vector3;
         updir: gd3d.math.vector3;
-        follow: trailPathNode;
-        speed: number;
-        followMove(delta: number): void;
-    }
-    class trailPathNode {
-        pos: gd3d.math.vector3;
-        updir: gd3d.math.vector3;
-        next: trailPathNode;
-    }
-    class trailPath {
-        add(): trailPathNode;
-        end: trailPathNode;
     }
 }
 declare namespace gd3d.framework {
@@ -1562,7 +1557,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.io {
     class binBuffer {
-        _buf: Uint8Array[];
+        private _buf;
         private _seekWritePos;
         private _seekWriteIndex;
         private _seekReadPos;
@@ -1650,7 +1645,6 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
-        dispose(): void;
     }
 }
 declare namespace gd3d.io {
@@ -1875,6 +1869,7 @@ declare namespace gd3d.math {
 }
 declare namespace gd3d.math {
     function spriteAnimation(row: number, column: number, index: number, out: vector4): void;
+    function GetPointAlongCurve(curveStart: vector3, curveStartHandle: vector3, curveEnd: vector3, curveEndHandle: vector3, t: number, out: vector3, crease?: number): void;
 }
 declare namespace gd3d.math {
     function vec2Subtract(a: vector2, b: vector2, out: vector2): void;
@@ -1986,6 +1981,7 @@ declare namespace gd3d.framework {
         matrix: math.matrix;
         tilling: math.vector2;
         rotationByEuler: math.quaternion;
+        startEuler: math.vector3;
         startRotation: math.quaternion;
         localRotation: math.quaternion;
         mesh: mesh;
@@ -2416,6 +2412,40 @@ declare namespace gd3d.framework {
         elements: EffectElement;
         velocity: any;
         frameInternal: number;
+        init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
+        update(frameIndex: number): void;
+    }
+    class RoseCurveAction implements IEffectAction {
+        type: string;
+        params: any;
+        startFrame: number;
+        endFrame: number;
+        elements: EffectElement;
+        radius: number;
+        polar: any;
+        level: number;
+        frameInternal: number;
+        speed: number;
+        init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
+        update(frameIndex: number): void;
+    }
+    class TrailAction implements IEffectAction {
+        type: string;
+        params: any;
+        startFrame: number;
+        endFrame: number;
+        elements: EffectElement;
+        radius: number;
+        position: any;
+        eular: any;
+        width: number;
+        frameInternal: number;
+        speed: number;
+        transform: gd3d.framework.transform;
+        startRotation: gd3d.math.quaternion;
+        color: any;
+        alpha: number;
+        offsetTransalte: gd3d.math.vector3;
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
         update(frameIndex: number): void;
     }

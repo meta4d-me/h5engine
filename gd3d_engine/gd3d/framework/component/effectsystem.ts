@@ -442,8 +442,13 @@ namespace gd3d.framework
             element.curAttrData = elementData.initFrameData.attrsData.clone();
             let vertexSize = subEffectBatcher.vertexSize;
             let vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
-            element.update();
 
+            if (element.curAttrData.startEuler) 
+            {
+
+                gd3d.math.quatFromEulerAngles(element.curAttrData.startEuler.x,element.curAttrData.startEuler.y, element.curAttrData.startEuler.z, element.curAttrData.startRotation);
+            }
+            element.update();
 
             subEffectBatcher.effectElements.push(element);
             for (let i = 0; i < vertexCount; i++)
