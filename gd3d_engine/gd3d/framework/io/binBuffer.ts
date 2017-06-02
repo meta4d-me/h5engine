@@ -2,7 +2,7 @@ namespace gd3d.io
 {
     export class binBuffer
     {
-        private _buf: Uint8Array[]//bufs 循环buf，用完的buf 转着圈用
+        public _buf: Uint8Array[]//bufs 循环buf，用完的buf 转着圈用
         private _seekWritePos: number;//buf位置
         private _seekWriteIndex: number;//buf 索引
         private _seekReadPos: number;
@@ -110,45 +110,54 @@ namespace gd3d.io
     }
     export class converter
     {
-        static getApplyFun(value: any): any{
+        static getApplyFun(value: any): any
+        {
             return Array.prototype.concat.apply([], value);
         }
         private static dataView: DataView = new DataView(new ArrayBuffer(8), 0, 8);//八字节临时空间
-        static ULongToArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[] {
+        static ULongToArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[]
+        {
             //这里注意不能直接用dataView.setFloat64，因为float64是float类型
             var uint1: number = value % 0x100000000;
             var uint2: number = (value / 0x100000000) | 0;
             converter.dataView.setUint32(0, uint1, true);
             converter.dataView.setUint32(4, uint2, true);
             let _array = new Uint8Array(converter.dataView.buffer);
-            if (target == null) {
+            if (target == null)
+            {
                 target = new Uint8Array(converter.dataView.buffer);
             }
-            else {
-                for (var i = 0; i < 8; i++) {
+            else
+            {
+                for (var i = 0; i < 8; i++)
+                {
                     target[offset + i] = _array[i];
                 }
             }
             return target;
         }
-        static LongToArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[] {
+        static LongToArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[]
+        {
             //这里注意不能直接用dataView.setFloat64，因为float64是float类型
             var uint1: number = value % 0x100000000;
             var uint2: number = (value / 0x100000000) | 0;
             converter.dataView.setInt32(0, uint1, true);
             converter.dataView.setInt32(4, uint2, true);
             let _array = new Int8Array(converter.dataView.buffer);
-            if (target == null) {
+            if (target == null)
+            {
                 target = new Int8Array(converter.dataView.buffer);
             }
-            else {
-                for (var i = 0; i < 8; i++) {
+            else
+            {
+                for (var i = 0; i < 8; i++)
+                {
                     target[offset + i] = _array[i];
                 }
             }
             return target;
         }
-       
+
         static Float64ToArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[]
         {
             converter.dataView.setFloat64(0, value, false);
@@ -312,24 +321,30 @@ namespace gd3d.io
             }
             return new Uint8Array(bstr);
         }
-        static ArrayToLong(buf: Uint8Array, offset: number = 0): number {
-            for (var i = 0; i < 4; i++) {
+        static ArrayToLong(buf: Uint8Array, offset: number = 0): number
+        {
+            for (var i = 0; i < 4; i++)
+            {
                 converter.dataView.setInt8(i, buf[offset + i]);
             }
             var n1 = converter.dataView.getInt32(0, true);
-            for (var i = 4; i < 8; i++) {
+            for (var i = 4; i < 8; i++)
+            {
                 converter.dataView.setInt8(i, buf[offset + i]);
             }
             var n2 = converter.dataView.getInt32(4, true);
             n1 += n2 * 0x100000000;
             return n1;
         }
-        static ArrayToULong(buf: Uint8Array, offset: number = 0): number {
-            for (var i = 0; i < 4; i++) {
+        static ArrayToULong(buf: Uint8Array, offset: number = 0): number
+        {
+            for (var i = 0; i < 4; i++)
+            {
                 converter.dataView.setUint8(i, buf[offset + i]);
             }
             var n1 = converter.dataView.getUint32(0, true);
-            for (var i = 4; i < 8; i++) {
+            for (var i = 4; i < 8; i++)
+            {
                 converter.dataView.setUint8(i, buf[offset + i]);
             }
             var n2 = converter.dataView.getUint32(4, true);
@@ -367,7 +382,7 @@ namespace gd3d.io
             }
             return converter.dataView.getInt32(0, true);
         }
- 
+
         static ArrayToInt16(buf: Uint8Array, offset: number = 0): number
         {
             for (var i = 0; i < 2; i++)
@@ -461,12 +476,14 @@ namespace gd3d.io
             this.read(array);
             return converter.ArrayToFloat32(array);
         }
-        readLong(): number {
+        readLong(): number
+        {
             let array = new Uint8Array(8);
             this.read(array);
             return converter.ArrayToLong(array);
         }
-        readULong(): number {
+        readULong(): number
+        {
             let array = new Uint8Array(8);
             this.read(array);
             return converter.ArrayToULong(array);
@@ -618,10 +635,12 @@ namespace gd3d.io
             this.write(converter.Float32ToArray(num));
         }
 
-        writeLong(num: number): void {
+        writeLong(num: number): void
+        {
             this.write(converter.LongToArray(num));
         }
-        writeULong(num: number): void {
+        writeULong(num: number): void
+        {
             this.write(converter.ULongToArray(num));
         }
         writeDouble(num: number): void
@@ -700,6 +719,11 @@ namespace gd3d.io
         writeInt(num: number): void
         {
             this.write(converter.Int32ToArray(num));
+        }
+
+        dispose()
+        {
+            this._buf.splice(0);
         }
     }
 }

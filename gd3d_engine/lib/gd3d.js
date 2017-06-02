@@ -8638,6 +8638,216 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var trailRender_recorde = (function () {
+            function trailRender_recorde() {
+                this.layer = framework.RenderLayerEnum.Common;
+                this.renderLayer = framework.CullingMask.default;
+                this.queue = 0;
+                this._startWidth = 1;
+                this._endWidth = 0;
+                this.lifetime = 0.35;
+                this.minvertexDistance = 0.1;
+                this.maxvertexCout = 12;
+                this.nodes = [];
+                this.interpolate = false;
+                this.notRender = false;
+            }
+            Object.defineProperty(trailRender_recorde.prototype, "material", {
+                get: function () {
+                    if (this._material != undefined) {
+                        return this._material;
+                    }
+                    else {
+                        var mat = new gd3d.framework.material();
+                        mat.setShader(this.app.getAssetMgr().getShader("shader/def"));
+                        this._material = mat;
+                        return this._material;
+                    }
+                },
+                set: function (material) {
+                    this._material = material;
+                    this.layer = this._material.getLayer();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(trailRender_recorde.prototype, "startColor", {
+                get: function () {
+                    if (this._startColor == undefined) {
+                        this._startColor = new gd3d.math.color(1, 1, 1, 1);
+                    }
+                    return this._startColor;
+                },
+                set: function (color) {
+                    this._startColor = color;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(trailRender_recorde.prototype, "endColor", {
+                get: function () {
+                    if (this._endColor == undefined) {
+                        this._endColor = new gd3d.math.color(this.startColor.r, this.startColor.g, this.startColor.b, 0);
+                    }
+                    return this._endColor;
+                },
+                set: function (color) {
+                    this._endColor = color;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            trailRender_recorde.prototype.setWidth = function (startWidth, endWidth) {
+                if (endWidth === void 0) { endWidth = 0; }
+                this._startWidth = startWidth;
+                this._endWidth = endWidth;
+            };
+            trailRender_recorde.prototype.start = function () {
+                this.app = this.gameObject.getScene().app;
+                this.webgl = this.app.webgl;
+                this.mesh = new gd3d.framework.mesh();
+                this.mesh.data = new gd3d.render.meshData();
+                this.mesh.glMesh = new gd3d.render.glMesh();
+                this.dataForVbo = new Float32Array(128);
+                this.dataForEbo = new Uint16Array(128);
+                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                this.mesh.glMesh.initBuffer(this.webgl, vf, 128, gd3d.render.MeshTypeEnum.Dynamic);
+                this.mesh.glMesh.addIndex(this.webgl, this.dataForEbo.length);
+                this.mesh.submesh = [];
+                {
+                    var sm = new framework.subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = this.dataForEbo.length;
+                    sm.line = false;
+                    this.mesh.submesh.push(sm);
+                }
+            };
+            trailRender_recorde.prototype.update = function (delta) {
+                var _time = this.app.getTotalTime();
+                this.refreshTrailNode(_time);
+                this.updateTrailData(_time);
+            };
+            trailRender_recorde.prototype.remove = function () {
+            };
+            trailRender_recorde.prototype.refreshTrailNode = function (curTime) {
+                while (this.nodes.length > 0 && curTime > this.nodes[this.nodes.length - 1].time + this.lifetime) {
+                    this.nodes.pop();
+                }
+                var pos = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
+                var length = this.nodes.length;
+                if (length != 0) {
+                    if (gd3d.math.vec3Distance(pos, this.nodes[0].location) < this.minvertexDistance)
+                        return;
+                }
+                var updir = new gd3d.math.vector3();
+                this.gameObject.transform.getUpInWorld(updir);
+                var newNode = new trailNode(pos, updir, curTime);
+                this.nodes.unshift(newNode);
+                while (this.nodes.length > this.maxvertexCout) {
+                    this.nodes.pop();
+                }
+            };
+            trailRender_recorde.prototype.updateTrailData = function (curTime) {
+                if (this.nodes.length < 2) {
+                    this.notRender = true;
+                    return;
+                }
+                else {
+                    this.notRender = false;
+                }
+                this.checkBufferSize();
+                for (var i = 0; i < this.nodes.length; i++) {
+                    var curNode = this.nodes[i];
+                    var u = i / this.nodes.length;
+                    var timeAlong = (curTime - curNode.time) / this.lifetime;
+                    var _updir = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(curNode.updir, _updir);
+                    var _width = this._startWidth + (this._endWidth - this._startWidth) * timeAlong;
+                    gd3d.math.vec3ScaleByNum(_updir, _width, _updir);
+                    var tempPos = gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Add(curNode.location, _updir, tempPos);
+                    this.dataForVbo[2 * i * 9 + 0] = tempPos.x;
+                    this.dataForVbo[2 * i * 9 + 1] = tempPos.y;
+                    this.dataForVbo[2 * i * 9 + 2] = tempPos.z;
+                    var tempColor = gd3d.math.pool.new_color();
+                    gd3d.math.colorLerp(this.startColor, this.endColor, timeAlong, tempColor);
+                    this.dataForVbo[2 * i * 9 + 3] = tempColor.r;
+                    this.dataForVbo[2 * i * 9 + 4] = tempColor.g;
+                    this.dataForVbo[2 * i * 9 + 5] = tempColor.b;
+                    this.dataForVbo[2 * i * 9 + 6] = tempColor.a;
+                    this.dataForVbo[2 * i * 9 + 7] = u;
+                    this.dataForVbo[2 * i * 9 + 8] = 1.0;
+                    gd3d.math.vec3Subtract(curNode.location, _updir, tempPos);
+                    this.dataForVbo[(2 * i + 1) * 9 + 0] = tempPos.x;
+                    this.dataForVbo[(2 * i + 1) * 9 + 1] = tempPos.y;
+                    this.dataForVbo[(2 * i + 1) * 9 + 2] = tempPos.z;
+                    this.dataForVbo[(2 * i + 1) * 9 + 3] = tempColor.r;
+                    this.dataForVbo[(2 * i + 1) * 9 + 4] = tempColor.g;
+                    this.dataForVbo[(2 * i + 1) * 9 + 5] = tempColor.b;
+                    this.dataForVbo[(2 * i + 1) * 9 + 6] = tempColor.a;
+                    var u = i / this.nodes.length;
+                    this.dataForVbo[(2 * i + 1) * 9 + 7] = u;
+                    this.dataForVbo[(2 * i + 1) * 9 + 8] = 0;
+                    gd3d.math.pool.delete_vector3(tempPos);
+                    gd3d.math.pool.delete_color(tempColor);
+                }
+                for (var k = 0; k < this.nodes.length - 1; k++) {
+                    this.dataForEbo[k * 6 + 0] = k * 2;
+                    this.dataForEbo[k * 6 + 1] = (k + 1) * 2;
+                    this.dataForEbo[k * 6 + 2] = k * 2 + 1;
+                    this.dataForEbo[k * 6 + 3] = k * 2 + 1;
+                    this.dataForEbo[k * 6 + 4] = (k + 1) * 2;
+                    this.dataForEbo[k * 6 + 5] = (k + 1) * 2 + 1;
+                }
+            };
+            trailRender_recorde.prototype.checkBufferSize = function () {
+                if (this.nodes.length * 2 * 9 > this.dataForVbo.length) {
+                    var length = this.dataForVbo.length;
+                    this.mesh.glMesh.resetVboSize(this.webgl, length * 2);
+                    this.dataForVbo = new Float32Array(length * 2);
+                }
+                if ((this.nodes.length - 1) * 6 > this.dataForEbo.length) {
+                    var length = this.dataForEbo.length;
+                    this.mesh.glMesh.resetEboSize(this.webgl, 0, length * 2);
+                    this.dataForEbo = new Uint16Array(length * 2);
+                }
+            };
+            trailRender_recorde.prototype.render = function (context, assetmgr, camera) {
+                if (this.notRender)
+                    return;
+                context.updateModeTrail();
+                this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+                this.mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
+                this.mesh.submesh[0].size = (this.nodes.length - 1) * 6;
+                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+            };
+            trailRender_recorde.prototype.clone = function () {
+            };
+            return trailRender_recorde;
+        }());
+        trailRender_recorde = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent
+        ], trailRender_recorde);
+        framework.trailRender_recorde = trailRender_recorde;
+        var trailNode = (function () {
+            function trailNode(p, updir, t) {
+                this.location = p;
+                this.updir = updir;
+                this.time = t;
+            }
+            return trailNode;
+        }());
+        framework.trailNode = trailNode;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var trailRender = (function () {
             function trailRender() {
                 this.layer = framework.RenderLayerEnum.Common;
@@ -8654,7 +8864,17 @@ var gd3d;
                 this.initmesh();
             };
             trailRender.prototype.update = function (delta) {
-                this.updateTrail();
+                var endnode = this.path.add();
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), endnode.pos);
+                this.gameObject.transform.getUpInWorld(endnode.updir);
+                gd3d.math.vec3ScaleByNum(endnode.updir, this.width, endnode.updir);
+                gd3d.math.vec3Clone(endnode.pos, this.sticks[0].location);
+                gd3d.math.vec3Clone(endnode.updir, this.sticks[0].updir);
+                var length = this.sticks.length;
+                for (var i = 1; i < length; i++) {
+                    this.sticks[i].followMove(delta);
+                }
+                this.updateTrailData();
             };
             trailRender.prototype.remove = function () {
             };
@@ -8699,6 +8919,23 @@ var gd3d;
                 this.width = Width;
             };
             trailRender.prototype.initmesh = function () {
+                this.path = new trailPath();
+                var endnode = this.path.add();
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), endnode.pos);
+                this.gameObject.transform.getUpInWorld(endnode.updir);
+                gd3d.math.vec3ScaleByNum(endnode.updir, this.width, endnode.updir);
+                this.sticks = [];
+                var length = this.vertexcount / 2;
+                for (var i = 0; i < this.vertexcount / 2; i++) {
+                    var ts = new trailStick();
+                    this.sticks.push(ts);
+                    ts.location = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(endnode.pos, ts.location);
+                    ts.updir = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(endnode.updir, ts.updir);
+                    ts.follow = endnode;
+                    ts.speed = (this.speed - this.lowspeed) * (length - i) / length + this.lowspeed;
+                }
                 this.mesh = new gd3d.framework.mesh();
                 this.mesh.data = new gd3d.render.meshData();
                 this.mesh.glMesh = new gd3d.render.glMesh();
@@ -8762,59 +8999,17 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(uppos);
                 gd3d.math.pool.delete_vector3(downpos);
             };
-            trailRender.prototype.updateTrail = function () {
+            trailRender.prototype.updateTrailData = function () {
                 var length = this.vertexcount / 2;
-                var pos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
-                var updir = gd3d.math.pool.new_vector3();
-                this.gameObject.transform.getUpInWorld(updir);
-                gd3d.math.vec3ScaleByNum(updir, this.width, updir);
-                var uppos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Add(pos, updir, uppos);
-                var downpos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(pos, updir, downpos);
-                this.dataForVbo[0] = uppos.x;
-                this.dataForVbo[1] = uppos.y;
-                this.dataForVbo[2] = uppos.z;
-                this.dataForVbo[9] = downpos.x;
-                this.dataForVbo[9 + 1] = downpos.y;
-                this.dataForVbo[9 + 2] = downpos.z;
-                gd3d.math.pool.delete_vector3(updir);
-                gd3d.math.pool.delete_vector3(pos);
-                gd3d.math.pool.delete_vector3(uppos);
-                gd3d.math.pool.delete_vector3(downpos);
-                for (var i = 1; i < length; i++) {
-                    var xx = this.dataForVbo[(i - 1) * 2 * 9] - this.dataForVbo[i * 2 * 9];
-                    var yy = this.dataForVbo[(i - 1) * 2 * 9 + 1] - this.dataForVbo[i * 2 * 9 + 1];
-                    var zz = this.dataForVbo[(i - 1) * 2 * 9 + 2] - this.dataForVbo[i * 2 * 9 + 2];
-                    var curspeed = (this.speed - this.lowspeed) * (length - i) / length + this.lowspeed;
-                    var xxOff = xx * curspeed;
-                    var yyOff = yy * curspeed;
-                    var zzOff = zz * curspeed;
-                    var mark = Math.sqrt(xx * xx + yy * yy + zz * zz);
-                    if (mark < 0.01) {
-                        xxOff = xx;
-                        yyOff = yy;
-                        zzOff = zz;
-                    }
-                    this.dataForVbo[i * 2 * 9] += xxOff;
-                    this.dataForVbo[i * 2 * 9 + 1] += yyOff;
-                    this.dataForVbo[i * 2 * 9 + 2] += zzOff;
-                    var xx1 = this.dataForVbo[((i - 1) * 2 + 1) * 9] - this.dataForVbo[(i * 2 + 1) * 9];
-                    var yy1 = this.dataForVbo[((i - 1) * 2 + 1) * 9 + 1] - this.dataForVbo[(i * 2 + 1) * 9 + 1];
-                    var zz1 = this.dataForVbo[((i - 1) * 2 + 1) * 9 + 2] - this.dataForVbo[(i * 2 + 1) * 9 + 2];
-                    var xx1Off = xx1 * curspeed;
-                    var yy1Off = yy1 * curspeed;
-                    var zz1Off = zz1 * curspeed;
-                    var mark1 = Math.sqrt(xx1 * xx1 + yy1 * yy1 + zz1 * zz1);
-                    if (mark1 < 0.01) {
-                        xx1Off = xx1;
-                        yy1Off = yy1;
-                        zz1Off = zz1;
-                    }
-                    this.dataForVbo[(i * 2 + 1) * 9] += xx1Off;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 1] += yy1Off;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 2] += zz1Off;
+                for (var i = 0; i < length; i++) {
+                    var pos = this.sticks[i].location;
+                    var up = this.sticks[i].updir;
+                    this.dataForVbo[i * 2 * 9] = pos.x;
+                    this.dataForVbo[i * 2 * 9 + 1] = pos.y;
+                    this.dataForVbo[i * 2 * 9 + 2] = pos.z;
+                    this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
                 }
             };
             trailRender.prototype.render = function (context, assetmgr, camera) {
@@ -8831,6 +9026,53 @@ var gd3d;
             gd3d.reflect.nodeComponent
         ], trailRender);
         framework.trailRender = trailRender;
+        var trailStick = (function () {
+            function trailStick() {
+                this.follow = null;
+            }
+            trailStick.prototype.followMove = function (delta) {
+                var dist = gd3d.math.vec3Distance(this.follow.pos, this.location);
+                if (dist < 0.01) {
+                    if (this.follow.next != null)
+                        this.follow = this.follow.next;
+                }
+                else {
+                    var dir = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(this.follow.pos, this.location, dir);
+                    var distadd = 1500 * this.speed * delta;
+                    if (distadd > dist)
+                        distadd = dist;
+                    var lerpv = distadd / dist;
+                    gd3d.math.vec3SLerp(this.location, this.follow.pos, lerpv, this.location);
+                    gd3d.math.vec3SLerp(this.updir, this.follow.updir, lerpv, this.updir);
+                }
+            };
+            return trailStick;
+        }());
+        framework.trailStick = trailStick;
+        var trailPathNode = (function () {
+            function trailPathNode() {
+                this.next = null;
+            }
+            return trailPathNode;
+        }());
+        framework.trailPathNode = trailPathNode;
+        var trailPath = (function () {
+            function trailPath() {
+                this.end = null;
+            }
+            trailPath.prototype.add = function () {
+                var node = new trailPathNode();
+                node.pos = gd3d.math.pool.new_vector3();
+                node.updir = gd3d.math.pool.new_vector3();
+                if (this.end != null)
+                    this.end.next = node;
+                this.end = node;
+                return node;
+            };
+            return trailPath;
+        }());
+        framework.trailPath = trailPath;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9541,6 +9783,9 @@ var gd3d;
             };
             binTool.prototype.writeInt = function (num) {
                 this.write(converter.Int32ToArray(num));
+            };
+            binTool.prototype.dispose = function () {
+                this._buf.splice(0);
             };
             return binTool;
         }(binBuffer));
