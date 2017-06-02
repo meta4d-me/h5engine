@@ -45,4 +45,30 @@ namespace gd3d.math {
         gd3d.math.pool.delete_vector3(tempt4);
         gd3d.math.pool.delete_vector3(tempt5);
     }
+    // export function GetPointAlongCurve2(curveStart:vector3,curveStartHandle:vector3,curveEnd:vector3,curveEndHandle:vector3,t:number, out:vector3,crease:number=0.3)
+    // {
+    //     var oneMinT = 1 - t;
+    //     var oneMinTPow3 =Math.pow(oneMinT, 3);
+    //     var oneMinTPow2 = Math.pow(oneMinT, 2);
+
+    //     var tempt1=gd3d.math.pool.new_vector3();
+    //     gd3d.math.vec3ScaleByNum(curveStart,oneMinTPow3,tempt1);
+    //     var tempt2=gd3d.math.pool.new_vector3();
+    //     gd3d.math.vec3ScaleByNum(curveStartHandle,3*oneMinTPow2*t,tempt2);
+    //     var tempt3=gd3d.math.pool.new_vector3();
+    //     gd3d.math.vec3ScaleByNum(curveEndHandle,3*oneMinT*Math.pow(t,2),tempt3);
+    //     var tempt4=gd3d.math.pool.new_vector3();
+    //     gd3d.math.vec3ScaleByNum(curveEnd,Math.pow(t,3),tempt4);
+
+    //     var tempt5=gd3d.math.pool.new_vector3();
+    //     gd3d.math.vec3Add(tempt1,tempt2,tempt5);
+    //     gd3d.math.vec3Add(tempt5,tempt3,tempt5);
+    //     gd3d.math.vec3Add(tempt5,tempt4,tempt5);
+       
+    //     gd3d.math.pool.delete_vector3(tempt1);
+    //     gd3d.math.pool.delete_vector3(tempt2);
+    //     gd3d.math.pool.delete_vector3(tempt3);
+    //     gd3d.math.pool.delete_vector3(tempt4);
+    //     gd3d.math.pool.delete_vector3(tempt5);
+    // }
 }

@@ -189,7 +189,7 @@ namespace t {
                     //this.trailrender=trailrender;
                     //trailrender.lifetime=0.4;
                     //trailrender.minvertexDistance=0.01;
-                    //trailrender.setWidth(1,1);
+                    trailrender.setWidth(1,1);
                 }
 
             }
