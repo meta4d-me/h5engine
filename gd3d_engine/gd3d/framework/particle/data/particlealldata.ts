@@ -230,13 +230,13 @@ namespace gd3d.framework
         //uv序列帧动画
         public row: number;
         public column: number;
-        public fps: number;
+        public totalCount: number;
         clone()
         {
             let sprite = new UVSpriteNew();
             sprite.row = this.row;
             sprite.column = this.column;
-            sprite.fps = this.fps;
+            sprite.totalCount = this.totalCount;
             return sprite;
         }
     }

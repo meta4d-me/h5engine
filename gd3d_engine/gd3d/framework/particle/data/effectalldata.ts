@@ -166,6 +166,9 @@ namespace gd3d.framework
                     case "uvroll":
                         action = new UVRollAction();
                         break;
+                    case "uvsprite":
+                        action = new UVSpriteAnimationAction();
+                        break;
                     case "rosepath":
                         action = new RoseCurveAction();
                         break;
@@ -185,7 +188,10 @@ namespace gd3d.framework
                 return;
             if (this.active)
             {
-
+                if (this.curAttrData.startEuler)
+                {
+                    gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
+                }
                 if (this.curAttrData.euler != undefined)
                 {
                     // console.log("euler:" + this.curAttrData.euler.toString());
@@ -261,7 +267,7 @@ namespace gd3d.framework
                     gd3d.math.pool.delete_quaternion(lookRot);
                     return;
                 }
-                else if(this.curAttrData.renderModel == RenderModel.Mesh)
+                else if (this.curAttrData.renderModel == RenderModel.Mesh)
                 {
                     EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
                 }
@@ -272,7 +278,7 @@ namespace gd3d.framework
                 gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
 
 
-                gd3d.math.quatMultiply(invTransformRotation, worldRotation,localRotation);
+                gd3d.math.quatMultiply(invTransformRotation, worldRotation, localRotation);
                 gd3d.math.quatMultiply(this.curAttrData.startRotation, localRotation, this.curAttrData.localRotation);
 
                 gd3d.math.pool.delete_vector3(translation);
@@ -281,7 +287,7 @@ namespace gd3d.framework
             } else
             {
                 gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, localRotation);
-                gd3d.math.quatMultiply(localRotation,this.curAttrData.startRotation,  this.curAttrData.localRotation);
+                gd3d.math.quatMultiply(localRotation, this.curAttrData.startRotation, this.curAttrData.localRotation);
             }
 
             gd3d.math.pool.delete_quaternion(localRotation);
@@ -340,21 +346,23 @@ namespace gd3d.framework
             elementdata.name = this.name;
             elementdata.type = this.type;
             elementdata.ref = this.ref;
-            if (this.initFrameData) 
+            if (this.initFrameData)
                 elementdata.initFrameData = this.initFrameData.clone();
 
             if (this.emissionData) 
             {
                 elementdata.emissionData = this.emissionData.clone();
             }
-            for (let key in this.timelineFrame) {
+            for (let key in this.timelineFrame)
+            {
                 if (this.initFrameData[key]) 
                 {
                     elementdata.timelineFrame[key] = this.initFrameData[key].clone();
                 }
             }
 
-            for (let key in this.actionData) {
+            for (let key in this.actionData)
+            {
                 if (this.actionData[key]) 
                 {
                     elementdata.actionData[key] = this.actionData[key].clone();
@@ -400,7 +408,7 @@ namespace gd3d.framework
          */
         public rotationByEuler: math.quaternion = new math.quaternion();
 
-        public startEuler:math.vector3;
+        public startEuler: math.vector3;
         public startRotation: math.quaternion = new math.quaternion();
         /**
          * 本地旋转(经过各种lerp和action后计算的最终值)
@@ -410,7 +418,7 @@ namespace gd3d.framework
          */
         public localRotation: math.quaternion = new math.quaternion();
         public mesh: mesh;
-        public meshdataVbo:Float32Array;
+        public meshdataVbo: Float32Array;
 
         // public localAxisX:gd3d.math.vector3 = new gd3d.math.vector3(1,0,0);
         // public localAxisY:gd3d.math.vector3 = new gd3d.math.vector3(0,1,0);
@@ -475,8 +483,8 @@ namespace gd3d.framework
                     return gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                 case "localRotation":
                     return gd3d.math.pool.clone_quaternion(this.localRotation);
-                // case "startRotation":
-                //     return gd3d.math.pool.clone_quaternion(this.startRotation);
+                case "startRotation":
+                    return gd3d.math.pool.clone_quaternion(this.startRotation);
                 case "matrix":
                     return gd3d.math.pool.clone_matrix(this.matrix);
             }
@@ -529,7 +537,7 @@ namespace gd3d.framework
                 data.rotationByEuler = math.pool.clone_quaternion(this.rotationByEuler);
             if (this.localRotation != undefined)
                 data.localRotation = math.pool.clone_quaternion(this.localRotation);
-            if(this.meshdataVbo != undefined)
+            if (this.meshdataVbo != undefined)
                 data.meshdataVbo = this.meshdataVbo;//这个数组不会被改变，可以直接引用
             if (this.startEuler != undefined)
                 data.startEuler = math.pool.clone_vector3(this.startEuler);

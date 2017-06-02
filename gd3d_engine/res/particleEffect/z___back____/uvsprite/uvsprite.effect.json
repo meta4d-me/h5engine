@@ -40,7 +40,7 @@
                             "param": {
                                 "row": 2,
                                 "colum": 5,
-                                "fps": 30
+                                "count": 30
                             }
                         }
                     ]

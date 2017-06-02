@@ -7676,9 +7676,6 @@ var gd3d;
                 element.curAttrData = elementData.initFrameData.attrsData.clone();
                 var vertexSize = subEffectBatcher.vertexSize;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
-                if (element.curAttrData.startEuler) {
-                    gd3d.math.quatFromEulerAngles(element.curAttrData.startEuler.x, element.curAttrData.startEuler.y, element.curAttrData.startEuler.z, element.curAttrData.startRotation);
-                }
                 element.update();
                 subEffectBatcher.effectElements.push(element);
                 for (var i_3 = 0; i_3 < vertexCount; i_3++) {
@@ -12896,6 +12893,9 @@ var gd3d;
                         case "uvroll":
                             action = new framework.UVRollAction();
                             break;
+                        case "uvsprite":
+                            action = new framework.UVSpriteAnimationAction();
+                            break;
                         case "rosepath":
                             action = new framework.RoseCurveAction();
                             break;
@@ -12911,6 +12911,9 @@ var gd3d;
                 if (this.curAttrData == undefined || this.curAttrData == null)
                     return;
                 if (this.active) {
+                    if (this.curAttrData.startEuler) {
+                        gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
+                    }
                     if (this.curAttrData.euler != undefined) {
                         gd3d.math.quatFromEulerAngles(this.curAttrData.euler.x, this.curAttrData.euler.y, this.curAttrData.euler.z, this.curAttrData.rotationByEuler);
                     }
@@ -13111,6 +13114,8 @@ var gd3d;
                         return gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                     case "localRotation":
                         return gd3d.math.pool.clone_quaternion(this.localRotation);
+                    case "startRotation":
+                        return gd3d.math.pool.clone_quaternion(this.startRotation);
                     case "matrix":
                         return gd3d.math.pool.clone_matrix(this.matrix);
                 }
@@ -13467,7 +13472,7 @@ var gd3d;
                 var sprite = new UVSpriteNew();
                 sprite.row = this.row;
                 sprite.column = this.column;
-                sprite.fps = this.fps;
+                sprite.totalCount = this.totalCount;
                 return sprite;
             };
             return UVSpriteNew;
@@ -14859,8 +14864,8 @@ var gd3d;
                                             data.uvSprite.row = _val["row"];
                                         if (_val["colum"] != undefined)
                                             data.uvSprite.column = _val["colum"];
-                                        if (_val["fps"] != undefined)
-                                            data.uvSprite.fps = _val["fps"];
+                                        if (_val["count"] != undefined)
+                                            data.uvSprite.totalCount = _val["count"];
                                         break;
                                     default:
                                         data.uvType = framework.UVTypeEnum.NONE;
@@ -16958,8 +16963,9 @@ var gd3d;
                 this.format = batcher.formate;
                 this.data = batcher.data.clone();
                 this.data.life.getValueRandom();
+                this.startFrameId = this.batcher.effectSys.frameId;
                 if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
-                    this.uvSpriteFrameInternal = framework.effectSystem.fps / this.data.uvSprite.fps;
+                    this.uvSpriteFrameInternal = (this.data.life.getValue() * framework.effectSystem.fps) / this.data.uvSprite.totalCount;
                 }
                 this.gameObject = batcher.effectSys.gameObject;
                 this.vertexSize = gd3d.render.meshData.calcByteSize(this.format) / 4;
@@ -17241,8 +17247,8 @@ var gd3d;
                 }
                 else if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
                     if (this.data.uvSprite != undefined) {
-                        this.spriteIndex = Math.floor(this.batcher.effectSys.frameId / this.uvSpriteFrameInternal);
-                        this.spriteIndex %= (this.data.uvSprite.column * this.data.uvSprite.row);
+                        this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
+                        this.spriteIndex %= this.data.uvSprite.totalCount;
                         this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
                         this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;
                         this.tilling.x = this.data.uvSprite.column;

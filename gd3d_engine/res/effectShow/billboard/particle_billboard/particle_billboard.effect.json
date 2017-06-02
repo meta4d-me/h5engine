@@ -81,7 +81,7 @@
                     "uvsprite": {
                         "row": 4,
                         "colum": 4,
-                        "fps": 30
+                        "count": 30
                     },
                     "billboard": "billboard",
                     "life": 5

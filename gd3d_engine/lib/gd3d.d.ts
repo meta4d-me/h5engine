@@ -2119,7 +2119,7 @@ declare namespace gd3d.framework {
     class UVSpriteNew {
         row: number;
         column: number;
-        fps: number;
+        totalCount: number;
         clone(): UVSpriteNew;
     }
     class UVRollNew {
@@ -2759,6 +2759,7 @@ declare namespace gd3d.framework {
         private batcher;
         private speedDir;
         private simulationSpeed;
+        startFrameId: number;
         constructor(batcher: EmissionBatcher);
         uploadData(array: Float32Array): void;
         initByData(): void;
