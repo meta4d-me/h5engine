@@ -188,7 +188,10 @@ namespace gd3d.framework
                 return;
             if (this.active)
             {
-
+                if (this.curAttrData.startEuler)
+                {
+                    gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
+                }
                 if (this.curAttrData.euler != undefined)
                 {
                     // console.log("euler:" + this.curAttrData.euler.toString());
@@ -480,8 +483,8 @@ namespace gd3d.framework
                     return gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                 case "localRotation":
                     return gd3d.math.pool.clone_quaternion(this.localRotation);
-                // case "startRotation":
-                //     return gd3d.math.pool.clone_quaternion(this.startRotation);
+                case "startRotation":
+                    return gd3d.math.pool.clone_quaternion(this.startRotation);
                 case "matrix":
                     return gd3d.math.pool.clone_matrix(this.matrix);
             }

@@ -73,12 +73,12 @@
         {
             if(s.isfinish)
             {
-                this.app.getAssetMgr().load("res/prefabs/dragon/dragon.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,
+                this.app.getAssetMgr().load("res/prefabs/fx_shuijing_cj/fx_shuijing_cj.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,
                 (_s)=>
                 {
                     if(_s.isfinish)
                     {
-                        let _prefab:gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("dragon.prefab.json")as gd3d.framework.prefab;
+                        let _prefab:gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("fx_shuijing_cj.prefab.json")as gd3d.framework.prefab;
                         this.dragon= _prefab.getCloneTrans();
                         this.scene.addChild(this.dragon);
                         state.finish = true;
@@ -108,13 +108,13 @@
     {
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
-        this.app.getAssetMgr().load("res/particleEffect/rose_rotation/rose_rotation.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
+        this.app.getAssetMgr().load("res/particleEffect/fx_shuijing_cj/fx_shuijing_cj.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)
             {
                 let tr = new gd3d.framework.transform();
                 this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
-                var text: gd3d.framework.textasset = this.app.getAssetMgr().getAssetByName("rose_rotation.effect.json") as gd3d.framework.textasset;
+                var text: gd3d.framework.textasset = this.app.getAssetMgr().getAssetByName("fx_shuijing_cj.effect.json") as gd3d.framework.textasset;
                 this.effect.setEffect(text.content);
                 this.scene.addChild(tr);
                 tr.markDirty();
@@ -152,7 +152,7 @@
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, 0);
+        objCam.localTranslate = new gd3d.math.vector3(0, 5, 10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();//标记为需要刷新
         state.finish = true;

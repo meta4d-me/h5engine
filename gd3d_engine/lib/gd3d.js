@@ -7676,9 +7676,6 @@ var gd3d;
                 element.curAttrData = elementData.initFrameData.attrsData.clone();
                 var vertexSize = subEffectBatcher.vertexSize;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
-                if (element.curAttrData.startEuler) {
-                    gd3d.math.quatFromEulerAngles(element.curAttrData.startEuler.x, element.curAttrData.startEuler.y, element.curAttrData.startEuler.z, element.curAttrData.startRotation);
-                }
                 element.update();
                 subEffectBatcher.effectElements.push(element);
                 for (var i_3 = 0; i_3 < vertexCount; i_3++) {
@@ -12909,6 +12906,9 @@ var gd3d;
                 if (this.curAttrData == undefined || this.curAttrData == null)
                     return;
                 if (this.active) {
+                    if (this.curAttrData.startEuler) {
+                        gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
+                    }
                     if (this.curAttrData.euler != undefined) {
                         gd3d.math.quatFromEulerAngles(this.curAttrData.euler.x, this.curAttrData.euler.y, this.curAttrData.euler.z, this.curAttrData.rotationByEuler);
                     }
@@ -13109,6 +13109,8 @@ var gd3d;
                         return gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                     case "localRotation":
                         return gd3d.math.pool.clone_quaternion(this.localRotation);
+                    case "startRotation":
+                        return gd3d.math.pool.clone_quaternion(this.startRotation);
                     case "matrix":
                         return gd3d.math.pool.clone_matrix(this.matrix);
                 }
