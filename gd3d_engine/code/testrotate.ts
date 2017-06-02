@@ -177,7 +177,7 @@
             {
                 var cube= this.cubetrail.clone();
                 this.scene.addChild(cube);
-                gd3d.framework.traillerp(this.startdir,this.enddir,this.timer*0.1,this.targetdir);
+               //gd3d.framework.traillerp(this.startdir,this.enddir,this.timer*0.1,this.targetdir);
                 gd3d.math.vec3ScaleByNum(this.targetdir,3,this.targetdir);
                 gd3d.math.vec3Clone(this.targetdir,cube.localTranslate);
                cube.markDirty();

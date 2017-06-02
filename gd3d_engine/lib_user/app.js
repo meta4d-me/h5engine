@@ -2241,12 +2241,12 @@ var t;
                     var renderer = cube.gameObject.addComponent("meshRenderer");
                     var cuber = renderer;
                     var trailtrans = new gd3d.framework.transform();
-                    trailtrans.localTranslate.z = 0.5;
+                    trailtrans.localTranslate.z = 2;
                     this.weapon.addChild(trailtrans);
                     gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
                     trailtrans.markDirty();
                     var trailrender = trailtrans.gameObject.addComponent("trailRender");
-                    trailrender.setWidth(1);
+                    trailrender.setWidth(2);
                     var mat = new gd3d.framework.material();
                     var shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json");
                     var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json");
@@ -2271,22 +2271,26 @@ var t;
             this.taskmgr.addTaskCall(this.initscene.bind(this));
             var tbn1 = this.addbtn("80px", "0px", "attack_01");
             tbn1.onclick = function () {
+                _this.trailrender.play();
                 var name = "attack_01.FBAni.aniclip.bin";
                 _this.aniplayer.playCross(name, 0.2);
-                _this.trailrender.play();
             };
             var btn = this.addbtn("120px", "0px", "attack_02");
             btn.onclick = function () {
+                _this.trailrender.play();
                 var name = "attack_02.FBAni.aniclip.bin";
                 _this.aniplayer.playCross(name, 0.2);
-                _this.trailrender.play();
+            };
+            var btn3 = this.addbtn("200px", "0px", "stop");
+            btn3.onclick = function () {
+                _this.trailrender.stop();
             };
             {
                 var btn2 = this.addbtn("160px", "0px", "playAttackAni");
                 btn2.onclick = function () {
+                    _this.trailrender.play();
                     var name = "attack_04.FBAni.aniclip.bin";
                     _this.aniplayer.playCross(name, 0.2);
-                    _this.trailrender.play();
                 };
             }
         };
@@ -4165,7 +4169,6 @@ var t;
             if (this.cubetrail) {
                 var cube = this.cubetrail.clone();
                 this.scene.addChild(cube);
-                gd3d.framework.traillerp(this.startdir, this.enddir, this.timer * 0.1, this.targetdir);
                 gd3d.math.vec3ScaleByNum(this.targetdir, 3, this.targetdir);
                 gd3d.math.vec3Clone(this.targetdir, cube.localTranslate);
                 cube.markDirty();
@@ -4752,7 +4755,6 @@ var t;
                     mat.setShader(shader);
                     mat.setTexture("_MainTex", tex);
                     trailrender.material = mat;
-                    trailrender.interpolate = true;
                     trailrender.setWidth(1, 1);
                 }
             }

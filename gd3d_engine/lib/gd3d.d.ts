@@ -1511,23 +1511,22 @@ declare namespace gd3d.framework {
         private dataForVbo;
         private dataForEbo;
         private sticks;
+        private active;
         start(): void;
         private app;
         private webgl;
-        private path;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
         material: gd3d.framework.material;
         color: gd3d.math.color;
-        setspeed(upspeed: number, lowspeed?: number): void;
+        setspeed(upspeed: number): void;
         setWidth(Width: number): void;
-        private active;
         play(): void;
         stop(): void;
         private initmesh();
+        private intidata();
         private speed;
-        private lowspeed;
         private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
@@ -1535,21 +1534,6 @@ declare namespace gd3d.framework {
     class trailStick {
         location: gd3d.math.vector3;
         updir: gd3d.math.vector3;
-        follow: trailPathNode;
-        speed: number;
-        activeTime: number;
-        delay: number;
-        followMove(delta: number): void;
-    }
-    function traillerp(startdir: math.vector3, enddir: math.vector3, lerp: number, outdir: math.vector3): void;
-    class trailPathNode {
-        pos: gd3d.math.vector3;
-        updir: gd3d.math.vector3;
-        next: trailPathNode;
-    }
-    class trailPath {
-        add(): trailPathNode;
-        end: trailPathNode;
     }
 }
 declare namespace gd3d.framework {

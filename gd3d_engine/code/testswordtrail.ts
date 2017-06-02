@@ -185,7 +185,7 @@ namespace t {
                     mat.setTexture("_MainTex", tex)
 
                     trailrender.material = mat;
-                    trailrender.interpolate=true;
+                    //trailrender.interpolate=true;
                     //this.trailrender=trailrender;
                     //trailrender.lifetime=0.4;
                     //trailrender.minvertexDistance=0.01;

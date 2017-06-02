@@ -8744,11 +8744,14 @@ var gd3d;
             trailRender_recorde.prototype.remove = function () {
             };
             trailRender_recorde.prototype.refreshTrailNode = function (curTime) {
+                while (this.targetPath.length > 0 && curTime > this.targetPath[this.targetPath.length - 1].time + this.lifetime) {
+                    this.targetPath.pop();
+                }
                 var pos = new gd3d.math.vector3();
                 gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
-                var length = this.nodes.length;
+                var length = this.targetPath.length;
                 if (length != 0) {
-                    if (gd3d.math.vec3Distance(pos, this.nodes[0].location) < this.minStickDistance)
+                    if (gd3d.math.vec3Distance(pos, this.targetPath[0].location) < this.minStickDistance)
                         return;
                 }
                 var updir = new gd3d.math.vector3();
@@ -8790,12 +8793,6 @@ var gd3d;
                         }
                         this.interpPath.unshift(newNode);
                     }
-                }
-                while (this.targetPath.length > 0 && curTime > this.targetPath[this.targetPath.length - 1].time + this.lifetime) {
-                    this.targetPath.pop();
-                }
-                while (this.nodes.length > 0 && curTime > this.nodes[this.nodes.length - 1].time + this.lifetime) {
-                    this.nodes.pop();
                 }
                 while (this.targetPath.length > this.maxStickCout) {
                     this.targetPath.pop();
@@ -8909,7 +8906,6 @@ var gd3d;
                 this.vertexcount = 24;
                 this.active = false;
                 this.speed = 0.5;
-                this.lowspeed = 0.3;
             }
             trailRender.prototype.start = function () {
                 this.app = this.gameObject.getScene().app;
@@ -8919,15 +8915,13 @@ var gd3d;
             trailRender.prototype.update = function (delta) {
                 if (!this.active)
                     return;
-                var endnode = this.path.add();
-                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), endnode.pos);
-                this.gameObject.transform.getUpInWorld(endnode.updir);
-                gd3d.math.vec3ScaleByNum(endnode.updir, this.width, endnode.updir);
-                gd3d.math.vec3Clone(endnode.pos, this.sticks[0].location);
-                gd3d.math.vec3Clone(endnode.updir, this.sticks[0].updir);
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), this.sticks[0].location);
+                this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
+                gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
                 var length = this.sticks.length;
                 for (var i = 1; i < length; i++) {
-                    this.sticks[i].followMove(delta);
+                    gd3d.math.vec3SLerp(this.sticks[i].location, this.sticks[i - 1].location, this.speed, this.sticks[i].location);
+                    gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, this.speed, this.sticks[i].updir);
                 }
                 this.updateTrailData();
             };
@@ -8965,39 +8959,20 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            trailRender.prototype.setspeed = function (upspeed, lowspeed) {
-                if (lowspeed === void 0) { lowspeed = 0.1; }
+            trailRender.prototype.setspeed = function (upspeed) {
                 this.speed = upspeed;
-                this.lowspeed = lowspeed;
             };
             trailRender.prototype.setWidth = function (Width) {
                 this.width = Width;
             };
             trailRender.prototype.play = function () {
+                this.intidata();
                 this.active = true;
             };
             trailRender.prototype.stop = function () {
                 this.active = false;
             };
             trailRender.prototype.initmesh = function () {
-                this.path = new trailPath();
-                var endnode = this.path.add();
-                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), endnode.pos);
-                this.gameObject.transform.getUpInWorld(endnode.updir);
-                gd3d.math.vec3ScaleByNum(endnode.updir, this.width, endnode.updir);
-                this.sticks = [];
-                var length = this.vertexcount / 2;
-                for (var i = 0; i < this.vertexcount / 2; i++) {
-                    var ts = new trailStick();
-                    this.sticks.push(ts);
-                    ts.location = new gd3d.math.vector3();
-                    gd3d.math.vec3Clone(endnode.pos, ts.location);
-                    ts.updir = new gd3d.math.vector3();
-                    gd3d.math.vec3Clone(endnode.updir, ts.updir);
-                    ts.follow = endnode;
-                    ts.delay = 0.01 * i;
-                    ts.speed = 0.5;
-                }
                 this.mesh = new gd3d.framework.mesh();
                 this.mesh.data = new gd3d.render.meshData();
                 this.mesh.glMesh = new gd3d.render.glMesh();
@@ -9015,6 +8990,18 @@ var gd3d;
                     sm.size = this.dataForEbo.length;
                     sm.line = false;
                     this.mesh.submesh.push(sm);
+                }
+            };
+            trailRender.prototype.intidata = function () {
+                this.sticks = [];
+                for (var i = 0; i < this.vertexcount / 2; i++) {
+                    var ts = new trailStick();
+                    this.sticks.push(ts);
+                    ts.location = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), ts.location);
+                    ts.updir = new gd3d.math.vector3();
+                    this.gameObject.transform.getUpInWorld(ts.updir);
+                    gd3d.math.vec3ScaleByNum(ts.updir, this.width, ts.updir);
                 }
                 var length = this.vertexcount / 2;
                 var updir = gd3d.math.pool.new_vector3();
@@ -9075,6 +9062,8 @@ var gd3d;
                 }
             };
             trailRender.prototype.render = function (context, assetmgr, camera) {
+                if (!this.active)
+                    return;
                 context.updateModeTrail();
                 this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
                 this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
@@ -9090,79 +9079,10 @@ var gd3d;
         framework.trailRender = trailRender;
         var trailStick = (function () {
             function trailStick() {
-                this.follow = null;
-                this.activeTime = 0;
-                this.delay = 0;
             }
-            trailStick.prototype.followMove = function (delta) {
-                this.activeTime += delta;
-                if (this.activeTime < this.delay)
-                    return;
-                var dist = gd3d.math.vec3Distance(this.follow.pos, this.location);
-                if (dist < 0.01) {
-                    if (this.follow.next != null)
-                        this.follow = this.follow.next;
-                    dist = gd3d.math.vec3Distance(this.follow.pos, this.location);
-                }
-                var dir = new gd3d.math.vector3();
-                gd3d.math.vec3Subtract(this.follow.pos, this.location, dir);
-                var distadd = 100 * this.speed * delta;
-                if (distadd > dist)
-                    distadd = dist;
-                if (dist != 0) {
-                    var lerpv = distadd / dist;
-                    gd3d.math.vec3SLerp(this.location, this.follow.pos, lerpv, this.location);
-                    traillerp(this.updir, this.follow.updir, lerpv, this.updir);
-                }
-                else {
-                    gd3d.math.vec3Clone(this.follow.updir, this.updir);
-                }
-            };
             return trailStick;
         }());
         framework.trailStick = trailStick;
-        function traillerp(startdir, enddir, lerp, outdir) {
-            var tempdir1 = gd3d.math.pool.new_vector3();
-            var tempdir2 = gd3d.math.pool.new_vector3();
-            var tempdir = gd3d.math.pool.new_vector3();
-            var quat = gd3d.math.pool.new_quaternion();
-            gd3d.math.vec3Normalize(startdir, tempdir1);
-            gd3d.math.vec3Normalize(enddir, tempdir2);
-            gd3d.math.vec3Cross(tempdir1, tempdir2, tempdir);
-            var angle = gd3d.math.vec3AngleBetween(tempdir1, tempdir2);
-            gd3d.math.quatFromAxisAngle(tempdir, lerp * angle * 180 / Math.PI, quat);
-            gd3d.math.quatTransformVector(quat, tempdir1, tempdir1);
-            var lenghth = gd3d.math.numberLerp(gd3d.math.vec3Length(startdir), gd3d.math.vec3Length(enddir), lerp);
-            gd3d.math.vec3ScaleByNum(tempdir1, lenghth, outdir);
-            gd3d.math.pool.delete_vector3(tempdir1);
-            gd3d.math.pool.delete_vector3(tempdir2);
-            gd3d.math.pool.delete_vector3(tempdir);
-            gd3d.math.pool.delete_quaternion(quat);
-        }
-        framework.traillerp = traillerp;
-        var trailPathNode = (function () {
-            function trailPathNode() {
-                this.next = null;
-            }
-            return trailPathNode;
-        }());
-        framework.trailPathNode = trailPathNode;
-        var trailPath = (function () {
-            function trailPath() {
-                this.end = null;
-            }
-            trailPath.prototype.add = function () {
-                var node = new trailPathNode();
-                node.pos = gd3d.math.pool.new_vector3();
-                node.updir = gd3d.math.pool.new_vector3();
-                if (this.end != null)
-                    this.end.next = node;
-                this.end = node;
-                return node;
-            };
-            return trailPath;
-        }());
-        framework.trailPath = trailPath;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

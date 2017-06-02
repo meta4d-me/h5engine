@@ -121,13 +121,19 @@ namespace gd3d.framework {
         }
         private refreshTrailNode(curTime: number) {
 
+
+            //移除死掉的粒子
+            while (this.targetPath.length > 0 && curTime > this.targetPath[this.targetPath.length - 1].time + this.lifetime) {
+                this.targetPath.pop();
+            }
+            
             //插入新粒子
             var pos = new gd3d.math.vector3();
             gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
 
-            var length = this.nodes.length;
+            var length = this.targetPath.length;
             if (length != 0) {
-                if (gd3d.math.vec3Distance(pos, this.nodes[0].location) < this.minStickDistance) return;
+                if (gd3d.math.vec3Distance(pos, this.targetPath[0].location) < this.minStickDistance) return;
             }
 
             var updir = new gd3d.math.vector3();
@@ -179,13 +185,9 @@ namespace gd3d.framework {
                 }
             }
 
-            //移除死掉的粒子
-            while (this.targetPath.length > 0 && curTime > this.targetPath[this.targetPath.length - 1].time + this.lifetime) {
-                this.targetPath.pop();
-            }
-            while (this.nodes.length > 0 && curTime > this.nodes[this.nodes.length - 1].time + this.lifetime) {
-                this.nodes.pop();
-            }
+            // while (this.nodes.length > 0 && curTime > this.nodes[this.nodes.length - 1].time + this.lifetime) {
+            //     this.nodes.pop();
+            // }
             //控制粒子数量
             while (this.targetPath.length > this.maxStickCout) {
                 this.targetPath.pop();
