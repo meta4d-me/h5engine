@@ -9794,6 +9794,9 @@ var gd3d;
             binTool.prototype.writeInt = function (num) {
                 this.write(converter.Int32ToArray(num));
             };
+            binTool.prototype.dispose = function () {
+                this._buf.splice(0);
+            };
             return binTool;
         }(binBuffer));
         io.binTool = binTool;
@@ -16950,6 +16953,7 @@ var gd3d;
                 this.format = batcher.formate;
                 this.data = batcher.data.clone();
                 this.data.life.getValueRandom();
+                this.startFrameId = this.batcher.effectSys.frameId;
                 if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
                     this.uvSpriteFrameInternal = framework.effectSystem.fps / this.data.uvSprite.fps;
                 }
@@ -17233,7 +17237,7 @@ var gd3d;
                 }
                 else if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
                     if (this.data.uvSprite != undefined) {
-                        this.spriteIndex = Math.floor(this.batcher.effectSys.frameId / this.uvSpriteFrameInternal);
+                        this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
                         this.spriteIndex %= (this.data.uvSprite.column * this.data.uvSprite.row);
                         this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
                         this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;

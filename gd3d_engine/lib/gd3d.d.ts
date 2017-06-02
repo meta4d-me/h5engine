@@ -1557,7 +1557,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.io {
     class binBuffer {
-        private _buf;
+        _buf: Uint8Array[];
         private _seekWritePos;
         private _seekWriteIndex;
         private _seekReadPos;
@@ -1645,6 +1645,7 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.io {
@@ -2757,6 +2758,7 @@ declare namespace gd3d.framework {
         private batcher;
         private speedDir;
         private simulationSpeed;
+        startFrameId: number;
         constructor(batcher: EmissionBatcher);
         uploadData(array: Float32Array): void;
         initByData(): void;

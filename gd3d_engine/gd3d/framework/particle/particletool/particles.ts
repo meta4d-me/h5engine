@@ -384,7 +384,7 @@ namespace gd3d.framework
         private batcher: EmissionBatcher;
         private speedDir: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
         private simulationSpeed: number;
-
+        public startFrameId: number;
         //根据发射器定义 初始化
         constructor(batcher: EmissionBatcher)//, _data: EmissionNew, startIndex: number, format: number
         {
@@ -392,6 +392,7 @@ namespace gd3d.framework
             this.format = batcher.formate;
             this.data = batcher.data.clone();
             this.data.life.getValueRandom();
+            this.startFrameId = this.batcher.effectSys.frameId;
             // if (this.data.moveSpeed != undefined)
             //     this.data.moveSpeed.getValueRandom();
             // if (this.data.eulerSpeed != undefined)
@@ -866,21 +867,6 @@ namespace gd3d.framework
                     let index = 0;
                     if (this.data.uvRoll.uvSpeedNodes != undefined)
                     {
-                        // for (var i = 0; i < this.data.uvRoll.uvSpeedNodes.length; i++)
-                        // {
-                        //     if (this.data.uvRoll.uvSpeedNodes[i].key < this.curLife)
-                        //     {
-                        //         this._startUVSpeedNode = this.data.uvRoll.uvSpeedNodes[i];
-                        //         index++;
-                        //     }
-                        // }
-                        // if (index == 0 || index == this.data.uvRoll.uvSpeedNodes.length) return;
-                        // this._curUVSpeedNode = this.data.uvRoll.uvSpeedNodes[index];
-                        // var duration = this.endNode.key - this._startNode.key;
-                        // if (duration > 0)
-                        // {
-                        //     gd3d.math.vec2SLerp(this._startUVSpeedNode.getValue(), this._curUVSpeedNode.getValue(), (this.curLife - this._startNode.key) / duration, this.uv);
-                        // }
                         this._updateNode(this.data.uvRoll.uvSpeedNodes, this.data.life.getValue(), this.uv);
                     } else if (this.data.uvRoll.uvSpeed != undefined)
                     {
@@ -894,7 +880,7 @@ namespace gd3d.framework
             {
                 if (this.data.uvSprite != undefined)
                 {
-                    this.spriteIndex = Math.floor(this.batcher.effectSys.frameId / this.uvSpriteFrameInternal);
+                    this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
                     this.spriteIndex %= (this.data.uvSprite.column * this.data.uvSprite.row);
                     this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
                     this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;
