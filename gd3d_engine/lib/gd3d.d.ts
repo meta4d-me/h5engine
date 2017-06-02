@@ -2118,7 +2118,7 @@ declare namespace gd3d.framework {
     class UVSpriteNew {
         row: number;
         column: number;
-        fps: number;
+        totalCount: number;
         clone(): UVSpriteNew;
     }
     class UVRollNew {

@@ -12891,6 +12891,9 @@ var gd3d;
                         case "uvroll":
                             action = new framework.UVRollAction();
                             break;
+                        case "uvsprite":
+                            action = new framework.UVSpriteAnimationAction();
+                            break;
                         case "rosepath":
                             action = new framework.RoseCurveAction();
                             break;
@@ -13462,7 +13465,7 @@ var gd3d;
                 var sprite = new UVSpriteNew();
                 sprite.row = this.row;
                 sprite.column = this.column;
-                sprite.fps = this.fps;
+                sprite.totalCount = this.totalCount;
                 return sprite;
             };
             return UVSpriteNew;
@@ -14854,8 +14857,8 @@ var gd3d;
                                             data.uvSprite.row = _val["row"];
                                         if (_val["colum"] != undefined)
                                             data.uvSprite.column = _val["colum"];
-                                        if (_val["fps"] != undefined)
-                                            data.uvSprite.fps = _val["fps"];
+                                        if (_val["count"] != undefined)
+                                            data.uvSprite.totalCount = _val["count"];
                                         break;
                                     default:
                                         data.uvType = framework.UVTypeEnum.NONE;
@@ -16955,7 +16958,7 @@ var gd3d;
                 this.data.life.getValueRandom();
                 this.startFrameId = this.batcher.effectSys.frameId;
                 if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
-                    this.uvSpriteFrameInternal = framework.effectSystem.fps / this.data.uvSprite.fps;
+                    this.uvSpriteFrameInternal = (this.data.life.getValue() * framework.effectSystem.fps) / this.data.uvSprite.totalCount;
                 }
                 this.gameObject = batcher.effectSys.gameObject;
                 this.vertexSize = gd3d.render.meshData.calcByteSize(this.format) / 4;
@@ -17238,7 +17241,7 @@ var gd3d;
                 else if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
                     if (this.data.uvSprite != undefined) {
                         this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
-                        this.spriteIndex %= (this.data.uvSprite.column * this.data.uvSprite.row);
+                        this.spriteIndex %= this.data.uvSprite.totalCount;
                         this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
                         this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;
                         this.tilling.x = this.data.uvSprite.column;

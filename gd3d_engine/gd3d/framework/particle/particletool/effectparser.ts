@@ -352,8 +352,8 @@ namespace gd3d.framework
                                         data.uvSprite.row = <number>_val["row"];
                                     if (_val["colum"] != undefined)
                                         data.uvSprite.column = <number>_val["colum"];
-                                    if (_val["fps"] != undefined)
-                                        data.uvSprite.fps = <number>_val["fps"];
+                                    if (_val["count"] != undefined)
+                                        data.uvSprite.totalCount = <number>_val["count"];
                                     break;
                                 default:
                                     data.uvType = UVTypeEnum.NONE;

@@ -432,7 +432,7 @@ namespace gd3d.framework
             // }
             if (this.data.uvType == UVTypeEnum.UVSprite)
             {
-                this.uvSpriteFrameInternal = effectSystem.fps / this.data.uvSprite.fps;
+                this.uvSpriteFrameInternal = (this.data.life.getValue() * effectSystem.fps) / this.data.uvSprite.totalCount;
             }
             this.gameObject = batcher.effectSys.gameObject;
             this.vertexSize = gd3d.render.meshData.calcByteSize(this.format) / 4;
@@ -881,7 +881,7 @@ namespace gd3d.framework
                 if (this.data.uvSprite != undefined)
                 {
                     this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
-                    this.spriteIndex %= (this.data.uvSprite.column * this.data.uvSprite.row);
+                    this.spriteIndex %= this.data.uvSprite.totalCount;
                     this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
                     this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;
                     this.tilling.x = this.data.uvSprite.column;
