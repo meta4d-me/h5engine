@@ -5026,7 +5026,7 @@ var gd3d;
             __metadata("design:paramtypes", [Number, Object, Object])
         ], UniformData);
         framework.UniformData = UniformData;
-        var material = (function () {
+        var material = material_1 = (function () {
             function material(assetName) {
                 if (assetName === void 0) { assetName = null; }
                 this.name = null;
@@ -5439,6 +5439,28 @@ var gd3d;
                     }
                 }
             };
+            material.prototype.clone = function () {
+                var mat = new material_1(this.getName());
+                mat.setShader(this.shader);
+                for (var i in this.mapUniform) {
+                    var data = this.mapUniform[i];
+                    var _uniformType = data.type;
+                    switch (_uniformType) {
+                        case gd3d.render.UniformTypeEnum.Texture:
+                            mat.setTexture(i, data.value);
+                            break;
+                        case gd3d.render.UniformTypeEnum.Float:
+                            mat.setFloat(i, data.value);
+                            break;
+                        case gd3d.render.UniformTypeEnum.Float4:
+                            mat.setVector4(i, data.value);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return mat;
+            };
             return material;
         }());
         __decorate([
@@ -5453,11 +5475,12 @@ var gd3d;
             gd3d.reflect.Field("UniformDataDic"),
             __metadata("design:type", Object)
         ], material.prototype, "mapUniform", void 0);
-        material = __decorate([
+        material = material_1 = __decorate([
             gd3d.reflect.SerializeType,
             __metadata("design:paramtypes", [String])
         ], material);
         framework.material = material;
+        var material_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
