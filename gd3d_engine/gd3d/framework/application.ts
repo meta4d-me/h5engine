@@ -22,8 +22,10 @@ namespace gd3d.framework
         height: number;
         limitFrame: boolean = true;
         notify: INotify;
+		version:string = "0001";
         start(div: HTMLDivElement)
         {
+			console.log("version: "+this.version);
             sceneMgr.app = this;
             this.container = div;
             var canvas = document.createElement("canvas");
