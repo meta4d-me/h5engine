@@ -102,7 +102,7 @@ namespace gd3d.framework
                             }
                             else if (key == "euler")
                             {
-                                frame.attrsData.startEuler = (val as ParticleNode).getValue();
+                                frame.attrsData.euler = (val as ParticleNode).getValue();
                             } 
                             else if (key == "mesh")
                             {

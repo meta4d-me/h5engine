@@ -18,6 +18,7 @@ declare namespace gd3d.framework {
         height: number;
         limitFrame: boolean;
         notify: INotify;
+        version: string;
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -1933,7 +1934,7 @@ declare namespace gd3d.framework {
         dispose(): void;
     }
     class EffectElement {
-        gameobject: transform;
+        transform: transform;
         data: EffectElementData;
         name: string;
         timelineFrame: {
@@ -1983,8 +1984,6 @@ declare namespace gd3d.framework {
         matrix: math.matrix;
         tilling: math.vector2;
         rotationByEuler: math.quaternion;
-        startEuler: math.vector3;
-        startRotation: math.quaternion;
         localRotation: math.quaternion;
         mesh: mesh;
         meshdataVbo: Float32Array;
