@@ -32,6 +32,7 @@ var gd3d;
         var application = (function () {
             function application() {
                 this.limitFrame = true;
+                this.version = "0001";
                 this.beStepNumber = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
@@ -44,6 +45,7 @@ var gd3d;
                 this._beStepForward = false;
             }
             application.prototype.start = function (div) {
+                console.log("version: " + this.version);
                 framework.sceneMgr.app = this;
                 this.container = div;
                 var canvas = document.createElement("canvas");
@@ -7666,7 +7668,7 @@ var gd3d;
             };
             effectSystem.prototype.addInitFrame = function (elementData) {
                 var element = new framework.EffectElement(elementData);
-                element.gameobject = this.gameObject.transform;
+                element.transform = this.gameObject.transform;
                 var _initFrameData = element.data.initFrameData;
                 if (_initFrameData == undefined || _initFrameData.attrsData == undefined || _initFrameData.attrsData.mesh == undefined)
                     return;
@@ -12986,9 +12988,6 @@ var gd3d;
                 if (this.curAttrData == undefined || this.curAttrData == null)
                     return;
                 if (this.active) {
-                    if (this.curAttrData.startEuler) {
-                        gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
-                    }
                     if (this.curAttrData.euler != undefined) {
                         gd3d.math.quatFromEulerAngles(this.curAttrData.euler.x, this.curAttrData.euler.y, this.curAttrData.euler.z, this.curAttrData.rotationByEuler);
                     }
@@ -13008,8 +13007,8 @@ var gd3d;
                     var worldTranslation = gd3d.math.pool.new_vector3();
                     var translation = gd3d.math.pool.new_vector3();
                     gd3d.math.vec3Clone(this.curAttrData.pos, translation);
-                    if (this.gameobject != undefined) {
-                        gd3d.math.matrixTransformVector3(translation, this.gameobject.getWorldMatrix(), worldTranslation);
+                    if (this.transform != undefined) {
+                        gd3d.math.matrixTransformVector3(translation, this.transform.getWorldMatrix(), worldTranslation);
                     }
                     if (this.curAttrData.renderModel == framework.RenderModel.BillBoard) {
                         gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
@@ -13031,7 +13030,7 @@ var gd3d;
                         gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
                         gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
                         var lookRot = new gd3d.math.quaternion();
-                        gd3d.math.quatClone(this.gameobject.getWorldRotate(), invTransformRotation);
+                        gd3d.math.quatClone(this.transform.getWorldRotate(), invTransformRotation);
                         gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                         gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
                         var inverRot = gd3d.math.pool.new_quaternion();
@@ -13050,17 +13049,15 @@ var gd3d;
                         framework.EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
                     }
                     gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, worldRotation);
-                    gd3d.math.quatClone(this.gameobject.gameObject.transform.getWorldRotate(), invTransformRotation);
+                    gd3d.math.quatClone(this.transform.gameObject.transform.getWorldRotate(), invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, localRotation);
-                    gd3d.math.quatMultiply(this.curAttrData.startRotation, localRotation, this.curAttrData.localRotation);
+                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.curAttrData.localRotation);
                     gd3d.math.pool.delete_vector3(translation);
                     gd3d.math.pool.delete_vector3(worldTranslation);
                     gd3d.math.pool.delete_quaternion(invTransformRotation);
                 }
                 else {
-                    gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, localRotation);
-                    gd3d.math.quatMultiply(localRotation, this.curAttrData.startRotation, this.curAttrData.localRotation);
+                    gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
                 }
                 gd3d.math.pool.delete_quaternion(localRotation);
                 gd3d.math.pool.delete_quaternion(worldRotation);
@@ -13133,13 +13130,11 @@ var gd3d;
         framework.EffectElementData = EffectElementData;
         var EffectAttrsData = (function () {
             function EffectAttrsData() {
-                this.euler = new gd3d.math.vector3();
                 this.uv = new gd3d.math.vector2(0, 0);
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
                 this.tilling = new gd3d.math.vector2(1, 1);
                 this.rotationByEuler = new gd3d.math.quaternion();
-                this.startRotation = new gd3d.math.quaternion();
                 this.localRotation = new gd3d.math.quaternion();
             }
             EffectAttrsData.prototype.setLerpAttribute = function (attribute, val) {
@@ -13189,8 +13184,6 @@ var gd3d;
                         return gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                     case "localRotation":
                         return gd3d.math.pool.clone_quaternion(this.localRotation);
-                    case "startRotation":
-                        return gd3d.math.pool.clone_quaternion(this.startRotation);
                     case "matrix":
                         return gd3d.math.pool.clone_matrix(this.matrix);
                 }
@@ -13240,10 +13233,6 @@ var gd3d;
                     data.localRotation = gd3d.math.pool.clone_quaternion(this.localRotation);
                 if (this.meshdataVbo != undefined)
                     data.meshdataVbo = this.meshdataVbo;
-                if (this.startEuler != undefined)
-                    data.startEuler = gd3d.math.pool.clone_vector3(this.startEuler);
-                if (this.startRotation != undefined)
-                    data.startRotation = gd3d.math.pool.clone_quaternion(this.startRotation);
                 data.alpha = this.alpha;
                 data.renderModel = this.renderModel;
                 data.mesh = this.mesh;
@@ -14450,7 +14439,8 @@ var gd3d;
                 this.frameInternal = 1 / framework.effectSystem.fps;
             };
             RoseCurveAction.prototype.update = function (frameIndex) {
-                var curAttrData = this.elements.data.initFrameData.attrsData.clone();
+                var initFrameDataPos = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Clone(this.elements.data.initFrameData.attrsData.pos, initFrameDataPos);
                 var radius = this.radius;
                 var curFrame = frameIndex % 360;
                 var x = this.polar.x.getValue();
@@ -14458,22 +14448,23 @@ var gd3d;
                 var z = this.polar.z.getValue();
                 {
                     var theta = frameIndex * this.speed;
-                    this.elements.curAttrData.pos.x = curAttrData.pos.x + radius * Math.cos(3 * theta + x) * Math.cos(theta);
-                    this.elements.curAttrData.pos.z = curAttrData.pos.z + radius * Math.cos(3 * theta + x) * Math.sin(theta);
-                    this.elements.curAttrData.pos.y = curAttrData.pos.y + y * Math.cos(frameIndex * this.speed);
+                    this.elements.curAttrData.pos.x = initFrameDataPos.x + radius * Math.cos(3 * theta + x) * Math.cos(theta);
+                    this.elements.curAttrData.pos.z = initFrameDataPos.z + radius * Math.cos(3 * theta + x) * Math.sin(theta);
+                    this.elements.curAttrData.pos.y = initFrameDataPos.y + y * Math.cos(frameIndex * this.speed);
                 }
                 {
                     var deltaTheta = frameIndex * this.speed + 0.001;
                     var targetPoint = gd3d.math.pool.new_vector3();
-                    targetPoint.x = curAttrData.pos.x + radius * Math.cos(3 * deltaTheta + x) * Math.cos(deltaTheta);
-                    targetPoint.z = curAttrData.pos.z + radius * Math.cos(3 * deltaTheta + x) * Math.sin(deltaTheta);
-                    targetPoint.y = curAttrData.pos.y + y * Math.cos(frameIndex * this.speed);
+                    targetPoint.x = initFrameDataPos.x + radius * Math.cos(3 * deltaTheta + x) * Math.cos(deltaTheta);
+                    targetPoint.z = initFrameDataPos.z + radius * Math.cos(3 * deltaTheta + x) * Math.sin(deltaTheta);
+                    targetPoint.y = initFrameDataPos.y + y * Math.cos(frameIndex * this.speed);
                     var rotation = gd3d.math.pool.new_quaternion();
                     gd3d.math.quatLookat(this.elements.curAttrData.pos, targetPoint, rotation);
                     gd3d.math.quatToEulerAngles(rotation, this.elements.curAttrData.euler);
                     gd3d.math.pool.delete_vector3(targetPoint);
                     gd3d.math.pool.delete_quaternion(rotation);
                 }
+                gd3d.math.pool.delete_vector3(initFrameDataPos);
             };
             return RoseCurveAction;
         }());
@@ -14528,8 +14519,8 @@ var gd3d;
                 var curAttrData = this.elements.data.initFrameData.attrsData.clone();
                 var worldTranslate = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(curAttrData.pos, worldTranslate);
-                if (this.elements.gameobject != undefined) {
-                    gd3d.math.matrixTransformVector3(worldTranslate, this.elements.gameobject.getWorldMatrix(), worldTranslate);
+                if (this.elements.transform != undefined) {
+                    gd3d.math.matrixTransformVector3(worldTranslate, this.elements.transform.getWorldMatrix(), worldTranslate);
                 }
                 gd3d.math.vec3Clone(worldTranslate, this.transform.localTranslate);
                 gd3d.math.pool.delete_vector3(worldTranslate);
@@ -14552,8 +14543,8 @@ var gd3d;
             TrailAction.prototype.update = function (frameIndex) {
                 var worldTranslate = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(this.elements.curAttrData.pos, worldTranslate);
-                if (this.elements.gameobject != undefined) {
-                    gd3d.math.matrixTransformVector3(worldTranslate, this.elements.gameobject.getWorldMatrix(), worldTranslate);
+                if (this.elements.transform != undefined) {
+                    gd3d.math.matrixTransformVector3(worldTranslate, this.elements.transform.getWorldMatrix(), worldTranslate);
                 }
                 gd3d.math.vec3Clone(worldTranslate, this.transform.localTranslate);
                 gd3d.math.vec3Add(this.transform.localTranslate, this.offsetTransalte, this.transform.localTranslate);
@@ -14741,7 +14732,7 @@ var gd3d;
                                     frame.attrsData.scale = val.getValue();
                                 }
                                 else if (key == "euler") {
-                                    frame.attrsData.startEuler = val.getValue();
+                                    frame.attrsData.euler = val.getValue();
                                 }
                                 else if (key == "mesh") {
                                     frame.attrsData.mesh = val;

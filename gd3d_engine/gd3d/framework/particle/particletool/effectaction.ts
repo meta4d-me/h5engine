@@ -337,7 +337,8 @@ namespace gd3d.framework
 
         update(frameIndex: number)
         {
-            let curAttrData = this.elements.data.initFrameData.attrsData.clone();
+            let initFrameDataPos = gd3d.math.pool.new_vector3();
+            gd3d.math.vec3Clone(this.elements.data.initFrameData.attrsData.pos,initFrameDataPos);
             let radius = this.radius;
             let curFrame = frameIndex%360;
 
@@ -346,23 +347,23 @@ namespace gd3d.framework
             let z = this.polar.z.getValue();
             {
                 let theta = frameIndex * this.speed;
-                this.elements.curAttrData.pos.x =curAttrData.pos.x + radius * Math.cos(3 * theta+ x) * Math.cos(theta);
-                this.elements.curAttrData.pos.z =curAttrData.pos.z +  radius * Math.cos(3 * theta+ x) * Math.sin(theta);
-                this.elements.curAttrData.pos.y =curAttrData.pos.y + y*Math.cos(frameIndex * this.speed); 
+                this.elements.curAttrData.pos.x = initFrameDataPos.x + radius * Math.cos(3 * theta+ x) * Math.cos(theta);
+                this.elements.curAttrData.pos.z = initFrameDataPos.z +  radius * Math.cos(3 * theta+ x) * Math.sin(theta);
+                this.elements.curAttrData.pos.y = initFrameDataPos.y + y*Math.cos(frameIndex * this.speed); 
             }
             {
                 let deltaTheta = frameIndex * this.speed + 0.001;
                 let targetPoint = gd3d.math.pool.new_vector3();
-                targetPoint.x =curAttrData.pos.x + radius * Math.cos(3 * deltaTheta + x) * Math.cos(deltaTheta);
-                targetPoint.z =curAttrData.pos.z + radius * Math.cos(3 * deltaTheta + x) * Math.sin(deltaTheta);
-                targetPoint.y =curAttrData.pos.y +  y*Math.cos(frameIndex * this.speed); 
+                targetPoint.x =initFrameDataPos.x + radius * Math.cos(3 * deltaTheta + x) * Math.cos(deltaTheta);
+                targetPoint.z =initFrameDataPos.z + radius * Math.cos(3 * deltaTheta + x) * Math.sin(deltaTheta);
+                targetPoint.y =initFrameDataPos.y +  y*Math.cos(frameIndex * this.speed); 
                 let rotation = gd3d.math.pool.new_quaternion();
                 gd3d.math.quatLookat(this.elements.curAttrData.pos,targetPoint,rotation);
                 gd3d.math.quatToEulerAngles(rotation,this.elements.curAttrData.euler);
                 gd3d.math.pool.delete_vector3(targetPoint);
                 gd3d.math.pool.delete_quaternion(rotation);
             }
-
+            gd3d.math.pool.delete_vector3(initFrameDataPos);
         }
     }
 
@@ -445,9 +446,9 @@ namespace gd3d.framework
             let curAttrData = this.elements.data.initFrameData.attrsData.clone();
             let worldTranslate = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Clone(curAttrData.pos, worldTranslate);
-            if (this.elements.gameobject != undefined) 
+            if (this.elements.transform != undefined) 
             {
-                gd3d.math.matrixTransformVector3(worldTranslate, this.elements.gameobject.getWorldMatrix(), worldTranslate);
+                gd3d.math.matrixTransformVector3(worldTranslate, this.elements.transform.getWorldMatrix(), worldTranslate);
             }
             gd3d.math.vec3Clone(worldTranslate,this.transform.localTranslate);
             gd3d.math.pool.delete_vector3(worldTranslate);
@@ -478,9 +479,9 @@ namespace gd3d.framework
         {
             let worldTranslate = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Clone(this.elements.curAttrData.pos, worldTranslate);
-            if (this.elements.gameobject != undefined) 
+            if (this.elements.transform != undefined) 
             {
-                gd3d.math.matrixTransformVector3(worldTranslate, this.elements.gameobject.getWorldMatrix(), worldTranslate);
+                gd3d.math.matrixTransformVector3(worldTranslate, this.elements.transform.getWorldMatrix(), worldTranslate);
             }
             gd3d.math.vec3Clone(worldTranslate,this.transform.localTranslate);
             gd3d.math.vec3Add(this.transform.localTranslate,this.offsetTransalte,this.transform.localTranslate);
