@@ -19,6 +19,7 @@ declare namespace gd3d.framework {
         limitFrame: boolean;
         notify: INotify;
         version: string;
+        build: string;
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);

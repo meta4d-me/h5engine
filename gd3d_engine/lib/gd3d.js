@@ -32,7 +32,8 @@ var gd3d;
         var application = (function () {
             function application() {
                 this.limitFrame = true;
-                this.version = "0001";
+                this.version = "v0.0.1";
+                this.build = "b000005";
                 this.beStepNumber = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
@@ -45,7 +46,7 @@ var gd3d;
                 this._beStepForward = false;
             }
             application.prototype.start = function (div) {
-                console.log("version: " + this.version);
+                console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
                 this.container = div;
                 var canvas = document.createElement("canvas");
