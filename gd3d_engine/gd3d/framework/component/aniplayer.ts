@@ -109,10 +109,14 @@ namespace gd3d.framework
                 var bone = this._playClip.bones[i];
                 //nbone next boneinfo
                 //
-
-                var next = this._playClip.frames[this._playFrameid].boneInfos[i];
+                var frame = this._playClip.frames[this._playFrameid];
+                var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
                 var outb = this.nowpose[bone];
                 var tpose = this.tpose[bone];
+                // var next = new PoseBoneMatrix();
+                // next.r =new gd3d.math.quaternion();
+                // next.t =new gd3d.math.vector3();
+                //next.copyFromData(frame, nextseek);
                 if (outb != undefined)
                 {
                     if (mix)
@@ -121,16 +125,17 @@ namespace gd3d.framework
                         if (last != undefined)
                         {
                             //把恶心的计算集中提纯到一起去，有空再修改
-                            outb.lerpInWorld(tpose, last, next, 1 - this.crossdelta);
+                            //outb.lerpInWorld(tpose, last, next, 1 - this.crossdelta);
+                            outb.lerpInWorldWithData(tpose, last, frame, nextseek, 1 - this.crossdelta);
                         }
                         else
                         {
-                            outb.copyFrom(next);
+                            outb.copyFromData(frame, nextseek);
                         }
                     }
                     else
                     {
-                        outb.copyFrom(next);
+                        outb.copyFromData(frame, nextseek);
                     }
                 }
 

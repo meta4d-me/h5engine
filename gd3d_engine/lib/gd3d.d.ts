@@ -728,15 +728,10 @@ declare namespace gd3d.framework {
         bones: string[];
         frameCount: number;
         frames: {
-            [fid: string]: Frame;
+            [fid: string]: Float32Array;
         };
         subclipCount: number;
         subclips: subClip[];
-    }
-    class Frame {
-        key: boolean;
-        boneInfos: PoseBoneMatrix[];
-        caclByteLength(): number;
     }
     class PoseBoneMatrix {
         t: math.vector3;
@@ -746,9 +741,12 @@ declare namespace gd3d.framework {
         load(read: io.binReader): void;
         static createDefault(): PoseBoneMatrix;
         copyFrom(src: PoseBoneMatrix): void;
+        copyFromData(src: Float32Array, seek: number): void;
         invert(): void;
         lerpInWorld(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, to: PoseBoneMatrix, v: number): void;
+        lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number): void;
         static sMultiply(left: PoseBoneMatrix, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
+        static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
         static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target?: PoseBoneMatrix): PoseBoneMatrix;
     }
     class subClip {
@@ -1843,12 +1841,14 @@ declare namespace gd3d.math {
 declare namespace gd3d.math {
     function quatNormalize(src: quaternion, out: quaternion): void;
     function quatTransformVector(src: quaternion, vector: vector3, out: vector3): void;
+    function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3): void;
     function quatMagnitude(src: quaternion): number;
     function quatClone(src: quaternion, out: quaternion): void;
     function quatToMatrix(src: quaternion, out: matrix): void;
     function quatInverse(src: quaternion, out: quaternion): void;
     function quatFromYawPitchRoll(yaw: number, pitch: number, roll: number, result: quaternion): void;
     function quatMultiply(srca: quaternion, srcb: quaternion, out: quaternion): void;
+    function quatMultiplyDataAndQuat(srca: Float32Array, srcaseek: number, srcb: quaternion, out: quaternion): void;
     function quatMultiplyVector(vector: vector3, scr: quaternion, out: quaternion): void;
     function quatLerp(srca: quaternion, srcb: quaternion, out: quaternion, t: number): void;
     function quatFromAxisAngle(axis: vector3, angle: number, out: quaternion): void;

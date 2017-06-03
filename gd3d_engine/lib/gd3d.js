@@ -4591,7 +4591,7 @@ var gd3d;
                     total += gd3d.math.caclStringByteLength(this.bones[k]);
                 }
                 for (var k in this.frames) {
-                    total += this.frames[k].caclByteLength();
+                    total += this.frames[k].byteLength;
                     total += gd3d.math.caclStringByteLength(k);
                 }
                 total += subClip.caclByteLength() * this.subclips.length;
@@ -4620,13 +4620,18 @@ var gd3d;
                 for (var i = 0; i < this.frameCount; i++) {
                     var _fid = read.readInt().toString();
                     var _key = read.readBoolean();
-                    var _frame = new Frame();
-                    _frame.key = _key;
-                    _frame.boneInfos = [];
+                    var _frame = new Float32Array(this.boneCount * 7 + 1);
+                    _frame[0] = _key ? 1 : 0;
+                    var _boneInfo = new PoseBoneMatrix();
                     for (var i_1 = 0; i_1 < this.boneCount; i_1++) {
-                        var _boneInfo = new PoseBoneMatrix();
                         _boneInfo.load(read);
-                        _frame.boneInfos.push(_boneInfo);
+                        _frame[i_1 * 7 + 1] = _boneInfo.r.x;
+                        _frame[i_1 * 7 + 2] = _boneInfo.r.y;
+                        _frame[i_1 * 7 + 3] = _boneInfo.r.z;
+                        _frame[i_1 * 7 + 4] = _boneInfo.r.w;
+                        _frame[i_1 * 7 + 5] = _boneInfo.t.x;
+                        _frame[i_1 * 7 + 6] = _boneInfo.t.y;
+                        _frame[i_1 * 7 + 7] = _boneInfo.t.z;
                     }
                     this.frames[_fid] = _frame;
                 }
@@ -4642,19 +4647,6 @@ var gd3d;
             __metadata("design:paramtypes", [String])
         ], animationClip);
         framework.animationClip = animationClip;
-        var Frame = (function () {
-            function Frame() {
-            }
-            Frame.prototype.caclByteLength = function () {
-                var total = 1;
-                if (this.boneInfos == undefined)
-                    return total;
-                total += this.boneInfos.length * PoseBoneMatrix.caclByteLength();
-                return total;
-            };
-            return Frame;
-        }());
-        framework.Frame = Frame;
         var PoseBoneMatrix = PoseBoneMatrix_1 = (function () {
             function PoseBoneMatrix() {
             }
@@ -4700,6 +4692,15 @@ var gd3d;
                 this.t.y = src.t.y;
                 this.t.z = src.t.z;
             };
+            PoseBoneMatrix.prototype.copyFromData = function (src, seek) {
+                this.r.x = src[seek + 0];
+                this.r.y = src[seek + 1];
+                this.r.z = src[seek + 2];
+                this.r.w = src[seek + 3];
+                this.t.x = src[seek + 4];
+                this.t.y = src[seek + 5];
+                this.t.z = src[seek + 6];
+            };
             PoseBoneMatrix.prototype.invert = function () {
                 gd3d.math.quatInverse(this.r, this.r);
                 gd3d.math.quatTransformVector(this.r, this.t, this.t);
@@ -4717,6 +4718,16 @@ var gd3d;
                 itpose.invert();
                 PoseBoneMatrix_1.sMultiply(outLerp, itpose, this);
             };
+            PoseBoneMatrix.prototype.lerpInWorldWithData = function (_tpose, from, todata, toseek, v) {
+                var tpose = new gd3d.math.matrix();
+                gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z), new gd3d.math.vector3(1, 1, 1), new gd3d.math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w), tpose);
+                var t1 = PoseBoneMatrix_1.sMultiply(from, _tpose);
+                var t2 = PoseBoneMatrix_1.sMultiplyDataAndMatrix(todata, toseek, _tpose);
+                var outLerp = PoseBoneMatrix_1.sLerp(t1, t2, v);
+                var itpose = _tpose.Clone();
+                itpose.invert();
+                PoseBoneMatrix_1.sMultiply(outLerp, itpose, this);
+            };
             PoseBoneMatrix.sMultiply = function (left, right, target) {
                 if (target === void 0) { target = null; }
                 if (target == null)
@@ -4729,6 +4740,20 @@ var gd3d;
                 target.t.y = dirtran.y + left.t.y;
                 target.t.z = dirtran.z + left.t.z;
                 gd3d.math.quatMultiply(left.r, right.r, target.r);
+                return target;
+            };
+            PoseBoneMatrix.sMultiplyDataAndMatrix = function (leftdata, leftseek, right, target) {
+                if (target === void 0) { target = null; }
+                if (target == null)
+                    target = PoseBoneMatrix_1.createDefault();
+                var dir = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(right.t, dir);
+                var dirtran = new gd3d.math.vector3();
+                gd3d.math.quatTransformVectorDataAndQuat(leftdata, leftseek + 0, dir, dirtran);
+                target.t.x = dirtran.x + leftdata[leftseek + 4];
+                target.t.y = dirtran.y + leftdata[leftseek + 5];
+                target.t.z = dirtran.z + leftdata[leftseek + 6];
+                gd3d.math.quatMultiplyDataAndQuat(leftdata, leftseek + 0, right.r, target.r);
                 return target;
             };
             PoseBoneMatrix.sLerp = function (left, right, v, target) {
@@ -6550,21 +6575,22 @@ var gd3d;
                 }
                 for (var i = 0; i < this._playClip.boneCount; i++) {
                     var bone = this._playClip.bones[i];
-                    var next = this._playClip.frames[this._playFrameid].boneInfos[i];
+                    var frame = this._playClip.frames[this._playFrameid];
+                    var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
                     var tpose = this.tpose[bone];
                     if (outb != undefined) {
                         if (mix) {
                             var last = this.lerppose[bone];
                             if (last != undefined) {
-                                outb.lerpInWorld(tpose, last, next, 1 - this.crossdelta);
+                                outb.lerpInWorldWithData(tpose, last, frame, nextseek, 1 - this.crossdelta);
                             }
                             else {
-                                outb.copyFrom(next);
+                                outb.copyFromData(frame, nextseek);
                             }
                         }
                         else {
-                            outb.copyFrom(next);
+                            outb.copyFromData(frame, nextseek);
                         }
                     }
                     var careobj = this.carelist[bone];
@@ -12126,6 +12152,22 @@ var gd3d;
             out.z = -w1 * src.z - x1 * src.y + y1 * src.x + z1 * src.w;
         }
         math.quatTransformVector = quatTransformVector;
+        function quatTransformVectorDataAndQuat(src, srcseek, vector, out) {
+            var x1, y1, z1, w1;
+            var x2 = vector.x, y2 = vector.y, z2 = vector.z;
+            var srcx = src[srcseek];
+            var srcy = src[srcseek + 1];
+            var srcz = src[srcseek + 2];
+            var srcw = src[srcseek + 3];
+            w1 = -srcx * x2 - srcy * y2 - srcz * z2;
+            x1 = srcw * x2 + srcy * z2 - srcz * y2;
+            y1 = srcw * y2 - srcx * z2 + srcz * x2;
+            z1 = srcw * z2 + srcx * y2 - srcy * x2;
+            out.x = -w1 * srcx + x1 * srcw - y1 * srcz + z1 * srcy;
+            out.y = -w1 * srcy + x1 * srcz + y1 * srcw - z1 * srcx;
+            out.z = -w1 * srcz - x1 * srcy + y1 * srcx + z1 * srcw;
+        }
+        math.quatTransformVectorDataAndQuat = quatTransformVectorDataAndQuat;
         function quatMagnitude(src) {
             return Math.sqrt(src.w * src.w + src.x * src.x + src.y * src.y + src.z * src.z);
         }
@@ -12196,6 +12238,16 @@ var gd3d;
             math.quatNormalize(out, out);
         }
         math.quatMultiply = quatMultiply;
+        function quatMultiplyDataAndQuat(srca, srcaseek, srcb, out) {
+            var w1 = srca[srcaseek + 3], x1 = srca[srcaseek + 0], y1 = srca[srcaseek + 1], z1 = srca[srcaseek + 2];
+            var w2 = srcb.w, x2 = srcb.x, y2 = srcb.y, z2 = srcb.z;
+            out.w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;
+            out.x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
+            out.y = w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2;
+            out.z = w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2;
+            math.quatNormalize(out, out);
+        }
+        math.quatMultiplyDataAndQuat = quatMultiplyDataAndQuat;
         function quatMultiplyVector(vector, scr, out) {
             var x2 = vector.x;
             var y2 = vector.y;
