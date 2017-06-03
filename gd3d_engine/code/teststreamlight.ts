@@ -39,21 +39,20 @@ class test_streamlight implements IState
                         this.scene.addChild(baihu);
                         objCam.lookat(baihu);
                         objCam.markDirty();
+
+                        let bb = _prefab.getCloneTrans();
+                        this.scene.addChild(bb);
+                        bb.localTranslate = new gd3d.math.vector3(2,0,0);
+                        bb.markDirty();
+
+                        let bodyRenderer = (bb.children[0].gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer);
+                        let mat = bodyRenderer.materials[0].clone();
+                        bodyRenderer.materials[0] = mat;
+
+                        mat.setVector4("_LightTex_ST",new gd3d.math.vector4(2,2,0,0));
+                        console.log("aaa");
                     }
                 });
-
-                // this.app.getAssetMgr().load("res/prefabs/streamlight/cube/Cube.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
-                // {
-                //     if (s.isfinish)
-                //     {
-                //         var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("Cube.prefab.json") as gd3d.framework.prefab;
-                //         baihu = _prefab.getCloneTrans();
-                //         this.player = baihu;
-                //         this.scene.addChild(baihu);
-                //         objCam.lookat(baihu);
-                //         objCam.markDirty();
-                //     }
-                // });
             }
         });
         this.cube = baihu;
