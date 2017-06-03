@@ -95,7 +95,7 @@
         {
             "name": "shader/_project/uvroll.shader.json",
             "length": 0
-        },        
+        },
         {
             "name": "shader/_project/uvroll.fs.glsl",
             "length": 0
@@ -112,7 +112,7 @@
             "name": "shader/base/diffuse.shader.json",
             "length": 0
         },
-		{
+        {
             "name": "shader/base/diffuse_bothside.shader.json",
             "length": 0
         },
@@ -180,10 +180,14 @@
             "name": "shader/particle/particles_blend.shader.json",
             "length": 0
         },
-		{
-			"name": "shader/particle/particles_blend_renderall.shader.json",
-			"length":0
-		},
+        {
+            "name": "shader/particle/particles_blend_renderall.shader.json",
+            "length": 0
+        },
+        {
+            "name": "shader/particle/particles_additive_renderall.shader.json",
+            "length": 0
+        },
         {
             "name": "shader/particle/particles_blend_premultiply.shader.json",
             "length": 0
@@ -280,6 +284,5 @@
             "name": "shader/base/transparent_bothside.shader.json",
             "length": 0
         }
-
     ]
 }
