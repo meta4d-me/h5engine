@@ -27,7 +27,8 @@ namespace gd3d.framework
 
     export class EffectElement
     {
-        public gameobject: transform;
+        /**整个特效 */
+        public transform: transform;
         public data: EffectElementData;
         public name: string;
         public timelineFrame: { [frameIndex: number]: EffectFrameData };
@@ -188,10 +189,10 @@ namespace gd3d.framework
                 return;
             if (this.active)
             {
-                if (this.curAttrData.startEuler)
-                {
-                    gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
-                }
+                // if (this.curAttrData.startEuler)
+                // {
+                //     gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
+                // }
                 if (this.curAttrData.euler != undefined)
                 {
                     // console.log("euler:" + this.curAttrData.euler.toString());
@@ -218,9 +219,9 @@ namespace gd3d.framework
                 let worldTranslation = gd3d.math.pool.new_vector3();
                 let translation = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(this.curAttrData.pos, translation);
-                if (this.gameobject != undefined)
+                if (this.transform != undefined)
                 {
-                    gd3d.math.matrixTransformVector3(translation, this.gameobject.getWorldMatrix(), worldTranslation);
+                    gd3d.math.matrixTransformVector3(translation, this.transform.getWorldMatrix(), worldTranslation);
                 }
                 if (this.curAttrData.renderModel == RenderModel.BillBoard) 
                 {
@@ -249,7 +250,7 @@ namespace gd3d.framework
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 
                     let lookRot = new gd3d.math.quaternion();
-                    gd3d.math.quatClone(this.gameobject.getWorldRotate(), invTransformRotation);
+                    gd3d.math.quatClone(this.transform.getWorldRotate(), invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                     gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
 
@@ -274,20 +275,22 @@ namespace gd3d.framework
 
                 gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, worldRotation);
                 //消除transform组件对粒子本身的影响
-                gd3d.math.quatClone(this.gameobject.gameObject.transform.getWorldRotate(), invTransformRotation);
+                gd3d.math.quatClone(this.transform.gameObject.transform.getWorldRotate(), invTransformRotation);
                 gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
 
+                gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.curAttrData.localRotation);
 
-                gd3d.math.quatMultiply(invTransformRotation, worldRotation, localRotation);
-                gd3d.math.quatMultiply(this.curAttrData.startRotation, localRotation, this.curAttrData.localRotation);
+                // gd3d.math.quatMultiply(invTransformRotation, worldRotation, localRotation);
+                // gd3d.math.quatMultiply(this.curAttrData.startRotation, localRotation, this.curAttrData.localRotation);
 
                 gd3d.math.pool.delete_vector3(translation);
                 gd3d.math.pool.delete_vector3(worldTranslation);
                 gd3d.math.pool.delete_quaternion(invTransformRotation);
             } else
             {
-                gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, localRotation);
-                gd3d.math.quatMultiply(localRotation, this.curAttrData.startRotation, this.curAttrData.localRotation);
+                gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
+                // gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, localRotation);
+                // gd3d.math.quatMultiply(localRotation, this.curAttrData.startRotation, this.curAttrData.localRotation);
             }
 
             gd3d.math.pool.delete_quaternion(localRotation);
@@ -388,7 +391,7 @@ namespace gd3d.framework
     {
 
         public pos: math.vector3;
-        public euler: math.vector3 = new gd3d.math.vector3();
+        public euler: math.vector3;
         public color: math.vector3;
         public scale: math.vector3;
         public uv: math.vector2 = new math.vector2(0, 0);
@@ -408,8 +411,8 @@ namespace gd3d.framework
          */
         public rotationByEuler: math.quaternion = new math.quaternion();
 
-        public startEuler: math.vector3;
-        public startRotation: math.quaternion = new math.quaternion();
+        // public startEuler: math.vector3;
+        // public startRotation: math.quaternion = new math.quaternion();
         /**
          * 本地旋转(经过各种lerp和action后计算的最终值)
          * 
@@ -483,8 +486,8 @@ namespace gd3d.framework
                     return gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                 case "localRotation":
                     return gd3d.math.pool.clone_quaternion(this.localRotation);
-                case "startRotation":
-                    return gd3d.math.pool.clone_quaternion(this.startRotation);
+                // case "startRotation":
+                //     return gd3d.math.pool.clone_quaternion(this.startRotation);
                 case "matrix":
                     return gd3d.math.pool.clone_matrix(this.matrix);
             }
@@ -539,10 +542,12 @@ namespace gd3d.framework
                 data.localRotation = math.pool.clone_quaternion(this.localRotation);
             if (this.meshdataVbo != undefined)
                 data.meshdataVbo = this.meshdataVbo;//这个数组不会被改变，可以直接引用
-            if (this.startEuler != undefined)
-                data.startEuler = math.pool.clone_vector3(this.startEuler);
-            if (this.startRotation != undefined)
-                data.startRotation = math.pool.clone_quaternion(this.startRotation);
+            // if (this.startEuler != undefined)
+            // {
+            //     data.startEuler = math.pool.clone_vector3(this.startEuler);
+            //     gd3d.math.quatFromEulerAngles(data.startEuler.x, data.startEuler.y, data.startEuler.z, data.startRotation);
+            //     // data.startRotation = math.pool.clone_quaternion(this.startRotation);
+            // }
             // if (this.localAxisX != undefined)
             //     data.localAxisX = math.pool.clone_vector3(this.localAxisX);
             // if (this.localAxisY != undefined)
