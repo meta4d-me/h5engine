@@ -867,6 +867,7 @@ declare namespace gd3d.framework {
         uploadUniform(pass: render.glDrawPass): void;
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
         Parse(assetmgr: assetMgr, json: any): void;
+        clone(): material;
     }
 }
 declare namespace gd3d.framework {

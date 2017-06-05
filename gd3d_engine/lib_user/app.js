@@ -4584,6 +4584,15 @@ var test_streamlight = (function () {
                         _this.scene.addChild(baihu);
                         objCam.lookat(baihu);
                         objCam.markDirty();
+                        var bb = _prefab.getCloneTrans();
+                        _this.scene.addChild(bb);
+                        bb.localTranslate = new gd3d.math.vector3(2, 0, 0);
+                        bb.markDirty();
+                        var bodyRenderer = bb.children[0].gameObject.getComponent("skinnedMeshRenderer");
+                        var mat = bodyRenderer.materials[0].clone();
+                        bodyRenderer.materials[0] = mat;
+                        mat.setVector4("_LightTex_ST", new gd3d.math.vector4(2, 2, 0, 0));
+                        console.log("aaa");
                     }
                 });
             }
