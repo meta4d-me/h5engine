@@ -1,16 +1,1 @@
-{
-    "files": [
-        {
-            "name": "resources/onepiece.png",
-            "length": 49589
-        },
-        {
-            "name": "resources/7FE68455E071C2828972666FA4C9447646A8DAD8.mesh.bin",
-            "length": 41722
-        },
-        {
-            "name": "billboard_rotation.effect.json",
-            "length": 41722
-        }
-    ]
-}
+{"packes":["resources/billboard_rotation.packs.txt","resources/billboard_rotation.packs.bin"],"files":[{"name":"resources/onepiece.png"},{"name":"resources/7FE68455E071C2828972666FA4C9447646A8DAD8.mesh.bin","packes":1,"length":1900},{"name":"billboard_rotation.effect.json","packes":0,"length":12783}]}

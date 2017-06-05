@@ -1,16 +1,1 @@
-{
-    "files": [
-        {
-            "name": "resources/GJ.png",
-            "length": 49589
-        },
-        {
-            "name": "resources/gj.mesh.bin",
-            "length": 41722
-        },
-        {
-            "name": "fx_ss_female@attack_01.effect.json",
-            "length": 41722
-        }
-    ]
-}
+{"packes":["resources/fx_ss_female@attack_01.packs.txt","resources/fx_ss_female@attack_01.packs.bin"],"files":[{"name":"resources/GJ.png"},{"name":"resources/gj.mesh.bin","packes":1,"length":516},{"name":"fx_ss_female@attack_01.effect.json","packes":0,"length":2119}]}

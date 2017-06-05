@@ -1,16 +1,1 @@
-{
-    "files": [
-        {
-            "name": "resources/rock256.png",
-            "length": 49589
-        },
-        {
-            "name": "resources/f_fire035a_5x2.png",
-            "length": 49589
-        },
-        {
-            "name": "particle.effect.json",
-            "length": 41722
-        }
-    ]
-}
+{"packes":["resources/particle.packs.txt","resources/particle.packs.bin"],"files":[{"name":"resources/rock256.png"},{"name":"resources/f_fire035a_5x2.png"},{"name":"particle.effect.json","packes":0,"length":2871}]}

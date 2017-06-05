@@ -1,12 +1,1 @@
-{
-    "files": [
-        {
-            "name": "resources/rock256.png",
-            "length": 49589
-        },
-        {
-            "name": "burst.effect.json",
-            "length": 41722
-        }
-    ]
-}
+{"packes":["resources/burst.packs.txt","resources/burst.packs.bin"],"files":[{"name":"resources/rock256.png"},{"name":"burst.effect.json","packes":0,"length":2811}]}

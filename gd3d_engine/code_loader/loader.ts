@@ -2,7 +2,6 @@
 ///<reference path="../lib_user/app.d.ts" />
 window.onload = () =>
 {
-    console.log("version 0001");
     //gd system lib
     gd3d.jsLoader.instance().addImportScript("lib/Reflect.js"); //微软反射库
     gd3d.jsLoader.instance().addImportScript("lib/gd3d.js");

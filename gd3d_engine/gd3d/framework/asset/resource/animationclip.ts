@@ -114,6 +114,7 @@ namespace gd3d.framework
                 }
                 this.frames[_fid] = _frame;
             }
+            buf = null;
         }
 
         fps: number;

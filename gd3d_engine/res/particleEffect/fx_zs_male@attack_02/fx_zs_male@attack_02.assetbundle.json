@@ -1,12 +1,1 @@
-{
-    "files": [
-        {
-            "name": "resources/daoguang_01.imgdesc.json",
-            "length": 49589
-        },
-        {
-            "name": "fx_zs_male@attack_02.effect.json",
-            "length": 41722
-        }
-    ]
-}
+{"packes":["resources/fx_zs_male@attack_02.packs.txt","resources/fx_zs_male@attack_02.packs.bin"],"files":[{"name":"resources/daoguang_01.imgdesc.json","packes":0,"length":118},{"name":"fx_zs_male@attack_02.effect.json","packes":0,"length":2900}]}

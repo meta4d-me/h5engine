@@ -19,6 +19,7 @@ declare namespace gd3d.framework {
         limitFrame: boolean;
         notify: INotify;
         version: string;
+        build: string;
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -583,6 +584,8 @@ declare namespace gd3d.framework {
         Atlas = 13,
         Font = 14,
         TextAsset = 15,
+        PackBin = 16,
+        PackTxt = 17,
     }
     class stateLoad {
         iserror: boolean;
@@ -607,7 +610,9 @@ declare namespace gd3d.framework {
         files: {
             name: string;
             length: number;
+            packes: number;
         }[];
+        packages: string[];
         url: string;
         path: string;
         constructor(url: string);
@@ -660,6 +665,11 @@ declare namespace gd3d.framework {
         removeAssetBundle(name: string): void;
         private assetUrlDic;
         getAssetUrl(asset: IAsset): string;
+        bundlePackBin: {
+            [name: string]: ArrayBuffer;
+        };
+        bundlePackJson: JSON;
+        loadResByPack(packnum: number, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
         loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private waitStateDic;
         doWaitState(name: string, state: stateLoad): void;
@@ -1722,6 +1732,7 @@ declare namespace gd3d.io {
         readInt32(): number;
         readUInt32(): number;
         readUint8Array(target?: Uint8Array, offset?: number, length?: number): Uint8Array;
+        readUint8ArrayByOffset(target: Uint8Array, offset: number, length?: number): Uint8Array;
         position: number;
         readBoolean(): boolean;
         readByte(): number;

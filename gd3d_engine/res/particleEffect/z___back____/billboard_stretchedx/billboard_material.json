@@ -1,7 +1,0 @@
-[
-  {
-    "name": "fazhen",
-    "shader":"particles_additive.shader",
-    "diffuseTexture": "rock256.png"
-  }
-]
