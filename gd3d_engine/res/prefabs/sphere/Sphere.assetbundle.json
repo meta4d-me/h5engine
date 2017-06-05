@@ -1,1 +1,1 @@
-{"packes":["resources/Sphere.packs.txt","resources/Sphere.packs.bin"],"files":[{"name":"resources/Sphere.mesh.bin","packes":1,"length":38106},{"name":"resources/Default-Material.mat.json","packes":0,"length":393},{"name":"resources/Sphere.prefab.json","packes":0,"length":447}]}
+{"packes":["resources/Sphere.packs.txt","resources/Sphere.packs.bin"],"files":[{"name":"resources/Sphere.mesh.bin","packes":1,"length":38106},{"name":"resources/Default-Material.mat.json","packes":0,"length":329},{"name":"resources/Sphere.prefab.json","packes":0,"length":235}]}
