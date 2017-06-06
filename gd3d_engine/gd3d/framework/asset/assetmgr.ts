@@ -127,7 +127,7 @@ namespace gd3d.framework
             {
                 var item = files[i];
                 let packes = -1;
-                if(item.packes)
+                if(item.packes != undefined)
                     packes = item.packes;
                 this.files.push({ name: item.name, length: item.length, packes:packes });
             }
@@ -186,7 +186,7 @@ namespace gd3d.framework
                     //压缩在包里的
                     mapPackes[url] = fitem.packes;
                 }
-                // else
+                
                 {
                     if (type == AssetTypeEnum.GLFragmentShader)
                         glfshaders.push(url);
@@ -305,13 +305,14 @@ namespace gd3d.framework
                         if (realTotal === 0)
                         {
                             state.isfinish = true;
+                            onstate(state);
                             assetmgr.loadByQueue();
                         }
                         else
                         {
+                            onstate(state);
                             loadcall();
                         }
-                        onstate(state);
                         assetmgr.doWaitState(this.url, state);
                     }, state);
                 }
@@ -336,13 +337,14 @@ namespace gd3d.framework
                         if (realTotal === 0)
                         {
                             state.isfinish = true;
+                            onstate(state);
                             assetmgr.loadByQueue();
                         }
                         else
                         {
-                            loadcall();
+                            onstate(state);
+                            loadcall(); 
                         }
-                        onstate(state);
                         assetmgr.doWaitState(this.url, state);
                     }, state);
                 }
@@ -638,9 +640,10 @@ namespace gd3d.framework
         private mapInLoad: { [id: string]: stateLoad } = {};
         removeAssetBundle(name: string)
         {
-            if (this.mapInLoad[name] == null)
-                return;
-            delete this.mapInLoad[name];
+            if(this.mapBundle[name] != null)
+                delete this.mapBundle[name];
+            if (this.mapInLoad[name] != null)
+                delete this.mapInLoad[name];
         }
         /**
          * @public
@@ -688,6 +691,7 @@ namespace gd3d.framework
             {
                 state.resstate[filename] = { state: 0, res: null }
                 let txt = this.bundlePackJson[filename];
+                txt = decodeURI(txt);
                 state.resstate[filename].state = 1;//完成
 
                 state.logs.push("load a glshader:" + filename);
@@ -698,6 +702,7 @@ namespace gd3d.framework
             {
                 state.resstate[filename] = { state: 0, res: null }
                 let txt = this.bundlePackJson[filename];
+                txt = decodeURI(txt);
                 state.resstate[filename].state = 1;//完成
 
                 state.logs.push("load a glshader:" + filename);
@@ -937,7 +942,7 @@ namespace gd3d.framework
                     var arr = new Uint8Array(_buffer.byteLength);
                     read.readUint8Array(arr);
                     let txt = gd3d.io.binReader.utf8ArrayToString(arr);
-
+                    
                     this.bundlePackJson = JSON.parse(txt);
                     onstate(state);
                 });
@@ -1218,16 +1223,16 @@ namespace gd3d.framework
         {
             this.bundlePackBin = {};
             this.bundlePackJson = null;
-            console.log("load queue");
-            if(this.queueState.length == 0)   return;
-            if(this.curloadinfo!=null && !this.curloadinfo.state.isfinish)
-            {    
-                console.log("loading " + this.curloadinfo.state.url);
-                return;
+            if(this.curloadinfo!=null)
+            {
+                if(!this.curloadinfo.state.isfinish)
+                    return;
+                else
+                    this.curloadinfo = null;
             }
+            if(this.queueState.length == 0)   return;
             
             this.curloadinfo = this.queueState.shift();
-            console.log("load start " + this.curloadinfo.state.url);
             let state = this.curloadinfo.state;
             let url = state.url;
             let type = this.curloadinfo.type;

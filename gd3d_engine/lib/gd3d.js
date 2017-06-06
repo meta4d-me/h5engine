@@ -3474,7 +3474,7 @@ var gd3d;
                 for (var i = 0; i < files.length; i++) {
                     var item = files[i];
                     var packes = -1;
-                    if (item.packes)
+                    if (item.packes != undefined)
                         packes = item.packes;
                     this.files.push({ name: item.name, length: item.length, packes: packes });
                 }
@@ -3607,12 +3607,13 @@ var gd3d;
                             }
                             if (realTotal === 0) {
                                 state.isfinish = true;
+                                onstate(state);
                                 assetmgr.loadByQueue();
                             }
                             else {
+                                onstate(state);
                                 loadcall();
                             }
-                            onstate(state);
                             assetmgr.doWaitState(_this.url, state);
                         }, state);
                     }
@@ -3628,12 +3629,13 @@ var gd3d;
                             }
                             if (realTotal === 0) {
                                 state.isfinish = true;
+                                onstate(state);
                                 assetmgr.loadByQueue();
                             }
                             else {
+                                onstate(state);
                                 loadcall();
                             }
-                            onstate(state);
                             assetmgr.doWaitState(_this.url, state);
                         }, state);
                     }
@@ -3785,9 +3787,10 @@ var gd3d;
                 return true;
             };
             assetMgr.prototype.removeAssetBundle = function (name) {
-                if (this.mapInLoad[name] == null)
-                    return;
-                delete this.mapInLoad[name];
+                if (this.mapBundle[name] != null)
+                    delete this.mapBundle[name];
+                if (this.mapInLoad[name] != null)
+                    delete this.mapInLoad[name];
             };
             assetMgr.prototype.getAssetUrl = function (asset) {
                 return this.assetUrlDic[asset.getGUID()];
@@ -3807,6 +3810,7 @@ var gd3d;
                 if (type == AssetTypeEnum.GLVertexShader) {
                     state.resstate[filename] = { state: 0, res: null };
                     var txt = this.bundlePackJson[filename];
+                    txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
                     state.logs.push("load a glshader:" + filename);
                     this.shaderPool.compileVS(this.webgl, name, txt);
@@ -3815,6 +3819,7 @@ var gd3d;
                 else if (type == AssetTypeEnum.GLFragmentShader) {
                     state.resstate[filename] = { state: 0, res: null };
                     var txt = this.bundlePackJson[filename];
+                    txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
                     state.logs.push("load a glshader:" + filename);
                     this.shaderPool.compileFS(this.webgl, name, txt);
@@ -4227,15 +4232,15 @@ var gd3d;
                 var _this = this;
                 this.bundlePackBin = {};
                 this.bundlePackJson = null;
-                console.log("load queue");
+                if (this.curloadinfo != null) {
+                    if (!this.curloadinfo.state.isfinish)
+                        return;
+                    else
+                        this.curloadinfo = null;
+                }
                 if (this.queueState.length == 0)
                     return;
-                if (this.curloadinfo != null && !this.curloadinfo.state.isfinish) {
-                    console.log("loading " + this.curloadinfo.state.url);
-                    return;
-                }
                 this.curloadinfo = this.queueState.shift();
-                console.log("load start " + this.curloadinfo.state.url);
                 var state = this.curloadinfo.state;
                 var url = state.url;
                 var type = this.curloadinfo.type;
