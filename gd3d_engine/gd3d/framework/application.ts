@@ -23,7 +23,7 @@ namespace gd3d.framework
         limitFrame: boolean = true;
         notify: INotify;
 		version:string = "v0.0.1";
-		build:string = "b000006";
+		build:string = "b000007";
         start(div: HTMLDivElement)
         {
 			console.log("version: "+this.version + "  build: "+this.build);
