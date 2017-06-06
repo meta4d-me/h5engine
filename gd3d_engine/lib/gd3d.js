@@ -3600,10 +3600,11 @@ var gd3d;
                             realTotal--;
                             state.curtask++;
                             var _fileName = assetmgr.getFileName(surl);
-                            var _res = s.resstate[_fileName].res;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)
+                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
+                                var _res = s.resstate[_fileName].res;
                                 _this.mapNamed[_fileName] = _res.getGUID();
+                            }
                             if (realTotal === 0) {
                                 state.isfinish = true;
                                 assetmgr.loadByQueue();
@@ -3620,10 +3621,11 @@ var gd3d;
                             realTotal--;
                             state.curtask++;
                             var _fileName = assetmgr.getFileName(surl);
-                            var _res = s.resstate[_fileName].res;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)
+                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
+                                var _res = s.resstate[_fileName].res;
                                 _this.mapNamed[_fileName] = _res.getGUID();
+                            }
                             if (realTotal === 0) {
                                 state.isfinish = true;
                                 assetmgr.loadByQueue();
@@ -3977,7 +3979,6 @@ var gd3d;
                 var filename = this.getFileName(url);
                 var name = filename.substring(0, filename.indexOf("."));
                 if (type == AssetTypeEnum.PackBin) {
-                    state.resstate[filename] = { state: 0, res: null };
                     this.bundlePackBin = {};
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         var read = new gd3d.io.binReader(_buffer);
@@ -3994,12 +3995,10 @@ var gd3d;
                             var bufs = _buffer.slice(start, start + len);
                             _this.bundlePackBin[strs[0]] = bufs;
                         }
-                        state.resstate[filename].state = 1;
                         onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.PackTxt) {
-                    state.resstate[filename] = { state: 0, res: null };
                     this.bundlePackJson = null;
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         var read = new gd3d.io.binReader(_buffer);
@@ -4007,7 +4006,6 @@ var gd3d;
                         read.readUint8Array(arr);
                         var txt = gd3d.io.binReader.utf8ArrayToString(arr);
                         _this.bundlePackJson = JSON.parse(txt);
-                        state.resstate[filename].state = 1;
                         onstate(state);
                     });
                 }

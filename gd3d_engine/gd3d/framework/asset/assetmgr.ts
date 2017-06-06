@@ -294,11 +294,13 @@ namespace gd3d.framework
                         state.curtask++;
 
                         let _fileName = assetmgr.getFileName(surl);
-                        let _res = s.resstate[_fileName].res;
 
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         &&type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
+                        {
+                            let _res = s.resstate[_fileName].res;
                             this.mapNamed[_fileName] = _res.getGUID();
+                        }
 
                         if (realTotal === 0)
                         {
@@ -321,12 +323,14 @@ namespace gd3d.framework
                         state.curtask++;
 
                         let _fileName = assetmgr.getFileName(surl);
-                        let _res = s.resstate[_fileName].res;
 
                         
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         &&type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
+                        {
+                            let _res = s.resstate[_fileName].res;
                             this.mapNamed[_fileName] = _res.getGUID();
+                        }
 
 
                         if (realTotal === 0)
@@ -901,7 +905,7 @@ namespace gd3d.framework
             let name = filename.substring(0, filename.indexOf("."));
             if(type == AssetTypeEnum.PackBin)
             {
-                state.resstate[filename] = { state: 0, res: null };
+                // state.resstate[filename] = { state: 0, res: null };
                 this.bundlePackBin = {};
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
@@ -923,13 +927,13 @@ namespace gd3d.framework
                         this.bundlePackBin[strs[0]] = bufs;
                     }
 
-                    state.resstate[filename].state = 1;
+                    // state.resstate[filename].state = 1;
                     onstate(state);
                 })
             }
             else if(type == AssetTypeEnum.PackTxt)
             {
-                state.resstate[filename] = { state: 0, res: null };
+                // state.resstate[filename] = { state: 0, res: null };
                 this.bundlePackJson = null;
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
@@ -940,7 +944,7 @@ namespace gd3d.framework
                     let txt = gd3d.io.binReader.utf8ArrayToString(arr);
 
                     this.bundlePackJson = JSON.parse(txt);
-                    state.resstate[filename].state = 1;
+                    // state.resstate[filename].state = 1;
                     onstate(state);
                 });
             }
