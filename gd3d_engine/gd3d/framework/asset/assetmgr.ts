@@ -905,8 +905,6 @@ namespace gd3d.framework
             let name = filename.substring(0, filename.indexOf("."));
             if(type == AssetTypeEnum.PackBin)
             {
-                // state.resstate[filename] = { state: 0, res: null };
-                this.bundlePackBin = {};
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
                     var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
@@ -927,14 +925,11 @@ namespace gd3d.framework
                         this.bundlePackBin[strs[0]] = bufs;
                     }
 
-                    // state.resstate[filename].state = 1;
                     onstate(state);
                 })
             }
             else if(type == AssetTypeEnum.PackTxt)
             {
-                // state.resstate[filename] = { state: 0, res: null };
-                this.bundlePackJson = null;
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
                     var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
@@ -944,7 +939,6 @@ namespace gd3d.framework
                     let txt = gd3d.io.binReader.utf8ArrayToString(arr);
 
                     this.bundlePackJson = JSON.parse(txt);
-                    // state.resstate[filename].state = 1;
                     onstate(state);
                 });
             }
@@ -983,7 +977,6 @@ namespace gd3d.framework
                     var _shader = new shader(filename);
                     _shader.parse(this, JSON.parse(txt));
                     this.assetUrlDic[_shader.getGUID()] = url;
-                    // this.use(_shader); //shader 地位特殊，不作为named resource,不卸载
                     this.mapShader[filename] = _shader;
                     onstate(state);
                 });
@@ -1223,6 +1216,8 @@ namespace gd3d.framework
         private curloadinfo:{state:stateLoad, type:AssetTypeEnum, onstate:(state:stateLoad) => void };
         public loadByQueue()
         {
+            this.bundlePackBin = {};
+            this.bundlePackJson = null;
             console.log("load queue");
             if(this.queueState.length == 0)   return;
             if(this.curloadinfo!=null && !this.curloadinfo.state.isfinish)

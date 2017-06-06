@@ -3979,7 +3979,6 @@ var gd3d;
                 var filename = this.getFileName(url);
                 var name = filename.substring(0, filename.indexOf("."));
                 if (type == AssetTypeEnum.PackBin) {
-                    this.bundlePackBin = {};
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         var read = new gd3d.io.binReader(_buffer);
                         var index = read.readInt32();
@@ -3999,7 +3998,6 @@ var gd3d;
                     });
                 }
                 else if (type == AssetTypeEnum.PackTxt) {
-                    this.bundlePackJson = null;
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         var read = new gd3d.io.binReader(_buffer);
                         var arr = new Uint8Array(_buffer.byteLength);
@@ -4227,6 +4225,8 @@ var gd3d;
             };
             assetMgr.prototype.loadByQueue = function () {
                 var _this = this;
+                this.bundlePackBin = {};
+                this.bundlePackJson = null;
                 console.log("load queue");
                 if (this.queueState.length == 0)
                     return;
