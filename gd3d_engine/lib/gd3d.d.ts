@@ -618,7 +618,11 @@ declare namespace gd3d.framework {
         constructor(url: string);
         parse(json: any): void;
         unload(): void;
-        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
+        load(assetmgr: assetMgr, stateinfo: {
+            state: stateLoad;
+            type: AssetTypeEnum;
+            onstate: (state: stateLoad) => void;
+        }): void;
         mapNamed: {
             [id: string]: number;
         };
@@ -673,11 +677,12 @@ declare namespace gd3d.framework {
         loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private waitStateDic;
         doWaitState(name: string, state: stateLoad): void;
+        private queueState;
+        private curloadinfo;
+        loadByQueue(): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         unload(url: string, onstate?: () => void): void;
         loadScene(sceneName: string, onComplete: () => void): void;
-        parseEffect(effectConfig: string, onComplete: (data: EffectSystemData) => void): void;
-        private loadEffectDependAssets(dependAssets, path, onFinish);
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[]) => void): void;
         saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;

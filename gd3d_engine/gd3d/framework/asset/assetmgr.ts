@@ -152,8 +152,11 @@ namespace gd3d.framework
             }
             this.assetmgr.removeAssetBundle(this.name);
         }
-        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad)
+        load(assetmgr: assetMgr, stateinfo:{state:stateLoad, type:AssetTypeEnum, onstate:(state:stateLoad) => void })
         {
+            let state = stateinfo.state;
+            let onstate = stateinfo.onstate;
+            
             let totoal = this.files.length;
             this.assetmgr = assetmgr;
             //这里需要一个顺序，现在比较偷懒，比如shader 一定在 glshader 之后
@@ -300,6 +303,7 @@ namespace gd3d.framework
                         if (realTotal === 0)
                         {
                             state.isfinish = true;
+                            assetmgr.loadByQueue();
                         }
                         else
                         {
@@ -328,6 +332,7 @@ namespace gd3d.framework
                         if (realTotal === 0)
                         {
                             state.isfinish = true;
+                            assetmgr.loadByQueue();
                         }
                         else
                         {
@@ -371,7 +376,6 @@ namespace gd3d.framework
             this.app = app;
             this.webgl = app.webgl;
             this.shaderPool = new gd3d.render.shaderPool();
-
         }
         initDefAsset()
         {
@@ -1190,20 +1194,6 @@ namespace gd3d.framework
                     onstate(state);
                 })
             }
-            // else if (type == AssetTypeEnum.Effect)
-            // {
-            //     state.resstate[filename] = { state: 0, res: null };
-            //     gd3d.io.loadText(url, (txt, err) =>
-            //     {
-            //         var effe = new Effect(filename);
-            //         this.assetUrlDic[effe.getGUID()] = url;
-            //         effe.Parse(txt, this);
-            //         this.use(effe);
-            //         state.resstate[filename].state = 1;
-            //         state.resstate[filename].res = effe;
-            //         onstate(state);
-            //     })
-            // }
             else
             {
                 throw new Error("cant use the type:" + type);
@@ -1224,6 +1214,53 @@ namespace gd3d.framework
                 this.waitStateDic[name].length = 0;
             }
         }
+
+        private queueState: {state:stateLoad, type:AssetTypeEnum, onstate:(state:stateLoad) => void }[] = [];
+        private curloadinfo:{state:stateLoad, type:AssetTypeEnum, onstate:(state:stateLoad) => void };
+        public loadByQueue()
+        {
+            console.log("load queue");
+            if(this.queueState.length == 0)   return;
+            if(this.curloadinfo!=null && !this.curloadinfo.state.isfinish)
+            {    
+                console.log("loading " + this.curloadinfo.state.url);
+                return;
+            }
+            
+            this.curloadinfo = this.queueState.shift();
+            console.log("load start " + this.curloadinfo.state.url);
+            let state = this.curloadinfo.state;
+            let url = state.url;
+            let type = this.curloadinfo.type;
+            let onstate = this.curloadinfo.onstate;
+            
+            if (type == AssetTypeEnum.Bundle)//加载包
+            {
+                gd3d.io.loadText(url, (txt, err) =>
+                {
+                    let filename = this.getFileName(url);
+
+                    var ab = new assetBundle(url)
+                    ab.name = filename;
+                    ab.parse(JSON.parse(txt));
+                    ab.load(this, this.curloadinfo);
+
+                    this.mapBundle[filename] = ab;
+                });
+            }
+            else
+            {
+                state.totaltask = 1;
+                this.loadSingleRes(url, type, (s) =>
+                {
+                    state.curtask = 1;
+                    s.isfinish = true;
+                    onstate(s);
+                    this.doWaitState(url, s);
+                    this.loadByQueue();
+                }, state);
+            }
+        }
         /**
          * @public
          * @language zh_CN
@@ -1240,7 +1277,7 @@ namespace gd3d.framework
                 onstate = () => { };
 
             let name = this.getFileName(url);
-            if (this.mapInLoad[name] != null && this.mapInLoad[name].isfinish)
+            if (this.mapInLoad[name] != null)
             {
                 let _state = this.mapInLoad[name];
                 if (_state.isfinish)
@@ -1272,31 +1309,8 @@ namespace gd3d.framework
                 this.doWaitState(url, state);
                 return;
             }
-            else if (type == AssetTypeEnum.Bundle)//加载包
-            {
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    let filename = this.getFileName(url);
-
-                    var ab = new assetBundle(url)
-                    ab.name = filename;
-                    ab.parse(JSON.parse(txt));
-                    ab.load(this, onstate, state);
-
-                    this.mapBundle[filename] = ab;
-                });
-            }
-            else
-            {
-                state.totaltask = 1;
-                this.loadSingleRes(url, type, (s) =>
-                {
-                    state.curtask = 1;
-                    s.isfinish = true;
-                    onstate(s);
-                    this.doWaitState(url, s);
-                }, state);
-            }
+            this.queueState.push({state, type, onstate});
+            this.loadByQueue();
         }
 
         /**
@@ -1368,138 +1382,6 @@ namespace gd3d.framework
             this.app.getScene().getRoot().markDirty();
             onComplete();
         }
-
-        /**
-         * 解析特效的配置
-         * @param effectConfig 
-         * @param onComplete 
-         */
-        parseEffect(effectConfig: string, onComplete: (data: EffectSystemData) => void)
-        {
-            if (effectConfig == null)
-                return;
-            let obj = JSON.parse(effectConfig);
-            {
-                // let effectData: EffectSystemData = new EffectSystemData();
-                // if (obj["assetpath"] != undefined)
-                // {
-                //     effectData.assetpath = obj["assetpath"];
-                //     effectData.life = <number>obj["life"];
-                //     effectData.autoplay = <boolean>obj["autoplay"];
-                //     if (obj["dependasset"] != undefined)
-                //     {
-                //         let dependAssets = <string[]>obj["dependasset"];
-                //         this.loadEffectDependAssets(dependAssets, effectData.assetpath, () =>
-                //         {
-                //             let layers = <any[]>obj["layers"];
-                //             for (let index in layers)
-                //             {
-                //                 let layer = layers[index];
-                //                 let data = new EffectElementData();
-                //                 if (layer["life"] != undefined)
-                //                     data.life = layer["life"];
-                //                 if (layer["name"] != undefined)
-                //                     data.name = layer["name"];
-                //                 if (layer["mesh"] != undefined)
-                //                 {
-                //                     let meshName: string = layer["mesh"];
-                //                     if (meshName.substr(meshName.indexOf(".")) == ".mesh.bin")
-                //                     {
-                //                         data.mesh = this.getAssetByName(meshName) as gd3d.framework.mesh;
-                //                     }
-                //                     else
-                //                     {
-                //                         data.mesh = this.getDefaultMesh(meshName) as gd3d.framework.mesh;
-                //                     }
-                //                 }
-                //                 if (layer["rendermodel"] != undefined)
-                //                     data.rendermodel = layer["rendermodel"];
-                //                 if (layer["mat"] != undefined)
-                //                 {
-                //                     let mat = layer["mat"];
-                //                     data.mat = new EffectMatData();
-                //                     if (mat["shader"] != undefined)
-                //                         data.mat.shader = this.getShader(mat["shader"]);
-                //                     if (mat["diffuseTexture"] != undefined)
-                //                         data.mat.diffuseTexture = this.getAssetByName(mat["diffuseTexture"]) as texture;
-                //                     if (mat["_AlphaCut"] != undefined)
-                //                         data.mat.alphaCut = <number>mat["_AlphaCut"];
-                //                 }
-                //                 if (layer["inittran"] != undefined)
-                //                 {
-                //                     let inittrans = layer["inittran"];
-                //                     data.initTrans = new EffectTransData();
-                //                     if (inittrans["pos"] != undefined)
-                //                     {
-                //                         let str: string = inittrans["pos"];
-                //                         let array: string[] = str.split(",");
-                //                         data.initTrans.pos.x = parseInt(array[0]);// <number>array[1], <number>array[2]);
-                //                         data.initTrans.pos.y = parseInt(array[1]);
-                //                         data.initTrans.pos.z = parseInt(array[2]);
-                //                     }
-                //                     if (inittrans["euler"] != undefined)
-                //                     {
-                //                         let str: string = inittrans["euler"];
-                //                         let array: string[] = str.split(",");
-                //                         data.initTrans.eulerAngles.x = parseInt(array[0]);// <number>array[1], <number>array[2]);
-                //                         data.initTrans.eulerAngles.y = parseInt(array[1]);
-                //                         data.initTrans.eulerAngles.z = parseInt(array[2]);
-                //                     }
-                //                     if (inittrans["scale"] != undefined)
-                //                     {
-                //                         let str: string = inittrans["scale"];
-                //                         let array: string[] = str.split(",");
-                //                         data.initTrans.scale.x = parseInt(array[0]);// <number>array[1], <number>array[2]);
-                //                         data.initTrans.scale.y = parseInt(array[1]);
-                //                         data.initTrans.scale.z = parseInt(array[2]);
-                //                     }
-                //                 }
-                //                 if (layer["methods"] != undefined)
-                //                 {
-                //                     data.methods = <any[]>layer["methods"];
-                //                 }
-                //                 effectData.elements.push(data);
-                //             }
-                //             if (onComplete != null)
-                //                 onComplete(effectData);
-                //         });
-                //     }
-                // }
-            }
-        }
-
-        /**
-         * 加载特效依赖的资源
-         * @param dependAssets 
-         * @param path 
-         * @param onFinish 
-         */
-        private loadEffectDependAssets(dependAssets: string[], path: string, onFinish: Function)
-        {
-            let totalCount = 0;
-            for (let index in dependAssets)
-            {
-                totalCount++;
-            }
-            for (let index in dependAssets)
-            {
-                let url = path + dependAssets[index];
-                this.load(url, AssetTypeEnum.Auto, (state) =>
-                {
-                    if (state.isfinish)
-                    {
-                        totalCount--;
-                        if (totalCount == 0)
-                        {
-                            if (onFinish != null)
-                                onFinish();
-                        }
-                    }
-                });
-            }
-        }
-
-
 
         /**
          * @public

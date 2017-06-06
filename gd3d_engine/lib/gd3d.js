@@ -3494,8 +3494,10 @@ var gd3d;
                 }
                 this.assetmgr.removeAssetBundle(this.name);
             };
-            assetBundle.prototype.load = function (assetmgr, onstate, state) {
+            assetBundle.prototype.load = function (assetmgr, stateinfo) {
                 var _this = this;
+                var state = stateinfo.state;
+                var onstate = stateinfo.onstate;
                 var totoal = this.files.length;
                 this.assetmgr = assetmgr;
                 var glvshaders = [];
@@ -3604,6 +3606,7 @@ var gd3d;
                                 _this.mapNamed[_fileName] = _res.getGUID();
                             if (realTotal === 0) {
                                 state.isfinish = true;
+                                assetmgr.loadByQueue();
                             }
                             else {
                                 loadcall();
@@ -3623,6 +3626,7 @@ var gd3d;
                                 _this.mapNamed[_fileName] = _res.getGUID();
                             if (realTotal === 0) {
                                 state.isfinish = true;
+                                assetmgr.loadByQueue();
                             }
                             else {
                                 loadcall();
@@ -3649,6 +3653,7 @@ var gd3d;
                 this.assetUrlDic = {};
                 this.bundlePackBin = {};
                 this.waitStateDic = {};
+                this.queueState = [];
                 this.app = app;
                 this.webgl = app.webgl;
                 this.shaderPool = new gd3d.render.shaderPool();
@@ -4222,14 +4227,49 @@ var gd3d;
                     this.waitStateDic[name].length = 0;
                 }
             };
-            assetMgr.prototype.load = function (url, type, onstate) {
+            assetMgr.prototype.loadByQueue = function () {
                 var _this = this;
+                console.log("load queue");
+                if (this.queueState.length == 0)
+                    return;
+                if (this.curloadinfo != null && !this.curloadinfo.state.isfinish) {
+                    console.log("loading " + this.curloadinfo.state.url);
+                    return;
+                }
+                this.curloadinfo = this.queueState.shift();
+                console.log("load start " + this.curloadinfo.state.url);
+                var state = this.curloadinfo.state;
+                var url = state.url;
+                var type = this.curloadinfo.type;
+                var onstate = this.curloadinfo.onstate;
+                if (type == AssetTypeEnum.Bundle) {
+                    gd3d.io.loadText(url, function (txt, err) {
+                        var filename = _this.getFileName(url);
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        ab.parse(JSON.parse(txt));
+                        ab.load(_this, _this.curloadinfo);
+                        _this.mapBundle[filename] = ab;
+                    });
+                }
+                else {
+                    state.totaltask = 1;
+                    this.loadSingleRes(url, type, function (s) {
+                        state.curtask = 1;
+                        s.isfinish = true;
+                        onstate(s);
+                        _this.doWaitState(url, s);
+                        _this.loadByQueue();
+                    }, state);
+                }
+            };
+            assetMgr.prototype.load = function (url, type, onstate) {
                 if (type === void 0) { type = AssetTypeEnum.Auto; }
                 if (onstate === void 0) { onstate = null; }
                 if (onstate == null)
                     onstate = function () { };
                 var name = this.getFileName(url);
-                if (this.mapInLoad[name] != null && this.mapInLoad[name].isfinish) {
+                if (this.mapInLoad[name] != null) {
                     var _state = this.mapInLoad[name];
                     if (_state.isfinish) {
                         onstate(this.mapInLoad[name]);
@@ -4254,25 +4294,8 @@ var gd3d;
                     this.doWaitState(url, state);
                     return;
                 }
-                else if (type == AssetTypeEnum.Bundle) {
-                    gd3d.io.loadText(url, function (txt, err) {
-                        var filename = _this.getFileName(url);
-                        var ab = new assetBundle(url);
-                        ab.name = filename;
-                        ab.parse(JSON.parse(txt));
-                        ab.load(_this, onstate, state);
-                        _this.mapBundle[filename] = ab;
-                    });
-                }
-                else {
-                    state.totaltask = 1;
-                    this.loadSingleRes(url, type, function (s) {
-                        state.curtask = 1;
-                        s.isfinish = true;
-                        onstate(s);
-                        _this.doWaitState(url, s);
-                    }, state);
-                }
+                this.queueState.push({ state: state, type: type, onstate: onstate });
+                this.loadByQueue();
             };
             assetMgr.prototype.unload = function (url, onstate) {
                 if (onstate === void 0) { onstate = null; }
@@ -4303,31 +4326,6 @@ var gd3d;
                 this.app.getScene().name = sceneName;
                 this.app.getScene().getRoot().markDirty();
                 onComplete();
-            };
-            assetMgr.prototype.parseEffect = function (effectConfig, onComplete) {
-                if (effectConfig == null)
-                    return;
-                var obj = JSON.parse(effectConfig);
-                {
-                }
-            };
-            assetMgr.prototype.loadEffectDependAssets = function (dependAssets, path, onFinish) {
-                var totalCount = 0;
-                for (var index in dependAssets) {
-                    totalCount++;
-                }
-                for (var index in dependAssets) {
-                    var url = path + dependAssets[index];
-                    this.load(url, AssetTypeEnum.Auto, function (state) {
-                        if (state.isfinish) {
-                            totalCount--;
-                            if (totalCount == 0) {
-                                if (onFinish != null)
-                                    onFinish();
-                            }
-                        }
-                    });
-                }
             };
             assetMgr.prototype.saveScene = function (fun) {
                 gd3d.io.SerializeDependent.resoursePaths = [];
