@@ -1779,8 +1779,7 @@ var test_assestmgr = (function () {
             for (var i = 0; i < 100; i++) {
                 this.baihu[i].dispose();
             }
-            this._prefab.unuse();
-            this.app.getAssetMgr().unload("res/prefabs/baihu/baihu.assetbundle.json");
+            this.app.getAssetMgr().getAssetBundle("baihu.assetbundle.json").unload();
             this.app.getAssetMgr().releaseUnuseAsset();
         }
     };
@@ -2571,10 +2570,14 @@ var test_loadScene = (function () {
         var z2 = Math.cos(this.timer * 0.5);
         var objCam = this.camera.gameObject.transform;
         objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, -z2 * 10);
-        objCam.lookat(this.cube);
-        objCam.markDirty();
-        this.cube.markDirty();
-        objCam.updateWorldTran();
+        if (this.timer > 5) {
+            this.app.getScene().getRoot().dispose();
+        }
+        if (this.timer > 10 && !this.bere) {
+            this.bere = true;
+            this.app.getAssetMgr().unload("res/scenes/city/city.assetbundle.json");
+            this.app.getAssetMgr().releaseUnuseAsset();
+        }
     };
     return test_loadScene;
 }());

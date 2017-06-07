@@ -111,8 +111,8 @@ class test_assestmgr implements IState
             {
                 this.baihu[i].dispose();
             }
-            this._prefab.unuse();
-            this.app.getAssetMgr().unload("res/prefabs/baihu/baihu.assetbundle.json");
+            // this._prefab.unuse();
+            this.app.getAssetMgr().getAssetBundle("baihu.assetbundle.json").unload();
             this.app.getAssetMgr().releaseUnuseAsset();
 
         }

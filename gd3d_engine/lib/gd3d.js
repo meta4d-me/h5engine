@@ -3474,7 +3474,7 @@ var gd3d;
                 for (var i = 0; i < files.length; i++) {
                     var item = files[i];
                     var packes = -1;
-                    if (item.packes)
+                    if (item.packes != undefined)
                         packes = item.packes;
                     this.files.push({ name: item.name, length: item.length, packes: packes });
                 }
@@ -3600,18 +3600,20 @@ var gd3d;
                             realTotal--;
                             state.curtask++;
                             var _fileName = assetmgr.getFileName(surl);
-                            var _res = s.resstate[_fileName].res;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)
+                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
+                                var _res = s.resstate[_fileName].res;
                                 _this.mapNamed[_fileName] = _res.getGUID();
+                            }
                             if (realTotal === 0) {
                                 state.isfinish = true;
+                                onstate(state);
                                 assetmgr.loadByQueue();
                             }
                             else {
+                                onstate(state);
                                 loadcall();
                             }
-                            onstate(state);
                             assetmgr.doWaitState(_this.url, state);
                         }, state);
                     }
@@ -3620,18 +3622,20 @@ var gd3d;
                             realTotal--;
                             state.curtask++;
                             var _fileName = assetmgr.getFileName(surl);
-                            var _res = s.resstate[_fileName].res;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)
+                                && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
+                                var _res = s.resstate[_fileName].res;
                                 _this.mapNamed[_fileName] = _res.getGUID();
+                            }
                             if (realTotal === 0) {
                                 state.isfinish = true;
+                                onstate(state);
                                 assetmgr.loadByQueue();
                             }
                             else {
+                                onstate(state);
                                 loadcall();
                             }
-                            onstate(state);
                             assetmgr.doWaitState(_this.url, state);
                         }, state);
                     }
@@ -3783,9 +3787,10 @@ var gd3d;
                 return true;
             };
             assetMgr.prototype.removeAssetBundle = function (name) {
-                if (this.mapInLoad[name] == null)
-                    return;
-                delete this.mapInLoad[name];
+                if (this.mapBundle[name] != null)
+                    delete this.mapBundle[name];
+                if (this.mapInLoad[name] != null)
+                    delete this.mapInLoad[name];
             };
             assetMgr.prototype.getAssetUrl = function (asset) {
                 return this.assetUrlDic[asset.getGUID()];
@@ -3805,6 +3810,7 @@ var gd3d;
                 if (type == AssetTypeEnum.GLVertexShader) {
                     state.resstate[filename] = { state: 0, res: null };
                     var txt = this.bundlePackJson[filename];
+                    txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
                     state.logs.push("load a glshader:" + filename);
                     this.shaderPool.compileVS(this.webgl, name, txt);
@@ -3813,6 +3819,7 @@ var gd3d;
                 else if (type == AssetTypeEnum.GLFragmentShader) {
                     state.resstate[filename] = { state: 0, res: null };
                     var txt = this.bundlePackJson[filename];
+                    txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
                     state.logs.push("load a glshader:" + filename);
                     this.shaderPool.compileFS(this.webgl, name, txt);
@@ -3977,8 +3984,6 @@ var gd3d;
                 var filename = this.getFileName(url);
                 var name = filename.substring(0, filename.indexOf("."));
                 if (type == AssetTypeEnum.PackBin) {
-                    state.resstate[filename] = { state: 0, res: null };
-                    this.bundlePackBin = {};
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         var read = new gd3d.io.binReader(_buffer);
                         var index = read.readInt32();
@@ -3994,20 +3999,16 @@ var gd3d;
                             var bufs = _buffer.slice(start, start + len);
                             _this.bundlePackBin[strs[0]] = bufs;
                         }
-                        state.resstate[filename].state = 1;
                         onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.PackTxt) {
-                    state.resstate[filename] = { state: 0, res: null };
-                    this.bundlePackJson = null;
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         var read = new gd3d.io.binReader(_buffer);
                         var arr = new Uint8Array(_buffer.byteLength);
                         read.readUint8Array(arr);
                         var txt = gd3d.io.binReader.utf8ArrayToString(arr);
                         _this.bundlePackJson = JSON.parse(txt);
-                        state.resstate[filename].state = 1;
                         onstate(state);
                     });
                 }
@@ -4229,15 +4230,17 @@ var gd3d;
             };
             assetMgr.prototype.loadByQueue = function () {
                 var _this = this;
-                console.log("load queue");
+                this.bundlePackBin = {};
+                this.bundlePackJson = null;
+                if (this.curloadinfo != null) {
+                    if (!this.curloadinfo.state.isfinish)
+                        return;
+                    else
+                        this.curloadinfo = null;
+                }
                 if (this.queueState.length == 0)
                     return;
-                if (this.curloadinfo != null && !this.curloadinfo.state.isfinish) {
-                    console.log("loading " + this.curloadinfo.state.url);
-                    return;
-                }
                 this.curloadinfo = this.queueState.shift();
-                console.log("load start " + this.curloadinfo.state.url);
                 var state = this.curloadinfo.state;
                 var url = state.url;
                 var type = this.curloadinfo.type;

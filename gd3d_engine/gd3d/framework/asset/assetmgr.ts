@@ -127,7 +127,7 @@ namespace gd3d.framework
             {
                 var item = files[i];
                 let packes = -1;
-                if(item.packes)
+                if(item.packes != undefined)
                     packes = item.packes;
                 this.files.push({ name: item.name, length: item.length, packes:packes });
             }
@@ -186,7 +186,7 @@ namespace gd3d.framework
                     //压缩在包里的
                     mapPackes[url] = fitem.packes;
                 }
-                // else
+                
                 {
                     if (type == AssetTypeEnum.GLFragmentShader)
                         glfshaders.push(url);
@@ -294,22 +294,25 @@ namespace gd3d.framework
                         state.curtask++;
 
                         let _fileName = assetmgr.getFileName(surl);
-                        let _res = s.resstate[_fileName].res;
 
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         &&type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
+                        {
+                            let _res = s.resstate[_fileName].res;
                             this.mapNamed[_fileName] = _res.getGUID();
+                        }
 
                         if (realTotal === 0)
                         {
                             state.isfinish = true;
+                            onstate(state);
                             assetmgr.loadByQueue();
                         }
                         else
                         {
+                            onstate(state);
                             loadcall();
                         }
-                        onstate(state);
                         assetmgr.doWaitState(this.url, state);
                     }, state);
                 }
@@ -321,24 +324,27 @@ namespace gd3d.framework
                         state.curtask++;
 
                         let _fileName = assetmgr.getFileName(surl);
-                        let _res = s.resstate[_fileName].res;
 
                         
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         &&type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
+                        {
+                            let _res = s.resstate[_fileName].res;
                             this.mapNamed[_fileName] = _res.getGUID();
+                        }
 
 
                         if (realTotal === 0)
                         {
                             state.isfinish = true;
+                            onstate(state);
                             assetmgr.loadByQueue();
                         }
                         else
                         {
-                            loadcall();
+                            onstate(state);
+                            loadcall(); 
                         }
-                        onstate(state);
                         assetmgr.doWaitState(this.url, state);
                     }, state);
                 }
@@ -634,9 +640,10 @@ namespace gd3d.framework
         private mapInLoad: { [id: string]: stateLoad } = {};
         removeAssetBundle(name: string)
         {
-            if (this.mapInLoad[name] == null)
-                return;
-            delete this.mapInLoad[name];
+            if(this.mapBundle[name] != null)
+                delete this.mapBundle[name];
+            if (this.mapInLoad[name] != null)
+                delete this.mapInLoad[name];
         }
         /**
          * @public
@@ -684,6 +691,7 @@ namespace gd3d.framework
             {
                 state.resstate[filename] = { state: 0, res: null }
                 let txt = this.bundlePackJson[filename];
+                txt = decodeURI(txt);
                 state.resstate[filename].state = 1;//完成
 
                 state.logs.push("load a glshader:" + filename);
@@ -694,6 +702,7 @@ namespace gd3d.framework
             {
                 state.resstate[filename] = { state: 0, res: null }
                 let txt = this.bundlePackJson[filename];
+                txt = decodeURI(txt);
                 state.resstate[filename].state = 1;//完成
 
                 state.logs.push("load a glshader:" + filename);
@@ -901,8 +910,6 @@ namespace gd3d.framework
             let name = filename.substring(0, filename.indexOf("."));
             if(type == AssetTypeEnum.PackBin)
             {
-                state.resstate[filename] = { state: 0, res: null };
-                this.bundlePackBin = {};
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
                     var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
@@ -923,14 +930,11 @@ namespace gd3d.framework
                         this.bundlePackBin[strs[0]] = bufs;
                     }
 
-                    state.resstate[filename].state = 1;
                     onstate(state);
                 })
             }
             else if(type == AssetTypeEnum.PackTxt)
             {
-                state.resstate[filename] = { state: 0, res: null };
-                this.bundlePackJson = null;
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
                     var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
@@ -938,9 +942,8 @@ namespace gd3d.framework
                     var arr = new Uint8Array(_buffer.byteLength);
                     read.readUint8Array(arr);
                     let txt = gd3d.io.binReader.utf8ArrayToString(arr);
-
+                    
                     this.bundlePackJson = JSON.parse(txt);
-                    state.resstate[filename].state = 1;
                     onstate(state);
                 });
             }
@@ -979,7 +982,6 @@ namespace gd3d.framework
                     var _shader = new shader(filename);
                     _shader.parse(this, JSON.parse(txt));
                     this.assetUrlDic[_shader.getGUID()] = url;
-                    // this.use(_shader); //shader 地位特殊，不作为named resource,不卸载
                     this.mapShader[filename] = _shader;
                     onstate(state);
                 });
@@ -1219,16 +1221,18 @@ namespace gd3d.framework
         private curloadinfo:{state:stateLoad, type:AssetTypeEnum, onstate:(state:stateLoad) => void };
         public loadByQueue()
         {
-            console.log("load queue");
-            if(this.queueState.length == 0)   return;
-            if(this.curloadinfo!=null && !this.curloadinfo.state.isfinish)
-            {    
-                console.log("loading " + this.curloadinfo.state.url);
-                return;
+            this.bundlePackBin = {};
+            this.bundlePackJson = null;
+            if(this.curloadinfo!=null)
+            {
+                if(!this.curloadinfo.state.isfinish)
+                    return;
+                else
+                    this.curloadinfo = null;
             }
+            if(this.queueState.length == 0)   return;
             
             this.curloadinfo = this.queueState.shift();
-            console.log("load start " + this.curloadinfo.state.url);
             let state = this.curloadinfo.state;
             let url = state.url;
             let type = this.curloadinfo.type;
