@@ -14133,7 +14133,6 @@ var gd3d;
                     this._sphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
                     this._sphereDirection.z = _radius * Math.cos(θ);
                     gd3d.math.vec3Normalize(this._sphereDirection, this._sphereDirection);
-                    gd3d.framework.EffectUtil.RotateVector3(this._sphereDirection, this.direction, this._sphereDirection);
                     this.getRandomPosition(this._sphereDirection, _radius);
                     return this._sphereDirection;
                 },
@@ -15429,7 +15428,7 @@ var gd3d;
                 return Math.random() * (max - min) + min;
             };
             EffectUtil.vecMuliNum = function (vec, num) {
-                var v = new gd3d.math.vector4(vec.x * num, vec.y * num, vec.z * num);
+                var v = new gd3d.math.vector3(vec.x * num, vec.y * num, vec.z * num);
                 return v;
             };
             EffectUtil.parseEffectVec3 = function (value) {
@@ -17415,8 +17414,7 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(forwardTarget);
                     }
                     else if (this.renderModel == framework.RenderModel.StretchedBillBoard) {
-                        gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
-                        gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
+                        gd3d.math.quatClone(this.rotationByShape, this.localRotation);
                         gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
                         var lookRot = new gd3d.math.quaternion();
                         gd3d.math.quatClone(this.gameObject.transform.getWorldRotate(), invTransformRotation);

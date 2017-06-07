@@ -573,9 +573,9 @@ namespace gd3d.framework
                 }
                 else if (this.renderModel == RenderModel.StretchedBillBoard)
                 {
-                    gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
-                    gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
-
+                    // gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
+                    // gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
+                    gd3d.math.quatClone(this.rotationByShape,this.localRotation);
 
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 

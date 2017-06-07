@@ -167,7 +167,7 @@
             this._sphereDirection.z = _radius * Math.cos(θ);
 
             math.vec3Normalize(this._sphereDirection, this._sphereDirection);
-            gd3d.framework.EffectUtil.RotateVector3(this._sphereDirection, this.direction, this._sphereDirection);
+            //gd3d.framework.EffectUtil.RotateVector3(this._sphereDirection, this.direction, this._sphereDirection);
             this.getRandomPosition(this._sphereDirection, _radius);
             return this._sphereDirection;
         }

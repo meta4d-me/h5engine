@@ -13,7 +13,7 @@ namespace gd3d.framework
         }
         public static vecMuliNum(vec: gd3d.math.vector3, num: number): gd3d.math.vector3
         {
-            var v = new gd3d.math.vector4(vec.x * num, vec.y * num, vec.z * num);
+            var v = new gd3d.math.vector3(vec.x * num, vec.y * num, vec.z * num);
             return v;
         }
         public static parseEffectVec3(value: any): ParticleNode
