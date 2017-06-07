@@ -1,1 +1,12 @@
-{"packes":["resources/horizontal.packs.txt","resources/horizontal.packs.bin"],"files":[{"name":"resources/rock256.png"},{"name":"horizontal.effect.json","packes":0,"length":792}]}
+{
+    "files": [
+        {
+            "name": "resources/rock256.png",
+            "length": 49589
+        },
+        {
+            "name": "horizontal.effect.json",
+            "length": 41722
+        }
+    ]
+}

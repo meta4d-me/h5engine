@@ -1,1 +1,12 @@
-{"packes":["resources/billboard.packs.txt","resources/billboard.packs.bin"],"files":[{"name":"resources/rock256.png"},{"name":"billboard.effect.json","packes":0,"length":791}]}
+{
+    "files": [
+        {
+            "name": "resources/rock256.png",
+            "length": 49589
+        },
+        {
+            "name": "billboard.effect.json",
+            "length": 41722
+        }
+    ]
+}

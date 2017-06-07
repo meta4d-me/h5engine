@@ -1,1 +1,24 @@
-{"packes":["resources/tilling.packs.txt","resources/tilling.packs.bin"],"files":[{"name":"resources/f_fire035a_5x2.png"},{"name":"resources/fs_1.png"},{"name":"resources/E_huo01.png"},{"name":"resources/117e875620d52496fb971dbf6724624d.png"},{"name":"tilling.effect.json","packes":0,"length":444}]}
+{
+    "files": [
+        {
+            "name": "resources/f_fire035a_5x2.png",
+            "length": 10000
+        },
+        {
+            "name": "resources/fs_1.png",
+            "length": 49589
+        },
+        {
+            "name": "resources/E_huo01.png",
+            "length": 10000
+        },
+        {
+            "name": "resources/117e875620d52496fb971dbf6724624d.png",
+            "length": 111111
+        },
+        {
+            "name": "tilling.effect.json",
+            "length": 41722
+        }
+    ]
+}

@@ -1,1 +1,12 @@
-{"packes":["resources/vertical.packs.txt","resources/vertical.packs.bin"],"files":[{"name":"resources/rock256.png"},{"name":"vertical.effect.json","packes":0,"length":792}]}
+{
+    "files": [
+        {
+            "name": "resources/rock256.png",
+            "length": 49589
+        },
+        {
+            "name": "vertical.effect.json",
+            "length": 41722
+        }
+    ]
+}
