@@ -39,6 +39,7 @@
         dispose()
         {
             this.trans.dispose();
+            this.jsonstr = null;
         }
         caclByteLength(): number
         {

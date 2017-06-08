@@ -394,12 +394,12 @@ namespace gd3d.framework
         public euler: math.vector3;
         public color: math.vector3;
         public scale: math.vector3;
-        public uv: math.vector2 = new math.vector2(0, 0);
+        public uv: math.vector2;
         public alpha: number;
         public mat: EffectMatData;
         public renderModel: RenderModel = RenderModel.None;
         public matrix: math.matrix = new math.matrix();
-        public tilling: math.vector2 = new math.vector2(1, 1);
+        public tilling: math.vector2;
         /**
          * lerp，action更新euler，再由euler合成rotationByEuler。
          * 下一步拿rotationByEuler乘以billboard生成的四元数得到最终的localRotation。
@@ -512,6 +512,12 @@ namespace gd3d.framework
                 case "color":
                     this.color = new gd3d.math.vector3(0, 0, 0);
                     break;
+                case "uv":
+                    this.uv = new gd3d.math.vector2(0, 0);
+                    break;
+                case "tilling":
+                    this.tilling = new gd3d.math.vector2(1, 1);
+                    break;
                 default:
                     console.log("不支持的属性：" + attribute);
                     break;
@@ -526,14 +532,28 @@ namespace gd3d.framework
             let data = new EffectAttrsData();
             if (this.pos != undefined)
                 data.pos = math.pool.clone_vector3(this.pos);
+            else
+                data.initAttribute("pos");
             if (this.euler != undefined)
                 data.euler = math.pool.clone_vector3(this.euler);
+            else
+                data.initAttribute("euler");
             if (this.color != undefined)
                 data.color = math.pool.clone_vector3(this.color);
+            else
+                data.initAttribute("color");
             if (this.scale != undefined)
                 data.scale = math.pool.clone_vector3(this.scale);
-            if (this.uv != undefined)
+            else
+                data.initAttribute("scale");
+            if (this.tilling != undefined)
                 data.tilling = math.pool.clone_vector2(this.tilling);
+            else
+                data.initAttribute("tilling");
+            if (this.uv != undefined)
+                data.uv = math.pool.clone_vector2(this.uv);
+            else
+                data.initAttribute("uv");
             if (this.mat != undefined)
                 data.mat = this.mat.clone();
             if (this.rotationByEuler != undefined)

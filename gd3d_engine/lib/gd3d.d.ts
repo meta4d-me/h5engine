@@ -20,6 +20,7 @@ declare namespace gd3d.framework {
         notify: INotify;
         version: string;
         build: string;
+        constructor();
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -3421,6 +3422,13 @@ declare namespace gd3d.render {
         Static = 0,
         Dynamic = 1,
         Stream = 2,
+    }
+    class drawInfo {
+        private static _ins;
+        static readonly ins: drawInfo;
+        triCount: number;
+        vboCount: number;
+        renderCount: number;
     }
     class glMesh {
         initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;
