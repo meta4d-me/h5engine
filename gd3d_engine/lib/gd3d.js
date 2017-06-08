@@ -33,7 +33,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000007";
+                this.build = "b000008";
                 this.beStepNumber = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
@@ -44,6 +44,7 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
+                window["gd3d_app"] = this;
             }
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);

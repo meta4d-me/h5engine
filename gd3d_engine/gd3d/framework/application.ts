@@ -24,6 +24,11 @@ namespace gd3d.framework
         notify: INotify;
 		version:string = "v0.0.1";
 		build:string = "b000008";
+
+        constructor(){
+            window["gd3d_app"] = this;
+        }
+
         start(div: HTMLDivElement)
         {
 			console.log("version: "+this.version + "  build: "+this.build);
