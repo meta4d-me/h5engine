@@ -33,7 +33,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000007";
+                this.build = "b000008";
                 this.beStepNumber = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
@@ -5303,6 +5303,7 @@ var gd3d;
                 this.name = null;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this._changeShaderMap = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
                 }
@@ -5457,6 +5458,23 @@ var gd3d;
                 this.mapUniform = {};
                 this.initUniformData(this.shader.passes["base"]);
             };
+            material.prototype.changeShader = function (shader) {
+                var map;
+                if (this._changeShaderMap[shader.getName()] != undefined) {
+                    map = this._changeShaderMap[shader.getName()].mapUniform;
+                }
+                else {
+                    var mat = this.clone();
+                    map = mat.mapUniform;
+                    this._changeShaderMap[shader.getName()] = mat;
+                }
+                this.setShader(shader);
+                for (var key in map) {
+                    if (this.mapUniform[key] != undefined) {
+                        this.mapUniform[key] = map[key];
+                    }
+                }
+            };
             material.prototype.getLayer = function () {
                 return this.shader.layer;
             };
@@ -5546,10 +5564,12 @@ var gd3d;
                             if (value != null) {
                                 pass.uniformTexture(id, value.glTexture);
                             }
-                            else if (defaultValue != null)
+                            else if (defaultValue != null) {
                                 pass.uniformTexture(id, defaultValue.glTexture);
-                            else
+                            }
+                            else {
                                 pass.uniformTexture(id, null);
+                            }
                             break;
                     }
                 }

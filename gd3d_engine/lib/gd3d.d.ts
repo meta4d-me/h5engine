@@ -854,6 +854,8 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         initUniformData(passes: render.glDrawPass[]): void;
         setShader(shader: shader): void;
+        private _changeShaderMap;
+        changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         getQueue(): number;
         getShader(): shader;

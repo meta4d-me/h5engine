@@ -1883,12 +1883,7 @@ var t;
         };
         test_changeshader.prototype.change = function (sha) {
             for (var i = 0; i < 4; i++) {
-                var _uniform = this.renderer.materials[i].mapUniform;
-                this.renderer.materials[i].setShader(sha);
-                for (var key in _uniform) {
-                    if (this.renderer.materials[i].mapUniform[key] != undefined)
-                        this.renderer.materials[i].mapUniform[key] = _uniform[key];
-                }
+                this.renderer.materials[i].changeShader(sha);
             }
         };
         test_changeshader.prototype.update = function (delta) {
