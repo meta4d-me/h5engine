@@ -15326,10 +15326,9 @@ var gd3d;
                 }
                 if (_startdata["direction"] != undefined) {
                     var _startdir = _startdata["direction"];
-                    var startdir = startdata.direction;
-                    startdir.x = _startdir["0"];
-                    startdir.y = _startdir["1"];
-                    startdir.z = _startdir["2"];
+                    startdata.direction.x = _startdir["0"];
+                    startdata.direction.y = _startdir["1"];
+                    startdata.direction.z = _startdir["2"];
                 }
             };
             EffectParser.prototype._parseToObjData = function (attrib, content) {
