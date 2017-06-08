@@ -4231,13 +4231,14 @@ var gd3d;
             };
             assetMgr.prototype.loadByQueue = function () {
                 var _this = this;
-                this.bundlePackBin = {};
-                this.bundlePackJson = null;
                 if (this.curloadinfo != null) {
                     if (!this.curloadinfo.state.isfinish)
                         return;
-                    else
+                    else {
                         this.curloadinfo = null;
+                        this.bundlePackBin = {};
+                        this.bundlePackJson = null;
+                    }
                 }
                 if (this.queueState.length == 0)
                     return;

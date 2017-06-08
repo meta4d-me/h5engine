@@ -1221,14 +1221,16 @@ namespace gd3d.framework
         private curloadinfo:{state:stateLoad, type:AssetTypeEnum, onstate:(state:stateLoad) => void };
         public loadByQueue()
         {
-            this.bundlePackBin = {};
-            this.bundlePackJson = null;
             if(this.curloadinfo!=null)
             {
                 if(!this.curloadinfo.state.isfinish)
                     return;
                 else
-                    this.curloadinfo = null;
+                {
+                    this.curloadinfo = null;   
+                    this.bundlePackBin = {};
+                    this.bundlePackJson = null;
+                }
             }
             if(this.queueState.length == 0)   return;
             
