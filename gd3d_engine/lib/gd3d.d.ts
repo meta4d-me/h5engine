@@ -20,7 +20,7 @@ declare namespace gd3d.framework {
         notify: INotify;
         version: string;
         build: string;
-        triCount: number;
+        constructor();
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);

@@ -115,9 +115,6 @@ var gd3d;
                 }
             };
             application.prototype.update = function (delta) {
-                gd3d.render.drawInfo.ins.renderCount = 0;
-                gd3d.render.drawInfo.ins.triCount = 0;
-                this.triCount = 0;
                 if (this.webgl.canvas.clientWidth != this.webgl.canvas.width || this.webgl.canvas.clientHeight != this.webgl.canvas.height) {
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth;
                     this.webgl.canvas.height = this.webgl.canvas.clientHeight;
