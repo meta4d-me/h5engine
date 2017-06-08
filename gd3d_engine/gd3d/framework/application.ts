@@ -24,7 +24,11 @@ namespace gd3d.framework
         notify: INotify;
 		version:string = "v0.0.1";
 		build:string = "b000008";
-        triCount:number;
+
+        constructor(){
+            window["gd3d_app"] = this;
+        }
+
         start(div: HTMLDivElement)
         {
 			console.log("version: "+this.version + "  build: "+this.build);
@@ -122,10 +126,6 @@ namespace gd3d.framework
         //delta 单位秒
         private update(delta: number)
         {
-            render.drawInfo.ins.renderCount = 0;
-            render.drawInfo.ins.triCount = 0;
-
-            this.triCount = 0;
             if (this.webgl.canvas.clientWidth != this.webgl.canvas.width || this.webgl.canvas.clientHeight != this.webgl.canvas.height)
             {
                 this.webgl.canvas.width = this.webgl.canvas.clientWidth;

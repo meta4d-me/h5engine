@@ -44,6 +44,7 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
+                window["gd3d_app"] = this;
             }
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
