@@ -42,7 +42,7 @@ class test_assestmgr implements IState
                                 this.scene.addChild(this.baihu[i]);
                                 this.baihu[i].localScale = new gd3d.math.vector3(10, 10, 10);
                                 this.baihu[i].localTranslate = new gd3d.math.vector3(0.2 * (i - 50), 0, 0);
-
+                                this.baihu[i].markDirty();
                                 this.scene.addChild(this.baihu[i]);
                             }
                             

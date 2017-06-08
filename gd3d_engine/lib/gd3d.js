@@ -33,7 +33,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000007";
+                this.build = "b000008";
                 this.beStepNumber = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
@@ -114,6 +114,9 @@ var gd3d;
                 }
             };
             application.prototype.update = function (delta) {
+                gd3d.render.drawInfo.ins.renderCount = 0;
+                gd3d.render.drawInfo.ins.triCount = 0;
+                this.triCount = 0;
                 if (this.webgl.canvas.clientWidth != this.webgl.canvas.width || this.webgl.canvas.clientHeight != this.webgl.canvas.height) {
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth;
                     this.webgl.canvas.height = this.webgl.canvas.clientHeight;
@@ -6067,6 +6070,7 @@ var gd3d;
             };
             prefab.prototype.dispose = function () {
                 this.trans.dispose();
+                this.jsonstr = null;
             };
             prefab.prototype.caclByteLength = function () {
                 var total = 0;
@@ -13413,10 +13417,8 @@ var gd3d;
         framework.EffectElementData = EffectElementData;
         var EffectAttrsData = (function () {
             function EffectAttrsData() {
-                this.uv = new gd3d.math.vector2(0, 0);
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
-                this.tilling = new gd3d.math.vector2(1, 1);
                 this.rotationByEuler = new gd3d.math.quaternion();
                 this.localRotation = new gd3d.math.quaternion();
             }
@@ -13488,6 +13490,12 @@ var gd3d;
                     case "color":
                         this.color = new gd3d.math.vector3(0, 0, 0);
                         break;
+                    case "uv":
+                        this.uv = new gd3d.math.vector2(0, 0);
+                        break;
+                    case "tilling":
+                        this.tilling = new gd3d.math.vector2(1, 1);
+                        break;
                     default:
                         console.log("不支持的属性：" + attribute);
                         break;
@@ -13500,14 +13508,28 @@ var gd3d;
                 var data = new EffectAttrsData();
                 if (this.pos != undefined)
                     data.pos = gd3d.math.pool.clone_vector3(this.pos);
+                else
+                    data.initAttribute("pos");
                 if (this.euler != undefined)
                     data.euler = gd3d.math.pool.clone_vector3(this.euler);
+                else
+                    data.initAttribute("euler");
                 if (this.color != undefined)
                     data.color = gd3d.math.pool.clone_vector3(this.color);
+                else
+                    data.initAttribute("color");
                 if (this.scale != undefined)
                     data.scale = gd3d.math.pool.clone_vector3(this.scale);
-                if (this.uv != undefined)
+                else
+                    data.initAttribute("scale");
+                if (this.tilling != undefined)
                     data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
+                else
+                    data.initAttribute("tilling");
+                if (this.uv != undefined)
+                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
+                else
+                    data.initAttribute("uv");
                 if (this.mat != undefined)
                     data.mat = this.mat.clone();
                 if (this.rotationByEuler != undefined)
@@ -14555,7 +14577,6 @@ var gd3d;
                         break;
                     case "alpha":
                         baseValue.alpha = baseValue.alpha + this.attrival;
-                        console.log("alpha: " + baseValue.alpha);
                         break;
                 }
             };
@@ -20564,6 +20585,21 @@ var gd3d;
             MeshTypeEnum[MeshTypeEnum["Dynamic"] = 1] = "Dynamic";
             MeshTypeEnum[MeshTypeEnum["Stream"] = 2] = "Stream";
         })(MeshTypeEnum = render.MeshTypeEnum || (render.MeshTypeEnum = {}));
+        var drawInfo = (function () {
+            function drawInfo() {
+            }
+            Object.defineProperty(drawInfo, "ins", {
+                get: function () {
+                    if (drawInfo._ins == null)
+                        drawInfo._ins = new drawInfo();
+                    return drawInfo._ins;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return drawInfo;
+        }());
+        render.drawInfo = drawInfo;
         var glMesh = (function () {
             function glMesh() {
                 this.bindIndex = -1;
@@ -20757,6 +20793,8 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.vertexCount / 3) | 0) * 3;
+                drawInfo.ins.triCount += count / 3;
+                drawInfo.ins.renderCount++;
                 webgl.drawArrays(webgl.TRIANGLES, start, count);
             };
             glMesh.prototype.drawArrayLines = function (webgl, start, count) {
@@ -20764,6 +20802,7 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
+                drawInfo.ins.renderCount++;
                 webgl.drawArrays(webgl.LINES, start, count);
             };
             glMesh.prototype.drawElementTris = function (webgl, start, count) {
@@ -20771,6 +20810,8 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
+                drawInfo.ins.triCount += count / 3;
+                drawInfo.ins.renderCount++;
                 webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
             };
             glMesh.prototype.drawElementLines = function (webgl, start, count) {
@@ -20778,6 +20819,7 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
+                drawInfo.ins.renderCount++;
                 webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
             };
             return glMesh;
