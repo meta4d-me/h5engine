@@ -287,6 +287,10 @@
 		{
 			"name":"shader/base/transparent_additive.shader.json",
 			"length":0
-		}
+		},
+        {
+            "name":"shader/base/transparent_add.fs.glsl",
+            "length":0
+        }
     ]
 }
