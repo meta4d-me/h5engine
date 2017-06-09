@@ -18,6 +18,7 @@ declare namespace gd3d.framework {
         height: number;
         limitFrame: boolean;
         notify: INotify;
+        timeScale: number;
         version: string;
         build: string;
         constructor();
@@ -32,9 +33,9 @@ declare namespace gd3d.framework {
         private beginTimer;
         private lastTimer;
         private totalTime;
-        private deltaTime;
+        private _deltaTime;
         getTotalTime(): number;
-        getDeltaTime(): number;
+        readonly deltaTime: number;
         private loop();
         private _scene;
         private initScene();
