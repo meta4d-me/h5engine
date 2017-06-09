@@ -284,9 +284,13 @@
             "name": "resources/base/transparent_bothside.shader.json",
             "length": 0
         },
-	{
-		"name":"resources/base/transparent_additive.shader.json",
-		"length":0
-	}
+		{
+			"name":"resources/base/transparent_additive.shader.json",
+			"length":0
+		},
+        {
+            "name":"shader/base/transparent_add.fs.glsl",
+            "length":0
+        }
     ]
 }
