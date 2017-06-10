@@ -49,6 +49,7 @@ var gd3d;
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
+                this.timeScale = 0.5;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 canvas.className = "full";
@@ -141,12 +142,16 @@ var gd3d;
             application.prototype.getTotalTime = function () {
                 return this.totalTime;
             };
-            application.prototype.getDeltaTime = function () {
-                return this.deltaTime;
-            };
+            Object.defineProperty(application.prototype, "deltaTime", {
+                get: function () {
+                    return this._deltaTime * this.timeScale;
+                },
+                enumerable: true,
+                configurable: true
+            });
             application.prototype.loop = function () {
                 var now = Date.now() / 1000;
-                this.deltaTime = now - this.lastTimer;
+                this._deltaTime = now - this.lastTimer;
                 this.totalTime = now - this.beginTimer;
                 this.update(this.deltaTime);
                 if (this.stats != null)
@@ -14044,13 +14049,13 @@ var gd3d;
                 this._angle = 0;
                 this.randomPosition = new gd3d.math.vector3(0, 0, 0);
                 this._randomDirection = new gd3d.math.vector3(0, 0, 0);
-                this._boxDirection = new gd3d.math.vector3(1, 0, 0);
-                this._sphereDirection = new gd3d.math.vector3(1, 0, 0);
-                this._hemisphereDirection = new gd3d.math.vector3(1, 0, 0);
+                this._boxDirection = new gd3d.math.vector3(0, 0, 1);
+                this._sphereDirection = new gd3d.math.vector3(0, 0, 1);
+                this._hemisphereDirection = new gd3d.math.vector3(0, 0, 1);
                 this.bottomRidus = 1000;
                 this._coneDirection = new gd3d.math.vector3(0, 0, 1);
-                this._circleDirection = new gd3d.math.vector3(1, 0, 0);
-                this._edgeDirection = new gd3d.math.vector3(1, 0, 0);
+                this._circleDirection = new gd3d.math.vector3(0, 0, 1);
+                this._edgeDirection = new gd3d.math.vector3(0, 0, 1);
                 gd3d.math.vec3Normalize(this.direction, this.direction);
             }
             Object.defineProperty(ParticleStartData.prototype, "position", {
