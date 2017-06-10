@@ -596,6 +596,59 @@ var t;
     }());
     t.test_rendertexture = test_rendertexture;
 })(t || (t = {}));
+var ShockType;
+(function (ShockType) {
+    ShockType[ShockType["Vertical"] = 0] = "Vertical";
+    ShockType[ShockType["Horizontal"] = 1] = "Horizontal";
+    ShockType[ShockType["Both"] = 2] = "Both";
+})(ShockType || (ShockType = {}));
+var CameraShock = (function () {
+    function CameraShock() {
+    }
+    CameraShock.prototype.start = function () {
+        this.isPlaying = false;
+    };
+    CameraShock.prototype.play = function (strength, life, fade, shockType) {
+        if (strength === void 0) { strength = 0.2; }
+        if (life === void 0) { life = 0.5; }
+        if (fade === void 0) { fade = false; }
+        if (shockType === void 0) { shockType = ShockType.Both; }
+        if (this.oldTranslate == null)
+            this.oldTranslate = new gd3d.math.vector3();
+        gd3d.math.vec3Clone(this.gameObject.transform.localTranslate, this.oldTranslate);
+        this.isPlaying = true;
+        this.strength = strength;
+        this.ticker = this.life = life;
+        this.fade = fade;
+        this.shockType = shockType;
+    };
+    CameraShock.prototype.update = function (delta) {
+        if (this.isPlaying) {
+            if (this.ticker > 0) {
+                this.ticker -= delta;
+                var s = this.fade ? this.strength * (this.ticker / this.life) : this.strength;
+                if (this.shockType == ShockType.Horizontal || this.shockType == ShockType.Both)
+                    this.gameObject.transform.localTranslate.x = this.oldTranslate.x + (Math.random() - 0.5) * s;
+                if (this.shockType == ShockType.Vertical || this.shockType == ShockType.Both)
+                    this.gameObject.transform.localTranslate.y = this.oldTranslate.y + (Math.random() - 0.5) * s;
+                this.gameObject.transform.markDirty();
+            }
+            else {
+                this.gameObject.transform.localTranslate.x = this.oldTranslate.x;
+                this.gameObject.transform.localTranslate.y = this.oldTranslate.y;
+                this.isPlaying = false;
+            }
+        }
+    };
+    CameraShock.prototype.remove = function () {
+    };
+    CameraShock.prototype.clone = function () {
+    };
+    return CameraShock;
+}());
+CameraShock = __decorate([
+    gd3d.reflect.nodeComponent
+], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -1047,6 +1100,7 @@ var demo;
             this.camera.near = 0.1;
             this.camera.far = 200;
             this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            this.cameraShock = tranCam.gameObject.addComponent("CameraShock");
             tranCam.localTranslate = new gd3d.math.vector3(0, 20, -16);
             tranCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             tranCam.markDirty();
@@ -1148,7 +1202,7 @@ var demo;
             var col = tran.gameObject.getComponent("boxcollider");
             for (var i = 0; i < this.cubes.length; i++) {
                 var c_1 = this.cubes[i].gameObject.getComponent("boxcollider");
-                if (col.obb.intersects(c_1.obb)) {
+                if (c_1 != null && col.obb.intersects(c_1.obb)) {
                     return true;
                 }
             }
@@ -1286,12 +1340,6 @@ var demo;
                     }
                     this.heroGun.markDirty();
                 }
-                if (this.camera != null) {
-                    this.camera.gameObject.transform.localTranslate.x = this.heroTank.localTranslate.x;
-                    this.camera.gameObject.transform.localTranslate.y = this.heroTank.localTranslate.y + 20;
-                    this.camera.gameObject.transform.localTranslate.z = this.heroTank.localTranslate.z - 16;
-                    this.camera.gameObject.transform.markDirty();
-                }
             }
         };
         TankGame.prototype.fire = function () {
@@ -1325,6 +1373,7 @@ var demo;
                 life: 3
             };
             this.bulletList.push(bullet);
+            this.cameraShock.play(1, 0.5, true);
         };
         TankGame.prototype.updateBullet = function (delta) {
             for (var i = 0; i < this.bulletList.length; i++) {
@@ -1750,6 +1799,7 @@ var test_assestmgr = (function () {
                             _this.scene.addChild(_this.baihu[i]);
                             _this.baihu[i].localScale = new gd3d.math.vector3(10, 10, 10);
                             _this.baihu[i].localTranslate = new gd3d.math.vector3(0.2 * (i - 50), 0, 0);
+                            _this.baihu[i].markDirty();
                             _this.scene.addChild(_this.baihu[i]);
                         }
                         objCam.lookat(_this.baihu[50]);
@@ -1884,12 +1934,7 @@ var t;
         };
         test_changeshader.prototype.change = function (sha) {
             for (var i = 0; i < 4; i++) {
-                var _uniform = this.renderer.materials[i].mapUniform;
-                this.renderer.materials[i].setShader(sha);
-                for (var key in _uniform) {
-                    if (this.renderer.materials[i].mapUniform[key] != undefined)
-                        this.renderer.materials[i].mapUniform[key] = _uniform[key];
-                }
+                this.renderer.materials[i].changeShader(sha);
             }
         };
         test_changeshader.prototype.update = function (delta) {

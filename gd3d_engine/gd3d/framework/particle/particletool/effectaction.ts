@@ -79,7 +79,6 @@ namespace gd3d.framework
                     break;
                 case "alpha":
                     baseValue.alpha = baseValue.alpha + this.attrival;
-                    console.log("alpha: " + baseValue.alpha);
                     break;
             }
         }

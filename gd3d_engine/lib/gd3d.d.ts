@@ -18,8 +18,10 @@ declare namespace gd3d.framework {
         height: number;
         limitFrame: boolean;
         notify: INotify;
+        timeScale: number;
         version: string;
         build: string;
+        constructor();
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -31,9 +33,9 @@ declare namespace gd3d.framework {
         private beginTimer;
         private lastTimer;
         private totalTime;
-        private deltaTime;
+        private _deltaTime;
         getTotalTime(): number;
-        getDeltaTime(): number;
+        readonly deltaTime: number;
         private loop();
         private _scene;
         private initScene();
@@ -855,6 +857,8 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         initUniformData(passes: render.glDrawPass[]): void;
         setShader(shader: shader): void;
+        private _changeShaderMap;
+        changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         getQueue(): number;
         getShader(): shader;
@@ -3484,6 +3488,13 @@ declare namespace gd3d.render {
         Static = 0,
         Dynamic = 1,
         Stream = 2,
+    }
+    class drawInfo {
+        private static _ins;
+        static readonly ins: drawInfo;
+        triCount: number;
+        vboCount: number;
+        renderCount: number;
     }
     class glMesh {
         initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;

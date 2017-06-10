@@ -44,10 +44,12 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
+                window["gd3d_app"] = this;
             }
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
+                this.timeScale = 0.5;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 canvas.className = "full";
@@ -140,12 +142,16 @@ var gd3d;
             application.prototype.getTotalTime = function () {
                 return this.totalTime;
             };
-            application.prototype.getDeltaTime = function () {
-                return this.deltaTime;
-            };
+            Object.defineProperty(application.prototype, "deltaTime", {
+                get: function () {
+                    return this._deltaTime * this.timeScale;
+                },
+                enumerable: true,
+                configurable: true
+            });
             application.prototype.loop = function () {
                 var now = Date.now() / 1000;
-                this.deltaTime = now - this.lastTimer;
+                this._deltaTime = now - this.lastTimer;
                 this.totalTime = now - this.beginTimer;
                 this.update(this.deltaTime);
                 if (this.stats != null)
@@ -4243,13 +4249,14 @@ var gd3d;
             };
             assetMgr.prototype.loadByQueue = function () {
                 var _this = this;
-                this.bundlePackBin = {};
-                this.bundlePackJson = null;
                 if (this.curloadinfo != null) {
                     if (!this.curloadinfo.state.isfinish)
                         return;
-                    else
+                    else {
                         this.curloadinfo = null;
+                        this.bundlePackBin = {};
+                        this.bundlePackJson = null;
+                    }
                 }
                 if (this.queueState.length == 0)
                     return;
@@ -5319,6 +5326,7 @@ var gd3d;
                 this.name = null;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this._changeShaderMap = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
                 }
@@ -5473,6 +5481,23 @@ var gd3d;
                 this.mapUniform = {};
                 this.initUniformData(this.shader.passes["base"]);
             };
+            material.prototype.changeShader = function (shader) {
+                var map;
+                if (this._changeShaderMap[shader.getName()] != undefined) {
+                    map = this._changeShaderMap[shader.getName()].mapUniform;
+                }
+                else {
+                    var mat = this.clone();
+                    map = mat.mapUniform;
+                    this._changeShaderMap[shader.getName()] = mat;
+                }
+                this.setShader(shader);
+                for (var key in map) {
+                    if (this.mapUniform[key] != undefined) {
+                        this.mapUniform[key] = map[key];
+                    }
+                }
+            };
             material.prototype.getLayer = function () {
                 return this.shader.layer;
             };
@@ -5562,10 +5587,12 @@ var gd3d;
                             if (value != null) {
                                 pass.uniformTexture(id, value.glTexture);
                             }
-                            else if (defaultValue != null)
+                            else if (defaultValue != null) {
                                 pass.uniformTexture(id, defaultValue.glTexture);
-                            else
+                            }
+                            else {
                                 pass.uniformTexture(id, null);
+                            }
                             break;
                     }
                 }
@@ -6273,6 +6300,7 @@ var gd3d;
             };
             prefab.prototype.dispose = function () {
                 this.trans.dispose();
+                this.jsonstr = null;
             };
             prefab.prototype.caclByteLength = function () {
                 var total = 0;
@@ -13766,10 +13794,8 @@ var gd3d;
         framework.EffectElementData = EffectElementData;
         var EffectAttrsData = (function () {
             function EffectAttrsData() {
-                this.uv = new gd3d.math.vector2(0, 0);
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
-                this.tilling = new gd3d.math.vector2(1, 1);
                 this.rotationByEuler = new gd3d.math.quaternion();
                 this.localRotation = new gd3d.math.quaternion();
             }
@@ -13841,6 +13867,12 @@ var gd3d;
                     case "color":
                         this.color = new gd3d.math.vector3(0, 0, 0);
                         break;
+                    case "uv":
+                        this.uv = new gd3d.math.vector2(0, 0);
+                        break;
+                    case "tilling":
+                        this.tilling = new gd3d.math.vector2(1, 1);
+                        break;
                     default:
                         console.log("不支持的属性：" + attribute);
                         break;
@@ -13853,14 +13885,28 @@ var gd3d;
                 var data = new EffectAttrsData();
                 if (this.pos != undefined)
                     data.pos = gd3d.math.pool.clone_vector3(this.pos);
+                else
+                    data.initAttribute("pos");
                 if (this.euler != undefined)
                     data.euler = gd3d.math.pool.clone_vector3(this.euler);
+                else
+                    data.initAttribute("euler");
                 if (this.color != undefined)
                     data.color = gd3d.math.pool.clone_vector3(this.color);
+                else
+                    data.initAttribute("color");
                 if (this.scale != undefined)
                     data.scale = gd3d.math.pool.clone_vector3(this.scale);
-                if (this.uv != undefined)
+                else
+                    data.initAttribute("scale");
+                if (this.tilling != undefined)
                     data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
+                else
+                    data.initAttribute("tilling");
+                if (this.uv != undefined)
+                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
+                else
+                    data.initAttribute("uv");
                 if (this.mat != undefined)
                     data.mat = this.mat.clone();
                 if (this.rotationByEuler != undefined)
@@ -14356,13 +14402,13 @@ var gd3d;
                 this._angle = 0;
                 this.randomPosition = new gd3d.math.vector3(0, 0, 0);
                 this._randomDirection = new gd3d.math.vector3(0, 0, 0);
-                this._boxDirection = new gd3d.math.vector3(1, 0, 0);
-                this._sphereDirection = new gd3d.math.vector3(1, 0, 0);
-                this._hemisphereDirection = new gd3d.math.vector3(1, 0, 0);
+                this._boxDirection = new gd3d.math.vector3(0, 0, 1);
+                this._sphereDirection = new gd3d.math.vector3(0, 0, 1);
+                this._hemisphereDirection = new gd3d.math.vector3(0, 0, 1);
                 this.bottomRidus = 1000;
                 this._coneDirection = new gd3d.math.vector3(0, 0, 1);
-                this._circleDirection = new gd3d.math.vector3(1, 0, 0);
-                this._edgeDirection = new gd3d.math.vector3(1, 0, 0);
+                this._circleDirection = new gd3d.math.vector3(0, 0, 1);
+                this._edgeDirection = new gd3d.math.vector3(0, 0, 1);
                 gd3d.math.vec3Normalize(this.direction, this.direction);
             }
             Object.defineProperty(ParticleStartData.prototype, "position", {
@@ -14908,7 +14954,6 @@ var gd3d;
                         break;
                     case "alpha":
                         baseValue.alpha = baseValue.alpha + this.attrival;
-                        console.log("alpha: " + baseValue.alpha);
                         break;
                 }
             };
@@ -15639,10 +15684,9 @@ var gd3d;
                 }
                 if (_startdata["direction"] != undefined) {
                     var _startdir = _startdata["direction"];
-                    var startdir = startdata.direction;
-                    startdir.x = _startdir["0"];
-                    startdir.y = _startdir["1"];
-                    startdir.z = _startdir["2"];
+                    startdata.direction.x = _startdir["0"];
+                    startdata.direction.y = _startdir["1"];
+                    startdata.direction.z = _startdir["2"];
                 }
             };
             EffectParser.prototype._parseToObjData = function (attrib, content) {
@@ -20917,6 +20961,21 @@ var gd3d;
             MeshTypeEnum[MeshTypeEnum["Dynamic"] = 1] = "Dynamic";
             MeshTypeEnum[MeshTypeEnum["Stream"] = 2] = "Stream";
         })(MeshTypeEnum = render.MeshTypeEnum || (render.MeshTypeEnum = {}));
+        var drawInfo = (function () {
+            function drawInfo() {
+            }
+            Object.defineProperty(drawInfo, "ins", {
+                get: function () {
+                    if (drawInfo._ins == null)
+                        drawInfo._ins = new drawInfo();
+                    return drawInfo._ins;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return drawInfo;
+        }());
+        render.drawInfo = drawInfo;
         var glMesh = (function () {
             function glMesh() {
                 this.bindIndex = -1;
@@ -21110,6 +21169,8 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.vertexCount / 3) | 0) * 3;
+                drawInfo.ins.triCount += count / 3;
+                drawInfo.ins.renderCount++;
                 webgl.drawArrays(webgl.TRIANGLES, start, count);
             };
             glMesh.prototype.drawArrayLines = function (webgl, start, count) {
@@ -21117,6 +21178,7 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
+                drawInfo.ins.renderCount++;
                 webgl.drawArrays(webgl.LINES, start, count);
             };
             glMesh.prototype.drawElementTris = function (webgl, start, count) {
@@ -21124,6 +21186,8 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
+                drawInfo.ins.triCount += count / 3;
+                drawInfo.ins.renderCount++;
                 webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
             };
             glMesh.prototype.drawElementLines = function (webgl, start, count) {
@@ -21131,6 +21195,7 @@ var gd3d;
                 if (count === void 0) { count = -1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
+                drawInfo.ins.renderCount++;
                 webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
             };
             return glMesh;

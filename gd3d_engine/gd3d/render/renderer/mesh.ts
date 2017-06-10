@@ -26,6 +26,19 @@
         Dynamic,
         Stream,
     }
+    export class drawInfo
+    {
+        private static _ins: drawInfo;
+        public static get ins(): drawInfo
+        {
+            if (drawInfo._ins == null)
+                drawInfo._ins = new drawInfo();
+            return drawInfo._ins;
+        }
+        triCount:number;
+        vboCount:number;
+        renderCount:number;
+    }
     export class glMesh
     {
         initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, vertexCount: number, mode: MeshTypeEnum = MeshTypeEnum.Static)
@@ -271,6 +284,8 @@
         {
             if (count < 0)
                 count = ((this.vertexCount / 3) | 0) * 3;
+            drawInfo.ins.triCount += count / 3;
+            drawInfo.ins.renderCount ++;
             //model
             webgl.drawArrays(webgl.TRIANGLES, start, count);
         }
@@ -279,6 +294,7 @@
         {
             if (count < 0)
                 count = ((this.vertexCount / 2) | 0) * 2;
+            drawInfo.ins.renderCount ++;
             //model
             webgl.drawArrays(webgl.LINES, start, count);
         }
@@ -286,12 +302,15 @@
         {
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
+            drawInfo.ins.triCount += count / 3;
+            drawInfo.ins.renderCount ++;
             webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
         }
         drawElementLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1)
         {
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
+            drawInfo.ins.renderCount ++;
             webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
         }
 

@@ -85,6 +85,26 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare enum ShockType {
+    Vertical = 0,
+    Horizontal = 1,
+    Both = 2,
+}
+declare class CameraShock implements gd3d.framework.INodeComponent {
+    gameObject: gd3d.framework.gameObject;
+    private isPlaying;
+    private fade;
+    private oldTranslate;
+    private shockType;
+    private strength;
+    private life;
+    private ticker;
+    start(): void;
+    play(strength?: number, life?: number, fade?: boolean, shockType?: ShockType): void;
+    update(delta: number): void;
+    remove(): void;
+    clone(): void;
+}
 declare class Joystick {
     app: gd3d.framework.application;
     overlay2d: gd3d.framework.overlay2D;
@@ -143,6 +163,7 @@ declare namespace demo {
         private loadHeroPrefab(laststate, state);
         private loadEnemyPrefab(laststate, state);
         private loadScene(laststate, state);
+        private cameraShock;
         private addCameraAndLight(laststate, state);
         private addJoystick(laststate, state);
         private addObject(laststate, state);
