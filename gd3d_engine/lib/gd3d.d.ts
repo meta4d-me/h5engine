@@ -586,6 +586,7 @@ declare namespace gd3d.framework {
         TextAsset = 15,
         PackBin = 16,
         PackTxt = 17,
+        pathAsset = 18,
     }
     class stateLoad {
         iserror: boolean;
@@ -899,6 +900,42 @@ declare namespace gd3d.framework {
         line: boolean;
         start: number;
         size: number;
+    }
+}
+declare namespace gd3d.framework {
+    class pathasset implements IAsset {
+        private name;
+        private id;
+        defaultAsset: boolean;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        use(): void;
+        unuse(): void;
+        dispose(): void;
+        caclByteLength(): number;
+        paths: gd3d.math.vector3[];
+        private type;
+        private instertPointcount;
+        private items;
+        Parse(json: JSON): void;
+        private lines;
+        private getpaths();
+        private getBeisaierPointAlongCurve(points, rate, clearflag?);
+        private vec3Lerp(start, end, lerp, out);
+    }
+    enum pathtype {
+        once = 0,
+        loop = 1,
+        pingpong = 2,
+    }
+    enum epointtype {
+        VertexPoint = 0,
+        ControlPoint = 1,
+    }
+    class pointitem {
+        point: gd3d.math.vector3;
+        type: epointtype;
     }
 }
 declare namespace gd3d.framework {
@@ -1290,6 +1327,29 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class guidpath implements INodeComponent {
+        private paths;
+        pathasset: pathasset;
+        speed: number;
+        private isactived;
+        setActive(value?: boolean): void;
+        isactive(): boolean;
+        private mystrans;
+        private datasafe;
+        private folowindex;
+        isloop: boolean;
+        lookforward: boolean;
+        setpathasset(pathasset: pathasset, speed?: number): void;
+        start(): void;
+        update(delta: number): void;
+        private adjustDir;
+        private followmove(delta);
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     enum LightTypeEnum {
         Direction = 0,
         Point = 1,
@@ -1491,6 +1551,8 @@ declare namespace gd3d.framework {
         startColor: gd3d.math.color;
         endColor: gd3d.math.color;
         setWidth(startWidth: number, endWidth?: number): void;
+        private activeMaxpointlimit;
+        setMaxpointcontroll(value?: boolean): void;
         start(): void;
         private app;
         private webgl;
@@ -1531,6 +1593,8 @@ declare namespace gd3d.framework {
         start(): void;
         private app;
         private webgl;
+        private camerapositon;
+        extenedOneSide: boolean;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
@@ -1540,6 +1604,7 @@ declare namespace gd3d.framework {
         setWidth(Width: number): void;
         play(): void;
         stop(): void;
+        lookAtCamera: boolean;
         private initmesh();
         private intidata();
         private speed;

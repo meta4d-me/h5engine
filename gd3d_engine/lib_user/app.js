@@ -202,6 +202,7 @@ var main = (function () {
         this.addBtn("TestRotate", function () { return new t.TestRotate(); });
         this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
         this.addBtn("effect", function () { return new test_effect(); });
+        this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -3610,6 +3611,162 @@ var t;
     }());
     t.Test_NormalMap = Test_NormalMap;
 })(t || (t = {}));
+var t;
+(function (t) {
+    var test_pathAsset = (function () {
+        function test_pathAsset() {
+            this.parentlist = [];
+            this.dragonlist = [];
+            this.taskmgr = new gd3d.framework.taskMgr();
+            this.timer = 0;
+        }
+        test_pathAsset.prototype.start = function (app) {
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+            this.taskmgr.addTaskCall(this.loadpath.bind(this));
+            this.taskmgr.addTaskCall(this.loadasset.bind(this));
+            this.taskmgr.addTaskCall(this.initscene.bind(this));
+        };
+        test_pathAsset.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+                if (_state.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        test_pathAsset.prototype.loadTexture = function (laststate, state) {
+            var texnumber = 2;
+            this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    texnumber--;
+                    if (texnumber == 0) {
+                        state.finish = true;
+                    }
+                }
+                else {
+                    state.error = true;
+                }
+            });
+            this.app.getAssetMgr().load("res/sd_hlb_1.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    texnumber--;
+                    if (texnumber == 0) {
+                        state.finish = true;
+                    }
+                }
+                else {
+                    state.error = true;
+                }
+            });
+        };
+        test_pathAsset.prototype.loadpath = function (laststate, state) {
+            var pathnumber = 2;
+            this.app.getAssetMgr().load("res/path/circlepath.path.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    pathnumber--;
+                    if (pathnumber == 0) {
+                        state.finish = true;
+                    }
+                }
+                else {
+                    state.error = true;
+                }
+            });
+            this.app.getAssetMgr().load("res/path/circlepath_2.path.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    pathnumber--;
+                    if (pathnumber == 0) {
+                        state.finish = true;
+                    }
+                }
+                else {
+                    state.error = true;
+                }
+            });
+        };
+        test_pathAsset.prototype.loadasset = function (laststate, state) {
+            this.app.getAssetMgr().load("res/prefabs/rotatedLongTou/rotatedLongTou.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+                if (_state.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        test_pathAsset.prototype.initscene = function (laststate, state) {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "cam_show";
+            this.scene.addChild(objCam);
+            this.showcamera = objCam.gameObject.addComponent("camera");
+            this.showcamera.order = 0;
+            this.showcamera.near = 0.01;
+            this.showcamera.far = 1000;
+            objCam.localTranslate = new gd3d.math.vector3(0, 50, -10);
+            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            objCam.markDirty();
+            {
+                var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
+                for (var i = 0; i < 4; i++) {
+                    var parent = new gd3d.framework.transform();
+                    parent.gameObject.visible = false;
+                    this.scene.addChild(parent);
+                    this.parentlist.push(parent);
+                    var head = longtouprefab.getCloneTrans();
+                    head.localScale.x = head.localScale.y = head.localScale.z = 4;
+                    parent.addChild(head);
+                    this.dragonlist.push(head);
+                    var trans = new gd3d.framework.transform();
+                    head.addChild(trans);
+                    var trailmat = new gd3d.framework.material();
+                    var shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json");
+                    var tex1 = this.app.getAssetMgr().getAssetByName("sd_hlb_1.png");
+                    trailmat.setShader(shader);
+                    trailmat.setTexture("_MainTex", tex1);
+                    this.trailrender = trans.gameObject.addComponent("trailRender");
+                    this.trailrender.material = trailmat;
+                    this.trailrender.setWidth(1.0);
+                    this.trailrender.lookAtCamera = true;
+                    this.trailrender.extenedOneSide = false;
+                    this.trailrender.setspeed(0.25);
+                    this.trailrender.play();
+                }
+            }
+            var path = this.app.getAssetMgr().getAssetByName("circlepath.path.json");
+            var path2 = this.app.getAssetMgr().getAssetByName("circlepath_2.path.json");
+            {
+                this.parentlist[0].gameObject.visible = true;
+                var guidp = this.dragonlist[0].gameObject.addComponent("guidpath");
+                guidp.setpathasset(path2, 50);
+                guidp.setActive();
+                guidp.isloop = true;
+            }
+            {
+                this.parentlist[1].gameObject.visible = true;
+                this.parentlist[1].localTranslate.x = -5;
+                this.parentlist[1].markDirty();
+                var guidp = this.dragonlist[1].gameObject.addComponent("guidpath");
+                guidp.setpathasset(path, 50);
+                guidp.setActive();
+                guidp.isloop = true;
+            }
+            {
+                this.parentlist[2].gameObject.visible = true;
+                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 180, this.parentlist[2].localRotate);
+                this.parentlist[2].markDirty();
+                var guidp = this.dragonlist[2].gameObject.addComponent("guidpath");
+                guidp.setpathasset(path2, 50);
+                guidp.setActive();
+                guidp.isloop = true;
+            }
+            state.finish = true;
+        };
+        test_pathAsset.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+        };
+        return test_pathAsset;
+    }());
+    t.test_pathAsset = test_pathAsset;
+})(t || (t = {}));
 var test_pick = (function () {
     function test_pick() {
         this.timer = 0;
@@ -4163,7 +4320,7 @@ var t;
             if (this.cube != null) {
                 this.cube.localTranslate.x = Math.cos(this.timer) * 3.0;
                 this.cube.localTranslate.z = Math.sin(this.timer) * 3.0;
-                this.cube.lookatPoint(this.zeroPoint);
+                this.cube.lookatPoint(gd3d.math.pool.vector3_zero);
                 this.cube.markDirty();
             }
             if (this.cube2) {
