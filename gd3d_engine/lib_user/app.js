@@ -4365,7 +4365,7 @@ var t;
             if (this.cube != null) {
                 this.cube.localTranslate.x = Math.cos(this.timer) * 3.0;
                 this.cube.localTranslate.z = Math.sin(this.timer) * 3.0;
-                this.cube.lookatPoint(gd3d.math.pool.vector3_zero);
+                this.cube.lookatPoint(this.zeroPoint);
                 this.cube.markDirty();
             }
             if (this.cube2) {
