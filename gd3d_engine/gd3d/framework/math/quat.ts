@@ -17,16 +17,31 @@
         var x2: number = vector.x, y2: number = vector.y, z2: number = vector.z;
 
         w1 = -src.x * x2 - src.y * y2 - src.z * z2;
-        x1 =  src.w * x2 + src.y * z2 - src.z * y2;
-        y1 =  src.w * y2 - src.x * z2 + src.z * x2;
-        z1 =  src.w * z2 + src.x * y2 - src.y * x2;
+        x1 = src.w * x2 + src.y * z2 - src.z * y2;
+        y1 = src.w * y2 - src.x * z2 + src.z * x2;
+        z1 = src.w * z2 + src.x * y2 - src.y * x2;
 
         out.x = -w1 * src.x + x1 * src.w - y1 * src.z + z1 * src.y;
         out.y = -w1 * src.y + x1 * src.z + y1 * src.w - z1 * src.x;
         out.z = -w1 * src.z - x1 * src.y + y1 * src.x + z1 * src.w;
-        
-    }
 
+    }
+    export function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3)
+    {
+        var x1: number, y1: number, z1: number, w1: number;
+        var x2: number = vector.x, y2: number = vector.y, z2: number = vector.z;
+        var srcx = src[srcseek]; var srcy = src[srcseek + 1]; var srcz = src[srcseek + 2]; var srcw = src[srcseek + 3];
+
+        w1 = -srcx * x2 - srcy * y2 - srcz * z2;
+        x1 = srcw * x2 + srcy * z2 - srcz * y2;
+        y1 = srcw * y2 - srcx * z2 + srcz * x2;
+        z1 = srcw * z2 + srcx * y2 - srcy * x2;
+
+        out.x = -w1 * srcx + x1 * srcw - y1 * srcz + z1 * srcy;
+        out.y = -w1 * srcy + x1 * srcz + y1 * srcw - z1 * srcx;
+        out.z = -w1 * srcz - x1 * srcy + y1 * srcx + z1 * srcw;
+
+    }
     export function quatMagnitude(src: quaternion): number
     {
         return Math.sqrt(src.w * src.w + src.x * src.x + src.y * src.y + src.z * src.z);
@@ -70,7 +85,7 @@
         if (norm > 0.0)
         {
             var invNorm = 1.0 / norm;
-            out.w =  src.w * invNorm;
+            out.w = src.w * invNorm;
             out.x = -src.x * invNorm;
             out.y = -src.y * invNorm;
             out.z = -src.z * invNorm;
@@ -105,7 +120,23 @@
         out.x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
         out.y = w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2;
         out.z = w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2;
-        
+
+        math.quatNormalize(out, out);
+        // out.w = x1 * x2 - y1 * y2 - z1 * z2 + w1 * w2;
+        // out.x = x1 * w2 + y1 * z2 - z1 * y2 + w1 * x2;
+        // out.y = -x1 * z2 + y1 * w2 + z1 * x2 + w1 * y2;
+        // out.z = x1 * y2 - y1 * x2 + z1 * w2 + w1 * z2;
+    }
+    export function quatMultiplyDataAndQuat(srca: Float32Array, srcaseek: number, srcb: quaternion, out: quaternion)
+    {
+        var w1: number = srca[srcaseek + 3], x1: number = srca[srcaseek + 0], y1: number = srca[srcaseek + 1], z1: number = srca[srcaseek + 2];
+        var w2: number = srcb.w, x2: number = srcb.x, y2: number = srcb.y, z2: number = srcb.z;
+
+        out.w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2;
+        out.x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2;
+        out.y = w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2;
+        out.z = w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2;
+
         math.quatNormalize(out, out);
         // out.w = x1 * x2 - y1 * y2 - z1 * z2 + w1 * w2;
         // out.x = x1 * w2 + y1 * z2 - z1 * y2 + w1 * x2;
@@ -211,7 +242,7 @@
         out.x = Math.asin(temp);
 
         out.y = Math.atan2(2.0 * (src.w * src.y + src.z * src.x), 1.0 - 2.0 * (src.y * src.y + src.x * src.x));
-        
+
         out.z = Math.atan2(2.0 * (src.w * src.z + src.y * src.x), 1.0 - 2.0 * (src.x * src.x + src.z * src.z));
 
         out.x /= Math.PI / 180;
@@ -262,24 +293,24 @@
         var dir = gd3d.math.pool.new_vector3();
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
-        var dot=gd3d.math.vec3Dot(gd3d.math.pool.vector3_forward,dir);
-        if(Math.abs(dot-(-1.0))<0.000001)
+        var dot = gd3d.math.vec3Dot(gd3d.math.pool.vector3_forward, dir);
+        if (Math.abs(dot - (-1.0)) < 0.000001)
         {
-            gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up,180,out);
+            gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 180, out);
             return;
         }
-        if(Math.abs(dot-1.0)<0.000001)
+        if (Math.abs(dot - 1.0) < 0.000001)
         {
-            out.x=0;
-            out.y=0;
-            out.z=0;
-            out.w=1;
+            out.x = 0;
+            out.y = 0;
+            out.z = 0;
+            out.w = 1;
         }
-        dot=gd3d.math.floatClamp(dot,-1,1);
-        var rotangle=Math.acos(dot);
-        var rotAxis=gd3d.math.pool.new_vector3();
-        gd3d.math.vec3Cross(gd3d.math.pool.vector3_forward,dir,rotAxis);
-        gd3d.math.quatFromAxisAngle(rotAxis,rotangle,out);
+        dot = gd3d.math.floatClamp(dot, -1, 1);
+        var rotangle = Math.acos(dot);
+        var rotAxis = gd3d.math.pool.new_vector3();
+        gd3d.math.vec3Cross(gd3d.math.pool.vector3_forward, dir, rotAxis);
+        gd3d.math.quatFromAxisAngle(rotAxis, rotangle, out);
     }
 
     export function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion)

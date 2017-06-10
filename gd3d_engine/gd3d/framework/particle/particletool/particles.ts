@@ -163,7 +163,7 @@ namespace gd3d.framework
         public mesh: mesh;
         public mat: material;
         public beBufferInited: boolean = false;
-        public beAddParticle:boolean = false;
+        public beAddParticle: boolean = false;
 
         public dataForVbo: Float32Array;
         public dataForEbo: Uint16Array;
@@ -312,7 +312,7 @@ namespace gd3d.framework
                 mesh.glMesh.addIndex(context.webgl, this.dataForEbo.length);
                 this.beBufferInited = true;
             }
-            if(this.beAddParticle)
+            if (this.beAddParticle)
             {
                 this.beAddParticle = false;
                 mesh.submesh[0].size = this.dataForEbo.length;//如果顶点上限要动态管理  也需要resetvbosize
@@ -383,8 +383,8 @@ namespace gd3d.framework
         private uvSpriteFrameInternal: number;
         private batcher: EmissionBatcher;
         private speedDir: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
-        private simulationSpeed:number;
-
+        private simulationSpeed: number;
+        public startFrameId: number;
         //根据发射器定义 初始化
         constructor(batcher: EmissionBatcher)//, _data: EmissionNew, startIndex: number, format: number
         {
@@ -392,6 +392,7 @@ namespace gd3d.framework
             this.format = batcher.formate;
             this.data = batcher.data.clone();
             this.data.life.getValueRandom();
+            this.startFrameId = this.batcher.effectSys.frameId;
             // if (this.data.moveSpeed != undefined)
             //     this.data.moveSpeed.getValueRandom();
             // if (this.data.eulerSpeed != undefined)
@@ -431,7 +432,7 @@ namespace gd3d.framework
             // }
             if (this.data.uvType == UVTypeEnum.UVSprite)
             {
-                this.uvSpriteFrameInternal = effectSystem.fps / this.data.uvSprite.fps;
+                this.uvSpriteFrameInternal = (this.data.life.getValue() * effectSystem.fps) / this.data.uvSprite.totalCount;
             }
             this.gameObject = batcher.effectSys.gameObject;
             this.vertexSize = gd3d.render.meshData.calcByteSize(this.format) / 4;
@@ -464,7 +465,7 @@ namespace gd3d.framework
             this.localTranslate = gd3d.math.pool.clone_vector3(localCenterTranslate);
             gd3d.math.vec3Add(this.localTranslate, localRandomTranslate, this.localTranslate);
 
-            this.simulationSpeed =  this.data.simulationSpeed != undefined?this.data.simulationSpeed.getValue():0;
+            this.simulationSpeed = this.data.simulationSpeed != undefined ? this.data.simulationSpeed.getValue() : 0;
 
             if (this.data.euler == undefined)
                 this.euler = new gd3d.math.vector3(0, 0, 0);
@@ -485,7 +486,8 @@ namespace gd3d.framework
 
 
             ///模型初始旋转量
-            if (this.renderModel == RenderModel.None || this.renderModel == RenderModel.StretchedBillBoard) {
+            if (this.renderModel == RenderModel.None || this.renderModel == RenderModel.StretchedBillBoard)
+            {
                 gd3d.math.quatFromEulerAngles(this.startPitchYawRoll.x, this.startPitchYawRoll.y, this.startPitchYawRoll.z, this.rotation_start);
 
                 if (this.data.particleStartData.shapeType != ParticleSystemShape.NORMAL)
@@ -534,8 +536,8 @@ namespace gd3d.framework
 
         private _updateElementRotation()
         {
-            
-            var cam=gd3d.framework.sceneMgr.app.getScene().mainCamera;
+
+            var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
             let cameraTransform = cam.gameObject.transform;
             let translation = gd3d.math.pool.new_vector3();
             let worldRotation = gd3d.math.pool.new_quaternion();
@@ -571,9 +573,9 @@ namespace gd3d.framework
                 }
                 else if (this.renderModel == RenderModel.StretchedBillBoard)
                 {
-                    gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
-                    gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
-
+                    // gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
+                    // gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
+                    gd3d.math.quatClone(this.rotationByShape,this.localRotation);
 
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 
@@ -598,7 +600,7 @@ namespace gd3d.framework
                 }
                 else if (this.renderModel == RenderModel.Mesh) 
                 {
-                        EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
                 }
                 gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);
                 //消除transform组件对粒子本身的影响
@@ -618,7 +620,8 @@ namespace gd3d.framework
         }
 
 
-        private _updatePos(delta: number) {
+        private _updatePos(delta: number)
+        {
 
             if (this.data.moveSpeed != undefined)
             {
@@ -632,7 +635,7 @@ namespace gd3d.framework
 
             let currentTranslate = EffectUtil.vecMuliNum(this.speedDir, this.simulationSpeed);
             gd3d.math.vec3Add(this.localTranslate, currentTranslate, this.localTranslate);
-            
+
         }
         private _updateEuler(delta: number)
         {
@@ -782,26 +785,25 @@ namespace gd3d.framework
                         }
                     }
                 }
+
+                var duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                 if (this.tempStartNode instanceof ParticleNode)
                 {
-                    var duration = this.tempEndNode.key - this.tempStartNode.key;
                     if (duration > 0)
                     {
-                        gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key) / duration, out);
+                        gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
                     }
                 } else if (this.tempStartNode instanceof ParticleNodeNumber)
                 {
-                    var duration = this.tempEndNode.key - this.tempStartNode.key;
                     if (duration > 0)
                     {
-                        out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key) / duration);
+                        out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
                     }
                 } else if (this.tempStartNode instanceof UVSpeedNode)
                 {
-                    var duration = this.tempEndNode.key - this.tempStartNode.key;
                     if (duration > 0)
                     {
-                        gd3d.math.vec2SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key) / duration, out);
+                        gd3d.math.vec2SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
                     }
                 }
 
@@ -865,21 +867,6 @@ namespace gd3d.framework
                     let index = 0;
                     if (this.data.uvRoll.uvSpeedNodes != undefined)
                     {
-                        // for (var i = 0; i < this.data.uvRoll.uvSpeedNodes.length; i++)
-                        // {
-                        //     if (this.data.uvRoll.uvSpeedNodes[i].key < this.curLife)
-                        //     {
-                        //         this._startUVSpeedNode = this.data.uvRoll.uvSpeedNodes[i];
-                        //         index++;
-                        //     }
-                        // }
-                        // if (index == 0 || index == this.data.uvRoll.uvSpeedNodes.length) return;
-                        // this._curUVSpeedNode = this.data.uvRoll.uvSpeedNodes[index];
-                        // var duration = this.endNode.key - this._startNode.key;
-                        // if (duration > 0)
-                        // {
-                        //     gd3d.math.vec2SLerp(this._startUVSpeedNode.getValue(), this._curUVSpeedNode.getValue(), (this.curLife - this._startNode.key) / duration, this.uv);
-                        // }
                         this._updateNode(this.data.uvRoll.uvSpeedNodes, this.data.life.getValue(), this.uv);
                     } else if (this.data.uvRoll.uvSpeed != undefined)
                     {
@@ -893,8 +880,8 @@ namespace gd3d.framework
             {
                 if (this.data.uvSprite != undefined)
                 {
-                    this.spriteIndex = Math.floor(this.batcher.effectSys.frameId / this.uvSpriteFrameInternal);
-                    this.spriteIndex %= (this.data.uvSprite.column * this.data.uvSprite.row);
+                    this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
+                    this.spriteIndex %= this.data.uvSprite.totalCount;
                     this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
                     this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;
                     this.tilling.x = this.data.uvSprite.column;

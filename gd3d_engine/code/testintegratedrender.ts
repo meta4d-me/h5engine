@@ -4,7 +4,7 @@ namespace t {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-            this.app.getAssetMgr().load("res/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) => {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) => {
                 if (_state.isfinish) {
                     state.finish = true;
                 }
@@ -23,6 +23,15 @@ namespace t {
             }
             );
             this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+                else {
+                    state.error = true;
+                }
+            }
+            );
+            this.app.getAssetMgr().load("res/swingFX.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
                 if (s.isfinish) {
                     state.finish = true;
                 }
@@ -125,9 +134,6 @@ namespace t {
                 }
 
                 {
-
-
-
                     var cube = new gd3d.framework.transform();
                     cube.name = "cube";
                     this.cube = cube;
@@ -157,28 +163,37 @@ namespace t {
                     // test1.markDirty();
                     
                     var trailtrans = new gd3d.framework.transform();
-                    trailtrans.localTranslate.z = 0.5;
+                    trailtrans.localTranslate.z = 2;
                     
                     this.weapon.addChild(trailtrans);               
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 90, trailtrans.localRotate);
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, 270, trailtrans.localRotate);
                     trailtrans.markDirty();
                     var trailrender = trailtrans.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
                     //trailrender.color=new gd3d.math.color(1.0,0,0,1.0);
                     //trailrender.speed = 1;
-                    trailrender.setWidth(1);
+                    trailrender.setWidth(2);
                     var mat = new gd3d.framework.material();
+                    //particles_additive.shader.json
+                    //transparent_bothside.shader.json
+                    //particles_additive_premultiply.shader.json
                     let shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json") as gd3d.framework.shader;
                     var tex = this.app.getAssetMgr().getAssetByName("trailtest2_00000.imgdesc.json") as gd3d.framework.texture;
                     mat.setShader(shader);
                     mat.setTexture("_MainTex", tex)
 
                     trailrender.material = mat;
+                    this.trailrender=trailrender;
+                    //trailrender.lifetime=0.4;
+                    //trailrender.minvertexDistance=0.01;
+                    //trailrender.setWidth(1,1);
                 }
 
             }
             state.finish = true;
 
         }
+
+        trailrender:gd3d.framework.trailRender;
         start(app: gd3d.framework.application) {
             console.log("i am here.");
             this.app = app;
@@ -191,20 +206,32 @@ namespace t {
             this.taskmgr.addTaskCall(this.loadRole.bind(this));
             this.taskmgr.addTaskCall(this.loadWeapon.bind(this));
             this.taskmgr.addTaskCall(this.initscene.bind(this));
-            var tbn1 = this.addbtn("80px", "0px", "start");
+            var tbn1 = this.addbtn("80px", "0px", "attack_01");
             tbn1.onclick = () => {
-                this.play = true;
+                    this.trailrender.play();
+                    let name = "attack_01.FBAni.aniclip.bin";
+                    this.aniplayer.playCross(name, 0.2);
+                    
             }
-            var btn = this.addbtn("120px", "0px", "stop");
+            var btn = this.addbtn("120px", "0px", "attack_02");
             btn.onclick = () => {
-                this.play = false;
+                    this.trailrender.play();
+                    let name = "attack_02.FBAni.aniclip.bin";
+                    this.aniplayer.playCross(name, 0.2);
+                    
+            }
+            var btn3 = this.addbtn("200px", "0px", "stop");
+            btn3.onclick = () => {
+                    this.trailrender.stop();
             }
 
             {
                 let btn2 = this.addbtn("160px", "0px", "playAttackAni");
                 btn2.onclick = () => {
+                    this.trailrender.play();
                     let name = "attack_04.FBAni.aniclip.bin";
                     this.aniplayer.playCross(name, 0.2);
+                    
                 }
             }
         }

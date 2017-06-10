@@ -15,7 +15,7 @@ class testloadImmediate implements IState
         this.scene.addChild(baihu);
 
         this.cube = baihu;
-        this.app.getAssetMgr().load("res/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {

@@ -1,5 +1,72 @@
 /// <reference path="../lib/gd3d.d.ts" />
 
+enum ShockType
+{
+    Vertical,
+    Horizontal,
+    Both
+}
+
+@gd3d.reflect.nodeComponent
+class CameraShock implements gd3d.framework.INodeComponent
+{
+    gameObject: gd3d.framework.gameObject;
+    private isPlaying: boolean;
+    private fade: boolean;
+    private oldTranslate: gd3d.math.vector3;
+    private shockType: ShockType;
+    private strength: number;
+    private life: number;
+    private ticker: number;
+    start()
+    {
+        this.isPlaying = false;
+    }
+    play(strength: number = 0.2, life: number = 0.5, fade: boolean = false, shockType: ShockType = ShockType.Both)
+    {
+        if (this.oldTranslate == null)
+            this.oldTranslate = new gd3d.math.vector3();
+        gd3d.math.vec3Clone(this.gameObject.transform.localTranslate, this.oldTranslate);
+        this.isPlaying = true;
+        this.strength = strength;
+        this.ticker = this.life = life;
+        this.fade = fade;
+        this.shockType = shockType;
+    }
+    update(delta: number)
+    {
+        if (this.isPlaying)
+        {
+            if (this.ticker > 0)
+            {
+                this.ticker -= delta;
+                let s = this.fade ? this.strength * (this.ticker / this.life) : this.strength;
+
+                if (this.shockType == ShockType.Horizontal || this.shockType == ShockType.Both)
+                    this.gameObject.transform.localTranslate.x = this.oldTranslate.x + (Math.random() - 0.5) * s;
+                if (this.shockType == ShockType.Vertical || this.shockType == ShockType.Both)
+                    this.gameObject.transform.localTranslate.y = this.oldTranslate.y + (Math.random() - 0.5) * s;
+
+                this.gameObject.transform.markDirty();
+            }
+            else
+            {
+                this.gameObject.transform.localTranslate.x = this.oldTranslate.x;
+                this.gameObject.transform.localTranslate.y = this.oldTranslate.y;
+                this.isPlaying = false;
+            }
+        }
+    }
+    remove()
+    {
+
+    }
+    clone()
+    {
+
+    }
+}
+
 class Joystick
 {
     app: gd3d.framework.application;
@@ -473,7 +540,7 @@ namespace demo
 
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
-            this.app.getAssetMgr().load("res/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
             {
                 if(s.isfinish)
                 {
@@ -569,6 +636,7 @@ namespace demo
             });
         }
 
+        private cameraShock: CameraShock;
         private addCameraAndLight(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             var tranCam = new gd3d.framework.transform();
@@ -578,6 +646,7 @@ namespace demo
             this.camera.near = 0.1;
             this.camera.far = 200;
             this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            this.cameraShock = tranCam.gameObject.addComponent("CameraShock") as CameraShock;
             tranCam.localTranslate = new gd3d.math.vector3(0, 20, -16);
             tranCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             tranCam.markDirty();
@@ -711,7 +780,7 @@ namespace demo
             for (var i = 0; i < this.cubes.length; i++)
             {
                 let c = this.cubes[i].gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
-                if (col.obb.intersects(c.obb))
+                if (c != null && col.obb.intersects(c.obb))
                 {
                     return true;
                 }
@@ -898,13 +967,13 @@ namespace demo
                     this.heroGun.markDirty();
                 }
 
-                if (this.camera != null)
-                {
-                    this.camera.gameObject.transform.localTranslate.x = this.heroTank.localTranslate.x;
-                    this.camera.gameObject.transform.localTranslate.y = this.heroTank.localTranslate.y + 20;
-                    this.camera.gameObject.transform.localTranslate.z = this.heroTank.localTranslate.z - 16;
-                    this.camera.gameObject.transform.markDirty();
-                }
+                // if (this.camera != null)
+                // {
+                //     this.camera.gameObject.transform.localTranslate.x = this.heroTank.localTranslate.x;
+                //     this.camera.gameObject.transform.localTranslate.y = this.heroTank.localTranslate.y + 20;
+                //     this.camera.gameObject.transform.localTranslate.z = this.heroTank.localTranslate.z - 16;
+                //     this.camera.gameObject.transform.markDirty();
+                // }
             }
             
         }
@@ -948,6 +1017,8 @@ namespace demo
                 life: 3
             };
             this.bulletList.push(bullet);
+            
+            this.cameraShock.play(1, 0.5, true);
         }
 
         private updateBullet(delta: number)

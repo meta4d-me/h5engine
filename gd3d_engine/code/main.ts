@@ -53,8 +53,10 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_integratedrender", () => new t.test_integratedrender());
         this.addBtn("test_blend", () => new t.test_blend());
         
-
-
+        this.addBtn("TestRotate",()=>new t.TestRotate());
+        this.addBtn("testtrailrenderRecorde",()=>new t.test_trailrenderrecorde());
+        this.addBtn("effect",()=>new test_effect());
+        this.addBtn("pathasset",()=>new t.test_pathAsset());
     }
     private x: number = 0;
     private y: number = 100;

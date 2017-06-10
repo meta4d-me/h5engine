@@ -13,7 +13,7 @@ class test_assestmgr implements IState
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
 
-        this.app.getAssetMgr().load("res/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {
@@ -42,7 +42,7 @@ class test_assestmgr implements IState
                                 this.scene.addChild(this.baihu[i]);
                                 this.baihu[i].localScale = new gd3d.math.vector3(10, 10, 10);
                                 this.baihu[i].localTranslate = new gd3d.math.vector3(0.2 * (i - 50), 0, 0);
-
+                                this.baihu[i].markDirty();
                                 this.scene.addChild(this.baihu[i]);
                             }
                             
@@ -111,8 +111,8 @@ class test_assestmgr implements IState
             {
                 this.baihu[i].dispose();
             }
-            this._prefab.unuse();
-            this.app.getAssetMgr().unload("res/prefabs/baihu/baihu.assetbundle.json");
+            // this._prefab.unuse();
+            this.app.getAssetMgr().getAssetBundle("baihu.assetbundle.json").unload();
             this.app.getAssetMgr().releaseUnuseAsset();
 
         }

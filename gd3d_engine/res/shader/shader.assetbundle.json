@@ -1,0 +1,296 @@
+{
+    "files": [
+        {
+            "name": "resources/base/post_depth.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/post_depth.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/post_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/post_quad_depth.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/color.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/color.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/color.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/base/normalmap.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/normalmap.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/normalmap.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light1.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light1.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light1.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light2.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light2.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light2.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light3.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light3.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/light3.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/example/transparent-diffuse.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/example/transparent-diffuse.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/example/transparent-diffuse.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/uvroll.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/uvroll.shader.json",
+            "length": 0
+        },        
+        {
+            "name": "resources/_project/uvroll.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/diffuse.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/diffuse.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/diffuse.shader.json",
+            "length": 0
+        },
+		{
+            "name": "resources/base/diffuse_bothside.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/base/colorwithborder.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/white.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/editor/line.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/editor/line.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/editor/line.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/editor/materialcolor.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/editor/materialcolor.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/editor/materialcolor.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/base/transparent.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/transparent.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/transparent.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/base/diffuselightmap.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/diffuselightmap.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_additive.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_additive_premultiply.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_blend.shader.json",
+            "length": 0
+        },
+	{
+	    "name": "resources/particle/particles_blend_renderall.shader.json",
+	    "length":0
+	},
+        {
+            "name": "resources/particle/particles_blend_premultiply.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_diffuse.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_diffuse.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_diffuse.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_transparent.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_transparent.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/streamlight.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/streamlight.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/streamlight.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/bone_eff.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/streamlightbone_eff.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/streamlight_bothside.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/fakepbr.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/fakepbr.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/fakepbr.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/asi.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/asi.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/asi.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/example/sample_uvsprite.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/example/sample_uvsprite.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/example/sample_uvsprite.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/example/selftimer_uvroll.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/example/selftimer_uvroll.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/example/selftimer_uvroll.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/transparent_bothside.shader.json",
+            "length": 0
+        },
+		{
+			"name":"resources/base/transparent_additive.shader.json",
+			"length":0
+		},
+        {
+            "name":"resources/base/transparent_add.fs.glsl",
+            "length":0
+        }
+    ]
+}

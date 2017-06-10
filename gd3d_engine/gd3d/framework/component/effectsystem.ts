@@ -374,7 +374,7 @@ namespace gd3d.framework
         private addInitFrame(elementData: EffectElementData)
         {
             let element: EffectElement = new EffectElement(elementData);
-            element.gameobject = this.gameObject.transform;
+            element.transform = this.gameObject.transform;
             let _initFrameData = element.data.initFrameData;
             if (_initFrameData == undefined || _initFrameData.attrsData == undefined || _initFrameData.attrsData.mesh == undefined)//初始化帧如果不存在,或者没有设置mesh信息，就不处理这个元素
                 return;
@@ -442,8 +442,12 @@ namespace gd3d.framework
             element.curAttrData = elementData.initFrameData.attrsData.clone();
             let vertexSize = subEffectBatcher.vertexSize;
             let vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
+            // if (_initFrameData.attrsData.startEuler)
+            //  {
+            //     _initFrameData.attrsData.startRotation = new gd3d.math.quaternion();
+            //     gd3d.math.quatFromEulerAngles(_initFrameData.attrsData.startEuler.x, _initFrameData.attrsData.startEuler.y, _initFrameData.attrsData.startEuler.z, _initFrameData.attrsData.startRotation);
+            // }
             element.update();
-
 
             subEffectBatcher.effectElements.push(element);
             for (let i = 0; i < vertexCount; i++)

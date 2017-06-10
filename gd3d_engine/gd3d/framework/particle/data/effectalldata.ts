@@ -27,7 +27,8 @@ namespace gd3d.framework
 
     export class EffectElement
     {
-        public gameobject: transform;
+        /**整个特效 */
+        public transform: transform;
         public data: EffectElementData;
         public name: string;
         public timelineFrame: { [frameIndex: number]: EffectFrameData };
@@ -166,11 +167,21 @@ namespace gd3d.framework
                     case "uvroll":
                         action = new UVRollAction();
                         break;
+                    case "uvsprite":
+                        action = new UVSpriteAnimationAction();
+                        break;
+                    case "rosepath":
+                        action = new RoseCurveAction();
+                        break;
+                    case "trail":
+                        action = new TrailAction();
+                        break;
                 }
                 action.init(actiondata.startFrame, actiondata.endFrame, actiondata.params, this);
                 this.actions.push(action);
             }
         }
+
 
         update()
         {
@@ -178,6 +189,10 @@ namespace gd3d.framework
                 return;
             if (this.active)
             {
+                // if (this.curAttrData.startEuler)
+                // {
+                //     gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
+                // }
                 if (this.curAttrData.euler != undefined)
                 {
                     // console.log("euler:" + this.curAttrData.euler.toString());
@@ -194,11 +209,9 @@ namespace gd3d.framework
 
         private updateElementRotation() 
         {
-
-
-
             let cameraTransform = gd3d.framework.sceneMgr.app.getScene().mainCamera.gameObject.transform;
             let worldRotation = gd3d.math.pool.new_quaternion();
+            let localRotation = gd3d.math.pool.new_quaternion();
 
             if (this.curAttrData.renderModel != RenderModel.None) 
             {
@@ -206,9 +219,9 @@ namespace gd3d.framework
                 let worldTranslation = gd3d.math.pool.new_vector3();
                 let translation = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(this.curAttrData.pos, translation);
-                if (this.gameobject != undefined)
+                if (this.transform != undefined)
                 {
-                    gd3d.math.matrixTransformVector3(translation, this.gameobject.getWorldMatrix(), worldTranslation);
+                    gd3d.math.matrixTransformVector3(translation, this.transform.getWorldMatrix(), worldTranslation);
                 }
                 if (this.curAttrData.renderModel == RenderModel.BillBoard) 
                 {
@@ -237,7 +250,7 @@ namespace gd3d.framework
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 
                     let lookRot = new gd3d.math.quaternion();
-                    gd3d.math.quatClone(this.gameobject.getWorldRotate(), invTransformRotation);
+                    gd3d.math.quatClone(this.transform.getWorldRotate(), invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                     gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
 
@@ -254,17 +267,21 @@ namespace gd3d.framework
                     gd3d.math.pool.delete_vector3(angle);
                     gd3d.math.pool.delete_quaternion(lookRot);
                     return;
-                }else if(this.curAttrData.renderModel == RenderModel.Mesh)
-                {
-                    {
-                        EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
-                    }
                 }
+                else if (this.curAttrData.renderModel == RenderModel.Mesh)
+                {
+                    EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                }
+
                 gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, worldRotation);
                 //消除transform组件对粒子本身的影响
-                gd3d.math.quatClone(this.gameobject.gameObject.transform.getWorldRotate(), invTransformRotation);
+                gd3d.math.quatClone(this.transform.gameObject.transform.getWorldRotate(), invTransformRotation);
                 gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+
                 gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.curAttrData.localRotation);
+
+                // gd3d.math.quatMultiply(invTransformRotation, worldRotation, localRotation);
+                // gd3d.math.quatMultiply(this.curAttrData.startRotation, localRotation, this.curAttrData.localRotation);
 
                 gd3d.math.pool.delete_vector3(translation);
                 gd3d.math.pool.delete_vector3(worldTranslation);
@@ -272,8 +289,11 @@ namespace gd3d.framework
             } else
             {
                 gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
+                // gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, localRotation);
+                // gd3d.math.quatMultiply(localRotation, this.curAttrData.startRotation, this.curAttrData.localRotation);
             }
 
+            gd3d.math.pool.delete_quaternion(localRotation);
             gd3d.math.pool.delete_quaternion(worldRotation);
 
         }
@@ -331,14 +351,25 @@ namespace gd3d.framework
             elementdata.ref = this.ref;
             if (this.initFrameData)
                 elementdata.initFrameData = this.initFrameData.clone();
-            elementdata.emissionData = this.emissionData.clone();
+
+            if (this.emissionData) 
+            {
+                elementdata.emissionData = this.emissionData.clone();
+            }
             for (let key in this.timelineFrame)
             {
-                elementdata.timelineFrame[key] = this.initFrameData[key].clone();
+                if (this.initFrameData[key]) 
+                {
+                    elementdata.timelineFrame[key] = this.initFrameData[key].clone();
+                }
             }
+
             for (let key in this.actionData)
             {
-                elementdata.actionData[key] = this.actionData[key].clone();
+                if (this.actionData[key]) 
+                {
+                    elementdata.actionData[key] = this.actionData[key].clone();
+                }
             }
             return elementdata;
         }
@@ -358,16 +389,17 @@ namespace gd3d.framework
 
     export class EffectAttrsData
     {
+
         public pos: math.vector3;
         public euler: math.vector3;
         public color: math.vector3;
         public scale: math.vector3;
-        public uv: math.vector2 = new math.vector2(0, 0);
+        public uv: math.vector2;
         public alpha: number;
         public mat: EffectMatData;
         public renderModel: RenderModel = RenderModel.None;
         public matrix: math.matrix = new math.matrix();
-        public tilling: math.vector2 = new math.vector2(1, 1);
+        public tilling: math.vector2;
         /**
          * lerp，action更新euler，再由euler合成rotationByEuler。
          * 下一步拿rotationByEuler乘以billboard生成的四元数得到最终的localRotation。
@@ -379,7 +411,8 @@ namespace gd3d.framework
          */
         public rotationByEuler: math.quaternion = new math.quaternion();
 
-        public startRotation: math.quaternion = new math.quaternion();
+        // public startEuler: math.vector3;
+        // public startRotation: math.quaternion = new math.quaternion();
         /**
          * 本地旋转(经过各种lerp和action后计算的最终值)
          * 
@@ -388,7 +421,7 @@ namespace gd3d.framework
          */
         public localRotation: math.quaternion = new math.quaternion();
         public mesh: mesh;
-        public meshdataVbo:Float32Array;
+        public meshdataVbo: Float32Array;
 
         // public localAxisX:gd3d.math.vector3 = new gd3d.math.vector3(1,0,0);
         // public localAxisY:gd3d.math.vector3 = new gd3d.math.vector3(0,1,0);
@@ -479,6 +512,12 @@ namespace gd3d.framework
                 case "color":
                     this.color = new gd3d.math.vector3(0, 0, 0);
                     break;
+                case "uv":
+                    this.uv = new gd3d.math.vector2(0, 0);
+                    break;
+                case "tilling":
+                    this.tilling = new gd3d.math.vector2(1, 1);
+                    break;
                 default:
                     console.log("不支持的属性：" + attribute);
                     break;
@@ -493,24 +532,42 @@ namespace gd3d.framework
             let data = new EffectAttrsData();
             if (this.pos != undefined)
                 data.pos = math.pool.clone_vector3(this.pos);
+            else
+                data.initAttribute("pos");
             if (this.euler != undefined)
                 data.euler = math.pool.clone_vector3(this.euler);
+            else
+                data.initAttribute("euler");
             if (this.color != undefined)
                 data.color = math.pool.clone_vector3(this.color);
+            else
+                data.initAttribute("color");
             if (this.scale != undefined)
                 data.scale = math.pool.clone_vector3(this.scale);
-            if (this.uv != undefined)
+            else
+                data.initAttribute("scale");
+            if (this.tilling != undefined)
                 data.tilling = math.pool.clone_vector2(this.tilling);
+            else
+                data.initAttribute("tilling");
+            if (this.uv != undefined)
+                data.uv = math.pool.clone_vector2(this.uv);
+            else
+                data.initAttribute("uv");
             if (this.mat != undefined)
                 data.mat = this.mat.clone();
             if (this.rotationByEuler != undefined)
                 data.rotationByEuler = math.pool.clone_quaternion(this.rotationByEuler);
             if (this.localRotation != undefined)
                 data.localRotation = math.pool.clone_quaternion(this.localRotation);
-            if(this.meshdataVbo != undefined)
+            if (this.meshdataVbo != undefined)
                 data.meshdataVbo = this.meshdataVbo;//这个数组不会被改变，可以直接引用
-            // if (this.startRotation != undefined)
-            //     data.startRotation = math.pool.clone_quaternion(this.startRotation);
+            // if (this.startEuler != undefined)
+            // {
+            //     data.startEuler = math.pool.clone_vector3(this.startEuler);
+            //     gd3d.math.quatFromEulerAngles(data.startEuler.x, data.startEuler.y, data.startEuler.z, data.startRotation);
+            //     // data.startRotation = math.pool.clone_quaternion(this.startRotation);
+            // }
             // if (this.localAxisX != undefined)
             //     data.localAxisX = math.pool.clone_vector3(this.localAxisX);
             // if (this.localAxisY != undefined)

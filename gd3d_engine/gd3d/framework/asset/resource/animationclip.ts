@@ -43,6 +43,7 @@ namespace gd3d.framework
             this.subclips.length = 0;
             delete this.frames;
         }
+
         caclByteLength(): number
         {
             let total = 0;
@@ -53,7 +54,8 @@ namespace gd3d.framework
 
             for (let k in this.frames)
             {
-                total += this.frames[k].caclByteLength();
+                total += this.frames[k].byteLength;
+
                 total += math.caclStringByteLength(k);
             }
 
@@ -94,17 +96,25 @@ namespace gd3d.framework
             {
                 let _fid = read.readInt().toString();
                 let _key = read.readBoolean();
-                let _frame = new Frame();
-                _frame.key = _key;
-                _frame.boneInfos = [];
+                let _frame = new Float32Array(this.boneCount * 7 + 1);
+                _frame[0] = _key ? 1 : 0;
+                //_frame.boneInfos = new Float32Array(this.boneCount * 7);
+
+                let _boneInfo = new PoseBoneMatrix();
                 for (let i = 0; i < this.boneCount; i++)
                 {
-                    let _boneInfo = new PoseBoneMatrix();
                     _boneInfo.load(read);
-                    _frame.boneInfos.push(_boneInfo);
+                    _frame[i * 7 + 1] = _boneInfo.r.x;
+                    _frame[i * 7 + 2] = _boneInfo.r.y;
+                    _frame[i * 7 + 3] = _boneInfo.r.z;
+                    _frame[i * 7 + 4] = _boneInfo.r.w;
+                    _frame[i * 7 + 5] = _boneInfo.t.x;
+                    _frame[i * 7 + 6] = _boneInfo.t.y;
+                    _frame[i * 7 + 7] = _boneInfo.t.z;
                 }
                 this.frames[_fid] = _frame;
             }
+            buf = null;
         }
 
         fps: number;
@@ -114,25 +124,26 @@ namespace gd3d.framework
         bones: string[];
 
         frameCount: number;
-        frames: { [fid: string]: Frame };
+        frames: { [fid: string]: Float32Array };
 
         subclipCount: number;
         subclips: subClip[];
 
     }
 
-    export class Frame
-    {
-        key: boolean;
-        boneInfos: PoseBoneMatrix[];
-        caclByteLength(): number
-        {
-            let total = 1;
-            if (this.boneInfos == undefined) return total;
-            total += this.boneInfos.length * PoseBoneMatrix.caclByteLength();
-            return total;
-        }
-    }
+    // export class Frame
+    // {
+    //     key: boolean;
+    //     //boneInfos: PoseBoneMatrix[];
+    //     boneInfos:Float32Array;
+    //     // caclByteLength(): number
+    //     // {
+    //     //     let total = 1;
+    //     //     if (this.boneInfos == undefined) return total;
+    //     //     total += this.boneInfos.length * PoseBoneMatrix.caclByteLength();
+    //     //     return total;
+    //     // }
+    // }
 
     @reflect.SerializeType
     export class PoseBoneMatrix
@@ -188,6 +199,16 @@ namespace gd3d.framework
             this.t.y = src.t.y;
             this.t.z = src.t.z;
         }
+        copyFromData(src: Float32Array, seek: number)
+        {
+            this.r.x = src[seek + 0];
+            this.r.y = src[seek + 1];
+            this.r.z = src[seek + 2];
+            this.r.w = src[seek + 3];
+            this.t.x = src[seek + 4];
+            this.t.y = src[seek + 5];
+            this.t.z = src[seek + 6];
+        }
         invert()
         {
             math.quatInverse(this.r, this.r)
@@ -219,6 +240,29 @@ namespace gd3d.framework
 
             PoseBoneMatrix.sMultiply(outLerp, itpose, this);
         }
+        lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number)
+        {
+            ////预乘之后，插值奇慢
+            var tpose = new math.matrix();
+
+            math.matrixMakeTransformRTS(
+                new math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z),
+                new math.vector3(1, 1, 1),
+                new math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w),
+                tpose);
+
+            var t1 = PoseBoneMatrix.sMultiply(from, _tpose);
+            var t2 = PoseBoneMatrix.sMultiplyDataAndMatrix(todata, toseek, _tpose);
+            //球插
+            var outLerp = PoseBoneMatrix.sLerp(t1, t2, v);
+
+            //再去掉tpose，为了加速这个过程，考虑要存一份 合并tpose的骨骼数据
+
+            var itpose = _tpose.Clone();
+            itpose.invert();
+
+            PoseBoneMatrix.sMultiply(outLerp, itpose, this);
+        }
         static sMultiply(left: PoseBoneMatrix, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix
         {
             if (target == null)
@@ -232,6 +276,21 @@ namespace gd3d.framework
             target.t.y = dirtran.y + left.t.y;
             target.t.z = dirtran.z + left.t.z;
             math.quatMultiply(left.r, right.r, target.r);
+            return target;
+        }
+        static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix
+        {
+            if (target == null)
+                target = PoseBoneMatrix.createDefault();
+            var dir = new math.vector3();
+            math.vec3Clone(right.t, dir);
+            var dirtran = new math.vector3();
+            math.quatTransformVectorDataAndQuat(leftdata, leftseek + 0, dir, dirtran);
+
+            target.t.x = dirtran.x + leftdata[leftseek + 4];
+            target.t.y = dirtran.y + leftdata[leftseek + 5];
+            target.t.z = dirtran.z + leftdata[leftseek + 6];
+            math.quatMultiplyDataAndQuat(leftdata, leftseek + 0, right.r, target.r);
             return target;
         }
         static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target: PoseBoneMatrix = null): PoseBoneMatrix

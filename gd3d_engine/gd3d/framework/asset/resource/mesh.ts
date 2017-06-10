@@ -276,6 +276,7 @@ namespace gd3d.framework
 
             }
 
+            buf = null;
             this.data = data;
             this.glMesh = new gd3d.render.glMesh();
             var vertexs = this.data.genVertexDataArray(vf);

@@ -11,7 +11,7 @@ class test_loadScene implements IState
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
 
-        this.app.getAssetMgr().load("res/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {
@@ -84,20 +84,20 @@ class test_loadScene implements IState
         var z2 = Math.cos(this.timer * 0.5);
         var objCam = this.camera.gameObject.transform;
         objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, -z2 * 10);
-        objCam.lookat(this.cube);
-        objCam.markDirty();//标记为需要刷新
+        // objCam.lookat(this.cube);
+        // objCam.markDirty();//标记为需要刷新
 
-        this.cube.markDirty();
-        objCam.updateWorldTran();
-        // if (this.timer > 5)
-        // {
-        //     this.app.getScene().getRoot().dispose();
-        // }
-        // if (this.timer > 10 && !this.bere)
-        // {
-        //     this.bere = true;
-        //     this.app.getAssetMgr().unload("res/scenes/city/city.assetbundle.json");
-        //     this.app.getAssetMgr().releaseUnuseAsset();
-        // }
+        // this.cube.markDirty();
+        // objCam.updateWorldTran();
+        if (this.timer > 5)
+        {
+            this.app.getScene().getRoot().dispose();
+        }
+        if (this.timer > 10 && !this.bere)
+        {
+            this.bere = true;
+            this.app.getAssetMgr().unload("res/scenes/city/city.assetbundle.json");
+            this.app.getAssetMgr().releaseUnuseAsset();
+        }
     }
 }

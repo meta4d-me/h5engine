@@ -352,8 +352,8 @@ namespace gd3d.framework
                                         data.uvSprite.row = <number>_val["row"];
                                     if (_val["colum"] != undefined)
                                         data.uvSprite.column = <number>_val["colum"];
-                                    if (_val["fps"] != undefined)
-                                        data.uvSprite.fps = <number>_val["fps"];
+                                    if (_val["count"] != undefined)
+                                        data.uvSprite.totalCount = <number>_val["count"];
                                     break;
                                 default:
                                     data.uvType = UVTypeEnum.NONE;
@@ -446,10 +446,9 @@ namespace gd3d.framework
             if (_startdata["direction"] != undefined)
             {
                 let _startdir = _startdata["direction"];
-                let startdir = startdata.direction;
-                startdir.x = _startdir["0"];
-                startdir.y = _startdir["1"];
-                startdir.z = _startdir["2"];
+                startdata.direction.x = _startdir["0"];
+                startdata.direction.y = _startdir["1"];
+                startdata.direction.z = _startdir["2"];
             }
 
         }

@@ -40,7 +40,7 @@ class test_01 implements IState {
             //然后用shader 构造材质，和unity相同
             // 配置代码如下
 
-            this.app.getAssetMgr().load("res/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) => {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) => {
                 if (state.isfinish) {
                     var sh = this.app.getAssetMgr().getShader("color.shader.json");
                     if (sh != null) {

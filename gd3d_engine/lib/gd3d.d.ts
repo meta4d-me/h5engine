@@ -18,6 +18,10 @@ declare namespace gd3d.framework {
         height: number;
         limitFrame: boolean;
         notify: INotify;
+        timeScale: number;
+        version: string;
+        build: string;
+        constructor();
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -29,9 +33,9 @@ declare namespace gd3d.framework {
         private beginTimer;
         private lastTimer;
         private totalTime;
-        private deltaTime;
+        private _deltaTime;
         getTotalTime(): number;
-        getDeltaTime(): number;
+        readonly deltaTime: number;
         private loop();
         private _scene;
         private initScene();
@@ -582,6 +586,9 @@ declare namespace gd3d.framework {
         Atlas = 13,
         Font = 14,
         TextAsset = 15,
+        PackBin = 16,
+        PackTxt = 17,
+        pathAsset = 18,
     }
     class stateLoad {
         iserror: boolean;
@@ -606,13 +613,19 @@ declare namespace gd3d.framework {
         files: {
             name: string;
             length: number;
+            packes: number;
         }[];
+        packages: string[];
         url: string;
         path: string;
         constructor(url: string);
         parse(json: any): void;
         unload(): void;
-        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
+        load(assetmgr: assetMgr, stateinfo: {
+            state: stateLoad;
+            type: AssetTypeEnum;
+            onstate: (state: stateLoad) => void;
+        }): void;
         mapNamed: {
             [id: string]: number;
         };
@@ -659,14 +672,20 @@ declare namespace gd3d.framework {
         removeAssetBundle(name: string): void;
         private assetUrlDic;
         getAssetUrl(asset: IAsset): string;
+        bundlePackBin: {
+            [name: string]: ArrayBuffer;
+        };
+        bundlePackJson: JSON;
+        loadResByPack(packnum: number, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
         loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private waitStateDic;
         doWaitState(name: string, state: stateLoad): void;
+        private queueState;
+        private curloadinfo;
+        loadByQueue(): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         unload(url: string, onstate?: () => void): void;
         loadScene(sceneName: string, onComplete: () => void): void;
-        parseEffect(effectConfig: string, onComplete: (data: EffectSystemData) => void): void;
-        private loadEffectDependAssets(dependAssets, path, onFinish);
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[]) => void): void;
         saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;
@@ -728,15 +747,10 @@ declare namespace gd3d.framework {
         bones: string[];
         frameCount: number;
         frames: {
-            [fid: string]: Frame;
+            [fid: string]: Float32Array;
         };
         subclipCount: number;
         subclips: subClip[];
-    }
-    class Frame {
-        key: boolean;
-        boneInfos: PoseBoneMatrix[];
-        caclByteLength(): number;
     }
     class PoseBoneMatrix {
         t: math.vector3;
@@ -746,9 +760,12 @@ declare namespace gd3d.framework {
         load(read: io.binReader): void;
         static createDefault(): PoseBoneMatrix;
         copyFrom(src: PoseBoneMatrix): void;
+        copyFromData(src: Float32Array, seek: number): void;
         invert(): void;
         lerpInWorld(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, to: PoseBoneMatrix, v: number): void;
+        lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number): void;
         static sMultiply(left: PoseBoneMatrix, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
+        static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
         static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target?: PoseBoneMatrix): PoseBoneMatrix;
     }
     class subClip {
@@ -840,6 +857,8 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         initUniformData(passes: render.glDrawPass[]): void;
         setShader(shader: shader): void;
+        private _changeShaderMap;
+        changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         getQueue(): number;
         getShader(): shader;
@@ -858,6 +877,7 @@ declare namespace gd3d.framework {
         uploadUniform(pass: render.glDrawPass): void;
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
         Parse(assetmgr: assetMgr, json: any): void;
+        clone(): material;
     }
 }
 declare namespace gd3d.framework {
@@ -884,6 +904,42 @@ declare namespace gd3d.framework {
         line: boolean;
         start: number;
         size: number;
+    }
+}
+declare namespace gd3d.framework {
+    class pathasset implements IAsset {
+        private name;
+        private id;
+        defaultAsset: boolean;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        use(): void;
+        unuse(): void;
+        dispose(): void;
+        caclByteLength(): number;
+        paths: gd3d.math.vector3[];
+        private type;
+        private instertPointcount;
+        private items;
+        Parse(json: JSON): void;
+        private lines;
+        private getpaths();
+        private getBeisaierPointAlongCurve(points, rate, clearflag?);
+        private vec3Lerp(start, end, lerp, out);
+    }
+    enum pathtype {
+        once = 0,
+        loop = 1,
+        pingpong = 2,
+    }
+    enum epointtype {
+        VertexPoint = 0,
+        ControlPoint = 1,
+    }
+    class pointitem {
+        point: gd3d.math.vector3;
+        type: epointtype;
     }
 }
 declare namespace gd3d.framework {
@@ -1275,6 +1331,29 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class guidpath implements INodeComponent {
+        private paths;
+        pathasset: pathasset;
+        speed: number;
+        private isactived;
+        setActive(value?: boolean): void;
+        isactive(): boolean;
+        private mystrans;
+        private datasafe;
+        private folowindex;
+        isloop: boolean;
+        lookforward: boolean;
+        setpathasset(pathasset: pathasset, speed?: number): void;
+        start(): void;
+        update(delta: number): void;
+        private adjustDir;
+        private followmove(delta);
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     enum LightTypeEnum {
         Direction = 0,
         Point = 1,
@@ -1451,6 +1530,56 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class trailRender_recorde implements IRenderer {
+        layer: RenderLayerEnum;
+        renderLayer: gd3d.framework.CullingMask;
+        queue: number;
+        private _startWidth;
+        private _endWidth;
+        lifetime: number;
+        minStickDistance: number;
+        maxStickCout: number;
+        private _material;
+        private _startColor;
+        private _endColor;
+        private trailTrans;
+        private nodes;
+        private mesh;
+        private dataForVbo;
+        private dataForEbo;
+        interpolate: boolean;
+        interpNumber: number;
+        interpPath: trailNode[];
+        private targetPath;
+        material: gd3d.framework.material;
+        startColor: gd3d.math.color;
+        endColor: gd3d.math.color;
+        setWidth(startWidth: number, endWidth?: number): void;
+        private activeMaxpointlimit;
+        setMaxpointcontroll(value?: boolean): void;
+        start(): void;
+        private app;
+        private webgl;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        private refreshTrailNode(curTime);
+        private notRender;
+        private updateTrailData(curTime);
+        private checkBufferSize();
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        clone(): void;
+    }
+    class trailNode {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
+        time: number;
+        handle: gd3d.math.vector3;
+        trailNodes: trailNode[];
+        constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
+    }
+}
+declare namespace gd3d.framework {
     class trailRender implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: gd3d.framework.CullingMask;
@@ -1462,22 +1591,34 @@ declare namespace gd3d.framework {
         private vertexcount;
         private dataForVbo;
         private dataForEbo;
+        private sticks;
+        private active;
+        private reInit;
         start(): void;
         private app;
         private webgl;
+        private camerapositon;
+        extenedOneSide: boolean;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
         material: gd3d.framework.material;
         color: gd3d.math.color;
-        setspeed(upspeed: number, lowspeed?: number): void;
+        setspeed(upspeed: number): void;
         setWidth(Width: number): void;
+        play(): void;
+        stop(): void;
+        lookAtCamera: boolean;
         private initmesh();
+        private intidata();
         private speed;
-        private lowspeed;
-        private updateTrail();
+        private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
+    }
+    class trailStick {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
     }
 }
 declare namespace gd3d.framework {
@@ -1501,7 +1642,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.io {
     class binBuffer {
-        private _buf;
+        _buf: Uint8Array[];
         private _seekWritePos;
         private _seekWriteIndex;
         private _seekReadPos;
@@ -1589,6 +1730,7 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.io {
@@ -1665,6 +1807,7 @@ declare namespace gd3d.io {
         readInt32(): number;
         readUInt32(): number;
         readUint8Array(target?: Uint8Array, offset?: number, length?: number): Uint8Array;
+        readUint8ArrayByOffset(target: Uint8Array, offset: number, length?: number): Uint8Array;
         position: number;
         readBoolean(): boolean;
         readByte(): number;
@@ -1785,12 +1928,14 @@ declare namespace gd3d.math {
 declare namespace gd3d.math {
     function quatNormalize(src: quaternion, out: quaternion): void;
     function quatTransformVector(src: quaternion, vector: vector3, out: vector3): void;
+    function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3): void;
     function quatMagnitude(src: quaternion): number;
     function quatClone(src: quaternion, out: quaternion): void;
     function quatToMatrix(src: quaternion, out: matrix): void;
     function quatInverse(src: quaternion, out: quaternion): void;
     function quatFromYawPitchRoll(yaw: number, pitch: number, roll: number, result: quaternion): void;
     function quatMultiply(srca: quaternion, srcb: quaternion, out: quaternion): void;
+    function quatMultiplyDataAndQuat(srca: Float32Array, srcaseek: number, srcb: quaternion, out: quaternion): void;
     function quatMultiplyVector(vector: vector3, scr: quaternion, out: quaternion): void;
     function quatLerp(srca: quaternion, srcb: quaternion, out: quaternion, t: number): void;
     function quatFromAxisAngle(axis: vector3, angle: number, out: quaternion): void;
@@ -1813,6 +1958,7 @@ declare namespace gd3d.math {
 }
 declare namespace gd3d.math {
     function spriteAnimation(row: number, column: number, index: number, out: vector4): void;
+    function GetPointAlongCurve(curveStart: vector3, curveStartHandle: vector3, curveEnd: vector3, curveEndHandle: vector3, t: number, out: vector3, crease?: number): void;
 }
 declare namespace gd3d.math {
     function vec2Subtract(a: vector2, b: vector2, out: vector2): void;
@@ -1874,7 +2020,7 @@ declare namespace gd3d.framework {
         dispose(): void;
     }
     class EffectElement {
-        gameobject: transform;
+        transform: transform;
         data: EffectElementData;
         name: string;
         timelineFrame: {
@@ -1924,7 +2070,6 @@ declare namespace gd3d.framework {
         matrix: math.matrix;
         tilling: math.vector2;
         rotationByEuler: math.quaternion;
-        startRotation: math.quaternion;
         localRotation: math.quaternion;
         mesh: mesh;
         meshdataVbo: Float32Array;
@@ -2059,7 +2204,7 @@ declare namespace gd3d.framework {
     class UVSpriteNew {
         row: number;
         column: number;
-        fps: number;
+        totalCount: number;
         clone(): UVSpriteNew;
     }
     class UVRollNew {
@@ -2354,6 +2499,40 @@ declare namespace gd3d.framework {
         elements: EffectElement;
         velocity: any;
         frameInternal: number;
+        init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
+        update(frameIndex: number): void;
+    }
+    class RoseCurveAction implements IEffectAction {
+        type: string;
+        params: any;
+        startFrame: number;
+        endFrame: number;
+        elements: EffectElement;
+        radius: number;
+        polar: any;
+        level: number;
+        frameInternal: number;
+        speed: number;
+        init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
+        update(frameIndex: number): void;
+    }
+    class TrailAction implements IEffectAction {
+        type: string;
+        params: any;
+        startFrame: number;
+        endFrame: number;
+        elements: EffectElement;
+        radius: number;
+        position: any;
+        eular: any;
+        width: number;
+        frameInternal: number;
+        speed: number;
+        transform: gd3d.framework.transform;
+        startRotation: gd3d.math.quaternion;
+        color: any;
+        alpha: number;
+        offsetTransalte: gd3d.math.vector3;
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
         update(frameIndex: number): void;
     }
@@ -2665,6 +2844,7 @@ declare namespace gd3d.framework {
         private batcher;
         private speedDir;
         private simulationSpeed;
+        startFrameId: number;
         constructor(batcher: EmissionBatcher);
         uploadData(array: Float32Array): void;
         initByData(): void;
@@ -3128,6 +3308,12 @@ declare namespace gd3d.math {
         static clone_vector4(src: vector4): vector4;
         static delete_vector4(v: vector4): void;
         static collect_vector4(): void;
+        private static _color_one;
+        static readonly color_one: color;
+        private static unused_color;
+        static new_color(): color;
+        static delete_color(v: color): void;
+        static collect_color(): void;
         private static _vector3_up;
         static readonly vector3_up: vector3;
         private static _vector3_right;
@@ -3302,6 +3488,13 @@ declare namespace gd3d.render {
         Static = 0,
         Dynamic = 1,
         Stream = 2,
+    }
+    class drawInfo {
+        private static _ins;
+        static readonly ins: drawInfo;
+        triCount: number;
+        vboCount: number;
+        renderCount: number;
     }
     class glMesh {
         initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, vertexCount: number, mode?: MeshTypeEnum): void;

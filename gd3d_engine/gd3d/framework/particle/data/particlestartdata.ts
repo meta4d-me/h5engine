@@ -138,7 +138,7 @@
 
 
 
-        private _boxDirection: gd3d.math.vector3 = new gd3d.math.vector3(1, 0, 0);
+        private _boxDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
         public get boxDirection(): gd3d.math.vector3
         {
             let boxpos = new gd3d.math.vector3(0, 0, 0);
@@ -155,7 +155,7 @@
         }
 
 
-        private _sphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(1, 0, 0);
+        private _sphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
         public get sphereDirection(): gd3d.math.vector3
         {
             let _radius = ValueData.RandomRange(0, this.radius);
@@ -167,13 +167,13 @@
             this._sphereDirection.z = _radius * Math.cos(θ);
 
             math.vec3Normalize(this._sphereDirection, this._sphereDirection);
-            gd3d.framework.EffectUtil.RotateVector3(this._sphereDirection, this.direction, this._sphereDirection);
+            //gd3d.framework.EffectUtil.RotateVector3(this._sphereDirection, this.direction, this._sphereDirection);
             this.getRandomPosition(this._sphereDirection, _radius);
             return this._sphereDirection;
         }
 
 
-        private _hemisphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(1, 0, 0);
+        private _hemisphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
         public get hemisphereDirection(): gd3d.math.vector3
         {
 
@@ -226,7 +226,7 @@
             return this._coneDirection;
         }
 
-        private _circleDirection: gd3d.math.vector3 = new gd3d.math.vector3(1, 0, 0);
+        private _circleDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
         public get circleDirection(): gd3d.math.vector3
         {
             let _arc = this.angle * (Math.PI / 180);
@@ -246,7 +246,7 @@
         }
 
 
-        private _edgeDirection: gd3d.math.vector3 = new gd3d.math.vector3(1, 0, 0);
+        private _edgeDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
         public get edgeDirection()
         {
 

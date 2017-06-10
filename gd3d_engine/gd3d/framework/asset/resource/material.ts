@@ -20,14 +20,6 @@ namespace gd3d.framework
         }
     }
 
-    // export enum shaderStatus
-    // {
-    //     Base,
-    //     Lightmap,
-    //     Bone,
-    //     BoneWithLightmap
-    // }
-
     @gd3d.reflect.SerializeType
     export class material implements IAsset
     {
@@ -217,15 +209,34 @@ namespace gd3d.framework
             }
         }
 
-        //shaderStatus: shaderStatus = shaderStatus.Base;
         setShader(shader: shader)
         {
             this.shader = shader;
             this.mapUniform = {};
 
             this.initUniformData(this.shader.passes["base"]);
-            //this.initUniformData(this.shader.passes_Lightmap);
-
+        }
+        private _changeShaderMap: { [name: string]: material } = {};
+        changeShader(shader: shader)
+        {
+            let map: { [id: string]: UniformData };
+            if (this._changeShaderMap[shader.getName()] != undefined)
+            {
+                map = this._changeShaderMap[shader.getName()].mapUniform;
+            } else
+            {
+                let mat: material = this.clone();
+                map = mat.mapUniform;
+                this._changeShaderMap[shader.getName()] = mat;
+            }
+            this.setShader(shader);
+            for (let key in map)
+            {
+                if (this.mapUniform[key] != undefined)
+                {
+                    this.mapUniform[key] = map[key];
+                }
+            }
         }
         getLayer()
         {
@@ -241,7 +252,6 @@ namespace gd3d.framework
         }
         @gd3d.reflect.Field("shader")
         private shader: shader;
-        // matjson: string;
 
         @gd3d.reflect.Field("UniformDataDic")
         mapUniform: {
@@ -346,9 +356,13 @@ namespace gd3d.framework
                             pass.uniformTexture(id, value.glTexture);
                         }
                         else if (defaultValue != null)
+                        {
                             pass.uniformTexture(id, defaultValue.glTexture);
+                        }
                         else
+                        {
                             pass.uniformTexture(id, null);
+                        }
                         break;
                 }
             }
@@ -535,6 +549,32 @@ namespace gd3d.framework
                         console.log("materialJson的mapuniform中的某type：" + jsonChild["type"] + "不符合范围（0-2）")
                 }
             }
+        }
+
+        public clone(): material
+        {
+            let mat: material = new material(this.getName());
+            mat.setShader(this.shader);
+            for (var i in this.mapUniform)
+            {
+                var data: UniformData = this.mapUniform[i];
+                var _uniformType: render.UniformTypeEnum = data.type;
+                switch (_uniformType)
+                {
+                    case render.UniformTypeEnum.Texture:
+                        mat.setTexture(i, data.value);
+                        break;
+                    case render.UniformTypeEnum.Float:
+                        mat.setFloat(i, data.value);
+                        break;
+                    case render.UniformTypeEnum.Float4:
+                        mat.setVector4(i, data.value);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return mat;
         }
     }
 }

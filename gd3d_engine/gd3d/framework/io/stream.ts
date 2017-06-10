@@ -166,6 +166,16 @@ namespace gd3d.io
             return target;
         }
 
+        readUint8ArrayByOffset(target:Uint8Array, offset:number, length:number = 0): Uint8Array
+        {
+            if (length < 0) length = target.length;
+            for (var i = 0; i < length; i++)
+            {
+                target[i] = this._data.getUint8(offset);
+                offset++;
+            }
+            return target;
+        }
 
 
         public set position(value: number)

@@ -11,7 +11,7 @@ namespace t {
             this.taskmgr.addTaskCall(this.initscene.bind(this));
         }
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-            this.app.getAssetMgr().load("res/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) => {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) => {
                 if (_state.isfinish) {
                     state.finish = true;
                 }
