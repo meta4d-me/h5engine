@@ -132,7 +132,9 @@ namespace t {
                     this.trailrender.lookAtCamera=true;
                     this.trailrender.extenedOneSide=false;
                     this.trailrender.setspeed(0.25);
+                    //--------------开关拖尾---------------------
                     this.trailrender.play();
+                    //this.trailrender.stop();
                 }
             }
             var path=this.app.getAssetMgr().getAssetByName("circlepath.path.json")as gd3d.framework.pathasset;
@@ -142,17 +144,23 @@ namespace t {
                 this.parentlist[0].gameObject.visible=true;
                 var guidp=this.dragonlist[0].gameObject.addComponent("guidpath")as gd3d.framework.guidpath;
                 guidp.setpathasset(path2,50);
-                guidp.setActive();
                 guidp.isloop=true;
+                guidp.play();
             }
             {
+                //---------------在非loop情况下，如果设置了委托，在引导走完后就执行oncomplete---------------------------------------------------------
                 this.parentlist[1].gameObject.visible=true;
                 this.parentlist[1].localTranslate.x=-5;
                 this.parentlist[1].markDirty();
                 var guidp=this.dragonlist[1].gameObject.addComponent("guidpath")as gd3d.framework.guidpath;
-                guidp.setpathasset(path,50);
-                guidp.setActive();
-                guidp.isloop=true;
+                guidp.setpathasset(path,50,()=>{
+                    this.parentlist[1].gameObject.visible=false;
+                });
+                //guidp.isloop=true;
+                guidp.play();
+                // guidp.pause();
+                // guidp.stop();
+
             }
             {
                 this.parentlist[2].gameObject.visible=true;
@@ -160,8 +168,10 @@ namespace t {
                 this.parentlist[2].markDirty();
                 var guidp=this.dragonlist[2].gameObject.addComponent("guidpath")as gd3d.framework.guidpath;
                 guidp.setpathasset(path2,50);
-                guidp.setActive();
                 guidp.isloop=true;
+                guidp.play();
+
+                this.guidpp=guidp;
             }
             state.finish = true;
         }
@@ -176,9 +186,16 @@ namespace t {
         taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
         angle: number;
         timer: number=0;
+
+        guidpp:gd3d.framework.guidpath;
         update(delta: number) {
             this.taskmgr.move(delta);
-
+            this.timer++;
+            if(this.timer>500)
+            {
+                this.guidpp.stop();
+                this.parentlist[2].gameObject.visible=false;
+            }
         }
     }
 }

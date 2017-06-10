@@ -8,20 +8,33 @@ namespace gd3d.framework
         public speed:number=1;
 
         private isactived:boolean=false;
-        public setActive(value:boolean=true)
+        play()
         {
-            this.isactived=value;
+            this.isactived=true;
         }
-        isactive():boolean
+        pause()
         {
-            return this.isactived;
+            this.isactived=false;
         }
+        stop()
+        {
+            this.isactived=false;
+            this.folowindex=0;
+        }
+        replay()
+        {
+            this.isactived=true;
+            this.folowindex=0;
+        }
+
         private mystrans:transform;
         private datasafe:boolean=false;
         private folowindex:number=0;
         public isloop:boolean=false;
         lookforward:boolean=false;
-        setpathasset(pathasset:pathasset,speed:number=1)
+
+        private oncomplete:()=>void;
+        setpathasset(pathasset:pathasset,speed:number=1,oncomplete:()=>void=null)
         {
             this.pathasset=pathasset;
             if(pathasset==null)
@@ -38,6 +51,8 @@ namespace gd3d.framework
             }
             this.mystrans=this.gameObject.transform;
             this.speed=speed;
+            
+            this.oncomplete=oncomplete;
         }
         start() 
         {
@@ -71,6 +86,10 @@ namespace gd3d.framework
                     if(!this.isloop)
                     {
                         this.isactived=false;
+                        if(this.oncomplete)
+                        {
+                            this.oncomplete();
+                        }
                     }
                 }
             }

@@ -531,6 +531,7 @@ declare namespace t {
         taskmgr: gd3d.framework.taskMgr;
         angle: number;
         timer: number;
+        guidpp: gd3d.framework.guidpath;
         update(delta: number): void;
     }
 }

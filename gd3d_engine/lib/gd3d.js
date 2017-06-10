@@ -8339,15 +8339,23 @@ var gd3d;
                 this.lookforward = false;
                 this.adjustDir = false;
             }
-            guidpath.prototype.setActive = function (value) {
-                if (value === void 0) { value = true; }
-                this.isactived = value;
+            guidpath.prototype.play = function () {
+                this.isactived = true;
             };
-            guidpath.prototype.isactive = function () {
-                return this.isactived;
+            guidpath.prototype.pause = function () {
+                this.isactived = false;
             };
-            guidpath.prototype.setpathasset = function (pathasset, speed) {
+            guidpath.prototype.stop = function () {
+                this.isactived = false;
+                this.folowindex = 0;
+            };
+            guidpath.prototype.replay = function () {
+                this.isactived = true;
+                this.folowindex = 0;
+            };
+            guidpath.prototype.setpathasset = function (pathasset, speed, oncomplete) {
                 if (speed === void 0) { speed = 1; }
+                if (oncomplete === void 0) { oncomplete = null; }
                 this.pathasset = pathasset;
                 if (pathasset == null) {
                     console.log(this.gameObject.getName().toString + ":are you sure set the right pathasset（error：null）");
@@ -8361,6 +8369,7 @@ var gd3d;
                 }
                 this.mystrans = this.gameObject.transform;
                 this.speed = speed;
+                this.oncomplete = oncomplete;
             };
             guidpath.prototype.start = function () {
             };
@@ -8383,6 +8392,9 @@ var gd3d;
                         this.folowindex = 0;
                         if (!this.isloop) {
                             this.isactived = false;
+                            if (this.oncomplete) {
+                                this.oncomplete();
+                            }
                         }
                     }
                 }

@@ -3739,6 +3739,7 @@ var t;
             });
         };
         test_pathAsset.prototype.initscene = function (laststate, state) {
+            var _this = this;
             var objCam = new gd3d.framework.transform();
             objCam.name = "cam_show";
             this.scene.addChild(objCam);
@@ -3782,17 +3783,18 @@ var t;
                 this.parentlist[0].gameObject.visible = true;
                 var guidp = this.dragonlist[0].gameObject.addComponent("guidpath");
                 guidp.setpathasset(path2, 50);
-                guidp.setActive();
                 guidp.isloop = true;
+                guidp.play();
             }
             {
                 this.parentlist[1].gameObject.visible = true;
                 this.parentlist[1].localTranslate.x = -5;
                 this.parentlist[1].markDirty();
                 var guidp = this.dragonlist[1].gameObject.addComponent("guidpath");
-                guidp.setpathasset(path, 50);
-                guidp.setActive();
-                guidp.isloop = true;
+                guidp.setpathasset(path, 50, function () {
+                    _this.parentlist[1].gameObject.visible = false;
+                });
+                guidp.play();
             }
             {
                 this.parentlist[2].gameObject.visible = true;
@@ -3800,13 +3802,19 @@ var t;
                 this.parentlist[2].markDirty();
                 var guidp = this.dragonlist[2].gameObject.addComponent("guidpath");
                 guidp.setpathasset(path2, 50);
-                guidp.setActive();
                 guidp.isloop = true;
+                guidp.play();
+                this.guidpp = guidp;
             }
             state.finish = true;
         };
         test_pathAsset.prototype.update = function (delta) {
             this.taskmgr.move(delta);
+            this.timer++;
+            if (this.timer > 500) {
+                this.guidpp.stop();
+                this.parentlist[2].gameObject.visible = false;
+            }
         };
         return test_pathAsset;
     }());
