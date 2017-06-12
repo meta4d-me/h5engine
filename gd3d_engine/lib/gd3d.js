@@ -49,7 +49,7 @@ var gd3d;
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
-                this.timeScale = 0.5;
+                this.timeScale = 1;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 canvas.className = "full";
@@ -68,6 +68,10 @@ var gd3d;
                 this.beginTimer = this.lastTimer = Date.now() / 1000;
                 this.loop();
                 gd3d.io.referenceInfo.regDefaultType();
+                var initovercallback = window["initovercallback"];
+                if (initovercallback != null) {
+                    initovercallback(this);
+                }
             };
             application.prototype.markNotify = function (trans, type) {
                 this.doNotify(trans, type);
