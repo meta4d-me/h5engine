@@ -195,7 +195,6 @@ namespace gd3d.framework
                     blendmode = render.BlendModeEnum.Blend_PreMultiply;
                     break;
             }
-            pass.setAlphaBlend(blendmode);
 
             switch (json["zwrite"])
             {
@@ -208,6 +207,7 @@ namespace gd3d.framework
                     break;
             }
 
+            pass.setAlphaBlend(blendmode);
             pass.state_ztest = true;
             switch (json["ztest"])
             {

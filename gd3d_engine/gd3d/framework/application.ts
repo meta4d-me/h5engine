@@ -33,7 +33,7 @@ namespace gd3d.framework
         {
 			console.log("version: "+this.version + "  build: "+this.build);
             sceneMgr.app = this;
-            this.timeScale = 0.5;
+            this.timeScale = 1;
             this.container = div;
             var canvas = document.createElement("canvas");
             canvas.className = "full";

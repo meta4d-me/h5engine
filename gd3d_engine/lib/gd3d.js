@@ -49,7 +49,7 @@ var gd3d;
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
-                this.timeScale = 0.5;
+                this.timeScale = 1;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 canvas.className = "full";
@@ -6348,7 +6348,6 @@ var gd3d;
                         blendmode = gd3d.render.BlendModeEnum.Blend_PreMultiply;
                         break;
                 }
-                pass.setAlphaBlend(blendmode);
                 switch (json["zwrite"]) {
                     case "off":
                         pass.state_zwrite = false;
@@ -6358,6 +6357,7 @@ var gd3d;
                         pass.state_zwrite = true;
                         break;
                 }
+                pass.setAlphaBlend(blendmode);
                 pass.state_ztest = true;
                 switch (json["ztest"]) {
                     case "greater":
