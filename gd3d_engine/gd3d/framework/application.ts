@@ -56,6 +56,12 @@ namespace gd3d.framework
             this.beginTimer = this.lastTimer = Date.now() / 1000;
             this.loop();
             gd3d.io.referenceInfo.regDefaultType();
+
+            let initovercallback = window["initovercallback"];
+            if(initovercallback!=null)
+            {
+                initovercallback(this);
+            }
         }
 
         markNotify(trans: any, type: NotifyType)
