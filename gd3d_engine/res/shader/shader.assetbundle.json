@@ -180,10 +180,10 @@
             "name": "resources/particle/particles_blend.shader.json",
             "length": 0
         },
-		{
-			"name": "resources/particle/particles_blend_renderall.shader.json",
-			"length":0
-		},
+	{
+	    "name": "resources/particle/particles_blend_renderall.shader.json",
+	    "length":0
+	},
         {
             "name": "resources/particle/particles_blend_premultiply.shader.json",
             "length": 0
@@ -229,6 +229,10 @@
             "length": 0
         },
         {
+            "name": "resources/_project/streamlight_bothside.shader.json",
+            "length": 0
+        },
+        {
             "name": "resources/_project/fakepbr.shader.json",
             "length": 0
         },
@@ -242,6 +246,10 @@
         },
         {
             "name": "resources/_project/asi.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/_project/asi_bothside.shader.json",
             "length": 0
         },
         {
@@ -279,7 +287,14 @@
         {
             "name": "resources/base/transparent_bothside.shader.json",
             "length": 0
+        },
+		{
+			"name":"resources/base/transparent_additive.shader.json",
+			"length":0
+		},
+        {
+            "name":"resources/base/transparent_add.fs.glsl",
+            "length":0
         }
-
     ]
 }

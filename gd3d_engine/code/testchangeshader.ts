@@ -125,13 +125,14 @@ namespace t
         {
             for (let i = 0; i < 4; i++)
             {
-                let _uniform = this.renderer.materials[i].mapUniform;
-                this.renderer.materials[i].setShader(sha);
-                for (let key in _uniform)
-                {
-                    if (this.renderer.materials[i].mapUniform[key] != undefined)
-                        this.renderer.materials[i].mapUniform[key] = _uniform[key];
-                }
+                // let _uniform = this.renderer.materials[i].mapUniform;
+                // this.renderer.materials[i].setShader(sha);
+                // for (let key in _uniform)
+                // {
+                //     if (this.renderer.materials[i].mapUniform[key] != undefined)
+                //         this.renderer.materials[i].mapUniform[key] = _uniform[key];
+                // }
+                this.renderer.materials[i].changeShader(sha);
             }
         }
 

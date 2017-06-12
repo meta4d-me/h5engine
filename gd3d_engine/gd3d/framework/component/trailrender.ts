@@ -29,6 +29,10 @@ namespace gd3d.framework
         }
         private app: application;
         private webgl: WebGLRenderingContext;
+
+        private camerapositon:gd3d.math.vector3;
+        
+        extenedOneSide:boolean=true;//延展方向
         update(delta: number)
         {
             if(!this.active) return;
@@ -37,15 +41,52 @@ namespace gd3d.framework
                 this.intidata();
                 this.reInit=false;
             }
-            gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), this.sticks[0].location);
-            this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
-            gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
+            var targetpos=this.gameObject.transform.getWorldTranslate();
+            if(this.lookAtCamera)
+            {
+                this.camerapositon=sceneMgr.app.getScene().mainCamera.gameObject.transform.getWorldTranslate();
+                var camdir=gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(this.camerapositon,this.sticks[0].location,camdir);
+                gd3d.math.vec3Normalize(camdir,camdir);
 
+                var direction:gd3d.math.vector3=gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(targetpos,this.sticks[0].location,direction);
+                gd3d.math.vec3Normalize(direction,direction);
+                gd3d.math.vec3Cross(camdir,direction,this.sticks[0].updir);
+                gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
+                gd3d.math.pool.delete_vector3(direction);
+            }
+            gd3d.math.vec3Clone(targetpos, this.sticks[0].location);
+            
             var length = this.sticks.length;
             for (var i = 1; i < length; i++)
             {
                 gd3d.math.vec3SLerp(this.sticks[i].location, this.sticks[i - 1].location, this.speed, this.sticks[i].location);
-                gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, this.speed, this.sticks[i].updir);
+            }
+            //--------------------------------延展面片方向-------------------------------------------------
+            if(this.lookAtCamera)
+            {
+                for(var i=1;i<length;i++)
+                {
+                    var tocamdir=gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Subtract(this.camerapositon,this.sticks[i].location,tocamdir);
+                    gd3d.math.vec3Normalize(tocamdir,tocamdir);
+                    var movedir=gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Subtract(this.sticks[i-1].location,this.sticks[i].location,movedir);
+                    gd3d.math.vec3Normalize(movedir,movedir);
+                    gd3d.math.vec3Cross(tocamdir,movedir,this.sticks[i].updir);
+                    gd3d.math.vec3ScaleByNum(this.sticks[i].updir, this.width, this.sticks[i].updir);
+                    gd3d.math.pool.delete_vector3(tocamdir);
+                }
+            }
+            else
+            {
+                this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
+                gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
+                for(var i=1;i<length;i++)
+                {
+                    gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, this.speed, this.sticks[i].updir);
+                }
             }
             this.updateTrailData();
         }
@@ -108,6 +149,7 @@ namespace gd3d.framework
         {
             this.active=false;
         }
+        lookAtCamera:boolean=false;
         //------------------------------------------------------------------------------------------------------
         private initmesh()
         {
@@ -216,18 +258,38 @@ namespace gd3d.framework
         private updateTrailData()
         {
             var length = this.vertexcount / 2;
-            for (var i = 0; i < length; i++)
-            {
-                var pos = this.sticks[i].location;
-                var up = this.sticks[i].updir;
-                this.dataForVbo[i * 2 * 9] = pos.x;
-                this.dataForVbo[i * 2 * 9 + 1] = pos.y;
-                this.dataForVbo[i * 2 * 9 + 2] = pos.z;
 
-                this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
-                this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
-                this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
+            if(this.extenedOneSide)
+            {
+                for (var i = 0; i < length; i++)
+                {
+                    var pos = this.sticks[i].location;
+                    var up = this.sticks[i].updir;
+                    this.dataForVbo[i * 2 * 9] = pos.x;
+                    this.dataForVbo[i * 2 * 9 + 1] = pos.y;
+                    this.dataForVbo[i * 2 * 9 + 2] = pos.z;
+
+                    this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
+                }
             }
+            else
+            {
+                for (var i = 0; i < length; i++)
+                {
+                    var pos = this.sticks[i].location;
+                    var up = this.sticks[i].updir;
+                    this.dataForVbo[i * 2 * 9] = pos.x-up.x;
+                    this.dataForVbo[i * 2 * 9 + 1] = pos.y-up.y;
+                    this.dataForVbo[i * 2 * 9 + 2] = pos.z-up.z;
+
+                    this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
+                }
+            }
+
         }
 
         render(context: renderContext, assetmgr: assetMgr, camera: camera)

@@ -25,7 +25,8 @@ namespace gd3d.framework
         Font,
         TextAsset,
         PackBin,
-        PackTxt
+        PackTxt,
+        pathAsset
     }
 
     /**
@@ -1196,6 +1197,20 @@ namespace gd3d.framework
                     onstate(state);
                 })
             }
+            else if(type==AssetTypeEnum.pathAsset)
+            {
+                state.resstate[filename]={state:0,res:null};
+                gd3d.io.loadText(url, (txt, err) =>
+                {
+                    var _path = new pathasset(filename);
+                    this.assetUrlDic[_path.getGUID()] = url;
+                    _path.Parse(JSON.parse(txt));
+                    this.use(_path);
+                    state.resstate[filename].state = 1;
+                    state.resstate[filename].res = _path;
+                    onstate(state);
+                })
+            }
             else
             {
                 throw new Error("cant use the type:" + type);
@@ -1221,14 +1236,16 @@ namespace gd3d.framework
         private curloadinfo:{state:stateLoad, type:AssetTypeEnum, onstate:(state:stateLoad) => void };
         public loadByQueue()
         {
-            this.bundlePackBin = {};
-            this.bundlePackJson = null;
             if(this.curloadinfo!=null)
             {
                 if(!this.curloadinfo.state.isfinish)
                     return;
                 else
-                    this.curloadinfo = null;
+                {
+                    this.curloadinfo = null;   
+                    this.bundlePackBin = {};
+                    this.bundlePackJson = null;
+                }
             }
             if(this.queueState.length == 0)   return;
             
@@ -1700,6 +1717,10 @@ namespace gd3d.framework
                 else if(extname == ".packs.txt")
                 {
                     return AssetTypeEnum.PackTxt;
+                }
+                else if(extname==".path.json")
+                {
+                    return AssetTypeEnum.pathAsset;
                 }
                 i = file.indexOf(".", i + 1);
             }

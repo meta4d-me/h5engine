@@ -22,13 +22,18 @@ namespace gd3d.framework
         height: number;
         limitFrame: boolean = true;
         notify: INotify;
+        timeScale:number;
 		version:string = "v0.0.1";
-		build:string = "b000008";
+		build:string = "b000009";
+        constructor(){
+            window["gd3d_app"] = this;
+        }
 
         start(div: HTMLDivElement)
         {
 			console.log("version: "+this.version + "  build: "+this.build);
             sceneMgr.app = this;
+            this.timeScale = 1;
             this.container = div;
             var canvas = document.createElement("canvas");
             canvas.className = "full";
@@ -51,12 +56,6 @@ namespace gd3d.framework
             this.beginTimer = this.lastTimer = Date.now() / 1000;
             this.loop();
             gd3d.io.referenceInfo.regDefaultType();
-
-            let initovercallback = window["initovercallback"];
-            if(initovercallback!=null)
-            {
-                initovercallback(this);
-            }
         }
 
         markNotify(trans: any, type: NotifyType)
@@ -162,19 +161,19 @@ namespace gd3d.framework
         private beginTimer;
         private lastTimer;
         private totalTime;
-        private deltaTime;
+        private _deltaTime;
         getTotalTime(): number
         {
             return this.totalTime;
         }
-        getDeltaTime(): number
+        public get deltaTime()
         {
-            return this.deltaTime;
+            return this._deltaTime * this.timeScale;
         }
         private loop()
         {
             var now = Date.now() / 1000;
-            this.deltaTime = now - this.lastTimer;
+            this._deltaTime = now - this.lastTimer;
             this.totalTime = now - this.beginTimer;
             this.update(this.deltaTime);
             if (this.stats != null)

@@ -216,6 +216,28 @@ namespace gd3d.framework
 
             this.initUniformData(this.shader.passes["base"]);
         }
+        private _changeShaderMap: { [name: string]: material } = {};
+        changeShader(shader: shader)
+        {
+            let map: { [id: string]: UniformData };
+            if (this._changeShaderMap[shader.getName()] != undefined)
+            {
+                map = this._changeShaderMap[shader.getName()].mapUniform;
+            } else
+            {
+                let mat: material = this.clone();
+                map = mat.mapUniform;
+                this._changeShaderMap[shader.getName()] = mat;
+            }
+            this.setShader(shader);
+            for (let key in map)
+            {
+                if (this.mapUniform[key] != undefined)
+                {
+                    this.mapUniform[key] = map[key];
+                }
+            }
+        }
         getLayer()
         {
             return this.shader.layer;
@@ -334,9 +356,13 @@ namespace gd3d.framework
                             pass.uniformTexture(id, value.glTexture);
                         }
                         else if (defaultValue != null)
+                        {
                             pass.uniformTexture(id, defaultValue.glTexture);
+                        }
                         else
+                        {
                             pass.uniformTexture(id, null);
+                        }
                         break;
                 }
             }
@@ -525,13 +551,13 @@ namespace gd3d.framework
             }
         }
 
-        public clone():material
+        public clone(): material
         {
-            let mat:material = new material(this.getName());
+            let mat: material = new material(this.getName());
             mat.setShader(this.shader);
             for (var i in this.mapUniform)
             {
-                var data:UniformData = this.mapUniform[i];
+                var data: UniformData = this.mapUniform[i];
                 var _uniformType: render.UniformTypeEnum = data.type;
                 switch (_uniformType)
                 {

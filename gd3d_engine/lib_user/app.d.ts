@@ -85,6 +85,26 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare enum ShockType {
+    Vertical = 0,
+    Horizontal = 1,
+    Both = 2,
+}
+declare class CameraShock implements gd3d.framework.INodeComponent {
+    gameObject: gd3d.framework.gameObject;
+    private isPlaying;
+    private fade;
+    private oldTranslate;
+    private shockType;
+    private strength;
+    private life;
+    private ticker;
+    start(): void;
+    play(strength?: number, life?: number, fade?: boolean, shockType?: ShockType): void;
+    update(delta: number): void;
+    remove(): void;
+    clone(): void;
+}
 declare class Joystick {
     app: gd3d.framework.application;
     overlay2d: gd3d.framework.overlay2D;
@@ -143,6 +163,7 @@ declare namespace demo {
         private loadHeroPrefab(laststate, state);
         private loadEnemyPrefab(laststate, state);
         private loadScene(laststate, state);
+        private cameraShock;
         private addCameraAndLight(laststate, state);
         private addJoystick(laststate, state);
         private addObject(laststate, state);
@@ -487,6 +508,30 @@ declare namespace t {
         light: gd3d.framework.light;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
+        update(delta: number): void;
+    }
+}
+declare namespace t {
+    class test_pathAsset implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        start(app: gd3d.framework.application): void;
+        private loadShader(laststate, state);
+        private loadTexture(laststate, state);
+        private loadpath(laststate, state);
+        private loadasset(laststate, state);
+        sh: gd3d.framework.shader;
+        private initscene(laststate, state);
+        private parentlist;
+        private dragonlist;
+        private trailrender;
+        private path;
+        private showcamera;
+        target: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        angle: number;
+        timer: number;
+        guidpp: gd3d.framework.guidpath;
         update(delta: number): void;
     }
 }
