@@ -179,12 +179,12 @@
 
             let _radius = ValueData.RandomRange(0, this.radius);
 
-            let θ = ValueData.RandomRange(0, Math.PI / 2);
+            let θ = ValueData.RandomRange(0, Math.PI/2);
             let φ = ValueData.RandomRange(-Math.PI, Math.PI);
 
-            this._hemisphereDirection.z = _radius * Math.sin(θ) * Math.cos(φ);
+            this._hemisphereDirection.z = _radius * Math.cos(θ);
             this._hemisphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-            this._hemisphereDirection.x = _radius * Math.cos(θ);
+            this._hemisphereDirection.x = _radius * Math.sin(θ)*Math.cos(φ);
 
             math.vec3Normalize(this._hemisphereDirection, this._hemisphereDirection);
             EffectUtil.RotateVector3(this._hemisphereDirection, this.direction, this._hemisphereDirection);
