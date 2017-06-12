@@ -21,6 +21,7 @@ declare namespace gd3d.framework {
         timeScale: number;
         version: string;
         build: string;
+        constructor();
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
