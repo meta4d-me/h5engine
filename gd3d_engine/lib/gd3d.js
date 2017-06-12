@@ -44,7 +44,6 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
-                window["gd3d_app"] = this;
             }
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
@@ -67,6 +66,10 @@ var gd3d;
                 this.beginTimer = this.lastTimer = Date.now() / 1000;
                 this.loop();
                 gd3d.io.referenceInfo.regDefaultType();
+                var initovercallback = window["initovercallback"];
+                if (initovercallback != null) {
+                    initovercallback(this);
+                }
             };
             application.prototype.markNotify = function (trans, type) {
                 this.doNotify(trans, type);

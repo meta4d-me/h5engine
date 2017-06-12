@@ -25,10 +25,6 @@ namespace gd3d.framework
 		version:string = "v0.0.1";
 		build:string = "b000008";
 
-        constructor(){
-            window["gd3d_app"] = this;
-        }
-
         start(div: HTMLDivElement)
         {
 			console.log("version: "+this.version + "  build: "+this.build);
@@ -55,6 +51,12 @@ namespace gd3d.framework
             this.beginTimer = this.lastTimer = Date.now() / 1000;
             this.loop();
             gd3d.io.referenceInfo.regDefaultType();
+
+            let initovercallback = window["initovercallback"];
+            if(initovercallback!=null)
+            {
+                initovercallback(this);
+            }
         }
 
         markNotify(trans: any, type: NotifyType)
