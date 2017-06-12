@@ -180,22 +180,6 @@ namespace gd3d.framework
             }
 
             var blendmode = render.BlendModeEnum.Close;
-            switch (json["blendmode"])
-            {
-                case "add":
-                    blendmode = render.BlendModeEnum.Add;
-                    break;
-                case "addpremult":
-                    blendmode = render.BlendModeEnum.Add_PreMultiply;
-                    break;
-                case "blend":
-                    blendmode = render.BlendModeEnum.Blend;
-                    break;
-                case "blendpremult":
-                    blendmode = render.BlendModeEnum.Blend_PreMultiply;
-                    break;
-            }
-
             switch (json["zwrite"])
             {
                 case "off":
@@ -207,7 +191,6 @@ namespace gd3d.framework
                     break;
             }
 
-            pass.setAlphaBlend(blendmode);
             pass.state_ztest = true;
             switch (json["ztest"])
             {
@@ -238,6 +221,22 @@ namespace gd3d.framework
                     pass.state_ztest_method = render.webglkit.LEQUAL;
                     break;
             }
+            switch (json["blendmode"])
+            {
+                case "add":
+                    blendmode = render.BlendModeEnum.Add;
+                    break;
+                case "addpremult":
+                    blendmode = render.BlendModeEnum.Add_PreMultiply;
+                    break;
+                case "blend":
+                    blendmode = render.BlendModeEnum.Blend;
+                    break;
+                case "blendpremult":
+                    blendmode = render.BlendModeEnum.Blend_PreMultiply;
+                    break;
+            }
+            pass.setAlphaBlend(blendmode);
 
             var program = assetmgr.shaderPool.linkProgram(assetmgr.webgl, vs, fs);
             pass.setProgram(program);

@@ -511,6 +511,30 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare namespace t {
+    class test_pathAsset implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        start(app: gd3d.framework.application): void;
+        private loadShader(laststate, state);
+        private loadTexture(laststate, state);
+        private loadpath(laststate, state);
+        private loadasset(laststate, state);
+        sh: gd3d.framework.shader;
+        private initscene(laststate, state);
+        private parentlist;
+        private dragonlist;
+        private trailrender;
+        private path;
+        private showcamera;
+        target: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        angle: number;
+        timer: number;
+        guidpp: gd3d.framework.guidpath;
+        update(delta: number): void;
+    }
+}
 declare class test_pick implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

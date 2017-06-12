@@ -249,6 +249,10 @@
             "length": 0
         },
         {
+            "name": "resources/_project/asi_bothside.shader.json",
+            "length": 0
+        },
+        {
             "name": "resources/_project/asi.fs.glsl",
             "length": 0
         },

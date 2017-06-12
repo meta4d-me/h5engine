@@ -56,6 +56,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("TestRotate",()=>new t.TestRotate());
         this.addBtn("testtrailrenderRecorde",()=>new t.test_trailrenderrecorde());
         this.addBtn("effect",()=>new test_effect());
+        this.addBtn("pathasset",()=>new t.test_pathAsset());
     }
     private x: number = 0;
     private y: number = 100;

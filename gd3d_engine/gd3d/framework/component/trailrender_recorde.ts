@@ -70,6 +70,11 @@ namespace gd3d.framework {
             this._startWidth = startWidth;
             this._endWidth = endWidth;
         }
+        private activeMaxpointlimit:boolean=false;
+        setMaxpointcontroll(value:boolean=false)
+        {
+            this.activeMaxpointlimit=value;
+        }
 
         //------------------------------------------------------------------------------------------------------
         start() {
@@ -141,6 +146,7 @@ namespace gd3d.framework {
 
             var newNode = new trailNode(pos, updir, curTime);
             this.nodes.unshift(newNode);
+
             if (this.interpolate) {
                 if (this.nodes.length > 2) {
                     var handle1 = new gd3d.math.vector3();
@@ -189,9 +195,13 @@ namespace gd3d.framework {
             //     this.nodes.pop();
             // }
             //控制粒子数量
-            while (this.targetPath.length > this.maxStickCout) {
-                this.targetPath.pop();
+            if(this.activeMaxpointlimit)
+            {
+                while (this.targetPath.length > this.maxStickCout) {
+                    this.targetPath.pop();
+                }
             }
+
         }
 
 
@@ -237,10 +247,10 @@ namespace gd3d.framework {
                 //this.dataForVbo[2 * i * 9 + 7] = timeAlong;
                 this.dataForVbo[2 * i * 9 + 8] = 1.0;
 
-                gd3d.math.vec3Subtract(curNode.location, _updir, tempPos);
-                this.dataForVbo[(2 * i + 1) * 9 + 0] = tempPos.x;
-                this.dataForVbo[(2 * i + 1) * 9 + 1] = tempPos.y;
-                this.dataForVbo[(2 * i + 1) * 9 + 2] = tempPos.z;
+                //gd3d.math.vec3Subtract(curNode.location, _updir, tempPos);
+                this.dataForVbo[(2 * i + 1) * 9 + 0] = curNode.location.x;
+                this.dataForVbo[(2 * i + 1) * 9 + 1] = curNode.location.y;
+                this.dataForVbo[(2 * i + 1) * 9 + 2] = curNode.location.z;
 
                 this.dataForVbo[(2 * i + 1) * 9 + 3] = tempColor.r;
                 this.dataForVbo[(2 * i + 1) * 9 + 4] = tempColor.g;
