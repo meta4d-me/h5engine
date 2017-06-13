@@ -3891,7 +3891,6 @@ var test_pick = (function () {
             var coll = this.cube2.gameObject.addComponent("spherecollider");
             coll.center = new gd3d.math.vector3(0, 1, 0);
             coll.radius = 1;
-            this.cube2.gameObject.addComponent("frustumculling");
         }
         {
             this.cube4 = new gd3d.framework.transform();

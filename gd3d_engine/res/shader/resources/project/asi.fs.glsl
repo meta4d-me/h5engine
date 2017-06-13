@@ -7,10 +7,6 @@ uniform highp float _emitpow;
 uniform highp float _diffuse;
 uniform highp float _Cutoff;
 
-uniform highp vec4 glstate_vec4_lightposs[8];
-uniform highp vec4 glstate_vec4_lightdirs[8];
-uniform highp float glstate_float_spotangelcoss[8];
-uniform highp float glstate_lightcount;
 
 varying highp vec2 _base_uv;
 varying highp vec2 _asm_uv;

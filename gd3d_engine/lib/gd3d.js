@@ -8388,30 +8388,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var frustumculling = (function () {
-            function frustumculling() {
-            }
-            frustumculling.prototype.start = function () {
-            };
-            frustumculling.prototype.update = function (delta) {
-            };
-            frustumculling.prototype.remove = function () {
-            };
-            frustumculling.prototype.clone = function () {
-            };
-            return frustumculling;
-        }());
-        frustumculling = __decorate([
-            gd3d.reflect.nodeComponent,
-            __metadata("design:paramtypes", [])
-        ], frustumculling);
-        framework.frustumculling = frustumculling;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var guidpath = (function () {
             function guidpath() {
                 this.speed = 1;
@@ -10075,6 +10051,13 @@ var gd3d;
             binBuffer.prototype.getBytesAvailable = function () {
                 return this.getLength();
             };
+            binBuffer.prototype.reset = function () {
+                this._buf = [];
+                this._seekWritePos = 0;
+                this._seekWriteIndex = 0;
+                this._buf[0] = new Uint8Array(this._bufSize);
+                this._seekReadPos = 0;
+            };
             binBuffer.prototype.read = function (target, offset, length) {
                 if (offset === void 0) { offset = 0; }
                 if (length === void 0) { length = -1; }
@@ -10082,6 +10065,7 @@ var gd3d;
                     length = target.length;
                 for (var i = offset; i < offset + length; i++) {
                     if (this._seekReadPos >= this._seekWritePos && 0 == this._seekWriteIndex) {
+                        this.reset();
                         throw new Error("no data to read.");
                     }
                     target[i] = this._buf[0][this._seekReadPos];
@@ -15693,8 +15677,9 @@ var gd3d;
                             if (_data["simulationSpeed"] != undefined) {
                                 data.simulationSpeed = this._parseToObjData("simulationSpeed", _data["simulationSpeed"]);
                             }
-                            if (_data["alpha"] != undefined)
+                            if (_data["alpha"] != undefined) {
                                 data.alpha = this._parseToObjData("alpha", _data["alpha"]);
+                            }
                             if (_data["alphaSpeed"] != undefined)
                                 data.alphaSpeed = this._parseToObjData("alphaSpeed", _data["alphaSpeed"]);
                             if (_data["alphaNodes"] != undefined) {
@@ -15704,8 +15689,27 @@ var gd3d;
                                     data.alpha.key = 0;
                                 }
                                 for (var i in _data["alphaNodes"]) {
-                                    var node = framework.EffectUtil.parseEffectNum(_data["alphaNodes"][i]);
+                                    var node = new framework.ParticleNodeNumber();
+                                    var item = _data["alphaNodes"][i];
+                                    if (item["key"] != null) {
+                                        node.key = item["key"];
+                                    }
+                                    var alphavalue = item["alpha"];
+                                    if (alphavalue != null) {
+                                        console.log("alphavalue:   " + alphavalue);
+                                        if (alphavalue instanceof Array) {
+                                            node.num.valueLimitMin = alphavalue[0];
+                                            node.num.valueLimitMax = alphavalue[1];
+                                        }
+                                        else {
+                                            console.log("--------赋值---------");
+                                            node.num.value = alphavalue;
+                                        }
+                                    }
                                     data.alphaNodes.push(node);
+                                }
+                                for (var i in data.alphaNodes) {
+                                    console.log("alphavalue:  " + data.alphaNodes[i].num.getValue() + "key:  " + data.alphaNodes[i].key);
                                 }
                             }
                             if (_data["color"] != undefined)

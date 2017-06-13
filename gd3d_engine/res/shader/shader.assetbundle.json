@@ -89,15 +89,15 @@
             "length": 0
         },
         {
-            "name": "resources/_project/uvroll.vs.glsl",
+            "name": "resources/project/uvroll.vs.glsl",
             "length": 0
         },
         {
-            "name": "resources/_project/uvroll.shader.json",
+            "name": "resources/project/uvroll.shader.json",
             "length": 0
         },        
         {
-            "name": "resources/_project/uvroll.fs.glsl",
+            "name": "resources/project/uvroll.fs.glsl",
             "length": 0
         },
         {
@@ -209,15 +209,15 @@
             "length": 0
         },
         {
-            "name": "resources/_project/streamlight.shader.json",
+            "name": "resources/project/streamlight.shader.json",
             "length": 0
         },
         {
-            "name": "resources/_project/streamlight.fs.glsl",
+            "name": "resources/project/streamlight.fs.glsl",
             "length": 0
         },
         {
-            "name": "resources/_project/streamlight.vs.glsl",
+            "name": "resources/project/streamlight.vs.glsl",
             "length": 0
         },
         {
@@ -225,43 +225,43 @@
             "length": 0
         },
         {
-            "name": "resources/_project/streamlightbone_eff.vs.glsl",
+            "name": "resources/project/streamlightbone_eff.vs.glsl",
             "length": 0
         },
         {
-            "name": "resources/_project/streamlight_bothside.shader.json",
+            "name": "resources/project/streamlight_bothside.shader.json",
             "length": 0
         },
         {
-            "name": "resources/_project/fakepbr.shader.json",
+            "name": "resources/project/fakepbr.shader.json",
             "length": 0
         },
         {
-            "name": "resources/_project/fakepbr.fs.glsl",
+            "name": "resources/project/fakepbr.fs.glsl",
             "length": 0
         },
         {
-            "name": "resources/_project/fakepbr.vs.glsl",
+            "name": "resources/project/fakepbr.vs.glsl",
             "length": 0
         },
         {
-            "name": "resources/_project/asi.shader.json",
+            "name": "resources/project/asi.shader.json",
             "length": 0
         },
         {
-            "name": "resources/_project/asi_bothside.shader.json",
+            "name": "resources/project/asi_bothside.shader.json",
             "length": 0
         },
         {
-            "name": "resources/_project/asi.fs.glsl",
+            "name": "resources/project/asi.fs.glsl",
             "length": 0
         },
         {
-            "name": "resources/_project/asi.vs.glsl",
+            "name": "resources/project/asi.vs.glsl",
             "length": 0
         },
         {
-            "name": "resources/_project/asibone_eff.vs.glsl",
+            "name": "resources/project/asibone_eff.vs.glsl",
             "length": 0
         },
         {

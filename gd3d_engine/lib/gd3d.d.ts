@@ -1334,16 +1334,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class frustumculling implements INodeComponent {
-        constructor();
-        gameObject: gameObject;
-        start(): void;
-        update(delta: number): void;
-        remove(): void;
-        clone(): void;
-    }
-}
-declare namespace gd3d.framework {
     class guidpath implements INodeComponent {
         private paths;
         _pathasset: pathasset;
@@ -1671,6 +1661,7 @@ declare namespace gd3d.io {
         getBufLength(): number;
         getBytesAvailable(): number;
         constructor(bufSize?: number);
+        reset(): void;
         read(target: Uint8Array | number[], offset?: number, length?: number): void;
         write(array: Uint8Array | number[], offset?: number, length?: number): void;
         getBuffer(): Uint8Array;

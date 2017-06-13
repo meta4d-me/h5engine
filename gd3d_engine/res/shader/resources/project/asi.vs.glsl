@@ -1,8 +1,6 @@
 attribute vec3 _glesVertex;
 attribute vec2 _glesMultiTexCoord0;
-//attribute vec3 _glesNormal;
 
-//uniform highp vec4 glstate_eyepos;
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp mat4 glstate_matrix_model;
 uniform highp vec4 _MainTex_ST;
