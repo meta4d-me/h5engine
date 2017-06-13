@@ -33,7 +33,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000009";
+                this.build = "b000010";
                 this.beStepNumber = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
