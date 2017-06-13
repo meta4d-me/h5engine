@@ -1333,6 +1333,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class guidpath implements INodeComponent {
         private paths;
+        _pathasset: pathasset;
         pathasset: pathasset;
         speed: number;
         private isactived;

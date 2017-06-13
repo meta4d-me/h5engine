@@ -6114,10 +6114,13 @@ var gd3d;
                 framework.sceneMgr.app.getAssetMgr().unuse(this);
             };
             pathasset.prototype.dispose = function () {
+                this.paths.length = 0;
             };
             pathasset.prototype.caclByteLength = function () {
                 if (this.paths) {
-                    return 0;
+                    var length = this.paths.length;
+                    var value = length * 12;
+                    return value;
                 }
             };
             pathasset.prototype.Parse = function (json) {
@@ -6152,6 +6155,11 @@ var gd3d;
                     this.items.push(item);
                 }
                 this.getpaths();
+                this.items.length = 0;
+                for (var i = 0; i < this.lines.length; i++) {
+                    this.lines[i].length = 0;
+                }
+                this.lines.length = 0;
             };
             pathasset.prototype.getpaths = function () {
                 var line = new Array();
@@ -8343,6 +8351,22 @@ var gd3d;
                 this.lookforward = false;
                 this.adjustDir = false;
             }
+            Object.defineProperty(guidpath.prototype, "pathasset", {
+                get: function () {
+                    return this._pathasset;
+                },
+                set: function (pathasset) {
+                    if (this._pathasset) {
+                        this._pathasset.unuse();
+                    }
+                    this._pathasset = pathasset;
+                    if (this._pathasset) {
+                        this._pathasset.use();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
             guidpath.prototype.play = function () {
                 this.isactived = true;
             };
@@ -8423,10 +8447,11 @@ var gd3d;
                 }
             };
             guidpath.prototype.remove = function () {
-                throw new Error('Method not implemented.');
+                if (this._pathasset) {
+                    this._pathasset.unuse();
+                }
             };
             guidpath.prototype.clone = function () {
-                throw new Error('Method not implemented.');
             };
             return guidpath;
         }());

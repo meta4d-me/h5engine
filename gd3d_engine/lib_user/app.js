@@ -203,6 +203,7 @@ var main = (function () {
         this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
         this.addBtn("effect", function () { return new test_effect(); });
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
+        this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1775,6 +1776,42 @@ var test_anim = (function () {
         objCam.updateWorldTran();
     };
     return test_anim;
+}());
+var test_loadAsiprefab = (function () {
+    function test_loadAsiprefab() {
+        this.timer = 0;
+    }
+    test_loadAsiprefab.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.app.getAssetMgr().load("res/prefabs/0001_archangel@idle_mesh/0001_archangel@idle_mesh.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        var _prefab = _this.app.getAssetMgr().getAssetByName("0001_archangel@idle_mesh.prefab.json");
+                        _this.baihu = _prefab.getCloneTrans();
+                        _this.scene.addChild(_this.baihu);
+                        objCam.lookat(_this.baihu);
+                        objCam.markDirty();
+                    }
+                });
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
+        objCam.markDirty();
+    };
+    test_loadAsiprefab.prototype.update = function (delta) {
+    };
+    return test_loadAsiprefab;
 }());
 var test_assestmgr = (function () {
     function test_assestmgr() {

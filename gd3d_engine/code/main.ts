@@ -57,6 +57,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("testtrailrenderRecorde",()=>new t.test_trailrenderrecorde());
         this.addBtn("effect",()=>new test_effect());
         this.addBtn("pathasset",()=>new t.test_pathAsset());
+        this.addBtn("test_Asi_prefab",()=>new test_loadAsiprefab());
     }
     private x: number = 0;
     private y: number = 100;
