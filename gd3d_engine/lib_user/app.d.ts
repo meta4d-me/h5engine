@@ -235,6 +235,15 @@ declare class test_anim implements IState {
     timer: number;
     update(delta: number): void;
 }
+declare class test_loadAsiprefab implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    baihu: gd3d.framework.transform;
+    timer: number;
+    update(delta: number): void;
+}
 declare class test_assestmgr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

@@ -33,7 +33,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000009";
+                this.build = "b000010";
                 this.beStepNumber = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
@@ -6114,10 +6114,13 @@ var gd3d;
                 framework.sceneMgr.app.getAssetMgr().unuse(this);
             };
             pathasset.prototype.dispose = function () {
+                this.paths.length = 0;
             };
             pathasset.prototype.caclByteLength = function () {
                 if (this.paths) {
-                    return 0;
+                    var length = this.paths.length;
+                    var value = length * 12;
+                    return value;
                 }
             };
             pathasset.prototype.Parse = function (json) {
@@ -6152,6 +6155,11 @@ var gd3d;
                     this.items.push(item);
                 }
                 this.getpaths();
+                this.items.length = 0;
+                for (var i = 0; i < this.lines.length; i++) {
+                    this.lines[i].length = 0;
+                }
+                this.lines.length = 0;
             };
             pathasset.prototype.getpaths = function () {
                 var line = new Array();
@@ -8414,6 +8422,22 @@ var gd3d;
                 this.lookforward = false;
                 this.adjustDir = false;
             }
+            Object.defineProperty(guidpath.prototype, "pathasset", {
+                get: function () {
+                    return this._pathasset;
+                },
+                set: function (pathasset) {
+                    if (this._pathasset) {
+                        this._pathasset.unuse();
+                    }
+                    this._pathasset = pathasset;
+                    if (this._pathasset) {
+                        this._pathasset.use();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
             guidpath.prototype.play = function () {
                 this.isactived = true;
             };
@@ -8494,10 +8518,11 @@ var gd3d;
                 }
             };
             guidpath.prototype.remove = function () {
-                throw new Error('Method not implemented.');
+                if (this._pathasset) {
+                    this._pathasset.unuse();
+                }
             };
             guidpath.prototype.clone = function () {
-                throw new Error('Method not implemented.');
             };
             return guidpath;
         }());
@@ -14654,9 +14679,9 @@ var gd3d;
                     var _radius = framework.ValueData.RandomRange(0, this.radius);
                     var θ = framework.ValueData.RandomRange(0, Math.PI / 2);
                     var φ = framework.ValueData.RandomRange(-Math.PI, Math.PI);
-                    this._hemisphereDirection.z = _radius * Math.sin(θ) * Math.cos(φ);
+                    this._hemisphereDirection.z = _radius * Math.cos(θ);
                     this._hemisphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-                    this._hemisphereDirection.x = _radius * Math.cos(θ);
+                    this._hemisphereDirection.x = _radius * Math.sin(θ) * Math.cos(φ);
                     gd3d.math.vec3Normalize(this._hemisphereDirection, this._hemisphereDirection);
                     framework.EffectUtil.RotateVector3(this._hemisphereDirection, this.direction, this._hemisphereDirection);
                     this.getRandomPosition(this._hemisphereDirection, _radius);

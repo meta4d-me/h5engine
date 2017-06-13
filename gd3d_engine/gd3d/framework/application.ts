@@ -24,7 +24,7 @@ namespace gd3d.framework
         notify: INotify;
         timeScale:number;
 		version:string = "v0.0.1";
-		build:string = "b000009";
+		build:string = "b000010";
         constructor(){
             window["gd3d_app"] = this;
         }

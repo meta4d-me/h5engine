@@ -39,16 +39,16 @@ namespace gd3d.framework
         }
         dispose()
         {
-           // this.content == null;
+           this.paths.length=0;
         }
-        //content: string;
 
         caclByteLength(): number
         {
             if (this.paths)
             {
-                //return math.caclStringByteLength(this.paths);
-                return 0;
+                var length=this.paths.length;
+                var value=length*12;
+                return value;
             }
         }
         paths:gd3d.math.vector3[]=[];
@@ -92,6 +92,13 @@ namespace gd3d.framework
                 this.items.push(item);
            }
            this.getpaths();
+           //------------------------------------------------
+           this.items.length=0;
+           for(var i=0;i<this.lines.length;i++)
+           {
+               this.lines[i].length=0;
+           }
+           this.lines.length=0;
         }
         private lines:Array<gd3d.math.vector3>[]=[];
         private getpaths()
