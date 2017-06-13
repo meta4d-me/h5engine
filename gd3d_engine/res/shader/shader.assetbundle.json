@@ -180,10 +180,10 @@
             "name": "resources/particle/particles_blend.shader.json",
             "length": 0
         },
-	{
-	    "name": "resources/particle/particles_blend_renderall.shader.json",
-	    "length":0
-	},
+        {
+            "name": "resources/particle/particles_blend_renderall.shader.json",
+            "length":0
+        },
         {
             "name": "resources/particle/particles_blend_premultiply.shader.json",
             "length": 0

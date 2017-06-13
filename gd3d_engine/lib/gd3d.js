@@ -15696,20 +15696,15 @@ var gd3d;
                                     }
                                     var alphavalue = item["alpha"];
                                     if (alphavalue != null) {
-                                        console.log("alphavalue:   " + alphavalue);
                                         if (alphavalue instanceof Array) {
                                             node.num.valueLimitMin = alphavalue[0];
                                             node.num.valueLimitMax = alphavalue[1];
                                         }
                                         else {
-                                            console.log("--------赋值---------");
                                             node.num.value = alphavalue;
                                         }
                                     }
                                     data.alphaNodes.push(node);
-                                }
-                                for (var i in data.alphaNodes) {
-                                    console.log("alphavalue:  " + data.alphaNodes[i].num.getValue() + "key:  " + data.alphaNodes[i].key);
                                 }
                             }
                             if (_data["color"] != undefined)
