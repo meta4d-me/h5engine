@@ -2585,11 +2585,11 @@ var test_loadScene = (function () {
         this.scene.addChild(this.cube);
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/city/city.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/scenes/chuangjue-01/chuangjue-01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     console.log(s.curtask + "/" + s.totaltask);
                     console.log(s.progress);
                     if (s.isfinish) {
-                        var _scene = _this.app.getAssetMgr().getAssetByName("city.scene.json");
+                        var _scene = _this.app.getAssetMgr().getAssetByName("chuangjue-01.scene.json");
                         var _root = _scene.getSceneRoot();
                         _this.scene.addChild(_root);
                         _root.localTranslate = new gd3d.math.vector3(0, 0, -50);
@@ -2616,14 +2616,7 @@ var test_loadScene = (function () {
         var z2 = Math.cos(this.timer * 0.5);
         var objCam = this.camera.gameObject.transform;
         objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, -z2 * 10);
-        if (this.timer > 5) {
-            this.app.getScene().getRoot().dispose();
-        }
-        if (this.timer > 10 && !this.bere) {
-            this.bere = true;
-            this.app.getAssetMgr().unload("res/scenes/city/city.assetbundle.json");
-            this.app.getAssetMgr().releaseUnuseAsset();
-        }
+        objCam.markDirty();
     };
     return test_loadScene;
 }());
@@ -3857,11 +3850,11 @@ var test_pick = (function () {
             var mesh = this.cube2.gameObject.addComponent("meshFilter");
             mesh.mesh = (smesh);
             var renderer = this.cube2.gameObject.addComponent("meshRenderer");
-            var coll = this.cube2.gameObject.addComponent("boxcollider");
-            coll.colliderVisible = true;
+            var coll = this.cube2.gameObject.addComponent("spherecollider");
+            coll.center = new gd3d.math.vector3(0, 1, 0);
+            coll.radius = 1;
+            this.cube2.gameObject.addComponent("frustumculling");
         }
-        this.cube3 = this.cube2.clone();
-        this.scene.addChild(this.cube3);
         {
             this.cube4 = new gd3d.framework.transform();
             this.cube4.name = "cube4";
@@ -3896,13 +3889,13 @@ var test_pick = (function () {
         }
         this.pointDown = this.inputMgr.point.touch;
         this.timer += delta;
-        if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
-            return;
-        }
-        this.cube3.localTranslate.x += delta;
-        this.cube3.markDirty();
-        if (this.timer > 1)
-            return;
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.1);
+        var z2 = Math.cos(this.timer * 0.1);
+        var objCam = this.camera.gameObject.transform;
+        objCam.localTranslate.x += delta;
+        objCam.markDirty();
     };
     return test_pick;
 }());

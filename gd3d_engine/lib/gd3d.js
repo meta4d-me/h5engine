@@ -7625,6 +7625,7 @@ var gd3d;
                 this.matProjP = new gd3d.math.matrix;
                 this.matProjO = new gd3d.math.matrix;
                 this.matProj = new gd3d.math.matrix;
+                this.frameVecs = [];
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
                 this.opvalue = 1;
@@ -7771,12 +7772,46 @@ var gd3d;
                 this.calcViewMatrix(matrixView);
                 this.calcProjectMatrix(asp, matrixProject);
                 var matrixViewProject = new gd3d.math.matrix();
-                var matinv = new gd3d.math.matrix();
                 gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
                 var ndcPos = gd3d.math.pool.new_vector3();
                 gd3d.math.matrixTransformVector3(worldPos, matrixViewProject, ndcPos);
                 outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
                 outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
+            };
+            camera.prototype.calcCameraFrame = function (app) {
+                var _vpp = new gd3d.math.rect();
+                this.calcViewPortPixel(app, _vpp);
+                var near_h = this.near * Math.tan(this.fov * 0.5);
+                var asp = _vpp.w / _vpp.h;
+                var near_w = near_h * asp;
+                var nearLT = new gd3d.math.vector3(-near_w, near_h, this.near);
+                var nearLD = new gd3d.math.vector3(-near_w, -near_h, this.near);
+                var nearRT = new gd3d.math.vector3(near_w, near_h, this.near);
+                var nearRD = new gd3d.math.vector3(near_w, -near_h, this.near);
+                var far_h = this.far * Math.tan(this.fov * 0.5);
+                var far_w = far_h * asp;
+                var farLT = new gd3d.math.vector3(-far_w, far_h, this.far);
+                var farLD = new gd3d.math.vector3(-far_w, -far_h, this.far);
+                var farRT = new gd3d.math.vector3(far_w, far_h, this.far);
+                var farRD = new gd3d.math.vector3(far_w, -far_h, this.far);
+                var matrix = this.gameObject.transform.getWorldMatrix();
+                gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
+                gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
+                gd3d.math.matrixTransformVector3(farRD, matrix, farRD);
+                gd3d.math.matrixTransformVector3(nearRD, matrix, nearRD);
+                gd3d.math.matrixTransformVector3(farLT, matrix, farLT);
+                gd3d.math.matrixTransformVector3(nearLT, matrix, nearLT);
+                gd3d.math.matrixTransformVector3(farRT, matrix, farRT);
+                gd3d.math.matrixTransformVector3(nearRT, matrix, nearRT);
+                this.frameVecs.length = 0;
+                this.frameVecs.push(farLD);
+                this.frameVecs.push(nearLD);
+                this.frameVecs.push(farRD);
+                this.frameVecs.push(nearRD);
+                this.frameVecs.push(farLT);
+                this.frameVecs.push(nearLT);
+                this.frameVecs.push(farRT);
+                this.frameVecs.push(nearRT);
             };
             camera.prototype.getPosAtXPanelInViewCoordinateByScreenPos = function (screenPos, app, z, out) {
                 var vpp = new gd3d.math.rect();
@@ -7807,6 +7842,18 @@ var gd3d;
                         this._fillRenderer(scene, node.children[i]);
                     }
                 }
+            };
+            camera.prototype.testFrustumCulling = function (scene, node) {
+                if (!node.gameObject.getComponent("frustumculling"))
+                    return true;
+                var spherecol = node.gameObject.getComponent("spherecollider");
+                var worldPos = node.getWorldTranslate();
+                spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]);
+                spherecol.caclPlaneDis(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]);
+                spherecol.caclPlaneDis(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]);
+                spherecol.caclPlaneDis(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]);
+                spherecol.caclPlaneDis(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]);
+                spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]);
             };
             camera.prototype._targetAndViewport = function (target, scene, context, withoutClear) {
                 {
@@ -8327,6 +8374,30 @@ var gd3d;
         ], effectSystem);
         framework.effectSystem = effectSystem;
         var effectSystem_1;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var frustumculling = (function () {
+            function frustumculling() {
+            }
+            frustumculling.prototype.start = function () {
+            };
+            frustumculling.prototype.update = function (delta) {
+            };
+            frustumculling.prototype.remove = function () {
+            };
+            frustumculling.prototype.clone = function () {
+            };
+            return frustumculling;
+        }());
+        frustumculling = __decorate([
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], frustumculling);
+        framework.frustumculling = frustumculling;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9184,7 +9255,7 @@ var gd3d;
     (function (framework) {
         var spherestruct = (function () {
             function spherestruct(_center, _r) {
-                this.center = _center;
+                this.center = gd3d.math.pool.clone_vector3(_center);
                 this.srcradius = _r;
                 this.tempScale = new gd3d.math.vector3();
             }
@@ -9212,8 +9283,18 @@ var gd3d;
         framework.spherestruct = spherestruct;
         var spherecollider = (function () {
             function spherecollider() {
+                this._worldCenter = new gd3d.math.vector3();
                 this._colliderVisible = false;
             }
+            Object.defineProperty(spherecollider.prototype, "worldCenter", {
+                get: function () {
+                    gd3d.math.vec3Add(this.gameObject.transform.localTranslate, this.center, this._worldCenter);
+                    gd3d.math.matrixTransformVector3(this._worldCenter, this.gameObject.transform.getWorldMatrix(), this._worldCenter);
+                    return this._worldCenter;
+                },
+                enumerable: true,
+                configurable: true
+            });
             spherecollider.prototype.getBound = function () {
                 return this.spherestruct;
             };
@@ -9248,6 +9329,18 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            spherecollider.prototype.caclPlaneDis = function (v0, v1, v2) {
+                var subv0 = gd3d.math.pool.new_vector3();
+                var subv1 = gd3d.math.pool.new_vector3();
+                var cro0 = gd3d.math.pool.new_vector3();
+                var point = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(v1, v0, subv0);
+                gd3d.math.vec3Subtract(v2, v1, subv1);
+                gd3d.math.vec3Cross(subv0, subv1, cro0);
+                gd3d.math.calPlaneLineIntersectPoint(cro0, v0, cro0, this.worldCenter, point);
+                var dis = gd3d.math.vec3Distance(this.worldCenter, point);
+                console.log(dis);
+            };
             spherecollider.prototype.intersectsTransform = function (tran) {
                 if (tran.gameObject.collider == null)
                     return false;
@@ -9260,7 +9353,6 @@ var gd3d;
                 if (this.center && this.radius) {
                     this.spherestruct = new spherestruct(this.center, this.radius);
                 }
-                this.buildMesh();
             };
             spherecollider.prototype.buildMesh = function () {
                 this.subTran = new gd3d.framework.transform();
@@ -9293,7 +9385,7 @@ var gd3d;
             __metadata("design:type", gd3d.math.vector3)
         ], spherecollider.prototype, "center", void 0);
         __decorate([
-            gd3d.reflect.Field("vector3"),
+            gd3d.reflect.Field("number"),
             __metadata("design:type", Number)
         ], spherecollider.prototype, "radius", void 0);
         spherecollider = __decorate([
@@ -19282,6 +19374,8 @@ var gd3d;
                 var pickinfo = null;
                 if (_collider instanceof framework.boxcollider) {
                     var obb = _collider.getBound();
+                    if (!obb)
+                        return null;
                     var vecs = [];
                     obb.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
                     var data = gd3d.render.meshData.genBoxByArray(vecs);

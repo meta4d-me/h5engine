@@ -1261,16 +1261,19 @@ declare namespace gd3d.framework {
         creatRayByScreen(screenpos: gd3d.math.vector2, app: application): ray;
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3): void;
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2): void;
+        calcCameraFrame(app: application): void;
         private matView;
         private matProjP;
         private matProjO;
         private matProj;
+        private frameVecs;
         fov: number;
         size: number;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
         private _fillRenderer(scene, node);
+        testFrustumCulling(scene: scene, node: transform): boolean;
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean): void;
         _renderOnce(scene: scene, context: renderContext, drawtype: string): void;
         postQueues: ICameraPostQueue[];
@@ -1328,6 +1331,16 @@ declare namespace gd3d.framework {
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
+    }
+}
+declare namespace gd3d.framework {
+    class frustumculling implements INodeComponent {
+        constructor();
+        gameObject: gameObject;
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1518,12 +1531,15 @@ declare namespace gd3d.framework {
         spherestruct: spherestruct;
         center: math.vector3;
         radius: number;
+        _worldCenter: math.vector3;
+        readonly worldCenter: math.vector3;
         getBound(): spherestruct;
         readonly matrix: gd3d.math.matrix;
         start(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
+        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): void;
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();
