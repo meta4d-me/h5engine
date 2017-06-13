@@ -13,12 +13,13 @@ class test_loadAsiprefab implements IState
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load("res/prefabs/0001_archangel@idle_mesh/0001_archangel@idle_mesh.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                this.app.getAssetMgr().load("res/prefabs/0001_archangel@idle_none/0001_archangel@idle_none.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                     (s) =>
                     {
                         if (s.isfinish)
                         {
-                            var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("0001_archangel@idle_mesh.prefab.json") as gd3d.framework.prefab;
+                            var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("0001_archangel@idle_none.prefab.json") as gd3d.framework.prefab;
+                            
                             this.baihu = _prefab.getCloneTrans();
                             this.scene.addChild(this.baihu);
                             // this.baihu.localScale = new gd3d.math.vector3(20, 20, 20);
@@ -26,9 +27,27 @@ class test_loadAsiprefab implements IState
 
                             // this.baihu = _prefab.getCloneTrans();
                             // this.scene.addChild(this.baihu);
-                            
+                            var test=this.baihu;
                             objCam.lookat(this.baihu);
                             objCam.markDirty();
+
+                            // var tex=this.app.getAssetMgr().getAssetByName("0001_archangel.imgdesc.json")as gd3d.framework.texture;
+                            // var cube=new gd3d.framework.transform();
+                            // var meshf=cube.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER)as gd3d.framework.meshFilter;
+                            // var meshr=cube.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER)as gd3d.framework.meshRenderer;
+                            // var mesh=this.app.getAssetMgr().getDefaultMesh("cube")as gd3d.framework.mesh;
+                            // var mat=new gd3d.framework.material();
+                            // var shader=this.app.getAssetMgr().getShader("diffuse.shader.json");
+                            // mat.setShader(shader);
+                            // mat.setTexture("_MainTex",tex);
+                            // meshf.mesh=mesh;
+                            // meshr.materials=[];
+                            // meshr.materials.push(mat);
+
+                           // this.scene.addChild(cube);
+
+                        //    var render= this.baihu.gameObject.getComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER)as gd3d.framework.meshRenderer;
+                        //    render.materials[0].setTexture("_MainTex",tex);
                         }
                     });
             }
@@ -42,7 +61,7 @@ class test_loadAsiprefab implements IState
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
+        objCam.localTranslate = new gd3d.math.vector3(0, 5, 5);
         objCam.markDirty();//标记为需要刷新
 
     }

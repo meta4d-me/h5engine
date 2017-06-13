@@ -1,18 +1,18 @@
 {
-    "shader":"asi_bothside.shader.json",
-    "srcshader":"Gd3d/Asi_bothside",
+    "shader":"asi.shader.json",
+    "srcshader":"Gd3d/Asi",
     "mapUniform":{
         "_MainTex":{
             "type":0,
             "value":"0001_archangel.imgdesc.json"
             },
-        "_diffue":{
+        "_diffuse":{
             "type":1,
-            "value":1.28571426868439
+            "value":1.01785719394684
             },
         "_emitpow":{
             "type":1,
-            "value":4.25747481713756E-09
+            "value":1.42857146263123
             },
         "_asm":{
             "type":0,

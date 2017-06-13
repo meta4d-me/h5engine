@@ -1789,11 +1789,12 @@ var test_loadAsiprefab = (function () {
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/0001_archangel@idle_mesh/0001_archangel@idle_mesh.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/prefabs/0001_archangel@idle_none/0001_archangel@idle_none.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName("0001_archangel@idle_mesh.prefab.json");
+                        var _prefab = _this.app.getAssetMgr().getAssetByName("0001_archangel@idle_none.prefab.json");
                         _this.baihu = _prefab.getCloneTrans();
                         _this.scene.addChild(_this.baihu);
+                        var test = _this.baihu;
                         objCam.lookat(_this.baihu);
                         objCam.markDirty();
                     }
@@ -1806,7 +1807,7 @@ var test_loadAsiprefab = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
+        objCam.localTranslate = new gd3d.math.vector3(0, 5, 5);
         objCam.markDirty();
     };
     test_loadAsiprefab.prototype.update = function (delta) {

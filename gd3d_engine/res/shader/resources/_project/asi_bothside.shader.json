@@ -8,6 +8,13 @@
                 "fs": "asi"
             }
         ],
+        "skin": [
+            {
+                "showface": "all",
+                "vs": "asibone_eff",
+                "fs": "asi"
+            }
+        ],
         "shadowgen": [],
         "bone": [],
         "shadowuse": []
