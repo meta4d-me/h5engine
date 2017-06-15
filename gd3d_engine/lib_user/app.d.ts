@@ -533,16 +533,20 @@ declare namespace t {
         private initscene(laststate, state);
         private parentlist;
         private dragonlist;
-        private trailrender;
+        private traillist;
+        private guippaths;
         private path;
         private showcamera;
         target: gd3d.framework.transform;
         taskmgr: gd3d.framework.taskMgr;
         angle: number;
         timer: number;
-        guidpp: gd3d.framework.guidpath;
         update(delta: number): void;
+        private addbtns();
+        private addBtn(text, x, y, func);
     }
+    function DBgetAtrans(mat: gd3d.framework.material, meshname?: string): gd3d.framework.transform;
+    function DBgetMat(texname?: string, shaderstring?: string): gd3d.framework.material;
 }
 declare class test_pick implements IState {
     app: gd3d.framework.application;

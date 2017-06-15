@@ -1340,15 +1340,16 @@ declare namespace gd3d.framework {
         pathasset: pathasset;
         speed: number;
         private isactived;
-        play(): void;
+        play(loopCount?: number): void;
         pause(): void;
         stop(): void;
-        replay(): void;
+        replay(loopCount?: number): void;
         private mystrans;
         private datasafe;
         private folowindex;
         isloop: boolean;
         lookforward: boolean;
+        private loopCount;
         private oncomplete;
         setpathasset(pathasset: pathasset, speed?: number, oncomplete?: () => void): void;
         start(): void;

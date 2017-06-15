@@ -8396,6 +8396,7 @@ var gd3d;
                 this.folowindex = 0;
                 this.isloop = false;
                 this.lookforward = false;
+                this.loopCount = 1;
                 this.adjustDir = false;
             }
             Object.defineProperty(guidpath.prototype, "pathasset", {
@@ -8414,8 +8415,10 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            guidpath.prototype.play = function () {
+            guidpath.prototype.play = function (loopCount) {
+                if (loopCount === void 0) { loopCount = 1; }
                 this.isactived = true;
+                this.loopCount = loopCount;
             };
             guidpath.prototype.pause = function () {
                 this.isactived = false;
@@ -8424,9 +8427,11 @@ var gd3d;
                 this.isactived = false;
                 this.folowindex = 0;
             };
-            guidpath.prototype.replay = function () {
+            guidpath.prototype.replay = function (loopCount) {
+                if (loopCount === void 0) { loopCount = 1; }
                 this.isactived = true;
                 this.folowindex = 0;
+                this.loopCount = loopCount;
             };
             guidpath.prototype.setpathasset = function (pathasset, speed, oncomplete) {
                 if (speed === void 0) { speed = 1; }
@@ -8466,9 +8471,13 @@ var gd3d;
                     else {
                         this.folowindex = 0;
                         if (!this.isloop) {
-                            this.isactived = false;
-                            if (this.oncomplete) {
-                                this.oncomplete();
+                            this.loopCount--;
+                            if (this.loopCount == 0) {
+                                this.isactived = false;
+                                this.loopCount = 1;
+                                if (this.oncomplete) {
+                                    this.oncomplete();
+                                }
                             }
                         }
                     }
