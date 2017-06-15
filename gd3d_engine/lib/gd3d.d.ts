@@ -588,6 +588,7 @@ declare namespace gd3d.framework {
         TextAsset = 15,
         PackBin = 16,
         PackTxt = 17,
+        pathAsset = 18,
     }
     class stateLoad {
         iserror: boolean;
@@ -903,6 +904,42 @@ declare namespace gd3d.framework {
         line: boolean;
         start: number;
         size: number;
+    }
+}
+declare namespace gd3d.framework {
+    class pathasset implements IAsset {
+        private name;
+        private id;
+        defaultAsset: boolean;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        use(): void;
+        unuse(): void;
+        dispose(): void;
+        caclByteLength(): number;
+        paths: gd3d.math.vector3[];
+        private type;
+        private instertPointcount;
+        private items;
+        Parse(json: JSON): void;
+        private lines;
+        private getpaths();
+        private getBeisaierPointAlongCurve(points, rate, clearflag?);
+        private vec3Lerp(start, end, lerp, out);
+    }
+    enum pathtype {
+        once = 0,
+        loop = 1,
+        pingpong = 2,
+    }
+    enum epointtype {
+        VertexPoint = 0,
+        ControlPoint = 1,
+    }
+    class pointitem {
+        point: gd3d.math.vector3;
+        type: epointtype;
     }
 }
 declare namespace gd3d.framework {
@@ -1224,16 +1261,19 @@ declare namespace gd3d.framework {
         creatRayByScreen(screenpos: gd3d.math.vector2, app: application): ray;
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3): void;
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2): void;
+        calcCameraFrame(app: application): void;
         private matView;
         private matProjP;
         private matProjO;
         private matProj;
+        private frameVecs;
         fov: number;
         size: number;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
         private _fillRenderer(scene, node);
+        testFrustumCulling(scene: scene, node: transform): boolean;
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean): void;
         _renderOnce(scene: scene, context: renderContext, drawtype: string): void;
         postQueues: ICameraPostQueue[];
@@ -1291,6 +1331,34 @@ declare namespace gd3d.framework {
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
+    }
+}
+declare namespace gd3d.framework {
+    class guidpath implements INodeComponent {
+        private paths;
+        _pathasset: pathasset;
+        pathasset: pathasset;
+        speed: number;
+        private isactived;
+        play(loopCount?: number): void;
+        pause(): void;
+        stop(): void;
+        replay(loopCount?: number): void;
+        private mystrans;
+        private datasafe;
+        private folowindex;
+        isloop: boolean;
+        lookforward: boolean;
+        private loopCount;
+        private oncomplete;
+        setpathasset(pathasset: pathasset, speed?: number, oncomplete?: () => void): void;
+        start(): void;
+        update(delta: number): void;
+        private adjustDir;
+        private followmove(delta);
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1455,12 +1523,15 @@ declare namespace gd3d.framework {
         spherestruct: spherestruct;
         center: math.vector3;
         radius: number;
+        _worldCenter: math.vector3;
+        readonly worldCenter: math.vector3;
         getBound(): spherestruct;
         readonly matrix: gd3d.math.matrix;
         start(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
+        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): void;
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();
@@ -1495,6 +1566,8 @@ declare namespace gd3d.framework {
         startColor: gd3d.math.color;
         endColor: gd3d.math.color;
         setWidth(startWidth: number, endWidth?: number): void;
+        private activeMaxpointlimit;
+        setMaxpointcontroll(value?: boolean): void;
         start(): void;
         private app;
         private webgl;
@@ -1535,6 +1608,8 @@ declare namespace gd3d.framework {
         start(): void;
         private app;
         private webgl;
+        private camerapositon;
+        extenedOneSide: boolean;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
@@ -1544,6 +1619,7 @@ declare namespace gd3d.framework {
         setWidth(Width: number): void;
         play(): void;
         stop(): void;
+        lookAtCamera: boolean;
         private initmesh();
         private intidata();
         private speed;
@@ -1586,6 +1662,7 @@ declare namespace gd3d.io {
         getBufLength(): number;
         getBytesAvailable(): number;
         constructor(bufSize?: number);
+        reset(): void;
         read(target: Uint8Array | number[], offset?: number, length?: number): void;
         write(array: Uint8Array | number[], offset?: number, length?: number): void;
         getBuffer(): Uint8Array;

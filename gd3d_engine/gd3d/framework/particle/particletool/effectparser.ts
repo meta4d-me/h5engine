@@ -292,7 +292,10 @@ namespace gd3d.framework
                             data.simulationSpeed = this._parseToObjData("simulationSpeed",_data["simulationSpeed"]);
                         }
                         if (_data["alpha"] != undefined)
+                        {
                             data.alpha = this._parseToObjData("alpha", _data["alpha"]);
+                        }
+                            
                         if (_data["alphaSpeed"] != undefined)
                             data.alphaSpeed = this._parseToObjData("alphaSpeed", _data["alphaSpeed"]);
                         if (_data["alphaNodes"] != undefined)
@@ -305,9 +308,34 @@ namespace gd3d.framework
                             }
                             for (let i in _data["alphaNodes"])
                             {
-                                let node = EffectUtil.parseEffectNum(_data["alphaNodes"][i]);
+                                let node = new ParticleNodeNumber();
+                                var item=_data["alphaNodes"][i];
+                                if(item["key"]!=null)
+                                {
+                                    node.key=item["key"];
+                                }
+                                let alphavalue=item["alpha"];
+                                if(alphavalue!=null)
+                                {
+                                    if(alphavalue instanceof Array)
+                                    {
+                                        node.num.valueLimitMin=alphavalue[0];
+                                        node.num.valueLimitMax=alphavalue[1];
+                                    }
+                                    else
+                                    {
+                                        node.num.value=alphavalue;
+                                    }
+                                    
+                                }
                                 data.alphaNodes.push(node);
+                                // let node = EffectUtil.parseEffectNum(_data["alphaNodes"][i]);
+                                // data.alphaNodes.push(node);
                             }
+                            // for(let i in data.alphaNodes)
+                            // {
+                            //     console.log("alphavalue:  "+data.alphaNodes[i].num.getValue()+"key:  "+data.alphaNodes[i].key);
+                            // }
                         }
 
                         if (_data["color"] != undefined)

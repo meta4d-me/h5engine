@@ -24,7 +24,7 @@ namespace gd3d.framework
         notify: INotify;
         timeScale:number;
 		version:string = "v0.0.1";
-		build:string = "b000008";
+		build:string = "b000010";
         constructor(){
             window["gd3d_app"] = this;
         }
@@ -33,7 +33,7 @@ namespace gd3d.framework
         {
 			console.log("version: "+this.version + "  build: "+this.build);
             sceneMgr.app = this;
-            this.timeScale = 0.5;
+            this.timeScale = 1;
             this.container = div;
             var canvas = document.createElement("canvas");
             canvas.className = "full";
@@ -56,6 +56,12 @@ namespace gd3d.framework
             this.beginTimer = this.lastTimer = Date.now() / 1000;
             this.loop();
             gd3d.io.referenceInfo.regDefaultType();
+
+            let initovercallback = window["initovercallback"];
+            if(initovercallback!=null)
+            {
+                initovercallback(this);
+            }
         }
 
         markNotify(trans: any, type: NotifyType)

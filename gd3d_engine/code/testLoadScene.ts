@@ -15,7 +15,7 @@ class test_loadScene implements IState
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load("res/scenes/city/city.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                this.app.getAssetMgr().load("res/scenes/chuangjue-01/chuangjue-01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                     // this.app.getAssetMgr().load("res/scenes/test/test.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                     (s) =>
                     {
@@ -40,7 +40,7 @@ class test_loadScene implements IState
                                 //     }
                                 // });
 
-                                var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName("city.scene.json") as gd3d.framework.rawscene;
+                                var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName("chuangjue-01.scene.json") as gd3d.framework.rawscene;
                                 var _root = _scene.getSceneRoot();
                                 this.scene.addChild(_root);
                                 _root.localTranslate = new gd3d.math.vector3(0, 0, -50);
@@ -85,19 +85,19 @@ class test_loadScene implements IState
         var objCam = this.camera.gameObject.transform;
         objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, -z2 * 10);
         // objCam.lookat(this.cube);
-        // objCam.markDirty();//标记为需要刷新
+        objCam.markDirty();//标记为需要刷新
 
         // this.cube.markDirty();
         // objCam.updateWorldTran();
-        if (this.timer > 5)
-        {
-            this.app.getScene().getRoot().dispose();
-        }
-        if (this.timer > 10 && !this.bere)
-        {
-            this.bere = true;
-            this.app.getAssetMgr().unload("res/scenes/city/city.assetbundle.json");
-            this.app.getAssetMgr().releaseUnuseAsset();
-        }
+        // if (this.timer > 5)
+        // {
+        //     this.app.getScene().getRoot().dispose();
+        // }
+        // if (this.timer > 10 && !this.bere)
+        // {
+        //     this.bere = true;
+        //     this.app.getAssetMgr().unload("res/scenes/city/city.assetbundle.json");
+        //     this.app.getAssetMgr().releaseUnuseAsset();
+        // }
     }
 }

@@ -235,6 +235,15 @@ declare class test_anim implements IState {
     timer: number;
     update(delta: number): void;
 }
+declare class test_loadAsiprefab implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    baihu: gd3d.framework.transform;
+    timer: number;
+    update(delta: number): void;
+}
 declare class test_assestmgr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -510,6 +519,34 @@ declare namespace t {
         taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
     }
+}
+declare namespace t {
+    class test_pathAsset implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        start(app: gd3d.framework.application): void;
+        private loadShader(laststate, state);
+        private loadTexture(laststate, state);
+        private loadpath(laststate, state);
+        private loadasset(laststate, state);
+        sh: gd3d.framework.shader;
+        private initscene(laststate, state);
+        private parentlist;
+        private dragonlist;
+        private traillist;
+        private guippaths;
+        private path;
+        private showcamera;
+        target: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        angle: number;
+        timer: number;
+        update(delta: number): void;
+        private addbtns();
+        private addBtn(text, x, y, func);
+    }
+    function DBgetAtrans(mat: gd3d.framework.material, meshname?: string): gd3d.framework.transform;
+    function DBgetMat(texname?: string, shaderstring?: string): gd3d.framework.material;
 }
 declare class test_pick implements IState {
     app: gd3d.framework.application;
