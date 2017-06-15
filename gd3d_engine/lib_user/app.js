@@ -3822,16 +3822,11 @@ var t;
                     trailrender.setspeed(0.25);
                 }
                 this.guippaths[0].setpathasset(path2, 50, function () {
-                    _this.parentlist[0].gameObject.visible = false;
-                    _this.traillist[0].stop();
                 });
                 this.guippaths[1].setpathasset(path, 50, function () {
                     _this.parentlist[1].gameObject.visible = false;
-                    _this.traillist[1].stop();
                 });
                 this.guippaths[2].setpathasset(path2, 50, function () {
-                    _this.parentlist[2].gameObject.visible = false;
-                    _this.traillist[2].stop();
                 });
             }
             state.finish = true;
@@ -3848,7 +3843,7 @@ var t;
                 for (var i_1 = 0; i_1 < _this.traillist.length; i_1++) {
                     _this.traillist[i_1].play();
                 }
-                _this.guippaths[0].play();
+                _this.guippaths[0].play(2);
                 _this.guippaths[1].play();
                 _this.guippaths[2].play(2);
             });
