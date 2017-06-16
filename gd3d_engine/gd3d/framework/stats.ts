@@ -6,9 +6,9 @@ namespace Stats
      */
     export class Stats
     {
-        constructor()
+        constructor(app:gd3d.framework.application)
         {
-
+            this.app = app;
 
             this.container = document.createElement('div');
             this.container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.7;z-index:1';
@@ -26,7 +26,7 @@ namespace Stats
 
             this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
-
+            this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             if (self.performance && self.performance["memory"])
             {
 
@@ -43,7 +43,7 @@ namespace Stats
             this.beginTime = this.end();
 
         }
-
+        app:gd3d.framework.application;
         container: HTMLDivElement;
         private mode = 0;
         private REVISION: 16;
@@ -53,6 +53,7 @@ namespace Stats
         private fpsPanel: Panel;
         private msPanel: Panel;
         private memPanel: Panel;
+        private ratePanel:Panel;
         private showPanel(id: number)
         {
 
@@ -86,11 +87,12 @@ namespace Stats
             var time = (performance || Date).now();
 
             this.msPanel.update(time - this.beginTime, 200);
-
             if (time > this.prevTime + 1000)
             {
+                let fps = (this.frames * 1000) / (time - this.prevTime);
 
-                this.fpsPanel.update((this.frames * 1000) / (time - this.prevTime), 100);
+                this.fpsPanel.update(fps, 100);
+                this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
 
                 this.prevTime = time;
                 this.frames = 0;

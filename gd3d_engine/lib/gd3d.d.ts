@@ -33,9 +33,12 @@ declare namespace gd3d.framework {
         private beginTimer;
         private lastTimer;
         private totalTime;
-        private _deltaTime;
         getTotalTime(): number;
+        private _deltaTime;
         readonly deltaTime: number;
+        private pretimer;
+        private updateTimer;
+        getUpdateTimer(): any;
         private loop();
         private _scene;
         private initScene();
@@ -86,8 +89,9 @@ declare namespace gd3d.framework {
 }
 declare namespace Stats {
     class Stats {
-        constructor();
+        constructor(app: gd3d.framework.application);
         update(): void;
+        app: gd3d.framework.application;
         container: HTMLDivElement;
         private mode;
         private REVISION;
@@ -97,6 +101,7 @@ declare namespace Stats {
         private fpsPanel;
         private msPanel;
         private memPanel;
+        private ratePanel;
         private showPanel(id);
         private addPanel(panel);
         private begin();
@@ -1334,6 +1339,16 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class frustumculling implements INodeComponent {
+        constructor();
+        gameObject: gameObject;
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     class guidpath implements INodeComponent {
         private paths;
         _pathasset: pathasset;
@@ -1531,7 +1546,7 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
-        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): void;
+        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): number;
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();

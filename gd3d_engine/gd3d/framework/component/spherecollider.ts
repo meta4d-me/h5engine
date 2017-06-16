@@ -56,7 +56,7 @@ namespace gd3d.framework
         _worldCenter:math.vector3 = new math.vector3();
         public get worldCenter():math.vector3
         {
-            math.vec3Add(this.gameObject.transform.localTranslate, this.center, this._worldCenter);
+            math.vec3Clone(this.center, this._worldCenter);
             math.matrixTransformVector3(this._worldCenter, this.gameObject.transform.getWorldMatrix(), this._worldCenter);
             return this._worldCenter;
         }
@@ -114,10 +114,12 @@ namespace gd3d.framework
             math.vec3Subtract(v1, v0, subv0);
             math.vec3Subtract(v2, v1, subv1);
             math.vec3Cross(subv0, subv1, cro0);
-
+  
             math.calPlaneLineIntersectPoint(cro0, v0, cro0, this.worldCenter, point);
-            let dis = math.vec3Distance(this.worldCenter, point);
-            console.log(dis);
+            
+            let sublp = math.pool.new_vector3();
+            math.vec3Subtract(point, this.worldCenter, sublp);
+            return math.vec3Dot(cro0, sublp);
         }
 
         intersectsTransform(tran: transform): boolean
