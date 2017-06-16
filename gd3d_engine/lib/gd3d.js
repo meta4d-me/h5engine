@@ -35,6 +35,7 @@ var gd3d;
                 this.version = "v0.0.1";
                 this.build = "b000010";
                 this.beStepNumber = 0;
+                this.pretimer = 0;
                 this._userCode = [];
                 this._userCodeNew = [];
                 this._editorCode = [];
@@ -104,7 +105,7 @@ var gd3d;
             };
             application.prototype.showFps = function () {
                 if (this.stats == null) {
-                    this.stats = new Stats.Stats();
+                    this.stats = new Stats.Stats(this);
                     this.stats.container.style.position = 'absolute';
                     this.stats.container.style.left = '0px';
                     this.stats.container.style.top = '0px';
@@ -153,14 +154,19 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            application.prototype.getUpdateTimer = function () {
+                return this.updateTimer;
+            };
             application.prototype.loop = function () {
                 var now = Date.now() / 1000;
+                this.pretimer = Date.now();
                 this._deltaTime = now - this.lastTimer;
                 this.totalTime = now - this.beginTimer;
                 this.update(this.deltaTime);
                 if (this.stats != null)
                     this.stats.update();
                 this.lastTimer = now;
+                this.updateTimer = Date.now() - this.pretimer;
                 if (this.limitFrame) {
                     requestAnimationFrame(this.loop.bind(this));
                 }
@@ -316,9 +322,10 @@ var gd3d;
 var Stats;
 (function (Stats_1) {
     var Stats = (function () {
-        function Stats() {
+        function Stats(app) {
             var _this = this;
             this.mode = 0;
+            this.app = app;
             this.container = document.createElement('div');
             this.container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.7;z-index:1';
             this.container.addEventListener('click', function (event) {
@@ -328,6 +335,7 @@ var Stats;
             this.beginTime = (performance || Date).now(), this.prevTime = this.beginTime, this.frames = 0;
             this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
+            this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             if (self.performance && self.performance["memory"]) {
                 this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
             }
@@ -354,7 +362,10 @@ var Stats;
             var time = (performance || Date).now();
             this.msPanel.update(time - this.beginTime, 200);
             if (time > this.prevTime + 1000) {
-                this.fpsPanel.update((this.frames * 1000) / (time - this.prevTime), 100);
+                var fps = (this.frames * 1000) / (time - this.prevTime);
+                this.fpsPanel.update(fps, 100);
+                console.log(this.app.getUpdateTimer() + "  " + this.frames);
+                this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
                 this.prevTime = time;
                 this.frames = 0;
                 if (this.memPanel) {
@@ -7839,6 +7850,7 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
+                this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
@@ -7856,12 +7868,25 @@ var gd3d;
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");
                 var worldPos = node.getWorldTranslate();
-                spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]);
-                spherecol.caclPlaneDis(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]);
-                spherecol.caclPlaneDis(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]);
-                spherecol.caclPlaneDis(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]);
-                spherecol.caclPlaneDis(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]);
-                spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]);
+                var dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]);
+                if (dis - spherecol.radius > 0)
+                    return false;
+                dis = spherecol.caclPlaneDis(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]);
+                if (dis - spherecol.radius > 0)
+                    return false;
+                dis = spherecol.caclPlaneDis(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]);
+                if (dis - spherecol.radius > 0)
+                    return false;
+                dis = spherecol.caclPlaneDis(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]);
+                if (dis - spherecol.radius > 0)
+                    return false;
+                dis = spherecol.caclPlaneDis(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]);
+                if (dis - spherecol.radius > 0)
+                    return false;
+                dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]);
+                if (dis - spherecol.radius > 0)
+                    return false;
+                return true;
             };
             camera.prototype._targetAndViewport = function (target, scene, context, withoutClear) {
                 {
@@ -9313,7 +9338,7 @@ var gd3d;
             }
             Object.defineProperty(spherecollider.prototype, "worldCenter", {
                 get: function () {
-                    gd3d.math.vec3Add(this.gameObject.transform.localTranslate, this.center, this._worldCenter);
+                    gd3d.math.vec3Clone(this.center, this._worldCenter);
                     gd3d.math.matrixTransformVector3(this._worldCenter, this.gameObject.transform.getWorldMatrix(), this._worldCenter);
                     return this._worldCenter;
                 },
@@ -9363,8 +9388,9 @@ var gd3d;
                 gd3d.math.vec3Subtract(v2, v1, subv1);
                 gd3d.math.vec3Cross(subv0, subv1, cro0);
                 gd3d.math.calPlaneLineIntersectPoint(cro0, v0, cro0, this.worldCenter, point);
-                var dis = gd3d.math.vec3Distance(this.worldCenter, point);
-                console.log(dis);
+                var sublp = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(point, this.worldCenter, sublp);
+                return gd3d.math.vec3Dot(cro0, sublp);
             };
             spherecollider.prototype.intersectsTransform = function (tran) {
                 if (tran.gameObject.collider == null)
