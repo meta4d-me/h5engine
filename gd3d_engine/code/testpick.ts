@@ -45,7 +45,9 @@
             let coll = this.cube2.gameObject.addComponent("spherecollider") as gd3d.framework.spherecollider;
             coll.center = new gd3d.math.vector3(0, 1, 0);
             coll.radius = 1;
-            this.cube2.gameObject.addComponent("frustumculling") as gd3d.framework.frustumculling;
+
+            //---------------------baocuo
+            //this.cube2.gameObject.addComponent("frustumculling") as gd3d.framework.frustumculling;
         }
 
 

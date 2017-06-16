@@ -3693,6 +3693,8 @@ var t;
         function test_pathAsset() {
             this.parentlist = [];
             this.dragonlist = [];
+            this.traillist = [];
+            this.guippaths = [];
             this.taskmgr = new gd3d.framework.taskMgr();
             this.timer = 0;
         }
@@ -3704,6 +3706,7 @@ var t;
             this.taskmgr.addTaskCall(this.loadpath.bind(this));
             this.taskmgr.addTaskCall(this.loadasset.bind(this));
             this.taskmgr.addTaskCall(this.initscene.bind(this));
+            this.taskmgr.addTaskCall(this.addbtns.bind(this));
         };
         test_pathAsset.prototype.loadShader = function (laststate, state) {
             this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
@@ -3778,12 +3781,21 @@ var t;
             this.showcamera.order = 0;
             this.showcamera.near = 0.01;
             this.showcamera.far = 1000;
-            objCam.localTranslate = new gd3d.math.vector3(0, 50, -10);
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
+            var mat = DBgetMat("rock256.png");
+            var trans = DBgetAtrans(mat);
+            this.scene.addChild(trans);
+            trans.localScale.y = 0.1;
+            trans.localScale.x = trans.localScale.z = 40;
+            trans.localTranslate.y = -1;
+            trans.markDirty();
+            var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
+            var path = this.app.getAssetMgr().getAssetByName("circlepath.path.json");
+            var path2 = this.app.getAssetMgr().getAssetByName("circlepath_2.path.json");
             {
-                var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
-                for (var i = 0; i < 4; i++) {
+                for (var i = 0; i < 3; i++) {
                     var parent = new gd3d.framework.transform();
                     parent.gameObject.visible = false;
                     this.scene.addChild(parent);
@@ -3792,64 +3804,107 @@ var t;
                     head.localScale.x = head.localScale.y = head.localScale.z = 4;
                     parent.addChild(head);
                     this.dragonlist.push(head);
+                    var guidp = head.gameObject.addComponent("guidpath");
+                    this.guippaths.push(guidp);
                     var trans = new gd3d.framework.transform();
                     head.addChild(trans);
                     var trailmat = new gd3d.framework.material();
-                    var shader = this.app.getAssetMgr().getShader("transparent_bothside.shader.json");
+                    var shader = this.app.getAssetMgr().getShader("particles_blend.shader.json");
                     var tex1 = this.app.getAssetMgr().getAssetByName("sd_hlb_1.png");
                     trailmat.setShader(shader);
                     trailmat.setTexture("_MainTex", tex1);
-                    this.trailrender = trans.gameObject.addComponent("trailRender");
-                    this.trailrender.material = trailmat;
-                    this.trailrender.setWidth(1.0);
-                    this.trailrender.lookAtCamera = true;
-                    this.trailrender.extenedOneSide = false;
-                    this.trailrender.setspeed(0.25);
-                    this.trailrender.play();
+                    var trailrender = trans.gameObject.addComponent("trailRender");
+                    this.traillist.push(trailrender);
+                    trailrender.material = trailmat;
+                    trailrender.setWidth(1.0);
+                    trailrender.lookAtCamera = true;
+                    trailrender.extenedOneSide = false;
+                    trailrender.setspeed(0.25);
                 }
-            }
-            var path = this.app.getAssetMgr().getAssetByName("circlepath.path.json");
-            var path2 = this.app.getAssetMgr().getAssetByName("circlepath_2.path.json");
-            {
-                this.parentlist[0].gameObject.visible = true;
-                var guidp = this.dragonlist[0].gameObject.addComponent("guidpath");
-                guidp.setpathasset(path2, 50);
-                guidp.isloop = true;
-                guidp.play();
-            }
-            {
-                this.parentlist[1].gameObject.visible = true;
-                this.parentlist[1].localTranslate.x = -5;
-                this.parentlist[1].markDirty();
-                var guidp = this.dragonlist[1].gameObject.addComponent("guidpath");
-                guidp.setpathasset(path, 50, function () {
+                this.guippaths[0].setpathasset(path2, 50, function () {
+                });
+                this.guippaths[1].setpathasset(path, 50, function () {
                     _this.parentlist[1].gameObject.visible = false;
                 });
-                guidp.play();
-            }
-            {
-                this.parentlist[2].gameObject.visible = true;
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 180, this.parentlist[2].localRotate);
-                this.parentlist[2].markDirty();
-                var guidp = this.dragonlist[2].gameObject.addComponent("guidpath");
-                guidp.setpathasset(path2, 50);
-                guidp.isloop = true;
-                guidp.play();
-                this.guidpp = guidp;
+                this.guippaths[2].setpathasset(path2, 50, function () {
+                });
             }
             state.finish = true;
         };
         test_pathAsset.prototype.update = function (delta) {
             this.taskmgr.move(delta);
-            this.timer++;
-            if (this.timer > 500) {
-                this.guidpp.stop();
-                this.parentlist[2].gameObject.visible = false;
-            }
+        };
+        test_pathAsset.prototype.addbtns = function () {
+            var _this = this;
+            this.addBtn("play", 10, 100, function () {
+                for (var i = 0; i < _this.parentlist.length; i++) {
+                    _this.parentlist[i].gameObject.visible = true;
+                }
+                for (var i_1 = 0; i_1 < _this.traillist.length; i_1++) {
+                    _this.traillist[i_1].play();
+                }
+                _this.guippaths[0].play(2);
+                _this.guippaths[1].play();
+                _this.guippaths[2].play(2);
+            });
+            this.addBtn("stop", 10, 200, function () {
+                for (var i = 0; i < _this.parentlist.length; i++) {
+                    _this.parentlist[i].gameObject.visible = false;
+                }
+                for (var i_2 = 0; i_2 < _this.guippaths.length; i_2++) {
+                    _this.traillist[i_2].stop();
+                    _this.guippaths[i_2].stop();
+                }
+            });
+        };
+        test_pathAsset.prototype.addBtn = function (text, x, y, func) {
+            var btn = document.createElement("button");
+            btn.textContent = text;
+            btn.onclick = function () {
+                func();
+            };
+            btn.style.top = y + "px";
+            btn.style.left = x + "px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
         };
         return test_pathAsset;
     }());
     t.test_pathAsset = test_pathAsset;
+    function DBgetAtrans(mat, meshname) {
+        if (meshname === void 0) { meshname = null; }
+        var trans = new gd3d.framework.transform();
+        var meshf = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var meshr = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        meshr.materials = [];
+        meshr.materials.push(mat);
+        if (meshname == null) {
+            var mesh = gd3d.framework.sceneMgr.app.getAssetMgr().getDefaultMesh("cube");
+            meshf.mesh = mesh;
+        }
+        else {
+            var mesh = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(meshname);
+            meshf.mesh = mesh;
+        }
+        return trans;
+    }
+    t.DBgetAtrans = DBgetAtrans;
+    function DBgetMat(texname, shaderstring) {
+        if (texname === void 0) { texname = null; }
+        if (shaderstring === void 0) { shaderstring = null; }
+        var mat = new gd3d.framework.material();
+        if (shaderstring == null) {
+            shaderstring = "diffuse.shader.json";
+        }
+        var shader = gd3d.framework.sceneMgr.app.getAssetMgr().getShader(shaderstring);
+        var tex = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(texname);
+        mat.setShader(shader);
+        if (texname != null) {
+            mat.setTexture("_MainTex", tex);
+        }
+        return mat;
+    }
+    t.DBgetMat = DBgetMat;
 })(t || (t = {}));
 var test_pick = (function () {
     function test_pick() {
@@ -3891,7 +3946,6 @@ var test_pick = (function () {
             var coll = this.cube2.gameObject.addComponent("spherecollider");
             coll.center = new gd3d.math.vector3(0, 1, 0);
             coll.radius = 1;
-            this.cube2.gameObject.addComponent("frustumculling");
         }
         {
             this.cube4 = new gd3d.framework.transform();

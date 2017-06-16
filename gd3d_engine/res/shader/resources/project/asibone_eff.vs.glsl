@@ -1,14 +1,11 @@
 attribute vec3 _glesVertex;
 attribute vec2 _glesMultiTexCoord0;
-attribute vec3 _glesNormal;
 
 attribute vec4 _glesBlendIndex4;
 attribute vec4 _glesBlendWeight4;
 uniform highp vec4 glstate_vec4_bones[120];
 
-uniform highp vec4 glstate_eyepos;
 uniform highp mat4 glstate_matrix_mvp;
-uniform highp mat4 glstate_matrix_model;
 uniform highp vec4 _MainTex_ST;
 uniform highp vec4 _asm_ST;
 uniform highp vec4 _streamlight_ST;

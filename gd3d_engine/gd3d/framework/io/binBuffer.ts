@@ -41,6 +41,14 @@ namespace gd3d.io
             this._seekReadPos = 0;
             // this._seekReadIndex = 0;
         }
+        reset()
+        {
+            this._buf = [];
+            this._seekWritePos = 0;
+            this._seekWriteIndex = 0;
+            this._buf[0] = new Uint8Array(this._bufSize);
+            this._seekReadPos = 0;
+        }
         read(target: Uint8Array | number[], offset: number = 0, length: number = -1)
         {
             if (length < 0) length = target.length;
@@ -48,6 +56,7 @@ namespace gd3d.io
             {
                 if (this._seekReadPos >= this._seekWritePos && 0 == this._seekWriteIndex)
                 {
+                    this.reset();
                     throw new Error("no data to read.");
                 }
                 target[i] = this._buf[0][this._seekReadPos];
