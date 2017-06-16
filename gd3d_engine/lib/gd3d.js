@@ -364,7 +364,6 @@ var Stats;
             if (time > this.prevTime + 1000) {
                 var fps = (this.frames * 1000) / (time - this.prevTime);
                 this.fpsPanel.update(fps, 100);
-                console.log(this.app.getUpdateTimer() + "  " + this.frames);
                 this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
                 this.prevTime = time;
                 this.frames = 0;
@@ -8407,6 +8406,30 @@ var gd3d;
         ], effectSystem);
         framework.effectSystem = effectSystem;
         var effectSystem_1;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var frustumculling = (function () {
+            function frustumculling() {
+            }
+            frustumculling.prototype.start = function () {
+            };
+            frustumculling.prototype.update = function (delta) {
+            };
+            frustumculling.prototype.remove = function () {
+            };
+            frustumculling.prototype.clone = function () {
+            };
+            return frustumculling;
+        }());
+        frustumculling = __decorate([
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], frustumculling);
+        framework.frustumculling = frustumculling;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
