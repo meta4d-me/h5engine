@@ -720,6 +720,9 @@ declare namespace gd3d.framework {
         static fscodeuifont: string;
         static vsdiffuse: string;
         static fsdiffuse: string;
+        static vsline: string;
+        static fsline: string;
+        static vsmaterialcolor: string;
         static initDefaultShader(assetmgr: assetMgr): void;
     }
 }

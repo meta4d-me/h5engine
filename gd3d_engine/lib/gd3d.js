@@ -4628,10 +4628,15 @@ var gd3d;
                 pool.compileFS(assetmgr.webgl, "defuifont", defShader.fscodeuifont);
                 pool.compileVS(assetmgr.webgl, "diffuse", defShader.vsdiffuse);
                 pool.compileFS(assetmgr.webgl, "diffuse", defShader.fsdiffuse);
+                pool.compileVS(assetmgr.webgl, "line", defShader.vsline);
+                pool.compileFS(assetmgr.webgl, "line", defShader.fsline);
+                pool.compileVS(assetmgr.webgl, "materialcolor", defShader.vsmaterialcolor);
                 var program = pool.linkProgram(assetmgr.webgl, "def", "def");
                 var program2 = pool.linkProgram(assetmgr.webgl, "def", "defui");
                 var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
                 var programdiffuse = pool.linkProgram(assetmgr.webgl, "diffuse", "diffuse");
+                var programline = pool.linkProgram(assetmgr.webgl, "line", "line");
+                var programmaterialcolor = pool.linkProgram(assetmgr.webgl, "materialcolor", "line");
                 {
                     var sh = new framework.shader("shader/def");
                     sh.defaultAsset = true;
@@ -4701,6 +4706,33 @@ var gd3d;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
                     p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
+                {
+                    var sh = new framework.shader("shader/line");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    p.setProgram(programline);
+                    p.state_ztest = true;
+                    p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+                    p.state_zwrite = true;
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
+                {
+                    var sh = new framework.shader("shader/materialcolor");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    p.setProgram(programmaterialcolor);
+                    p.state_ztest = false;
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+                    sh.layer = framework.RenderLayerEnum.Overlay;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
@@ -4812,15 +4844,47 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
     }";
         defShader.fsdiffuse = "\
     uniform sampler2D _MainTex;\
-uniform lowp float _AlphaCut;\
-varying highp vec2 xlv_TEXCOORD0;\
-void main() \
-{\
-    lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
-    if(tmpvar_3.a < _AlphaCut)\
-        discard;\
-    gl_FragData[0] = tmpvar_3;\
-}";
+    uniform lowp float _AlphaCut;\
+    varying highp vec2 xlv_TEXCOORD0;\
+    void main() \
+    {\
+        lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
+        if(tmpvar_3.a < _AlphaCut)\
+            discard;\
+        gl_FragData[0] = tmpvar_3;\
+    }";
+        defShader.vsline = "\
+    attribute vec4 _glesVertex;\
+    attribute vec4 _glesColor;\
+    uniform highp mat4 glstate_matrix_mvp;\
+    varying lowp vec4 xlv_COLOR;\
+    void main()\
+    {\
+        highp vec4 tmpvar_1;\
+        tmpvar_1.w = 1.0;\
+        tmpvar_1.xyz = _glesVertex.xyz;\
+        xlv_COLOR = _glesColor;\
+        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+    }";
+        defShader.fsline = "\
+    varying lowp vec4 xlv_COLOR;\
+    void main()\
+    {\
+        gl_FragData[0] = xlv_COLOR;\
+    }";
+        defShader.vsmaterialcolor = "\
+    attribute vec4 _glesVertex;\
+    uniform vec4 _Color;\
+    uniform highp mat4 glstate_matrix_mvp;\
+    varying lowp vec4 xlv_COLOR;\
+    void main()\
+    {\
+        highp vec4 tmpvar_1;\
+        tmpvar_1.w = 1.0;\
+        tmpvar_1.xyz = _glesVertex.xyz;\
+        xlv_COLOR = _Color;\
+        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+    }";
         framework.defShader = defShader;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
