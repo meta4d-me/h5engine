@@ -3636,7 +3636,10 @@ var gd3d;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                                 && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
                                 var _res = s.resstate[_fileName].res;
-                                _this.mapNamed[_fileName] = _res.getGUID();
+                                if (_res != null)
+                                    _this.mapNamed[_fileName] = _res.getGUID();
+                                else
+                                    console.error(_fileName);
                             }
                             if (realTotal === 0) {
                                 state.isfinish = true;
@@ -4085,6 +4088,9 @@ var gd3d;
                         var _format = _texturedesc["format"];
                         var _mipmap = _texturedesc["mipmap"];
                         var _wrap = _texturedesc["wrap"];
+                        if (_name.indexOf("LightmapFar") >= 0) {
+                            console.log("");
+                        }
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         if (_format == "RGB") {
                             _textureFormat = gd3d.render.TextureFormatEnum.RGB;
@@ -10067,6 +10073,12 @@ var gd3d;
                 this._buf[0] = new Uint8Array(this._bufSize);
                 this._seekReadPos = 0;
             };
+            binBuffer.prototype.dispose = function () {
+                this._buf.splice(0);
+                this._seekWritePos = 0;
+                this._seekWriteIndex = 0;
+                this._seekReadPos = 0;
+            };
             binBuffer.prototype.read = function (target, offset, length) {
                 if (offset === void 0) { offset = 0; }
                 if (length === void 0) { length = -1; }
@@ -10626,9 +10638,6 @@ var gd3d;
             };
             binTool.prototype.writeInt = function (num) {
                 this.write(converter.Int32ToArray(num));
-            };
-            binTool.prototype.dispose = function () {
-                this._buf.splice(0);
             };
             return binTool;
         }(binBuffer));

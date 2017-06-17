@@ -299,6 +299,18 @@
         {
             "name":"resources/base/transparent_add.fs.glsl",
             "length":0
+        },
+        {
+            "name":"resources/base/terrain.fs.glsl",
+            "length":0
+        },
+        {
+            "name":"resources/base/terrain.vs.glsl",
+            "length":0
+        },
+        {
+            "name":"resources/base/terrain.shader.json",
+            "length":0
         }
     ]
 }
