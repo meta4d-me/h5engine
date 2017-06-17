@@ -725,6 +725,9 @@ declare namespace gd3d.framework {
         static fscodeuifont: string;
         static vsdiffuse: string;
         static fsdiffuse: string;
+        static vsline: string;
+        static fsline: string;
+        static vsmaterialcolor: string;
         static initDefaultShader(assetmgr: assetMgr): void;
     }
 }
@@ -1678,6 +1681,7 @@ declare namespace gd3d.io {
         getBytesAvailable(): number;
         constructor(bufSize?: number);
         reset(): void;
+        dispose(): void;
         read(target: Uint8Array | number[], offset?: number, length?: number): void;
         write(array: Uint8Array | number[], offset?: number, length?: number): void;
         getBuffer(): Uint8Array;
@@ -1757,7 +1761,6 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
-        dispose(): void;
     }
 }
 declare namespace gd3d.io {

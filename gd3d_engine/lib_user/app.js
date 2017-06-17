@@ -2139,6 +2139,7 @@ var test_effect = (function () {
         });
     };
     test_effect.prototype.start = function (app) {
+        var _this = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
@@ -2146,18 +2147,41 @@ var test_effect = (function () {
         this.taskmgr.addTaskCall(this.loadText.bind(this));
         this.taskmgr.addTaskCall(this.addcam.bind(this));
         this.taskmgr.addTaskCall(this.loadEffect.bind(this));
+        var btn = document.createElement("button");
+        btn.textContent = "Play";
+        btn.onclick = function () {
+            _this.effect.play();
+        };
+        btn.style.top = "160px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        this.app.getAssetMgr().load("res/particleEffect/fx_0005_sword_sword/fx_0005_sword_sword.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+        var names = ["fx_shuijing_cj", "fx_zs_male@attack_01"];
+        var name = names[1];
+        this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 var tr = new gd3d.framework.transform();
                 _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                var text = _this.app.getAssetMgr().getAssetByName("fx_0005_sword_sword.effect.json");
-                _this.effect.setJsonData(text);
+                var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
+                _this.effect.setEffect(text.content);
                 _this.scene.addChild(tr);
                 tr.markDirty();
                 state.finish = true;
+            }
+        });
+    };
+    test_effect.prototype._loadEffect = function (assetbundleName, name) {
+        var _this = this;
+        this.app.getAssetMgr().load(assetbundleName, gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                var tr = new gd3d.framework.transform();
+                _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+                var text = _this.app.getAssetMgr().getAssetByName(name);
+                _this.effect.setEffect(text.content);
+                _this.scene.addChild(tr);
+                tr.markDirty();
             }
         });
     };
@@ -2170,7 +2194,7 @@ var test_effect = (function () {
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, 10);
+        objCam.localTranslate = new gd3d.math.vector3(0, 5, 10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
         state.finish = true;
@@ -2608,13 +2632,15 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
+        var names = ["xinshoucun_fuben_day", "111111", "chuangjue-01", "city"];
+        var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/chuangjue-01/chuangjue-01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     console.log(s.curtask + "/" + s.totaltask);
                     console.log(s.progress);
                     if (s.isfinish) {
-                        var _scene = _this.app.getAssetMgr().getAssetByName("chuangjue-01.scene.json");
+                        var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
                         var _root = _scene.getSceneRoot();
                         _this.scene.addChild(_root);
                         _root.localTranslate = new gd3d.math.vector3(0, 0, -50);
@@ -2634,14 +2660,6 @@ var test_loadScene = (function () {
         this.cube.localTranslate = new gd3d.math.vector3(40, 0, 10);
     };
     test_loadScene.prototype.update = function (delta) {
-        this.timer += delta;
-        var x = Math.sin(this.timer);
-        var z = Math.cos(this.timer);
-        var x2 = Math.sin(this.timer * 0.5);
-        var z2 = Math.cos(this.timer * 0.5);
-        var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, -z2 * 10);
-        objCam.markDirty();
     };
     return test_loadScene;
 }());
@@ -4150,18 +4168,20 @@ var test_loadprefab = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
+        var names = ["MyTerrain1", "terrainlightmap"];
+        var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/baihu/baihu.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName("baihu.prefab.json");
+                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
                         _this.baihu = _prefab.getCloneTrans();
                         _this.scene.addChild(_this.baihu);
-                        _this.baihu.localScale = new gd3d.math.vector3(20, 20, 20);
-                        _this.baihu.localTranslate = new gd3d.math.vector3(2, 0, 0);
+                        _this.baihu.localScale = new gd3d.math.vector3(0.1, 0.1, 0.1);
+                        _this.baihu.localTranslate = new gd3d.math.vector3(-5, 0, 0);
                         _this.baihu = _prefab.getCloneTrans();
-                        _this.scene.addChild(_this.baihu);
-                        objCam.lookat(_this.baihu);
+                        objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                        objCam.lookatPoint(new gd3d.math.vector3(0.1, 0.1, 0.1));
                         objCam.markDirty();
                     }
                 });
@@ -4173,7 +4193,7 @@ var test_loadprefab = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -15);
         objCam.markDirty();
     };
     test_loadprefab.prototype.update = function (delta) {
@@ -4183,11 +4203,6 @@ var test_loadprefab = (function () {
         var x2 = Math.sin(this.timer * 0.1);
         var z2 = Math.cos(this.timer * 0.1);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
-        if (this.baihu) {
-            objCam.lookat(this.baihu);
-            objCam.markDirty();
-        }
     };
     return test_loadprefab;
 }());

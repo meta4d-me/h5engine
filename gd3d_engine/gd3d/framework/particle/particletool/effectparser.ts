@@ -326,7 +326,6 @@ namespace gd3d.framework
                                     {
                                         node.num.value=alphavalue;
                                     }
-                                    
                                 }
                                 data.alphaNodes.push(node);
                                 // let node = EffectUtil.parseEffectNum(_data["alphaNodes"][i]);

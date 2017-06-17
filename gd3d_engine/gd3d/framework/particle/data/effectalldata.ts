@@ -57,9 +57,24 @@ namespace gd3d.framework
                 for (let i in this.data.timelineFrame)
                 {
                     let frameData = this.data.timelineFrame[i];
-                    if (frameData.frameIndex != -1 && frameData.lerpDatas != undefined)
+                    if (frameData.frameIndex != -1)
                     {
-                        this.recordLerpValues(frameData);
+                        if (frameData.lerpDatas != undefined)
+                        {
+                            this.recordLerpValues(frameData);
+                        } else if (frameData.attrsData != undefined)
+                        {
+                            if (this.timelineFrame[frameData.frameIndex] == undefined)
+                            {
+                                this.timelineFrame[frameData.frameIndex] = new EffectFrameData();
+                                this.timelineFrame[frameData.frameIndex].attrsData = new EffectAttrsData();
+                                this.timelineFrame[frameData.frameIndex].frameIndex = frameData.frameIndex;
+                            }
+                            for (let k in frameData.attrsData)
+                            {
+                                this.timelineFrame[frameData.frameIndex].attrsData.setLerpAttribute(k, frameData.attrsData.getAttribute(k));
+                            }
+                        }
                     }
                 }
             }
