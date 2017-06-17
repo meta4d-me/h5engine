@@ -1,6 +1,6 @@
 namespace gd3d.framework
 {
-    export class EmissionNew
+    export class Emission
     {
         /**
          * 发射器类型
@@ -98,8 +98,8 @@ namespace gd3d.framework
          */
         uv: ParticleNodeVec2;
         uvType: UVTypeEnum;
-        uvRoll: UVRollNew;
-        uvSprite: UVSpriteNew;
+        uvRoll: UVRoll;
+        uvSprite: UVSprite;
 
         /**
          * 材质相关
@@ -132,7 +132,7 @@ namespace gd3d.framework
 
         clone()
         {
-            let emission = new EmissionNew();
+            let emission = new Emission();
             if (this.emissionType != undefined)
                 emission.emissionType = this.emissionType;
             if (this.maxEmissionCount != undefined)
@@ -225,7 +225,7 @@ namespace gd3d.framework
         }
     }
 
-    export class UVSpriteNew
+    export class UVSprite
     {
         //uv序列帧动画
         public row: number;
@@ -233,7 +233,7 @@ namespace gd3d.framework
         public totalCount: number;
         clone()
         {
-            let sprite = new UVSpriteNew();
+            let sprite = new UVSprite();
             sprite.row = this.row;
             sprite.column = this.column;
             sprite.totalCount = this.totalCount;
@@ -241,7 +241,7 @@ namespace gd3d.framework
         }
     }
 
-    export class UVRollNew
+    export class UVRoll
     {
         /**
         * uv滚动
@@ -250,7 +250,7 @@ namespace gd3d.framework
         public uvSpeedNodes: Array<UVSpeedNode>;
         clone()
         {
-            let roll = new UVRollNew();
+            let roll = new UVRoll();
             if (this.uvSpeed != undefined)
                 roll.uvSpeed = this.uvSpeed;
             if (this.uvSpeedNodes != undefined)

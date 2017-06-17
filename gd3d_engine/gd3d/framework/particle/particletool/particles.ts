@@ -14,7 +14,7 @@ namespace gd3d.framework
             this.effectSys = sys;
             this.vf = sys.vf;
         }
-        addEmission(_emissionNew: EmissionNew)
+        addEmission(_emissionNew: Emission)
         {
             let _emissionElement = new EmissionElement(_emissionNew, this.effectSys);
             this.emissionElements.push(_emissionElement);
@@ -49,7 +49,7 @@ namespace gd3d.framework
 
         public active: boolean = true;//激活状态
 
-        public emissionNew: EmissionNew;//原始数据，不能被改变
+        public emissionNew: Emission;//原始数据，不能被改变
         private vf: number;
         private curTime: number;
         private numcount: number;
@@ -57,7 +57,7 @@ namespace gd3d.framework
 
         private _continueSpaceTime: number;
         public effectSys: effectSystem;
-        constructor(_emissionNew: EmissionNew, sys: effectSystem)
+        constructor(_emissionNew: Emission, sys: effectSystem)
         {
             this.effectSys = sys;
             this.vf = sys.vf;
@@ -159,7 +159,7 @@ namespace gd3d.framework
     export class EmissionBatcher
     {
         public gameObject: gameObject;
-        public data: EmissionNew;
+        public data: Emission;
         public mesh: mesh;
         public mat: material;
         public beBufferInited: boolean = false;
@@ -168,7 +168,7 @@ namespace gd3d.framework
         public dataForVbo: Float32Array;
         public dataForEbo: Uint16Array;
 
-        public particles: ParticleNew1[] = [];
+        public particles: Particle[] = [];
         // public curLiveIndex: number = 0;
         /**
          * 顶点大小
@@ -179,7 +179,7 @@ namespace gd3d.framework
         public vertexSize: number = 0;
         public formate: number = 0;
         public effectSys: effectSystem;
-        constructor(_data: EmissionNew, effectSys: effectSystem)
+        constructor(_data: Emission, effectSys: effectSystem)
         {
             this.effectSys = effectSys;
             this.data = _data;
@@ -223,7 +223,7 @@ namespace gd3d.framework
         public curIndexCount: number = 0;
         addParticle()
         {
-            let p = new ParticleNew1(this);
+            let p = new Particle(this);
             p.uploadData(this.dataForVbo);
             for (let i = 0; i < p.dataForEbo.length; i++)
             {
@@ -336,7 +336,7 @@ namespace gd3d.framework
     }
     //还是要抽象出粒子的概念
     //这里根据发射器定义的初始参数  计算当前要提交的数据
-    export class ParticleNew1
+    export class Particle
     {
         public gameObject: gameObject;
         public localTranslate: math.vector3;
@@ -375,7 +375,7 @@ namespace gd3d.framework
         public dataForVbo: Float32Array; //自己维护一个顶点数据的数组
         public sourceVbo: Float32Array;
         public dataForEbo: Uint16Array;
-        public data: EmissionNew;
+        public data: Emission;
         private vertexCount: number;//顶点数量
         private vertexSize: number;//单个顶点大小
         private curLife: number;//当前经过的生命周期

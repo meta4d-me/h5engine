@@ -11,6 +11,7 @@ namespace gd3d.framework
         Unknown,
         Auto,
         Bundle,
+        CompressBundle,
         GLVertexShader,
         GLFragmentShader,
         Shader,
@@ -1320,7 +1321,7 @@ namespace gd3d.framework
             if (this.waitStateDic[name] == null)
                 return;
             for (var key in this.waitStateDic[name])
-            {
+            { 
                 this.waitStateDic[name][key](state);
             }
             if (state.isfinish)
@@ -1364,9 +1365,27 @@ namespace gd3d.framework
                     }
                     let filename = this.getFileName(url);
 
-                    var ab = new assetBundle(url)
+                    var ab = new assetBundle(url);
                     ab.name = filename;
                     ab.parse(JSON.parse(txt));
+                    ab.load(this, this.curloadinfo);
+
+                    this.mapBundle[filename] = ab;
+                });
+            }
+            else if(type == AssetTypeEnum.CompressBundle)
+            {
+                //压缩的bundle在packs.txt中
+                let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                gd3d.io.loadText(loadurl, (txt, err) =>
+                {
+                    let filename = this.getFileName(url);
+
+                    var ab = new assetBundle(url);
+                    ab.name = filename;
+                    let json = JSON.parse(txt);
+                    this.bundlePackJson = json;
+                    ab.parse(json["bundleinfo"]);
                     ab.load(this, this.curloadinfo);
 
                     this.mapBundle[filename] = ab;
@@ -1384,6 +1403,34 @@ namespace gd3d.framework
                     this.loadByQueue();
                 }, state);
             }
+        }
+        /**
+         * @public
+         * @language zh_CN
+         * 加载压缩后的包
+         * @version gd3d 1.0
+         * @param url 资源的url
+         * @param type 资源的类型
+         * @param onstate 状态返回的回调
+         */
+        loadCompressBundle(url: string, onstate: (state: stateLoad) => void = null)
+        {
+            let name = this.getFileName(url);
+            let type = this.calcType(url);
+            var state = new stateLoad();
+            this.mapInLoad[name] = state;
+            state.url = url;
+            if(type != AssetTypeEnum.Bundle)
+            {
+                state.errs.push(new Error("is not bundle compress type:" + url));
+                state.iserror = true;
+                onstate(state);
+                this.doWaitState(url, state);
+                return;
+            }
+            type = AssetTypeEnum.CompressBundle;
+            this.queueState.push({state, type, onstate});
+            this.loadByQueue();
         }
         /**
          * @public
