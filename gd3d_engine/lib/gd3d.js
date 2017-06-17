@@ -8353,10 +8353,7 @@ var gd3d;
                     }
                 }
                 this.state = framework.EffectPlayStateEnum.BeReady;
-                if (this.data.life == 0)
-                    this.beLoop = true;
-                else
-                    this.beLoop = false;
+                this.beLoop = this.data.beLoop;
             };
             effectSystem.prototype.addInitFrame = function (elementData) {
                 var element = new framework.EffectElement(elementData);
@@ -13628,11 +13625,13 @@ var gd3d;
     (function (framework) {
         var EffectSystemData = (function () {
             function EffectSystemData() {
+                this.beLoop = false;
                 this.elements = [];
             }
             EffectSystemData.prototype.clone = function () {
                 var data = new EffectSystemData();
                 data.life = this.life;
+                data.beLoop = this.beLoop;
                 for (var key in this.elements) {
                     data.elements[key] = this.elements[key].clone();
                 }
@@ -14226,6 +14225,7 @@ var gd3d;
     (function (framework) {
         var Emission = (function () {
             function Emission() {
+                this.beLoop = false;
                 this.renderModel = framework.RenderModel.None;
                 this.particleStartData = new gd3d.framework.ParticleStartData();
             }
@@ -14247,6 +14247,7 @@ var gd3d;
                     emission.time = this.time;
                 if (this.pos != undefined)
                     emission.pos = this.pos.clone();
+                emission.beLoop = this.beLoop;
                 if (this.simulationSpeed != undefined) {
                     emission.simulationSpeed = this.simulationSpeed.clone();
                 }
@@ -15353,6 +15354,8 @@ var gd3d;
                 var content = JSON.parse(str);
                 if (content["life"] != undefined)
                     effectData.life = content["life"];
+                if (content["beloop"] != undefined)
+                    effectData.beLoop = content["beloop"];
                 if (content["elements"] != undefined) {
                     effectData.elements = [];
                     var elements = content["elements"];
@@ -15516,6 +15519,8 @@ var gd3d;
                                     data.emissionType = framework.ParticleEmissionType.continue;
                                     break;
                             }
+                            if (_data["beloop"] != undefined)
+                                data.beLoop = _data["beloop"];
                             if (_data["maxcount"] != undefined)
                                 data.maxEmissionCount = _data["maxcount"];
                             if (_data["emissioncount"] != undefined)
@@ -16065,24 +16070,24 @@ var gd3d;
         }());
         framework.Particles = Particles;
         var EmissionElement = (function () {
-            function EmissionElement(_emissionNew, sys) {
+            function EmissionElement(_emission, sys) {
                 this.active = true;
                 this.isover = false;
                 this.effectSys = sys;
                 this.vf = sys.vf;
                 this.gameObject = sys.gameObject;
-                this.emissionNew = _emissionNew;
-                switch (this.emissionNew.emissionType) {
+                this.emission = _emission;
+                switch (this.emission.emissionType) {
                     case framework.ParticleEmissionType.burst:
                         break;
                     case framework.ParticleEmissionType.continue:
-                        this._continueSpaceTime = this.emissionNew.time / (this.emissionNew.emissionCount - 1);
+                        this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
                         break;
                 }
                 this.curTime = 0;
                 this.numcount = 0;
                 this.emissionBatchers = [];
-                this.emissionBatchers[0] = new EmissionBatcher(this.emissionNew, this.effectSys);
+                this.emissionBatchers[0] = new EmissionBatcher(this.emission, this.effectSys);
             }
             EmissionElement.prototype.update = function (delta) {
                 this.curTime += delta;
@@ -16097,26 +16102,39 @@ var gd3d;
             EmissionElement.prototype.updateEmission = function (delta) {
                 if (this.isover)
                     return;
-                if (this.emissionNew.emissionType == framework.ParticleEmissionType.continue) {
+                if (this.emission.emissionType == framework.ParticleEmissionType.continue) {
                     if (this.numcount == 0) {
                         this.addParticle();
                         this.numcount++;
                     }
                     if (this.curTime > this._continueSpaceTime) {
-                        if (this.numcount < this.emissionNew.emissionCount) {
+                        if (this.numcount < this.emission.emissionCount) {
                             this.addParticle();
                             this.curTime = 0;
                             this.numcount++;
                         }
                         else {
-                            this.isover = true;
+                            if (this.emission.beLoop) {
+                                this.curTime = 0;
+                                this.numcount = 0;
+                                this.isover = false;
+                            }
+                            else {
+                                this.isover = true;
+                            }
                         }
                     }
                 }
-                else if (this.emissionNew.emissionType == framework.ParticleEmissionType.burst) {
-                    if (this.curTime > this.emissionNew.time) {
-                        this.addParticle(this.emissionNew.emissionCount);
-                        this.isover = true;
+                else if (this.emission.emissionType == framework.ParticleEmissionType.burst) {
+                    if (this.curTime > this.emission.time) {
+                        this.addParticle(this.emission.emissionCount);
+                        if (this.emission.beLoop) {
+                            this.curTime = 0;
+                            this.isover = false;
+                        }
+                        else {
+                            this.isover = true;
+                        }
                     }
                 }
             };

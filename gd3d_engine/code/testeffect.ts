@@ -66,27 +66,27 @@
         state.finish = true;
     }
 
-    private dragon:gd3d.framework.transform;
-    private loadModel(laststate:gd3d.framework.taskstate,state:gd3d.framework.taskstate)
+    private dragon: gd3d.framework.transform;
+    private loadModel(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
     {
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
         {
-            if(s.isfinish)
+            if (s.isfinish)
             {
-                this.app.getAssetMgr().load("res/prefabs/fx_shuijing_cj/fx_shuijing_cj.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,
-                (_s)=>
-                {
-                    if(_s.isfinish)
+                this.app.getAssetMgr().load("res/prefabs/fx_shuijing_cj/fx_shuijing_cj.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                    (_s) =>
                     {
-                        let _prefab:gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("fx_shuijing_cj.prefab.json")as gd3d.framework.prefab;
-                        this.dragon= _prefab.getCloneTrans();
-                        this.scene.addChild(this.dragon);
-                        state.finish = true;
-                    }
-                });
+                        if (_s.isfinish)
+                        {
+                            let _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("fx_shuijing_cj.prefab.json") as gd3d.framework.prefab;
+                            this.dragon = _prefab.getCloneTrans();
+                            this.scene.addChild(this.dragon);
+                            state.finish = true;
+                        }
+                    });
             }
         });
-        
+
     }
     start(app: gd3d.framework.application)
     {
@@ -109,13 +109,15 @@
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
-        this.app.getAssetMgr().load("res/particleEffect/fx_0005_sword_sword/fx_0005_sword_sword.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
+        let names: string[] = ["particle", "fx_ss_female@attack_03", "particle_billboard", "fx_0005_sword_sword"];
+        let name = names[0];
+        this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)
             {
                 let tr = new gd3d.framework.transform();
                 this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
-                var text: gd3d.framework.textasset = this.app.getAssetMgr().getAssetByName("fx_0005_sword_sword.effect.json") as gd3d.framework.textasset;
+                var text: gd3d.framework.textasset = this.app.getAssetMgr().getAssetByName(name + ".effect.json") as gd3d.framework.textasset;
                 this.effect.setJsonData(text);
                 this.scene.addChild(tr);
                 tr.markDirty();

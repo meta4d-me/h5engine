@@ -4,11 +4,13 @@ namespace gd3d.framework
     export class EffectSystemData
     {
         public life: number;
+        public beLoop: boolean = false;
         public elements: EffectElementData[] = [];
         clone()
         {
             let data: EffectSystemData = new EffectSystemData();
             data.life = this.life;
+            data.beLoop = this.beLoop;
             for (let key in this.elements)
             {
                 data.elements[key] = this.elements[key].clone();

@@ -2000,6 +2000,7 @@ declare namespace gd3d.math {
 declare namespace gd3d.framework {
     class EffectSystemData {
         life: number;
+        beLoop: boolean;
         elements: EffectElementData[];
         clone(): EffectSystemData;
         dispose(): void;
@@ -2150,6 +2151,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Emission {
+        beLoop: boolean;
         emissionType: ParticleEmissionType;
         maxEmissionCount: number;
         emissionCount: number;
@@ -2498,14 +2500,14 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         emissionBatchers: EmissionBatcher[];
         active: boolean;
-        emissionNew: Emission;
+        emission: Emission;
         private vf;
         private curTime;
         private numcount;
         private isover;
         private _continueSpaceTime;
         effectSys: effectSystem;
-        constructor(_emissionNew: Emission, sys: effectSystem);
+        constructor(_emission: Emission, sys: effectSystem);
         update(delta: number): void;
         updateBatcher(delta: number): void;
         updateEmission(delta: number): void;

@@ -2149,11 +2149,13 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        this.app.getAssetMgr().load("res/particleEffect/fx_0005_sword_sword/fx_0005_sword_sword.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+        var names = ["particle", "fx_ss_female@attack_03", "particle_billboard", "fx_0005_sword_sword"];
+        var name = names[0];
+        this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 var tr = new gd3d.framework.transform();
                 _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                var text = _this.app.getAssetMgr().getAssetByName("fx_0005_sword_sword.effect.json");
+                var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
                 _this.effect.setJsonData(text);
                 _this.scene.addChild(tr);
                 tr.markDirty();

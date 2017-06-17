@@ -49,7 +49,7 @@ namespace gd3d.framework
 
         public active: boolean = true;//激活状态
 
-        public emissionNew: Emission;//原始数据，不能被改变
+        public emission: Emission;//原始数据，不能被改变
         private vf: number;
         private curTime: number;
         private numcount: number;
@@ -57,25 +57,25 @@ namespace gd3d.framework
 
         private _continueSpaceTime: number;
         public effectSys: effectSystem;
-        constructor(_emissionNew: Emission, sys: effectSystem)
+        constructor(_emission: Emission, sys: effectSystem)
         {
             this.effectSys = sys;
             this.vf = sys.vf;
             this.gameObject = sys.gameObject;
-            this.emissionNew = _emissionNew;
-            switch (this.emissionNew.emissionType)
+            this.emission = _emission;
+            switch (this.emission.emissionType)
             {
                 case ParticleEmissionType.burst:
                     break;
                 case ParticleEmissionType.continue:
-                    this._continueSpaceTime = this.emissionNew.time / (this.emissionNew.emissionCount - 1);
+                    this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
                     break;
             }
             this.curTime = 0;
             this.numcount = 0;
 
             this.emissionBatchers = [];
-            this.emissionBatchers[0] = new EmissionBatcher(this.emissionNew, this.effectSys);//先处理一个batcher的情况
+            this.emissionBatchers[0] = new EmissionBatcher(this.emission, this.effectSys);//先处理一个batcher的情况
         }
 
         public update(delta: number)
@@ -96,7 +96,7 @@ namespace gd3d.framework
         updateEmission(delta: number)
         {
             if (this.isover) return;
-            if (this.emissionNew.emissionType == ParticleEmissionType.continue)
+            if (this.emission.emissionType == ParticleEmissionType.continue)
             {
                 if (this.numcount == 0) 
                 {
@@ -106,7 +106,7 @@ namespace gd3d.framework
 
                 if (this.curTime > this._continueSpaceTime)
                 {
-                    if (this.numcount < this.emissionNew.emissionCount)
+                    if (this.numcount < this.emission.emissionCount)
                     {
                         this.addParticle();
                         this.curTime = 0;
@@ -114,16 +114,31 @@ namespace gd3d.framework
                     }
                     else
                     {
-                        this.isover = true;
+                        if (this.emission.beLoop)
+                        {
+                            this.curTime = 0;
+                            this.numcount = 0;
+                            this.isover = false;
+                        } else
+                        {
+                            this.isover = true;
+                        }
                     }
                 }
             }
-            else if (this.emissionNew.emissionType == ParticleEmissionType.burst)
+            else if (this.emission.emissionType == ParticleEmissionType.burst)
             {
-                if (this.curTime > this.emissionNew.time)
+                if (this.curTime > this.emission.time)
                 {
-                    this.addParticle(this.emissionNew.emissionCount);
-                    this.isover = true;
+                    this.addParticle(this.emission.emissionCount);
+                    if (this.emission.beLoop)
+                    {
+                        this.curTime = 0;
+                        this.isover = false;
+                    } else
+                    {
+                        this.isover = true;
+                    }
                 }
             }
         }
@@ -575,7 +590,7 @@ namespace gd3d.framework
                 {
                     // gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
                     // gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
-                    gd3d.math.quatClone(this.rotationByShape,this.localRotation);
+                    gd3d.math.quatClone(this.rotationByShape, this.localRotation);
 
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 

@@ -2,6 +2,7 @@ namespace gd3d.framework
 {
     export class Emission
     {
+        beLoop: boolean = false;
         /**
          * 发射器类型
          */
@@ -79,7 +80,7 @@ namespace gd3d.framework
          * @type {number}
          * @memberof EmissionNew
          */
-        simulationSpeed:ParticleNodeNumber;
+        simulationSpeed: ParticleNodeNumber;
         /**
          * 透明度相关
          * 
@@ -116,7 +117,7 @@ namespace gd3d.framework
          * @memberof EmissionNew
          */
         life: ValueData;
-        renderModel: RenderModel=RenderModel.None;
+        renderModel: RenderModel = RenderModel.None;
         mesh: mesh;
 
         particleStartData: gd3d.framework.ParticleStartData = new gd3d.framework.ParticleStartData();
@@ -143,9 +144,10 @@ namespace gd3d.framework
                 emission.time = this.time;
             if (this.pos != undefined)
                 emission.pos = this.pos.clone();
+            emission.beLoop = this.beLoop;
             // if (this.shape != undefined)
             //     emission.shape = this.shape;
-            if(this.simulationSpeed!=undefined)
+            if (this.simulationSpeed != undefined)
             {
                 emission.simulationSpeed = this.simulationSpeed.clone();
             }
