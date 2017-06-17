@@ -794,4 +794,13 @@ namespace gd3d.framework
     {
         Linear//线性插值
     }
+    export enum RenderModel
+    {
+        None,
+        BillBoard,
+        StretchedBillBoard,
+        HorizontalBillBoard,
+        VerticalBillBoard,
+        Mesh
+    }
 }

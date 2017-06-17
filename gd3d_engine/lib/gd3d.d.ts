@@ -1447,53 +1447,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class particleSystem implements IRenderer {
-        particleData: ParticleData;
-        camera: camera;
-        private emission;
-        private particleMesh;
-        private material;
-        particleMethodType: ParticleMethodType;
-        private meshBatchers;
-        private curBather;
-        layer: RenderLayerEnum;
-        queue: number;
-        delayTime: number;
-        isTrail: boolean;
-        private startLifeTime;
-        private timer;
-        speed: number;
-        private assetmgr;
-        start(): void;
-        private initByData(assetmgr);
-        update(delta: number): void;
-        render(context: gd3d.framework.renderContext, assetmgr: gd3d.framework.assetMgr, camera: gd3d.framework.camera): void;
-        private batchervercountLimit;
-        creatMeshbatcher(mat: gd3d.framework.material, needCount?: number): void;
-        checkEmissionBatcher(emission: Emission, count?: number): void;
-        remove(): void;
-        clone(): void;
-        gameObject: gd3d.framework.gameObject;
-        renderLayer: CullingMask;
-    }
-    class Emission {
-        emissionType: ParticleEmissionType;
-        maxEmissionCount: number;
-        emissionCount: number;
-        burstDelayTime: number;
-        emissionKeepTime: number;
-        particleData: ParticleData;
-        private curTime;
-        private numcount;
-        private b;
-        private isover;
-        private _continueSpaceTime;
-        constructor(_type?: ParticleEmissionType, count?: number, time?: number);
-        update(delta: number): boolean;
-        isOver(): boolean;
-    }
-}
-declare namespace gd3d.framework {
     class skinnedMeshRenderer implements IRenderer {
         constructor();
         gameObject: gameObject;
@@ -2171,14 +2124,13 @@ declare namespace gd3d.framework {
     enum EffectLerpTypeEnum {
         Linear = 0,
     }
-}
-declare namespace gd3d.framework {
-    class EffectData {
-        name: string;
-        particlelist: Array<ParticleData>;
-        dependImgList: Array<string>;
-        dependShapeList: Array<string>;
-        constructor();
+    enum RenderModel {
+        None = 0,
+        BillBoard = 1,
+        StretchedBillBoard = 2,
+        HorizontalBillBoard = 3,
+        VerticalBillBoard = 4,
+        Mesh = 5,
     }
 }
 declare namespace gd3d.framework {
@@ -2246,20 +2198,6 @@ declare namespace gd3d.framework {
         NONE = 0,
         UVRoll = 1,
         UVSprite = 2,
-    }
-}
-declare namespace gd3d.framework {
-    class MaterialData {
-        name: string;
-        shaderName: string;
-        diffuseTexture: string;
-        tiling: gd3d.math.vector2;
-        offset: gd3d.math.vector2;
-        alphaCut: number;
-        mapData: {
-            [id: string]: any;
-        };
-        constructor();
     }
 }
 declare namespace gd3d.framework {
@@ -2348,80 +2286,6 @@ declare namespace gd3d.framework {
         constructor();
         private getRandomPosition(dir, length);
         clone(): ParticleStartData;
-    }
-}
-declare namespace gd3d.framework {
-    enum RenderModel {
-        None = 0,
-        BillBoard = 1,
-        StretchedBillBoard = 2,
-        HorizontalBillBoard = 3,
-        VerticalBillBoard = 4,
-        Mesh = 5,
-    }
-    enum ParticleCurveType {
-        LINEAR = 0,
-        CURVE = 1,
-    }
-    class ParticleData {
-        emissionData: EmissionData;
-        materialData: MaterialData;
-        particleDetailData: ParticleDetailData;
-        constructor();
-    }
-    enum ParticleMethodType {
-        Normal = 0,
-        UVSPRITE = 1,
-        UVROLL = 2,
-    }
-    class ParticleDetailData {
-        name: string;
-        renderModel: RenderModel;
-        bindAxis: boolean;
-        bindx: boolean;
-        bindy: boolean;
-        bindz: boolean;
-        type: string;
-        meshName: string;
-        isLoop: boolean;
-        isLookAtCamera: boolean;
-        gravity: ValueData;
-        gravitySpeed: ValueData;
-        life: ValueData;
-        speed: ValueData;
-        startPitchYawRoll: ParticleNode;
-        angularVelocity: ParticleNode;
-        velocity: ParticleNode;
-        acceleration: ParticleNode;
-        scale: ParticleNode;
-        scaleNode: Array<ParticleNode>;
-        color: ParticleNode;
-        colorNode: Array<ParticleNode>;
-        alpha: ValueData;
-        alphaNode: Array<AlphaNode>;
-        positionNode: Array<ParticleNode>;
-        particleStartData: gd3d.framework.ParticleStartData;
-        isRotation: boolean;
-        infinite: boolean;
-        delayTime: ValueData;
-        interpolationType: ParticleCurveType;
-        uvSprite: UVSprite;
-        uvRoll: UVRoll;
-        particleMethodType: ParticleMethodType;
-        istrail: boolean;
-        angleSpeedForbillboard: ValueData;
-        constructor();
-    }
-    class UVSprite {
-        row: number;
-        column: number;
-        frameOverLifeTime: number;
-        startFrame: number;
-        cycles: number;
-    }
-    class UVRoll {
-        uvSpeed: UVSpeedNode;
-        uvSpeedNodes: Array<UVSpeedNode>;
     }
 }
 declare namespace gd3d.framework {
@@ -2612,175 +2476,6 @@ declare namespace gd3d.framework {
         static lookatVerticalBillboard(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, up?: gd3d.math.vector3): void;
         static quatLookatZ(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, forward?: gd3d.math.vector3): void;
         static quatLookatX(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, right?: gd3d.math.vector3): void;
-    }
-}
-declare namespace gd3d.framework {
-    class MeshBatcher {
-        groupMesh: gd3d.framework.mesh;
-        camera: gd3d.framework.camera;
-        bufferInit: boolean;
-        dataForVbo: Float32Array;
-        dataForEbo: Uint16Array;
-        _material: gd3d.framework.material;
-        particleSystem: particleSystem;
-        private listUVSPeedNode;
-        private _vercount;
-        readonly vercount: number;
-        private _indexcount;
-        readonly indexcount: number;
-        parlist: Array<Particle>;
-        private _maxvercount;
-        maxvercount: number;
-        constructor(mat: material, maxvercout: number, particle: particleSystem);
-        private vf;
-        private total;
-        AddP(particle: Particle): void;
-        addParticle(particleMesh: gd3d.framework.mesh, particleData: gd3d.framework.ParticleData): Particle;
-        update(delta: number): void;
-        render(context: gd3d.framework.renderContext, assetmgr: gd3d.framework.assetMgr): void;
-        bdispose: boolean;
-        dispose(): void;
-    }
-    class Particle {
-        vertexStartIndex: number;
-        isinit: boolean;
-        mesh: gd3d.framework.mesh;
-        vertexArr: Float32Array;
-        private meshBatcherWorldMatrix;
-        private particleSyTrans;
-        private centerPosition;
-        private _localTranslate;
-        localTranslate: gd3d.math.vector3;
-        private startAlphaNode;
-        private curAlphaNode;
-        private _alpha;
-        alpha: number;
-        private listAlphaNode;
-        private startScaleNode;
-        private curScaleNode;
-        private _scale;
-        private _scale_temp;
-        localScale: gd3d.math.vector3;
-        private listScaleNode;
-        private startUVSpeedNode;
-        private CurUVSpeedNode;
-        private _uvSpeed;
-        private _uvSpeed_temp;
-        uvSpeed: gd3d.math.vector2;
-        private listUvSpeedNode;
-        private _alive;
-        private startColorNode;
-        private curColorNode;
-        private _color;
-        private _color_temp;
-        color: gd3d.math.vector4;
-        private listColorNode;
-        private curve;
-        alive: boolean;
-        private lifeTime;
-        private curlifeTime;
-        readonly lifeLocation: number;
-        private isloop;
-        private lookatcam;
-        private infinite;
-        private speed;
-        private speedDir;
-        private particleDetailData;
-        materialData: MaterialData;
-        private meshBatcher;
-        private curTime;
-        private delayTime;
-        private time;
-        private renderModel;
-        private velocity;
-        private acceleration;
-        private angularVelocity;
-        private angularVelocityForBillboard;
-        gravitySpeed: number;
-        gravityModifier: number;
-        private localAxisX;
-        private localAxisY;
-        private localAxisZ;
-        private camera;
-        private cameraTransform;
-        private startPosition;
-        private curPosition;
-        private isRotation;
-        private startPitchYawRoll;
-        private rotation_start;
-        private rotation_shape;
-        private rotationToCamera;
-        private rotation_overLifetime;
-        private rotation_overLifetime_temp;
-        private rotation;
-        private localRotation;
-        private worldRotation;
-        localMatrix: gd3d.math.matrix;
-        worldMatrix: gd3d.math.matrix;
-        private interpType;
-        private bindAxis;
-        private bindx;
-        private bindy;
-        private bindz;
-        trailMatrix: gd3d.math.matrix;
-        constructor(_shape: gd3d.framework.mesh, particleData: gd3d.framework.ParticleData, MeshBatcher: MeshBatcher);
-        private recordTrailMatrix();
-        parseByData(): void;
-        private RotAngle;
-        private updaterot(delta);
-        updatematrix(): void;
-        addUVSpeedNode(node: EffectUVSpeedNode): void;
-        resetMatrix(): void;
-        addAlphaNode(node: EffectAlphaNode): void;
-        addColorNode(node: EffectColorNode): void;
-        addScaleNode(node: EffectScaleNode): void;
-        updategravity(deltaTime: number): void;
-        private displacement;
-        private updateForce(delta);
-        private _tempVec3;
-        updateposition(deltaTime: number): void;
-        updatescale(deltaTime: number): void;
-        curTextureOffset: gd3d.math.vector4;
-        private updateUV(deltaTime);
-        private updateUVSpriteAnimation(deltaTime);
-        updatecolor(deltaTime: number): void;
-        updatelifetime(deltaTime: number): boolean;
-        update(delta: number): void;
-        clear(): void;
-        dispose(): void;
-    }
-    class EffectColorNode {
-        lifeLocation: number;
-        keyColor: gd3d.math.vector3;
-        constructor(_location: number, _color: gd3d.math.vector3);
-    }
-    class EffectScaleNode {
-        lifeLocation: number;
-        keyScale: gd3d.math.vector3;
-        constructor(_location: number, _scale: gd3d.math.vector3);
-    }
-    class EffectAlphaNode {
-        lifeLocation: number;
-        keyAlpha: number;
-        constructor(_location: number, _keyAlpha: number);
-    }
-    class EffectUVSpeedNode {
-        lifelocation: number;
-        keyUVSpeed: gd3d.math.vector2;
-        constructor(_location: number, _uvSpeed: gd3d.math.vector2);
-    }
-}
-declare namespace gd3d.framework {
-    class ParticleLoader {
-        private emisssionMap;
-        private materialMap;
-        particleMap: {
-            [name: string]: any;
-        };
-        load(indexurl: string, callback: (effecsystemdata: EffectData) => void): void;
-        loadEmission(baseUrl: string, callback: (emissionArray: Array<EmissionData>, _err: Error) => void): void;
-        loadMatrial(indexurl: string, callback: (material: Array<MaterialData>, _err: Error) => void): void;
-        loadParticle(indexurl: string, callback: (p: Array<ParticleDetailData>, _err: Error) => void): void;
     }
 }
 declare namespace gd3d.framework {
