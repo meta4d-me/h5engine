@@ -2039,7 +2039,7 @@ declare namespace gd3d.framework {
         initFrameData: EffectFrameData;
         ref: string;
         actionData: EffectActionData[];
-        emissionData: EmissionNew;
+        emissionData: Emission;
         clone(): EffectElementData;
         dispose(): void;
     }
@@ -2149,7 +2149,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class EmissionNew {
+    class Emission {
         emissionType: ParticleEmissionType;
         maxEmissionCount: number;
         emissionCount: number;
@@ -2172,8 +2172,8 @@ declare namespace gd3d.framework {
         alphaSpeed: ParticleNodeNumber;
         uv: ParticleNodeVec2;
         uvType: UVTypeEnum;
-        uvRoll: UVRollNew;
-        uvSprite: UVSpriteNew;
+        uvRoll: UVRoll;
+        uvSprite: UVSprite;
         mat: EffectMatData;
         life: ValueData;
         renderModel: RenderModel;
@@ -2181,20 +2181,20 @@ declare namespace gd3d.framework {
         particleStartData: gd3d.framework.ParticleStartData;
         private dataForVbo;
         getVboData(vf: number): Float32Array;
-        clone(): EmissionNew;
+        clone(): Emission;
         cloneParticleNodeArray(_array: Array<ParticleNode>): ParticleNode[];
         cloneParticleNodeNumberArray(_array: Array<ParticleNodeNumber>): ParticleNodeNumber[];
     }
-    class UVSpriteNew {
+    class UVSprite {
         row: number;
         column: number;
         totalCount: number;
-        clone(): UVSpriteNew;
+        clone(): UVSprite;
     }
-    class UVRollNew {
+    class UVRoll {
         uvSpeed: UVSpeedNode;
         uvSpeedNodes: Array<UVSpeedNode>;
-        clone(): UVRollNew;
+        clone(): UVRoll;
     }
     enum UVTypeEnum {
         NONE = 0,
@@ -2489,7 +2489,7 @@ declare namespace gd3d.framework {
         effectSys: effectSystem;
         loopFrame: number;
         constructor(sys: effectSystem);
-        addEmission(_emissionNew: EmissionNew): void;
+        addEmission(_emissionNew: Emission): void;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
@@ -2498,14 +2498,14 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         emissionBatchers: EmissionBatcher[];
         active: boolean;
-        emissionNew: EmissionNew;
+        emissionNew: Emission;
         private vf;
         private curTime;
         private numcount;
         private isover;
         private _continueSpaceTime;
         effectSys: effectSystem;
-        constructor(_emissionNew: EmissionNew, sys: effectSystem);
+        constructor(_emissionNew: Emission, sys: effectSystem);
         update(delta: number): void;
         updateBatcher(delta: number): void;
         updateEmission(delta: number): void;
@@ -2516,18 +2516,18 @@ declare namespace gd3d.framework {
     }
     class EmissionBatcher {
         gameObject: gameObject;
-        data: EmissionNew;
+        data: Emission;
         mesh: mesh;
         mat: material;
         beBufferInited: boolean;
         beAddParticle: boolean;
         dataForVbo: Float32Array;
         dataForEbo: Uint16Array;
-        particles: ParticleNew1[];
+        particles: Particle[];
         vertexSize: number;
         formate: number;
         effectSys: effectSystem;
-        constructor(_data: EmissionNew, effectSys: effectSystem);
+        constructor(_data: Emission, effectSys: effectSystem);
         curVerCount: number;
         curIndexCount: number;
         addParticle(): void;
@@ -2541,7 +2541,7 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
     }
-    class ParticleNew1 {
+    class Particle {
         gameObject: gameObject;
         localTranslate: math.vector3;
         euler: math.vector3;
@@ -2562,7 +2562,7 @@ declare namespace gd3d.framework {
         dataForVbo: Float32Array;
         sourceVbo: Float32Array;
         dataForEbo: Uint16Array;
-        data: EmissionNew;
+        data: Emission;
         private vertexCount;
         private vertexSize;
         private curLife;

@@ -220,7 +220,7 @@ namespace gd3d.framework
                 if (elementData["timeline"]["attrs"] != undefined)
                 {
                     let _data = elementData["timeline"]["attrs"];
-                    let data = new EmissionNew();
+                    let data = new Emission();
                     element.emissionData = data;
                     if (_data["emissionType"] != undefined)
                     {
@@ -367,14 +367,14 @@ namespace gd3d.framework
                                     data.uvType = UVTypeEnum.UVRoll;
                                     if (_data["uvroll"] != undefined)
                                     {
-                                        data.uvRoll = new UVRollNew();
+                                        data.uvRoll = new UVRoll();
                                         data.uvRoll.uvSpeed = EffectUtil.parseEffectUVSpeed(_data["uvroll"]);
                                     }
                                     break;
                                 case "uvsprite":
                                     let _val = _data["uvsprite"];
                                     data.uvType = UVTypeEnum.UVSprite;
-                                    data.uvSprite = new UVSpriteNew();
+                                    data.uvSprite = new UVSprite();
                                     if (_val["row"] != undefined)
                                         data.uvSprite.row = <number>_val["row"];
                                     if (_val["colum"] != undefined)

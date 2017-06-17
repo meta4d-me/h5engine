@@ -14224,19 +14224,19 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var EmissionNew = (function () {
-            function EmissionNew() {
+        var Emission = (function () {
+            function Emission() {
                 this.renderModel = framework.RenderModel.None;
                 this.particleStartData = new gd3d.framework.ParticleStartData();
             }
-            EmissionNew.prototype.getVboData = function (vf) {
+            Emission.prototype.getVboData = function (vf) {
                 if (this.dataForVbo == undefined) {
                     this.dataForVbo = this.mesh.data.genVertexDataArray(vf);
                 }
                 return this.dataForVbo;
             };
-            EmissionNew.prototype.clone = function () {
-                var emission = new EmissionNew();
+            Emission.prototype.clone = function () {
+                var emission = new Emission();
                 if (this.emissionType != undefined)
                     emission.emissionType = this.emissionType;
                 if (this.maxEmissionCount != undefined)
@@ -14302,41 +14302,41 @@ var gd3d;
                     emission.particleStartData = this.particleStartData.clone();
                 return emission;
             };
-            EmissionNew.prototype.cloneParticleNodeArray = function (_array) {
+            Emission.prototype.cloneParticleNodeArray = function (_array) {
                 var array = new Array();
                 for (var i in _array) {
                     array.push(_array[i].clone());
                 }
                 return array;
             };
-            EmissionNew.prototype.cloneParticleNodeNumberArray = function (_array) {
+            Emission.prototype.cloneParticleNodeNumberArray = function (_array) {
                 var array = new Array();
                 for (var i in _array) {
                     array.push(_array[i].clone());
                 }
                 return array;
             };
-            return EmissionNew;
+            return Emission;
         }());
-        framework.EmissionNew = EmissionNew;
-        var UVSpriteNew = (function () {
-            function UVSpriteNew() {
+        framework.Emission = Emission;
+        var UVSprite = (function () {
+            function UVSprite() {
             }
-            UVSpriteNew.prototype.clone = function () {
-                var sprite = new UVSpriteNew();
+            UVSprite.prototype.clone = function () {
+                var sprite = new UVSprite();
                 sprite.row = this.row;
                 sprite.column = this.column;
                 sprite.totalCount = this.totalCount;
                 return sprite;
             };
-            return UVSpriteNew;
+            return UVSprite;
         }());
-        framework.UVSpriteNew = UVSpriteNew;
-        var UVRollNew = (function () {
-            function UVRollNew() {
+        framework.UVSprite = UVSprite;
+        var UVRoll = (function () {
+            function UVRoll() {
             }
-            UVRollNew.prototype.clone = function () {
-                var roll = new UVRollNew();
+            UVRoll.prototype.clone = function () {
+                var roll = new UVRoll();
                 if (this.uvSpeed != undefined)
                     roll.uvSpeed = this.uvSpeed;
                 if (this.uvSpeedNodes != undefined) {
@@ -14348,9 +14348,9 @@ var gd3d;
                 }
                 return roll;
             };
-            return UVRollNew;
+            return UVRoll;
         }());
-        framework.UVRollNew = UVRollNew;
+        framework.UVRoll = UVRoll;
         var UVTypeEnum;
         (function (UVTypeEnum) {
             UVTypeEnum[UVTypeEnum["NONE"] = 0] = "NONE";
@@ -15505,7 +15505,7 @@ var gd3d;
                 if (elementData["timeline"] != undefined) {
                     if (elementData["timeline"]["attrs"] != undefined) {
                         var _data = elementData["timeline"]["attrs"];
-                        var data = new framework.EmissionNew();
+                        var data = new framework.Emission();
                         element.emissionData = data;
                         if (_data["emissionType"] != undefined) {
                             switch (_data["emissionType"]) {
@@ -15616,14 +15616,14 @@ var gd3d;
                                     case "uvroll":
                                         data.uvType = framework.UVTypeEnum.UVRoll;
                                         if (_data["uvroll"] != undefined) {
-                                            data.uvRoll = new framework.UVRollNew();
+                                            data.uvRoll = new framework.UVRoll();
                                             data.uvRoll.uvSpeed = framework.EffectUtil.parseEffectUVSpeed(_data["uvroll"]);
                                         }
                                         break;
                                     case "uvsprite":
                                         var _val = _data["uvsprite"];
                                         data.uvType = framework.UVTypeEnum.UVSprite;
-                                        data.uvSprite = new framework.UVSpriteNew();
+                                        data.uvSprite = new framework.UVSprite();
                                         if (_val["row"] != undefined)
                                             data.uvSprite.row = _val["row"];
                                         if (_val["colum"] != undefined)
@@ -16186,7 +16186,7 @@ var gd3d;
                     this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
             }
             EmissionBatcher.prototype.addParticle = function () {
-                var p = new ParticleNew1(this);
+                var p = new Particle(this);
                 p.uploadData(this.dataForVbo);
                 for (var i = 0; i < p.dataForEbo.length; i++) {
                     this.dataForEbo[this.curIndexCount + i] = p.dataForEbo[i] + this.curVerCount;
@@ -16272,8 +16272,8 @@ var gd3d;
             return EmissionBatcher;
         }());
         framework.EmissionBatcher = EmissionBatcher;
-        var ParticleNew1 = (function () {
-            function ParticleNew1(batcher) {
+        var Particle = (function () {
+            function Particle(batcher) {
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
                 this.tilling = new gd3d.math.vector2(1, 1);
@@ -16302,10 +16302,10 @@ var gd3d;
                 this.initByData();
                 this.dataForVbo.set(this.data.mesh.data.genVertexDataArray(this.format), 0);
             }
-            ParticleNew1.prototype.uploadData = function (array) {
+            Particle.prototype.uploadData = function (array) {
                 array.set(this.dataForVbo, this.vertexStartIndex * this.vertexSize);
             };
-            ParticleNew1.prototype.initByData = function () {
+            Particle.prototype.initByData = function () {
                 var localRandomDirection = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomDirection);
                 this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
                 var localCenterTranslate = gd3d.math.pool.clone_vector3(this.data.particleStartData.position);
@@ -16341,7 +16341,7 @@ var gd3d;
                     }
                 }
             };
-            ParticleNew1.prototype.update = function (delta) {
+            Particle.prototype.update = function (delta) {
                 this.curLife += delta;
                 if (this.curLife >= this.data.life.getValue()) {
                     gd3d.math.matrixZero(this.matrix);
@@ -16358,14 +16358,14 @@ var gd3d;
                 this._updateUV(delta);
                 this._updateVBO();
             };
-            ParticleNew1.prototype._updateLocalMatrix = function (delta) {
+            Particle.prototype._updateLocalMatrix = function (delta) {
                 gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.scale, this.localRotation, this.matrix);
             };
-            ParticleNew1.prototype._updateRotation = function (delta) {
+            Particle.prototype._updateRotation = function (delta) {
                 gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 this._updateElementRotation();
             };
-            ParticleNew1.prototype._updateElementRotation = function () {
+            Particle.prototype._updateElementRotation = function () {
                 var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
                 var cameraTransform = cam.gameObject.transform;
                 var translation = gd3d.math.pool.new_vector3();
@@ -16428,7 +16428,7 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(worldTranslation);
                 gd3d.math.pool.delete_quaternion(invTransformRotation);
             };
-            ParticleNew1.prototype._updatePos = function (delta) {
+            Particle.prototype._updatePos = function (delta) {
                 if (this.data.moveSpeed != undefined) {
                     if (this.data.moveSpeed.x != undefined)
                         this.localTranslate.x += this.data.moveSpeed.x.getValue() * delta;
@@ -16440,7 +16440,7 @@ var gd3d;
                 var currentTranslate = framework.EffectUtil.vecMuliNum(this.speedDir, this.simulationSpeed);
                 gd3d.math.vec3Add(this.localTranslate, currentTranslate, this.localTranslate);
             };
-            ParticleNew1.prototype._updateEuler = function (delta) {
+            Particle.prototype._updateEuler = function (delta) {
                 var index = 0;
                 if (this.data.eulerNodes != undefined && this.data.eulerSpeed != undefined) {
                     console.error("scale只能通过插值或者speed来修改，不能两个同时存在！");
@@ -16458,7 +16458,7 @@ var gd3d;
                         this.euler.z += this.data.eulerSpeed.z.getValue() * delta;
                 }
             };
-            ParticleNew1.prototype._updateScale = function (delta) {
+            Particle.prototype._updateScale = function (delta) {
                 var index = 0;
                 if (this.data.scaleNodes != undefined && this.data.scaleSpeed != undefined) {
                     console.error("scale只能通过插值或者speed来修改，不能两个同时存在！");
@@ -16476,7 +16476,7 @@ var gd3d;
                         this.scale.z += this.data.scaleSpeed.z.getValue() * delta;
                 }
             };
-            ParticleNew1.prototype._updateColor = function (delta) {
+            Particle.prototype._updateColor = function (delta) {
                 var index = 0;
                 if (this.data.colorNodes != undefined && this.data.colorSpeed != undefined) {
                     console.error("color只能通过插值或者speed来修改，不能两个同时存在！");
@@ -16494,7 +16494,7 @@ var gd3d;
                         this.color.z += this.data.colorSpeed.z.getValue() * delta;
                 }
             };
-            ParticleNew1.prototype._updateNode = function (nodes, life, out) {
+            Particle.prototype._updateNode = function (nodes, life, out) {
                 var index = 0;
                 if (nodes != undefined) {
                     for (var i = 0; i < nodes.length; i++) {
@@ -16531,7 +16531,7 @@ var gd3d;
                     }
                 }
             };
-            ParticleNew1.prototype._updateAlpha = function (delta) {
+            Particle.prototype._updateAlpha = function (delta) {
                 var index = 0;
                 if (this.data.alphaNodes != undefined && this.data.alphaSpeed != undefined) {
                     console.error("color只能通过插值或者speed来修改，不能两个同时存在！");
@@ -16544,7 +16544,7 @@ var gd3d;
                     this.alpha += this.data.alphaSpeed.getValue() * delta;
                 }
             };
-            ParticleNew1.prototype._updateUV = function (delta) {
+            Particle.prototype._updateUV = function (delta) {
                 if (this.uv == undefined)
                     this.uv = new gd3d.math.vector2();
                 if (this.data.uvType == framework.UVTypeEnum.NONE) {
@@ -16579,7 +16579,7 @@ var gd3d;
                     }
                 }
             };
-            ParticleNew1.prototype._updateVBO = function () {
+            Particle.prototype._updateVBO = function () {
                 var vertexSize = this.vertexSize;
                 for (var i = 0; i < this.vertexCount; i++) {
                     {
@@ -16616,7 +16616,7 @@ var gd3d;
                     }
                 }
             };
-            ParticleNew1.prototype.dispose = function () {
+            Particle.prototype.dispose = function () {
                 this.dataForVbo = null;
                 this.dataForEbo = null;
                 this.rotation_start = null;
@@ -16632,9 +16632,9 @@ var gd3d;
                 this.color = null;
                 this.uv = null;
             };
-            return ParticleNew1;
+            return Particle;
         }());
-        framework.ParticleNew1 = ParticleNew1;
+        framework.Particle = Particle;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

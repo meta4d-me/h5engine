@@ -357,7 +357,7 @@ namespace gd3d.framework
         public initFrameData: EffectFrameData;
         public ref: string;//数据整体引用
         public actionData: EffectActionData[];
-        public emissionData: EmissionNew;
+        public emissionData: Emission;
         clone()
         {
             let elementdata = new EffectElementData();
