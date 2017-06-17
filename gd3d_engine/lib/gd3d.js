@@ -13744,8 +13744,20 @@ var gd3d;
                 if (this.data.timelineFrame != undefined) {
                     for (var i in this.data.timelineFrame) {
                         var frameData = this.data.timelineFrame[i];
-                        if (frameData.frameIndex != -1 && frameData.lerpDatas != undefined) {
-                            this.recordLerpValues(frameData);
+                        if (frameData.frameIndex != -1) {
+                            if (frameData.lerpDatas != undefined) {
+                                this.recordLerpValues(frameData);
+                            }
+                            else if (frameData.attrsData != undefined) {
+                                if (this.timelineFrame[frameData.frameIndex] == undefined) {
+                                    this.timelineFrame[frameData.frameIndex] = new EffectFrameData();
+                                    this.timelineFrame[frameData.frameIndex].attrsData = new EffectAttrsData();
+                                    this.timelineFrame[frameData.frameIndex].frameIndex = frameData.frameIndex;
+                                }
+                                for (var k in frameData.attrsData) {
+                                    this.timelineFrame[frameData.frameIndex].attrsData.setLerpAttribute(k, frameData.attrsData.getAttribute(k));
+                                }
+                            }
                         }
                     }
                 }
