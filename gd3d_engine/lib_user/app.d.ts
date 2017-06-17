@@ -308,7 +308,6 @@ declare class test_effect implements IState {
     private loadModel(laststate, state);
     start(app: gd3d.framework.application): void;
     private loadEffect(laststate, state);
-    _loadEffect(assetbundleName: string, name: string): void;
     private addcam(laststate, state);
     beclone: boolean;
     update(delta: number): void;

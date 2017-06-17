@@ -3444,22 +3444,23 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Unknown"] = 0] = "Unknown";
             AssetTypeEnum[AssetTypeEnum["Auto"] = 1] = "Auto";
             AssetTypeEnum[AssetTypeEnum["Bundle"] = 2] = "Bundle";
-            AssetTypeEnum[AssetTypeEnum["GLVertexShader"] = 3] = "GLVertexShader";
-            AssetTypeEnum[AssetTypeEnum["GLFragmentShader"] = 4] = "GLFragmentShader";
-            AssetTypeEnum[AssetTypeEnum["Shader"] = 5] = "Shader";
-            AssetTypeEnum[AssetTypeEnum["Texture"] = 6] = "Texture";
-            AssetTypeEnum[AssetTypeEnum["TextureDesc"] = 7] = "TextureDesc";
-            AssetTypeEnum[AssetTypeEnum["Mesh"] = 8] = "Mesh";
-            AssetTypeEnum[AssetTypeEnum["Prefab"] = 9] = "Prefab";
-            AssetTypeEnum[AssetTypeEnum["Material"] = 10] = "Material";
-            AssetTypeEnum[AssetTypeEnum["Aniclip"] = 11] = "Aniclip";
-            AssetTypeEnum[AssetTypeEnum["Scene"] = 12] = "Scene";
-            AssetTypeEnum[AssetTypeEnum["Atlas"] = 13] = "Atlas";
-            AssetTypeEnum[AssetTypeEnum["Font"] = 14] = "Font";
-            AssetTypeEnum[AssetTypeEnum["TextAsset"] = 15] = "TextAsset";
-            AssetTypeEnum[AssetTypeEnum["PackBin"] = 16] = "PackBin";
-            AssetTypeEnum[AssetTypeEnum["PackTxt"] = 17] = "PackTxt";
-            AssetTypeEnum[AssetTypeEnum["pathAsset"] = 18] = "pathAsset";
+            AssetTypeEnum[AssetTypeEnum["CompressBundle"] = 3] = "CompressBundle";
+            AssetTypeEnum[AssetTypeEnum["GLVertexShader"] = 4] = "GLVertexShader";
+            AssetTypeEnum[AssetTypeEnum["GLFragmentShader"] = 5] = "GLFragmentShader";
+            AssetTypeEnum[AssetTypeEnum["Shader"] = 6] = "Shader";
+            AssetTypeEnum[AssetTypeEnum["Texture"] = 7] = "Texture";
+            AssetTypeEnum[AssetTypeEnum["TextureDesc"] = 8] = "TextureDesc";
+            AssetTypeEnum[AssetTypeEnum["Mesh"] = 9] = "Mesh";
+            AssetTypeEnum[AssetTypeEnum["Prefab"] = 10] = "Prefab";
+            AssetTypeEnum[AssetTypeEnum["Material"] = 11] = "Material";
+            AssetTypeEnum[AssetTypeEnum["Aniclip"] = 12] = "Aniclip";
+            AssetTypeEnum[AssetTypeEnum["Scene"] = 13] = "Scene";
+            AssetTypeEnum[AssetTypeEnum["Atlas"] = 14] = "Atlas";
+            AssetTypeEnum[AssetTypeEnum["Font"] = 15] = "Font";
+            AssetTypeEnum[AssetTypeEnum["TextAsset"] = 16] = "TextAsset";
+            AssetTypeEnum[AssetTypeEnum["PackBin"] = 17] = "PackBin";
+            AssetTypeEnum[AssetTypeEnum["PackTxt"] = 18] = "PackTxt";
+            AssetTypeEnum[AssetTypeEnum["pathAsset"] = 19] = "pathAsset";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var stateLoad = (function () {
             function stateLoad() {
@@ -4295,6 +4296,19 @@ var gd3d;
                         _this.mapBundle[filename] = ab;
                     });
                 }
+                else if (type == AssetTypeEnum.CompressBundle) {
+                    var loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                    gd3d.io.loadText(loadurl, function (txt, err) {
+                        var filename = _this.getFileName(url);
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        var json = JSON.parse(txt);
+                        _this.bundlePackJson = json;
+                        ab.parse(json["bundleinfo"]);
+                        ab.load(_this, _this.curloadinfo);
+                        _this.mapBundle[filename] = ab;
+                    });
+                }
                 else {
                     state.totaltask = 1;
                     this.loadSingleRes(url, type, function (s) {
@@ -4305,6 +4319,24 @@ var gd3d;
                         _this.loadByQueue();
                     }, state);
                 }
+            };
+            assetMgr.prototype.loadCompressBundle = function (url, onstate) {
+                if (onstate === void 0) { onstate = null; }
+                var name = this.getFileName(url);
+                var type = this.calcType(url);
+                var state = new stateLoad();
+                this.mapInLoad[name] = state;
+                state.url = url;
+                if (type != AssetTypeEnum.Bundle) {
+                    state.errs.push(new Error("is not bundle compress type:" + url));
+                    state.iserror = true;
+                    onstate(state);
+                    this.doWaitState(url, state);
+                    return;
+                }
+                type = AssetTypeEnum.CompressBundle;
+                this.queueState.push({ state: state, type: type, onstate: onstate });
+                this.loadByQueue();
             };
             assetMgr.prototype.load = function (url, type, onstate) {
                 if (type === void 0) { type = AssetTypeEnum.Auto; }
@@ -14578,8 +14610,7 @@ var gd3d;
                     boxpos.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
                     boxpos.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
                     boxpos.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
-                    var length = gd3d.math.vec3Length(boxpos);
-                    framework.EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
+                    gd3d.math.vec3Normalize(boxpos, this.direction);
                     this.getRandomPosition(boxpos, length);
                     return this.direction;
                 },
