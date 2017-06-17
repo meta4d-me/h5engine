@@ -3,8 +3,15 @@
     "passes": {
         "base": [
             {
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "asi",
+                "fs": "asi"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "all",
+                "vs": "asibone_eff",
                 "fs": "asi"
             }
         ],

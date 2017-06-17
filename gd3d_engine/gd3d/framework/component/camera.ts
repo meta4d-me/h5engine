@@ -284,7 +284,7 @@ namespace gd3d.framework
             gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
 
         }
-
+        
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2)
         {
             var vpp = new math.rect();
@@ -295,7 +295,6 @@ namespace gd3d.framework
             this.calcViewMatrix(matrixView);
             this.calcProjectMatrix(asp, matrixProject);
             var matrixViewProject = new gd3d.math.matrix();
-            var matinv = new gd3d.math.matrix();
             gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
 
             var ndcPos = gd3d.math.pool.new_vector3();
@@ -303,85 +302,58 @@ namespace gd3d.framework
             outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
             outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
         }
+        
+        calcCameraFrame(app: application)
+        {
+            var _vpp = new math.rect();
+            this.calcViewPortPixel(app, _vpp);
 
-        //----------------待我测试，董波---------------------
-        //creatRayByScreenPos(app: application, screenPos: math.vector2): gd3d.framework.ray
-        //{
-        //    var _vpp = new math.rect();
-        //    this.calcViewPortPixel(app, _vpp);
-        //    var ex = screenPos.x / _vpp.w * 2 - 1;
-        //    var ey = 1 - screenPos.y / _vpp.h * 2;
+            var near_h = this.near * Math.tan(this.fov * 0.5);
+            var asp = _vpp.w / _vpp.h;
+            var near_w = near_h * asp;
 
-        //    //这些都是半长
-        //    var near_h = this.near * Math.tan(this.fov * 0.5);
-        //    var asp = _vpp.w / _vpp.h;
-        //    var near_w = near_h * asp;
+            var nearLT = new gd3d.math.vector3(-near_w, near_h, this.near);
+            var nearLD = new gd3d.math.vector3(-near_w, -near_h, this.near);
+            var nearRT = new gd3d.math.vector3(near_w, near_h, this.near);
+            var nearRD = new gd3d.math.vector3(near_w, -near_h, this.near);
 
-        //    var near_pos = gd3d.math.pool.new_vector3();
-        //    near_pos.x = ex * near_w;
-        //    near_pos.y = ey * near_h;
-        //    near_pos.z = -this.near;
+            var far_h = this.far * Math.tan(this.fov * 0.5);
+            var far_w = far_h * asp;
 
-        //    var far_h = this.far * Math.tan(this.fov * 0.5);
-        //    var far_w = far_h * asp;
+            var farLT = new gd3d.math.vector3(-far_w, far_h, this.far);
+            var farLD = new gd3d.math.vector3(-far_w, -far_h, this.far);
+            var farRT = new gd3d.math.vector3(far_w, far_h, this.far);
+            var farRD = new gd3d.math.vector3(far_w, -far_h, this.far);
 
-        //    var far_pos = gd3d.math.pool.new_vector3();
-        //    far_pos.x = ex * far_w;
-        //    far_pos.y = ey * far_h;
-        //    far_pos.z = -this.far;
-
-        //    var camworld = this.gameObject.transform.getWorldMatrix();
-        //    var w_near = gd3d.math.pool.new_vector3();
-        //    var w_far = gd3d.math.pool.new_vector3();
-        //    gd3d.math.matrixMakeTransformVector3(near_pos, camworld, w_near);
-        //    gd3d.math.matrixMakeTransformVector3(far_pos, camworld, w_far);
-
-        //    var dir = gd3d.math.pool.new_vector3();
-        //    var dir1: gd3d.math.vector3 = gd3d.math.pool.new_vector3();
-        //    gd3d.math.vec3Subtract(w_far, w_near, dir);
-        //    gd3d.math.vec3Normalize(dir, dir1);
-
-        //    var ray = new gd3d.framework.ray(w_near, dir1);
-        //    gd3d.math.pool.delete_vector3(near_pos);
-        //    gd3d.math.pool.delete_vector3(far_pos);
-        //    gd3d.math.pool.delete_vector3(dir);
-        //    gd3d.math.pool.delete_vector3(dir1);
-        //    gd3d.math.pool.delete_vector3(w_near);
-        //    gd3d.math.pool.delete_vector3(w_far);
-
-        //    return ray;
-        //}
-
-
+            let matrix = this.gameObject.transform.getWorldMatrix();
+            gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
+            gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
+            gd3d.math.matrixTransformVector3(farRD, matrix, farRD);
+            gd3d.math.matrixTransformVector3(nearRD, matrix, nearRD);
+            gd3d.math.matrixTransformVector3(farLT, matrix, farLT);
+            gd3d.math.matrixTransformVector3(nearLT, matrix, nearLT);
+            gd3d.math.matrixTransformVector3(farRT, matrix, farRT);
+            gd3d.math.matrixTransformVector3(nearRT, matrix, nearRT);
+            this.frameVecs.length = 0;
+            this.frameVecs.push(farLD);
+            this.frameVecs.push(nearLD);
+            this.frameVecs.push(farRD);
+            this.frameVecs.push(nearRD);
+            this.frameVecs.push(farLT);
+            this.frameVecs.push(nearLT);
+            this.frameVecs.push(farRT);
+            this.frameVecs.push(nearRT);
+        }
         private matView: math.matrix = new math.matrix;
         private matProjP: math.matrix = new math.matrix;
         private matProjO: math.matrix = new math.matrix;
         private matProj: math.matrix = new math.matrix;
 
-        //asp: number = 1;//由viewport 和 renderTarget计算而来
-        // near: number = 0.2;
-        // far: number = 100;
+        private frameVecs:math.vector3[] = [];
 
         fov: number = Math.PI * 0.25;//透视投影的fov
         size: number = 2;//正交投影的竖向size
         opvalue: number = 1;//0=正交， 1=透视 中间值可以在两种相机间过度
-
-        //这些问自己的
-
-        // updateproj()
-        // {
-        //     if (this.opvalue > 0)
-        //         TSM.mat4.sPerspectiveLH(this.p_fov, this.asp, this.near, this.far, this.matProjP);
-        //     if (this.opvalue < 1)
-        //         TSM.mat4.sOrthoLH(this.asp * this.o_size, this.o_size, this.near, this.far, this.matProjO);
-
-        //     if (this.opvalue == 0)
-        //         this.matProjO.copy(this.matProj);
-        //     else if (this.opvalue == 1)
-        //         this.matProjP.copy(this.matProj);
-        //     else
-        //         TSM.mat4.sLerp(this.matProjO, this.matProjP, this.opvalue, this.matProj);
-        // }
 
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
@@ -406,10 +378,12 @@ namespace gd3d.framework
         fillRenderer(scene: scene)
         {
             scene.renderList.clear();
+            this.calcCameraFrame(scene.app);
             this._fillRenderer(scene, scene.getRoot());
         }
         private _fillRenderer(scene: scene, node: transform)
         {
+            // if(!this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
             if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
             {
                 scene.renderList.addRenderer(node.gameObject.renderer);
@@ -422,6 +396,27 @@ namespace gd3d.framework
                 }
             }
         }
+        testFrustumCulling(scene: scene, node:transform)
+        {
+            if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
+            let spherecol = node.gameObject.getComponent("spherecollider") as spherecollider;
+            let worldPos = node.getWorldTranslate();
+
+            let dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]);
+            if(dis - spherecol.radius > 0)  return false;
+            dis = spherecol.caclPlaneDis(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]);
+            if(dis - spherecol.radius > 0)  return false;
+            dis = spherecol.caclPlaneDis(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]);
+            if(dis - spherecol.radius > 0)  return false;
+            dis = spherecol.caclPlaneDis(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]);
+            if(dis - spherecol.radius > 0)  return false;
+            dis = spherecol.caclPlaneDis(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]);
+            if(dis - spherecol.radius > 0)  return false;
+            dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]);
+            if(dis - spherecol.radius > 0)  return false;
+            return true;
+        }
+
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean)
         {
             {

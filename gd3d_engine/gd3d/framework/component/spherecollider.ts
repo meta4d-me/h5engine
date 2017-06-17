@@ -8,7 +8,7 @@ namespace gd3d.framework
         private tempScale:gd3d.math.vector3;
         constructor(_center:math.vector3, _r:number)
         {
-            this.center = _center;
+            this.center = math.pool.clone_vector3(_center);
             this.srcradius = _r;
             this.tempScale = new gd3d.math.vector3();
         }
@@ -51,8 +51,15 @@ namespace gd3d.framework
         spherestruct: spherestruct;
         @gd3d.reflect.Field("vector3")
         center: math.vector3;
-        @gd3d.reflect.Field("vector3")
+        @gd3d.reflect.Field("number")
         radius: number;
+        _worldCenter:math.vector3 = new math.vector3();
+        public get worldCenter():math.vector3
+        {
+            math.vec3Clone(this.center, this._worldCenter);
+            math.matrixTransformVector3(this._worldCenter, this.gameObject.transform.getWorldMatrix(), this._worldCenter);
+            return this._worldCenter;
+        }
         getBound()
         {
             return this.spherestruct;
@@ -97,6 +104,24 @@ namespace gd3d.framework
             }
 
         }
+
+        caclPlaneDis(v0: math.vector3, v1:math.vector3, v2: math.vector3)
+        {
+            let subv0 = math.pool.new_vector3();
+            let subv1 = math.pool.new_vector3();
+            let cro0 = math.pool.new_vector3();
+            let point = math.pool.new_vector3();
+            math.vec3Subtract(v1, v0, subv0);
+            math.vec3Subtract(v2, v1, subv1);
+            math.vec3Cross(subv0, subv1, cro0);
+  
+            math.calPlaneLineIntersectPoint(cro0, v0, cro0, this.worldCenter, point);
+            
+            let sublp = math.pool.new_vector3();
+            math.vec3Subtract(point, this.worldCenter, sublp);
+            return math.vec3Dot(cro0, sublp);
+        }
+
         intersectsTransform(tran: transform): boolean
         {
             if (tran.gameObject.collider == null) return false;
@@ -118,7 +143,7 @@ namespace gd3d.framework
             {
                 this.spherestruct = new spherestruct(this.center, this.radius);
             }
-            this.buildMesh();
+            // this.buildMesh();
         }
         /**
         * @private

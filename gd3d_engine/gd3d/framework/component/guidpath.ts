@@ -4,13 +4,29 @@ namespace gd3d.framework
     export class guidpath implements INodeComponent
     {
         private paths:gd3d.math.vector3[];
-        public pathasset:pathasset;
+        public _pathasset:pathasset;
+        set pathasset(pathasset:pathasset){
+            if(this._pathasset)
+            {
+                this._pathasset.unuse();
+            }
+            this._pathasset=pathasset;
+            if(this._pathasset)
+            {
+                this._pathasset.use();
+            }
+        }
+        get pathasset()
+        {
+            return this._pathasset;
+        }
         public speed:number=1;
 
         private isactived:boolean=false;
-        play()
+        play(loopCount:number=1)
         {
             this.isactived=true;
+            this.loopCount=loopCount;
         }
         pause()
         {
@@ -21,10 +37,11 @@ namespace gd3d.framework
             this.isactived=false;
             this.folowindex=0;
         }
-        replay()
+        replay(loopCount:number=1)
         {
             this.isactived=true;
             this.folowindex=0;
+            this.loopCount=loopCount;
         }
 
         private mystrans:transform;
@@ -32,6 +49,7 @@ namespace gd3d.framework
         private folowindex:number=0;
         public isloop:boolean=false;
         lookforward:boolean=false;
+        private loopCount:number=1;
 
         private oncomplete:()=>void;
         setpathasset(pathasset:pathasset,speed:number=1,oncomplete:()=>void=null)
@@ -85,10 +103,15 @@ namespace gd3d.framework
                     this.folowindex=0;
                     if(!this.isloop)
                     {
-                        this.isactived=false;
-                        if(this.oncomplete)
+                        this.loopCount--;
+                        if(this.loopCount==0)
                         {
-                            this.oncomplete();
+                            this.isactived=false;
+                            this.loopCount=1;
+                            if(this.oncomplete)
+                            {
+                                this.oncomplete();
+                            }
                         }
                     }
                 }
@@ -119,11 +142,14 @@ namespace gd3d.framework
         gameObject: gameObject;
         remove() 
         {
-            throw new Error('Method not implemented.');
+            if(this._pathasset)
+            {
+                this._pathasset.unuse();
+            }
         }
         clone() 
         {
-            throw new Error('Method not implemented.');
+            
         }
     }
 }

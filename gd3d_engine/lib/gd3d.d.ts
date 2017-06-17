@@ -33,9 +33,12 @@ declare namespace gd3d.framework {
         private beginTimer;
         private lastTimer;
         private totalTime;
-        private _deltaTime;
         getTotalTime(): number;
+        private _deltaTime;
         readonly deltaTime: number;
+        private pretimer;
+        private updateTimer;
+        getUpdateTimer(): any;
         private loop();
         private _scene;
         private initScene();
@@ -86,8 +89,9 @@ declare namespace gd3d.framework {
 }
 declare namespace Stats {
     class Stats {
-        constructor();
+        constructor(app: gd3d.framework.application);
         update(): void;
+        app: gd3d.framework.application;
         container: HTMLDivElement;
         private mode;
         private REVISION;
@@ -97,6 +101,7 @@ declare namespace Stats {
         private fpsPanel;
         private msPanel;
         private memPanel;
+        private ratePanel;
         private showPanel(id);
         private addPanel(panel);
         private begin();
@@ -1264,16 +1269,19 @@ declare namespace gd3d.framework {
         creatRayByScreen(screenpos: gd3d.math.vector2, app: application): ray;
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3): void;
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2): void;
+        calcCameraFrame(app: application): void;
         private matView;
         private matProjP;
         private matProjO;
         private matProj;
+        private frameVecs;
         fov: number;
         size: number;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
         private _fillRenderer(scene, node);
+        testFrustumCulling(scene: scene, node: transform): boolean;
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean): void;
         _renderOnce(scene: scene, context: renderContext, drawtype: string): void;
         postQueues: ICameraPostQueue[];
@@ -1334,20 +1342,32 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class frustumculling implements INodeComponent {
+        constructor();
+        gameObject: gameObject;
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     class guidpath implements INodeComponent {
         private paths;
+        _pathasset: pathasset;
         pathasset: pathasset;
         speed: number;
         private isactived;
-        play(): void;
+        play(loopCount?: number): void;
         pause(): void;
         stop(): void;
-        replay(): void;
+        replay(loopCount?: number): void;
         private mystrans;
         private datasafe;
         private folowindex;
         isloop: boolean;
         lookforward: boolean;
+        private loopCount;
         private oncomplete;
         setpathasset(pathasset: pathasset, speed?: number, oncomplete?: () => void): void;
         start(): void;
@@ -1521,12 +1541,15 @@ declare namespace gd3d.framework {
         spherestruct: spherestruct;
         center: math.vector3;
         radius: number;
+        _worldCenter: math.vector3;
+        readonly worldCenter: math.vector3;
         getBound(): spherestruct;
         readonly matrix: gd3d.math.matrix;
         start(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
+        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): number;
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();
@@ -1657,6 +1680,8 @@ declare namespace gd3d.io {
         getBufLength(): number;
         getBytesAvailable(): number;
         constructor(bufSize?: number);
+        reset(): void;
+        dispose(): void;
         read(target: Uint8Array | number[], offset?: number, length?: number): void;
         write(array: Uint8Array | number[], offset?: number, length?: number): void;
         getBuffer(): Uint8Array;
@@ -1736,7 +1761,6 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
-        dispose(): void;
     }
 }
 declare namespace gd3d.io {

@@ -90,6 +90,7 @@
             if (_collider instanceof boxcollider)
             {
                 var obb = _collider.getBound() as obb;
+                if(!obb)    return null;
                 var vecs: gd3d.math.vector3[] = [];
                 obb.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
                 var data = gd3d.render.meshData.genBoxByArray(vecs);

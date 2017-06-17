@@ -169,7 +169,6 @@ namespace gd3d.framework
             {
                 angle = -angle;
             }
-
             let quatertion = gd3d.math.pool.new_quaternion();
             gd3d.math.quatFromAxisAngle(axis, angle, quatertion);
             gd3d.math.quatTransformVector(quatertion, source, out);
