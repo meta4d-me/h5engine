@@ -2149,28 +2149,15 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        this.app.getAssetMgr().load("res/particleEffect/fx_shuijing_cj/fx_shuijing_cj.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+        this.app.getAssetMgr().load("res/particleEffect/fx_0005_sword_sword/fx_0005_sword_sword.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 var tr = new gd3d.framework.transform();
                 _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                var text = _this.app.getAssetMgr().getAssetByName("fx_shuijing_cj.effect.json");
-                _this.effect.setEffect(text.content);
+                var text = _this.app.getAssetMgr().getAssetByName("fx_0005_sword_sword.effect.json");
+                _this.effect.setJsonData(text);
                 _this.scene.addChild(tr);
                 tr.markDirty();
                 state.finish = true;
-            }
-        });
-    };
-    test_effect.prototype._loadEffect = function (assetbundleName, name) {
-        var _this = this;
-        this.app.getAssetMgr().load(assetbundleName, gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                var tr = new gd3d.framework.transform();
-                _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                var text = _this.app.getAssetMgr().getAssetByName(name);
-                _this.effect.setEffect(text.content);
-                _this.scene.addChild(tr);
-                tr.markDirty();
             }
         });
     };
@@ -2183,7 +2170,7 @@ var test_effect = (function () {
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 5, 10);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, 10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
         state.finish = true;

@@ -146,10 +146,11 @@
             boxpos.y = ValueData.RandomRange(-this.height / 2, this.height / 2);
             boxpos.z = ValueData.RandomRange(-this.depth / 2, this.depth / 2);
 
-            let length = math.vec3Length(boxpos);
+            // let length = math.vec3Length(boxpos);
 
-            EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
+            // EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
 
+            gd3d.math.vec3Normalize(boxpos,this.direction);
             this.getRandomPosition(boxpos, length);
             return this.direction;
         }
