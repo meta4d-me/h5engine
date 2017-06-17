@@ -916,6 +916,12 @@ namespace gd3d.framework
             {
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
                     let index = read.readInt32();
                     read.position = index;
@@ -941,6 +947,12 @@ namespace gd3d.framework
             {
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
 
                     var arr = new Uint8Array(_buffer.byteLength);
@@ -956,6 +968,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null }
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     state.resstate[filename].state = 1;//完成
 
                     state.logs.push("load a glshader:" + filename);
@@ -969,6 +987,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null }
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     state.resstate[filename].state = 1;//完成
 
                     state.logs.push("load a glshader:" + filename);
@@ -982,6 +1006,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null }
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     state.resstate[filename].state = 1;//完成
                     var _shader = new shader(filename);
                     _shader.parse(this, JSON.parse(txt));
@@ -1023,6 +1053,12 @@ namespace gd3d.framework
             {
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _texturedesc = JSON.parse(txt);
                     var _name: string = _texturedesc["name"];
                     var _filterMode: string = _texturedesc["filterMode"];
@@ -1094,6 +1130,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     state.resstate[filename].state = 1;
                     var _material = new material(filename);//?what the fuck,解析出材质
                     _material.Parse(this, JSON.parse(txt));
@@ -1109,6 +1151,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _mesh = new mesh(filename);
                     this.assetUrlDic[_mesh.getGUID()] = url;
                     _mesh.Parse(_buffer, this.webgl);//在此方法中命名mesh的name（name存在bin文件中）
@@ -1123,6 +1171,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _clip = new animationClip(filename);
                     this.assetUrlDic[_clip.getGUID()] = url;
                     _clip.Parse(_buffer);
@@ -1137,6 +1191,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _atlas = new atlas(filename);
                     this.assetUrlDic[_atlas.getGUID()] = url;
                     _atlas.Parse(txt, this);
@@ -1151,6 +1211,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _prefab = new prefab(filename);
                     _prefab.assetbundle = bundlename;
                     this.assetUrlDic[_prefab.getGUID()] = url;
@@ -1166,6 +1232,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _scene = new rawscene(filename);
                     _scene.assetbundle = bundlename;
                     this.assetUrlDic[_scene.getGUID()] = url;
@@ -1181,6 +1253,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _font = new font(filename);
                     this.assetUrlDic[_font.getGUID()] = url;
                     _font.Parse(txt, this);
@@ -1195,6 +1273,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _textasset = new textasset(filename);
                     this.assetUrlDic[_textasset.getGUID()] = url;
                     _textasset.content = txt;
@@ -1209,6 +1293,12 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     var _path = new pathasset(filename);
                     this.assetUrlDic[_path.getGUID()] = url;
                     _path.Parse(JSON.parse(txt));
@@ -1266,6 +1356,12 @@ namespace gd3d.framework
             {
                 gd3d.io.loadText(url, (txt, err) =>
                 {
+                    if(err!=null){
+                        this.curloadinfo.state.iserror = true;
+                        this.curloadinfo.state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     let filename = this.getFileName(url);
 
                     var ab = new assetBundle(url)

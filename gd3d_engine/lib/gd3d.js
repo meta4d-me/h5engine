@@ -4009,6 +4009,12 @@ var gd3d;
                 var name = filename.substring(0, filename.indexOf("."));
                 if (type == AssetTypeEnum.PackBin) {
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var read = new gd3d.io.binReader(_buffer);
                         var index = read.readInt32();
                         read.position = index;
@@ -4028,6 +4034,12 @@ var gd3d;
                 }
                 else if (type == AssetTypeEnum.PackTxt) {
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var read = new gd3d.io.binReader(_buffer);
                         var arr = new Uint8Array(_buffer.byteLength);
                         read.readUint8Array(arr);
@@ -4039,6 +4051,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.GLVertexShader) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         state.resstate[filename].state = 1;
                         state.logs.push("load a glshader:" + filename);
                         _this.shaderPool.compileVS(_this.webgl, name, txt);
@@ -4048,6 +4066,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.GLFragmentShader) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         state.resstate[filename].state = 1;
                         state.logs.push("load a glshader:" + filename);
                         _this.shaderPool.compileFS(_this.webgl, name, txt);
@@ -4057,6 +4081,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Shader) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         state.resstate[filename].state = 1;
                         var _shader = new framework.shader(filename);
                         _shader.parse(_this, JSON.parse(txt));
@@ -4092,6 +4122,12 @@ var gd3d;
                 }
                 else if (type == AssetTypeEnum.TextureDesc) {
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _texturedesc = JSON.parse(txt);
                         var _name = _texturedesc["name"];
                         var _filterMode = _texturedesc["filterMode"];
@@ -4145,6 +4181,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Material) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         state.resstate[filename].state = 1;
                         var _material = new framework.material(filename);
                         _material.Parse(_this, JSON.parse(txt));
@@ -4158,6 +4200,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Mesh) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _mesh = new framework.mesh(filename);
                         _this.assetUrlDic[_mesh.getGUID()] = url;
                         _mesh.Parse(_buffer, _this.webgl);
@@ -4170,6 +4218,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Aniclip) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _clip = new framework.animationClip(filename);
                         _this.assetUrlDic[_clip.getGUID()] = url;
                         _clip.Parse(_buffer);
@@ -4182,6 +4236,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Atlas) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _atlas = new framework.atlas(filename);
                         _this.assetUrlDic[_atlas.getGUID()] = url;
                         _atlas.Parse(txt, _this);
@@ -4194,6 +4254,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Prefab) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _prefab = new framework.prefab(filename);
                         _prefab.assetbundle = bundlename;
                         _this.assetUrlDic[_prefab.getGUID()] = url;
@@ -4207,6 +4273,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Scene) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _scene = new framework.rawscene(filename);
                         _scene.assetbundle = bundlename;
                         _this.assetUrlDic[_scene.getGUID()] = url;
@@ -4220,6 +4292,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.Font) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _font = new framework.font(filename);
                         _this.assetUrlDic[_font.getGUID()] = url;
                         _font.Parse(txt, _this);
@@ -4232,6 +4310,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.TextAsset) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _textasset = new framework.textasset(filename);
                         _this.assetUrlDic[_textasset.getGUID()] = url;
                         _textasset.content = txt;
@@ -4244,6 +4328,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.pathAsset) {
                     state.resstate[filename] = { state: 0, res: null };
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var _path = new framework.pathasset(filename);
                         _this.assetUrlDic[_path.getGUID()] = url;
                         _path.Parse(JSON.parse(txt));
@@ -4287,6 +4377,12 @@ var gd3d;
                 var onstate = this.curloadinfo.onstate;
                 if (type == AssetTypeEnum.Bundle) {
                     gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            _this.curloadinfo.state.iserror = true;
+                            _this.curloadinfo.state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var filename = _this.getFileName(url);
                         var ab = new assetBundle(url);
                         ab.name = filename;
