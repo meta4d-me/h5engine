@@ -11,11 +11,11 @@ class test_loadScene implements IState
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
 
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        this.app.getAssetMgr().loadCompressBundle("res/shader/shader.assetbundle.json", (state) =>
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load("res/scenes/chuangjue-01/chuangjue-01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                this.app.getAssetMgr().loadCompressBundle("res/scenes/chuangjue-01/chuangjue-01.assetbundle.json",
                     // this.app.getAssetMgr().load("res/scenes/test/test.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                     (s) =>
                     {

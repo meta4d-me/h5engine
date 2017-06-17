@@ -2621,9 +2621,9 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+        this.app.getAssetMgr().loadCompressBundle("res/shader/shader.assetbundle.json", function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/chuangjue-01/chuangjue-01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().loadCompressBundle("res/scenes/chuangjue-01/chuangjue-01.assetbundle.json", function (s) {
                     console.log(s.curtask + "/" + s.totaltask);
                     console.log(s.progress);
                     if (s.isfinish) {

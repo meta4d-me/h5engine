@@ -578,22 +578,23 @@ declare namespace gd3d.framework {
         Unknown = 0,
         Auto = 1,
         Bundle = 2,
-        GLVertexShader = 3,
-        GLFragmentShader = 4,
-        Shader = 5,
-        Texture = 6,
-        TextureDesc = 7,
-        Mesh = 8,
-        Prefab = 9,
-        Material = 10,
-        Aniclip = 11,
-        Scene = 12,
-        Atlas = 13,
-        Font = 14,
-        TextAsset = 15,
-        PackBin = 16,
-        PackTxt = 17,
-        pathAsset = 18,
+        CompressBundle = 3,
+        GLVertexShader = 4,
+        GLFragmentShader = 5,
+        Shader = 6,
+        Texture = 7,
+        TextureDesc = 8,
+        Mesh = 9,
+        Prefab = 10,
+        Material = 11,
+        Aniclip = 12,
+        Scene = 13,
+        Atlas = 14,
+        Font = 15,
+        TextAsset = 16,
+        PackBin = 17,
+        PackTxt = 18,
+        pathAsset = 19,
     }
     class stateLoad {
         iserror: boolean;
@@ -688,6 +689,7 @@ declare namespace gd3d.framework {
         private queueState;
         private curloadinfo;
         loadByQueue(): void;
+        loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         unload(url: string, onstate?: () => void): void;
         loadScene(sceneName: string, onComplete: () => void): void;
