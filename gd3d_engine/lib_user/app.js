@@ -3816,16 +3816,11 @@ var t;
                     trailrender.setspeed(0.25);
                 }
                 this.guippaths[0].setpathasset(path2, 50, function () {
-                    _this.parentlist[0].gameObject.visible = false;
-                    _this.traillist[0].stop();
                 });
                 this.guippaths[1].setpathasset(path, 50, function () {
                     _this.parentlist[1].gameObject.visible = false;
-                    _this.traillist[1].stop();
                 });
                 this.guippaths[2].setpathasset(path2, 50, function () {
-                    _this.parentlist[2].gameObject.visible = false;
-                    _this.traillist[2].stop();
                 });
             }
             state.finish = true;

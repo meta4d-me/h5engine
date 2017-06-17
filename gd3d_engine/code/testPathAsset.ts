@@ -156,16 +156,16 @@ namespace t {
                 }
                 //------------------------------设置路径--------------------------------------------
                 this.guippaths[0].setpathasset(path2,50,()=>{
-                    this.parentlist[0].gameObject.visible=false;
-                    this.traillist[0].stop();
+                    //this.parentlist[0].gameObject.visible=false;
+                    //this.traillist[0].stop();
                 });
                 this.guippaths[1].setpathasset(path,50,()=>{
                     this.parentlist[1].gameObject.visible=false;
-                    this.traillist[1].stop();
+                    //this.traillist[1].stop();
                 });
                 this.guippaths[2].setpathasset(path2,50,()=>{
-                    this.parentlist[2].gameObject.visible=false;
-                    this.traillist[2].stop();
+                    //this.parentlist[2].gameObject.visible=false;
+                    //this.traillist[2].stop();
                 });
 
             // {

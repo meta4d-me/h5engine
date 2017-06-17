@@ -1,0 +1,18 @@
+{
+  "layer": "transparent",
+  "queue": 0,
+  "passes": {
+    "base": [
+      {
+        "blendmode": "add",
+        "showface": "all",
+        "zwrite": "off",
+        "vs": "flowwater",
+        "fs": "flowwater"
+      }
+    ],
+    "shadowgen": [],
+    "bone": [],
+    "shadowuse": []
+  }
+}

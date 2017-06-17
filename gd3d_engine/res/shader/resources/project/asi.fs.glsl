@@ -5,7 +5,7 @@ uniform highp float _LightRate;
 uniform highp vec4 _LightColor;
 uniform highp float _emitpow;
 uniform highp float _diffuse;
-uniform highp float _Cutoff;
+//uniform highp float _Cutoff;
 
 
 varying highp vec2 _base_uv;
@@ -15,7 +15,7 @@ varying highp vec2 _light_uv;
 
 void main() 
 {
-    if(texture2D(_asm,_asm_uv).r<_Cutoff)
+    if(texture2D(_asm,_asm_uv).r<0.5)
     {
         discard;
     }

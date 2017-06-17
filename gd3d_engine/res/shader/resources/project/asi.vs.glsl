@@ -2,7 +2,6 @@ attribute vec3 _glesVertex;
 attribute vec2 _glesMultiTexCoord0;
 
 uniform highp mat4 glstate_matrix_mvp;
-uniform highp mat4 glstate_matrix_model;
 uniform highp vec4 _MainTex_ST;
 uniform highp vec4 _asm_ST;
 uniform highp vec4 _streamlight_ST;

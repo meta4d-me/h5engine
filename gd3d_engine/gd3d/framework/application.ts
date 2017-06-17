@@ -110,7 +110,7 @@ namespace gd3d.framework
         {
             if (this.stats == null)
             {
-                this.stats = new Stats.Stats();
+                this.stats = new Stats.Stats(this);
                 this.stats.container.style.position = 'absolute'; //绝对坐标  
                 this.stats.container.style.left = '0px';// (0,0)px,左上角  
                 this.stats.container.style.top = '0px';
@@ -167,25 +167,34 @@ namespace gd3d.framework
         private beginTimer;
         private lastTimer;
         private totalTime;
-        private _deltaTime;
         getTotalTime(): number
         {
             return this.totalTime;
         }
+
+        private _deltaTime;
         public get deltaTime()
         {
             return this._deltaTime * this.timeScale;
         }
+        private pretimer:number = 0;
+        private updateTimer;
+        getUpdateTimer()
+        {
+            return this.updateTimer;
+        }
+
         private loop()
         {
             var now = Date.now() / 1000;
+            this.pretimer = Date.now();
             this._deltaTime = now - this.lastTimer;
             this.totalTime = now - this.beginTimer;
             this.update(this.deltaTime);
             if (this.stats != null)
                 this.stats.update();
             this.lastTimer = now;
-
+            this.updateTimer = Date.now() - this.pretimer;
             if (this.limitFrame)
             {
                 requestAnimationFrame(this.loop.bind(this));
