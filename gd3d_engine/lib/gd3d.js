@@ -3647,7 +3647,10 @@ var gd3d;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                                 && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
                                 var _res = s.resstate[_fileName].res;
-                                _this.mapNamed[_fileName] = _res.getGUID();
+                                if (_res != null)
+                                    _this.mapNamed[_fileName] = _res.getGUID();
+                                else
+                                    console.error(_fileName);
                             }
                             if (realTotal === 0) {
                                 state.isfinish = true;
@@ -4096,6 +4099,9 @@ var gd3d;
                         var _format = _texturedesc["format"];
                         var _mipmap = _texturedesc["mipmap"];
                         var _wrap = _texturedesc["wrap"];
+                        if (_name.indexOf("LightmapFar") >= 0) {
+                            console.log("");
+                        }
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         if (_format == "RGB") {
                             _textureFormat = gd3d.render.TextureFormatEnum.RGB;
@@ -4670,10 +4676,15 @@ var gd3d;
                 pool.compileFS(assetmgr.webgl, "defuifont", defShader.fscodeuifont);
                 pool.compileVS(assetmgr.webgl, "diffuse", defShader.vsdiffuse);
                 pool.compileFS(assetmgr.webgl, "diffuse", defShader.fsdiffuse);
+                pool.compileVS(assetmgr.webgl, "line", defShader.vsline);
+                pool.compileFS(assetmgr.webgl, "line", defShader.fsline);
+                pool.compileVS(assetmgr.webgl, "materialcolor", defShader.vsmaterialcolor);
                 var program = pool.linkProgram(assetmgr.webgl, "def", "def");
                 var program2 = pool.linkProgram(assetmgr.webgl, "def", "defui");
                 var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
                 var programdiffuse = pool.linkProgram(assetmgr.webgl, "diffuse", "diffuse");
+                var programline = pool.linkProgram(assetmgr.webgl, "line", "line");
+                var programmaterialcolor = pool.linkProgram(assetmgr.webgl, "materialcolor", "line");
                 {
                     var sh = new framework.shader("shader/def");
                     sh.defaultAsset = true;
@@ -4743,6 +4754,33 @@ var gd3d;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
                     p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
+                {
+                    var sh = new framework.shader("shader/line");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    p.setProgram(programline);
+                    p.state_ztest = true;
+                    p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+                    p.state_zwrite = true;
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
+                {
+                    var sh = new framework.shader("shader/materialcolor");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    p.setProgram(programmaterialcolor);
+                    p.state_ztest = false;
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+                    sh.layer = framework.RenderLayerEnum.Overlay;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
@@ -4854,15 +4892,47 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
     }";
         defShader.fsdiffuse = "\
     uniform sampler2D _MainTex;\
-uniform lowp float _AlphaCut;\
-varying highp vec2 xlv_TEXCOORD0;\
-void main() \
-{\
-    lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
-    if(tmpvar_3.a < _AlphaCut)\
-        discard;\
-    gl_FragData[0] = tmpvar_3;\
-}";
+    uniform lowp float _AlphaCut;\
+    varying highp vec2 xlv_TEXCOORD0;\
+    void main() \
+    {\
+        lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
+        if(tmpvar_3.a < _AlphaCut)\
+            discard;\
+        gl_FragData[0] = tmpvar_3;\
+    }";
+        defShader.vsline = "\
+    attribute vec4 _glesVertex;\
+    attribute vec4 _glesColor;\
+    uniform highp mat4 glstate_matrix_mvp;\
+    varying lowp vec4 xlv_COLOR;\
+    void main()\
+    {\
+        highp vec4 tmpvar_1;\
+        tmpvar_1.w = 1.0;\
+        tmpvar_1.xyz = _glesVertex.xyz;\
+        xlv_COLOR = _glesColor;\
+        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+    }";
+        defShader.fsline = "\
+    varying lowp vec4 xlv_COLOR;\
+    void main()\
+    {\
+        gl_FragData[0] = xlv_COLOR;\
+    }";
+        defShader.vsmaterialcolor = "\
+    attribute vec4 _glesVertex;\
+    uniform vec4 _Color;\
+    uniform highp mat4 glstate_matrix_mvp;\
+    varying lowp vec4 xlv_COLOR;\
+    void main()\
+    {\
+        highp vec4 tmpvar_1;\
+        tmpvar_1.w = 1.0;\
+        tmpvar_1.xyz = _glesVertex.xyz;\
+        xlv_COLOR = _Color;\
+        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+    }";
         framework.defShader = defShader;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -10148,6 +10218,12 @@ var gd3d;
                 this._buf[0] = new Uint8Array(this._bufSize);
                 this._seekReadPos = 0;
             };
+            binBuffer.prototype.dispose = function () {
+                this._buf.splice(0);
+                this._seekWritePos = 0;
+                this._seekWriteIndex = 0;
+                this._seekReadPos = 0;
+            };
             binBuffer.prototype.read = function (target, offset, length) {
                 if (offset === void 0) { offset = 0; }
                 if (length === void 0) { length = -1; }
@@ -10707,9 +10783,6 @@ var gd3d;
             };
             binTool.prototype.writeInt = function (num) {
                 this.write(converter.Int32ToArray(num));
-            };
-            binTool.prototype.dispose = function () {
-                this._buf.splice(0);
             };
             return binTool;
         }(binBuffer));
@@ -13767,8 +13840,20 @@ var gd3d;
                 if (this.data.timelineFrame != undefined) {
                     for (var i in this.data.timelineFrame) {
                         var frameData = this.data.timelineFrame[i];
-                        if (frameData.frameIndex != -1 && frameData.lerpDatas != undefined) {
-                            this.recordLerpValues(frameData);
+                        if (frameData.frameIndex != -1) {
+                            if (frameData.lerpDatas != undefined) {
+                                this.recordLerpValues(frameData);
+                            }
+                            else if (frameData.attrsData != undefined) {
+                                if (this.timelineFrame[frameData.frameIndex] == undefined) {
+                                    this.timelineFrame[frameData.frameIndex] = new EffectFrameData();
+                                    this.timelineFrame[frameData.frameIndex].attrsData = new EffectAttrsData();
+                                    this.timelineFrame[frameData.frameIndex].frameIndex = frameData.frameIndex;
+                                }
+                                for (var k in frameData.attrsData) {
+                                    this.timelineFrame[frameData.frameIndex].attrsData.setLerpAttribute(k, frameData.attrsData.getAttribute(k));
+                                }
+                            }
                         }
                     }
                 }
@@ -14725,8 +14810,7 @@ var gd3d;
                     boxpos.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
                     boxpos.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
                     boxpos.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
-                    var length = gd3d.math.vec3Length(boxpos);
-                    framework.EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
+                    gd3d.math.vec3Normalize(boxpos, this.direction);
                     this.getRandomPosition(boxpos, length);
                     return this.direction;
                 },
