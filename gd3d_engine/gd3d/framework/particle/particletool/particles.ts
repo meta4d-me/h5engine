@@ -14,7 +14,7 @@ namespace gd3d.framework
             this.effectSys = sys;
             this.vf = sys.vf;
         }
-        addEmission(_emissionNew: EmissionNew)
+        addEmission(_emissionNew: Emission)
         {
             let _emissionElement = new EmissionElement(_emissionNew, this.effectSys);
             this.emissionElements.push(_emissionElement);
@@ -49,7 +49,7 @@ namespace gd3d.framework
 
         public active: boolean = true;//激活状态
 
-        public emissionNew: EmissionNew;//原始数据，不能被改变
+        public emission: Emission;//原始数据，不能被改变
         private vf: number;
         private curTime: number;
         private numcount: number;
@@ -57,25 +57,25 @@ namespace gd3d.framework
 
         private _continueSpaceTime: number;
         public effectSys: effectSystem;
-        constructor(_emissionNew: EmissionNew, sys: effectSystem)
+        constructor(_emission: Emission, sys: effectSystem)
         {
             this.effectSys = sys;
             this.vf = sys.vf;
             this.gameObject = sys.gameObject;
-            this.emissionNew = _emissionNew;
-            switch (this.emissionNew.emissionType)
+            this.emission = _emission;
+            switch (this.emission.emissionType)
             {
                 case ParticleEmissionType.burst:
                     break;
                 case ParticleEmissionType.continue:
-                    this._continueSpaceTime = this.emissionNew.time / (this.emissionNew.emissionCount - 1);
+                    this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
                     break;
             }
             this.curTime = 0;
             this.numcount = 0;
 
             this.emissionBatchers = [];
-            this.emissionBatchers[0] = new EmissionBatcher(this.emissionNew, this.effectSys);//先处理一个batcher的情况
+            this.emissionBatchers[0] = new EmissionBatcher(this.emission, this.effectSys);//先处理一个batcher的情况
         }
 
         public update(delta: number)
@@ -96,7 +96,7 @@ namespace gd3d.framework
         updateEmission(delta: number)
         {
             if (this.isover) return;
-            if (this.emissionNew.emissionType == ParticleEmissionType.continue)
+            if (this.emission.emissionType == ParticleEmissionType.continue)
             {
                 if (this.numcount == 0) 
                 {
@@ -106,7 +106,7 @@ namespace gd3d.framework
 
                 if (this.curTime > this._continueSpaceTime)
                 {
-                    if (this.numcount < this.emissionNew.emissionCount)
+                    if (this.numcount < this.emission.emissionCount)
                     {
                         this.addParticle();
                         this.curTime = 0;
@@ -114,16 +114,31 @@ namespace gd3d.framework
                     }
                     else
                     {
-                        this.isover = true;
+                        if (this.emission.beLoop)
+                        {
+                            this.curTime = 0;
+                            this.numcount = 0;
+                            this.isover = false;
+                        } else
+                        {
+                            this.isover = true;
+                        }
                     }
                 }
             }
-            else if (this.emissionNew.emissionType == ParticleEmissionType.burst)
+            else if (this.emission.emissionType == ParticleEmissionType.burst)
             {
-                if (this.curTime > this.emissionNew.time)
+                if (this.curTime > this.emission.time)
                 {
-                    this.addParticle(this.emissionNew.emissionCount);
-                    this.isover = true;
+                    this.addParticle(this.emission.emissionCount);
+                    if (this.emission.beLoop)
+                    {
+                        this.curTime = 0;
+                        this.isover = false;
+                    } else
+                    {
+                        this.isover = true;
+                    }
                 }
             }
         }
@@ -159,7 +174,7 @@ namespace gd3d.framework
     export class EmissionBatcher
     {
         public gameObject: gameObject;
-        public data: EmissionNew;
+        public data: Emission;
         public mesh: mesh;
         public mat: material;
         public beBufferInited: boolean = false;
@@ -168,7 +183,7 @@ namespace gd3d.framework
         public dataForVbo: Float32Array;
         public dataForEbo: Uint16Array;
 
-        public particles: ParticleNew1[] = [];
+        public particles: Particle[] = [];
         // public curLiveIndex: number = 0;
         /**
          * 顶点大小
@@ -179,7 +194,7 @@ namespace gd3d.framework
         public vertexSize: number = 0;
         public formate: number = 0;
         public effectSys: effectSystem;
-        constructor(_data: EmissionNew, effectSys: effectSystem)
+        constructor(_data: Emission, effectSys: effectSystem)
         {
             this.effectSys = effectSys;
             this.data = _data;
@@ -223,7 +238,7 @@ namespace gd3d.framework
         public curIndexCount: number = 0;
         addParticle()
         {
-            let p = new ParticleNew1(this);
+            let p = new Particle(this);
             p.uploadData(this.dataForVbo);
             for (let i = 0; i < p.dataForEbo.length; i++)
             {
@@ -336,7 +351,7 @@ namespace gd3d.framework
     }
     //还是要抽象出粒子的概念
     //这里根据发射器定义的初始参数  计算当前要提交的数据
-    export class ParticleNew1
+    export class Particle
     {
         public gameObject: gameObject;
         public localTranslate: math.vector3;
@@ -375,7 +390,7 @@ namespace gd3d.framework
         public dataForVbo: Float32Array; //自己维护一个顶点数据的数组
         public sourceVbo: Float32Array;
         public dataForEbo: Uint16Array;
-        public data: EmissionNew;
+        public data: Emission;
         private vertexCount: number;//顶点数量
         private vertexSize: number;//单个顶点大小
         private curLife: number;//当前经过的生命周期
@@ -575,7 +590,7 @@ namespace gd3d.framework
                 {
                     // gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
                     // gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
-                    gd3d.math.quatClone(this.rotationByShape,this.localRotation);
+                    gd3d.math.quatClone(this.rotationByShape, this.localRotation);
 
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 

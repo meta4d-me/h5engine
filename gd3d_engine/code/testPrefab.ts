@@ -8,7 +8,7 @@ class test_loadprefab implements IState
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        let names: string[] = ["MyTerrain1", "terrainlightmap"];
+        let names: string[] = ["baihu"];
         let name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
@@ -22,8 +22,8 @@ class test_loadprefab implements IState
                             var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
                             this.baihu = _prefab.getCloneTrans();
                             this.scene.addChild(this.baihu);
-                            this.baihu.localScale = new gd3d.math.vector3(0.1, 0.1, 0.1);
-                            this.baihu.localTranslate = new gd3d.math.vector3(-5, 0, 0);
+                            this.baihu.localScale = new gd3d.math.vector3(30, 30, 30);
+                            this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                             // this.baihu.localEulerAngles = new gd3d.math.vector3();
                             this.baihu = _prefab.getCloneTrans();
                             objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
@@ -57,11 +57,11 @@ class test_loadprefab implements IState
         var x2 = Math.sin(this.timer * 0.1);
         var z2 = Math.cos(this.timer * 0.1);
         var objCam = this.camera.gameObject.transform;
-        // objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
-        // if (this.baihu)
-        // {
-        //     objCam.lookat(this.baihu);
-        //     objCam.markDirty();//标记为需要刷新
-        // }
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
+        if (this.baihu)
+        {
+            objCam.lookat(this.baihu);
+            objCam.markDirty();//标记为需要刷新
+        }
     }
 }

@@ -76,7 +76,7 @@
 
         public get height()
         {
-            return this._width;
+            return this._height;
         }
 
         public depth: number = 0;
@@ -146,7 +146,7 @@
             boxpos.y = ValueData.RandomRange(-this.height / 2, this.height / 2);
             boxpos.z = ValueData.RandomRange(-this.depth / 2, this.depth / 2);
 
-            // let length = math.vec3Length(boxpos);
+            let length = math.vec3Length(boxpos);
 
             // EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
 

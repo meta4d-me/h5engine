@@ -4,11 +4,13 @@ namespace gd3d.framework
     export class EffectSystemData
     {
         public life: number;
+        public beLoop: boolean = false;
         public elements: EffectElementData[] = [];
         clone()
         {
             let data: EffectSystemData = new EffectSystemData();
             data.life = this.life;
+            data.beLoop = this.beLoop;
             for (let key in this.elements)
             {
                 data.elements[key] = this.elements[key].clone();
@@ -357,7 +359,7 @@ namespace gd3d.framework
         public initFrameData: EffectFrameData;
         public ref: string;//数据整体引用
         public actionData: EffectActionData[];
-        public emissionData: EmissionNew;
+        public emissionData: Emission;
         clone()
         {
             let elementdata = new EffectElementData();
@@ -793,5 +795,14 @@ namespace gd3d.framework
     export enum EffectLerpTypeEnum
     {
         Linear//线性插值
+    }
+    export enum RenderModel
+    {
+        None,
+        BillBoard,
+        StretchedBillBoard,
+        HorizontalBillBoard,
+        VerticalBillBoard,
+        Mesh
     }
 }

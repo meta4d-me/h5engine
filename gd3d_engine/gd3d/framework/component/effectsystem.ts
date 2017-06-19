@@ -362,10 +362,7 @@ namespace gd3d.framework
             }
 
             this.state = EffectPlayStateEnum.BeReady;
-            if (this.data.life == 0)
-                this.beLoop = true;
-            else
-                this.beLoop = false;
+            this.beLoop = this.data.beLoop;
         }
 
         /**

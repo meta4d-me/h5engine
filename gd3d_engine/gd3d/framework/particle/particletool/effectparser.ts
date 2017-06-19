@@ -21,6 +21,8 @@ namespace gd3d.framework
             let content = JSON.parse(str);
             if (content["life"] != undefined)
                 effectData.life = <number>content["life"];
+            if (content["beloop"] != undefined)
+                effectData.beLoop = <boolean>content["beloop"];
             if (content["elements"] != undefined)
             {
                 effectData.elements = [];
@@ -103,7 +105,7 @@ namespace gd3d.framework
                             else if (key == "euler")
                             {
                                 frame.attrsData.euler = (val as ParticleNode).getValue();
-                            } 
+                            }
                             else if (key == "mesh")
                             {
                                 frame.attrsData.mesh = val as mesh;
@@ -119,7 +121,7 @@ namespace gd3d.framework
                             else if (key == "tilling")
                             {
                                 frame.attrsData.tilling = (val as ParticleNodeVec2).getValue();
-                            } 
+                            }
                             else if (key == "billboard")
                             {
                                 frame.attrsData.renderModel = val;
@@ -220,7 +222,7 @@ namespace gd3d.framework
                 if (elementData["timeline"]["attrs"] != undefined)
                 {
                     let _data = elementData["timeline"]["attrs"];
-                    let data = new EmissionNew();
+                    let data = new Emission();
                     element.emissionData = data;
                     if (_data["emissionType"] != undefined)
                     {
@@ -233,6 +235,8 @@ namespace gd3d.framework
                                 data.emissionType = ParticleEmissionType.continue;
                                 break;
                         }
+                        if (_data["beloop"] != undefined)
+                            data.beLoop = <boolean>_data["beloop"];
                         if (_data["maxcount"] != undefined)
                             data.maxEmissionCount = <number>_data["maxcount"];
                         if (_data["emissioncount"] != undefined)
@@ -287,15 +291,15 @@ namespace gd3d.framework
                                 data.scaleNodes.push(node);
                             }
                         }
-                        if(_data["simulationSpeed"]!=undefined)
+                        if (_data["simulationSpeed"] != undefined)
                         {
-                            data.simulationSpeed = this._parseToObjData("simulationSpeed",_data["simulationSpeed"]);
+                            data.simulationSpeed = this._parseToObjData("simulationSpeed", _data["simulationSpeed"]);
                         }
                         if (_data["alpha"] != undefined)
                         {
                             data.alpha = this._parseToObjData("alpha", _data["alpha"]);
                         }
-                            
+
                         if (_data["alphaSpeed"] != undefined)
                             data.alphaSpeed = this._parseToObjData("alphaSpeed", _data["alphaSpeed"]);
                         if (_data["alphaNodes"] != undefined)
@@ -309,22 +313,22 @@ namespace gd3d.framework
                             for (let i in _data["alphaNodes"])
                             {
                                 let node = new ParticleNodeNumber();
-                                var item=_data["alphaNodes"][i];
-                                if(item["key"]!=null)
+                                var item = _data["alphaNodes"][i];
+                                if (item["key"] != null)
                                 {
-                                    node.key=item["key"];
+                                    node.key = item["key"];
                                 }
-                                let alphavalue=item["alpha"];
-                                if(alphavalue!=null)
+                                let alphavalue = item["alpha"];
+                                if (alphavalue != null)
                                 {
-                                    if(alphavalue instanceof Array)
+                                    if (alphavalue instanceof Array)
                                     {
-                                        node.num.valueLimitMin=alphavalue[0];
-                                        node.num.valueLimitMax=alphavalue[1];
+                                        node.num.valueLimitMin = alphavalue[0];
+                                        node.num.valueLimitMax = alphavalue[1];
                                     }
                                     else
                                     {
-                                        node.num.value=alphavalue;
+                                        node.num.value = alphavalue;
                                     }
                                 }
                                 data.alphaNodes.push(node);
@@ -367,14 +371,14 @@ namespace gd3d.framework
                                     data.uvType = UVTypeEnum.UVRoll;
                                     if (_data["uvroll"] != undefined)
                                     {
-                                        data.uvRoll = new UVRollNew();
+                                        data.uvRoll = new UVRoll();
                                         data.uvRoll.uvSpeed = EffectUtil.parseEffectUVSpeed(_data["uvroll"]);
                                     }
                                     break;
                                 case "uvsprite":
                                     let _val = _data["uvsprite"];
                                     data.uvType = UVTypeEnum.UVSprite;
-                                    data.uvSprite = new UVSpriteNew();
+                                    data.uvSprite = new UVSprite();
                                     if (_val["row"] != undefined)
                                         data.uvSprite.row = <number>_val["row"];
                                     if (_val["colum"] != undefined)

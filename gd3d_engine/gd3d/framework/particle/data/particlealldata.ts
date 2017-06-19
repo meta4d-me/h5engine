@@ -1,7 +1,8 @@
 namespace gd3d.framework
 {
-    export class EmissionNew
+    export class Emission
     {
+        beLoop: boolean = false;
         /**
          * 发射器类型
          */
@@ -79,7 +80,7 @@ namespace gd3d.framework
          * @type {number}
          * @memberof EmissionNew
          */
-        simulationSpeed:ParticleNodeNumber;
+        simulationSpeed: ParticleNodeNumber;
         /**
          * 透明度相关
          * 
@@ -98,8 +99,8 @@ namespace gd3d.framework
          */
         uv: ParticleNodeVec2;
         uvType: UVTypeEnum;
-        uvRoll: UVRollNew;
-        uvSprite: UVSpriteNew;
+        uvRoll: UVRoll;
+        uvSprite: UVSprite;
 
         /**
          * 材质相关
@@ -116,7 +117,7 @@ namespace gd3d.framework
          * @memberof EmissionNew
          */
         life: ValueData;
-        renderModel: RenderModel=RenderModel.None;
+        renderModel: RenderModel = RenderModel.None;
         mesh: mesh;
 
         particleStartData: gd3d.framework.ParticleStartData = new gd3d.framework.ParticleStartData();
@@ -132,7 +133,7 @@ namespace gd3d.framework
 
         clone()
         {
-            let emission = new EmissionNew();
+            let emission = new Emission();
             if (this.emissionType != undefined)
                 emission.emissionType = this.emissionType;
             if (this.maxEmissionCount != undefined)
@@ -143,9 +144,10 @@ namespace gd3d.framework
                 emission.time = this.time;
             if (this.pos != undefined)
                 emission.pos = this.pos.clone();
+            emission.beLoop = this.beLoop;
             // if (this.shape != undefined)
             //     emission.shape = this.shape;
-            if(this.simulationSpeed!=undefined)
+            if (this.simulationSpeed != undefined)
             {
                 emission.simulationSpeed = this.simulationSpeed.clone();
             }
@@ -225,7 +227,7 @@ namespace gd3d.framework
         }
     }
 
-    export class UVSpriteNew
+    export class UVSprite
     {
         //uv序列帧动画
         public row: number;
@@ -233,7 +235,7 @@ namespace gd3d.framework
         public totalCount: number;
         clone()
         {
-            let sprite = new UVSpriteNew();
+            let sprite = new UVSprite();
             sprite.row = this.row;
             sprite.column = this.column;
             sprite.totalCount = this.totalCount;
@@ -241,7 +243,7 @@ namespace gd3d.framework
         }
     }
 
-    export class UVRollNew
+    export class UVRoll
     {
         /**
         * uv滚动
@@ -250,7 +252,7 @@ namespace gd3d.framework
         public uvSpeedNodes: Array<UVSpeedNode>;
         clone()
         {
-            let roll = new UVRollNew();
+            let roll = new UVRoll();
             if (this.uvSpeed != undefined)
                 roll.uvSpeed = this.uvSpeed;
             if (this.uvSpeedNodes != undefined)
