@@ -85,6 +85,24 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare namespace demo {
+    class DragonTest implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        light: gd3d.framework.light;
+        dragon: gd3d.framework.transform;
+        camTran: gd3d.framework.transform;
+        cube: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        private loadShader(laststate, state);
+        private loadLongPrefab(laststate, state);
+        private loadScene(laststate, state);
+        private addCameraAndLight(laststate, state);
+        start(app: gd3d.framework.application): void;
+        update(delta: number): void;
+    }
+}
 declare enum ShockType {
     Vertical = 0,
     Horizontal = 1,

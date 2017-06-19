@@ -47,6 +47,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_fakepbr", () => new test_fakepbr());
         this.addBtn("test_metalModel", () => new t.test_metal());
         this.addBtn("test_tank", () => new demo.TankGame());
+        this.addBtn("test_long", () => new demo.DragonTest());
 
         this.addBtn("test_lookAt", () => new t.TestRotate());
         this.addBtn("test_skillsystem", () => new t.test_skillsystem());
