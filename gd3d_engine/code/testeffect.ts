@@ -110,7 +110,7 @@
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
         let names: string[] = ["particle", "fx_ss_female@attack_03", "particle_billboard", "fx_0005_sword_sword"];
-        let name = names[0];
+        let name = names[3];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)

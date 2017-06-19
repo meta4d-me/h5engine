@@ -2150,7 +2150,7 @@ var test_effect = (function () {
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
         var names = ["particle", "fx_ss_female@attack_03", "particle_billboard", "fx_0005_sword_sword"];
-        var name = names[0];
+        var name = names[3];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 var tr = new gd3d.framework.transform();
