@@ -8074,23 +8074,17 @@ var gd3d;
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");
                 var worldPos = node.getWorldTranslate();
-                var dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]))
                     return false;
                 return true;
             };
@@ -9414,7 +9408,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            spherecollider.prototype.caclPlaneDis = function (v0, v1, v2) {
+            spherecollider.prototype.caclPlaneInDir = function (v0, v1, v2) {
                 var subv0 = gd3d.math.pool.new_vector3();
                 var subv1 = gd3d.math.pool.new_vector3();
                 var cro0 = gd3d.math.pool.new_vector3();
@@ -9425,7 +9419,17 @@ var gd3d;
                 gd3d.math.calPlaneLineIntersectPoint(cro0, v0, cro0, this.worldCenter, point);
                 var sublp = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Subtract(point, this.worldCenter, sublp);
-                return gd3d.math.vec3Dot(cro0, sublp);
+                var val = gd3d.math.vec3Dot(cro0, sublp);
+                gd3d.math.pool.delete_vector3(subv0);
+                gd3d.math.pool.delete_vector3(subv1);
+                gd3d.math.pool.delete_vector3(cro0);
+                if (val <= 0)
+                    return true;
+                var dis = gd3d.math.vec3Distance(this.worldCenter, point);
+                gd3d.math.pool.delete_vector3(point);
+                if (dis < this.radius)
+                    return true;
+                return false;
             };
             spherecollider.prototype.intersectsTransform = function (tran) {
                 if (tran.gameObject.collider == null)

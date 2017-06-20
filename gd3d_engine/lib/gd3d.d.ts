@@ -1508,7 +1508,7 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
-        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): number;
+        caclPlaneInDir(v0: math.vector3, v1: math.vector3, v2: math.vector3): boolean;
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();

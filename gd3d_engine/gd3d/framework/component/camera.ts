@@ -402,18 +402,12 @@ namespace gd3d.framework
             let spherecol = node.gameObject.getComponent("spherecollider") as spherecollider;
             let worldPos = node.getWorldTranslate();
 
-            let dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]);
-            if(dis - spherecol.radius > 0)  return false;
-            dis = spherecol.caclPlaneDis(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]);
-            if(dis - spherecol.radius > 0)  return false;
-            dis = spherecol.caclPlaneDis(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]);
-            if(dis - spherecol.radius > 0)  return false;
-            dis = spherecol.caclPlaneDis(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]);
-            if(dis - spherecol.radius > 0)  return false;
-            dis = spherecol.caclPlaneDis(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]);
-            if(dis - spherecol.radius > 0)  return false;
-            dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]);
-            if(dis - spherecol.radius > 0)  return false;
+            if(!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5])) return false;
+            if(!spherecol.caclPlaneInDir(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7])) return false;
+            if(!spherecol.caclPlaneInDir(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6])) return false;
+            if(!spherecol.caclPlaneInDir(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4])) return false;
+            if(!spherecol.caclPlaneInDir(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6])) return false;
+            if(!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3])) return false;
             return true;
         }
 
