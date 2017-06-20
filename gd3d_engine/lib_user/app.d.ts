@@ -806,7 +806,7 @@ declare namespace t {
 }
 declare class CameraController {
     private static g_this;
-    static instance(): CameraController;
+    static instance(): any;
     gameObject: gd3d.framework.gameObject;
     app: gd3d.framework.application;
     target: gd3d.framework.camera;

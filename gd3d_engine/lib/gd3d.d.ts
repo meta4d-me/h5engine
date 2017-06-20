@@ -2827,6 +2827,32 @@ declare namespace gd3d.framework {
         getVec3(vecs: gd3d.math.vector3[]): void;
     }
 }
+declare class CameraController {
+    private static g_this;
+    static instance(): CameraController;
+    gameObject: gd3d.framework.gameObject;
+    app: gd3d.framework.application;
+    target: gd3d.framework.camera;
+    moveSpeed: number;
+    movemul: number;
+    wheelSpeed: number;
+    rotateSpeed: number;
+    keyMap: {
+        [id: number]: boolean;
+    };
+    beRightClick: boolean;
+    update(delta: number): void;
+    rotAngle: gd3d.math.vector3;
+    isInit: boolean;
+    init(app: gd3d.framework.application, target: gd3d.framework.camera): void;
+    private moveVector;
+    doMove(delta: number): void;
+    doRotate(rotateX: number, rotateY: number): void;
+    lookat(trans: gd3d.framework.transform): void;
+    checkOnRightClick(mouseEvent: MouseEvent): boolean;
+    private doMouseWheel(ev, isFirefox);
+    remove(): void;
+}
 declare namespace gd3d.framework {
     class obb {
         center: gd3d.math.vector3;
