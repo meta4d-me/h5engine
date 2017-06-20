@@ -357,6 +357,7 @@ namespace gd3d.framework
         public localTranslate: math.vector3;
         public euler: math.vector3;
         public color: math.vector3;
+        private initscale:math.vector3=new gd3d.math.vector3();
         public scale: math.vector3;
         public uv: math.vector2;
         public alpha: number;
@@ -498,7 +499,9 @@ namespace gd3d.framework
                 this.alpha = 1;
             else
                 this.alpha = this.data.alpha.getValueRandom();
-
+            
+            //记下初始scale
+            gd3d.math.vec3Clone(this.scale,this.initscale);
 
             ///模型初始旋转量
             if (this.renderModel == RenderModel.None || this.renderModel == RenderModel.StretchedBillBoard)
@@ -725,7 +728,7 @@ namespace gd3d.framework
                 // {
                 //     gd3d.math.vec3SLerp(startVal, this.endNode.getValue(), (this.curLife - startKey) / duration, this.scale);
                 // }
-                this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale);
+                this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale,nodeType.scale);
             } else if (this.data.scaleSpeed != undefined)
             {
                 if (this.data.scaleSpeed.x != undefined)
@@ -808,8 +811,9 @@ namespace gd3d.framework
                 if (this.tempStartNode instanceof ParticleNode)
                 {
                     if (duration > 0)
-                    {
+                    {   
                         gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
+
                     }
                 } else if (this.tempStartNode instanceof ParticleNodeNumber)
                 {
@@ -823,6 +827,11 @@ namespace gd3d.framework
                         if(nodetype==nodeType.alpha)
                         {
                             this.alpha=gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                        }
+                        else if(nodetype=nodeType.scale)
+                        {
+                            var targetscale=gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            gd3d.math.vec3ScaleByNum(this.initscale,targetscale,out);
                         }
                         // else
                         // {
@@ -987,6 +996,8 @@ namespace gd3d.framework
     }
     export enum nodeType{
         none,
-        alpha
+        alpha,
+        scale
+        
     }
 }

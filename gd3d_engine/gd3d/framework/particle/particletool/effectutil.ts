@@ -82,6 +82,30 @@ namespace gd3d.framework
             return node;
         }
 
+        public static parseEffectNumNode(value:any):ParticleNodeNumber
+        {
+            let node = new ParticleNodeNumber();
+            for (let key in value)
+            {
+                if(value[key] instanceof Array)
+                {
+                    node[key].valueLimitMin=value[key][0];
+                    node[key].valueLimitMax=value[key][1];
+                }
+                else
+                {
+                    if(key=="key")
+                    {
+                        node[key]=value[key];
+                    }else
+                    {
+                        node.num.value=value[key];
+                    }
+                }
+            }
+            return node;
+        }
+
         public static parseEffectValueData(value: any): ValueData
         {
             let val = new ValueData();

@@ -14373,7 +14373,7 @@ var gd3d;
                 if (this.scale != undefined)
                     emission.scale = this.scale.clone();
                 if (this.scaleNodes != undefined)
-                    emission.scaleNodes = this.cloneParticleNodeArray(this.scaleNodes);
+                    emission.scaleNodes = this.cloneParticleNodeNumberArray(this.scaleNodes);
                 if (this.scaleSpeed != undefined)
                     emission.scaleSpeed = this.scaleSpeed.clone();
                 if (this.color != undefined)
@@ -15666,12 +15666,12 @@ var gd3d;
                                 data.scaleSpeed = this._parseToObjData("scaleSpeed", _data["scaleSpeed"]);
                             if (_data["scaleNodes"] != undefined) {
                                 data.scaleNodes = [];
-                                if (data.scale != undefined) {
-                                    data.scaleNodes.push(data.scale);
-                                    data.scale.key = 0;
-                                }
+                                var startscale = new framework.ParticleNodeNumber();
+                                startscale.num.value = 1;
+                                startscale.key = 0;
+                                data.scaleNodes.push(startscale);
                                 for (var i in _data["scaleNodes"]) {
-                                    var node = framework.EffectUtil.parseEffectVec3(_data["scaleNodes"][i]);
+                                    var node = framework.EffectUtil.parseEffectNumNode(_data["scaleNodes"][i]);
                                     data.scaleNodes.push(node);
                                 }
                             }
@@ -16014,6 +16014,24 @@ var gd3d;
                 else {
                     node.num.value = value;
                     node.num.isRandom = false;
+                }
+                return node;
+            };
+            EffectUtil.parseEffectNumNode = function (value) {
+                var node = new framework.ParticleNodeNumber();
+                for (var key in value) {
+                    if (value[key] instanceof Array) {
+                        node[key].valueLimitMin = value[key][0];
+                        node[key].valueLimitMax = value[key][1];
+                    }
+                    else {
+                        if (key == "key") {
+                            node[key] = value[key];
+                        }
+                        else {
+                            node.num.value = value[key];
+                        }
+                    }
                 }
                 return node;
             };
@@ -16402,6 +16420,7 @@ var gd3d;
         framework.EmissionBatcher = EmissionBatcher;
         var Particle = (function () {
             function Particle(batcher) {
+                this.initscale = new gd3d.math.vector3();
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
                 this.tilling = new gd3d.math.vector2(1, 1);
@@ -16457,6 +16476,7 @@ var gd3d;
                     this.alpha = 1;
                 else
                     this.alpha = this.data.alpha.getValueRandom();
+                gd3d.math.vec3Clone(this.scale, this.initscale);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
                     gd3d.math.quatFromEulerAngles(this.startPitchYawRoll.x, this.startPitchYawRoll.y, this.startPitchYawRoll.z, this.rotation_start);
                     if (this.data.particleStartData.shapeType != framework.ParticleSystemShape.NORMAL) {
@@ -16593,7 +16613,7 @@ var gd3d;
                     return;
                 }
                 if (this.data.scaleNodes != undefined) {
-                    this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale);
+                    this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale, nodeType.scale);
                 }
                 else if (this.data.scaleSpeed != undefined) {
                     if (this.data.scaleSpeed.x != undefined)
@@ -16654,6 +16674,10 @@ var gd3d;
                         if (duration > 0) {
                             if (nodetype == nodeType.alpha) {
                                 this.alpha = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            }
+                            else if (nodetype = nodeType.scale) {
+                                var targetscale = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                                gd3d.math.vec3ScaleByNum(this.initscale, targetscale, out);
                             }
                         }
                     }
@@ -16772,6 +16796,7 @@ var gd3d;
         (function (nodeType) {
             nodeType[nodeType["none"] = 0] = "none";
             nodeType[nodeType["alpha"] = 1] = "alpha";
+            nodeType[nodeType["scale"] = 2] = "scale";
         })(nodeType = framework.nodeType || (framework.nodeType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
