@@ -129,6 +129,7 @@ var gd3d;
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
                 if (this.bePlay) {
+                    this.preusercodetimer = Date.now();
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
                             this.beStepNumber--;
@@ -138,11 +139,15 @@ var gd3d;
                     else {
                         this.updateUserCode(delta);
                     }
+                    this.usercodetime = Date.now() - this.preusercodetimer;
                 }
                 this.updateEditorCode(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
+            };
+            application.prototype.getUserUpdateTimer = function () {
+                return this.usercodetime;
             };
             application.prototype.getTotalTime = function () {
                 return this.totalTime;
@@ -336,6 +341,7 @@ var Stats;
             this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
             this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
+            this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             if (self.performance && self.performance["memory"]) {
                 this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
             }
@@ -365,6 +371,7 @@ var Stats;
                 var fps = (this.frames * 1000) / (time - this.prevTime);
                 this.fpsPanel.update(fps, 100);
                 this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
+                this.userratePanel.update(this.app.getUserUpdateTimer() * this.frames / 10, 100);
                 this.prevTime = time;
                 this.frames = 0;
                 if (this.memPanel) {
@@ -8051,6 +8058,8 @@ var gd3d;
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
+                if (!this.testFrustumCulling(scene, node))
+                    return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
                 }

@@ -27,6 +27,7 @@ namespace Stats
             this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
             this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
+            this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             if (self.performance && self.performance["memory"])
             {
 
@@ -54,6 +55,7 @@ namespace Stats
         private msPanel: Panel;
         private memPanel: Panel;
         private ratePanel:Panel;
+        private userratePanel:Panel;
         private showPanel(id: number)
         {
 
@@ -93,6 +95,7 @@ namespace Stats
 
                 this.fpsPanel.update(fps, 100);
                 this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
+                this.userratePanel.update(this.app.getUserUpdateTimer() * this.frames / 10, 100);
 
                 this.prevTime = time;
                 this.frames = 0;

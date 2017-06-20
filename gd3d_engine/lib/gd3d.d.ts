@@ -30,6 +30,9 @@ declare namespace gd3d.framework {
         closeFps(): void;
         beStepNumber: number;
         private update(delta);
+        private preusercodetimer;
+        private usercodetime;
+        getUserUpdateTimer(): number;
         private beginTimer;
         private lastTimer;
         private totalTime;
@@ -102,6 +105,7 @@ declare namespace Stats {
         private msPanel;
         private memPanel;
         private ratePanel;
+        private userratePanel;
         private showPanel(id);
         private addPanel(panel);
         private begin();
