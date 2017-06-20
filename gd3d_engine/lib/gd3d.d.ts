@@ -30,6 +30,9 @@ declare namespace gd3d.framework {
         closeFps(): void;
         beStepNumber: number;
         private update(delta);
+        private preusercodetimer;
+        private usercodetime;
+        getUserUpdateTimer(): number;
         private beginTimer;
         private lastTimer;
         private totalTime;
@@ -102,6 +105,7 @@ declare namespace Stats {
         private msPanel;
         private memPanel;
         private ratePanel;
+        private userratePanel;
         private showPanel(id);
         private addPanel(panel);
         private begin();
@@ -2830,32 +2834,6 @@ declare namespace gd3d.framework {
         clone(): aabb;
         getVec3(vecs: gd3d.math.vector3[]): void;
     }
-}
-declare class CameraController {
-    private static g_this;
-    static instance(): CameraController;
-    gameObject: gd3d.framework.gameObject;
-    app: gd3d.framework.application;
-    target: gd3d.framework.camera;
-    moveSpeed: number;
-    movemul: number;
-    wheelSpeed: number;
-    rotateSpeed: number;
-    keyMap: {
-        [id: number]: boolean;
-    };
-    beRightClick: boolean;
-    update(delta: number): void;
-    rotAngle: gd3d.math.vector3;
-    isInit: boolean;
-    init(app: gd3d.framework.application, target: gd3d.framework.camera): void;
-    private moveVector;
-    doMove(delta: number): void;
-    doRotate(rotateX: number, rotateY: number): void;
-    lookat(trans: gd3d.framework.transform): void;
-    checkOnRightClick(mouseEvent: MouseEvent): boolean;
-    private doMouseWheel(ev, isFirefox);
-    remove(): void;
 }
 declare namespace gd3d.framework {
     class obb {

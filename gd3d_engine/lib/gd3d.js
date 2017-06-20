@@ -129,6 +129,7 @@ var gd3d;
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
                 if (this.bePlay) {
+                    this.preusercodetimer = Date.now();
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
                             this.beStepNumber--;
@@ -138,11 +139,15 @@ var gd3d;
                     else {
                         this.updateUserCode(delta);
                     }
+                    this.usercodetime = Date.now() - this.preusercodetimer;
                 }
                 this.updateEditorCode(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
+            };
+            application.prototype.getUserUpdateTimer = function () {
+                return this.usercodetime;
             };
             application.prototype.getTotalTime = function () {
                 return this.totalTime;
@@ -336,6 +341,7 @@ var Stats;
             this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
             this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
+            this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             if (self.performance && self.performance["memory"]) {
                 this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
             }
@@ -365,6 +371,7 @@ var Stats;
                 var fps = (this.frames * 1000) / (time - this.prevTime);
                 this.fpsPanel.update(fps, 100);
                 this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
+                this.userratePanel.update(this.app.getUserUpdateTimer() * this.frames / 10, 100);
                 this.prevTime = time;
                 this.frames = 0;
                 if (this.memPanel) {
@@ -8051,6 +8058,8 @@ var gd3d;
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
+                if (!this.testFrustumCulling(scene, node))
+                    return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
                 }
@@ -17750,147 +17759,6 @@ var gd3d;
         framework.aabb = aabb;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-var CameraController = (function () {
-    function CameraController() {
-        this.moveSpeed = 10;
-        this.movemul = 5;
-        this.wheelSpeed = 1;
-        this.rotateSpeed = 0.1;
-        this.keyMap = {};
-        this.beRightClick = false;
-        this.isInit = false;
-        this.moveVector = new gd3d.math.vector3(0, 0, 1);
-    }
-    CameraController.instance = function () {
-        if (CameraController.g_this == null) {
-            CameraController.g_this = new CameraController();
-        }
-        return CameraController.g_this;
-    };
-    CameraController.prototype.update = function (delta) {
-        if (this.beRightClick) {
-            this.doMove(delta);
-        }
-    };
-    CameraController.prototype.init = function (app, target) {
-        var _this = this;
-        this.isInit = true;
-        this.app = app;
-        this.target = target;
-        this.rotAngle = new gd3d.math.vector3();
-        gd3d.math.quatToEulerAngles(this.target.gameObject.transform.localRotate, this.rotAngle);
-        this.app.webgl.canvas.addEventListener("mousedown", function (ev) {
-            _this.checkOnRightClick(ev);
-        }, false);
-        this.app.webgl.canvas.addEventListener("mouseup", function (ev) {
-            _this.beRightClick = false;
-        }, false);
-        this.app.webgl.canvas.addEventListener("mousemove", function (ev) {
-            if (_this.beRightClick) {
-                _this.doRotate(ev.movementX, ev.movementY);
-            }
-        }, false);
-        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
-            _this.keyMap[ev.keyCode] = true;
-        }, false);
-        this.app.webgl.canvas.addEventListener("keyup", function (ev) {
-            _this.moveSpeed = 10;
-            _this.keyMap[ev.keyCode] = false;
-        }, false);
-        if (navigator.userAgent.indexOf('Firefox') >= 0) {
-            this.app.webgl.canvas.addEventListener("DOMMouseScroll", function (ev) {
-                _this.doMouseWheel(ev, true);
-            }, false);
-        }
-        else {
-            this.app.webgl.canvas.addEventListener("mousewheel", function (ev) {
-                _this.doMouseWheel(ev, false);
-            }, false);
-        }
-        this.app.webgl.canvas.addEventListener("mouseout", function (ev) {
-            _this.beRightClick = false;
-        }, false);
-        document.oncontextmenu = function (ev) {
-            ev.preventDefault();
-        };
-    };
-    CameraController.prototype.doMove = function (delta) {
-        if (this.target == null)
-            return;
-        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_W] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_W])
-            || (this.keyMap[gd3d.framework.NumberUtil.KEY_w] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_w])) {
-            this.moveSpeed += this.movemul * delta;
-            this.target.gameObject.transform.getForwardInWorld(this.moveVector);
-            gd3d.math.vec3ScaleByNum(this.moveVector, this.moveSpeed * delta, this.moveVector);
-            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
-        }
-        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_S] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_S])
-            || (this.keyMap[gd3d.framework.NumberUtil.KEY_s] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_s])) {
-            this.moveSpeed += this.movemul * delta;
-            this.target.gameObject.transform.getForwardInWorld(this.moveVector);
-            gd3d.math.vec3ScaleByNum(this.moveVector, -this.moveSpeed * delta, this.moveVector);
-            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
-        }
-        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_A] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_A])
-            || (this.keyMap[gd3d.framework.NumberUtil.KEY_a] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_a])) {
-            this.moveSpeed += this.movemul * delta;
-            this.target.gameObject.transform.getRightInWorld(this.moveVector);
-            gd3d.math.vec3ScaleByNum(this.moveVector, -this.moveSpeed * delta, this.moveVector);
-            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
-        }
-        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_D] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_D])
-            || (this.keyMap[gd3d.framework.NumberUtil.KEY_d] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_d])) {
-            this.moveSpeed += this.movemul * delta;
-            this.target.gameObject.transform.getRightInWorld(this.moveVector);
-            gd3d.math.vec3ScaleByNum(this.moveVector, this.moveSpeed * delta, this.moveVector);
-            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
-        }
-        this.target.gameObject.transform.markDirty();
-    };
-    CameraController.prototype.doRotate = function (rotateX, rotateY) {
-        this.rotAngle.x += rotateY * this.rotateSpeed;
-        this.rotAngle.y += rotateX * this.rotateSpeed;
-        this.rotAngle.x %= 360;
-        this.rotAngle.y %= 360;
-        gd3d.math.quatFromEulerAngles(this.rotAngle.x, this.rotAngle.y, this.rotAngle.z, this.target.gameObject.transform.localRotate);
-    };
-    CameraController.prototype.lookat = function (trans) {
-        this.target.gameObject.transform.lookat(trans);
-        this.target.gameObject.transform.markDirty();
-        gd3d.math.quatToEulerAngles(this.target.gameObject.transform.localRotate, this.rotAngle);
-    };
-    CameraController.prototype.checkOnRightClick = function (mouseEvent) {
-        var value = mouseEvent.button;
-        if (value == 2) {
-            this.beRightClick = true;
-            return true;
-        }
-        else if (value == 0) {
-            this.beRightClick = false;
-            return false;
-        }
-    };
-    CameraController.prototype.doMouseWheel = function (ev, isFirefox) {
-        if (!this.target)
-            return;
-        if (this.target.opvalue == 0) {
-        }
-        else {
-            this.target.gameObject.transform.getForwardInWorld(this.moveVector);
-            if (isFirefox) {
-                gd3d.math.vec3ScaleByNum(this.moveVector, this.wheelSpeed * (ev.detail * (-0.5)), this.moveVector);
-            }
-            else {
-                gd3d.math.vec3ScaleByNum(this.moveVector, this.wheelSpeed * ev.deltaY * (-0.01), this.moveVector);
-            }
-            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
-            this.target.gameObject.transform.markDirty();
-        }
-    };
-    CameraController.prototype.remove = function () {
-    };
-    return CameraController;
-}());
 var gd3d;
 (function (gd3d) {
     var framework;
