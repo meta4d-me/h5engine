@@ -280,14 +280,14 @@ namespace gd3d.framework
                         if (_data["scaleNodes"] != undefined)
                         {
                             data.scaleNodes = [];
-                            if (data.scale != undefined)
-                            {
-                                data.scaleNodes.push(data.scale);
-                                data.scale.key = 0;
-                            }
+                            //-----------------------------初始scale为1--------------------------------
+                            var startscale=new ParticleNodeNumber();
+                            startscale.num.value=1;
+                            startscale.key=0;
+                            data.scaleNodes.push(startscale);
                             for (let i in _data["scaleNodes"])
                             {
-                                let node = EffectUtil.parseEffectVec3(_data["scaleNodes"][i]);
+                                let node = EffectUtil.parseEffectNumNode(_data["scaleNodes"][i]);
                                 data.scaleNodes.push(node);
                             }
                         }

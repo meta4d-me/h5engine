@@ -62,7 +62,7 @@ namespace gd3d.framework
          * @memberof EmissionNew
          */
         scale: ParticleNode;
-        scaleNodes: Array<ParticleNode>;
+        scaleNodes: Array<ParticleNodeNumber>;
         scaleSpeed: ParticleNode;
 
         /**
@@ -164,7 +164,7 @@ namespace gd3d.framework
             if (this.scale != undefined)
                 emission.scale = this.scale.clone();
             if (this.scaleNodes != undefined)
-                emission.scaleNodes = this.cloneParticleNodeArray(this.scaleNodes);
+                emission.scaleNodes = this.cloneParticleNodeNumberArray(this.scaleNodes);
             if (this.scaleSpeed != undefined)
                 emission.scaleSpeed = this.scaleSpeed.clone();
             if (this.color != undefined)

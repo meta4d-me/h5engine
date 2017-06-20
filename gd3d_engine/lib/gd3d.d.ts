@@ -2163,7 +2163,7 @@ declare namespace gd3d.framework {
         eulerNodes: Array<ParticleNode>;
         eulerSpeed: ParticleNode;
         scale: ParticleNode;
-        scaleNodes: Array<ParticleNode>;
+        scaleNodes: Array<ParticleNodeNumber>;
         scaleSpeed: ParticleNode;
         color: ParticleNode;
         colorNodes: Array<ParticleNode>;
@@ -2472,6 +2472,7 @@ declare namespace gd3d.framework {
         static parseEffectVec3(value: any): ParticleNode;
         static parseEffectVec2(value: any): ParticleNodeVec2;
         static parseEffectNum(value: any): ParticleNodeNumber;
+        static parseEffectNumNode(value: any): ParticleNodeNumber;
         static parseEffectValueData(value: any): ValueData;
         static parseEffectUVSpeed(value: any): UVSpeedNode;
         static lookat(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, up?: gd3d.math.vector3): void;
@@ -2548,6 +2549,7 @@ declare namespace gd3d.framework {
         localTranslate: math.vector3;
         euler: math.vector3;
         color: math.vector3;
+        private initscale;
         scale: math.vector3;
         uv: math.vector2;
         alpha: number;
@@ -2603,6 +2605,7 @@ declare namespace gd3d.framework {
     enum nodeType {
         none = 0,
         alpha = 1,
+        scale = 2,
     }
 }
 declare namespace gd3d.framework {
