@@ -383,7 +383,7 @@ namespace gd3d.framework
         }
         private _fillRenderer(scene: scene, node: transform)
         {
-            // if(!this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
+            if(!this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
             if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
             {
                 scene.renderList.addRenderer(node.gameObject.renderer);
