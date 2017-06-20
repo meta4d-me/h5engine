@@ -14708,7 +14708,6 @@ var gd3d;
                     boxpos.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
                     boxpos.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
                     var length = gd3d.math.vec3Length(boxpos);
-                    framework.EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
                     gd3d.math.vec3Normalize(boxpos, this.direction);
                     this.getRandomPosition(boxpos, length);
                     return this.direction;

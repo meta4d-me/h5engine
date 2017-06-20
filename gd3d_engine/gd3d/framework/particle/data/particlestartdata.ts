@@ -148,7 +148,7 @@
 
             let length = math.vec3Length(boxpos);
 
-            EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
+            //EffectUtil.RotateVector3(boxpos, this.direction, boxpos);
 
             gd3d.math.vec3Normalize(boxpos,this.direction);
             this.getRandomPosition(boxpos, length);
