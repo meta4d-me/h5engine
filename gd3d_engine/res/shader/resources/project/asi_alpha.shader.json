@@ -1,0 +1,22 @@
+{
+    "layer": "geometry",
+    "passes": {
+        "base": [
+            {
+                "showface": "all",
+                "vs": "asi",
+                "fs": "asi_alpha"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "all",
+                "vs": "asibone_eff",
+                "fs": "asi_alpha"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}

@@ -105,7 +105,7 @@ namespace gd3d.framework
 
         }
 
-        caclPlaneDis(v0: math.vector3, v1:math.vector3, v2: math.vector3)
+        caclPlaneInDir(v0: math.vector3, v1:math.vector3, v2: math.vector3)
         {
             let subv0 = math.pool.new_vector3();
             let subv1 = math.pool.new_vector3();
@@ -119,7 +119,17 @@ namespace gd3d.framework
             
             let sublp = math.pool.new_vector3();
             math.vec3Subtract(point, this.worldCenter, sublp);
-            return math.vec3Dot(cro0, sublp);
+            let val = math.vec3Dot(cro0, sublp);
+            math.pool.delete_vector3(subv0);
+            math.pool.delete_vector3(subv1);
+            math.pool.delete_vector3(cro0);
+
+            if(val <= 0) return true;
+            let dis = math.vec3Distance(this.worldCenter, point);
+            math.pool.delete_vector3(point);
+            if(dis < this.radius)    return true;
+
+            return false;
         }
 
         intersectsTransform(tran: transform): boolean

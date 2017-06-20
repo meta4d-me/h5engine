@@ -4,8 +4,8 @@
   "passes": {
     "base": [
       {
-        "blendmode": "add",
-        "showface": "all",
+        "blendmode": "blend",
+        "showface": "ccw",
         "zwrite": "off",
         "vs": "flowwater",
         "fs": "flowwater"

@@ -30,6 +30,9 @@ declare namespace gd3d.framework {
         closeFps(): void;
         beStepNumber: number;
         private update(delta);
+        private preusercodetimer;
+        private usercodetime;
+        getUserUpdateTimer(): number;
         private beginTimer;
         private lastTimer;
         private totalTime;
@@ -102,6 +105,7 @@ declare namespace Stats {
         private msPanel;
         private memPanel;
         private ratePanel;
+        private userratePanel;
         private showPanel(id);
         private addPanel(panel);
         private begin();
@@ -1512,7 +1516,7 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
-        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): number;
+        caclPlaneInDir(v0: math.vector3, v1: math.vector3, v2: math.vector3): boolean;
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();
@@ -2171,7 +2175,7 @@ declare namespace gd3d.framework {
         eulerNodes: Array<ParticleNode>;
         eulerSpeed: ParticleNode;
         scale: ParticleNode;
-        scaleNodes: Array<ParticleNode>;
+        scaleNodes: Array<ParticleNodeNumber>;
         scaleSpeed: ParticleNode;
         color: ParticleNode;
         colorNodes: Array<ParticleNode>;
@@ -2480,6 +2484,7 @@ declare namespace gd3d.framework {
         static parseEffectVec3(value: any): ParticleNode;
         static parseEffectVec2(value: any): ParticleNodeVec2;
         static parseEffectNum(value: any): ParticleNodeNumber;
+        static parseEffectNumNode(value: any): ParticleNodeNumber;
         static parseEffectValueData(value: any): ValueData;
         static parseEffectUVSpeed(value: any): UVSpeedNode;
         static lookat(eye: gd3d.math.vector3, targetpos: gd3d.math.vector3, out: gd3d.math.quaternion, up?: gd3d.math.vector3): void;
@@ -2556,6 +2561,7 @@ declare namespace gd3d.framework {
         localTranslate: math.vector3;
         euler: math.vector3;
         color: math.vector3;
+        private initscale;
         scale: math.vector3;
         uv: math.vector2;
         alpha: number;
@@ -2597,7 +2603,7 @@ declare namespace gd3d.framework {
         private _updateColor(delta);
         private tempStartNode;
         private tempEndNode;
-        private _updateNode(nodes, life, out);
+        private _updateNode(nodes, life, out, nodetype?);
         private _startNodeNum;
         private _curNodeNum;
         private _updateAlpha(delta);
@@ -2607,6 +2613,11 @@ declare namespace gd3d.framework {
         private _updateUV(delta);
         private _updateVBO();
         dispose(): void;
+    }
+    enum nodeType {
+        none = 0,
+        alpha = 1,
+        scale = 2,
     }
 }
 declare namespace gd3d.framework {

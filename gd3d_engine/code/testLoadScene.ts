@@ -10,7 +10,7 @@ class test_loadScene implements IState
 
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        let names: string[] = ["xinshoucun_fuben_day","city"];
+        let names: string[] = ["city", "chuangjue-01"];
         let name = names[1];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
@@ -47,7 +47,6 @@ class test_loadScene implements IState
                             _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
                             this.app.getScene().lightmaps = [];
                             _scene.useLightMap(this.app.getScene());
-                            _scene.useFog(this.app.getScene());
                             // });
                         }
                     });
@@ -65,11 +64,11 @@ class test_loadScene implements IState
 
         // this.camera.near = 0.01;
         // this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(50, 82, -84);
+        objCam.localTranslate = new gd3d.math.vector3(133, 100, 60);
         this.cube.localTranslate = new gd3d.math.vector3(0, 0, 0);
-        objCam.lookat(this.cube);
+        objCam.lookatPoint(new gd3d.math.vector3(133.6694, 97.87, 67));
         objCam.markDirty();//标记为需要刷新
-        CameraController.instance().init(app,this.camera);
+        CameraController.instance().init(this.app, this.camera);
     }
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;
@@ -80,10 +79,11 @@ class test_loadScene implements IState
     update(delta: number)
     {
         this.timer += delta;
-        var x = Math.sin(this.timer);
-        var z = Math.cos(this.timer);
-        var x2 = Math.sin(this.timer * 0.5);
-        var z2 = Math.cos(this.timer * 0.5);
+        CameraController.instance().update(delta);
+        // var x = Math.sin(this.timer);
+        // var z = Math.cos(this.timer);
+        // var x2 = Math.sin(this.timer * 0.5);
+        // var z2 = Math.cos(this.timer * 0.5);
         // var objCam = this.camera.gameObject.transform;
         // objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
         // objCam.markDirty();//标记为需要刷新

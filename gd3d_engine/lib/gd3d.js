@@ -129,6 +129,7 @@ var gd3d;
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
                 if (this.bePlay) {
+                    this.preusercodetimer = Date.now();
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
                             this.beStepNumber--;
@@ -138,11 +139,15 @@ var gd3d;
                     else {
                         this.updateUserCode(delta);
                     }
+                    this.usercodetime = Date.now() - this.preusercodetimer;
                 }
                 this.updateEditorCode(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
+            };
+            application.prototype.getUserUpdateTimer = function () {
+                return this.usercodetime;
             };
             application.prototype.getTotalTime = function () {
                 return this.totalTime;
@@ -336,6 +341,7 @@ var Stats;
             this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
             this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
+            this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             if (self.performance && self.performance["memory"]) {
                 this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
             }
@@ -365,6 +371,7 @@ var Stats;
                 var fps = (this.frames * 1000) / (time - this.prevTime);
                 this.fpsPanel.update(fps, 100);
                 this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
+                this.userratePanel.update(this.app.getUserUpdateTimer() * this.frames / 10, 100);
                 this.prevTime = time;
                 this.frames = 0;
                 if (this.memPanel) {
@@ -8080,6 +8087,8 @@ var gd3d;
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
+                if (!this.testFrustumCulling(scene, node))
+                    return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
                 }
@@ -8094,23 +8103,17 @@ var gd3d;
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");
                 var worldPos = node.getWorldTranslate();
-                var dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6]))
                     return false;
-                dis = spherecol.caclPlaneDis(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]);
-                if (dis - spherecol.radius > 0)
+                if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3]))
                     return false;
                 return true;
             };
@@ -9437,7 +9440,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            spherecollider.prototype.caclPlaneDis = function (v0, v1, v2) {
+            spherecollider.prototype.caclPlaneInDir = function (v0, v1, v2) {
                 var subv0 = gd3d.math.pool.new_vector3();
                 var subv1 = gd3d.math.pool.new_vector3();
                 var cro0 = gd3d.math.pool.new_vector3();
@@ -9448,7 +9451,17 @@ var gd3d;
                 gd3d.math.calPlaneLineIntersectPoint(cro0, v0, cro0, this.worldCenter, point);
                 var sublp = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Subtract(point, this.worldCenter, sublp);
-                return gd3d.math.vec3Dot(cro0, sublp);
+                var val = gd3d.math.vec3Dot(cro0, sublp);
+                gd3d.math.pool.delete_vector3(subv0);
+                gd3d.math.pool.delete_vector3(subv1);
+                gd3d.math.pool.delete_vector3(cro0);
+                if (val <= 0)
+                    return true;
+                var dis = gd3d.math.vec3Distance(this.worldCenter, point);
+                gd3d.math.pool.delete_vector3(point);
+                if (dis < this.radius)
+                    return true;
+                return false;
             };
             spherecollider.prototype.intersectsTransform = function (tran) {
                 if (tran.gameObject.collider == null)
@@ -14392,7 +14405,7 @@ var gd3d;
                 if (this.scale != undefined)
                     emission.scale = this.scale.clone();
                 if (this.scaleNodes != undefined)
-                    emission.scaleNodes = this.cloneParticleNodeArray(this.scaleNodes);
+                    emission.scaleNodes = this.cloneParticleNodeNumberArray(this.scaleNodes);
                 if (this.scaleSpeed != undefined)
                     emission.scaleSpeed = this.scaleSpeed.clone();
                 if (this.color != undefined)
@@ -15685,12 +15698,12 @@ var gd3d;
                                 data.scaleSpeed = this._parseToObjData("scaleSpeed", _data["scaleSpeed"]);
                             if (_data["scaleNodes"] != undefined) {
                                 data.scaleNodes = [];
-                                if (data.scale != undefined) {
-                                    data.scaleNodes.push(data.scale);
-                                    data.scale.key = 0;
-                                }
+                                var startscale = new framework.ParticleNodeNumber();
+                                startscale.num.value = 1;
+                                startscale.key = 0;
+                                data.scaleNodes.push(startscale);
                                 for (var i in _data["scaleNodes"]) {
-                                    var node = framework.EffectUtil.parseEffectVec3(_data["scaleNodes"][i]);
+                                    var node = framework.EffectUtil.parseEffectNumNode(_data["scaleNodes"][i]);
                                     data.scaleNodes.push(node);
                                 }
                             }
@@ -16033,6 +16046,24 @@ var gd3d;
                 else {
                     node.num.value = value;
                     node.num.isRandom = false;
+                }
+                return node;
+            };
+            EffectUtil.parseEffectNumNode = function (value) {
+                var node = new framework.ParticleNodeNumber();
+                for (var key in value) {
+                    if (value[key] instanceof Array) {
+                        node[key].valueLimitMin = value[key][0];
+                        node[key].valueLimitMax = value[key][1];
+                    }
+                    else {
+                        if (key == "key") {
+                            node[key] = value[key];
+                        }
+                        else {
+                            node.num.value = value[key];
+                        }
+                    }
                 }
                 return node;
             };
@@ -16421,6 +16452,7 @@ var gd3d;
         framework.EmissionBatcher = EmissionBatcher;
         var Particle = (function () {
             function Particle(batcher) {
+                this.initscale = new gd3d.math.vector3();
                 this.renderModel = framework.RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
                 this.tilling = new gd3d.math.vector2(1, 1);
@@ -16476,6 +16508,7 @@ var gd3d;
                     this.alpha = 1;
                 else
                     this.alpha = this.data.alpha.getValueRandom();
+                gd3d.math.vec3Clone(this.scale, this.initscale);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
                     gd3d.math.quatFromEulerAngles(this.startPitchYawRoll.x, this.startPitchYawRoll.y, this.startPitchYawRoll.z, this.rotation_start);
                     if (this.data.particleStartData.shapeType != framework.ParticleSystemShape.NORMAL) {
@@ -16612,7 +16645,7 @@ var gd3d;
                     return;
                 }
                 if (this.data.scaleNodes != undefined) {
-                    this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale);
+                    this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale, nodeType.scale);
                 }
                 else if (this.data.scaleSpeed != undefined) {
                     if (this.data.scaleSpeed.x != undefined)
@@ -16641,8 +16674,10 @@ var gd3d;
                         this.color.z += this.data.colorSpeed.z.getValue() * delta;
                 }
             };
-            Particle.prototype._updateNode = function (nodes, life, out) {
+            Particle.prototype._updateNode = function (nodes, life, out, nodetype) {
+                if (nodetype === void 0) { nodetype = nodeType.none; }
                 var index = 0;
+                var duration = 0;
                 if (nodes != undefined) {
                     for (var i = 0; i < nodes.length; i++) {
                         if (i + 1 < nodes.length) {
@@ -16650,6 +16685,7 @@ var gd3d;
                                 this.tempStartNode = nodes[i];
                                 this.tempEndNode = nodes[i + 1];
                                 index++;
+                                duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                                 break;
                             }
                         }
@@ -16657,10 +16693,10 @@ var gd3d;
                             if (this.curLife < nodes[i].key * life) {
                                 this.tempStartNode = nodes[i - 1];
                                 this.tempEndNode = nodes[i];
+                                duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                             }
                         }
                     }
-                    var duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                     if (this.tempStartNode instanceof framework.ParticleNode) {
                         if (duration > 0) {
                             gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
@@ -16668,7 +16704,13 @@ var gd3d;
                     }
                     else if (this.tempStartNode instanceof framework.ParticleNodeNumber) {
                         if (duration > 0) {
-                            out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            if (nodetype == nodeType.alpha) {
+                                this.alpha = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            }
+                            else if (nodetype = nodeType.scale) {
+                                var targetscale = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                                gd3d.math.vec3ScaleByNum(this.initscale, targetscale, out);
+                            }
                         }
                     }
                     else if (this.tempStartNode instanceof framework.UVSpeedNode) {
@@ -16685,7 +16727,7 @@ var gd3d;
                     return;
                 }
                 if (this.data.alphaNodes != undefined) {
-                    this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha);
+                    this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha, nodeType.alpha);
                 }
                 else if (this.data.alphaSpeed != undefined) {
                     this.alpha += this.data.alphaSpeed.getValue() * delta;
@@ -16782,6 +16824,12 @@ var gd3d;
             return Particle;
         }());
         framework.Particle = Particle;
+        var nodeType;
+        (function (nodeType) {
+            nodeType[nodeType["none"] = 0] = "none";
+            nodeType[nodeType["alpha"] = 1] = "alpha";
+            nodeType[nodeType["scale"] = 2] = "scale";
+        })(nodeType = framework.nodeType || (framework.nodeType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
