@@ -22,12 +22,6 @@ void main()
     _speed = vec2(_speedu,_speedv);
     _light_uv = (_glesMultiTexCoord0.xy * _streamlight_ST.xy + _streamlight_ST.zw)  + _speed * glstate_timer;
 
-	    //求世界空间法线
-    // highp mat3 normalmat = mat3(glstate_matrix_model);
-    // Normalinworld =normalize(normalmat*_glesNormal);
-
-    // worldpos =(glstate_matrix_model * vec4(_glesVertex.xyz, 1.0)).xyz;
-	// eyedir = glstate_eyepos.xyz - worldpos;
 
 	gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
 }
