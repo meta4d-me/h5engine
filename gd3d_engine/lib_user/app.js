@@ -2687,8 +2687,8 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        var names = ["city"];
-        var name = names[0];
+        var names = ["xinshoucun_fuben_day", "city"];
+        var name = names[1];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
@@ -2701,6 +2701,7 @@ var test_loadScene = (function () {
                         _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
                         _this.app.getScene().lightmaps = [];
                         _scene.useLightMap(_this.app.getScene());
+                        _scene.useFog(_this.app.getScene());
                     }
                 });
             }
@@ -2713,6 +2714,7 @@ var test_loadScene = (function () {
         this.cube.localTranslate = new gd3d.math.vector3(0, 0, 0);
         objCam.lookat(this.cube);
         objCam.markDirty();
+        CameraController.instance().init(app, this.camera);
     };
     test_loadScene.prototype.update = function (delta) {
         this.timer += delta;
@@ -2720,9 +2722,6 @@ var test_loadScene = (function () {
         var z = Math.cos(this.timer);
         var x2 = Math.sin(this.timer * 0.5);
         var z2 = Math.cos(this.timer * 0.5);
-        var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
-        objCam.markDirty();
     };
     return test_loadScene;
 }());

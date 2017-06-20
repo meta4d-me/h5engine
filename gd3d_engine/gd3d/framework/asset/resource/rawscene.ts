@@ -6,6 +6,7 @@ namespace gd3d.framework
         private name: constText;
         private id: resID = new resID();
         defaultAsset: boolean = false;
+        fog: Fog;
         constructor(assetName: string = null)
         {
             if (!assetName)
@@ -67,6 +68,18 @@ namespace gd3d.framework
                     this.lightmaps.push(lightmap);
                 }
             }
+
+            let fogData = _json["fog"];
+            if (fogData != undefined)
+            {
+                this.fog = new Fog();
+                this.fog._Start = <number>fogData["_Start"];
+                this.fog._End = <number>fogData["_End"];
+                let cor: string = fogData["_Color"];
+                let array: string[] = cor.split(",");
+                this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                this.fog._Density = <number>fogData["_Density"];
+            }
         }
 
         getSceneRoot(): transform
@@ -82,14 +95,18 @@ namespace gd3d.framework
                 scene.lightmaps.push(this.lightmaps[i]);
             }
         }
+        useFog(scene: scene)
+        {
+            scene.fog = this.fog;
+        }
 
         dispose()
         {
-            if(this.rootNode)
+            if (this.rootNode)
             {
                 this.rootNode.dispose();
             }
-            for(let key in this.lightmaps)
+            for (let key in this.lightmaps)
             {
                 this.lightmaps[key].unuse(true);
             }
@@ -97,5 +114,13 @@ namespace gd3d.framework
 
         private rootNode: transform;
         private lightmaps: texture[];
+    }
+
+    export class Fog
+    {
+        public _Start: number;
+        public _End: number;
+        public _Color: gd3d.math.vector4;
+        public _Density: number;
     }
 }
