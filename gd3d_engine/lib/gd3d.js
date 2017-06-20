@@ -16609,8 +16609,10 @@ var gd3d;
                         this.color.z += this.data.colorSpeed.z.getValue() * delta;
                 }
             };
-            Particle.prototype._updateNode = function (nodes, life, out) {
+            Particle.prototype._updateNode = function (nodes, life, out, nodetype) {
+                if (nodetype === void 0) { nodetype = nodeType.none; }
                 var index = 0;
+                var duration = 0;
                 if (nodes != undefined) {
                     for (var i = 0; i < nodes.length; i++) {
                         if (i + 1 < nodes.length) {
@@ -16618,6 +16620,7 @@ var gd3d;
                                 this.tempStartNode = nodes[i];
                                 this.tempEndNode = nodes[i + 1];
                                 index++;
+                                duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                                 break;
                             }
                         }
@@ -16625,10 +16628,10 @@ var gd3d;
                             if (this.curLife < nodes[i].key * life) {
                                 this.tempStartNode = nodes[i - 1];
                                 this.tempEndNode = nodes[i];
+                                duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                             }
                         }
                     }
-                    var duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                     if (this.tempStartNode instanceof framework.ParticleNode) {
                         if (duration > 0) {
                             gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
@@ -16636,7 +16639,9 @@ var gd3d;
                     }
                     else if (this.tempStartNode instanceof framework.ParticleNodeNumber) {
                         if (duration > 0) {
-                            out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            if (nodetype == nodeType.alpha) {
+                                this.alpha = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            }
                         }
                     }
                     else if (this.tempStartNode instanceof framework.UVSpeedNode) {
@@ -16653,7 +16658,7 @@ var gd3d;
                     return;
                 }
                 if (this.data.alphaNodes != undefined) {
-                    this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha);
+                    this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha, nodeType.alpha);
                 }
                 else if (this.data.alphaSpeed != undefined) {
                     this.alpha += this.data.alphaSpeed.getValue() * delta;
@@ -16750,6 +16755,11 @@ var gd3d;
             return Particle;
         }());
         framework.Particle = Particle;
+        var nodeType;
+        (function (nodeType) {
+            nodeType[nodeType["none"] = 0] = "none";
+            nodeType[nodeType["alpha"] = 1] = "alpha";
+        })(nodeType = framework.nodeType || (framework.nodeType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

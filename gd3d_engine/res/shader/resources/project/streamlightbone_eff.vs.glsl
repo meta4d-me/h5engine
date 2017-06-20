@@ -51,6 +51,6 @@ void main()
 
 	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
     highp vec2 _speed;
-    _speed = vec2(_SpeedU,_SpeedV);
+    _speed = vec2(_SpeedU,-_SpeedV);
     _StreamLightUV = (_glesMultiTexCoord0.xy * _LightTex_ST.xy + _LightTex_ST.zw)  + _speed * glstate_timer;
 }

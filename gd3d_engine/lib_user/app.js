@@ -195,6 +195,7 @@ var main = (function () {
         this.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
         this.addBtn("test_metalModel", function () { return new t.test_metal(); });
         this.addBtn("test_tank", function () { return new demo.TankGame(); });
+        this.addBtn("test_long", function () { return new demo.DragonTest(); });
         this.addBtn("test_lookAt", function () { return new t.TestRotate(); });
         this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
         this.addBtn("test_integratedrender", function () { return new t.test_integratedrender(); });
@@ -597,6 +598,82 @@ var t;
     }());
     t.test_rendertexture = test_rendertexture;
 })(t || (t = {}));
+var demo;
+(function (demo) {
+    var DragonTest = (function () {
+        function DragonTest() {
+            this.taskmgr = new gd3d.framework.taskMgr();
+        }
+        DragonTest.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        DragonTest.prototype.loadLongPrefab = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/prefabs/long/long.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("long.prefab.json");
+                    _this.dragon = _prefab.getCloneTrans();
+                    _this.scene.addChild(_this.dragon);
+                    _this.dragon.markDirty();
+                    _this.camTran = _this.dragon.find("Dummy001");
+                    state.finish = true;
+                }
+            });
+        };
+        DragonTest.prototype.loadScene = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/scenes/test_scene/test_scene.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _scene = _this.app.getAssetMgr().getAssetByName("test_scene.scene.json");
+                    var _root = _scene.getSceneRoot();
+                    _this.scene.addChild(_root);
+                    _root.localTranslate.y = -0.1;
+                    _this.app.getScene().lightmaps = [];
+                    _scene.useLightMap(_this.app.getScene());
+                    state.finish = true;
+                }
+            });
+        };
+        DragonTest.prototype.addCameraAndLight = function (laststate, state) {
+            var tranCam = new gd3d.framework.transform();
+            tranCam.name = "Cam";
+            this.camTran.addChild(tranCam);
+            tranCam.localEulerAngles = new gd3d.math.vector3(0, 270, 0);
+            this.camera = tranCam.gameObject.addComponent("camera");
+            this.camera.near = 0.001;
+            this.camera.far = 200;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            tranCam.markDirty();
+            var tranLight = new gd3d.framework.transform();
+            tranLight.name = "light";
+            this.scene.addChild(tranLight);
+            this.light = tranLight.gameObject.addComponent("light");
+            this.light.type = gd3d.framework.LightTypeEnum.Direction;
+            tranLight.localTranslate.x = 5;
+            tranLight.localTranslate.y = 5;
+            tranLight.localTranslate.z = -5;
+            tranLight.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            tranLight.markDirty();
+            state.finish = true;
+        };
+        DragonTest.prototype.start = function (app) {
+            this.app = app;
+            this.scene = app.getScene();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadLongPrefab.bind(this));
+            this.taskmgr.addTaskCall(this.addCameraAndLight.bind(this));
+        };
+        DragonTest.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+        };
+        return DragonTest;
+    }());
+    demo.DragonTest = DragonTest;
+})(demo || (demo = {}));
 var ShockType;
 (function (ShockType) {
     ShockType[ShockType["Vertical"] = 0] = "Vertical";
