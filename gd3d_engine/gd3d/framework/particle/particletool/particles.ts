@@ -775,9 +775,10 @@ namespace gd3d.framework
 
         private tempStartNode: any;
         private tempEndNode: any;
-        private _updateNode(nodes: any, life: number, out: any)
+        private _updateNode(nodes: any, life: number, out: any,nodetype:nodeType=nodeType.none)
         {
             let index = 0;
+            var duration=0;
             if (nodes != undefined)
             {
                 for (var i = 0; i < nodes.length; i++)
@@ -789,6 +790,7 @@ namespace gd3d.framework
                             this.tempStartNode = nodes[i];
                             this.tempEndNode = nodes[i + 1];
                             index++;
+                            duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                             break;
                         }
                     } else
@@ -797,11 +799,12 @@ namespace gd3d.framework
                         {
                             this.tempStartNode = nodes[i - 1];
                             this.tempEndNode = nodes[i];
+                            duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                         }
                     }
                 }
 
-                var duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
+                //var duration = (this.tempEndNode.key - this.tempStartNode.key) * life;
                 if (this.tempStartNode instanceof ParticleNode)
                 {
                     if (duration > 0)
@@ -810,9 +813,21 @@ namespace gd3d.framework
                     }
                 } else if (this.tempStartNode instanceof ParticleNodeNumber)
                 {
+                    //目前这里只刷了alpha值，
                     if (duration > 0)
                     {
-                        out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                        // var lvalue=this.tempStartNode.getValue();
+                        // var rvalue=this.tempEndNode.getValue();
+                        // var lerp=(this.curLife - this.tempStartNode.key * life) / duration;
+                        // out=gd3d.math.numberLerp(lvalue,rvalue,lerp);
+                        if(nodetype==nodeType.alpha)
+                        {
+                            this.alpha=gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                        }
+                        // else
+                        // {
+                        //     out = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                        // }
                     }
                 } else if (this.tempStartNode instanceof UVSpeedNode)
                 {
@@ -854,7 +869,7 @@ namespace gd3d.framework
                 // {
                 //     this.alpha = gd3d.math.numberLerp(this._startNodeNum.getValue(), this._curNodeNum.getValue(), (this.curLife - this._startNode.key) / duration);
                 // }
-                this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha);
+                this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha,nodeType.alpha);
             } else if (this.data.alphaSpeed != undefined)
             {
                 this.alpha += this.data.alphaSpeed.getValue() * delta;
@@ -969,5 +984,9 @@ namespace gd3d.framework
             this.color = null;
             this.uv = null;
         }
+    }
+    export enum nodeType{
+        none,
+        alpha
     }
 }

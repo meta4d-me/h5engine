@@ -332,13 +332,7 @@ namespace gd3d.framework
                                     }
                                 }
                                 data.alphaNodes.push(node);
-                                // let node = EffectUtil.parseEffectNum(_data["alphaNodes"][i]);
-                                // data.alphaNodes.push(node);
                             }
-                            // for(let i in data.alphaNodes)
-                            // {
-                            //     console.log("alphavalue:  "+data.alphaNodes[i].num.getValue()+"key:  "+data.alphaNodes[i].key);
-                            // }
                         }
 
                         if (_data["color"] != undefined)

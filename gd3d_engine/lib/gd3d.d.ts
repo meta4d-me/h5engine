@@ -2589,7 +2589,7 @@ declare namespace gd3d.framework {
         private _updateColor(delta);
         private tempStartNode;
         private tempEndNode;
-        private _updateNode(nodes, life, out);
+        private _updateNode(nodes, life, out, nodetype?);
         private _startNodeNum;
         private _curNodeNum;
         private _updateAlpha(delta);
@@ -2599,6 +2599,10 @@ declare namespace gd3d.framework {
         private _updateUV(delta);
         private _updateVBO();
         dispose(): void;
+    }
+    enum nodeType {
+        none = 0,
+        alpha = 1,
     }
 }
 declare namespace gd3d.framework {
