@@ -109,8 +109,8 @@
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
-        let names: string[] = ["particle", "fx_fs_female@attack_02", "particle_billboard", "fx_0005_sword_sword"];
-        let name = names[1];
+        let names: string[] = ["fx_0005_sword_sword", "fx_fs_female@attack_02", "particle_billboard", "fx_0005_sword_sword"];
+        let name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)
@@ -148,7 +148,6 @@
 
     tr:gd3d.framework.transform;
     ttr:gd3d.framework.transform;
-    tttr:gd3d.framework.transform;
     eff:gd3d.framework.effectSystem;
     beclone = false;
     effectloaded = false;
@@ -164,23 +163,20 @@
             {
                 this.beclone = true;
                 this.ttr = this.tr.clone(); 
-                this.tttr = this.ttr;
                 this.eff = this.ttr.gameObject.getComponent("effectSystem") as gd3d.framework.effectSystem;
                 this.scene.addChild(this.ttr);
             }
-            if(this.timer > 1.3 && !this.bestop)
-            {
-                this.bestop = true;
-                this.ttr.dispose();
-                this.ttr = null;
-                console.log(this.tttr.name);
-            }
+            // if(this.timer > 3 && !this.bestop)
+            // {
+            //     this.bestop = true;
+            //     this.eff.stop();
+            // }
 
-            if(this.timer > 6 && !this.bereplay)
-            {
-                this.bereplay = true;
-                this.eff.play();
-            }
+            // if(this.timer > 6 && !this.bereplay)
+            // {
+            //     this.bereplay = true;
+            //     this.eff.play();
+            // }
         }
     }
 }

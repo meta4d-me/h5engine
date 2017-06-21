@@ -2230,8 +2230,8 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["particle", "fx_fs_female@attack_02", "particle_billboard", "fx_0005_sword_sword"];
-        var name = names[1];
+        var names = ["fx_0005_sword_sword", "fx_fs_female@attack_02", "particle_billboard", "fx_0005_sword_sword"];
+        var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
@@ -2265,19 +2265,8 @@ var test_effect = (function () {
             if (this.timer > 1 && !this.beclone) {
                 this.beclone = true;
                 this.ttr = this.tr.clone();
-                this.tttr = this.ttr;
                 this.eff = this.ttr.gameObject.getComponent("effectSystem");
                 this.scene.addChild(this.ttr);
-            }
-            if (this.timer > 1.3 && !this.bestop) {
-                this.bestop = true;
-                this.ttr.dispose();
-                this.ttr = null;
-                console.log(this.tttr.name);
-            }
-            if (this.timer > 6 && !this.bereplay) {
-                this.bereplay = true;
-                this.eff.play();
             }
         }
     };

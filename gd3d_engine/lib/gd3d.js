@@ -8471,7 +8471,8 @@ var gd3d;
                             element.curAttrData = element.data.initFrameData.attrsData.clone();
                     }
                 }
-                this.particles.dispose();
+                if (this.particles)
+                    this.particles.dispose();
                 for (var index in this.data.elements) {
                     var data = this.data.elements[index];
                     if (data.type == framework.EffectElementTypeEnum.EmissionType) {
