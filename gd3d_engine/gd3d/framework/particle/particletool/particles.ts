@@ -202,8 +202,8 @@ namespace gd3d.framework
             this.data = _data;
             this.formate = effectSys.vf;
             this.vertexSize = gd3d.render.meshData.calcByteSize(this.formate) / 4;
-            this.curTotalVertexCount = 256;
-            this.indexStartIndex = 256;
+            this.curTotalVertexCount = 512;
+            this.indexStartIndex = 512;
 
             this.initMesh();
 
