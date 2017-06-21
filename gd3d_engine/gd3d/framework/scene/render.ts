@@ -29,7 +29,7 @@ namespace gd3d.framework
         lightmap: gd3d.framework.texture = null;
         lightmapUV: number = 1;
         lightmapOffset: gd3d.math.vector4 = new gd3d.math.vector4(1, 1, 0, 0);
-
+        fog:Fog;
         updateCamera(app: application, camera: camera)
         {
             camera.calcViewPortPixel(app, this.viewPortPixel);

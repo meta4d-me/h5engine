@@ -14,7 +14,23 @@
                 "ztest":"lequal"
             }
         ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_diffuse",
+                "fs": "fog_diffuse",
+                "zwrite":"on",
+                "ztest":"lequal"
+            }
+        ],
         "skin": [
+            {
+                "showface": "ccw",
+                "vs": "bone_eff",
+                "fs": "diffuse"
+            }
+        ],
+         "skin_fog": [
             {
                 "showface": "ccw",
                 "vs": "bone_eff",
@@ -26,6 +42,13 @@
                 "showface": "ccw",
                 "vs": "diffuselightmap",
                 "fs": "diffuselightmap"
+            }
+        ],
+        "lightmap_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_diffuselightmap",
+                "fs": "fog_diffuselightmap"
             }
         ],
         "quad": [

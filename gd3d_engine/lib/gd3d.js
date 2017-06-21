@@ -4494,6 +4494,7 @@ var gd3d;
                         this.app.getScene().addChild(willLoadRoot.children.shift());
                     }
                     _rawscene.useLightMap(this.app.getScene());
+                    _rawscene.useFog(this.app.getScene());
                 }
                 else {
                     var _camera = new framework.transform();
@@ -5911,6 +5912,15 @@ var gd3d;
                             case "glstate_lightmapUV":
                                 this.setFloat(key, context.lightmapUV);
                                 break;
+                            case "_Start":
+                                this.setFloat(key, context.fog._Start);
+                                break;
+                            case "_End":
+                                this.setFloat(key, context.fog._End);
+                                break;
+                            case "_Color":
+                                this.setVector4(key, context.fog._Color);
+                                break;
                         }
                     }
                     this.uploadUniform(pass);
@@ -6607,6 +6617,16 @@ var gd3d;
                         this.lightmaps.push(lightmap);
                     }
                 }
+                var fogData = _json["fog"];
+                if (fogData != undefined) {
+                    this.fog = new Fog();
+                    this.fog._Start = fogData["_Start"];
+                    this.fog._End = fogData["_End"];
+                    var cor = fogData["_Color"];
+                    var array = cor.split(",");
+                    this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                    this.fog._Density = fogData["_Density"];
+                }
             };
             rawscene.prototype.getSceneRoot = function () {
                 return gd3d.io.cloneObj(this.rootNode);
@@ -6616,6 +6636,9 @@ var gd3d;
                 for (var i = 0; i < this.lightmaps.length; i++) {
                     scene.lightmaps.push(this.lightmaps[i]);
                 }
+            };
+            rawscene.prototype.useFog = function (scene) {
+                scene.fog = this.fog;
             };
             rawscene.prototype.dispose = function () {
                 if (this.rootNode) {
@@ -6632,6 +6655,12 @@ var gd3d;
             __metadata("design:paramtypes", [String])
         ], rawscene);
         framework.rawscene = rawscene;
+        var Fog = (function () {
+            function Fog() {
+            }
+            return Fog;
+        }());
+        framework.Fog = Fog;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9004,9 +9033,9 @@ var gd3d;
                                 var sm = mesh.submesh[i];
                                 var mid = mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
-                                var drawtype = "base";
+                                var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
                                 if (this.lightmapIndex >= 0) {
-                                    drawtype = "lightmap";
+                                    drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                     if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
                                         context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
                                         context.lightmapOffset = this.lightmapScaleOffset;
@@ -9014,6 +9043,9 @@ var gd3d;
                                     }
                                 }
                                 else {
+                                }
+                                if (this.gameObject.transform.scene.fog) {
+                                    context.fog = this.gameObject.transform.scene.fog;
                                 }
                                 if (usemat != null)
                                     usemat.draw(context, mesh, sm, drawtype);

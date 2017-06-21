@@ -205,6 +205,7 @@ var main = (function () {
         this.addBtn("effect", function () { return new test_effect(); });
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
+        this.addBtn("test_tex_uv", function () { return new test_texuv(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -2706,7 +2707,7 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        var names = ["city", "chuangjue-01"];
+        var names = ["city", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[1];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -2720,6 +2721,7 @@ var test_loadScene = (function () {
                         _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
                         _this.app.getScene().lightmaps = [];
                         _scene.useLightMap(_this.app.getScene());
+                        _scene.useFog(_this.app.getScene());
                     }
                 });
             }
@@ -3089,10 +3091,10 @@ var test_multipleplayer_anim = (function () {
                 _this.app.getAssetMgr().load("res/" + data_1.abName, gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
-                        var a = 20;
+                        var a = 10;
                         var b = 10;
-                        for (var i = -8; i <= 8; i++) {
-                            for (var j = -8; j <= 8; j++) {
+                        for (var i = -7; i <= 7; i++) {
+                            for (var j = -7; j <= 7; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);
@@ -3863,16 +3865,9 @@ var t;
             this.showcamera.order = 0;
             this.showcamera.near = 0.01;
             this.showcamera.far = 1000;
-            objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, -50);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
-            var mat = DBgetMat("rock256.png");
-            var trans = DBgetAtrans(mat);
-            this.scene.addChild(trans);
-            trans.localScale.y = 0.1;
-            trans.localScale.x = trans.localScale.z = 40;
-            trans.localTranslate.y = -1;
-            trans.markDirty();
             var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
             var path = this.app.getAssetMgr().getAssetByName("circlepath.path.json");
             var path2 = this.app.getAssetMgr().getAssetByName("circlepath_2.path.json");
@@ -3979,9 +3974,9 @@ var t;
             shaderstring = "diffuse.shader.json";
         }
         var shader = gd3d.framework.sceneMgr.app.getAssetMgr().getShader(shaderstring);
-        var tex = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(texname);
         mat.setShader(shader);
         if (texname != null) {
+            var tex = gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(texname);
             mat.setTexture("_MainTex", tex);
         }
         return mat;
@@ -5198,6 +5193,48 @@ var t;
     }());
     t.test_trailrenderrecorde = test_trailrenderrecorde;
 })(t || (t = {}));
+var test_texuv = (function () {
+    function test_texuv() {
+        this.timer = 0;
+    }
+    test_texuv.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.app.getAssetMgr().load("res/trailtest_yellow.png", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                    if (state.isfinish) {
+                        var mat = t.DBgetMat("trailtest_yellow.png");
+                        var trans1 = t.DBgetAtrans(mat);
+                        _this.scene.addChild(trans1);
+                        var mat2 = t.DBgetMat(null, "testtexuv.shader.json");
+                        var trans2 = t.DBgetAtrans(mat2);
+                        _this.scene.addChild(trans2);
+                        trans1.localTranslate.x = -1;
+                        trans2.localTranslate.x = 1;
+                        trans1.markDirty();
+                        trans2.markDirty();
+                    }
+                });
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 2, 5);
+        objCam.lookatPoint(new gd3d.math.vector3());
+        objCam.markDirty();
+    };
+    test_texuv.prototype.update = function (delta) {
+    };
+    return test_texuv;
+}());
 var t;
 (function (t) {
     var test_trailrender = (function () {

@@ -72,10 +72,10 @@ namespace gd3d.framework
 
                             var mid = mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质
                             var usemat = this.materials[mid];
-                            var drawtype = "base";
+                            var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
                             if (this.lightmapIndex >= 0)
                             {
-                                drawtype = "lightmap";
+                                drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                 //usemat.shaderStatus = shaderStatus.Lightmap;
                                 if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex)
                                 {
@@ -87,6 +87,10 @@ namespace gd3d.framework
                             else
                             {
                                 //usemat.shaderStatus = shaderStatus.Base;
+                            }
+                            if (this.gameObject.transform.scene.fog)
+                            {
+                                context.fog = this.gameObject.transform.scene.fog;
                             }
                             if (usemat != null)
                                 usemat.draw(context, mesh, sm, drawtype);
