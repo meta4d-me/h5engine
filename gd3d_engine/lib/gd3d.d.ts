@@ -352,8 +352,8 @@ declare namespace gd3d.render {
         repeat: boolean;
         mirroredU: boolean;
         mirroredV: boolean;
-        updateRect(id: string, data: Uint8Array, x: number, y: number, width: number, height: number): void;
-        updateRectImg(id: string, data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
+        updateRect(data: Uint8Array, x: number, y: number, width: number, height: number): void;
+        updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
         isFrameBuffer(): boolean;
         webgl: WebGLRenderingContext;
         texture: WebGLTexture;

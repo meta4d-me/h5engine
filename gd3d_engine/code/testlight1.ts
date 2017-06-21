@@ -36,10 +36,13 @@
                     da[seek + 2] = 230;
                     da[seek + 3] = 230;
                 }
-            wt.updateRect("aa", da, 50, 50, 256, 256);
+            wt.updateRect(da, 256, 256, 256, 256);
+
+            //用圖片填充貼圖部分數據
             var img = new Image();
             img.onload = (e) => {
                 state.finish = true;
+                wt.updateRectImg( img, 0, 0);
             };
 
             img.src = "res/zg256.png";

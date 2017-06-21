@@ -1595,11 +1595,11 @@ var gd3d;
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
                 }
             }
-            WriteableTexture2D.prototype.updateRect = function (id, data, x, y, width, height) {
+            WriteableTexture2D.prototype.updateRect = function (data, x, y, width, height) {
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, width, height, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
             };
-            WriteableTexture2D.prototype.updateRectImg = function (id, data, x, y) {
+            WriteableTexture2D.prototype.updateRectImg = function (data, x, y) {
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
             };

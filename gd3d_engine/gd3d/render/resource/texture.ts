@@ -522,7 +522,7 @@
         repeat: boolean = false;
         mirroredU: boolean = false;
         mirroredV: boolean = false
-        updateRect(id: string, data: Uint8Array, x: number, y: number, width: number, height: number) {
+        updateRect(data: Uint8Array, x: number, y: number, width: number, height: number) {
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
 
             this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0,
@@ -531,7 +531,7 @@
                 this.webgl.UNSIGNED_BYTE,
                 data);
         }
-        updateRectImg(id: string, data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number) {
+        updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number) {
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0,
                 x, y,
