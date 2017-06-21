@@ -1885,8 +1885,7 @@ var test_loadAsiprefab = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
-        this.camera.backgroundColor = new gd3d.math.color(0, 0, 0, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 8, 10);
+        objCam.localTranslate = new gd3d.math.vector3(0, 5, 5);
         objCam.markDirty();
     };
     test_loadAsiprefab.prototype.update = function (delta) {
