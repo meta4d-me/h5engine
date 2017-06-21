@@ -742,6 +742,15 @@ declare namespace t {
         private addbtn(top, left, text);
     }
 }
+declare class test_texuv implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    baihu: gd3d.framework.transform;
+    timer: number;
+    update(delta: number): void;
+}
 declare namespace t {
     class test_trailrender implements IState {
         app: gd3d.framework.application;

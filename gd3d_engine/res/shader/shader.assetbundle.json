@@ -347,6 +347,18 @@
         {
             "name": "resources/project/flowwater.fs.glsl",
             "length": 0
+        },
+        {
+            "name": "resources/test/testtexuv.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/test/testtexuv.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/test/testtexuv.fs.glsl",
+            "length": 0
         }
     ]
 }

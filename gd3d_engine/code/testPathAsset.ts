@@ -299,10 +299,10 @@ namespace t {
             shaderstring="diffuse.shader.json";
         }
         var shader=gd3d.framework.sceneMgr.app.getAssetMgr().getShader(shaderstring);
-        var tex=gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(texname)as gd3d.framework.texture;
         mat.setShader(shader);
         if(texname!=null)
         {
+            var tex=gd3d.framework.sceneMgr.app.getAssetMgr().getAssetByName(texname)as gd3d.framework.texture;
             mat.setTexture("_MainTex",tex);
         }
         return mat;
