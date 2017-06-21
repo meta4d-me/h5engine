@@ -12,6 +12,17 @@
                 "fs": "white"
             }
         ],
+        "base_fog": [
+            {
+                "showface": "all",
+                "vs": "fog_color",
+                "fs": "fog_color"
+            },
+            {
+                "vs": "fog_color",
+                "fs": "fog_white"
+            }
+        ],
         "shadowgen": [],
         "bone": [],
         "shadowuse": []
