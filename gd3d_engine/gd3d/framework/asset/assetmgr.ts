@@ -1541,6 +1541,9 @@ namespace gd3d.framework
 
                 //lightmap
                 _rawscene.useLightMap(this.app.getScene());
+                //fog
+                _rawscene.useFog(this.app.getScene());
+                
             }
             else
             {

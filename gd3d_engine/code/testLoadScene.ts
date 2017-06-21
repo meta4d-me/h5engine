@@ -10,7 +10,7 @@ class test_loadScene implements IState
 
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        let names: string[] = ["city", "chuangjue-01"];
+        let names: string[] = ["city", "xinshoucun_fuben_day","chuangjue-01"];
         let name = names[1];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
@@ -47,6 +47,7 @@ class test_loadScene implements IState
                             _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
                             this.app.getScene().lightmaps = [];
                             _scene.useLightMap(this.app.getScene());
+                            _scene.useFog(this.app.getScene());
                             // });
                         }
                     });

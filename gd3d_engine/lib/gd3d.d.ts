@@ -981,6 +981,7 @@ declare namespace gd3d.framework {
         private name;
         private id;
         defaultAsset: boolean;
+        fog: Fog;
         constructor(assetName?: string);
         getName(): string;
         getGUID(): number;
@@ -991,9 +992,16 @@ declare namespace gd3d.framework {
         Parse(txt: string, assetmgr: assetMgr): void;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
+        useFog(scene: scene): void;
         dispose(): void;
         private rootNode;
         private lightmaps;
+    }
+    class Fog {
+        _Start: number;
+        _End: number;
+        _Color: gd3d.math.vector4;
+        _Density: number;
     }
 }
 declare namespace gd3d.framework {
@@ -1508,7 +1516,7 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
-        caclPlaneDis(v0: math.vector3, v1: math.vector3, v2: math.vector3): number;
+        caclPlaneInDir(v0: math.vector3, v1: math.vector3, v2: math.vector3): boolean;
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();
@@ -2734,6 +2742,7 @@ declare namespace gd3d.framework {
         lightmap: gd3d.framework.texture;
         lightmapUV: number;
         lightmapOffset: gd3d.math.vector4;
+        fog: Fog;
         updateCamera(app: application, camera: camera): void;
         updateLights(lights: light[]): void;
         updateOverlay(): void;
@@ -2778,6 +2787,7 @@ declare namespace gd3d.framework {
         private renderContext;
         private renderLights;
         lightmaps: texture[];
+        fog: Fog;
         update(delta: number): void;
         private RealCameraNumber;
         private _renderCamera(camindex);

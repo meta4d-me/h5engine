@@ -42,6 +42,7 @@ namespace gd3d.framework
         private renderContext: renderContext[] = [];
         private renderLights: light[] = [];//需要光源 class
         lightmaps: texture[] = [];//lightmap
+        fog:Fog;
         update(delta: number)
         {
             //更新矩阵

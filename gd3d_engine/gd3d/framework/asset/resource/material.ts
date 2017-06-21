@@ -473,6 +473,15 @@ namespace gd3d.framework
                         case "glstate_lightmapUV":
                             this.setFloat(key, context.lightmapUV);
                             break;
+                        case "_Start":
+                            this.setFloat(key, context.fog._Start);
+                            break;
+                        case "_End":
+                            this.setFloat(key, context.fog._End);
+                            break;
+                        case "_Color":
+                            this.setVector4(key, context.fog._Color);
+                            break;
                     }
                 }
                 this.uploadUniform(pass);
