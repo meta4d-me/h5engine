@@ -2953,6 +2953,7 @@ declare namespace gd3d.framework {
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
+        beDispose: boolean;
         dispose(): void;
     }
     class insID {

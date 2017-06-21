@@ -18250,6 +18250,7 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
@@ -18632,6 +18633,8 @@ var gd3d;
                 return gd3d.io.cloneObj(this);
             };
             transform.prototype.dispose = function () {
+                if (this.beDispose)
+                    return;
                 if (this.children) {
                     for (var k in this.children) {
                         this.children[k].dispose();
@@ -18639,6 +18642,7 @@ var gd3d;
                     this.removeAllChild();
                 }
                 this._gameObject.dispose();
+                this.beDispose = true;
             };
             return transform;
         }());

@@ -148,6 +148,7 @@
 
     tr:gd3d.framework.transform;
     ttr:gd3d.framework.transform;
+    tttr:gd3d.framework.transform;
     eff:gd3d.framework.effectSystem;
     beclone = false;
     effectloaded = false;
@@ -163,13 +164,16 @@
             {
                 this.beclone = true;
                 this.ttr = this.tr.clone(); 
+                this.tttr = this.ttr;
                 this.eff = this.ttr.gameObject.getComponent("effectSystem") as gd3d.framework.effectSystem;
                 this.scene.addChild(this.ttr);
             }
             if(this.timer > 1.3 && !this.bestop)
             {
                 this.bestop = true;
-                this.eff.stop();
+                this.ttr.dispose();
+                this.ttr = null;
+                console.log(this.tttr.name);
             }
 
             if(this.timer > 6 && !this.bereplay)

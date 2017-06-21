@@ -329,6 +329,7 @@ declare class test_effect implements IState {
     private addcam(laststate, state);
     tr: gd3d.framework.transform;
     ttr: gd3d.framework.transform;
+    tttr: gd3d.framework.transform;
     eff: gd3d.framework.effectSystem;
     beclone: boolean;
     effectloaded: boolean;
