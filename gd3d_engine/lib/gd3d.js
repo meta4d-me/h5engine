@@ -8281,12 +8281,17 @@ var gd3d;
                 },
                 set: function (value) {
                     this._data = value;
-                    this.addElements();
                 },
                 enumerable: true,
                 configurable: true
             });
+            effectSystem.prototype.init = function () {
+                if (this._data) {
+                    this.addElements();
+                }
+            };
             effectSystem.prototype.start = function () {
+                this.init();
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
@@ -8464,6 +8469,16 @@ var gd3d;
                         element.setActive(true);
                         if (element.data.initFrameData != undefined)
                             element.curAttrData = element.data.initFrameData.attrsData.clone();
+                    }
+                }
+                this.particles.dispose();
+                for (var index in this.data.elements) {
+                    var data = this.data.elements[index];
+                    if (data.type == framework.EffectElementTypeEnum.EmissionType) {
+                        if (this.particles == undefined) {
+                            this.particles = new framework.Particles(this);
+                        }
+                        this.particles.addEmission(data.emissionData);
                     }
                 }
             };
@@ -11774,7 +11789,7 @@ var gd3d;
         function isAsset(type) {
             if (type == "mesh" || type == "texture" || type == "shader" ||
                 type == "material" || type == "animationClip" || type == "atlas" ||
-                type == "font" || type == "prefab" || type == "sprite")
+                type == "font" || type == "prefab" || type == "sprite" || type == "textasset")
                 return true;
             return false;
         }
@@ -14017,6 +14032,7 @@ var gd3d;
                 elementdata.name = this.name;
                 elementdata.type = this.type;
                 elementdata.ref = this.ref;
+                elementdata.actionData = [];
                 if (this.initFrameData)
                     elementdata.initFrameData = this.initFrameData.clone();
                 if (this.emissionData) {
@@ -14224,6 +14240,7 @@ var gd3d;
                 actiondata.actionType = this.actionType;
                 actiondata.startFrame = this.startFrame;
                 actiondata.endFrame = this.endFrame;
+                actiondata.params = [];
                 for (var key in this.params) {
                     actiondata.params[key] = this.params[key];
                 }
@@ -16225,6 +16242,7 @@ var gd3d;
                 for (var key in this.emissionElements) {
                     this.emissionElements[key].dispose();
                 }
+                this.emissionElements.length = 0;
             };
             return Particles;
         }());
@@ -16313,6 +16331,7 @@ var gd3d;
                 for (var key in this.emissionBatchers) {
                     this.emissionBatchers[key].dispose();
                 }
+                this.emissionBatchers.length = 0;
             };
             EmissionElement.prototype.isOver = function () {
                 return this.isover;
@@ -16338,6 +16357,20 @@ var gd3d;
                 this.vertexSize = gd3d.render.meshData.calcByteSize(this.formate) / 4;
                 this.curTotalVertexCount = 256;
                 this.indexStartIndex = 256;
+                this.initMesh();
+                this.mat = new framework.material();
+                if (this.data.mat.shader == null) {
+                    this.mat.setShader(framework.sceneMgr.app.getAssetMgr().getShader("diffuse.shader.json"));
+                }
+                else {
+                    this.mat.setShader(this.data.mat.shader);
+                }
+                if (this.data.mat.alphaCut != undefined)
+                    this.mat.setFloat("_AlphaCut", this.data.mat.alphaCut);
+                if (this.data.mat.diffuseTexture != null)
+                    this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
+            }
+            EmissionBatcher.prototype.initMesh = function () {
                 this.mesh = new framework.mesh();
                 this.mesh.data = new gd3d.render.meshData();
                 this.mesh.glMesh = new gd3d.render.glMesh();
@@ -16351,18 +16384,7 @@ var gd3d;
                     sm.line = false;
                     this.mesh.submesh.push(sm);
                 }
-                this.mat = new framework.material();
-                if (this.data.mat.shader == null) {
-                    this.mat.setShader(framework.sceneMgr.app.getAssetMgr().getShader("diffuse.shader.json"));
-                }
-                else {
-                    this.mat.setShader(this.data.mat.shader);
-                }
-                if (this.data.mat.alphaCut != undefined)
-                    this.mat.setFloat("_AlphaCut", this.data.mat.alphaCut);
-                if (this.data.mat.diffuseTexture != null)
-                    this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
-            }
+            };
             EmissionBatcher.prototype.addParticle = function () {
                 var p = new Particle(this);
                 p.uploadData(this.dataForVbo);
@@ -18228,6 +18250,7 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
@@ -18610,6 +18633,8 @@ var gd3d;
                 return gd3d.io.cloneObj(this);
             };
             transform.prototype.dispose = function () {
+                if (this.beDispose)
+                    return;
                 if (this.children) {
                     for (var k in this.children) {
                         this.children[k].dispose();
@@ -18617,6 +18642,7 @@ var gd3d;
                     this.removeAllChild();
                 }
                 this._gameObject.dispose();
+                this.beDispose = true;
             };
             return transform;
         }());

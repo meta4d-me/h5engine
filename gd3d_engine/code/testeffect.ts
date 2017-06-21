@@ -109,19 +109,20 @@
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
-        let names: string[] = ["particle", "fx_ss_female@attack_03", "particle_billboard", "fx_0005_sword_sword"];
-        let name = names[3];
+        let names: string[] = ["particle", "fx_fs_female@attack_02", "particle_billboard", "fx_0005_sword_sword"];
+        let name = names[1];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)
             {
-                let tr = new gd3d.framework.transform();
-                this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
+                this.tr = new gd3d.framework.transform();
+                this.effect = this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
                 var text: gd3d.framework.textasset = this.app.getAssetMgr().getAssetByName(name + ".effect.json") as gd3d.framework.textasset;
                 this.effect.setJsonData(text);
-                this.scene.addChild(tr);
-                tr.markDirty();
+                // this.scene.addChild(this.tr);
+                this.tr.markDirty();
                 state.finish = true;
+                this.effectloaded = true;
             }
         }
         );
@@ -145,11 +146,41 @@
         state.finish = true;
     }
 
-
+    tr:gd3d.framework.transform;
+    ttr:gd3d.framework.transform;
+    tttr:gd3d.framework.transform;
+    eff:gd3d.framework.effectSystem;
     beclone = false;
+    effectloaded = false;
+    bestop = false;
+    bereplay = false;
     update(delta: number)
     {
         this.taskmgr.move(delta);
-        this.timer += delta;
+        if(this.effectloaded)
+        {
+            this.timer += delta;
+            if(this.timer > 1 && !this.beclone)
+            {
+                this.beclone = true;
+                this.ttr = this.tr.clone(); 
+                this.tttr = this.ttr;
+                this.eff = this.ttr.gameObject.getComponent("effectSystem") as gd3d.framework.effectSystem;
+                this.scene.addChild(this.ttr);
+            }
+            if(this.timer > 1.3 && !this.bestop)
+            {
+                this.bestop = true;
+                this.ttr.dispose();
+                this.ttr = null;
+                console.log(this.tttr.name);
+            }
+
+            if(this.timer > 6 && !this.bereplay)
+            {
+                this.bereplay = true;
+                this.eff.play();
+            }
+        }
     }
 }

@@ -366,6 +366,7 @@ namespace gd3d.framework
             elementdata.name = this.name;
             elementdata.type = this.type;
             elementdata.ref = this.ref;
+            elementdata.actionData = [];
             if (this.initFrameData)
                 elementdata.initFrameData = this.initFrameData.clone();
 
@@ -655,6 +656,7 @@ namespace gd3d.framework
             actiondata.actionType = this.actionType;
             actiondata.startFrame = this.startFrame;
             actiondata.endFrame = this.endFrame;
+            actiondata.params = [];
             for (let key in this.params)
             {
                 actiondata.params[key] = this.params[key];

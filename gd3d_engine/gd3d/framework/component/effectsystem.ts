@@ -41,16 +41,22 @@ namespace gd3d.framework
         set data(value: EffectSystemData)
         {
             this._data = value;
-            this.addElements();
         }
         get data(): EffectSystemData
         {
             return this._data;
         }
+        init()
+        {
+            if(this._data)
+            {
+                this.addElements();
+            }
+        }
         private _data: EffectSystemData;
         start()
         {
-
+            this.init();
         }
         update(delta: number)
         {
@@ -334,6 +340,20 @@ namespace gd3d.framework
                     element.setActive(true);
                     if (element.data.initFrameData != undefined)//引用问题还没处理
                         element.curAttrData = element.data.initFrameData.attrsData.clone();
+                }
+            }
+            this.particles.dispose();
+            
+            for (let index in this.data.elements)
+            {
+                let data = this.data.elements[index];
+                if (data.type == EffectElementTypeEnum.EmissionType)
+                {
+                    if (this.particles == undefined)
+                    {
+                        this.particles = new Particles(this);
+                    }
+                    this.particles.addEmission(data.emissionData);
                 }
             }
         }

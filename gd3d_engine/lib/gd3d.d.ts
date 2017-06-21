@@ -1336,6 +1336,7 @@ declare namespace gd3d.framework {
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
+        init(): void;
         private _data;
         start(): void;
         update(delta: number): void;
@@ -2543,6 +2544,7 @@ declare namespace gd3d.framework {
         formate: number;
         effectSys: effectSystem;
         constructor(_data: Emission, effectSys: effectSystem);
+        initMesh(): void;
         curVerCount: number;
         curIndexCount: number;
         addParticle(): void;
@@ -2951,6 +2953,7 @@ declare namespace gd3d.framework {
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
+        beDispose: boolean;
         dispose(): void;
     }
     class insID {
