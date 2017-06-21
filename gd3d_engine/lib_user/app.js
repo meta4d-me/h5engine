@@ -3070,10 +3070,10 @@ var test_multipleplayer_anim = (function () {
                 _this.app.getAssetMgr().load("res/" + data_1.abName, gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
-                        var a = 20;
+                        var a = 10;
                         var b = 10;
-                        for (var i = -8; i <= 8; i++) {
-                            for (var j = -8; j <= 8; j++) {
+                        for (var i = -7; i <= 7; i++) {
+                            for (var j = -7; j <= 7; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);

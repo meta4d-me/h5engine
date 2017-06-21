@@ -36,11 +36,11 @@ class test_multipleplayer_anim implements IState
                     if (s.isfinish)
                     {
                         var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(data.prefabName) as gd3d.framework.prefab;
-                        let a = 20;
+                        let a = 10;
                         let b = 10;
-                        for (let i = -8; i <=8; i++)
+                        for (let i = -7; i <=7; i++)
                         {
-                            for (let j = -8; j <=8; j++)
+                            for (let j = -7; j <=7; j++)
                             {
                                 let trans = _prefab.getCloneTrans();
 
