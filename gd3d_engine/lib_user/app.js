@@ -2687,7 +2687,7 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        var names = ["city", "chuangjue-01"];
+        var names = ["city", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[1];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -2701,6 +2701,7 @@ var test_loadScene = (function () {
                         _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
                         _this.app.getScene().lightmaps = [];
                         _scene.useLightMap(_this.app.getScene());
+                        _scene.useFog(_this.app.getScene());
                     }
                 });
             }
@@ -3844,16 +3845,9 @@ var t;
             this.showcamera.order = 0;
             this.showcamera.near = 0.01;
             this.showcamera.far = 1000;
-            objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, -50);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
-            var mat = DBgetMat("rock256.png");
-            var trans = DBgetAtrans(mat);
-            this.scene.addChild(trans);
-            trans.localScale.y = 0.1;
-            trans.localScale.x = trans.localScale.z = 40;
-            trans.localTranslate.y = -1;
-            trans.markDirty();
             var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
             var path = this.app.getAssetMgr().getAssetByName("circlepath.path.json");
             var path2 = this.app.getAssetMgr().getAssetByName("circlepath_2.path.json");
