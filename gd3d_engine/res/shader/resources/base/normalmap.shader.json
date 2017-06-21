@@ -8,6 +8,13 @@
 				"fs": "normalmap"
 			}
 		],
+		"base_fog": [
+			{
+				"showface": "all",
+				"vs": "fog_normalmap",
+				"fs": "fog_normalmap"
+			}
+		],
 		"shadowgen": [],
 		"bone": [],
 		"shadowuse": []

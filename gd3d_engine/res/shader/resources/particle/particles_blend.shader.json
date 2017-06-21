@@ -10,6 +10,14 @@
             "fs": "particles_transparent"
           }
         ],
+        "base_fog": [
+          {
+            "blendmode":"blend",
+            "showface": "all",
+            "vs": "fog_particles_transparent",
+            "fs": "fog_particles_transparent"
+          }
+        ],
         "shadowgen": [],  
         "bone": [],
         "shadowuse": []

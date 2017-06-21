@@ -11,6 +11,15 @@
         "fs": "flowwater"
       }
     ],
+    "base_fog": [
+      {
+        "blendmode": "blend",
+        "showface": "ccw",
+        "zwrite": "off",
+        "vs": "fog_flowwater",
+        "fs": "fog_flowwater"
+      }
+    ],
     "shadowgen": [],
     "bone": [],
     "shadowuse": []

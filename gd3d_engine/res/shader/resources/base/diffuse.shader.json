@@ -26,8 +26,8 @@
         "skin": [
             {
                 "showface": "ccw",
-                "vs": "bone_eff",
-                "fs": "diffuse"
+                "vs": "fog_bone_eff",
+                "fs": "fog_diffuse"
             }
         ],
          "skin_fog": [
