@@ -2,7 +2,7 @@ uniform sampler2D _MainTex;
 uniform lowp float _AlphaCut;
 uniform highp vec4 _Color; 
 
-varying highp float factor;    
+varying highp float factor; 
 varying highp vec2 xlv_TEXCOORD0;
 void main() 
 {

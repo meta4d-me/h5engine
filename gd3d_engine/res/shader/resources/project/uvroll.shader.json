@@ -9,6 +9,13 @@
                 "fs": "uvroll"
             }
         ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_uvroll",
+                "fs": "fog_uvroll"
+            }
+        ],
         "shadowgen": [],
         "bone": [],
         "shadowuse": []

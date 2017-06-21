@@ -13,6 +13,14 @@
                 "fs": "transparent_add"
             }
         ],
+        "base_fog": [
+            {
+                "blendmode": "add",
+                "showface": "ccw",
+                "vs": "fog_transparent",
+                "fs": "fog_transparent_add"
+            }
+        ],
         "skin": [
             {
                 "showface": "ccw",
@@ -21,11 +29,25 @@
                 "fs": "transparent_add"
             }
         ],
+        "skin_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_bone_eff",
+                "fs": "fog_transparent_add"
+            }
+        ],
         "lightmap": [
             {
                 "showface": "ccw",
                 "vs": "diffuselightmap",
                 "fs": "diffuselightmap"
+            }
+        ],
+        "lightmap_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_diffuselightmap",
+                "fs": "fog_diffuselightmap"
             }
         ],
         "quad": [

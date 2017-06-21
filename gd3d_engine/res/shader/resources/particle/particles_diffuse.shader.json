@@ -10,6 +10,14 @@
             "fs": "particles_diffuse"
           }
         ],
+        "base_fog": [
+          {
+            "blendmode":"close",
+            "showface": "all",
+            "vs": "fog_particles_diffuse",
+            "fs": "fog_particles_diffuse"
+          }
+        ],
         "shadowgen": [],  
         "bone": [],
         "shadowuse": []
