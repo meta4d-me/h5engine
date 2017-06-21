@@ -4,6 +4,7 @@
     {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
+        tex: gd3d.framework.texture;
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
@@ -18,18 +19,31 @@
 
         private loadText(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
-            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, (s) => 
-            {
-                if (s.isfinish) 
+            //創建一個貼圖
+            this.tex = new gd3d.framework.texture();
+            this.tex.glTexture = new gd3d.render.WriteableTexture2D(this.app.webgl, gd3d.render.TextureFormatEnum.RGBA, 512, 512, true);
+            var wt = this.tex.glTexture as gd3d.render.WriteableTexture2D;
+
+
+            //填充貼圖部分數據
+            var da = new Uint8Array(256 * 256 * 4);
+            for (var x = 0; x < 256; x++)
+                for (var y = 0; y < 256; y++)
                 {
-                    state.finish = true;
+                    var seek = y * 256 * 4 + x * 4;
+                    da[seek] = 235;
+                    da[seek + 1] = 50;
+                    da[seek + 2] = 230;
+                    da[seek + 3] = 230;
                 }
-                else
-                {
-                    state.error = true;
-                }
-            }
-            );
+            wt.updateRect("aa", da, 50, 50, 256, 256);
+            var img = new Image();
+            img.onload = (e) => {
+                state.finish = true;
+            };
+
+            img.src = "res/zg256.png";
+
         }
 
         private addcube(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
@@ -59,8 +73,8 @@
                         cuber.materials[0].setShader(sh);//----------------使用shader
                         //cuber.materials[0].setVector4("_Color", new gd3d.math.vector4(0.4, 0.4, 0.2, 1.0));
 
-                        let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
-                        cuber.materials[0].setTexture("_MainTex", texture);
+                        //let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
+                        cuber.materials[0].setTexture("_MainTex", this.tex);
 
                     }
 
