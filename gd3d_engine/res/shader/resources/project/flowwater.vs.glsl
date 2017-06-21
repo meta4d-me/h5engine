@@ -12,7 +12,7 @@ varying highp vec2 _base_uv;
 
 void main()
 {
-    highp vec2 _speed= vec2(_speedu,_speedv);
+    highp vec2 _speed= vec2(_speedu,-_speedv);
 	_base_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw+ _speed * glstate_timer;
 
 	gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
