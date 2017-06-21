@@ -2158,6 +2158,9 @@ var test_effect = (function () {
         this.timer = 0;
         this.taskmgr = new gd3d.framework.taskMgr();
         this.beclone = false;
+        this.effectloaded = false;
+        this.bestop = false;
+        this.bereplay = false;
     }
     test_effect.prototype.loadShader = function (laststate, state) {
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
@@ -2226,17 +2229,17 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["particle", "fx_ss_female@attack_03", "particle_billboard", "fx_0005_sword_sword"];
-        var name = names[3];
+        var names = ["particle", "fx_fs_female@attack_02", "particle_billboard", "fx_0005_sword_sword"];
+        var name = names[1];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
-                var tr = new gd3d.framework.transform();
-                _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+                _this.tr = new gd3d.framework.transform();
+                _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
                 var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
                 _this.effect.setJsonData(text);
-                _this.scene.addChild(tr);
-                tr.markDirty();
+                _this.tr.markDirty();
                 state.finish = true;
+                _this.effectloaded = true;
             }
         });
     };
@@ -2256,7 +2259,23 @@ var test_effect = (function () {
     };
     test_effect.prototype.update = function (delta) {
         this.taskmgr.move(delta);
-        this.timer += delta;
+        if (this.effectloaded) {
+            this.timer += delta;
+            if (this.timer > 1 && !this.beclone) {
+                this.beclone = true;
+                this.ttr = this.tr.clone();
+                this.eff = this.ttr.gameObject.getComponent("effectSystem");
+                this.scene.addChild(this.ttr);
+            }
+            if (this.timer > 1.3 && !this.bestop) {
+                this.bestop = true;
+                this.eff.stop();
+            }
+            if (this.timer > 6 && !this.bereplay) {
+                this.bereplay = true;
+                this.eff.play();
+            }
+        }
     };
     return test_effect;
 }());

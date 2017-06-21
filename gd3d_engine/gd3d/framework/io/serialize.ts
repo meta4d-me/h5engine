@@ -905,7 +905,7 @@ namespace gd3d.io
         //rawscene比较特殊、不可能存在结构中
         if (type == "mesh" || type == "texture" || type == "shader" ||
             type == "material" || type == "animationClip" || type == "atlas" ||
-            type == "font" || type == "prefab" || type == "sprite")
+            type == "font" || type == "prefab" || type == "sprite" || type == "textasset")
             return true;
         return false;
     }

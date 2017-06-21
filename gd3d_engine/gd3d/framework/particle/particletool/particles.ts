@@ -39,6 +39,7 @@ namespace gd3d.framework
             {
                 this.emissionElements[key].dispose();
             }
+            this.emissionElements.length = 0;
         }
     }
     //发射器也作为特效系统的一个元素
@@ -165,6 +166,7 @@ namespace gd3d.framework
             {
                 this.emissionBatchers[key].dispose();
             }
+            this.emissionBatchers.length = 0;
         }
         public isOver(): boolean
         {
@@ -203,20 +205,7 @@ namespace gd3d.framework
             this.curTotalVertexCount = 256;
             this.indexStartIndex = 256;
 
-            //初始化mesh信息
-            this.mesh = new mesh();
-            this.mesh.data = new render.meshData();
-            this.mesh.glMesh = new render.glMesh();
-            this.mesh.submesh = [];
-            {
-                var sm = new subMeshInfo();
-                sm.matIndex = 0;
-                sm.useVertexIndex = 0;
-                sm.start = 0;
-                sm.size = 0;
-                sm.line = false;
-                this.mesh.submesh.push(sm);
-            }
+            this.initMesh();
 
             //初始化材质信息
             this.mat = new material();
@@ -232,6 +221,23 @@ namespace gd3d.framework
                 this.mat.setFloat("_AlphaCut", this.data.mat.alphaCut);
             if (this.data.mat.diffuseTexture != null)
                 this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
+        }
+
+        initMesh()
+        {
+            this.mesh = new mesh();
+            this.mesh.data = new render.meshData();
+            this.mesh.glMesh = new render.glMesh();
+            this.mesh.submesh = [];
+            {
+                var sm = new subMeshInfo();
+                sm.matIndex = 0;
+                sm.useVertexIndex = 0;
+                sm.start = 0;
+                sm.size = 0;
+                sm.line = false;
+                this.mesh.submesh.push(sm);
+            }
         }
 
         public curVerCount: number = 0;
