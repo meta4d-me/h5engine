@@ -2230,8 +2230,8 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_0005_sword_sword", "fx_fs_female@attack_02", "particle_billboard", "fx_0005_sword_sword"];
-        var name = names[0];
+        var names = ["fx_0005_sword_sword", "fx_fs_female@attack_02", "fx_xunlu", "fx_0005_sword_sword"];
+        var name = names[2];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
@@ -3085,8 +3085,8 @@ var test_multipleplayer_anim = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
                         var a = 10;
                         var b = 10;
-                        for (var i = -7; i <= 7; i++) {
-                            for (var j = -7; j <= 7; j++) {
+                        for (var i = -14; i <= 14; i++) {
+                            for (var j = -14; j <= 14; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);
@@ -3115,14 +3115,6 @@ var test_multipleplayer_anim = (function () {
         objCam.markDirty();
     };
     test_multipleplayer_anim.prototype.update = function (delta) {
-        this.timer += delta;
-        var x = Math.sin(this.timer * 0.5);
-        var z = Math.cos(this.timer * 0.5);
-        var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x * 86, 55, -z * 86);
-        objCam.lookat(this.cube);
-        objCam.markDirty();
-        objCam.updateWorldTran();
     };
     return test_multipleplayer_anim;
 }());

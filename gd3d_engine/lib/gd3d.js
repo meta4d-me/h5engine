@@ -8557,7 +8557,7 @@ var gd3d;
                 }
                 element.effectBatcher = subEffectBatcher;
                 element.startIndex = vertexStartIndex;
-                element.curAttrData = elementData.initFrameData.attrsData.clone();
+                element.curAttrData = elementData.initFrameData.attrsData.copyandinit();
                 var vertexSize = subEffectBatcher.vertexSize;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
@@ -13820,7 +13820,7 @@ var gd3d;
                     for (var i in this.data.timelineFrame) {
                         var frameData = this.data.timelineFrame[i];
                         if (frameData.frameIndex != -1) {
-                            if (frameData.lerpDatas != undefined) {
+                            if (frameData.lerpDatas != undefined && frameData.lerpDatas.length != 0) {
                                 this.recordLerpValues(frameData);
                             }
                             else if (frameData.attrsData != undefined) {
@@ -14034,14 +14034,15 @@ var gd3d;
                 elementdata.type = this.type;
                 elementdata.ref = this.ref;
                 elementdata.actionData = [];
+                elementdata.timelineFrame = [];
                 if (this.initFrameData)
                     elementdata.initFrameData = this.initFrameData.clone();
                 if (this.emissionData) {
                     elementdata.emissionData = this.emissionData.clone();
                 }
                 for (var key in this.timelineFrame) {
-                    if (this.initFrameData[key]) {
-                        elementdata.timelineFrame[key] = this.initFrameData[key].clone();
+                    if (this.timelineFrame[key]) {
+                        elementdata.timelineFrame[key] = this.timelineFrame[key].clone();
                     }
                 }
                 for (var key in this.actionData) {
@@ -14153,7 +14154,7 @@ var gd3d;
             EffectAttrsData.prototype.resetMatrix = function () {
                 gd3d.math.matrixZero(this.matrix);
             };
-            EffectAttrsData.prototype.clone = function () {
+            EffectAttrsData.prototype.copyandinit = function () {
                 var data = new EffectAttrsData();
                 if (this.pos != undefined)
                     data.pos = gd3d.math.pool.clone_vector3(this.pos);
@@ -14192,6 +14193,33 @@ var gd3d;
                 data.mesh = this.mesh;
                 return data;
             };
+            EffectAttrsData.prototype.clone = function () {
+                var data = new EffectAttrsData();
+                if (this.pos != undefined)
+                    data.pos = gd3d.math.pool.clone_vector3(this.pos);
+                if (this.euler != undefined)
+                    data.euler = gd3d.math.pool.clone_vector3(this.euler);
+                if (this.color != undefined)
+                    data.color = gd3d.math.pool.clone_vector3(this.color);
+                if (this.scale != undefined)
+                    data.scale = gd3d.math.pool.clone_vector3(this.scale);
+                if (this.tilling != undefined)
+                    data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
+                if (this.uv != undefined)
+                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
+                if (this.mat != undefined)
+                    data.mat = this.mat.clone();
+                if (this.rotationByEuler != undefined)
+                    data.rotationByEuler = gd3d.math.pool.clone_quaternion(this.rotationByEuler);
+                if (this.localRotation != undefined)
+                    data.localRotation = gd3d.math.pool.clone_quaternion(this.localRotation);
+                if (this.meshdataVbo != undefined)
+                    data.meshdataVbo = this.meshdataVbo;
+                data.alpha = this.alpha;
+                data.renderModel = this.renderModel;
+                data.mesh = this.mesh;
+                return data;
+            };
             return EffectAttrsData;
         }());
         framework.EffectAttrsData = EffectAttrsData;
@@ -14202,6 +14230,7 @@ var gd3d;
                 var framedata = new EffectFrameData();
                 framedata.frameIndex = this.frameIndex;
                 framedata.attrsData = this.attrsData.clone();
+                framedata.lerpDatas = [];
                 for (var key in this.lerpDatas) {
                     framedata.lerpDatas[key] = this.lerpDatas[key].clone();
                 }
@@ -16356,8 +16385,8 @@ var gd3d;
                 this.data = _data;
                 this.formate = effectSys.vf;
                 this.vertexSize = gd3d.render.meshData.calcByteSize(this.formate) / 4;
-                this.curTotalVertexCount = 512;
-                this.indexStartIndex = 512;
+                this.curTotalVertexCount = 256;
+                this.indexStartIndex = 256;
                 this.initMesh();
                 this.mat = new framework.material();
                 if (this.data.mat.shader == null) {
