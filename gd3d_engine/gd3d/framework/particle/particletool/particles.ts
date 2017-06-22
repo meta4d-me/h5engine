@@ -120,6 +120,7 @@ namespace gd3d.framework
                             this.curTime = 0;
                             this.numcount = 0;
                             this.isover = false;
+                            this.emissionBatchers[0].reset();
                         } else
                         {
                             this.isover = true;
@@ -255,6 +256,13 @@ namespace gd3d.framework
             this.curIndexCount += p.dataForEbo.length;
             this.particles.push(p);
             this.beAddParticle = true;
+        }
+
+        reset()
+        {
+            this.curVerCount = 0;
+            this.curIndexCount = 0;
+            this.curTotalVertexCount = 0;
         }
         /**
          * 当前总的顶点数量
@@ -506,10 +514,14 @@ namespace gd3d.framework
             else
                 this.alpha = this.data.alpha.getValueRandom();
             if (this.data.uv == undefined) 
-                this.uv = new gd3d.math.vector2(1, 1);
+                this.uv = new gd3d.math.vector2(0, 0);
             else
                 this.uv = this.data.uv.getValueRandom();
 
+            if (this.data.uv == undefined)
+                this.tilling = new gd3d.math.vector2(1, 1);
+            else
+                this.tilling = this.data.uv.getValueRandom();
             //记下初始scale
             gd3d.math.vec3Clone(this.scale,this.initscale);
 

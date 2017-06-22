@@ -2190,6 +2190,7 @@ declare namespace gd3d.framework {
         uvType: UVTypeEnum;
         uvRoll: UVRoll;
         uvSprite: UVSprite;
+        tilling: math.vector2;
         mat: EffectMatData;
         life: ValueData;
         renderModel: RenderModel;
@@ -2549,6 +2550,7 @@ declare namespace gd3d.framework {
         curVerCount: number;
         curIndexCount: number;
         addParticle(): void;
+        reset(): void;
         private _totalVertexCount;
         curTotalVertexCount: number;
         private _indexStartIndex;

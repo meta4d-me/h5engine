@@ -14111,6 +14111,8 @@ var gd3d;
                         return gd3d.math.pool.clone_vector3(this.color);
                     case "tilling":
                         return gd3d.math.pool.clone_vector2(this.tilling);
+                    case "uv":
+                        return gd3d.math.pool.clone_vector2(this.uv);
                     case "mat":
                         return this.mat.clone();
                     case "renderModel":
@@ -14172,14 +14174,14 @@ var gd3d;
                     data.scale = gd3d.math.pool.clone_vector3(this.scale);
                 else
                     data.initAttribute("scale");
-                if (this.tilling != undefined)
-                    data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
-                else
-                    data.initAttribute("tilling");
                 if (this.uv != undefined)
                     data.uv = gd3d.math.pool.clone_vector2(this.uv);
                 else
                     data.initAttribute("uv");
+                if (this.tilling != undefined)
+                    data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
+                else
+                    data.initAttribute("tilling");
                 if (this.mat != undefined)
                     data.mat = this.mat.clone();
                 if (this.rotationByEuler != undefined)
@@ -16326,6 +16328,7 @@ var gd3d;
                                 this.curTime = 0;
                                 this.numcount = 0;
                                 this.isover = false;
+                                this.emissionBatchers[0].reset();
                             }
                             else {
                                 this.isover = true;
@@ -16425,6 +16428,11 @@ var gd3d;
                 this.curIndexCount += p.dataForEbo.length;
                 this.particles.push(p);
                 this.beAddParticle = true;
+            };
+            EmissionBatcher.prototype.reset = function () {
+                this.curVerCount = 0;
+                this.curIndexCount = 0;
+                this.curTotalVertexCount = 0;
             };
             Object.defineProperty(EmissionBatcher.prototype, "curTotalVertexCount", {
                 get: function () {
@@ -16560,6 +16568,14 @@ var gd3d;
                     this.alpha = 1;
                 else
                     this.alpha = this.data.alpha.getValueRandom();
+                if (this.data.uv == undefined)
+                    this.uv = new gd3d.math.vector2(0, 0);
+                else
+                    this.uv = this.data.uv.getValueRandom();
+                if (this.data.uv == undefined)
+                    this.tilling = new gd3d.math.vector2(1, 1);
+                else
+                    this.tilling = this.data.uv.getValueRandom();
                 gd3d.math.vec3Clone(this.scale, this.initscale);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
                     gd3d.math.quatFromEulerAngles(this.startPitchYawRoll.x, this.startPitchYawRoll.y, this.startPitchYawRoll.z, this.rotation_start);
