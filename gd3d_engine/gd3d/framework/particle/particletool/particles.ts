@@ -505,7 +505,11 @@ namespace gd3d.framework
                 this.alpha = 1;
             else
                 this.alpha = this.data.alpha.getValueRandom();
-            
+            if (this.data.uv == undefined) 
+                this.uv = new gd3d.math.vector2(1, 1);
+            else
+                this.uv = this.data.uv.getValueRandom();
+
             //记下初始scale
             gd3d.math.vec3Clone(this.scale,this.initscale);
 

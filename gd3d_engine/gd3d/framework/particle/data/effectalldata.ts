@@ -497,6 +497,8 @@ namespace gd3d.framework
                     return gd3d.math.pool.clone_vector3(this.color);
                 case "tilling":
                     return gd3d.math.pool.clone_vector2(this.tilling);
+                case "uv":
+                    return gd3d.math.pool.clone_vector2(this.uv);
                 case "mat":
                     return this.mat.clone();
                 case "renderModel":
