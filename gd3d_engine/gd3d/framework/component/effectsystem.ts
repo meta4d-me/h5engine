@@ -48,6 +48,12 @@ namespace gd3d.framework
             return this._data;
         }
         private _data: EffectSystemData;
+
+        get totalFrameCount():number
+        {
+            return this.data.life * effectSystem.fps;
+        }
+
         start()
         {
 
@@ -56,9 +62,10 @@ namespace gd3d.framework
         {
             if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
                 return;
-            if (this.state == EffectPlayStateEnum.Play)
+            if (this.state == EffectPlayStateEnum.Play || this.state == EffectPlayStateEnum.Pause)
             {
-                this.playTimer += delta * this.speed;
+                if(this.state == EffectPlayStateEnum.Play)
+                    this.playTimer += delta * this.speed;
                 // console.log(this.playTimer);
                 if (this.playTimer >= this.data.life)
                 {
@@ -508,6 +515,11 @@ namespace gd3d.framework
 
         }
 
+        public setFrameId(id:number)
+        {
+            if(this.state == EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
+                this.curFrameId = id;
+        }
 
         /**
          * 计算当前的frameid
@@ -518,10 +530,13 @@ namespace gd3d.framework
          */
         private checkFrameId(): boolean
         {
+            // if(this.state == EffectPlayStateEnum.Pause)
+            //     return true;
             let curid = (effectSystem.fps * this.playTimer) | 0;
             if (curid != this.curFrameId)
             {
-                this.curFrameId = curid;
+                if(this.state == EffectPlayStateEnum.Play)
+                    this.curFrameId = curid;
                 return true;
             }
             return false;
