@@ -129,7 +129,6 @@ var gd3d;
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
                 if (this.bePlay) {
-                    this.preusercodetimer = Date.now();
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
                             this.beStepNumber--;
@@ -139,12 +138,13 @@ var gd3d;
                     else {
                         this.updateUserCode(delta);
                     }
-                    this.usercodetime = Date.now() - this.preusercodetimer;
                 }
                 this.updateEditorCode(delta);
+                this.preusercodetimer = Date.now();
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
+                this.usercodetime = Date.now() - this.preusercodetimer;
             };
             application.prototype.getUserUpdateTimer = function () {
                 return this.usercodetime;
@@ -14111,6 +14111,8 @@ var gd3d;
                         return gd3d.math.pool.clone_vector3(this.color);
                     case "tilling":
                         return gd3d.math.pool.clone_vector2(this.tilling);
+                    case "uv":
+                        return gd3d.math.pool.clone_vector2(this.uv);
                     case "mat":
                         return this.mat.clone();
                     case "renderModel":
@@ -16560,6 +16562,10 @@ var gd3d;
                     this.alpha = 1;
                 else
                     this.alpha = this.data.alpha.getValueRandom();
+                if (this.data.uv == undefined)
+                    this.uv = new gd3d.math.vector2(1, 1);
+                else
+                    this.uv = this.data.uv.getValueRandom();
                 gd3d.math.vec3Clone(this.scale, this.initscale);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
                     gd3d.math.quatFromEulerAngles(this.startPitchYawRoll.x, this.startPitchYawRoll.y, this.startPitchYawRoll.z, this.rotation_start);
