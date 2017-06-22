@@ -1455,6 +1455,7 @@ declare namespace gd3d.framework {
         queue: number;
         filter: meshFilter;
         start(): void;
+        private refreshLayerAndQue();
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         remove(): void;
@@ -2701,6 +2702,7 @@ declare namespace gd3d.framework {
         hideFlags: HideFlags;
         transform: transform;
         components: nodeComponent[];
+        private componentsInit;
         renderer: IRenderer;
         camera: camera;
         light: light;
@@ -2709,6 +2711,7 @@ declare namespace gd3d.framework {
         readonly visibleInScene: boolean;
         visible: boolean;
         getName(): string;
+        init(): void;
         update(delta: number): void;
         addComponentDirect(comp: INodeComponent): INodeComponent;
         getComponent(type: string): INodeComponent;
@@ -2795,6 +2798,9 @@ declare namespace gd3d.framework {
         private RealCameraNumber;
         private _renderCamera(camindex);
         updateScene(node: transform, delta: any): void;
+        private objupdateInEditor(node, delta);
+        private objupdate(node, delta);
+        private collectCameraAndLight(node);
         addChild(node: transform): void;
         removeChild(node: transform): void;
         getChildren(): transform[];

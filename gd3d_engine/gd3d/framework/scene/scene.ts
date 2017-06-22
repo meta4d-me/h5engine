@@ -56,14 +56,13 @@ namespace gd3d.framework
 
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
+
             //但是场景管理的优化，可能针对每个camera 跑一遍
             //log coll
             document["log"] = {};
 
             document["log"].lights = this.renderLights.length;
             document["log"].cameras = [];
-
-
 
             //排序
             //排序camera 并绘制
@@ -106,7 +105,25 @@ namespace gd3d.framework
             var cam = this.renderCameras[camindex];
             var context = this.renderContext[camindex];
 
-            if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
+            if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0)
+            {
+                context.updateCamera(this.app, cam);
+                context.updateLights(this.renderLights);
+                cam.fillRenderer(this);
+                cam.renderScene(this, context);
+                this.RealCameraNumber++;
+
+                // //还有overlay
+                let overLays: IOverLay[] = cam.getOverLays();
+                for (var i = 0; i < overLays.length; i++)
+                {
+                    if (cam.CullingMask & CullingMask.ui)
+                    {
+                        overLays[i].render(context, this.assetmgr, cam);         
+                    }
+                }
+            }
+            else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
             {
                 context.updateCamera(this.app, cam);
                 context.updateLights(this.renderLights);
@@ -123,24 +140,6 @@ namespace gd3d.framework
                         {
                             overLays[i].render(context, this.assetmgr, cam);         
                         }
-                    }
-                }
-            }
-            else if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0)
-            {
-                context.updateCamera(this.app, cam);
-                context.updateLights(this.renderLights);
-                cam.fillRenderer(this);
-                cam.renderScene(this, context);
-                this.RealCameraNumber++;
-
-                // //还有overlay
-                let overLays: IOverLay[] = cam.getOverLays();
-                for (var i = 0; i < overLays.length; i++)
-                {
-                    if (cam.CullingMask & CullingMask.ui)
-                    {
-                        overLays[i].render(context, this.assetmgr, cam);         
                     }
                 }
             }
@@ -175,42 +174,78 @@ namespace gd3d.framework
         // }
         updateScene(node: transform, delta)
         {
-            if (node.gameObject != null)
+            if(this.app.bePlay)
+            {
+                this.objupdate(node,delta);
+            }
+            else
+            {
+                this.objupdateInEditor(node,delta);
+            }
+        }
+
+        private objupdateInEditor(node: transform, delta)//场编下
+        {
+            node.gameObject.init();//组件还未初始化的初始化
+            if(node.gameObject.renderer!=null)
+            {
+                node.gameObject.renderer.update(delta);//update 了啥
+            }
+            var c = node.gameObject.camera;
+            if(c!=null)
+            {
+                node.gameObject.camera.update(delta);//update 了啥
+            }
+            
+            this.collectCameraAndLight(node);
+
+            if (node.children != null)
+            {
+                for (var i = 0; i < node.children.length; i++)
+                {
+                    this.objupdateInEditor(node.children[i], delta);
+                }
+            }
+        }
+        private objupdate(node: transform, delta)//play状态下
+        {
+            node.gameObject.init();//组件还未初始化的初始化
+            if(node.gameObject.components.length>0)
             {
                 node.gameObject.update(delta);
-                //update 的时候只收集摄像机和灯光信息
-                // this.renderList.addObj(node.gameObject);
-                // //收集渲染物体
-                // var r = node.gameObject.renderer;
-                // if (r != null)
-                // {
-                //     this.renderList.addRenderer(r);
-                // }
-                //收集摄像机
-                var c = node.gameObject.camera;
-                if (c != null)
-                {
-                    this.renderCameras.push(c);
-                }
-                while (this.renderContext.length < this.renderCameras.length)
-                {
-                    this.renderContext.push(new renderContext(this.webgl));
-                }
-                //收集灯光
-                var l = node.gameObject.light;
-                if (l != null)
-                {
-                    this.renderLights.push(l);
-                }
+
+                this.collectCameraAndLight(node);
             }
             if (node.children != null)
             {
                 for (var i = 0; i < node.children.length; i++)
                 {
-                    this.updateScene(node.children[i], delta);
+                    this.objupdate(node.children[i], delta);
                 }
             }
         }
+
+        private collectCameraAndLight(node: transform)
+        {
+            //update 的时候只收集摄像机和灯光信息
+            //收集摄像机
+            var c = node.gameObject.camera;
+            if (c != null)
+            {
+                this.renderCameras.push(c);
+            }
+            while (this.renderContext.length < this.renderCameras.length)
+            {
+                this.renderContext.push(new renderContext(this.webgl));
+            }
+            //收集灯光
+            var l = node.gameObject.light;
+            if (l != null)
+            {
+                this.renderLights.push(l);
+            }
+        }
+
         addChild(node: transform)
         {
             this.rootNode.addChild(node);

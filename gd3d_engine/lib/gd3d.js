@@ -8168,7 +8168,6 @@ var gd3d;
                 }
             };
             camera.prototype.renderScene = function (scene, context) {
-                var _this = this;
                 for (var i = 0; i < scene.renderList.renderLayers.length; i++) {
                     var layer = scene.renderList.renderLayers[i];
                     var list = layer.list;
@@ -8179,8 +8178,7 @@ var gd3d;
                                     return a.queue - b.queue;
                                 }
                                 else {
-                                    var matrixView = gd3d.math.pool.new_matrix();
-                                    _this.calcViewMatrix(matrixView);
+                                    var matrixView = context.matrixView;
                                     var az = gd3d.math.pool.new_vector3();
                                     var bz = gd3d.math.pool.new_vector3();
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
@@ -8993,6 +8991,7 @@ var gd3d;
     (function (framework) {
         var meshRenderer = (function () {
             function meshRenderer() {
+                this.materials = [];
                 this.lightmapIndex = -1;
                 this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.layer = framework.RenderLayerEnum.Common;
@@ -9013,15 +9012,21 @@ var gd3d;
             });
             meshRenderer.prototype.start = function () {
                 this.filter = this.gameObject.getComponent("meshFilter");
+                this.refreshLayerAndQue();
+            };
+            meshRenderer.prototype.refreshLayerAndQue = function () {
+                if (this.materials == null || this.materials.length == 0) {
+                    this.materials = [];
+                    this.materials.push(new framework.material());
+                    this.materials[0].setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
+                }
+                this.layer = this.materials[0].getLayer();
+                if (!this.issetq)
+                    this._queue = this.materials[0].getQueue();
             };
             meshRenderer.prototype.update = function (delta) {
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
-                if (this.materials == null || this.materials.length == 0) {
-                    this.materials = [];
-                    this.materials.push(new framework.material());
-                    this.materials[0].setShader(assetmgr.getShader("shader/def"));
-                }
                 this.layer = this.materials[0].getLayer();
                 if (!this.issetq)
                     this._queue = this.materials[0].getQueue();
@@ -17059,6 +17064,7 @@ var gd3d;
                 this.layer = 0;
                 this.hideFlags = HideFlags.None;
                 this.components = [];
+                this.componentsInit = [];
                 this._visible = true;
             }
             gameObject.prototype.getScene = function () {
@@ -17092,20 +17098,20 @@ var gd3d;
             gameObject.prototype.getName = function () {
                 return this.transform.name;
             };
-            gameObject.prototype.update = function (delta) {
-                if (this.components == null)
-                    return;
-                for (var i = 0; i < this.components.length; i++) {
-                    if (this.components[i].init == false) {
+            gameObject.prototype.init = function () {
+                if (this.componentsInit.length > 0) {
+                    for (var i = 0; i < this.componentsInit.length; i++) {
                         this.components[i].comp.start();
                         this.components[i].init = true;
                     }
-                    if (this.getScene().app.bePlay && !this.getScene().app.bePause) {
-                        this.components[i].comp.update(delta);
-                    }
-                    else if (this.components[i].comp == this.renderer || this.components[i].comp == this.camera) {
-                        this.components[i].comp.update(delta);
-                    }
+                    this.componentsInit.length = 0;
+                }
+            };
+            gameObject.prototype.update = function (delta) {
+                if (this.components.length == 0)
+                    return;
+                for (var i = 0; i < this.components.length; i++) {
+                    this.components[i].comp.update(delta);
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
@@ -17113,8 +17119,6 @@ var gd3d;
                     throw new Error("this components has added to a  gameObject");
                 }
                 comp.gameObject = this;
-                if (this.components == null)
-                    this.components = [];
                 var nodeObj = new nodeComponent(comp, false);
                 var add = true;
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "effectbatcher") == "1") {
@@ -17156,6 +17160,7 @@ var gd3d;
                 }
                 if (add) {
                     this.components.push(nodeObj);
+                    this.componentsInit.push(nodeObj);
                     if (gd3d.reflect.getClassTag(comp["__proto__"], "camera") == "1")
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCamera);
                     if (gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
@@ -17206,8 +17211,6 @@ var gd3d;
                 return result;
             };
             gameObject.prototype.addComponent = function (type) {
-                if (this.components == null)
-                    this.components = [];
                 for (var key in this.components) {
                     var st = this.components[key]["comp"]["constructor"]["name"];
                     if (st == type) {
@@ -17473,7 +17476,20 @@ var gd3d;
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];
                 var context = this.renderContext[camindex];
-                if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0) {
+                if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0) {
+                    context.updateCamera(this.app, cam);
+                    context.updateLights(this.renderLights);
+                    cam.fillRenderer(this);
+                    cam.renderScene(this, context);
+                    this.RealCameraNumber++;
+                    var overLays = cam.getOverLays();
+                    for (var i = 0; i < overLays.length; i++) {
+                        if (cam.CullingMask & framework.CullingMask.ui) {
+                            overLays[i].render(context, this.assetmgr, cam);
+                        }
+                    }
+                }
+                else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0) {
                     context.updateCamera(this.app, cam);
                     context.updateLights(this.renderLights);
                     cam.fillRenderer(this);
@@ -17485,19 +17501,6 @@ var gd3d;
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
                             }
-                        }
-                    }
-                }
-                else if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0) {
-                    context.updateCamera(this.app, cam);
-                    context.updateLights(this.renderLights);
-                    cam.fillRenderer(this);
-                    cam.renderScene(this, context);
-                    this.RealCameraNumber++;
-                    var overLays = cam.getOverLays();
-                    for (var i = 0; i < overLays.length; i++) {
-                        if (cam.CullingMask & framework.CullingMask.ui) {
-                            overLays[i].render(context, this.assetmgr, cam);
                         }
                     }
                 }
@@ -17513,24 +17516,52 @@ var gd3d;
                 }
             };
             scene.prototype.updateScene = function (node, delta) {
-                if (node.gameObject != null) {
+                if (this.app.bePlay) {
+                    this.objupdate(node, delta);
+                }
+                else {
+                    this.objupdateInEditor(node, delta);
+                }
+            };
+            scene.prototype.objupdateInEditor = function (node, delta) {
+                node.gameObject.init();
+                if (node.gameObject.renderer != null) {
+                    node.gameObject.renderer.update(delta);
+                }
+                var c = node.gameObject.camera;
+                if (c != null) {
+                    node.gameObject.camera.update(delta);
+                }
+                this.collectCameraAndLight(node);
+                if (node.children != null) {
+                    for (var i = 0; i < node.children.length; i++) {
+                        this.objupdateInEditor(node.children[i], delta);
+                    }
+                }
+            };
+            scene.prototype.objupdate = function (node, delta) {
+                node.gameObject.init();
+                if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
-                    var c = node.gameObject.camera;
-                    if (c != null) {
-                        this.renderCameras.push(c);
-                    }
-                    while (this.renderContext.length < this.renderCameras.length) {
-                        this.renderContext.push(new framework.renderContext(this.webgl));
-                    }
-                    var l = node.gameObject.light;
-                    if (l != null) {
-                        this.renderLights.push(l);
-                    }
+                    this.collectCameraAndLight(node);
                 }
                 if (node.children != null) {
                     for (var i = 0; i < node.children.length; i++) {
-                        this.updateScene(node.children[i], delta);
+                        this.objupdate(node.children[i], delta);
                     }
+                }
+            };
+            scene.prototype.collectCameraAndLight = function (node) {
+                var c = node.gameObject.camera;
+                if (c != null) {
+                    this.renderCameras.push(c);
+                }
+                while (this.renderContext.length < this.renderCameras.length) {
+                    this.renderContext.push(new framework.renderContext(this.webgl));
+                }
+                var l = node.gameObject.light;
+                if (l != null) {
+                    this.renderLights.push(l);
                 }
             };
             scene.prototype.addChild = function (node) {
