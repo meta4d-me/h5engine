@@ -8477,7 +8477,7 @@ var gd3d;
                             element.curAttrData = element.data.initFrameData.attrsData.clone();
                     }
                 }
-                if (this.particles)
+                if (this.particles != undefined)
                     this.particles.dispose();
                 for (var index in this.data.elements) {
                     var data = this.data.elements[index];
