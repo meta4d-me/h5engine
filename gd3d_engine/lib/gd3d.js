@@ -16537,7 +16537,7 @@ var gd3d;
                     mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
                 }
                 mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                if (this.gameObject.getScene().fog) {
+                if (this.gameObject != undefined && this.gameObject.getScene().fog) {
                     context.fog = this.gameObject.getScene().fog;
                     this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
                 }
