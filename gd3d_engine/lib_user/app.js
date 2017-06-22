@@ -2709,8 +2709,8 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        var names = ["city", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
-        var name = names[1];
+        var names = ["city", "1042_pata_shenyuan_01", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
+        var name = names[3];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
