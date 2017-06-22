@@ -782,7 +782,7 @@ namespace gd3d.framework
                     this.assetUrlDic[_texture.getGUID()] = url;
 
                     var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                    t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
+                    t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
                     _texture.glTexture = t2d;
 
                     this.use(_texture);
@@ -1042,7 +1042,7 @@ namespace gd3d.framework
                     this.assetUrlDic[_texture.getGUID()] = url;
                     var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
                     var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                    t2d.uploadImage(img, true, true, false, true);
+                    t2d.uploadImage(img, true, true, true, true);
                     _texture.glTexture = t2d;
                     this.use(_texture);
                     state.resstate[filename].state = 1;//完成
@@ -1116,7 +1116,7 @@ namespace gd3d.framework
                         this.assetUrlDic[_texture.getGUID()] = url;
 
                         var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                        t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
+                        t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
                         _texture.glTexture = t2d;
 
                         this.use(_texture);
