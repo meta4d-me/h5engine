@@ -48,12 +48,18 @@ namespace gd3d.framework
         }
         init()
         {
-            if(this._data)
+            if (this._data)
             {
                 this.addElements();
             }
         }
         private _data: EffectSystemData;
+
+        get totalFrameCount():number
+        {
+            return this.data.life * effectSystem.fps;
+        }
+
         start()
         {
             this.init();
@@ -62,9 +68,10 @@ namespace gd3d.framework
         {
             if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
                 return;
-            if (this.state == EffectPlayStateEnum.Play)
+            if (this.state == EffectPlayStateEnum.Play || this.state == EffectPlayStateEnum.Pause)
             {
-                this.playTimer += delta * this.speed;
+                if(this.state == EffectPlayStateEnum.Play)
+                    this.playTimer += delta * this.speed;
                 // console.log(this.playTimer);
                 if (this.playTimer >= this.data.life)
                 {
@@ -194,7 +201,7 @@ namespace gd3d.framework
             }
             if (mesh == undefined)
                 return;
-            if(curAttrsData.meshdataVbo == undefined)
+            if (curAttrsData.meshdataVbo == undefined)
             {
                 curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
             }
@@ -267,7 +274,7 @@ namespace gd3d.framework
                     if (!subEffectBatcher.beBufferInited)
                     {
                         mesh.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                        if(mesh.glMesh.ebos.length == 0)
+                        if (mesh.glMesh.ebos.length == 0)
                         {
                             mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
                         }
@@ -275,12 +282,19 @@ namespace gd3d.framework
                         {
                             mesh.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                         }
-                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo); 
+                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
                         mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
                         subEffectBatcher.beBufferInited = true;
                     }
                     mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                    subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base");//只有一个submesh
+                    if (this.gameObject.getScene().fog)
+                    {
+                        context.fog = this.gameObject.getScene().fog;
+                        subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base_fog");//只有一个submesh
+                    } else
+                    {
+                        subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base");//只有一个submesh
+                    }
                 }
                 if (this.particles != undefined)
                 {
@@ -342,9 +356,9 @@ namespace gd3d.framework
                         element.curAttrData = element.data.initFrameData.attrsData.clone();
                 }
             }
-            if(this.particles)
+            if (this.particles != undefined)
                 this.particles.dispose();
-            
+
             for (let index in this.data.elements)
             {
                 let data = this.data.elements[index];
@@ -529,6 +543,11 @@ namespace gd3d.framework
 
         }
 
+        public setFrameId(id:number)
+        {
+            if(this.state == EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
+                this.curFrameId = id;
+        }
 
         /**
          * 计算当前的frameid
@@ -539,10 +558,13 @@ namespace gd3d.framework
          */
         private checkFrameId(): boolean
         {
+            // if(this.state == EffectPlayStateEnum.Pause)
+            //     return true;
             let curid = (effectSystem.fps * this.playTimer) | 0;
             if (curid != this.curFrameId)
             {
-                this.curFrameId = curid;
+                if(this.state == EffectPlayStateEnum.Play)
+                    this.curFrameId = curid;
                 return true;
             }
             return false;

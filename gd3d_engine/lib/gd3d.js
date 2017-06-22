@@ -45,10 +45,19 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
-                window["gd3d_app"] = this;
             }
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
+                var metas = document.getElementsByName("viewport");
+                var meta;
+                if (!metas || metas.length < 1) {
+                    meta = document.createElement("meta");
+                    meta.name = "viewport";
+                    document.head.appendChild(meta);
+                }
+                else
+                    meta = metas[0];
+                meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
                 framework.sceneMgr.app = this;
                 this.timeScale = 1;
                 this.container = div;
@@ -129,7 +138,6 @@ var gd3d;
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
                 if (this.bePlay) {
-                    this.preusercodetimer = Date.now();
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
                             this.beStepNumber--;
@@ -139,12 +147,13 @@ var gd3d;
                     else {
                         this.updateUserCode(delta);
                     }
-                    this.usercodetime = Date.now() - this.preusercodetimer;
                 }
                 this.updateEditorCode(delta);
+                this.preusercodetimer = Date.now();
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
+                this.usercodetime = Date.now() - this.preusercodetimer;
             };
             application.prototype.getUserUpdateTimer = function () {
                 return this.usercodetime;
@@ -3907,7 +3916,7 @@ var gd3d;
                         _texture.realName = _name;
                         _this.assetUrlDic[_texture.getGUID()] = url;
                         var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
+                        t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
                         _texture.glTexture = t2d;
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4120,7 +4129,7 @@ var gd3d;
                         _this.assetUrlDic[_texture.getGUID()] = url;
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(img, true, true, false, true);
+                        t2d.uploadImage(img, true, true, true, true);
                         _texture.glTexture = t2d;
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4177,7 +4186,7 @@ var gd3d;
                             _texture.realName = _name;
                             _this.assetUrlDic[_texture.getGUID()] = url;
                             var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                            t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
+                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
                             _texture.glTexture = t2d;
                             _this.use(_texture);
                             state.resstate[filename].state = 1;
@@ -8290,14 +8299,22 @@ var gd3d;
                     this.addElements();
                 }
             };
+            Object.defineProperty(effectSystem.prototype, "totalFrameCount", {
+                get: function () {
+                    return this.data.life * effectSystem_1.fps;
+                },
+                enumerable: true,
+                configurable: true
+            });
             effectSystem.prototype.start = function () {
                 this.init();
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
                     return;
-                if (this.state == framework.EffectPlayStateEnum.Play) {
-                    this.playTimer += delta * this.speed;
+                if (this.state == framework.EffectPlayStateEnum.Play || this.state == framework.EffectPlayStateEnum.Pause) {
+                    if (this.state == framework.EffectPlayStateEnum.Play)
+                        this.playTimer += delta * this.speed;
                     if (this.playTimer >= this.data.life) {
                         if (this.beLoop) {
                             this.reset();
@@ -8432,7 +8449,13 @@ var gd3d;
                             subEffectBatcher.beBufferInited = true;
                         }
                         mesh_1.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                        subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base");
+                        if (this.gameObject.getScene().fog) {
+                            context.fog = this.gameObject.getScene().fog;
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base_fog");
+                        }
+                        else {
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base");
+                        }
                     }
                     if (this.particles != undefined) {
                         this.particles.render(context, assetmgr, camera);
@@ -8471,7 +8494,7 @@ var gd3d;
                             element.curAttrData = element.data.initFrameData.attrsData.clone();
                     }
                 }
-                if (this.particles)
+                if (this.particles != undefined)
                     this.particles.dispose();
                 for (var index in this.data.elements) {
                     var data = this.data.elements[index];
@@ -8607,10 +8630,15 @@ var gd3d;
                 }
                 this.effectBatchers[index].beBufferInited = false;
             };
+            effectSystem.prototype.setFrameId = function (id) {
+                if (this.state == framework.EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
+                    this.curFrameId = id;
+            };
             effectSystem.prototype.checkFrameId = function () {
                 var curid = (effectSystem_1.fps * this.playTimer) | 0;
                 if (curid != this.curFrameId) {
-                    this.curFrameId = curid;
+                    if (this.state == framework.EffectPlayStateEnum.Play)
+                        this.curFrameId = curid;
                     return true;
                 }
                 return false;
@@ -9317,8 +9345,15 @@ var gd3d;
                                 var sm = this._mesh.submesh[i];
                                 var mid = this._mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
-                                if (usemat != null)
-                                    usemat.draw(context, this._mesh, sm, "skin");
+                                if (usemat != null) {
+                                    if (this.gameObject.transform.scene.fog) {
+                                        context.fog = this.gameObject.transform.scene.fog;
+                                        usemat.draw(context, this._mesh, sm, "skin_fog");
+                                    }
+                                    else {
+                                        usemat.draw(context, this._mesh, sm, "skin");
+                                    }
+                                }
                             }
                         }
                     }
@@ -9773,7 +9808,13 @@ var gd3d;
                 this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
                 this.mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = (this.targetPath.length - 1) * 6;
-                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                }
             };
             trailRender_recorde.prototype.clone = function () {
             };
@@ -10019,7 +10060,13 @@ var gd3d;
                     return;
                 context.updateModeTrail();
                 this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                }
             };
             trailRender.prototype.clone = function () {
             };
@@ -14174,14 +14221,14 @@ var gd3d;
                     data.scale = gd3d.math.pool.clone_vector3(this.scale);
                 else
                     data.initAttribute("scale");
-                if (this.uv != undefined)
-                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
-                else
-                    data.initAttribute("uv");
                 if (this.tilling != undefined)
                     data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
                 else
                     data.initAttribute("tilling");
+                if (this.uv != undefined)
+                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
+                else
+                    data.initAttribute("uv");
                 if (this.mat != undefined)
                     data.mat = this.mat.clone();
                 if (this.rotationByEuler != undefined)
@@ -16328,7 +16375,6 @@ var gd3d;
                                 this.curTime = 0;
                                 this.numcount = 0;
                                 this.isover = false;
-                                this.emissionBatchers[0].reset();
                             }
                             else {
                                 this.isover = true;
@@ -16429,11 +16475,6 @@ var gd3d;
                 this.particles.push(p);
                 this.beAddParticle = true;
             };
-            EmissionBatcher.prototype.reset = function () {
-                this.curVerCount = 0;
-                this.curIndexCount = 0;
-                this.curTotalVertexCount = 0;
-            };
             Object.defineProperty(EmissionBatcher.prototype, "curTotalVertexCount", {
                 get: function () {
                     return this._totalVertexCount;
@@ -16496,7 +16537,13 @@ var gd3d;
                     mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
                 }
                 mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                this.mat.draw(context, mesh, mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.mat.draw(context, mesh, mesh.submesh[0], "base");
+                }
             };
             EmissionBatcher.prototype.dispose = function () {
                 this.dataForVbo = null;
@@ -16569,13 +16616,9 @@ var gd3d;
                 else
                     this.alpha = this.data.alpha.getValueRandom();
                 if (this.data.uv == undefined)
-                    this.uv = new gd3d.math.vector2(0, 0);
+                    this.uv = new gd3d.math.vector2(1, 1);
                 else
                     this.uv = this.data.uv.getValueRandom();
-                if (this.data.uv == undefined)
-                    this.tilling = new gd3d.math.vector2(1, 1);
-                else
-                    this.tilling = this.data.uv.getValueRandom();
                 gd3d.math.vec3Clone(this.scale, this.initscale);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
                     gd3d.math.quatFromEulerAngles(this.startPitchYawRoll.x, this.startPitchYawRoll.y, this.startPitchYawRoll.z, this.rotation_start);

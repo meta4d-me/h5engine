@@ -1,0 +1,1 @@
+uglifyjs gd3d.js -c -m --keep-fnames -o gd3d.min.js
