@@ -8474,7 +8474,7 @@ var gd3d;
                         var element = subEffectBatcher.effectElements[key];
                         element.setActive(true);
                         if (element.data.initFrameData != undefined)
-                            element.curAttrData = element.data.initFrameData.attrsData.clone();
+                            element.curAttrData = element.data.initFrameData.attrsData.copyandinit();
                     }
                 }
                 if (this.particles != undefined)
