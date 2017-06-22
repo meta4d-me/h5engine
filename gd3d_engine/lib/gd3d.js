@@ -3907,7 +3907,7 @@ var gd3d;
                         _texture.realName = _name;
                         _this.assetUrlDic[_texture.getGUID()] = url;
                         var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
+                        t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
                         _texture.glTexture = t2d;
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4120,7 +4120,7 @@ var gd3d;
                         _this.assetUrlDic[_texture.getGUID()] = url;
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(img, true, true, false, true);
+                        t2d.uploadImage(img, true, true, true, true);
                         _texture.glTexture = t2d;
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4177,7 +4177,7 @@ var gd3d;
                             _texture.realName = _name;
                             _this.assetUrlDic[_texture.getGUID()] = url;
                             var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                            t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
+                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
                             _texture.glTexture = t2d;
                             _this.use(_texture);
                             state.resstate[filename].state = 1;
@@ -8477,7 +8477,7 @@ var gd3d;
                             element.curAttrData = element.data.initFrameData.attrsData.clone();
                     }
                 }
-                if (this.particles)
+                if (this.particles != undefined)
                     this.particles.dispose();
                 for (var index in this.data.elements) {
                     var data = this.data.elements[index];

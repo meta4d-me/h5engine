@@ -356,7 +356,7 @@ namespace gd3d.framework
                         element.curAttrData = element.data.initFrameData.attrsData.clone();
                 }
             }
-            if (this.particles)
+            if (this.particles != undefined)
                 this.particles.dispose();
 
             for (let index in this.data.elements)
