@@ -15231,7 +15231,7 @@ var gd3d;
             LoopAction.prototype.update = function (frameIndex) {
                 if (frameIndex == this.startFrame) {
                     this.elements.loopFrame = this.startFrame + 1;
-                    this.elements.curAttrData = this.elements.data.initFrameData.attrsData.clone();
+                    this.elements.curAttrData = this.elements.data.initFrameData.attrsData.copyandinit();
                 }
             };
             return LoopAction;

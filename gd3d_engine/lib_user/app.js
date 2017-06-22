@@ -2230,7 +2230,7 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_0005_sword_sword", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
+        var names = ["fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
         var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
