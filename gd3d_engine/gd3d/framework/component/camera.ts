@@ -502,8 +502,9 @@ namespace gd3d.framework
                             }
                             else
                             {
-                                var matrixView = math.pool.new_matrix();
-                                this.calcViewMatrix(matrixView);
+                                // var matrixView = math.pool.new_matrix();
+                                // this.calcViewMatrix(matrixView);
+                                var matrixView=context.matrixView;
 
                                 var az = math.pool.new_vector3();
                                 var bz = math.pool.new_vector3();

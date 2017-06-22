@@ -56,6 +56,7 @@ namespace gd3d.framework
 
         @gd3d.reflect.Field("nodeComponent[]")
         components: nodeComponent[] = [];
+        private  componentsInit:nodeComponent[]=[];
         renderer: IRenderer;
         camera: camera;
         light: light;
@@ -88,26 +89,41 @@ namespace gd3d.framework
             return this.transform.name;
             // return this.transform != null ? this.transform.name : this.transform2d.name;
         }
-        update(delta: number)
-        {
-            if (this.components == null) return;
 
-            for (var i = 0; i < this.components.length; i++)
+        init()
+        {
+            if(this.componentsInit.length>0)
             {
-                if (this.components[i].init == false)
+                for(var i=0;i<this.componentsInit.length;i++)
                 {
                     this.components[i].comp.start();
                     this.components[i].init = true;
                 }
-                if (this.getScene().app.bePlay && !this.getScene().app.bePause)
-                {
-                    this.components[i].comp.update(delta);
-                }
-                else if (this.components[i].comp == this.renderer || this.components[i].comp == this.camera)
-                {
-                    //有些组件是需要在场编状态下运行的
-                    this.components[i].comp.update(delta);
-                }
+                this.componentsInit.length=0;
+            }
+        }
+
+        update(delta: number)
+        {
+            if (this.components.length == 0) return;
+
+            for (var i = 0; i < this.components.length; i++)
+            {
+                // if (this.components[i].init == false)
+                // {
+                //     this.components[i].comp.start();
+                //     this.components[i].init = true;
+                // }
+                // if (this.getScene().app.bePlay && !this.getScene().app.bePause)
+                // {
+                //     this.components[i].comp.update(delta);
+                // }
+                // else if (this.components[i].comp == this.renderer || this.components[i].comp == this.camera)
+                // {
+                //     //有些组件是需要在场编状态下运行的
+                //     this.components[i].comp.update(delta);
+                // }
+                this.components[i].comp.update(delta);
             }
         }
         addComponentDirect(comp: INodeComponent): INodeComponent
@@ -117,8 +133,8 @@ namespace gd3d.framework
                 throw new Error("this components has added to a  gameObject");
             }
             comp.gameObject = this;
-            if (this.components == null)
-                this.components = [];
+            // if (this.components == null)
+            //     this.components = [];
 
             //这种不明确的初始化以后不要用，反射识别不到类型。一定要构建类型
             //this.components.push({ comp: comp, init: false });
@@ -187,6 +203,7 @@ namespace gd3d.framework
             if (add)
             {
                 this.components.push(nodeObj);
+                this.componentsInit.push(nodeObj);
                 if (reflect.getClassTag(comp["__proto__"], "camera") == "1")
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCamera);
                 if (reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
@@ -255,8 +272,8 @@ namespace gd3d.framework
         }
         addComponent(type: string): INodeComponent
         {
-            if (this.components == null)
-                this.components = [];
+            // if (this.components == null)
+            //     this.components = [];
             for (var key in this.components)
             {
                 var st = this.components[key]["comp"]["constructor"]["name"];

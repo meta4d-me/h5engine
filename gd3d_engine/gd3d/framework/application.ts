@@ -25,13 +25,22 @@ namespace gd3d.framework
         timeScale:number;
 		version:string = "v0.0.1";
 		build:string = "b000010";
-        constructor(){
-            window["gd3d_app"] = this;
-        }
 
         start(div: HTMLDivElement)
         {
 			console.log("version: "+this.version + "  build: "+this.build);
+            var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
+            var meta:HTMLMetaElement;
+            if(!metas || metas.length<1)
+            {
+                meta = document.createElement("meta") as HTMLMetaElement;
+                meta.name = "viewport";
+                document.head.appendChild(meta);
+            }
+            else
+                meta = metas[0];
+            meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
+
             sceneMgr.app = this;
             this.timeScale = 1;
             this.container = div;

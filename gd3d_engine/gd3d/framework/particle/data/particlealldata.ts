@@ -102,6 +102,7 @@ namespace gd3d.framework
         uvRoll: UVRoll;
         uvSprite: UVSprite;
 
+        tilling:math.vector2;
         /**
          * 材质相关
          * 
@@ -189,7 +190,7 @@ namespace gd3d.framework
             if (this.uvRoll != undefined)
                 emission.uvRoll = this.uvRoll.clone();
             if (this.uvSprite != undefined)
-                emission.uvSprite = this.uvSprite.clone();
+                emission.uvSprite = this.uvSprite.clone(); 
 
             if (this.mat != undefined)
                 emission.mat = this.mat.clone();

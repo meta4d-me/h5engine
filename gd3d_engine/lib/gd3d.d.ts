@@ -21,7 +21,6 @@ declare namespace gd3d.framework {
         timeScale: number;
         version: string;
         build: string;
-        constructor();
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -1338,6 +1337,7 @@ declare namespace gd3d.framework {
         data: EffectSystemData;
         init(): void;
         private _data;
+        readonly totalFrameCount: number;
         start(): void;
         update(delta: number): void;
         private _update(delta);
@@ -1351,6 +1351,7 @@ declare namespace gd3d.framework {
         reset(): void;
         private addElements();
         private addInitFrame(elementData);
+        setFrameId(id: number): void;
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
@@ -1455,6 +1456,7 @@ declare namespace gd3d.framework {
         queue: number;
         filter: meshFilter;
         start(): void;
+        private refreshLayerAndQue();
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         remove(): void;
@@ -2190,6 +2192,7 @@ declare namespace gd3d.framework {
         uvType: UVTypeEnum;
         uvRoll: UVRoll;
         uvSprite: UVSprite;
+        tilling: math.vector2;
         mat: EffectMatData;
         life: ValueData;
         renderModel: RenderModel;
@@ -2701,6 +2704,7 @@ declare namespace gd3d.framework {
         hideFlags: HideFlags;
         transform: transform;
         components: nodeComponent[];
+        private componentsInit;
         renderer: IRenderer;
         camera: camera;
         light: light;
@@ -2709,6 +2713,7 @@ declare namespace gd3d.framework {
         readonly visibleInScene: boolean;
         visible: boolean;
         getName(): string;
+        init(): void;
         update(delta: number): void;
         addComponentDirect(comp: INodeComponent): INodeComponent;
         getComponent(type: string): INodeComponent;
@@ -2795,6 +2800,9 @@ declare namespace gd3d.framework {
         private RealCameraNumber;
         private _renderCamera(camindex);
         updateScene(node: transform, delta: any): void;
+        private objupdateInEditor(node, delta);
+        private objupdate(node, delta);
+        private collectCameraAndLight(node);
         addChild(node: transform): void;
         removeChild(node: transform): void;
         getChildren(): transform[];
