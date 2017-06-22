@@ -14221,14 +14221,14 @@ var gd3d;
                     data.scale = gd3d.math.pool.clone_vector3(this.scale);
                 else
                     data.initAttribute("scale");
-                if (this.tilling != undefined)
-                    data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
-                else
-                    data.initAttribute("tilling");
                 if (this.uv != undefined)
                     data.uv = gd3d.math.pool.clone_vector2(this.uv);
                 else
                     data.initAttribute("uv");
+                if (this.tilling != undefined)
+                    data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
+                else
+                    data.initAttribute("tilling");
                 if (this.mat != undefined)
                     data.mat = this.mat.clone();
                 if (this.rotationByEuler != undefined)
