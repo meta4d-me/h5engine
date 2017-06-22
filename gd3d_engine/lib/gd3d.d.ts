@@ -21,7 +21,6 @@ declare namespace gd3d.framework {
         timeScale: number;
         version: string;
         build: string;
-        constructor();
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -1338,6 +1337,7 @@ declare namespace gd3d.framework {
         data: EffectSystemData;
         init(): void;
         private _data;
+        readonly totalFrameCount: number;
         start(): void;
         update(delta: number): void;
         private _update(delta);
@@ -1351,6 +1351,7 @@ declare namespace gd3d.framework {
         reset(): void;
         private addElements();
         private addInitFrame(elementData);
+        setFrameId(id: number): void;
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
