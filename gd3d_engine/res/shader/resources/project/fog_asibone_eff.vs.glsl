@@ -3,7 +3,7 @@ attribute vec2 _glesMultiTexCoord0;
 
 attribute vec4 _glesBlendIndex4;
 attribute vec4 _glesBlendWeight4;
-uniform highp vec4 glstate_vec4_bones[120];
+uniform highp vec4 glstate_vec4_bones[80];
 
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp vec4 _MainTex_ST;

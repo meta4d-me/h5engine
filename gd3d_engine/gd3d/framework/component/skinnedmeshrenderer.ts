@@ -265,7 +265,7 @@ namespace gd3d.framework
             }
             if (skintype == 2 && this._skeletonMatrixData == null)
             {
-                this.maxBoneCount = 60;
+                this.maxBoneCount = 40;
                 this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                 this._efficient = true;
             }

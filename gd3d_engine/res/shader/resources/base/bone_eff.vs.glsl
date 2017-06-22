@@ -3,7 +3,7 @@ attribute vec4 _glesBlendIndex4;
 attribute vec4 _glesBlendWeight4;
 attribute vec4 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
-uniform highp vec4 glstate_vec4_bones[120];
+uniform highp vec4 glstate_vec4_bones[80];
 varying highp vec2 xlv_TEXCOORD0;
 mat4 buildMat4(int index)
 {

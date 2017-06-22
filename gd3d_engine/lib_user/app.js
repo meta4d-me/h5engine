@@ -2488,14 +2488,25 @@ var t;
             });
         };
         test_light1.prototype.loadText = function (laststate, state) {
-            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    state.finish = true;
+            this.tex = new gd3d.framework.texture();
+            this.tex.glTexture = new gd3d.render.WriteableTexture2D(this.app.webgl, gd3d.render.TextureFormatEnum.RGBA, 512, 512, true);
+            var wt = this.tex.glTexture;
+            var da = new Uint8Array(256 * 256 * 4);
+            for (var x = 0; x < 256; x++)
+                for (var y = 0; y < 256; y++) {
+                    var seek = y * 256 * 4 + x * 4;
+                    da[seek] = 235;
+                    da[seek + 1] = 50;
+                    da[seek + 2] = 230;
+                    da[seek + 3] = 230;
                 }
-                else {
-                    state.error = true;
-                }
-            });
+            wt.updateRect(da, 256, 256, 256, 256);
+            var img = new Image();
+            img.onload = function (e) {
+                state.finish = true;
+                wt.updateRectImg(img, 0, 0);
+            };
+            img.src = "res/zg256.png";
         };
         test_light1.prototype.addcube = function (laststate, state) {
             for (var i = -4; i < 5; i++) {
@@ -2516,8 +2527,7 @@ var t;
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);
-                        var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
-                        cuber.materials[0].setTexture("_MainTex", texture);
+                        cuber.materials[0].setTexture("_MainTex", this.tex);
                     }
                 }
             }
