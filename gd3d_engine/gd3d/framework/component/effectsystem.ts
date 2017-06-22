@@ -48,7 +48,7 @@ namespace gd3d.framework
         }
         init()
         {
-            if(this._data)
+            if (this._data)
             {
                 this.addElements();
             }
@@ -194,7 +194,7 @@ namespace gd3d.framework
             }
             if (mesh == undefined)
                 return;
-            if(curAttrsData.meshdataVbo == undefined)
+            if (curAttrsData.meshdataVbo == undefined)
             {
                 curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
             }
@@ -267,7 +267,7 @@ namespace gd3d.framework
                     if (!subEffectBatcher.beBufferInited)
                     {
                         mesh.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                        if(mesh.glMesh.ebos.length == 0)
+                        if (mesh.glMesh.ebos.length == 0)
                         {
                             mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
                         }
@@ -275,12 +275,19 @@ namespace gd3d.framework
                         {
                             mesh.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                         }
-                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo); 
+                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
                         mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
                         subEffectBatcher.beBufferInited = true;
                     }
                     mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                    subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base");//只有一个submesh
+                    if (this.gameObject.getScene().fog)
+                    {
+                        context.fog = this.gameObject.getScene().fog;
+                        subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base_fog");//只有一个submesh
+                    } else
+                    {
+                        subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base");//只有一个submesh
+                    }
                 }
                 if (this.particles != undefined)
                 {
@@ -342,9 +349,9 @@ namespace gd3d.framework
                         element.curAttrData = element.data.initFrameData.attrsData.clone();
                 }
             }
-            if(this.particles)
+            if (this.particles)
                 this.particles.dispose();
-            
+
             for (let index in this.data.elements)
             {
                 let data = this.data.elements[index];

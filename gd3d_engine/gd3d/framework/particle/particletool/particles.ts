@@ -341,7 +341,14 @@ namespace gd3d.framework
                 mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
             }
             mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-            this.mat.draw(context, mesh, mesh.submesh[0], "base");
+            if (this.gameObject.getScene().fog)
+            {
+                context.fog = this.gameObject.getScene().fog;
+                this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
+            } else
+            {
+                this.mat.draw(context, mesh, mesh.submesh[0], "base");
+            }
         }
         dispose()
         {
@@ -363,7 +370,7 @@ namespace gd3d.framework
         public localTranslate: math.vector3;
         public euler: math.vector3;
         public color: math.vector3;
-        private initscale:math.vector3=new gd3d.math.vector3();
+        private initscale: math.vector3 = new gd3d.math.vector3();
         public scale: math.vector3;
         public uv: math.vector2;
         public alpha: number;
@@ -505,9 +512,9 @@ namespace gd3d.framework
                 this.alpha = 1;
             else
                 this.alpha = this.data.alpha.getValueRandom();
-            
+
             //记下初始scale
-            gd3d.math.vec3Clone(this.scale,this.initscale);
+            gd3d.math.vec3Clone(this.scale, this.initscale);
 
             ///模型初始旋转量
             if (this.renderModel == RenderModel.None || this.renderModel == RenderModel.StretchedBillBoard)
@@ -734,7 +741,7 @@ namespace gd3d.framework
                 // {
                 //     gd3d.math.vec3SLerp(startVal, this.endNode.getValue(), (this.curLife - startKey) / duration, this.scale);
                 // }
-                this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale,nodeType.scale);
+                this._updateNode(this.data.scaleNodes, this.data.life.getValue(), this.scale, nodeType.scale);
             } else if (this.data.scaleSpeed != undefined)
             {
                 if (this.data.scaleSpeed.x != undefined)
@@ -784,10 +791,10 @@ namespace gd3d.framework
 
         private tempStartNode: any;
         private tempEndNode: any;
-        private _updateNode(nodes: any, life: number, out: any,nodetype:nodeType=nodeType.none)
+        private _updateNode(nodes: any, life: number, out: any, nodetype: nodeType = nodeType.none)
         {
             let index = 0;
-            var duration=0;
+            var duration = 0;
             if (nodes != undefined)
             {
                 for (var i = 0; i < nodes.length; i++)
@@ -817,7 +824,7 @@ namespace gd3d.framework
                 if (this.tempStartNode instanceof ParticleNode)
                 {
                     if (duration > 0)
-                    {   
+                    {
                         gd3d.math.vec3SLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration, out);
 
                     }
@@ -830,14 +837,14 @@ namespace gd3d.framework
                         // var rvalue=this.tempEndNode.getValue();
                         // var lerp=(this.curLife - this.tempStartNode.key * life) / duration;
                         // out=gd3d.math.numberLerp(lvalue,rvalue,lerp);
-                        if(nodetype==nodeType.alpha)
+                        if (nodetype == nodeType.alpha)
                         {
-                            this.alpha=gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            this.alpha = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
                         }
-                        else if(nodetype=nodeType.scale)
+                        else if (nodetype = nodeType.scale)
                         {
-                            var targetscale=gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
-                            gd3d.math.vec3ScaleByNum(this.initscale,targetscale,out);
+                            var targetscale = gd3d.math.numberLerp(this.tempStartNode.getValue(), this.tempEndNode.getValue(), (this.curLife - this.tempStartNode.key * life) / duration);
+                            gd3d.math.vec3ScaleByNum(this.initscale, targetscale, out);
                         }
                         // else
                         // {
@@ -884,7 +891,7 @@ namespace gd3d.framework
                 // {
                 //     this.alpha = gd3d.math.numberLerp(this._startNodeNum.getValue(), this._curNodeNum.getValue(), (this.curLife - this._startNode.key) / duration);
                 // }
-                this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha,nodeType.alpha);
+                this._updateNode(this.data.alphaNodes, this.data.life.getValue(), this.alpha, nodeType.alpha);
             } else if (this.data.alphaSpeed != undefined)
             {
                 this.alpha += this.data.alphaSpeed.getValue() * delta;
@@ -1000,10 +1007,11 @@ namespace gd3d.framework
             this.uv = null;
         }
     }
-    export enum nodeType{
+    export enum nodeType
+    {
         none,
         alpha,
         scale
-        
+
     }
 }

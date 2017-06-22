@@ -8432,7 +8432,13 @@ var gd3d;
                             subEffectBatcher.beBufferInited = true;
                         }
                         mesh_1.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                        subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base");
+                        if (this.gameObject.getScene().fog) {
+                            context.fog = this.gameObject.getScene().fog;
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base_fog");
+                        }
+                        else {
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base");
+                        }
                     }
                     if (this.particles != undefined) {
                         this.particles.render(context, assetmgr, camera);
@@ -9317,8 +9323,15 @@ var gd3d;
                                 var sm = this._mesh.submesh[i];
                                 var mid = this._mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
-                                if (usemat != null)
-                                    usemat.draw(context, this._mesh, sm, "skin");
+                                if (usemat != null) {
+                                    if (this.gameObject.transform.scene.fog) {
+                                        context.fog = this.gameObject.transform.scene.fog;
+                                        usemat.draw(context, this._mesh, sm, "skin_fog");
+                                    }
+                                    else {
+                                        usemat.draw(context, this._mesh, sm, "skin");
+                                    }
+                                }
                             }
                         }
                     }
@@ -9773,7 +9786,13 @@ var gd3d;
                 this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
                 this.mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = (this.targetPath.length - 1) * 6;
-                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                }
             };
             trailRender_recorde.prototype.clone = function () {
             };
@@ -10019,7 +10038,13 @@ var gd3d;
                     return;
                 context.updateModeTrail();
                 this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                }
             };
             trailRender.prototype.clone = function () {
             };
@@ -16459,7 +16484,13 @@ var gd3d;
                     mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
                 }
                 mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                this.mat.draw(context, mesh, mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.mat.draw(context, mesh, mesh.submesh[0], "base");
+                }
             };
             EmissionBatcher.prototype.dispose = function () {
                 this.dataForVbo = null;
