@@ -45,10 +45,19 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
-                window["gd3d_app"] = this;
             }
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
+                var metas = document.getElementsByName("viewport");
+                var meta;
+                if (!metas || metas.length < 1) {
+                    meta = document.createElement("meta");
+                    meta.name = "viewport";
+                    document.head.appendChild(meta);
+                }
+                else
+                    meta = metas[0];
+                meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
                 framework.sceneMgr.app = this;
                 this.timeScale = 1;
                 this.container = div;
@@ -8290,14 +8299,22 @@ var gd3d;
                     this.addElements();
                 }
             };
+            Object.defineProperty(effectSystem.prototype, "totalFrameCount", {
+                get: function () {
+                    return this.data.life * effectSystem_1.fps;
+                },
+                enumerable: true,
+                configurable: true
+            });
             effectSystem.prototype.start = function () {
                 this.init();
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
                     return;
-                if (this.state == framework.EffectPlayStateEnum.Play) {
-                    this.playTimer += delta * this.speed;
+                if (this.state == framework.EffectPlayStateEnum.Play || this.state == framework.EffectPlayStateEnum.Pause) {
+                    if (this.state == framework.EffectPlayStateEnum.Play)
+                        this.playTimer += delta * this.speed;
                     if (this.playTimer >= this.data.life) {
                         if (this.beLoop) {
                             this.reset();
@@ -8613,10 +8630,15 @@ var gd3d;
                 }
                 this.effectBatchers[index].beBufferInited = false;
             };
+            effectSystem.prototype.setFrameId = function (id) {
+                if (this.state == framework.EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
+                    this.curFrameId = id;
+            };
             effectSystem.prototype.checkFrameId = function () {
                 var curid = (effectSystem_1.fps * this.playTimer) | 0;
                 if (curid != this.curFrameId) {
-                    this.curFrameId = curid;
+                    if (this.state == framework.EffectPlayStateEnum.Play)
+                        this.curFrameId = curid;
                     return true;
                 }
                 return false;
