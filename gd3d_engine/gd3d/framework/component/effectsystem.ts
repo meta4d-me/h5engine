@@ -464,7 +464,7 @@ namespace gd3d.framework
             }
             element.effectBatcher = subEffectBatcher;
             element.startIndex = vertexStartIndex;
-            element.curAttrData = elementData.initFrameData.attrsData.clone();
+            element.curAttrData = elementData.initFrameData.attrsData.copyandinit();
             let vertexSize = subEffectBatcher.vertexSize;
             let vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
             // if (_initFrameData.attrsData.startEuler)

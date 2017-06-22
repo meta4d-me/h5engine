@@ -2076,6 +2076,7 @@ declare namespace gd3d.framework {
         getAttribute(attribute: string): any;
         initAttribute(attribute: string): void;
         resetMatrix(): void;
+        copyandinit(): EffectAttrsData;
         clone(): EffectAttrsData;
     }
     class EffectFrameData {
