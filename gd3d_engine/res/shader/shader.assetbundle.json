@@ -108,6 +108,14 @@
             "name": "resources/base/fog_diffuse.vs.glsl",
             "length": 0
         },
+         {
+            "name": "resources/base/fog_color.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/base/fog_color.vs.glsl",
+            "length": 0
+        },
         {
             "name": "resources/base/fog_diffuselightmap.fs.glsl",
             "length": 0
@@ -238,6 +246,10 @@
         },
         {
             "name": "resources/white.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/fog_white.fs.glsl",
             "length": 0
         },
         {

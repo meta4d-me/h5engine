@@ -2699,7 +2699,7 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        var names = ["city", "xinshoucun_fuben_day", "chuangjue-01"];
+        var names = ["city", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[1];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
