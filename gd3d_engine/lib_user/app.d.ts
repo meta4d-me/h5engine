@@ -371,6 +371,7 @@ declare namespace t {
     class test_light1 implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
+        tex: gd3d.framework.texture;
         private loadShader(laststate, state);
         private loadText(laststate, state);
         private addcube(laststate, state);
