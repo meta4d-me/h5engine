@@ -18,12 +18,26 @@
                 "fs": "streamlight"
             }
         ],
+        "base_fog": [
+            {
+                "showface": "all",
+                "vs": "fog_streamlight",
+                "fs": "fog_streamlight"
+            }
+        ],
         "skin": [
             {
                 "showface": "all",
                 "vs": "streamlightbone_eff",
                 "fs": "streamlight"
             }
+        ],
+        "fog_skin": [
+            {
+                "showface": "all",
+                "vs": "fog_streamlightbone_eff",
+                "fs": "fog_streamlight"
+            }   
         ]
     }
 }

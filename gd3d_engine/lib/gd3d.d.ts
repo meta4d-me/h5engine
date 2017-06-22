@@ -1336,6 +1336,7 @@ declare namespace gd3d.framework {
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
+        init(): void;
         private _data;
         start(): void;
         update(delta: number): void;
@@ -2075,6 +2076,7 @@ declare namespace gd3d.framework {
         getAttribute(attribute: string): any;
         initAttribute(attribute: string): void;
         resetMatrix(): void;
+        copyandinit(): EffectAttrsData;
         clone(): EffectAttrsData;
     }
     class EffectFrameData {
@@ -2543,6 +2545,7 @@ declare namespace gd3d.framework {
         formate: number;
         effectSys: effectSystem;
         constructor(_data: Emission, effectSys: effectSystem);
+        initMesh(): void;
         curVerCount: number;
         curIndexCount: number;
         addParticle(): void;
@@ -2951,6 +2954,7 @@ declare namespace gd3d.framework {
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
+        beDispose: boolean;
         dispose(): void;
     }
     class insID {
@@ -3464,5 +3468,24 @@ declare namespace gd3d.render {
         private static mapTexture;
         static formGrayArray(webgl: WebGLRenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
         static staticTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
+    }
+    class WriteableTexture2D implements ITexture {
+        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum, width: number, height: number, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean);
+        linear: boolean;
+        premultiply: boolean;
+        repeat: boolean;
+        mirroredU: boolean;
+        mirroredV: boolean;
+        updateRect(data: Uint8Array, x: number, y: number, width: number, height: number): void;
+        updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
+        isFrameBuffer(): boolean;
+        webgl: WebGLRenderingContext;
+        texture: WebGLTexture;
+        format: TextureFormatEnum;
+        formatGL: number;
+        width: number;
+        height: number;
+        dispose(webgl: WebGLRenderingContext): void;
+        caclByteLength(): number;
     }
 }

@@ -327,7 +327,13 @@ declare class test_effect implements IState {
     start(app: gd3d.framework.application): void;
     private loadEffect(laststate, state);
     private addcam(laststate, state);
+    tr: gd3d.framework.transform;
+    ttr: gd3d.framework.transform;
+    eff: gd3d.framework.effectSystem;
     beclone: boolean;
+    effectloaded: boolean;
+    bestop: boolean;
+    bereplay: boolean;
     update(delta: number): void;
 }
 declare namespace t {
@@ -365,6 +371,7 @@ declare namespace t {
     class test_light1 implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
+        tex: gd3d.framework.texture;
         private loadShader(laststate, state);
         private loadText(laststate, state);
         private addcube(laststate, state);

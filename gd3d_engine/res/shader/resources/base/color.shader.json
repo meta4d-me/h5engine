@@ -8,6 +8,13 @@
                 "fs": "color"
             }
         ],
+        "base_fog": [
+            {
+                "showface": "all",
+                "vs": "fog_color",
+                "fs": "fog_color"
+            }
+        ],
         "shadowgen": [],
         "bone": [],
         "shadowuse": []

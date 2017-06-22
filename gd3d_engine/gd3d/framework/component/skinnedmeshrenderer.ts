@@ -219,7 +219,7 @@ namespace gd3d.framework
                     let mat1 = this.getMatByIndex(verindex1);
                     let mat2 = this.getMatByIndex(verindex2);
                     if (mat0 == null || mat1 == null || mat2 == null) continue;
-                    
+
                     let mat00 = gd3d.math.pool.new_matrix();
                     gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
                     let mat11 = gd3d.math.pool.new_matrix();
@@ -265,7 +265,7 @@ namespace gd3d.framework
             }
             if (skintype == 2 && this._skeletonMatrixData == null)
             {
-                this.maxBoneCount = 60;
+                this.maxBoneCount = 40;
                 this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                 this._efficient = true;
             }
@@ -279,7 +279,7 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-           // if (!(camera.CullingMask & this.renderLayer)) return;
+            // if (!(camera.CullingMask & this.renderLayer)) return;
             // if (this.materials == null)
             // {
             //     this.materials = [];
@@ -334,7 +334,16 @@ namespace gd3d.framework
                             var mid = this._mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质
                             var usemat = this.materials[mid];
                             if (usemat != null)
-                                usemat.draw(context, this._mesh, sm, "skin");
+                            {
+                                if (this.gameObject.transform.scene.fog)
+                                {
+                                    context.fog = this.gameObject.transform.scene.fog;
+                                    usemat.draw(context, this._mesh, sm, "skin_fog");
+                                } else
+                                {
+                                    usemat.draw(context, this._mesh, sm, "skin");
+                                }
+                            }
                         }
                     }
                 }
@@ -343,7 +352,7 @@ namespace gd3d.framework
 
         remove()
         {
-            if(this.mesh)
+            if (this.mesh)
                 this.mesh.unuse(true);
             this.bones.length = 0;
         }

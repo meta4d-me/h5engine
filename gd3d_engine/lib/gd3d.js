@@ -129,7 +129,6 @@ var gd3d;
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
                 if (this.bePlay) {
-                    this.preusercodetimer = Date.now();
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
                             this.beStepNumber--;
@@ -139,12 +138,13 @@ var gd3d;
                     else {
                         this.updateUserCode(delta);
                     }
-                    this.usercodetime = Date.now() - this.preusercodetimer;
                 }
                 this.updateEditorCode(delta);
+                this.preusercodetimer = Date.now();
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
+                this.usercodetime = Date.now() - this.preusercodetimer;
             };
             application.prototype.getUserUpdateTimer = function () {
                 return this.usercodetime;
@@ -3907,7 +3907,7 @@ var gd3d;
                         _texture.realName = _name;
                         _this.assetUrlDic[_texture.getGUID()] = url;
                         var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                        t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
                         _texture.glTexture = t2d;
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4120,7 +4120,7 @@ var gd3d;
                         _this.assetUrlDic[_texture.getGUID()] = url;
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(img, true, true, true, true);
+                        t2d.uploadImage(img, true, true, false, true);
                         _texture.glTexture = t2d;
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4177,7 +4177,7 @@ var gd3d;
                             _texture.realName = _name;
                             _this.assetUrlDic[_texture.getGUID()] = url;
                             var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                            t2d.uploadImage(img, _mipmap, _linear, false, _repeat);
                             _texture.glTexture = t2d;
                             _this.use(_texture);
                             state.resstate[filename].state = 1;
@@ -8281,12 +8281,17 @@ var gd3d;
                 },
                 set: function (value) {
                     this._data = value;
-                    this.addElements();
                 },
                 enumerable: true,
                 configurable: true
             });
+            effectSystem.prototype.init = function () {
+                if (this._data) {
+                    this.addElements();
+                }
+            };
             effectSystem.prototype.start = function () {
+                this.init();
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
@@ -8427,7 +8432,13 @@ var gd3d;
                             subEffectBatcher.beBufferInited = true;
                         }
                         mesh_1.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                        subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base");
+                        if (this.gameObject.getScene().fog) {
+                            context.fog = this.gameObject.getScene().fog;
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base_fog");
+                        }
+                        else {
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base");
+                        }
                     }
                     if (this.particles != undefined) {
                         this.particles.render(context, assetmgr, camera);
@@ -8464,6 +8475,17 @@ var gd3d;
                         element.setActive(true);
                         if (element.data.initFrameData != undefined)
                             element.curAttrData = element.data.initFrameData.attrsData.clone();
+                    }
+                }
+                if (this.particles)
+                    this.particles.dispose();
+                for (var index in this.data.elements) {
+                    var data = this.data.elements[index];
+                    if (data.type == framework.EffectElementTypeEnum.EmissionType) {
+                        if (this.particles == undefined) {
+                            this.particles = new framework.Particles(this);
+                        }
+                        this.particles.addEmission(data.emissionData);
                     }
                 }
             };
@@ -8541,7 +8563,7 @@ var gd3d;
                 }
                 element.effectBatcher = subEffectBatcher;
                 element.startIndex = vertexStartIndex;
-                element.curAttrData = elementData.initFrameData.attrsData.clone();
+                element.curAttrData = elementData.initFrameData.attrsData.copyandinit();
                 var vertexSize = subEffectBatcher.vertexSize;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
@@ -9269,7 +9291,7 @@ var gd3d;
                     this._efficient = false;
                 }
                 if (skintype == 2 && this._skeletonMatrixData == null) {
-                    this.maxBoneCount = 60;
+                    this.maxBoneCount = 40;
                     this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                     this._efficient = true;
                 }
@@ -9301,8 +9323,15 @@ var gd3d;
                                 var sm = this._mesh.submesh[i];
                                 var mid = this._mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
-                                if (usemat != null)
-                                    usemat.draw(context, this._mesh, sm, "skin");
+                                if (usemat != null) {
+                                    if (this.gameObject.transform.scene.fog) {
+                                        context.fog = this.gameObject.transform.scene.fog;
+                                        usemat.draw(context, this._mesh, sm, "skin_fog");
+                                    }
+                                    else {
+                                        usemat.draw(context, this._mesh, sm, "skin");
+                                    }
+                                }
                             }
                         }
                     }
@@ -9757,7 +9786,13 @@ var gd3d;
                 this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
                 this.mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = (this.targetPath.length - 1) * 6;
-                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                }
             };
             trailRender_recorde.prototype.clone = function () {
             };
@@ -10003,7 +10038,13 @@ var gd3d;
                     return;
                 context.updateModeTrail();
                 this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                }
             };
             trailRender.prototype.clone = function () {
             };
@@ -11774,7 +11815,7 @@ var gd3d;
         function isAsset(type) {
             if (type == "mesh" || type == "texture" || type == "shader" ||
                 type == "material" || type == "animationClip" || type == "atlas" ||
-                type == "font" || type == "prefab" || type == "sprite")
+                type == "font" || type == "prefab" || type == "sprite" || type == "textasset")
                 return true;
             return false;
         }
@@ -13804,7 +13845,7 @@ var gd3d;
                     for (var i in this.data.timelineFrame) {
                         var frameData = this.data.timelineFrame[i];
                         if (frameData.frameIndex != -1) {
-                            if (frameData.lerpDatas != undefined) {
+                            if (frameData.lerpDatas != undefined && frameData.lerpDatas.length != 0) {
                                 this.recordLerpValues(frameData);
                             }
                             else if (frameData.attrsData != undefined) {
@@ -14017,14 +14058,16 @@ var gd3d;
                 elementdata.name = this.name;
                 elementdata.type = this.type;
                 elementdata.ref = this.ref;
+                elementdata.actionData = [];
+                elementdata.timelineFrame = [];
                 if (this.initFrameData)
                     elementdata.initFrameData = this.initFrameData.clone();
                 if (this.emissionData) {
                     elementdata.emissionData = this.emissionData.clone();
                 }
                 for (var key in this.timelineFrame) {
-                    if (this.initFrameData[key]) {
-                        elementdata.timelineFrame[key] = this.initFrameData[key].clone();
+                    if (this.timelineFrame[key]) {
+                        elementdata.timelineFrame[key] = this.timelineFrame[key].clone();
                     }
                 }
                 for (var key in this.actionData) {
@@ -14093,6 +14136,8 @@ var gd3d;
                         return gd3d.math.pool.clone_vector3(this.color);
                     case "tilling":
                         return gd3d.math.pool.clone_vector2(this.tilling);
+                    case "uv":
+                        return gd3d.math.pool.clone_vector2(this.uv);
                     case "mat":
                         return this.mat.clone();
                     case "renderModel":
@@ -14136,7 +14181,7 @@ var gd3d;
             EffectAttrsData.prototype.resetMatrix = function () {
                 gd3d.math.matrixZero(this.matrix);
             };
-            EffectAttrsData.prototype.clone = function () {
+            EffectAttrsData.prototype.copyandinit = function () {
                 var data = new EffectAttrsData();
                 if (this.pos != undefined)
                     data.pos = gd3d.math.pool.clone_vector3(this.pos);
@@ -14175,6 +14220,33 @@ var gd3d;
                 data.mesh = this.mesh;
                 return data;
             };
+            EffectAttrsData.prototype.clone = function () {
+                var data = new EffectAttrsData();
+                if (this.pos != undefined)
+                    data.pos = gd3d.math.pool.clone_vector3(this.pos);
+                if (this.euler != undefined)
+                    data.euler = gd3d.math.pool.clone_vector3(this.euler);
+                if (this.color != undefined)
+                    data.color = gd3d.math.pool.clone_vector3(this.color);
+                if (this.scale != undefined)
+                    data.scale = gd3d.math.pool.clone_vector3(this.scale);
+                if (this.tilling != undefined)
+                    data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
+                if (this.uv != undefined)
+                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
+                if (this.mat != undefined)
+                    data.mat = this.mat.clone();
+                if (this.rotationByEuler != undefined)
+                    data.rotationByEuler = gd3d.math.pool.clone_quaternion(this.rotationByEuler);
+                if (this.localRotation != undefined)
+                    data.localRotation = gd3d.math.pool.clone_quaternion(this.localRotation);
+                if (this.meshdataVbo != undefined)
+                    data.meshdataVbo = this.meshdataVbo;
+                data.alpha = this.alpha;
+                data.renderModel = this.renderModel;
+                data.mesh = this.mesh;
+                return data;
+            };
             return EffectAttrsData;
         }());
         framework.EffectAttrsData = EffectAttrsData;
@@ -14185,6 +14257,7 @@ var gd3d;
                 var framedata = new EffectFrameData();
                 framedata.frameIndex = this.frameIndex;
                 framedata.attrsData = this.attrsData.clone();
+                framedata.lerpDatas = [];
                 for (var key in this.lerpDatas) {
                     framedata.lerpDatas[key] = this.lerpDatas[key].clone();
                 }
@@ -14224,6 +14297,7 @@ var gd3d;
                 actiondata.actionType = this.actionType;
                 actiondata.startFrame = this.startFrame;
                 actiondata.endFrame = this.endFrame;
+                actiondata.params = [];
                 for (var key in this.params) {
                     actiondata.params[key] = this.params[key];
                 }
@@ -16225,6 +16299,7 @@ var gd3d;
                 for (var key in this.emissionElements) {
                     this.emissionElements[key].dispose();
                 }
+                this.emissionElements.length = 0;
             };
             return Particles;
         }());
@@ -16313,6 +16388,7 @@ var gd3d;
                 for (var key in this.emissionBatchers) {
                     this.emissionBatchers[key].dispose();
                 }
+                this.emissionBatchers.length = 0;
             };
             EmissionElement.prototype.isOver = function () {
                 return this.isover;
@@ -16338,6 +16414,20 @@ var gd3d;
                 this.vertexSize = gd3d.render.meshData.calcByteSize(this.formate) / 4;
                 this.curTotalVertexCount = 256;
                 this.indexStartIndex = 256;
+                this.initMesh();
+                this.mat = new framework.material();
+                if (this.data.mat.shader == null) {
+                    this.mat.setShader(framework.sceneMgr.app.getAssetMgr().getShader("diffuse.shader.json"));
+                }
+                else {
+                    this.mat.setShader(this.data.mat.shader);
+                }
+                if (this.data.mat.alphaCut != undefined)
+                    this.mat.setFloat("_AlphaCut", this.data.mat.alphaCut);
+                if (this.data.mat.diffuseTexture != null)
+                    this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
+            }
+            EmissionBatcher.prototype.initMesh = function () {
                 this.mesh = new framework.mesh();
                 this.mesh.data = new gd3d.render.meshData();
                 this.mesh.glMesh = new gd3d.render.glMesh();
@@ -16351,18 +16441,7 @@ var gd3d;
                     sm.line = false;
                     this.mesh.submesh.push(sm);
                 }
-                this.mat = new framework.material();
-                if (this.data.mat.shader == null) {
-                    this.mat.setShader(framework.sceneMgr.app.getAssetMgr().getShader("diffuse.shader.json"));
-                }
-                else {
-                    this.mat.setShader(this.data.mat.shader);
-                }
-                if (this.data.mat.alphaCut != undefined)
-                    this.mat.setFloat("_AlphaCut", this.data.mat.alphaCut);
-                if (this.data.mat.diffuseTexture != null)
-                    this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
-            }
+            };
             EmissionBatcher.prototype.addParticle = function () {
                 var p = new Particle(this);
                 p.uploadData(this.dataForVbo);
@@ -16436,7 +16515,13 @@ var gd3d;
                     mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
                 }
                 mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                this.mat.draw(context, mesh, mesh.submesh[0], "base");
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.mat.draw(context, mesh, mesh.submesh[0], "base");
+                }
             };
             EmissionBatcher.prototype.dispose = function () {
                 this.dataForVbo = null;
@@ -16508,6 +16593,10 @@ var gd3d;
                     this.alpha = 1;
                 else
                     this.alpha = this.data.alpha.getValueRandom();
+                if (this.data.uv == undefined)
+                    this.uv = new gd3d.math.vector2(1, 1);
+                else
+                    this.uv = this.data.uv.getValueRandom();
                 gd3d.math.vec3Clone(this.scale, this.initscale);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
                     gd3d.math.quatFromEulerAngles(this.startPitchYawRoll.x, this.startPitchYawRoll.y, this.startPitchYawRoll.z, this.rotation_start);
@@ -18228,6 +18317,7 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
@@ -18610,6 +18700,8 @@ var gd3d;
                 return gd3d.io.cloneObj(this);
             };
             transform.prototype.dispose = function () {
+                if (this.beDispose)
+                    return;
                 if (this.children) {
                     for (var k in this.children) {
                         this.children[k].dispose();
@@ -18617,6 +18709,7 @@ var gd3d;
                     this.removeAllChild();
                 }
                 this._gameObject.dispose();
+                this.beDispose = true;
             };
             return transform;
         }());
@@ -21482,6 +21575,94 @@ var gd3d;
         }());
         glTexture2D.mapTexture = {};
         render.glTexture2D = glTexture2D;
+        var WriteableTexture2D = (function () {
+            function WriteableTexture2D(webgl, format, width, height, linear, premultiply, repeat, mirroredU, mirroredV) {
+                if (format === void 0) { format = TextureFormatEnum.RGBA; }
+                if (premultiply === void 0) { premultiply = true; }
+                if (repeat === void 0) { repeat = false; }
+                if (mirroredU === void 0) { mirroredU = false; }
+                if (mirroredV === void 0) { mirroredV = false; }
+                this.premultiply = true;
+                this.repeat = false;
+                this.mirroredU = false;
+                this.mirroredV = false;
+                this.width = 0;
+                this.height = 0;
+                this.webgl = webgl;
+                this.texture = webgl.createTexture();
+                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                this.format = format;
+                this.formatGL = this.webgl.RGBA;
+                if (format == TextureFormatEnum.RGB)
+                    this.formatGL = this.webgl.RGB;
+                else if (format == TextureFormatEnum.Gray)
+                    this.formatGL = this.webgl.LUMINANCE;
+                var data = null;
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, this.formatGL, width, height, 0, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
+                if (linear) {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
+                }
+                else {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
+                }
+                if (repeat) {
+                    if (mirroredU && mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else if (mirroredU) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                    else if (mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                }
+                else {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
+                }
+            }
+            WriteableTexture2D.prototype.updateRect = function (data, x, y, width, height) {
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, width, height, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
+            };
+            WriteableTexture2D.prototype.updateRectImg = function (data, x, y) {
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
+            };
+            WriteableTexture2D.prototype.isFrameBuffer = function () {
+                return false;
+            };
+            WriteableTexture2D.prototype.dispose = function (webgl) {
+                if (this.texture != null) {
+                    webgl.deleteTexture(this.texture);
+                    this.texture = null;
+                }
+            };
+            WriteableTexture2D.prototype.caclByteLength = function () {
+                var pixellen = 1;
+                if (this.format == TextureFormatEnum.RGBA) {
+                    pixellen = 4;
+                }
+                else if (this.format == TextureFormatEnum.RGB) {
+                    pixellen = 3;
+                }
+                var len = this.width * this.height * pixellen;
+                return len;
+            };
+            return WriteableTexture2D;
+        }());
+        render.WriteableTexture2D = WriteableTexture2D;
     })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
 //# sourceMappingURL=gd3d.js.map

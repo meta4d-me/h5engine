@@ -18,11 +18,25 @@
                 "fs": "streamlight"
             }
         ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_streamlight",
+                "fs": "fog_streamlight"
+            }
+        ],
         "skin": [
             {
                 "showface": "ccw",
                 "vs": "streamlightbone_eff",
                 "fs": "streamlight"
+            }
+        ],
+        "skin_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_streamlightbone_eff",
+                "fs": "fog_streamlight"
             }
         ]
     }

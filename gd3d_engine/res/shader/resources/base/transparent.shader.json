@@ -3,10 +3,18 @@
     "passes": {
         "base": [
             {
-                "blendmode":  "blend",
+                "blendmode": "blend",
                 "showface": "ccw",
                 "vs": "transparent",
                 "fs": "transparent"
+            }
+        ],
+        "base_fog": [
+            {
+                "blendmode": "blend",
+                "showface": "ccw",
+                "vs": "fog_transparent",
+                "fs": "fog_transparent"
             }
         ],
         "shadowgen": [],

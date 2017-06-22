@@ -61,7 +61,7 @@ namespace gd3d.framework
                     let frameData = this.data.timelineFrame[i];
                     if (frameData.frameIndex != -1)
                     {
-                        if (frameData.lerpDatas != undefined)
+                        if (frameData.lerpDatas != undefined && frameData.lerpDatas.length != 0)
                         {
                             this.recordLerpValues(frameData);
                         } else if (frameData.attrsData != undefined)
@@ -366,6 +366,8 @@ namespace gd3d.framework
             elementdata.name = this.name;
             elementdata.type = this.type;
             elementdata.ref = this.ref;
+            elementdata.actionData = [];
+            elementdata.timelineFrame = [];
             if (this.initFrameData)
                 elementdata.initFrameData = this.initFrameData.clone();
 
@@ -375,9 +377,9 @@ namespace gd3d.framework
             }
             for (let key in this.timelineFrame)
             {
-                if (this.initFrameData[key]) 
+                if (this.timelineFrame[key]) 
                 {
-                    elementdata.timelineFrame[key] = this.initFrameData[key].clone();
+                    elementdata.timelineFrame[key] = this.timelineFrame[key].clone();
                 }
             }
 
@@ -495,6 +497,8 @@ namespace gd3d.framework
                     return gd3d.math.pool.clone_vector3(this.color);
                 case "tilling":
                     return gd3d.math.pool.clone_vector2(this.tilling);
+                case "uv":
+                    return gd3d.math.pool.clone_vector2(this.uv);
                 case "mat":
                     return this.mat.clone();
                 case "renderModel":
@@ -544,7 +548,7 @@ namespace gd3d.framework
         {
             math.matrixZero(this.matrix);
         }
-        clone(): EffectAttrsData
+        copyandinit(): EffectAttrsData//没有的数据初始化
         {
             let data = new EffectAttrsData();
             if (this.pos != undefined)
@@ -596,6 +600,46 @@ namespace gd3d.framework
             data.mesh = this.mesh;
             return data;
         }
+        clone(): EffectAttrsData
+        {
+            let data = new EffectAttrsData();
+            if (this.pos != undefined)
+                data.pos = math.pool.clone_vector3(this.pos);
+            if (this.euler != undefined)
+                data.euler = math.pool.clone_vector3(this.euler);
+            if (this.color != undefined)
+                data.color = math.pool.clone_vector3(this.color);
+            if (this.scale != undefined)
+                data.scale = math.pool.clone_vector3(this.scale);
+            if (this.tilling != undefined)
+                data.tilling = math.pool.clone_vector2(this.tilling);
+            if (this.uv != undefined)
+                data.uv = math.pool.clone_vector2(this.uv);
+            if (this.mat != undefined)
+                data.mat = this.mat.clone();
+            if (this.rotationByEuler != undefined)
+                data.rotationByEuler = math.pool.clone_quaternion(this.rotationByEuler);
+            if (this.localRotation != undefined)
+                data.localRotation = math.pool.clone_quaternion(this.localRotation);
+            if (this.meshdataVbo != undefined)
+                data.meshdataVbo = this.meshdataVbo;//这个数组不会被改变，可以直接引用
+            // if (this.startEuler != undefined)
+            // {
+            //     data.startEuler = math.pool.clone_vector3(this.startEuler);
+            //     gd3d.math.quatFromEulerAngles(data.startEuler.x, data.startEuler.y, data.startEuler.z, data.startRotation);
+            //     // data.startRotation = math.pool.clone_quaternion(this.startRotation);
+            // }
+            // if (this.localAxisX != undefined)
+            //     data.localAxisX = math.pool.clone_vector3(this.localAxisX);
+            // if (this.localAxisY != undefined)
+            //     data.localAxisY = math.pool.clone_vector3(this.localAxisY);
+            // if (this.localAxisZ != undefined)
+            //     data.localAxisZ = math.pool.clone_vector3(this.localAxisZ);
+            data.alpha = this.alpha;
+            data.renderModel = this.renderModel;
+            data.mesh = this.mesh;
+            return data;
+        }
     }
 
     export class EffectFrameData
@@ -608,6 +652,7 @@ namespace gd3d.framework
             let framedata = new EffectFrameData();
             framedata.frameIndex = this.frameIndex;
             framedata.attrsData = this.attrsData.clone();
+            framedata.lerpDatas = [];
             for (let key in this.lerpDatas)
             {
                 framedata.lerpDatas[key] = this.lerpDatas[key].clone();
@@ -655,6 +700,7 @@ namespace gd3d.framework
             actiondata.actionType = this.actionType;
             actiondata.startFrame = this.startFrame;
             actiondata.endFrame = this.endFrame;
+            actiondata.params = [];
             for (let key in this.params)
             {
                 actiondata.params[key] = this.params[key];

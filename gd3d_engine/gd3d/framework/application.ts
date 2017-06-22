@@ -144,7 +144,6 @@ namespace gd3d.framework
 
             if (this.bePlay)
             {
-                this.preusercodetimer = Date.now();
                 if (this.bePause)
                 {
                     if (this.beStepForward && this.beStepNumber > 0)
@@ -157,14 +156,15 @@ namespace gd3d.framework
                 {
                     this.updateUserCode(delta);
                 }
-                this.usercodetime = Date.now() - this.preusercodetimer;
             }
             this.updateEditorCode(delta);
 
+            this.preusercodetimer = Date.now();
             if (this._scene != null)
             {
                 this._scene.update(delta);
             }
+            this.usercodetime = Date.now() - this.preusercodetimer;
         }
         private preusercodetimer:number;
         private usercodetime:number;

@@ -41,11 +41,17 @@ namespace gd3d.framework
         set data(value: EffectSystemData)
         {
             this._data = value;
-            this.addElements();
         }
         get data(): EffectSystemData
         {
             return this._data;
+        }
+        init()
+        {
+            if (this._data)
+            {
+                this.addElements();
+            }
         }
         private _data: EffectSystemData;
 
@@ -56,7 +62,7 @@ namespace gd3d.framework
 
         start()
         {
-
+            this.init();
         }
         update(delta: number)
         {
@@ -195,7 +201,7 @@ namespace gd3d.framework
             }
             if (mesh == undefined)
                 return;
-            if(curAttrsData.meshdataVbo == undefined)
+            if (curAttrsData.meshdataVbo == undefined)
             {
                 curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
             }
@@ -268,7 +274,7 @@ namespace gd3d.framework
                     if (!subEffectBatcher.beBufferInited)
                     {
                         mesh.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                        if(mesh.glMesh.ebos.length == 0)
+                        if (mesh.glMesh.ebos.length == 0)
                         {
                             mesh.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
                         }
@@ -276,12 +282,19 @@ namespace gd3d.framework
                         {
                             mesh.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                         }
-                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo); 
+                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
                         mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
                         subEffectBatcher.beBufferInited = true;
                     }
                     mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                    subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base");//只有一个submesh
+                    if (this.gameObject.getScene().fog)
+                    {
+                        context.fog = this.gameObject.getScene().fog;
+                        subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base_fog");//只有一个submesh
+                    } else
+                    {
+                        subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base");//只有一个submesh
+                    }
                 }
                 if (this.particles != undefined)
                 {
@@ -341,6 +354,21 @@ namespace gd3d.framework
                     element.setActive(true);
                     if (element.data.initFrameData != undefined)//引用问题还没处理
                         element.curAttrData = element.data.initFrameData.attrsData.clone();
+                }
+            }
+            if (this.particles)
+                this.particles.dispose();
+
+            for (let index in this.data.elements)
+            {
+                let data = this.data.elements[index];
+                if (data.type == EffectElementTypeEnum.EmissionType)
+                {
+                    if (this.particles == undefined)
+                    {
+                        this.particles = new Particles(this);
+                    }
+                    this.particles.addEmission(data.emissionData);
                 }
             }
         }
@@ -443,7 +471,7 @@ namespace gd3d.framework
             }
             element.effectBatcher = subEffectBatcher;
             element.startIndex = vertexStartIndex;
-            element.curAttrData = elementData.initFrameData.attrsData.clone();
+            element.curAttrData = elementData.initFrameData.attrsData.copyandinit();
             let vertexSize = subEffectBatcher.vertexSize;
             let vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
             // if (_initFrameData.attrsData.startEuler)

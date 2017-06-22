@@ -654,9 +654,10 @@ namespace gd3d.framework
         {
             return io.cloneObj(this) as transform;
         }
-
+        beDispose:boolean = false;//是否被释放了
         dispose()
         {
+            if(this.beDispose)  return;
             if (this.children)
             {
                 for (var k in this.children)
@@ -666,6 +667,7 @@ namespace gd3d.framework
                 this.removeAllChild();
             }
             this._gameObject.dispose();
+            this.beDispose = true;
         }
     }
 

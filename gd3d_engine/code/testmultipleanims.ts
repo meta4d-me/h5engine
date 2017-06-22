@@ -38,9 +38,9 @@ class test_multipleplayer_anim implements IState
                         var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(data.prefabName) as gd3d.framework.prefab;
                         let a = 10;
                         let b = 10;
-                        for (let i = -7; i <=7; i++)
+                        for (let i = -14; i <=14; i++)
                         {
-                            for (let j = -7; j <=7; j++)
+                            for (let j = -14; j <=14; j++)
                             {
                                 let trans = _prefab.getCloneTrans();
 
@@ -85,16 +85,16 @@ class test_multipleplayer_anim implements IState
     timer: number = 0;
     update(delta: number)
     {
-        this.timer += delta;
-        var x = Math.sin(this.timer * 0.5);
-        var z = Math.cos(this.timer * 0.5);
-        // var x2 = Math.sin(this.timer * 1.1);
-        // var z2 = Math.cos(this.timer * 1.1);
-        let objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x * 86, 55, -z * 86);
-        objCam.lookat(this.cube);
-        objCam.markDirty();//标记为需要刷新
-        objCam.updateWorldTran();
+        // this.timer += delta;
+        // var x = Math.sin(this.timer * 0.5);
+        // var z = Math.cos(this.timer * 0.5);
+        // // var x2 = Math.sin(this.timer * 1.1);
+        // // var z2 = Math.cos(this.timer * 1.1);
+        // let objCam = this.camera.gameObject.transform;
+        // objCam.localTranslate = new gd3d.math.vector3(x * 86, 55, -z * 86);
+        // objCam.lookat(this.cube);
+        // objCam.markDirty();//标记为需要刷新
+        // objCam.updateWorldTran();
         // for (var key in this.cubes)
         // {
         //     var ap = this.player.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;

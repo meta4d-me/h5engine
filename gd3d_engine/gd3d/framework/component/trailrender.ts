@@ -19,8 +19,8 @@ namespace gd3d.framework
         private dataForEbo: Uint16Array;
         private sticks: trailStick[];
         // private targetpos:Float32Array;
-        private active:boolean=false;
-        private reInit:boolean=false;
+        private active: boolean = false;
+        private reInit: boolean = false;
         start()
         {
             this.app = this.gameObject.getScene().app;
@@ -30,51 +30,51 @@ namespace gd3d.framework
         private app: application;
         private webgl: WebGLRenderingContext;
 
-        private camerapositon:gd3d.math.vector3;
-        
-        extenedOneSide:boolean=true;//延展方向
+        private camerapositon: gd3d.math.vector3;
+
+        extenedOneSide: boolean = true;//延展方向
         update(delta: number)
         {
-            if(!this.active) return;
-            if(this.reInit)
+            if (!this.active) return;
+            if (this.reInit)
             {
                 this.intidata();
-                this.reInit=false;
+                this.reInit = false;
             }
-            var targetpos=this.gameObject.transform.getWorldTranslate();
-            if(this.lookAtCamera)
+            var targetpos = this.gameObject.transform.getWorldTranslate();
+            if (this.lookAtCamera)
             {
-                this.camerapositon=sceneMgr.app.getScene().mainCamera.gameObject.transform.getWorldTranslate();
-                var camdir=gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(this.camerapositon,this.sticks[0].location,camdir);
-                gd3d.math.vec3Normalize(camdir,camdir);
+                this.camerapositon = sceneMgr.app.getScene().mainCamera.gameObject.transform.getWorldTranslate();
+                var camdir = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(this.camerapositon, this.sticks[0].location, camdir);
+                gd3d.math.vec3Normalize(camdir, camdir);
 
-                var direction:gd3d.math.vector3=gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(targetpos,this.sticks[0].location,direction);
-                gd3d.math.vec3Normalize(direction,direction);
-                gd3d.math.vec3Cross(camdir,direction,this.sticks[0].updir);
+                var direction: gd3d.math.vector3 = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(targetpos, this.sticks[0].location, direction);
+                gd3d.math.vec3Normalize(direction, direction);
+                gd3d.math.vec3Cross(camdir, direction, this.sticks[0].updir);
                 gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
                 gd3d.math.pool.delete_vector3(direction);
             }
             gd3d.math.vec3Clone(targetpos, this.sticks[0].location);
-            
+
             var length = this.sticks.length;
             for (var i = 1; i < length; i++)
             {
                 gd3d.math.vec3SLerp(this.sticks[i].location, this.sticks[i - 1].location, this.speed, this.sticks[i].location);
             }
             //--------------------------------延展面片方向-------------------------------------------------
-            if(this.lookAtCamera)
+            if (this.lookAtCamera)
             {
-                for(var i=1;i<length;i++)
+                for (var i = 1; i < length; i++)
                 {
-                    var tocamdir=gd3d.math.pool.new_vector3();
-                    gd3d.math.vec3Subtract(this.camerapositon,this.sticks[i].location,tocamdir);
-                    gd3d.math.vec3Normalize(tocamdir,tocamdir);
-                    var movedir=gd3d.math.pool.new_vector3();
-                    gd3d.math.vec3Subtract(this.sticks[i-1].location,this.sticks[i].location,movedir);
-                    gd3d.math.vec3Normalize(movedir,movedir);
-                    gd3d.math.vec3Cross(tocamdir,movedir,this.sticks[i].updir);
+                    var tocamdir = gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Subtract(this.camerapositon, this.sticks[i].location, tocamdir);
+                    gd3d.math.vec3Normalize(tocamdir, tocamdir);
+                    var movedir = gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Subtract(this.sticks[i - 1].location, this.sticks[i].location, movedir);
+                    gd3d.math.vec3Normalize(movedir, movedir);
+                    gd3d.math.vec3Cross(tocamdir, movedir, this.sticks[i].updir);
                     gd3d.math.vec3ScaleByNum(this.sticks[i].updir, this.width, this.sticks[i].updir);
                     gd3d.math.pool.delete_vector3(tocamdir);
                 }
@@ -83,7 +83,7 @@ namespace gd3d.framework
             {
                 this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
                 gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
-                for(var i=1;i<length;i++)
+                for (var i = 1; i < length; i++)
                 {
                     gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, this.speed, this.sticks[i].updir);
                 }
@@ -141,15 +141,15 @@ namespace gd3d.framework
         public play()
         {
             //this.intidata();//项目喜欢添加组件后立刻播放，会报错，此时组件的start还没走
-            this.reInit=true;
-            this.active=true;
+            this.reInit = true;
+            this.active = true;
         }
         //停止
         public stop()
         {
-            this.active=false;
+            this.active = false;
         }
-        lookAtCamera:boolean=false;
+        lookAtCamera: boolean = false;
         //------------------------------------------------------------------------------------------------------
         private initmesh()
         {
@@ -191,7 +191,7 @@ namespace gd3d.framework
                 gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), ts.location);
                 ts.updir = new gd3d.math.vector3();
                 this.gameObject.transform.getUpInWorld(ts.updir);
-                gd3d.math.vec3ScaleByNum(ts.updir,this.width,ts.updir);
+                gd3d.math.vec3ScaleByNum(ts.updir, this.width, ts.updir);
             }
 
             var length = this.vertexcount / 2;
@@ -231,7 +231,7 @@ namespace gd3d.framework
                 this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a;
                 this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
                 this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
-      
+
             }
             //--------------------------------------     
             for (var k = 0; k < length - 1; k++)
@@ -259,7 +259,7 @@ namespace gd3d.framework
         {
             var length = this.vertexcount / 2;
 
-            if(this.extenedOneSide)
+            if (this.extenedOneSide)
             {
                 for (var i = 0; i < length; i++)
                 {
@@ -280,9 +280,9 @@ namespace gd3d.framework
                 {
                     var pos = this.sticks[i].location;
                     var up = this.sticks[i].updir;
-                    this.dataForVbo[i * 2 * 9] = pos.x-up.x;
-                    this.dataForVbo[i * 2 * 9 + 1] = pos.y-up.y;
-                    this.dataForVbo[i * 2 * 9 + 2] = pos.z-up.z;
+                    this.dataForVbo[i * 2 * 9] = pos.x - up.x;
+                    this.dataForVbo[i * 2 * 9 + 1] = pos.y - up.y;
+                    this.dataForVbo[i * 2 * 9 + 2] = pos.z - up.z;
 
                     this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
                     this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
@@ -294,11 +294,18 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
-            if(!this.active) return;
+            if (!this.active) return;
             context.updateModeTrail();
             this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
             //--------------------------render-------------------------------------------
-            this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+            if (this.gameObject.getScene().fog)
+            {
+                context.fog = this.gameObject.getScene().fog;
+                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+            } else
+            {
+                this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+            }
         }
         clone()
         {

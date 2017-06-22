@@ -10,8 +10,8 @@
                 "showface": "ccw",
                 "vs": "diffuse",
                 "fs": "diffuse",
-                "zwrite":"on",
-                "ztest":"lequal"
+                "zwrite": "on",
+                "ztest": "lequal"
             }
         ],
         "base_fog": [
@@ -19,8 +19,8 @@
                 "showface": "ccw",
                 "vs": "fog_diffuse",
                 "fs": "fog_diffuse",
-                "zwrite":"on",
-                "ztest":"lequal"
+                "zwrite": "on",
+                "ztest": "lequal"
             }
         ],
         "skin": [
@@ -30,11 +30,11 @@
                 "fs": "diffuse"
             }
         ],
-         "skin_fog": [
+        "skin_fog": [
             {
                 "showface": "ccw",
-                "vs": "bone_eff",
-                "fs": "diffuse"
+                "vs": "fog_bone_eff",
+                "fs": "fog_diffuse"
             }
         ],
         "lightmap": [
