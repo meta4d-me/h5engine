@@ -13,7 +13,7 @@ namespace gd3d.framework
         gameObject: gameObject;
 
         @gd3d.reflect.Field("material[]")
-        materials: material[];
+        materials: material[]=[];
 
         @gd3d.reflect.Field("number")
         lightmapIndex: number = -1;
@@ -38,26 +38,34 @@ namespace gd3d.framework
         start()
         {
             this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
-            // console.warn("start:" + this.filter);
+
+            this.refreshLayerAndQue();
         }
+
+        private refreshLayerAndQue()
+        {
+            if (this.materials == null || this.materials.length == 0)
+            {
+                this.materials = [];
+                this.materials.push(new framework.material());
+                this.materials[0].setShader(sceneMgr.app.getAssetMgr().getShader("shader/def"));
+            }
+
+            this.layer = this.materials[0].getLayer();
+            if (!this.issetq)
+                this._queue = this.materials[0].getQueue();
+        }
+
         update(delta: number)
         {
 
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            //if (!(camera.CullingMask & this.renderLayer)) return;
-            if (this.materials == null || this.materials.length == 0)
-            {
-                this.materials = [];
-                this.materials.push(new framework.material());
-                this.materials[0].setShader(assetmgr.getShader("shader/def"));
-            }
-
             this.layer = this.materials[0].getLayer();
             if (!this.issetq)
                 this._queue = this.materials[0].getQueue();
-
+                
             context.updateModel(this.gameObject.transform);
             if (this.filter != null)
             {

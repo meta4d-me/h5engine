@@ -26,7 +26,7 @@ void main()
     highp vec3 lay2 = texture2D(_Splat1,uv_Splat1).xyz;
     highp vec3 lay3 = texture2D(_Splat2,uv_Splat2).xyz;
     highp vec3 lay4 = texture2D(_Splat3,uv_Splat2).xyz;
-    lowp vec4 outColor = vec4(lay1*control.r + lay2*control.g + lay3*control.b + lay4*(1.0-control.a),0);
+    lowp vec4 outColor = vec4(lay1*control.r + lay2*control.g + lay3*control.b + lay4*(1.0-control.a),1);
     // outColor = vec4(lay4,0);
 
     lowp vec4 lightmap = texture2D(_LightmapTex, xlv_TEXCOORD1);

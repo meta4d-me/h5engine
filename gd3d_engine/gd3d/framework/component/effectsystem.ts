@@ -353,7 +353,7 @@ namespace gd3d.framework
                     let element = subEffectBatcher.effectElements[key];
                     element.setActive(true);
                     if (element.data.initFrameData != undefined)//引用问题还没处理
-                        element.curAttrData = element.data.initFrameData.attrsData.clone();
+                        element.curAttrData = element.data.initFrameData.attrsData.copyandinit();
                 }
             }
             if (this.particles != undefined)

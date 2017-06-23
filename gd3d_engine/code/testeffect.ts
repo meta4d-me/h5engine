@@ -109,8 +109,8 @@
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
-        let names: string[] = ["fx_0005_sword_sword", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
-        let name = names[2];
+        let names: string[] = ["fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
+        let name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)
@@ -166,17 +166,17 @@
                 this.eff = this.ttr.gameObject.getComponent("effectSystem") as gd3d.framework.effectSystem;
                 this.scene.addChild(this.ttr);
             }
-            // if(this.timer > 3 && !this.bestop)
-            // {
-            //     this.bestop = true;
-            //     this.eff.stop();
-            // }
+            if(this.timer > 3 && !this.bestop)
+            {
+                this.bestop = true;
+                this.eff.stop();
+            }
 
-            // if(this.timer > 6 && !this.bereplay)
-            // {
-            //     this.bereplay = true;
-            //     this.eff.play();
-            // }
+            if(this.timer > 6 && !this.bereplay)
+            {
+                this.bereplay = true;
+                this.eff.play();
+            }
         }
     }
 }

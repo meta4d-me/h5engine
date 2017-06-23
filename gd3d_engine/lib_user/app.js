@@ -2230,8 +2230,8 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_0005_sword_sword", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
-        var name = names[2];
+        var names = ["fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
+        var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
@@ -2267,6 +2267,14 @@ var test_effect = (function () {
                 this.ttr = this.tr.clone();
                 this.eff = this.ttr.gameObject.getComponent("effectSystem");
                 this.scene.addChild(this.ttr);
+            }
+            if (this.timer > 3 && !this.bestop) {
+                this.bestop = true;
+                this.eff.stop();
+            }
+            if (this.timer > 6 && !this.bereplay) {
+                this.bereplay = true;
+                this.eff.play();
             }
         }
     };
@@ -2709,8 +2717,8 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        var names = ["city", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
-        var name = names[1];
+        var names = ["city", "1042_pata_shenyuan_01", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
+        var name = names[3];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
