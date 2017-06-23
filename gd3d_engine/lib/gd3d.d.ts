@@ -29,8 +29,8 @@ declare namespace gd3d.framework {
         closeFps(): void;
         beStepNumber: number;
         private update(delta);
-        private preusercodetimer;
-        private usercodetime;
+        preusercodetimer: number;
+        usercodetime: number;
         getUserUpdateTimer(): number;
         private beginTimer;
         private lastTimer;

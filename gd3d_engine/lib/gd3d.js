@@ -149,11 +149,9 @@ var gd3d;
                     }
                 }
                 this.updateEditorCode(delta);
-                this.preusercodetimer = Date.now();
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
-                this.usercodetime = Date.now() - this.preusercodetimer;
             };
             application.prototype.getUserUpdateTimer = function () {
                 return this.usercodetime;
@@ -8092,12 +8090,9 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
-                this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
-                if (!this.testFrustumCulling(scene, node))
-                    return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
                 }
@@ -17523,9 +17518,11 @@ var gd3d;
                     document["log"].cameras[i].objs = [];
                 }
                 this.RealCameraNumber = 0;
+                this.app.preusercodetimer = Date.now();
                 for (var i = 0; i < this.renderCameras.length; i++) {
                     this._renderCamera(i);
                 }
+                this.app.usercodetime = Date.now() - this.app.preusercodetimer;
                 if (this.RealCameraNumber == 0) {
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
