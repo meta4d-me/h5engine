@@ -5233,8 +5233,6 @@ var gd3d;
                 this.t.z *= -1;
             };
             PoseBoneMatrix.prototype.lerpInWorld = function (_tpose, from, to, v) {
-                var tpose = new gd3d.math.matrix();
-                gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z), new gd3d.math.vector3(1, 1, 1), new gd3d.math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w), tpose);
                 var t1 = PoseBoneMatrix_1.sMultiply(from, _tpose);
                 var t2 = PoseBoneMatrix_1.sMultiply(to, _tpose);
                 var outLerp = PoseBoneMatrix_1.sLerp(t1, t2, v);
@@ -5254,28 +5252,32 @@ var gd3d;
                 if (target === void 0) { target = null; }
                 if (target == null)
                     target = PoseBoneMatrix_1.createDefault();
-                var dir = new gd3d.math.vector3();
+                var dir = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(right.t, dir);
-                var dirtran = new gd3d.math.vector3();
+                var dirtran = gd3d.math.pool.new_vector3();
                 gd3d.math.quatTransformVector(left.r, dir, dirtran);
                 target.t.x = dirtran.x + left.t.x;
                 target.t.y = dirtran.y + left.t.y;
                 target.t.z = dirtran.z + left.t.z;
                 gd3d.math.quatMultiply(left.r, right.r, target.r);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(dirtran);
                 return target;
             };
             PoseBoneMatrix.sMultiplyDataAndMatrix = function (leftdata, leftseek, right, target) {
                 if (target === void 0) { target = null; }
                 if (target == null)
                     target = PoseBoneMatrix_1.createDefault();
-                var dir = new gd3d.math.vector3();
+                var dir = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(right.t, dir);
-                var dirtran = new gd3d.math.vector3();
+                var dirtran = gd3d.math.pool.new_vector3();
                 gd3d.math.quatTransformVectorDataAndQuat(leftdata, leftseek + 0, dir, dirtran);
                 target.t.x = dirtran.x + leftdata[leftseek + 4];
                 target.t.y = dirtran.y + leftdata[leftseek + 5];
                 target.t.z = dirtran.z + leftdata[leftseek + 6];
                 gd3d.math.quatMultiplyDataAndQuat(leftdata, leftseek + 0, right.r, target.r);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(dirtran);
                 return target;
             };
             PoseBoneMatrix.sLerp = function (left, right, v, target) {
@@ -17507,19 +17509,10 @@ var gd3d;
                 this.renderLights.length = 0;
                 this.renderList.clear();
                 this.updateScene(this.rootNode, delta);
-                document["log"] = {};
-                document["log"].lights = this.renderLights.length;
-                document["log"].cameras = [];
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
                         return a.order - b.order;
                     });
-                }
-                for (var i = 0; i < this.renderCameras.length; i++) {
-                    this.renderCameras[i].index = i;
-                    document["log"].cameras.push({});
-                    document["log"].cameras[i].name = this.renderCameras[i].gameObject.getName();
-                    document["log"].cameras[i].objs = [];
                 }
                 this.RealCameraNumber = 0;
                 for (var i = 0; i < this.renderCameras.length; i++) {
@@ -19531,6 +19524,7 @@ var gd3d;
                     webglkit.ONE_MINUS_SRC_COLOR = webgl.ONE_MINUS_SRC_COLOR;
                     webglkit.ONE_MINUS_DST_ALPHA = webgl.ONE_MINUS_DST_ALPHA;
                     webglkit.ONE_MINUS_DST_COLOR = webgl.ONE_MINUS_DST_COLOR;
+                    webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
                 }
             };
             return webglkit;

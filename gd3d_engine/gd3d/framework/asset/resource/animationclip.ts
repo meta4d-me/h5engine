@@ -220,13 +220,13 @@ namespace gd3d.framework
         lerpInWorld(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, to: PoseBoneMatrix, v: number)
         {
             ////预乘之后，插值奇慢
-            var tpose = new math.matrix();
+            // var tpose = new math.matrix();
 
-            math.matrixMakeTransformRTS(
-                new math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z),
-                new math.vector3(1, 1, 1),
-                new math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w),
-                tpose);
+            // math.matrixMakeTransformRTS(
+            //     new math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z),
+            //     new math.vector3(1, 1, 1),
+            //     new math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w),
+            //     tpose);
 
             var t1 = PoseBoneMatrix.sMultiply(from, _tpose);
             var t2 = PoseBoneMatrix.sMultiply(to, _tpose);
@@ -267,30 +267,36 @@ namespace gd3d.framework
         {
             if (target == null)
                 target = PoseBoneMatrix.createDefault();
-            var dir = new math.vector3();
+            var dir = math.pool.new_vector3();
             math.vec3Clone(right.t, dir);
-            var dirtran = new math.vector3();
+            var dirtran = math.pool.new_vector3();
             math.quatTransformVector(left.r, dir, dirtran);
 
             target.t.x = dirtran.x + left.t.x;
             target.t.y = dirtran.y + left.t.y;
             target.t.z = dirtran.z + left.t.z;
             math.quatMultiply(left.r, right.r, target.r);
+
+            math.pool.delete_vector3(dir);
+            math.pool.delete_vector3(dirtran);
             return target;
         }
         static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix
         {
             if (target == null)
                 target = PoseBoneMatrix.createDefault();
-            var dir = new math.vector3();
+            var dir = math.pool.new_vector3();
             math.vec3Clone(right.t, dir);
-            var dirtran = new math.vector3();
+            var dirtran = math.pool.new_vector3();
             math.quatTransformVectorDataAndQuat(leftdata, leftseek + 0, dir, dirtran);
 
             target.t.x = dirtran.x + leftdata[leftseek + 4];
             target.t.y = dirtran.y + leftdata[leftseek + 5];
             target.t.z = dirtran.z + leftdata[leftseek + 6];
             math.quatMultiplyDataAndQuat(leftdata, leftseek + 0, right.r, target.r);
+
+            math.pool.delete_vector3(dir);
+            math.pool.delete_vector3(dirtran);
             return target;
         }
         static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target: PoseBoneMatrix = null): PoseBoneMatrix
