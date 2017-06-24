@@ -10108,15 +10108,6 @@ var gd3d;
                 this.touches = {};
                 this.keyboardMap = {};
                 app.container.addEventListener("touchstart", function (ev) {
-                    if (_this.inputlast != null) {
-                        _this.inputlast.blur();
-                    }
-                    if (ev.target instanceof HTMLInputElement) {
-                        _this.inputlast = ev.target;
-                        _this.inputlast.focus();
-                        ev.preventDefault();
-                        return;
-                    }
                     _this.point.x = ev.touches[0].clientX;
                     _this.point.y = ev.touches[0].clientY;
                     _this.point.touch = true;
@@ -17508,19 +17499,10 @@ var gd3d;
                 this.renderLights.length = 0;
                 this.renderList.clear();
                 this.updateScene(this.rootNode, delta);
-                document["log"] = {};
-                document["log"].lights = this.renderLights.length;
-                document["log"].cameras = [];
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
                         return a.order - b.order;
                     });
-                }
-                for (var i = 0; i < this.renderCameras.length; i++) {
-                    this.renderCameras[i].index = i;
-                    document["log"].cameras.push({});
-                    document["log"].cameras[i].name = this.renderCameras[i].gameObject.getName();
-                    document["log"].cameras[i].objs = [];
                 }
                 this.RealCameraNumber = 0;
                 for (var i = 0; i < this.renderCameras.length; i++) {
@@ -19532,6 +19514,7 @@ var gd3d;
                     webglkit.ONE_MINUS_SRC_COLOR = webgl.ONE_MINUS_SRC_COLOR;
                     webglkit.ONE_MINUS_DST_ALPHA = webgl.ONE_MINUS_DST_ALPHA;
                     webglkit.ONE_MINUS_DST_COLOR = webgl.ONE_MINUS_DST_COLOR;
+                    webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
                 }
             };
             return webglkit;
