@@ -149,11 +149,9 @@ var gd3d;
                     }
                 }
                 this.updateEditorCode(delta);
-                this.preusercodetimer = Date.now();
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
-                this.usercodetime = Date.now() - this.preusercodetimer;
             };
             application.prototype.getUserUpdateTimer = function () {
                 return this.usercodetime;
@@ -8091,7 +8089,8 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
-                this.calcCameraFrame(scene.app);
+                if (this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model)
+                    this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
@@ -8107,6 +8106,8 @@ var gd3d;
                 }
             };
             camera.prototype.testFrustumCulling = function (scene, node) {
+                if (!(this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model))
+                    return;
                 if (!node.gameObject.getComponent("frustumculling"))
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");

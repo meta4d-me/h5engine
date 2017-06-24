@@ -168,15 +168,13 @@ namespace gd3d.framework
             }
             this.updateEditorCode(delta);
 
-            this.preusercodetimer = Date.now();
             if (this._scene != null)
             {
                 this._scene.update(delta);
             }
-            this.usercodetime = Date.now() - this.preusercodetimer;
         }
-        private preusercodetimer:number;
-        private usercodetime:number;
+        public preusercodetimer:number;
+        public usercodetime:number;
         getUserUpdateTimer()
         {
             return this.usercodetime;
