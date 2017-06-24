@@ -256,7 +256,7 @@ namespace gd3d.framework
         @gd3d.reflect.Field("UniformDataDic")
         mapUniform: {
             [id: string]: UniformData
-        };//参数
+        } = {};//参数
         private mapUniformTemp: {
             [id: string]: UniformData
         };
@@ -473,13 +473,13 @@ namespace gd3d.framework
                         case "glstate_lightmapUV":
                             this.setFloat(key, context.lightmapUV);
                             break;
-                        case "_Start":
+                        case "glstate_fog_start":
                             this.setFloat(key, context.fog._Start);
                             break;
-                        case "_End":
+                        case "glstate_fog_end":
                             this.setFloat(key, context.fog._End);
                             break;
-                        case "_Color":
+                        case "glstate_fog_color":
                             this.setVector4(key, context.fog._Color);
                             break;
                     }
