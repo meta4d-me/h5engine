@@ -18,17 +18,17 @@ namespace gd3d.framework
         {
             app.container.addEventListener("touchstart", (ev: TouchEvent) =>
             {
-                if (this.inputlast != null)
-                {
-                    this.inputlast.blur();
-                }
-                if (ev.target instanceof HTMLInputElement)
-                {
-                    this.inputlast = ev.target as HTMLInputElement;
-                    this.inputlast.focus();
-                    ev.preventDefault();
-                    return;
-                }
+            //     if (this.inputlast != null)
+            //     {
+            //         this.inputlast.blur();
+            //     }
+            //     if (ev.target instanceof HTMLInputElement)
+            //     {
+            //         this.inputlast = ev.target as HTMLInputElement;
+            //         this.inputlast.focus();
+            //         ev.preventDefault();
+            //         return;
+            //     }
                 this.point.x = ev.touches[0].clientX;
                 this.point.y = ev.touches[0].clientY;
                 this.point.touch = true;

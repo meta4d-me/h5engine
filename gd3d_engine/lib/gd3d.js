@@ -36,6 +36,7 @@ var gd3d;
                 this.build = "b000010";
                 this.beStepNumber = 0;
                 this.pretimer = 0;
+                this.isFrustumCulling = true;
                 this._userCode = [];
                 this._userCodeNew = [];
                 this._editorCode = [];
@@ -7889,7 +7890,6 @@ var gd3d;
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
                 this.opvalue = 1;
-                this.isFrustumCulling = true;
                 this.postQueues = [];
             }
             Object.defineProperty(camera.prototype, "near", {
@@ -8092,12 +8092,12 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
-                if (this.isFrustumCulling)
+                if (scene.app.isFrustumCulling)
                     this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
-                if (this.isFrustumCulling && !this.testFrustumCulling(scene, node))
+                if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))
                     return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
@@ -10109,15 +10109,6 @@ var gd3d;
                 this.touches = {};
                 this.keyboardMap = {};
                 app.container.addEventListener("touchstart", function (ev) {
-                    if (_this.inputlast != null) {
-                        _this.inputlast.blur();
-                    }
-                    if (ev.target instanceof HTMLInputElement) {
-                        _this.inputlast = ev.target;
-                        _this.inputlast.focus();
-                        ev.preventDefault();
-                        return;
-                    }
                     _this.point.x = ev.touches[0].clientX;
                     _this.point.y = ev.touches[0].clientY;
                     _this.point.touch = true;

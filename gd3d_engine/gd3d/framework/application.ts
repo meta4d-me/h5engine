@@ -199,6 +199,7 @@ namespace gd3d.framework
             return this.updateTimer;
         }
 
+        public isFrustumCulling: boolean = true;
         private loop()
         {
             var now = Date.now() / 1000;

@@ -354,7 +354,6 @@ namespace gd3d.framework
         fov: number = Math.PI * 0.25;//透视投影的fov
         size: number = 2;//正交投影的竖向size
         opvalue: number = 1;//0=正交， 1=透视 中间值可以在两种相机间过度
-        isFrustumCulling: boolean = true;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
             var vpp = new math.rect();
@@ -378,13 +377,13 @@ namespace gd3d.framework
         fillRenderer(scene: scene)
         {
             scene.renderList.clear();
-            if(this.isFrustumCulling)
+            if(scene.app.isFrustumCulling)
                 this.calcCameraFrame(scene.app);
             this._fillRenderer(scene, scene.getRoot());
         }
         private _fillRenderer(scene: scene, node: transform)
         {
-            if(this.isFrustumCulling && !this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
+            if(scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
             if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
             {
                 scene.renderList.addRenderer(node.gameObject.renderer);
