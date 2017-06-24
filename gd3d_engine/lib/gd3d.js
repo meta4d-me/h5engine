@@ -7889,6 +7889,7 @@ var gd3d;
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
                 this.opvalue = 1;
+                this.isFrustumCulling = false;
                 this.postQueues = [];
             }
             Object.defineProperty(camera.prototype, "near", {
@@ -8091,12 +8092,12 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
-                if (this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model)
+                if (this.isFrustumCulling)
                     this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
-                if (!this.testFrustumCulling(scene, node))
+                if (this.isFrustumCulling && !this.testFrustumCulling(scene, node))
                     return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
@@ -8108,8 +8109,6 @@ var gd3d;
                 }
             };
             camera.prototype.testFrustumCulling = function (scene, node) {
-                if (!(this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model))
-                    return;
                 if (!node.gameObject.getComponent("frustumculling"))
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");
