@@ -354,7 +354,7 @@ namespace gd3d.framework
         fov: number = Math.PI * 0.25;//透视投影的fov
         size: number = 2;//正交投影的竖向size
         opvalue: number = 1;//0=正交， 1=透视 中间值可以在两种相机间过度
-        isFrustumCulling: boolean = false;
+        isFrustumCulling: boolean = true;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
             var vpp = new math.rect();

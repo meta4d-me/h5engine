@@ -7889,7 +7889,7 @@ var gd3d;
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
                 this.opvalue = 1;
-                this.isFrustumCulling = false;
+                this.isFrustumCulling = true;
                 this.postQueues = [];
             }
             Object.defineProperty(camera.prototype, "near", {
