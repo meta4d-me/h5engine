@@ -378,7 +378,8 @@ namespace gd3d.framework
         fillRenderer(scene: scene)
         {
             scene.renderList.clear();
-            this.calcCameraFrame(scene.app);
+            if(this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model)
+                this.calcCameraFrame(scene.app);
             this._fillRenderer(scene, scene.getRoot());
         }
         private _fillRenderer(scene: scene, node: transform)
@@ -398,6 +399,7 @@ namespace gd3d.framework
         }
         testFrustumCulling(scene: scene, node:transform)
         {
+            if(!(this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model))   return;
             if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
             let spherecol = node.gameObject.getComponent("spherecollider") as spherecollider;
             let worldPos = node.getWorldTranslate();

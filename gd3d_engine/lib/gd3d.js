@@ -8090,9 +8090,13 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
+                if (this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model)
+                    this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
+                if (!this.testFrustumCulling(scene, node))
+                    return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
                 }
@@ -8103,6 +8107,8 @@ var gd3d;
                 }
             };
             camera.prototype.testFrustumCulling = function (scene, node) {
+                if (!(this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model))
+                    return;
                 if (!node.gameObject.getComponent("frustumculling"))
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");
@@ -17518,11 +17524,9 @@ var gd3d;
                     document["log"].cameras[i].objs = [];
                 }
                 this.RealCameraNumber = 0;
-                this.app.preusercodetimer = Date.now();
                 for (var i = 0; i < this.renderCameras.length; i++) {
                     this._renderCamera(i);
                 }
-                this.app.usercodetime = Date.now() - this.app.preusercodetimer;
                 if (this.RealCameraNumber == 0) {
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
