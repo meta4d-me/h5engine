@@ -243,13 +243,13 @@ namespace gd3d.framework
         lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number)
         {
             ////预乘之后，插值奇慢
-            var tpose = new math.matrix();
+            // var tpose = new math.matrix();
 
-            math.matrixMakeTransformRTS(
-                new math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z),
-                new math.vector3(1, 1, 1),
-                new math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w),
-                tpose);
+            // math.matrixMakeTransformRTS(
+            //     new math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z),
+            //     new math.vector3(1, 1, 1),
+            //     new math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w),
+            //     tpose);
 
             var t1 = PoseBoneMatrix.sMultiply(from, _tpose);
             var t2 = PoseBoneMatrix.sMultiplyDataAndMatrix(todata, toseek, _tpose);

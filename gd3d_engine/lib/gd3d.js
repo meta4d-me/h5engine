@@ -5245,8 +5245,6 @@ var gd3d;
                 PoseBoneMatrix_1.sMultiply(outLerp, itpose, this);
             };
             PoseBoneMatrix.prototype.lerpInWorldWithData = function (_tpose, from, todata, toseek, v) {
-                var tpose = new gd3d.math.matrix();
-                gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z), new gd3d.math.vector3(1, 1, 1), new gd3d.math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w), tpose);
                 var t1 = PoseBoneMatrix_1.sMultiply(from, _tpose);
                 var t2 = PoseBoneMatrix_1.sMultiplyDataAndMatrix(todata, toseek, _tpose);
                 var outLerp = PoseBoneMatrix_1.sLerp(t1, t2, v);
@@ -19533,7 +19531,6 @@ var gd3d;
                     webglkit.ONE_MINUS_SRC_COLOR = webgl.ONE_MINUS_SRC_COLOR;
                     webglkit.ONE_MINUS_DST_ALPHA = webgl.ONE_MINUS_DST_ALPHA;
                     webglkit.ONE_MINUS_DST_COLOR = webgl.ONE_MINUS_DST_COLOR;
-                    webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
                 }
             };
             return webglkit;
