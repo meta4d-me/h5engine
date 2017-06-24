@@ -8,7 +8,7 @@ uniform highp vec4 glstate_eyepos;
 uniform highp vec4 glstate_vec4_lightposs[8];
 uniform highp vec4 glstate_vec4_lightdirs[8];
 uniform highp float glstate_float_spotangelcoss[8];
-uniform highp vec4 _Color; 
+uniform highp vec4 glstate_fog_color; 
 
 varying highp float factor; 
 varying highp vec2 xlv_TEXCOORD0;
@@ -107,6 +107,6 @@ void main()
     mediump vec4 prev_2;
     lowp vec4 final = (diffuseColor*vec4(directDiffuse+indirectDiffuse,1.0)  + specularColor);
 
-    lowp vec3 afterFog = mix(_Color.rgb, final.rgb, factor);
+    lowp vec3 afterFog = mix(glstate_fog_color.rgb, final.rgb, factor);
     gl_FragData[0] = vec4(afterFog,final.a);
 }

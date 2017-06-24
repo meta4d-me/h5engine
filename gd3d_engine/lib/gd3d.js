@@ -5554,6 +5554,7 @@ var gd3d;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
                 this._changeShaderMap = {};
+                this.mapUniform = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
                 }
@@ -5919,13 +5920,13 @@ var gd3d;
                             case "glstate_lightmapUV":
                                 this.setFloat(key, context.lightmapUV);
                                 break;
-                            case "_Start":
+                            case "glstate_fog_start":
                                 this.setFloat(key, context.fog._Start);
                                 break;
-                            case "_End":
+                            case "glstate_fog_end":
                                 this.setFloat(key, context.fog._End);
                                 break;
-                            case "_Color":
+                            case "glstate_fog_color":
                                 this.setVector4(key, context.fog._Color);
                                 break;
                         }
@@ -18836,142 +18837,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var PrimitiveType;
-        (function (PrimitiveType) {
-            PrimitiveType[PrimitiveType["Sphere"] = 0] = "Sphere";
-            PrimitiveType[PrimitiveType["Capsule"] = 1] = "Capsule";
-            PrimitiveType[PrimitiveType["Cylinder"] = 2] = "Cylinder";
-            PrimitiveType[PrimitiveType["Cube"] = 3] = "Cube";
-            PrimitiveType[PrimitiveType["Plane"] = 4] = "Plane";
-            PrimitiveType[PrimitiveType["Quad"] = 5] = "Quad";
-            PrimitiveType[PrimitiveType["Pyramid"] = 6] = "Pyramid";
-        })(PrimitiveType = framework.PrimitiveType || (framework.PrimitiveType = {}));
-        var Primitive2DType;
-        (function (Primitive2DType) {
-            Primitive2DType[Primitive2DType["RawImage2D"] = 0] = "RawImage2D";
-            Primitive2DType[Primitive2DType["Image2D"] = 1] = "Image2D";
-            Primitive2DType[Primitive2DType["Label"] = 2] = "Label";
-            Primitive2DType[Primitive2DType["Button"] = 3] = "Button";
-        })(Primitive2DType = framework.Primitive2DType || (framework.Primitive2DType = {}));
-        var GameObjectUtil = (function () {
-            function GameObjectUtil() {
-            }
-            GameObjectUtil.CreatePrimitive = function (type, app) {
-                var objName = PrimitiveType[type];
-                var trans = new framework.transform();
-                trans.name = objName;
-                var mesh = trans.gameObject.addComponent("meshFilter");
-                var smesh = app.getAssetMgr().getDefaultMesh(objName.toLowerCase());
-                mesh.mesh = smesh;
-                var renderer = trans.gameObject.addComponent("meshRenderer");
-                renderer.materials = [];
-                renderer.materials.push(new framework.material());
-                renderer.materials[0].setShader(app.getAssetMgr().getShader("shader/def"));
-                return trans.gameObject;
-            };
-            GameObjectUtil.Create2DPrimitive = function (type, app) {
-                var objName = Primitive2DType[type];
-                var componentName = framework.StringUtil.firstCharToLowerCase(objName);
-                var t2d = new framework.transform2D();
-                t2d.name = objName;
-                var i2dComp = t2d.addComponent(componentName);
-                t2d.pivot.x = 0;
-                t2d.pivot.y = 0;
-                switch (type) {
-                    case Primitive2DType.RawImage2D:
-                        GameObjectUtil.create2D_rawImage(i2dComp, app);
-                        break;
-                    case Primitive2DType.Image2D:
-                        GameObjectUtil.create2D_image2D(i2dComp, app);
-                        break;
-                    case Primitive2DType.Label:
-                        GameObjectUtil.create2D_label(i2dComp, app);
-                        break;
-                    case Primitive2DType.Button:
-                        GameObjectUtil.create2D_button(i2dComp, app);
-                        break;
-                }
-                return t2d;
-            };
-            GameObjectUtil.create2D_rawImage = function (img, app) {
-                img.transform.width = 100;
-                img.transform.height = 100;
-                img.image = app.getAssetMgr().getDefaultTexture("white");
-            };
-            GameObjectUtil.create2D_image2D = function (img, app) {
-                img.transform.width = 100;
-                img.transform.height = 100;
-                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
-            };
-            GameObjectUtil.create2D_label = function (label, app) {
-                label.transform.width = 150;
-                label.transform.height = 50;
-                label.text = "label";
-                label.fontsize = 25;
-                label.color = new gd3d.math.color(1, 0, 0, 1);
-                var _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                if (_font == null) {
-                    app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                        if (s.isfinish) {
-                            app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                                label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                                label.transform.markDirty();
-                            });
-                        }
-                    });
-                }
-                else {
-                    label.font = _font;
-                    ;
-                    label.transform.markDirty();
-                }
-            };
-            GameObjectUtil.create2D_button = function (btn, app) {
-                btn.transform.width = 150;
-                btn.transform.height = 50;
-                var img = btn.transform.addComponent("image2D");
-                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
-                img.imageType = gd3d.framework.ImageType.Sliced;
-                btn.targetImage = img;
-                btn.transition = gd3d.framework.TransitionType.ColorTint;
-                var lab = new gd3d.framework.transform2D();
-                lab.name = "label";
-                lab.width = 150;
-                lab.height = 50;
-                lab.pivot.x = 0;
-                lab.pivot.y = 0;
-                lab.localTranslate.y = -10;
-                var label = lab.addComponent("label");
-                label.text = "button";
-                label.fontsize = 25;
-                label.color = new gd3d.math.color(1, 0, 0, 1);
-                btn.transform.addChild(lab);
-                var _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                if (_font == null) {
-                    app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                        if (s.isfinish) {
-                            app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                                label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
-                                btn.transform.markDirty();
-                            });
-                        }
-                    });
-                }
-                else {
-                    label.font = _font;
-                    ;
-                    btn.transform.markDirty();
-                }
-            };
-            return GameObjectUtil;
-        }());
-        framework.GameObjectUtil = GameObjectUtil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var NumberUtil = (function () {
             function NumberUtil() {
             }
@@ -19052,6 +18917,142 @@ var gd3d;
         StringUtil.UIStyle_Enum = "enum";
         StringUtil.RESOURCES_MESH_CUBE = "cube";
         framework.StringUtil = StringUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var PrimitiveType;
+        (function (PrimitiveType) {
+            PrimitiveType[PrimitiveType["Sphere"] = 0] = "Sphere";
+            PrimitiveType[PrimitiveType["Capsule"] = 1] = "Capsule";
+            PrimitiveType[PrimitiveType["Cylinder"] = 2] = "Cylinder";
+            PrimitiveType[PrimitiveType["Cube"] = 3] = "Cube";
+            PrimitiveType[PrimitiveType["Plane"] = 4] = "Plane";
+            PrimitiveType[PrimitiveType["Quad"] = 5] = "Quad";
+            PrimitiveType[PrimitiveType["Pyramid"] = 6] = "Pyramid";
+        })(PrimitiveType = framework.PrimitiveType || (framework.PrimitiveType = {}));
+        var Primitive2DType;
+        (function (Primitive2DType) {
+            Primitive2DType[Primitive2DType["RawImage2D"] = 0] = "RawImage2D";
+            Primitive2DType[Primitive2DType["Image2D"] = 1] = "Image2D";
+            Primitive2DType[Primitive2DType["Label"] = 2] = "Label";
+            Primitive2DType[Primitive2DType["Button"] = 3] = "Button";
+        })(Primitive2DType = framework.Primitive2DType || (framework.Primitive2DType = {}));
+        var TransformUtil = (function () {
+            function TransformUtil() {
+            }
+            TransformUtil.CreatePrimitive = function (type, app) {
+                var objName = PrimitiveType[type];
+                var trans = new framework.transform();
+                trans.name = objName;
+                var mesh = trans.gameObject.addComponent("meshFilter");
+                var smesh = app.getAssetMgr().getDefaultMesh(objName.toLowerCase());
+                mesh.mesh = smesh;
+                var renderer = trans.gameObject.addComponent("meshRenderer");
+                renderer.materials = [];
+                renderer.materials.push(new framework.material());
+                renderer.materials[0].setShader(app.getAssetMgr().getShader("shader/def"));
+                return trans;
+            };
+            TransformUtil.Create2DPrimitive = function (type, app) {
+                var objName = Primitive2DType[type];
+                var componentName = framework.StringUtil.firstCharToLowerCase(objName);
+                var t2d = new framework.transform2D();
+                t2d.name = objName;
+                var i2dComp = t2d.addComponent(componentName);
+                t2d.pivot.x = 0;
+                t2d.pivot.y = 0;
+                switch (type) {
+                    case Primitive2DType.RawImage2D:
+                        TransformUtil.create2D_rawImage(i2dComp, app);
+                        break;
+                    case Primitive2DType.Image2D:
+                        TransformUtil.create2D_image2D(i2dComp, app);
+                        break;
+                    case Primitive2DType.Label:
+                        TransformUtil.create2D_label(i2dComp, app);
+                        break;
+                    case Primitive2DType.Button:
+                        TransformUtil.create2D_button(i2dComp, app);
+                        break;
+                }
+                return t2d;
+            };
+            TransformUtil.create2D_rawImage = function (img, app) {
+                img.transform.width = 100;
+                img.transform.height = 100;
+                img.image = app.getAssetMgr().getDefaultTexture("white");
+            };
+            TransformUtil.create2D_image2D = function (img, app) {
+                img.transform.width = 100;
+                img.transform.height = 100;
+                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+            };
+            TransformUtil.create2D_label = function (label, app) {
+                label.transform.width = 150;
+                label.transform.height = 50;
+                label.text = "label";
+                label.fontsize = 25;
+                label.color = new gd3d.math.color(1, 0, 0, 1);
+                var _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                if (_font == null) {
+                    app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        if (s.isfinish) {
+                            app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                                label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                                label.transform.markDirty();
+                            });
+                        }
+                    });
+                }
+                else {
+                    label.font = _font;
+                    ;
+                    label.transform.markDirty();
+                }
+            };
+            TransformUtil.create2D_button = function (btn, app) {
+                btn.transform.width = 150;
+                btn.transform.height = 50;
+                var img = btn.transform.addComponent("image2D");
+                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+                img.imageType = gd3d.framework.ImageType.Sliced;
+                btn.targetImage = img;
+                btn.transition = gd3d.framework.TransitionType.ColorTint;
+                var lab = new gd3d.framework.transform2D();
+                lab.name = "label";
+                lab.width = 150;
+                lab.height = 50;
+                lab.pivot.x = 0;
+                lab.pivot.y = 0;
+                lab.localTranslate.y = -10;
+                var label = lab.addComponent("label");
+                label.text = "button";
+                label.fontsize = 25;
+                label.color = new gd3d.math.color(1, 0, 0, 1);
+                btn.transform.addChild(lab);
+                var _font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                if (_font == null) {
+                    app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        if (s.isfinish) {
+                            app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                                label.font = app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                                btn.transform.markDirty();
+                            });
+                        }
+                    });
+                }
+                else {
+                    label.font = _font;
+                    ;
+                    btn.transform.markDirty();
+                }
+            };
+            return TransformUtil;
+        }());
+        framework.TransformUtil = TransformUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -19276,7 +19277,6 @@ var gd3d;
             pool.new_vector3 = function () {
                 if (pool.unused_vector3.length > 0) {
                     var v = pool.unused_vector3.pop();
-                    v.x = v.y = v.z = 0;
                     return v;
                 }
                 else
@@ -21644,7 +21644,7 @@ var gd3d;
                 this.height = 0;
                 this.webgl = webgl;
                 this.texture = webgl.createTexture();
-                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
                 this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 this.format = format;

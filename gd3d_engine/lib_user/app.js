@@ -2717,7 +2717,7 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-        var names = ["city", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
+        var names = ["city", "1042_pata_shenyuan_01", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[3];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -4033,21 +4033,6 @@ var test_pick = (function () {
             coll.center = new gd3d.math.vector3(0, 1, 0);
             coll.radius = 1;
         }
-        this.cube3 = this.cube2.clone();
-        this.scene.addChild(this.cube3);
-        {
-            this.cube3 = new gd3d.framework.transform();
-            this.cube3.name = "cube3";
-            this.scene.addChild(this.cube3);
-            this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
-            this.cube3.localTranslate.x = -5;
-            this.cube3.markDirty();
-            var mesh = this.cube3.gameObject.addComponent("meshFilter");
-            mesh.mesh = (smesh);
-            var renderer = this.cube3.gameObject.addComponent("meshRenderer");
-            var coll = this.cube3.gameObject.addComponent("boxcollider");
-            coll.colliderVisible = true;
-        }
         {
             this.cube4 = new gd3d.framework.transform();
             this.cube4.name = "cube4";
@@ -4081,16 +4066,14 @@ var test_pick = (function () {
             }
         }
         this.pointDown = this.inputMgr.point.touch;
-        if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
-            return;
-        }
         this.timer += delta;
-        this.cube3.localTranslate.x += delta;
-        this.cube3.markDirty();
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);
         var x2 = Math.sin(this.timer * 0.1);
         var z2 = Math.cos(this.timer * 0.1);
+        var objCam = this.camera.gameObject.transform;
+        objCam.localTranslate.x += delta;
+        objCam.markDirty();
     };
     return test_pick;
 }());

@@ -12,8 +12,8 @@ uniform highp vec4 _streamlight_ST;
 uniform highp float _speedu;
 uniform highp float _speedv;
 uniform highp float glstate_timer;
-uniform highp float _Start;
-uniform highp float _End;
+uniform highp float glstate_fog_start;
+uniform highp float glstate_fog_end;
 
 varying highp float factor;
 varying highp vec2 _base_uv;
@@ -64,7 +64,7 @@ void main()
 			 + buildMat4(i4)*_glesBlendWeight4.w;
 			 
 	highp vec4 pos = (glstate_matrix_mvp * mat)* tmpvar_1;
-    factor = (_End - abs(pos.z))/(_End - _Start); 
+    factor = (glstate_fog_end - abs(pos.z))/(glstate_fog_end - glstate_fog_start); 
     factor = clamp(factor, 0.0, 1.0);  
     gl_Position = pos;
 }

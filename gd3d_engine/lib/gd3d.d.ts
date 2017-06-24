@@ -2979,31 +2979,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    enum PrimitiveType {
-        Sphere = 0,
-        Capsule = 1,
-        Cylinder = 2,
-        Cube = 3,
-        Plane = 4,
-        Quad = 5,
-        Pyramid = 6,
-    }
-    enum Primitive2DType {
-        RawImage2D = 0,
-        Image2D = 1,
-        Label = 2,
-        Button = 3,
-    }
-    class GameObjectUtil {
-        static CreatePrimitive(type: PrimitiveType, app: application): gameObject;
-        static Create2DPrimitive(type: Primitive2DType, app: application): transform2D;
-        private static create2D_rawImage(img, app);
-        private static create2D_image2D(img, app);
-        private static create2D_label(label, app);
-        private static create2D_button(btn, app);
-    }
-}
-declare namespace gd3d.framework {
     class NumberUtil {
         static KEY_A: number;
         static KEY_D: number;
@@ -3052,6 +3027,31 @@ declare namespace gd3d.framework {
         static replaceAll(srcStr: string, fromStr: string, toStr: string): string;
         static trimAll(str: string): string;
         static firstCharToLowerCase(str: string): string;
+    }
+}
+declare namespace gd3d.framework {
+    enum PrimitiveType {
+        Sphere = 0,
+        Capsule = 1,
+        Cylinder = 2,
+        Cube = 3,
+        Plane = 4,
+        Quad = 5,
+        Pyramid = 6,
+    }
+    enum Primitive2DType {
+        RawImage2D = 0,
+        Image2D = 1,
+        Label = 2,
+        Button = 3,
+    }
+    class TransformUtil {
+        static CreatePrimitive(type: PrimitiveType, app: application): transform;
+        static Create2DPrimitive(type: Primitive2DType, app: application): transform2D;
+        private static create2D_rawImage(img, app);
+        private static create2D_image2D(img, app);
+        private static create2D_label(label, app);
+        private static create2D_button(btn, app);
     }
 }
 declare namespace gd3d.io {
