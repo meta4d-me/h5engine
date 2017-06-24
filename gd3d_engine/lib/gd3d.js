@@ -5233,8 +5233,6 @@ var gd3d;
                 this.t.z *= -1;
             };
             PoseBoneMatrix.prototype.lerpInWorld = function (_tpose, from, to, v) {
-                var tpose = new gd3d.math.matrix();
-                gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(_tpose.t.x, _tpose.t.y, _tpose.t.z), new gd3d.math.vector3(1, 1, 1), new gd3d.math.quaternion(_tpose.r.x, _tpose.r.y, _tpose.r.z, _tpose.r.w), tpose);
                 var t1 = PoseBoneMatrix_1.sMultiply(from, _tpose);
                 var t2 = PoseBoneMatrix_1.sMultiply(to, _tpose);
                 var outLerp = PoseBoneMatrix_1.sLerp(t1, t2, v);
@@ -5254,28 +5252,32 @@ var gd3d;
                 if (target === void 0) { target = null; }
                 if (target == null)
                     target = PoseBoneMatrix_1.createDefault();
-                var dir = new gd3d.math.vector3();
+                var dir = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(right.t, dir);
-                var dirtran = new gd3d.math.vector3();
+                var dirtran = gd3d.math.pool.new_vector3();
                 gd3d.math.quatTransformVector(left.r, dir, dirtran);
                 target.t.x = dirtran.x + left.t.x;
                 target.t.y = dirtran.y + left.t.y;
                 target.t.z = dirtran.z + left.t.z;
                 gd3d.math.quatMultiply(left.r, right.r, target.r);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(dirtran);
                 return target;
             };
             PoseBoneMatrix.sMultiplyDataAndMatrix = function (leftdata, leftseek, right, target) {
                 if (target === void 0) { target = null; }
                 if (target == null)
                     target = PoseBoneMatrix_1.createDefault();
-                var dir = new gd3d.math.vector3();
+                var dir = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(right.t, dir);
-                var dirtran = new gd3d.math.vector3();
+                var dirtran = gd3d.math.pool.new_vector3();
                 gd3d.math.quatTransformVectorDataAndQuat(leftdata, leftseek + 0, dir, dirtran);
                 target.t.x = dirtran.x + leftdata[leftseek + 4];
                 target.t.y = dirtran.y + leftdata[leftseek + 5];
                 target.t.z = dirtran.z + leftdata[leftseek + 6];
                 gd3d.math.quatMultiplyDataAndQuat(leftdata, leftseek + 0, right.r, target.r);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(dirtran);
                 return target;
             };
             PoseBoneMatrix.sLerp = function (left, right, v, target) {
@@ -7887,6 +7889,7 @@ var gd3d;
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
                 this.opvalue = 1;
+                this.isFrustumCulling = true;
                 this.postQueues = [];
             }
             Object.defineProperty(camera.prototype, "near", {
@@ -8089,12 +8092,12 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
-                if (this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model)
+                if (this.isFrustumCulling)
                     this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
-                if (!this.testFrustumCulling(scene, node))
+                if (this.isFrustumCulling && !this.testFrustumCulling(scene, node))
                     return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);
@@ -8106,8 +8109,6 @@ var gd3d;
                 }
             };
             camera.prototype.testFrustumCulling = function (scene, node) {
-                if (!(this.CullingMask & CullingMask.everything || this.CullingMask & CullingMask.model))
-                    return;
                 if (!node.gameObject.getComponent("frustumculling"))
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");

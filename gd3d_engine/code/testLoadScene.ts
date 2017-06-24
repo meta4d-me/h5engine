@@ -11,7 +11,7 @@ class test_loadScene implements IState
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
         let names: string[] = ["city", "1042_pata_shenyuan_01", "MainCity", "xinshoucun_fuben_day", "chuangjue-01"];
-        let name = names[3];
+        let name = names[2];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
