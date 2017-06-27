@@ -38,6 +38,7 @@ var gd3d;
                 this._standDeltaTime = -1;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
+                this.isFrustumCulling = true;
                 this._userCode = [];
                 this._userCodeNew = [];
                 this._editorCode = [];
@@ -146,7 +147,7 @@ var gd3d;
                 if (this.webgl.canvas.clientWidth != this.webgl.canvas.width || this.webgl.canvas.clientHeight != this.webgl.canvas.height) {
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth;
                     this.webgl.canvas.height = this.webgl.canvas.clientHeight;
-                    console.log("canvas resize.");
+                    console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
                 }
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
@@ -4437,6 +4438,12 @@ var gd3d;
                 else if (type == AssetTypeEnum.CompressBundle) {
                     var loadurl = url.replace(".assetbundle.json", ".packs.txt");
                     gd3d.io.loadText(loadurl, function (txt, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
                         var filename = _this.getFileName(url);
                         var ab = new assetBundle(url);
                         ab.name = filename;
@@ -7917,7 +7924,6 @@ var gd3d;
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
                 this.opvalue = 1;
-                this.isFrustumCulling = true;
                 this.postQueues = [];
             }
             Object.defineProperty(camera.prototype, "near", {
@@ -8120,12 +8126,12 @@ var gd3d;
             };
             camera.prototype.fillRenderer = function (scene) {
                 scene.renderList.clear();
-                if (this.isFrustumCulling)
+                if (scene.app.isFrustumCulling)
                     this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
-                if (this.isFrustumCulling && !this.testFrustumCulling(scene, node))
+                if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))
                     return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
                     scene.renderList.addRenderer(node.gameObject.renderer);

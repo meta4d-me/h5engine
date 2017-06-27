@@ -44,6 +44,7 @@ declare namespace gd3d.framework {
         private pretimer;
         private updateTimer;
         getUpdateTimer(): any;
+        isFrustumCulling: boolean;
         private loop();
         private _scene;
         private initScene();
@@ -1294,7 +1295,6 @@ declare namespace gd3d.framework {
         fov: number;
         size: number;
         opvalue: number;
-        isFrustumCulling: boolean;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
         private _fillRenderer(scene, node);

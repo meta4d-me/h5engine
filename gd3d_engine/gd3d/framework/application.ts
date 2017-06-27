@@ -156,7 +156,7 @@ namespace gd3d.framework
             {
                 this.webgl.canvas.width = this.webgl.canvas.clientWidth;
                 this.webgl.canvas.height = this.webgl.canvas.clientHeight;
-                console.log("canvas resize.");
+                console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
             }
             this.width = this.webgl.canvas.width;
             this.height = this.webgl.canvas.height;
@@ -209,6 +209,7 @@ namespace gd3d.framework
             return this.updateTimer;
         }
 
+        public isFrustumCulling: boolean = true;
         private loop()
         {
             var now = Date.now() / 1000;

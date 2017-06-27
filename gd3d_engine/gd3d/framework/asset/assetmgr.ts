@@ -1379,6 +1379,12 @@ namespace gd3d.framework
                 let loadurl = url.replace(".assetbundle.json", ".packs.txt");
                 gd3d.io.loadText(loadurl, (txt, err) =>
                 {
+                    if(err!=null){
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
                     let filename = this.getFileName(url);
 
                     var ab = new assetBundle(url);
