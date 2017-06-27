@@ -345,7 +345,7 @@ namespace gd3d.framework
             {
                 context.fog = this.gameObject.getScene().fog;
                 this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
-            }else
+            } else
             {
                 this.mat.draw(context, mesh, mesh.submesh[0], "base");
             }
@@ -370,6 +370,7 @@ namespace gd3d.framework
         public localTranslate: math.vector3;
         public euler: math.vector3;
         public color: math.vector3;
+        public colorRate: number;
         private initscale: math.vector3 = new gd3d.math.vector3();
         public scale: math.vector3;
         public uv: math.vector2;
@@ -508,6 +509,10 @@ namespace gd3d.framework
                 this.color = new gd3d.math.vector3(0, 0, 0);
             else
                 this.color = this.data.color.getValueRandom();
+            if (this.data.colorRate == undefined)
+                this.colorRate = this.data.colorRate;
+            else
+                this.colorRate = 1;
             if (this.data.alpha == undefined)
                 this.alpha = 1;
             else
@@ -974,12 +979,19 @@ namespace gd3d.framework
                     let a = math.floatClamp(this.sourceVbo[i * vertexSize + 12], 0, 1);
                     if (this.color != undefined)
                     {
-                        r = math.floatClamp(this.color.x, 0, 1);
-                        g = math.floatClamp(this.color.y, 0, 1);
-                        b = math.floatClamp(this.color.z, 0, 1);
+                        r = this.color.x;
+                        g = this.color.y;
+                        b = this.color.z;
                     }
                     if (this.alpha != undefined)
-                        a = math.floatClamp(this.alpha, 0, 1);
+                        a = this.alpha;
+                    if (this.colorRate != undefined)
+                    {
+                        r *= this.colorRate;
+                        g *= this.colorRate;
+                        b *= this.colorRate;
+                        a *= this.colorRate;
+                    }
                     this.dataForVbo[i * 15 + 9] = r;
                     this.dataForVbo[i * 15 + 10] = g;
                     this.dataForVbo[i * 15 + 11] = b;
@@ -1008,6 +1020,7 @@ namespace gd3d.framework
             this.euler = null;
             this.scale = null;
             this.color = null;
+            this.colorRate = 1;
             this.uv = null;
         }
     }

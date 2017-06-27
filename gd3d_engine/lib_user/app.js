@@ -2253,7 +2253,7 @@ var test_effect = (function () {
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, 10);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, 50);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
         state.finish = true;
@@ -4266,7 +4266,7 @@ var test_loadprefab = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        var names = ["0001_fashion", "baihu"];
+        var names = ["Cube", "0001_fashion", "baihu"];
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {

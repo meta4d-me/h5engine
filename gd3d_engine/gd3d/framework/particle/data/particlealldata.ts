@@ -72,6 +72,7 @@ namespace gd3d.framework
          * @memberof EmissionNew
          */
         color: ParticleNode;
+        colorRate: number;
         colorNodes: Array<ParticleNode>;
         colorSpeed: ParticleNode;
         /**
@@ -102,7 +103,7 @@ namespace gd3d.framework
         uvRoll: UVRoll;
         uvSprite: UVSprite;
 
-        tilling:math.vector2;
+        tilling: math.vector2;
         /**
          * 材质相关
          * 
@@ -170,6 +171,8 @@ namespace gd3d.framework
                 emission.scaleSpeed = this.scaleSpeed.clone();
             if (this.color != undefined)
                 emission.color = this.color.clone();
+            if (this.colorRate != undefined)
+                emission.colorRate = this.colorRate;
             if (this.colorNodes != undefined)
                 emission.colorNodes = this.cloneParticleNodeArray(this.colorNodes);
             if (this.colorSpeed != undefined)
@@ -190,7 +193,7 @@ namespace gd3d.framework
             if (this.uvRoll != undefined)
                 emission.uvRoll = this.uvRoll.clone();
             if (this.uvSprite != undefined)
-                emission.uvSprite = this.uvSprite.clone(); 
+                emission.uvSprite = this.uvSprite.clone();
 
             if (this.mat != undefined)
                 emission.mat = this.mat.clone();

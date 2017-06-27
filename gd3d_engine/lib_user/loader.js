@@ -28,7 +28,6 @@ window.onload = function () {
             }
         }, 50);
         var gdapp = new gd3d.framework.application();
-        gdapp.targetFrame = 1;
         var div = document.getElementById("drawarea");
         gdapp.start(div);
         gdapp.showFps();
