@@ -4266,7 +4266,7 @@ var test_loadprefab = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        var names = ["baihu"];
+        var names = ["0001_fashion", "baihu"];
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -4275,10 +4275,10 @@ var test_loadprefab = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
                         _this.baihu = _prefab.getCloneTrans();
                         _this.scene.addChild(_this.baihu);
-                        _this.baihu.localScale = new gd3d.math.vector3(30, 30, 30);
+                        _this.baihu.localScale = new gd3d.math.vector3(1, 1, 1);
                         _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                         _this.baihu = _prefab.getCloneTrans();
-                        objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
                         objCam.lookatPoint(new gd3d.math.vector3(0.1, 0.1, 0.1));
                         objCam.markDirty();
                     }
@@ -4291,7 +4291,6 @@ var test_loadprefab = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -15);
         objCam.markDirty();
     };
     test_loadprefab.prototype.update = function (delta) {
@@ -4301,7 +4300,6 @@ var test_loadprefab = (function () {
         var x2 = Math.sin(this.timer * 0.1);
         var z2 = Math.cos(this.timer * 0.1);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
         if (this.baihu) {
             objCam.lookat(this.baihu);
             objCam.markDirty();

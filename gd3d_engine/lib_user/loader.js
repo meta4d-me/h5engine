@@ -1,5 +1,4 @@
 window.onload = function () {
-    console.log("version 0001");
     gd3d.jsLoader.instance().addImportScript("lib/Reflect.js");
     gd3d.jsLoader.instance().addImportScript("lib/gd3d.js");
     gd3d.jsLoader.instance().addImportScript("lib_user/app.js");
@@ -29,6 +28,7 @@ window.onload = function () {
             }
         }, 50);
         var gdapp = new gd3d.framework.application();
+        gdapp.targetFrame = 1;
         var div = document.getElementById("drawarea");
         gdapp.start(div);
         gdapp.showFps();

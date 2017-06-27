@@ -34,6 +34,8 @@ var gd3d;
                 this.limitFrame = true;
                 this.version = "v0.0.1";
                 this.build = "b000010";
+                this._tar = -1;
+                this._standDeltaTime = -1;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
                 this._userCode = [];
@@ -46,6 +48,17 @@ var gd3d;
                 this._bePause = false;
                 this._beStepForward = false;
             }
+            Object.defineProperty(application.prototype, "targetFrame", {
+                get: function () {
+                    return this._tar;
+                },
+                set: function (val) {
+                    this._tar = val;
+                    this._standDeltaTime = 1 / this._tar;
+                },
+                enumerable: true,
+                configurable: true
+            });
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
                 var metas = document.getElementsByName("viewport");
@@ -75,7 +88,7 @@ var gd3d;
                 this.initAssetMgr();
                 this.initInputMgr();
                 this.initScene();
-                this.beginTimer = this.lastTimer = Date.now() / 1000;
+                this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
                 this.loop();
                 gd3d.io.referenceInfo.regDefaultType();
                 var initovercallback = window["initovercallback"];
@@ -171,19 +184,34 @@ var gd3d;
             };
             application.prototype.loop = function () {
                 var now = Date.now() / 1000;
-                this.pretimer = Date.now();
                 this._deltaTime = now - this.lastTimer;
                 this.totalTime = now - this.beginTimer;
-                this.update(this.deltaTime);
-                if (this.stats != null)
-                    this.stats.update();
-                this.lastTimer = now;
-                this.updateTimer = Date.now() - this.pretimer;
-                if (this.limitFrame) {
-                    requestAnimationFrame(this.loop.bind(this));
+                this.updateTimer = now - this.pretimer;
+                if (this._deltaTime < this._standDeltaTime) {
+                    var _this_1 = this;
+                    var del = this._standDeltaTime - this._deltaTime;
+                    setTimeout(function () {
+                        var _now = Date.now() / 1000;
+                        _this_1.lastTimer = _now;
+                        _this_1.pretimer = _now;
+                        _this_1.update(_this_1._standDeltaTime);
+                        if (_this_1.stats != null)
+                            _this_1.stats.update();
+                        _this_1.loop();
+                    }, del * 1000);
                 }
                 else {
-                    setTimeout(this.loop.bind(this), 1);
+                    this.update(this.deltaTime);
+                    if (this.stats != null)
+                        this.stats.update();
+                    this.lastTimer = now;
+                    this.pretimer = now;
+                    if (this.limitFrame) {
+                        requestAnimationFrame(this.loop.bind(this));
+                    }
+                    else {
+                        setTimeout(this.loop.bind(this), 1);
+                    }
                 }
             };
             application.prototype.initScene = function () {

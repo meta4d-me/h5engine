@@ -22,16 +22,26 @@ namespace gd3d.framework
         height: number;
         limitFrame: boolean = true;
         notify: INotify;
-        timeScale:number;
-		version:string = "v0.0.1";
-		build:string = "b000010";
-
+        timeScale: number;
+        version: string = "v0.0.1";
+        build: string = "b000010";
+        _tar: number = -1;
+        private _standDeltaTime: number = -1;
+        set targetFrame(val: number)
+        {
+            this._tar = val;
+            this._standDeltaTime = 1 / this._tar;
+        }
+        get targetFrame()
+        {
+            return this._tar;
+        }
         start(div: HTMLDivElement)
         {
-			console.log("version: "+this.version + "  build: "+this.build);
+            console.log("version: " + this.version + "  build: " + this.build);
             var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
-            var meta:HTMLMetaElement;
-            if(!metas || metas.length<1)
+            var meta: HTMLMetaElement;
+            if (!metas || metas.length < 1)
             {
                 meta = document.createElement("meta") as HTMLMetaElement;
                 meta.name = "viewport";
@@ -62,12 +72,12 @@ namespace gd3d.framework
             this.initInputMgr();
 
             this.initScene();
-            this.beginTimer = this.lastTimer = Date.now() / 1000;
+            this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
             this.loop();
             gd3d.io.referenceInfo.regDefaultType();
 
             let initovercallback = window["initovercallback"];
-            if(initovercallback!=null)
+            if (initovercallback != null)
             {
                 initovercallback(this);
             }
@@ -173,8 +183,8 @@ namespace gd3d.framework
                 this._scene.update(delta);
             }
         }
-        public preusercodetimer:number;
-        public usercodetime:number;
+        public preusercodetimer: number;
+        public usercodetime: number;
         getUserUpdateTimer()
         {
             return this.usercodetime;
@@ -192,7 +202,7 @@ namespace gd3d.framework
         {
             return this._deltaTime * this.timeScale;
         }
-        private pretimer:number = 0;
+        private pretimer: number = 0;
         private updateTimer;
         getUpdateTimer()
         {
@@ -202,24 +212,41 @@ namespace gd3d.framework
         private loop()
         {
             var now = Date.now() / 1000;
-            this.pretimer = Date.now();
             this._deltaTime = now - this.lastTimer;
             this.totalTime = now - this.beginTimer;
-            this.update(this.deltaTime);
-            if (this.stats != null)
-                this.stats.update();
-            this.lastTimer = now;
-            this.updateTimer = Date.now() - this.pretimer;
-            if (this.limitFrame)
+            this.updateTimer = now - this.pretimer;
+            if (this._deltaTime < this._standDeltaTime)
             {
-                requestAnimationFrame(this.loop.bind(this));
+                let _this = this;
+                let del = this._standDeltaTime - this._deltaTime;
+                setTimeout(function ()
+                {
+                    var _now = Date.now() / 1000;
+                    _this.lastTimer = _now;
+                    _this.pretimer = _now;
+                    _this.update(_this._standDeltaTime);
+                    if (_this.stats != null)
+                        _this.stats.update();
+                    _this.loop();
+                }, del * 1000);
             }
             else
             {
-                setTimeout(this.loop.bind(this), 1);
+                this.update(this.deltaTime);
+                if (this.stats != null)
+                    this.stats.update();
+                this.lastTimer = now;
+                this.pretimer = now;
+                if (this.limitFrame)
+                {
+                    requestAnimationFrame(this.loop.bind(this));
+                }
+                else
+                {
+                    setTimeout(this.loop.bind(this), 1);
+                }
             }
         }
-
 
         //一个Program 拥有横竖两条控制线，横向是时间线，用状态机表达UserState
         //纵向是 多个Scene，每个Scene拥有多个Camera，多个Scene用到的情况极少
