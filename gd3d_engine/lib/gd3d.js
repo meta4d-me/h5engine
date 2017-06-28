@@ -34,6 +34,8 @@ var gd3d;
                 this.limitFrame = true;
                 this.version = "v0.0.1";
                 this.build = "b000010";
+                this._tar = -1;
+                this._standDeltaTime = -1;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
                 this.isFrustumCulling = true;
@@ -47,6 +49,17 @@ var gd3d;
                 this._bePause = false;
                 this._beStepForward = false;
             }
+            Object.defineProperty(application.prototype, "targetFrame", {
+                get: function () {
+                    return this._tar;
+                },
+                set: function (val) {
+                    this._tar = val;
+                    this._standDeltaTime = 1 / this._tar;
+                },
+                enumerable: true,
+                configurable: true
+            });
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
                 var metas = document.getElementsByName("viewport");
@@ -76,7 +89,7 @@ var gd3d;
                 this.initAssetMgr();
                 this.initInputMgr();
                 this.initScene();
-                this.beginTimer = this.lastTimer = Date.now() / 1000;
+                this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
                 this.loop();
                 gd3d.io.referenceInfo.regDefaultType();
                 var initovercallback = window["initovercallback"];
@@ -172,19 +185,34 @@ var gd3d;
             };
             application.prototype.loop = function () {
                 var now = Date.now() / 1000;
-                this.pretimer = Date.now();
                 this._deltaTime = now - this.lastTimer;
                 this.totalTime = now - this.beginTimer;
-                this.update(this.deltaTime);
-                if (this.stats != null)
-                    this.stats.update();
-                this.lastTimer = now;
-                this.updateTimer = Date.now() - this.pretimer;
-                if (this.limitFrame) {
-                    requestAnimationFrame(this.loop.bind(this));
+                this.updateTimer = now - this.pretimer;
+                if (this._deltaTime < this._standDeltaTime) {
+                    var _this_1 = this;
+                    var del = this._standDeltaTime - this._deltaTime;
+                    setTimeout(function () {
+                        var _now = Date.now() / 1000;
+                        _this_1.lastTimer = _now;
+                        _this_1.pretimer = _now;
+                        _this_1.update(_this_1._standDeltaTime);
+                        if (_this_1.stats != null)
+                            _this_1.stats.update();
+                        _this_1.loop();
+                    }, del * 1000);
                 }
                 else {
-                    setTimeout(this.loop.bind(this), 1);
+                    this.update(this.deltaTime);
+                    if (this.stats != null)
+                        this.stats.update();
+                    this.lastTimer = now;
+                    this.pretimer = now;
+                    if (this.limitFrame) {
+                        requestAnimationFrame(this.loop.bind(this));
+                    }
+                    else {
+                        setTimeout(this.loop.bind(this), 1);
+                    }
                 }
             };
             application.prototype.initScene = function () {
@@ -8526,17 +8554,23 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        var r = gd3d.math.floatClamp(vertexArr[i * vertexSize + 9], 0, 1);
-                        var g = gd3d.math.floatClamp(vertexArr[i * vertexSize + 10], 0, 1);
-                        var b = gd3d.math.floatClamp(vertexArr[i * vertexSize + 11], 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i * vertexSize + 12], 0, 1);
+                        var r = vertexArr[i * vertexSize + 9];
+                        var g = vertexArr[i * vertexSize + 10];
+                        var b = vertexArr[i * vertexSize + 11];
+                        var a = vertexArr[i * vertexSize + 12];
                         if (curAttrsData.color != undefined) {
-                            r = gd3d.math.floatClamp(curAttrsData.color.x, 0, 1);
-                            g = gd3d.math.floatClamp(curAttrsData.color.y, 0, 1);
-                            b = gd3d.math.floatClamp(curAttrsData.color.z, 0, 1);
+                            r = curAttrsData.color.x;
+                            g = curAttrsData.color.y;
+                            b = curAttrsData.color.z;
                         }
                         if (curAttrsData.alpha != undefined)
-                            a = gd3d.math.floatClamp(curAttrsData.alpha * a, 0, 1);
+                            a = curAttrsData.alpha;
+                        if (curAttrsData.colorRate != undefined) {
+                            r *= curAttrsData.colorRate;
+                            g *= curAttrsData.colorRate;
+                            b *= curAttrsData.colorRate;
+                            a *= curAttrsData.colorRate;
+                        }
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
@@ -14313,6 +14347,8 @@ var gd3d;
                         return gd3d.math.pool.clone_quaternion(this.localRotation);
                     case "matrix":
                         return gd3d.math.pool.clone_matrix(this.matrix);
+                    case "colorRate":
+                        return this.colorRate;
                 }
             };
             EffectAttrsData.prototype.initAttribute = function (attribute) {
@@ -14337,6 +14373,9 @@ var gd3d;
                         break;
                     case "tilling":
                         this.tilling = new gd3d.math.vector2(1, 1);
+                        break;
+                    case "colorRate":
+                        this.colorRate = 1;
                         break;
                     default:
                         console.log("不支持的属性：" + attribute);
@@ -14372,6 +14411,10 @@ var gd3d;
                     data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
                 else
                     data.initAttribute("tilling");
+                if (this.colorRate != undefined)
+                    data.colorRate = this.colorRate;
+                else
+                    data.initAttribute("colorRate");
                 if (this.mat != undefined)
                     data.mat = this.mat.clone();
                 if (this.rotationByEuler != undefined)
@@ -14397,6 +14440,8 @@ var gd3d;
                     data.scale = gd3d.math.pool.clone_vector3(this.scale);
                 if (this.tilling != undefined)
                     data.tilling = gd3d.math.pool.clone_vector2(this.tilling);
+                if (this.colorRate != undefined)
+                    data.colorRate = this.colorRate;
                 if (this.uv != undefined)
                     data.uv = gd3d.math.pool.clone_vector2(this.uv);
                 if (this.mat != undefined)
@@ -14649,6 +14694,8 @@ var gd3d;
                     emission.scaleSpeed = this.scaleSpeed.clone();
                 if (this.color != undefined)
                     emission.color = this.color.clone();
+                if (this.colorRate != undefined)
+                    emission.colorRate = this.colorRate;
                 if (this.colorNodes != undefined)
                     emission.colorNodes = this.cloneParticleNodeArray(this.colorNodes);
                 if (this.colorSpeed != undefined)
@@ -15817,6 +15864,9 @@ var gd3d;
                                 else if (key == "billboard") {
                                     frame.attrsData.renderModel = val;
                                 }
+                                else if (key == "colorRate") {
+                                    frame.attrsData.colorRate = val;
+                                }
                             }
                         }
                         if (frame.frameIndex == -1) {
@@ -15858,6 +15908,9 @@ var gd3d;
                                         }
                                         else if (key == "alpha") {
                                             lerp.attrsData.alpha = val.getValue();
+                                        }
+                                        else {
+                                            console.error("未支持的插值属性：" + key);
                                         }
                                     }
                                 }
@@ -15981,6 +16034,8 @@ var gd3d;
                             }
                             if (_data["color"] != undefined)
                                 data.color = this._parseToObjData("color", _data["color"]);
+                            if (_data["colorRate"] != undefined)
+                                data.colorRate = _data["colorRate"];
                             if (_data["colorSpeed"] != undefined)
                                 data.colorSpeed = this._parseToObjData("colorSpeed", _data["colorSpeed"]);
                             if (_data["colorNodes"] != undefined) {
@@ -16754,6 +16809,10 @@ var gd3d;
                     this.color = new gd3d.math.vector3(0, 0, 0);
                 else
                     this.color = this.data.color.getValueRandom();
+                if (this.data.colorRate == undefined)
+                    this.colorRate = this.data.colorRate;
+                else
+                    this.colorRate = 1;
                 if (this.data.alpha == undefined)
                     this.alpha = 1;
                 else
@@ -17042,12 +17101,18 @@ var gd3d;
                         var b = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 11], 0, 1);
                         var a = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 12], 0, 1);
                         if (this.color != undefined) {
-                            r = gd3d.math.floatClamp(this.color.x, 0, 1);
-                            g = gd3d.math.floatClamp(this.color.y, 0, 1);
-                            b = gd3d.math.floatClamp(this.color.z, 0, 1);
+                            r = this.color.x;
+                            g = this.color.y;
+                            b = this.color.z;
                         }
                         if (this.alpha != undefined)
-                            a = gd3d.math.floatClamp(this.alpha, 0, 1);
+                            a = this.alpha;
+                        if (this.colorRate != undefined) {
+                            r *= this.colorRate;
+                            g *= this.colorRate;
+                            b *= this.colorRate;
+                            a *= this.colorRate;
+                        }
                         this.dataForVbo[i * 15 + 9] = r;
                         this.dataForVbo[i * 15 + 10] = g;
                         this.dataForVbo[i * 15 + 11] = b;
@@ -17073,6 +17138,7 @@ var gd3d;
                 this.euler = null;
                 this.scale = null;
                 this.color = null;
+                this.colorRate = 1;
                 this.uv = null;
             };
             return Particle;

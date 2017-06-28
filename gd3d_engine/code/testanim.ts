@@ -11,7 +11,7 @@ class test_anim implements IState
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
-
+        // this.app.targetFrame = 10;
         var baihu = new gd3d.framework.transform();
         baihu.name = "baihu";
         baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 1;

@@ -21,6 +21,9 @@ declare namespace gd3d.framework {
         timeScale: number;
         version: string;
         build: string;
+        _tar: number;
+        private _standDeltaTime;
+        targetFrame: number;
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -2072,6 +2075,7 @@ declare namespace gd3d.framework {
         pos: math.vector3;
         euler: math.vector3;
         color: math.vector3;
+        colorRate: number;
         scale: math.vector3;
         uv: math.vector2;
         alpha: number;
@@ -2191,6 +2195,7 @@ declare namespace gd3d.framework {
         scaleNodes: Array<ParticleNodeNumber>;
         scaleSpeed: ParticleNode;
         color: ParticleNode;
+        colorRate: number;
         colorNodes: Array<ParticleNode>;
         colorSpeed: ParticleNode;
         simulationSpeed: ParticleNodeNumber;
@@ -2576,6 +2581,7 @@ declare namespace gd3d.framework {
         localTranslate: math.vector3;
         euler: math.vector3;
         color: math.vector3;
+        colorRate: number;
         private initscale;
         scale: math.vector3;
         uv: math.vector2;
