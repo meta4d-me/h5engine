@@ -56,7 +56,9 @@ namespace gd3d.framework
         public mix:boolean = false;
 
         get cacheKey(){
-            return this._playClip.getGUID()+"_"+this._playFrameid;
+            if(this._playClip)
+                return this._playClip.getGUID()+"_"+this._playFrameid;
+            return this._playFrameid;
         }
 
         private init()
@@ -80,7 +82,7 @@ namespace gd3d.framework
                 this.care(asbones[key].gameObject.transform);
             }
 
-            if (this.autoplay && this.clips != null)
+            if (this.autoplay && this.clips != null && this.clips.length>0)
             {
                 this.playByIndex(this.playIndex);
             }
