@@ -1837,7 +1837,7 @@ var test_anim = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 100, -100);
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
         objCam.lookat(baihu);
         objCam.markDirty();
     };
@@ -1848,7 +1848,7 @@ var test_anim = (function () {
         var x2 = Math.sin(this.timer * 1.1);
         var z2 = Math.cos(this.timer * 1.1);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 50, 22.5, -z2 * 50);
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
         objCam.lookat(this.cube);
         objCam.markDirty();
         objCam.updateWorldTran();
