@@ -6,7 +6,6 @@ namespace gd3d.framework
     export class aniplayer implements INodeComponent
     {
         gameObject: gameObject;
-        // renders: skinnedMeshRenderer[];
 
         private _clipnameCount = 0;
         private _clipnames: { [key: string]: number } = null;
@@ -54,6 +53,11 @@ namespace gd3d.framework
         private playStyle: PlayStyle = PlayStyle.NormalPlay;
         private percent: number = 0;
 
+        public mix:boolean = false;
+
+        get cacheKey(){
+            return this._playClip.getGUID()+"_"+this._playFrameid;
+        }
 
         private init()
         {
@@ -97,29 +101,24 @@ namespace gd3d.framework
 
             this.checkFrameId(delta);
 
-            var mix = false;
+            this.mix = false;
             if (this.crossdelta > 0)
             {
                 this.crossdelta -= delta / this.speed * this.crossspeed;
-                mix = true;
+                this.mix = true;
             }
 
             for (var i = 0; i < this._playClip.boneCount; i++)
             {
                 var bone = this._playClip.bones[i];
-                //nbone next boneinfo
-                //
+
                 var frame = this._playClip.frames[this._playFrameid];
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
                 var outb = this.nowpose[bone];
                 var tpose = this.tpose[bone];
-                // var next = new PoseBoneMatrix();
-                // next.r =new gd3d.math.quaternion();
-                // next.t =new gd3d.math.vector3();
-                //next.copyFromData(frame, nextseek);
                 if (outb != undefined)
                 {
-                    if (mix)
+                    if (this.mix)
                     {
                         var last = this.lerppose[bone];
                         if (last != undefined)

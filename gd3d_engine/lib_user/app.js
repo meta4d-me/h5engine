@@ -1837,7 +1837,7 @@ var test_anim = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.localTranslate = new gd3d.math.vector3(0, 100, -100);
         objCam.lookat(baihu);
         objCam.markDirty();
     };
@@ -1848,7 +1848,7 @@ var test_anim = (function () {
         var x2 = Math.sin(this.timer * 1.1);
         var z2 = Math.cos(this.timer * 1.1);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 50, 22.5, -z2 * 50);
         objCam.lookat(this.cube);
         objCam.markDirty();
         objCam.updateWorldTran();
@@ -2778,7 +2778,7 @@ var test_load = (function () {
                     if (s.isfinish) {
                         var smesh1 = _this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin");
                         var mesh1 = baihu.gameObject.addComponent("meshFilter");
-                        mesh1.mesh = (smesh1);
+                        mesh1.mesh = smesh1.clone();
                         var renderer = baihu.gameObject.addComponent("meshRenderer");
                         var collider = baihu.gameObject.addComponent("boxcollider");
                         baihu.markDirty();

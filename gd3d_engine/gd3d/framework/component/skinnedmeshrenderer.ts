@@ -8,7 +8,6 @@ namespace gd3d.framework
     {
         constructor()
         {
-
         }
         gameObject: gameObject;
 
@@ -73,6 +72,10 @@ namespace gd3d.framework
 
         //这个数据是扣掉tpose之后的
         private _skeletonMatrixData: Float32Array;
+
+        public static dataCaches: { key: string, data: Float32Array }[] = [];
+        private cacheData:Float32Array;
+
         //是否高效
         private _efficient: boolean = true;
         start()
@@ -255,38 +258,50 @@ namespace gd3d.framework
 
         update(delta: number)
         {
-            //根据shader决定传什么数据
-            var skintype = this.useBoneShader(this.materials[0]);
-            if (skintype == 1 && this._skeletonMatrixData == null)
+            if(this._skeletonMatrixData == null)
             {
-                this.maxBoneCount = 24;
-                this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
-                this._efficient = false;
-            }
-            if (skintype == 2 && this._skeletonMatrixData == null)
-            {
-                this.maxBoneCount = 40;
-                this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
-                this._efficient = true;
+                //根据shader决定传什么数据
+                var skintype = this.useBoneShader(this.materials[0]);
+                if (skintype == 1)
+                {
+                    this.maxBoneCount = 24;
+                    this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
+                    this._efficient = false;
+                }
+                else if (skintype == 2)
+                {
+                    this.maxBoneCount = 40;
+                    this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
+                    this._efficient = true;
+                }
             }
 
-
-            if (this.player != null && this._skeletonMatrixData != null)
+            if (this.player != null)
             {
-                this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
+                if (!this.player.mix)
+                {
+                    let cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
+                    let data: Float32Array = skinnedMeshRenderer.dataCaches[cacheKey];
+                    if (!data)
+                    {
+                        data = new Float32Array(8 * 40);
+                        this.player.fillPoseData(data, this.bones, true);
+                        skinnedMeshRenderer.dataCaches[cacheKey] = data;
+                    }
+                    this.cacheData = data;
+                    return;
+                }
+                this.cacheData = null;
+
+                if (this._skeletonMatrixData != null)
+                {
+                    this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
+                }
             }
         }
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            // if (!(camera.CullingMask & this.renderLayer)) return;
-            // if (this.materials == null)
-            // {
-            //     this.materials = [];
-            //     this.materials.push(new framework.material());
-            //     this.materials[0].setShader(assetmgr.getShader("bone_eff.shader.json"));
-            // }
-
             this.layer = this.materials[0].getLayer();
             if (!this.issetq)
                 this._queue = this.materials[0].getQueue();
@@ -299,15 +314,18 @@ namespace gd3d.framework
 
             for (let i = 0; i < this.materials.length; i++)
             {
-                // if (!this.useBoneShader(this.materials[i]))
-                // {
-                //     //let _mat = new material();
-                //     let _texture = this.materials[i].mapUniform["_MainTex"].value as texture;
-                //     //this.materials[i] = _mat;
-                //      //this.materials[i].setShader(assetmgr.getShader("bone.shader.json"));
-                //     //this.materials[i].setShader(assetmgr.getShader("bone_eff.shader.json"));
-                //     //this.materials[i].setTexture("_MainTex", _texture);
-                // }
+                if(this.cacheData!=null)
+                {
+                    if (this._efficient)
+                    {
+                        this.materials[i].setVector4v("glstate_vec4_bones", this.cacheData);
+                    }
+                    else
+                    {
+                        this.materials[i].setMatrixv("glstate_matrix_bones", this.cacheData);
+                    }
+                    continue;
+                }
                 if (this._skeletonMatrixData != null)
                 {
                     if (this._efficient)

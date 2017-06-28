@@ -30,7 +30,7 @@ class test_load implements IState
                     {
                         var smesh1 = this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin") as gd3d.framework.mesh;
                         var mesh1 = baihu.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                        mesh1.mesh = (smesh1);
+                        mesh1.mesh = smesh1.clone();
                         var renderer = baihu.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
                         var collider = baihu.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
                         baihu.markDirty();
