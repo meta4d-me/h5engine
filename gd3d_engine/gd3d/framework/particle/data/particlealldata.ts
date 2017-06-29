@@ -3,10 +3,18 @@ namespace gd3d.framework
     export class Emission
     {
         beLoop: boolean = false;
+
+        paricleLoop:boolean=false;
+        singleMeshLoop:boolean=false;
         /**
          * 发射器类型
          */
         emissionType: ParticleEmissionType;
+
+        rootpos:gd3d.math.vector3;
+        rootRotAngle:gd3d.math.vector3;
+        rootScale:gd3d.math.vector3;
+
         /**
          * 最大发射粒子数（全类型）
          */
@@ -137,6 +145,19 @@ namespace gd3d.framework
             let emission = new Emission();
             if (this.emissionType != undefined)
                 emission.emissionType = this.emissionType;
+
+            if(this.rootpos!=undefined)
+            {
+                emission.rootpos=gd3d.math.pool.clone_vector3(this.rootpos);
+            }
+            if(this.rootRotAngle!=undefined)
+            {
+                emission.rootRotAngle=gd3d.math.pool.clone_vector3(this.rootRotAngle);
+            }
+            if(this.rootScale!=undefined)
+            {
+                emission.rootScale=gd3d.math.pool.clone_vector3(this.rootScale);
+            }
             if (this.maxEmissionCount != undefined)
                 emission.maxEmissionCount = this.maxEmissionCount;
             if (this.emissionCount != undefined)
@@ -205,6 +226,11 @@ namespace gd3d.framework
             if (this.particleStartData != undefined)
                 emission.particleStartData = this.particleStartData.clone();
             return emission;
+        }
+
+        getworldRotation()
+        {
+            
         }
 
         cloneParticleNodeArray(_array: Array<ParticleNode>)

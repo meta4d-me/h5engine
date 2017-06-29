@@ -22,7 +22,9 @@ namespace gd3d.framework
             if (content["life"] != undefined)
                 effectData.life = <number>content["life"];
             if (content["beloop"] != undefined)
+            {
                 effectData.beLoop = <boolean>content["beloop"];
+            }
             if (content["elements"] != undefined)
             {
                 effectData.elements = [];
@@ -36,6 +38,8 @@ namespace gd3d.framework
                         element.name = elementData["name"];
                     if (elementData["ref"] != undefined)
                         element.ref = elementData["ref"];
+                    if(elementData["beloop"]!=undefined)
+                        element.beloop=elementData["beloop"];
                     if (elementData["type"] != undefined)
                     {
                         switch (elementData["type"])
@@ -235,8 +239,16 @@ namespace gd3d.framework
                                 data.emissionType = ParticleEmissionType.continue;
                                 break;
                         }
-                        if (_data["beloop"] != undefined)
-                            data.beLoop = <boolean>_data["beloop"];
+                        // if (_data["beloop"] != undefined)
+                        // {
+                        //     //data.beLoop = <boolean>_data["beloop"];
+                        //     data.paricleLoop=<boolean>_data["beloop"];
+                        //     if(data.paricleLoop) 
+                        //     {
+                        //         data.beLoop=true;
+                        //     }
+                        // }
+
                         if (_data["maxcount"] != undefined)
                             data.maxEmissionCount = <number>_data["maxcount"];
                         if (_data["emissioncount"] != undefined)
@@ -251,6 +263,30 @@ namespace gd3d.framework
                         //     data.pos = this._parseToObjData("pos", _data["pos"]);
                         // if (_data["shape"] != undefined)
                         //     data.shape = _data["shape"];
+                        if(_data["rootpos"]!=undefined)
+                        {
+                            data.rootpos=EffectUtil.parseVector3(_data["rootpos"]);
+                        }
+                        else
+                        {
+                            data.rootpos=new gd3d.math.vector3();
+                        }
+                        if(_data["rootRotAngle"]!=undefined)
+                        {
+                            data.rootRotAngle=EffectUtil.parseVector3(_data["rootRotAngle"]);
+                        }
+                        else
+                        {
+                            data.rootRotAngle=new gd3d.math.vector3();
+                        }
+                        if(_data["rootscale"])
+                        {
+                            data.rootScale=EffectUtil.parseVector3(_data["rootscale"]);
+                        }
+                        else
+                        {
+                            data.rootScale=new gd3d.math.vector3(1,1,1);
+                        }
                         if (_data["moveSpeed"] != undefined)
                             data.moveSpeed = this._parseToObjData("moveSpeed", _data["moveSpeed"]);
                         if (_data["gravity"] != undefined)
@@ -402,13 +438,13 @@ namespace gd3d.framework
         {
             let startdata = element.emissionData.particleStartData;
 
-            if (_startdata["center"] != undefined)
-            {
-                let _startpos = _startdata["center"];
-                startdata.position.x = _startpos["0"];
-                startdata.position.y = _startpos["1"];
-                startdata.position.z = _startpos["2"];
-            }
+            // if (_startdata["center"] != undefined)
+            // {
+            //     let _startpos = _startdata["center"];
+            //     startdata.position.x = _startpos["0"];
+            //     startdata.position.y = _startpos["1"];
+            //     startdata.position.z = _startpos["2"];
+            // }
 
             switch (_startdata["type"])
             {
@@ -434,14 +470,15 @@ namespace gd3d.framework
                     startdata.shapeType = gd3d.framework.ParticleSystemShape.EDGE;
                     break;
                 default:
+                    startdata.shapeType = gd3d.framework.ParticleSystemShape.NORMAL;
                     break;
             }
 
 
-            if (_startdata["bottomradius"] != undefined)
-            {
-                startdata.bottomRadius = _startdata["bottomradius"];
-            }
+            // if (_startdata["bottomradius"] != undefined)
+            // {
+            //     startdata.bottomRadius = _startdata["bottomradius"];
+            // }
 
             if (_startdata["width"] != undefined)
             {
@@ -471,9 +508,9 @@ namespace gd3d.framework
             if (_startdata["direction"] != undefined)
             {
                 let _startdir = _startdata["direction"];
-                startdata.direction.x = _startdir["0"];
-                startdata.direction.y = _startdir["1"];
-                startdata.direction.z = _startdir["2"];
+                startdata.direction.x = _startdir["x"];
+                startdata.direction.y = _startdir["y"];
+                startdata.direction.z = _startdir["z"];
             }
 
         }

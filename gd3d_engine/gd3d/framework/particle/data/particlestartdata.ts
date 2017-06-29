@@ -20,7 +20,7 @@
     export class ParticleStartData 
     {
 
-        public shapeType: ParticleSystemShape = ParticleSystemShape.BOX;
+        public shapeType: ParticleSystemShape = ParticleSystemShape.NORMAL;
 
         private _position: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
         public set position(_pos: gd3d.math.vector3) 
@@ -34,7 +34,7 @@
             return this._position;
         }
 
-        private _direction: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
+        private _direction: gd3d.math.vector3 = new gd3d.math.vector3(0, 1, 0);
         public set direction(_dir: gd3d.math.vector3)
         {
             // this._direction = gd3d.math.pool.clone_vector3(_dir);
@@ -57,16 +57,6 @@
             return this._width;
         }
 
-        private _bottomRadius: number = 0;
-        public set bottomRadius(_r: number)
-        {
-            this._bottomRadius = _r;
-        }
-
-        public get bottomRadius() 
-        {
-            return this._bottomRadius;
-        }
 
         private _height: number = 0;
         public set height(_h: number) 
@@ -103,9 +93,10 @@
             return this._angle;
         }
 
+        public emitFrom:emitfromenum=emitfromenum.base;
         public randomPosition: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
 
-        private _randomDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
+        private _randomDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 1, 0);
         public get randomDirection(): gd3d.math.vector3
         {
             switch (this.shapeType)
@@ -135,10 +126,7 @@
             math.vec3Normalize(this._randomDirection, this._randomDirection);
             return this._randomDirection;
         }
-
-
-
-        private _boxDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
+        private _boxDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 1, 0);
         public get boxDirection(): gd3d.math.vector3
         {
             let boxpos = new gd3d.math.vector3(0, 0, 0);
@@ -156,7 +144,7 @@
         }
 
 
-        private _sphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
+        private _sphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 1, 0);
         public get sphereDirection(): gd3d.math.vector3
         {
             let _radius = ValueData.RandomRange(0, this.radius);
@@ -174,7 +162,7 @@
         }
 
 
-        private _hemisphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
+        private _hemisphereDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 1, 0);
         public get hemisphereDirection(): gd3d.math.vector3
         {
 
@@ -194,36 +182,35 @@
             return this._hemisphereDirection;
         }
 
-        private bottomRidus: number = 1000;
+        //private bottomRidus: number = 1000;
 
-        private _coneDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
+        private _coneDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 1, 0);
         public get coneDirection(): gd3d.math.vector3
         {
-            if (this.radius > this.bottomRidus)
+
+            var randomAngle=Math.random()*Math.PI*2;//弧度
+            var randomHeight=Math.random()*this.height;
+            var radius=randomHeight*Math.tan(this.angle*Math.PI/180)+this.radius;
+            var radomRadius=Math.random()*radius;
+            var bottompos=gd3d.math.pool.new_vector3();
+            bottompos.x=radius*Math.cos(randomAngle);
+            bottompos.y=0;
+            bottompos.z=radius*Math.sin(randomAngle);
+
+            if(this.emitFrom==emitfromenum.base)
             {
-                this.bottomRidus = this.radius;
+               gd3d.math.vec3Clone(bottompos,this.randomPosition);
             }
-
-            let height = this.bottomRidus / (Math.tan(this.angle * (Math.PI / 180)));
-
-            let subHeight = height * (this.radius / this.bottomRidus)
-
-            let a = ValueData.RandomRange(0.01, this.angle * (Math.PI / 180));
-            let b = ValueData.RandomRange(-Math.PI, Math.PI);
-
-            let _height = ValueData.RandomRange(subHeight, this.height);
-            let _raidus = _height * Math.tan(a);
-
-            this._coneDirection.z = _height;
-            this._coneDirection.y = _raidus * Math.sin(b);
-            this._coneDirection.x = _raidus * Math.cos(b);
-
-            let length = math.vec3Length(this._coneDirection);
-
-            math.vec3Normalize(this._coneDirection, this._coneDirection);
-            EffectUtil.RotateVector3(this._coneDirection, this.direction, this._coneDirection);
-            ///让截面上随机的点旋转至圆锥轴所朝向的方向，得到该方向上的最终方向
-            this.getRandomPosition(this._coneDirection, length);
+            else if(this.emitFrom==emitfromenum.volume)
+            {
+                
+                this.randomPosition.x=radomRadius*Math.cos(randomAngle);
+                this.randomPosition.z=radomRadius*Math.sin(randomAngle);
+                this.randomPosition.y=randomHeight;
+            }
+            this._coneDirection.x=Math.cos(randomAngle);
+            this._coneDirection.z=Math.sin(randomAngle);
+            this._coneDirection.y=Math.cos(this.angle*Math.PI/180);
             return this._coneDirection;
         }
 
@@ -247,7 +234,7 @@
         }
 
 
-        private _edgeDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 1);
+        private _edgeDirection: gd3d.math.vector3 = new gd3d.math.vector3(0, 1, 0);
         public get edgeDirection()
         {
 
@@ -264,7 +251,7 @@
 
         constructor()
         {
-            math.vec3Normalize(this.direction, this.direction);
+            //math.vec3Normalize(this.direction, this.direction);
         }
 
         private getRandomPosition(dir: gd3d.math.vector3, length: number)
@@ -284,7 +271,7 @@
             data._direction = new gd3d.math.vector3();
             gd3d.math.vec3Clone(this._direction, data._direction);
             data._width = this._width;
-            data._bottomRadius = this._bottomRadius;
+            //data._bottomRadius = this._bottomRadius;
 
             data._height = this._height;
 
@@ -309,7 +296,7 @@
             data._hemisphereDirection = new gd3d.math.vector3();
             gd3d.math.vec3Clone(this._hemisphereDirection, data._hemisphereDirection);
 
-            data.bottomRidus = this.bottomRidus;
+            //data.bottomRidus = this.bottomRidus;
 
             data._coneDirection = new gd3d.math.vector3();
             gd3d.math.vec3Clone(this._coneDirection, data._coneDirection);
@@ -322,6 +309,11 @@
             gd3d.math.vec3Clone(this._edgeDirection, data._edgeDirection);
             return data;
         }
+    }
+    export enum emitfromenum
+    {
+        base,
+        volume
     }
 }
 

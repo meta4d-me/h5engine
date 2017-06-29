@@ -378,7 +378,7 @@ namespace gd3d.framework
         fillRenderer(scene: scene)
         {
             scene.renderList.clear();
-            this.calcCameraFrame(scene.app);
+            //this.calcCameraFrame(scene.app);
             this._fillRenderer(scene, scene.getRoot());
         }
         private _fillRenderer(scene: scene, node: transform)
@@ -396,6 +396,31 @@ namespace gd3d.framework
                 }
             }
         }
+        private maxTolerance:number=10;
+        private testFrustCulling2(scene: scene, node:transform)
+        {
+            if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
+            var forward=gd3d.math.pool.new_vector3();
+            this.gameObject.transform.getForwardInWorld(forward);
+
+            
+            var pos=node.getWorldTranslate();
+            var posinView=gd3d.math.pool.new_vector3();
+            gd3d.math.matrixTransformVector3(pos,this.matView,posinView);
+
+            
+
+            var distance_z=posinView.z;
+            if(distance_z<0&&distance_z<this.maxTolerance) return;
+
+            if(distance_z>0)
+            {
+
+            }
+            
+
+        }
+
         testFrustumCulling(scene: scene, node:transform)
         {
             if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试

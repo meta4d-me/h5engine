@@ -358,6 +358,7 @@ namespace gd3d.framework
         public timelineFrame: { [frameIndex: number]: EffectFrameData };
         public initFrameData: EffectFrameData;
         public ref: string;//数据整体引用
+        public beloop:boolean;
         public actionData: EffectActionData[];
         public emissionData: Emission;
         clone()
@@ -366,6 +367,7 @@ namespace gd3d.framework
             elementdata.name = this.name;
             elementdata.type = this.type;
             elementdata.ref = this.ref;
+            elementdata.beloop=this.beloop;
             elementdata.actionData = [];
             elementdata.timelineFrame = [];
             if (this.initFrameData)
