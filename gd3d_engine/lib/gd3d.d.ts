@@ -731,20 +731,20 @@ declare class PVRHeader {
     depth: number;
     numSurfaces: number;
     numFaces: number;
-    MIPMapCount: number;
+    mipMapCount: number;
     metaDataSize: number;
     gl: WebGLRenderingContext;
     constructor(gl: WebGLRenderingContext);
     parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D;
-    private getTextureFormat(gl, header);
+    private getTextureFormat();
     private genPixelTypeH4(c1Name, c2Name, c3Name, c4Name);
     private genPixelTypeH1(c1Name);
     private genPixelTypeL3(c1Bits, c2Bits, c3Bits);
     private genPixelTypeL2(c1Bits, c2Bits);
     private genPixelTypeL1(c1Bits);
     private genPixelTypeL4(c1Bits, c2Bits, c3Bits, c4Bits);
-    private getDataSize(header, MIPLevel, allSurfaces, allFaces);
-    private getBitsPerPixel(header);
+    private getDataSize(mipLevel, allSurfaces, allFaces);
+    private getBitsPerPixel();
 }
 declare enum ChannelTypes {
     UnsignedByteNorm = 0,
