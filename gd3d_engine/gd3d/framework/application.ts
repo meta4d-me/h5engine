@@ -29,6 +29,9 @@ namespace gd3d.framework
         private _standDeltaTime: number = -1;
         set targetFrame(val: number)
         {
+            //加个限制，防止传一个很小的数
+            if(val < 0.01)
+                return;
             this._tar = val;
             this._standDeltaTime = 1 / this._tar;
         }

@@ -1163,7 +1163,7 @@ declare namespace gd3d.framework {
         private playStyle;
         private percent;
         mix: boolean;
-        readonly cacheKey: string;
+        readonly cacheKey: string | number;
         private init();
         start(): void;
         update(delta: number): void;

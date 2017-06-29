@@ -54,6 +54,8 @@ var gd3d;
                     return this._tar;
                 },
                 set: function (val) {
+                    if (val < 0.01)
+                        return;
                     this._tar = val;
                     this._standDeltaTime = 1 / this._tar;
                 },
@@ -7479,7 +7481,9 @@ var gd3d;
             });
             Object.defineProperty(aniplayer.prototype, "cacheKey", {
                 get: function () {
-                    return this._playClip.getGUID() + "_" + this._playFrameid;
+                    if (this._playClip)
+                        return this._playClip.getGUID() + "_" + this._playFrameid;
+                    return this._playFrameid;
                 },
                 enumerable: true,
                 configurable: true
@@ -7499,7 +7503,7 @@ var gd3d;
                 for (var key in asbones) {
                     this.care(asbones[key].gameObject.transform);
                 }
-                if (this.autoplay && this.clips != null) {
+                if (this.autoplay && this.clips != null && this.clips.length > 0) {
                     this.playByIndex(this.playIndex);
                 }
             };
