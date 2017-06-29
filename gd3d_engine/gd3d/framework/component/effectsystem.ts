@@ -55,7 +55,7 @@ namespace gd3d.framework
         }
         private _data: EffectSystemData;
 
-        get totalFrameCount():number
+        get totalFrameCount(): number
         {
             return this.data.life * effectSystem.fps;
         }
@@ -70,7 +70,7 @@ namespace gd3d.framework
                 return;
             if (this.state == EffectPlayStateEnum.Play || this.state == EffectPlayStateEnum.Pause)
             {
-                if(this.state == EffectPlayStateEnum.Play)
+                if (this.state == EffectPlayStateEnum.Play)
                     this.playTimer += delta * this.speed;
                 // console.log(this.playTimer);
                 if (this.playTimer >= this.data.life)
@@ -238,13 +238,19 @@ namespace gd3d.framework
                     }
                     if (curAttrsData.alpha != undefined)
                         a = curAttrsData.alpha;//配置的alpha作为整体的百分比使用 源alpha依然是具体顶点的
-                    if(curAttrsData.colorRate!=undefined)
+                    if (curAttrsData.colorRate != undefined)
                     {
                         r *= curAttrsData.colorRate;
                         g *= curAttrsData.colorRate;
                         b *= curAttrsData.colorRate;
                         a *= curAttrsData.colorRate;
                     }
+
+                    r = math.floatClamp(r, 0, 3);
+                    g = math.floatClamp(g, 0, 3);
+                    b = math.floatClamp(b, 0, 3);
+                    a = math.floatClamp(a, 0, 3);
+
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
@@ -550,9 +556,9 @@ namespace gd3d.framework
 
         }
 
-        public setFrameId(id:number)
+        public setFrameId(id: number)
         {
-            if(this.state == EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
+            if (this.state == EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
                 this.curFrameId = id;
         }
 
@@ -570,7 +576,7 @@ namespace gd3d.framework
             let curid = (effectSystem.fps * this.playTimer) | 0;
             if (curid != this.curFrameId)
             {
-                if(this.state == EffectPlayStateEnum.Play)
+                if (this.state == EffectPlayStateEnum.Play)
                     this.curFrameId = curid;
                 return true;
             }

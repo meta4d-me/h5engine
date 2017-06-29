@@ -8864,6 +8864,10 @@ var gd3d;
                             b *= curAttrsData.colorRate;
                             a *= curAttrsData.colorRate;
                         }
+                        r = gd3d.math.floatClamp(r, 0, 3);
+                        g = gd3d.math.floatClamp(g, 0, 3);
+                        b = gd3d.math.floatClamp(b, 0, 3);
+                        a = gd3d.math.floatClamp(a, 0, 3);
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
                         effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
@@ -20115,7 +20119,6 @@ var gd3d;
             glDrawPass.prototype.setAlphaBlend = function (mode) {
                 if (mode == BlendModeEnum.Add) {
                     this.state_blend = true;
-                    this.state_zwrite = false;
                     this.state_blendEquation = render.webglkit.FUNC_ADD;
                     this.state_blendSrcRGB = render.webglkit.SRC_ALPHA;
                     this.state_blendDestRGB = render.webglkit.ONE;
@@ -20124,7 +20127,6 @@ var gd3d;
                 }
                 else if (mode == BlendModeEnum.Add_PreMultiply) {
                     this.state_blend = true;
-                    this.state_zwrite = false;
                     this.state_blendEquation = render.webglkit.FUNC_ADD;
                     this.state_blendSrcRGB = render.webglkit.ONE;
                     this.state_blendDestRGB = render.webglkit.ONE;
@@ -20142,7 +20144,6 @@ var gd3d;
                 }
                 else if (mode == BlendModeEnum.Blend_PreMultiply) {
                     this.state_blend = true;
-                    this.state_zwrite = false;
                     this.state_blendEquation = render.webglkit.FUNC_ADD;
                     this.state_blendSrcRGB = render.webglkit.ONE;
                     this.state_blendDestRGB = render.webglkit.ONE_MINUS_SRC_ALPHA;
