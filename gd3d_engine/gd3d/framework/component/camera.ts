@@ -354,7 +354,6 @@ namespace gd3d.framework
         fov: number = Math.PI * 0.25;//透视投影的fov
         size: number = 2;//正交投影的竖向size
         opvalue: number = 1;//0=正交， 1=透视 中间值可以在两种相机间过度
-
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
             var vpp = new math.rect();
@@ -378,12 +377,13 @@ namespace gd3d.framework
         fillRenderer(scene: scene)
         {
             scene.renderList.clear();
-            //this.calcCameraFrame(scene.app);
+            if(scene.app.isFrustumCulling)
+                this.calcCameraFrame(scene.app);
             this._fillRenderer(scene, scene.getRoot());
         }
         private _fillRenderer(scene: scene, node: transform)
         {
-            if(!this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
+            if(scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
             if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
             {
                 scene.renderList.addRenderer(node.gameObject.renderer);
@@ -396,31 +396,6 @@ namespace gd3d.framework
                 }
             }
         }
-        private maxTolerance:number=10;
-        private testFrustCulling2(scene: scene, node:transform)
-        {
-            if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
-            var forward=gd3d.math.pool.new_vector3();
-            this.gameObject.transform.getForwardInWorld(forward);
-
-            
-            var pos=node.getWorldTranslate();
-            var posinView=gd3d.math.pool.new_vector3();
-            gd3d.math.matrixTransformVector3(pos,this.matView,posinView);
-
-            
-
-            var distance_z=posinView.z;
-            if(distance_z<0&&distance_z<this.maxTolerance) return;
-
-            if(distance_z>0)
-            {
-
-            }
-            
-
-        }
-
         testFrustumCulling(scene: scene, node:transform)
         {
             if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试

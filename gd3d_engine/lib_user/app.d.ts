@@ -637,6 +637,7 @@ declare namespace t {
         counttimer: number;
         private loadShader(laststate, state);
         private loadText(laststate, state);
+        private loadPvr(laststate, state);
         private addcam(laststate, state);
         private addcube(laststate, state);
         cubetrail: gd3d.framework.transform;

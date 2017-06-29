@@ -414,6 +414,7 @@ namespace gd3d.framework
         public pos: math.vector3;
         public euler: math.vector3;
         public color: math.vector3;
+        public colorRate: number;//几倍颜色叠加
         public scale: math.vector3;
         public uv: math.vector2;
         public alpha: number;
@@ -513,6 +514,8 @@ namespace gd3d.framework
                 //     return gd3d.math.pool.clone_quaternion(this.startRotation);
                 case "matrix":
                     return gd3d.math.pool.clone_matrix(this.matrix);
+                case "colorRate":
+                    return this.colorRate;
             }
         }
 
@@ -540,6 +543,9 @@ namespace gd3d.framework
                     break;
                 case "tilling":
                     this.tilling = new gd3d.math.vector2(1, 1);
+                    break;
+                case "colorRate":
+                    this.colorRate = 1;
                     break;
                 default:
                     console.log("不支持的属性：" + attribute);
@@ -577,6 +583,10 @@ namespace gd3d.framework
                 data.tilling = math.pool.clone_vector2(this.tilling);
             else
                 data.initAttribute("tilling");
+            if (this.colorRate != undefined)
+                data.colorRate = this.colorRate;
+            else
+                data.initAttribute("colorRate");
             if (this.mat != undefined)
                 data.mat = this.mat.clone();
             if (this.rotationByEuler != undefined)
@@ -615,6 +625,8 @@ namespace gd3d.framework
                 data.scale = math.pool.clone_vector3(this.scale);
             if (this.tilling != undefined)
                 data.tilling = math.pool.clone_vector2(this.tilling);
+            if (this.colorRate != undefined)
+                data.colorRate = this.colorRate;
             if (this.uv != undefined)
                 data.uv = math.pool.clone_vector2(this.uv);
             if (this.mat != undefined)

@@ -59,10 +59,10 @@ namespace gd3d.framework
 
             //但是场景管理的优化，可能针对每个camera 跑一遍
             //log coll
-            document["log"] = {};
+            // document["log"] = {};
 
-            document["log"].lights = this.renderLights.length;
-            document["log"].cameras = [];
+            // document["log"].lights = this.renderLights.length;
+            // document["log"].cameras = [];
 
             //排序
             //排序camera 并绘制
@@ -75,13 +75,13 @@ namespace gd3d.framework
             }
 
 
-            for (var i = 0; i < this.renderCameras.length; i++)
-            {
-                this.renderCameras[i].index = i;
-                document["log"].cameras.push({});
-                document["log"].cameras[i].name = this.renderCameras[i].gameObject.getName();
-                document["log"].cameras[i].objs = [];
-            }
+            // for (var i = 0; i < this.renderCameras.length; i++)
+            // {
+            //     this.renderCameras[i].index = i;
+            //     document["log"].cameras.push({});
+            //     document["log"].cameras[i].name = this.renderCameras[i].gameObject.getName();
+            //     document["log"].cameras[i].objs = [];
+            // }
 
             this.RealCameraNumber = 0;
             for (var i = 0; i < this.renderCameras.length; i++)

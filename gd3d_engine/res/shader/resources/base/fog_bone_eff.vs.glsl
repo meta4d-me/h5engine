@@ -4,8 +4,8 @@ attribute vec4 _glesBlendWeight4;
 attribute vec4 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp vec4 glstate_vec4_bones[80];
-uniform highp float _Start;
-uniform highp float _End;
+uniform highp float glstate_fog_start;
+uniform highp float glstate_fog_end;
 
 varying highp float factor;
 varying highp vec2 xlv_TEXCOORD0;
@@ -47,7 +47,7 @@ void main()
 			 + buildMat4(i4)*_glesBlendWeight4.w;
 			 
 	highp vec4 pos = (glstate_matrix_mvp * mat)* tmpvar_1;
-    factor = (_End - abs(pos.z))/(_End - _Start); 
+    factor = (glstate_fog_end - abs(pos.z))/(glstate_fog_end - glstate_fog_start); 
     factor = clamp(factor, 0.0, 1.0);  
     gl_Position = pos;
 

@@ -301,6 +301,10 @@
             "length": 0
         },
         {
+            "name": "resources/particle/particles_additive_zwriteon.shader.json",
+            "length": 0
+        },
+        {
             "name": "resources/particle/particles_additive_premultiply.shader.json",
             "length": 0
         },

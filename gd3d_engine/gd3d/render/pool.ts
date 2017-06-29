@@ -151,7 +151,6 @@ namespace gd3d.math
             if (pool.unused_vector3.length > 0)
             {
                 let v = pool.unused_vector3.pop();
-                v.x = v.y = v.z = 0;
                 return v;
             }
             else

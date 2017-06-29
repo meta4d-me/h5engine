@@ -58,13 +58,19 @@ namespace gd3d.framework
 
         update(delta: number)
         {
-
+            if (this.materials != null && this.materials.length > 0)
+            {
+                let _mat = this.materials[0];
+                if (_mat)
+                {
+                    this.layer = _mat.getLayer();
+                    if (!this.issetq)
+                        this._queue = _mat.getQueue();
+                }
+            }
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            this.layer = this.materials[0].getLayer();
-            if (!this.issetq)
-                this._queue = this.materials[0].getQueue();
                 
             context.updateModel(this.gameObject.transform);
             if (this.filter != null)

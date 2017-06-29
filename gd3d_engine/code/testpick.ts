@@ -51,21 +51,21 @@
         }
 
 
-        // this.cube3 = this.cube2.clone();
-        // this.scene.addChild(this.cube3);
-        // {
-        //     this.cube3 = new gd3d.framework.transform();
-        //     this.cube3.name = "cube3";
-        //     this.scene.addChild(this.cube3);
-        //     this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
-        //     this.cube3.localTranslate.x = -5;
-        //     this.cube3.markDirty();
-        //     var mesh = this.cube3.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-        //     mesh.mesh =(smesh);
-        //     var renderer = this.cube3.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-        //     let coll = this.cube3.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
-        //     coll.colliderVisible = true ;
-        // }
+        this.cube3 = this.cube2.clone();
+        this.scene.addChild(this.cube3);
+        {
+            this.cube3 = new gd3d.framework.transform();
+            this.cube3.name = "cube3";
+            this.scene.addChild(this.cube3);
+            this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
+            this.cube3.localTranslate.x = -5;
+            this.cube3.markDirty();
+            var mesh = this.cube3.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            mesh.mesh =(smesh);
+            var renderer = this.cube3.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            let coll = this.cube3.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
+            coll.colliderVisible = true ;
+        }
 
 
         {
@@ -117,16 +117,20 @@
         }
         this.pointDown = this.inputMgr.point.touch;
 
+        if ((this.cube3.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider).intersectsTransform(this.cube4))
+        {
+            return;
+        }
         this.timer += delta;
-        // this.cube3.localTranslate.x += delta;
-        // this.cube3.markDirty();
+        this.cube3.localTranslate.x += delta;
+        this.cube3.markDirty();
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);
         var x2 = Math.sin(this.timer * 0.1);
         var z2 = Math.cos(this.timer * 0.1);
-        var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate.x += delta;
-        objCam.markDirty();
+        // var objCam = this.camera.gameObject.transform;
+        // objCam.localTranslate.x += delta;
+        // objCam.markDirty();
 
         // var tv = new gd3d.math.vector3();
         // gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);

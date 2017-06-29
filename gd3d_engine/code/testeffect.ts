@@ -109,8 +109,8 @@
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
-        let names: string[] = ["fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
-        let name = names[2];
+        let names: string[] = ["fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
+        let name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)
@@ -119,7 +119,7 @@
                 this.effect = this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
                 var text: gd3d.framework.textasset = this.app.getAssetMgr().getAssetByName(name + ".effect.json") as gd3d.framework.textasset;
                 this.effect.setJsonData(text);
-                this.scene.addChild(this.tr);
+                // this.scene.addChild(this.tr);
                 this.tr.markDirty();
                 state.finish = true;
                 this.effectloaded = true;
@@ -140,7 +140,7 @@
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, 10);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, 50);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();//标记为需要刷新
         state.finish = true;
@@ -156,27 +156,27 @@
     update(delta: number)
     {
         this.taskmgr.move(delta);
-        // if(this.effectloaded)
-        // {
-        //     this.timer += delta;
-        //     if(this.timer > 1 && !this.beclone)
-        //     {
-        //         this.beclone = true;
-        //         this.ttr = this.tr.clone(); 
-        //         this.eff = this.ttr.gameObject.getComponent("effectSystem") as gd3d.framework.effectSystem;
-        //         this.scene.addChild(this.ttr);
-        //     }
-        //     if(this.timer > 3 && !this.bestop)
-        //     {
-        //         this.bestop = true;
-        //         this.eff.stop();
-        //     }
+        if(this.effectloaded)
+        {
+            this.timer += delta;
+            if(this.timer > 1 && !this.beclone)
+            {
+                this.beclone = true;
+                this.ttr = this.tr.clone(); 
+                this.eff = this.ttr.gameObject.getComponent("effectSystem") as gd3d.framework.effectSystem;
+                this.scene.addChild(this.ttr);
+            }
+            if(this.timer > 3 && !this.bestop)
+            {
+                this.bestop = true;
+                this.eff.stop();
+            }
 
-        //     if(this.timer > 6 && !this.bereplay)
-        //     {
-        //         this.bereplay = true;
-        //         this.eff.play();
-        //     }
-        // }
+            if(this.timer > 6 && !this.bereplay)
+            {
+                this.bereplay = true;
+                this.eff.play();
+            }
+        }
     }
 }

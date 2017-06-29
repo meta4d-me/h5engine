@@ -129,6 +129,9 @@ namespace gd3d.framework
                             else if (key == "billboard")
                             {
                                 frame.attrsData.renderModel = val;
+                            } else if (key == "colorRate")
+                            {
+                                frame.attrsData.colorRate = <number>val;
                             }
                         }
                     }
@@ -183,6 +186,9 @@ namespace gd3d.framework
                                     else if (key == "alpha")
                                     {
                                         lerp.attrsData.alpha = val.getValue();
+                                    } else
+                                    {
+                                        console.error("未支持的插值属性：" + key);
                                     }
                                 }
                             }
@@ -317,9 +323,9 @@ namespace gd3d.framework
                         {
                             data.scaleNodes = [];
                             //-----------------------------初始scale为1--------------------------------
-                            var startscale=new ParticleNodeNumber();
-                            startscale.num.value=1;
-                            startscale.key=0;
+                            var startscale = new ParticleNodeNumber();
+                            startscale.num.value = 1;
+                            startscale.key = 0;
                             data.scaleNodes.push(startscale);
                             for (let i in _data["scaleNodes"])
                             {
@@ -373,6 +379,8 @@ namespace gd3d.framework
 
                         if (_data["color"] != undefined)
                             data.color = this._parseToObjData("color", _data["color"]);
+                        if (_data["colorRate"] != undefined)
+                            data.colorRate = <number>_data["colorRate"];
                         if (_data["colorSpeed"] != undefined)
                             data.colorSpeed = this._parseToObjData("colorSpeed", _data["colorSpeed"]);
                         if (_data["colorNodes"] != undefined)

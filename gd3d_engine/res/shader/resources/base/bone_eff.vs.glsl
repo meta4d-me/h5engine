@@ -42,7 +42,7 @@ void main()
 			 + buildMat4(i3)*_glesBlendWeight4.z 
 			 + buildMat4(i4)*_glesBlendWeight4.w;
 			 
-    gl_Position = (glstate_matrix_mvp * mat)* tmpvar_1;
+    gl_Position = glstate_matrix_mvp * (mat* tmpvar_1);
 
 	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
 }

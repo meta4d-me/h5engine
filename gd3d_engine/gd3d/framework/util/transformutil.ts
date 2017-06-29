@@ -19,9 +19,9 @@ namespace gd3d.framework
         Button
     }
 
-    export class GameObjectUtil
+    export class TransformUtil
     {
-        static CreatePrimitive(type: PrimitiveType, app: application): gameObject
+        static CreatePrimitive(type: PrimitiveType, app: application): transform
         {
             // let enumObj = EnumUtil.getEnumObjByType("gd3d.framework.PrimitiveType");
             let objName = (PrimitiveType[type] as string);
@@ -35,7 +35,7 @@ namespace gd3d.framework
             renderer.materials = [];
             renderer.materials.push(new framework.material());
             renderer.materials[0].setShader(app.getAssetMgr().getShader("shader/def"));
-            return trans.gameObject;
+            return trans;
         }
 
         static Create2DPrimitive(type: Primitive2DType, app: application): transform2D
@@ -54,16 +54,16 @@ namespace gd3d.framework
             switch (type)
             {
                 case Primitive2DType.RawImage2D:
-                    GameObjectUtil.create2D_rawImage(i2dComp as rawImage2D, app);
+                    TransformUtil.create2D_rawImage(i2dComp as rawImage2D, app);
                     break;
                 case Primitive2DType.Image2D:
-                    GameObjectUtil.create2D_image2D(i2dComp as image2D, app);
+                    TransformUtil.create2D_image2D(i2dComp as image2D, app);
                     break;
                 case Primitive2DType.Label:
-                    GameObjectUtil.create2D_label(i2dComp as label, app);
+                    TransformUtil.create2D_label(i2dComp as label, app);
                     break;
                 case Primitive2DType.Button:
-                    GameObjectUtil.create2D_button(i2dComp as button, app);
+                    TransformUtil.create2D_button(i2dComp as button, app);
                     break;
             }
             return t2d;

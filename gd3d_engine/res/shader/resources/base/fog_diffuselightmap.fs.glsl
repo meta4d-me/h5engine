@@ -1,7 +1,7 @@
 uniform sampler2D _MainTex;
 uniform sampler2D _LightmapTex;
 uniform lowp float _AlphaCut;
-uniform highp vec4 _Color;  
+uniform highp vec4 glstate_fog_color;  
 
 varying highp float factor;    
 varying highp vec2 xlv_TEXCOORD0;
@@ -20,7 +20,7 @@ void main()
     outColor.xyz *= decode_hdr(lightmap);
 
 
-    lowp vec3 afterFog = mix(_Color.rgb, outColor.rgb, factor);
+    lowp vec3 afterFog = mix(glstate_fog_color.rgb, outColor.rgb, factor);
 
     gl_FragData[0] = vec4(afterFog,outColor.a);
 }

@@ -19,6 +19,7 @@ namespace gd3d.render
         public textureFloatLinearFiltering: boolean;
         public textureLOD: boolean;
         public drawBuffersExtension;
+        public pvrtcExtension: any;
     }
     export class webglkit
     {
@@ -100,6 +101,7 @@ namespace gd3d.render
                 // Extensions
                 //这个扩展会影响bump
                 webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
+                webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
                 //各种扩展
                 // webglkit.caps.s3tc = webgl.getExtension('WEBGL_compressed_texture_s3tc');
                 // webglkit.caps.textureFloat = (webgl.getExtension('OES_texture_float') !== null);
