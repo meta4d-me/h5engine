@@ -9211,11 +9211,16 @@ var gd3d;
                     this._queue = this.materials[0].getQueue();
             };
             meshRenderer.prototype.update = function (delta) {
+                if (this.materials != null && this.materials.length > 0) {
+                    var _mat = this.materials[0];
+                    if (_mat) {
+                        this.layer = _mat.getLayer();
+                        if (!this.issetq)
+                            this._queue = _mat.getQueue();
+                    }
+                }
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
-                this.layer = this.materials[0].getLayer();
-                if (!this.issetq)
-                    this._queue = this.materials[0].getQueue();
                 context.updateModel(this.gameObject.transform);
                 if (this.filter != null) {
                     var mesh = this.filter.getMeshOutput();
@@ -9499,11 +9504,16 @@ var gd3d;
                         this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
                     }
                 }
+                if (this.materials != null && this.materials.length > 0) {
+                    var _mat = this.materials[0];
+                    if (_mat) {
+                        this.layer = _mat.getLayer();
+                        if (!this.issetq)
+                            this._queue = _mat.getQueue();
+                    }
+                }
             };
             skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
-                this.layer = this.materials[0].getLayer();
-                if (!this.issetq)
-                    this._queue = this.materials[0].getQueue();
                 if (this.player != null) {
                     context.updateModel(this.player.gameObject.transform);
                 }

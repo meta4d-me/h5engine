@@ -74,7 +74,7 @@ namespace gd3d.framework
         private _skeletonMatrixData: Float32Array;
 
         public static dataCaches: { key: string, data: Float32Array }[] = [];
-        private cacheData:Float32Array;
+        private cacheData: Float32Array;
 
         //是否高效
         private _efficient: boolean = true;
@@ -258,7 +258,7 @@ namespace gd3d.framework
 
         update(delta: number)
         {
-            if(this._skeletonMatrixData == null)
+            if (this._skeletonMatrixData == null)
             {
                 //根据shader决定传什么数据
                 var skintype = this.useBoneShader(this.materials[0]);
@@ -298,13 +298,22 @@ namespace gd3d.framework
                     this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
                 }
             }
+
+            if (this.materials != null && this.materials.length > 0)
+            {
+                let _mat = this.materials[0];
+                if (_mat)
+                {
+                    this.layer = _mat.getLayer();
+                    if (!this.issetq)
+                        this._queue = _mat.getQueue();
+                }
+            }
         }
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            this.layer = this.materials[0].getLayer();
-            if (!this.issetq)
-                this._queue = this.materials[0].getQueue();
+
 
             if (this.player != null)
             {
@@ -314,7 +323,7 @@ namespace gd3d.framework
 
             for (let i = 0; i < this.materials.length; i++)
             {
-                if(this.cacheData!=null)
+                if (this.cacheData != null)
                 {
                     if (this._efficient)
                     {
