@@ -108,7 +108,7 @@
             "name": "resources/base/fog_diffuse.vs.glsl",
             "length": 0
         },
-         {
+        {
             "name": "resources/base/fog_color.fs.glsl",
             "length": 0
         },
@@ -310,6 +310,10 @@
         },
         {
             "name": "resources/particle/particles_blend.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/particle/particles_blend_zwriteon.shader.json",
             "length": 0
         },
         {
