@@ -602,6 +602,7 @@ declare namespace gd3d.framework {
         PackBin = 17,
         PackTxt = 18,
         pathAsset = 19,
+        PVR = 20,
     }
     class stateLoad {
         iserror: boolean;
@@ -717,6 +718,50 @@ declare namespace gd3d.framework {
             [key: string]: string;
         };
     }
+}
+declare class PVRHeader {
+    version: number;
+    flags: number;
+    pixelFormatH: number;
+    pixelFormatL: number;
+    colourSpace: number;
+    channelType: number;
+    height: number;
+    width: number;
+    depth: number;
+    numSurfaces: number;
+    numFaces: number;
+    MIPMapCount: number;
+    metaDataSize: number;
+    gl: WebGLRenderingContext;
+    constructor(gl: WebGLRenderingContext);
+    parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D;
+    private getTextureFormat(gl, header);
+    private genPixelTypeH4(c1Name, c2Name, c3Name, c4Name);
+    private genPixelTypeH1(c1Name);
+    private genPixelTypeL3(c1Bits, c2Bits, c3Bits);
+    private genPixelTypeL2(c1Bits, c2Bits);
+    private genPixelTypeL1(c1Bits);
+    private genPixelTypeL4(c1Bits, c2Bits, c3Bits, c4Bits);
+    private getDataSize(header, MIPLevel, allSurfaces, allFaces);
+    private getBitsPerPixel(header);
+}
+declare enum ChannelTypes {
+    UnsignedByteNorm = 0,
+    SignedByteNorm = 1,
+    UnsignedByte = 2,
+    SignedByte = 3,
+    UnsignedShortNorm = 4,
+    SignedShortNorm = 5,
+    UnsignedShort = 6,
+    SignedShort = 7,
+    UnsignedIntegerNorm = 8,
+    SignedIntegerNorm = 9,
+    UnsignedInteger = 10,
+    SignedInteger = 11,
+    SignedFloat = 12,
+    Float = 12,
+    UnsignedFloat = 13,
 }
 declare namespace gd3d.framework {
     class defMesh {
@@ -3144,6 +3189,7 @@ declare namespace gd3d.render {
         textureFloatLinearFiltering: boolean;
         textureLOD: boolean;
         drawBuffersExtension: any;
+        pvrtcExtension: any;
     }
     class webglkit {
         private static _maxVertexAttribArray;
@@ -3434,6 +3480,7 @@ declare namespace gd3d.render {
         RGBA = 1,
         RGB = 2,
         Gray = 3,
+        PVRTC = 4,
     }
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
@@ -3465,6 +3512,7 @@ declare namespace gd3d.render {
         isFrameBuffer(): boolean;
     }
     class glTexture2D implements ITexture {
+        private ext;
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;

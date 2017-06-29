@@ -2230,7 +2230,7 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
+        var names = ["fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
         var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
@@ -4477,6 +4477,13 @@ var t;
                 }
             });
         };
+        TestRotate.prototype.loadPvr = function (laststate, state) {
+            this.app.getAssetMgr().load("res/resources/Image.pvr", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
         TestRotate.prototype.addcam = function (laststate, state) {
             var objCam = new gd3d.framework.transform();
             objCam.name = "sth.";
@@ -4507,7 +4514,11 @@ var t;
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);
-                        var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
+                        var texture = this.app.getAssetMgr().getAssetByName("Image.pvr");
+                        if (texture == null)
+                            console.error("为什么他是空的呀");
+                        else
+                            console.error("不是空的呀");
                         cuber.materials[0].setTexture("_MainTex", texture);
                     }
                     this.cube = cube;
@@ -4552,6 +4563,7 @@ var t;
             this.scene = this.app.getScene();
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
+            this.taskmgr.addTaskCall(this.loadPvr.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this));
             this.taskmgr.addTaskCall(this.addcam.bind(this));
         };

@@ -40,6 +40,19 @@
             );
         }
 
+        private loadPvr(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        {
+            this.app.getAssetMgr().load("res/resources/Image.pvr", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            {
+                if (s.isfinish)
+                {
+                    state.finish = true;
+                }
+            });
+        }
+
+
+
         private addcam(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
 
@@ -82,7 +95,11 @@
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);//----------------使用shader
-                        let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
+                        let texture = this.app.getAssetMgr().getAssetByName("Image.pvr") as gd3d.framework.texture;
+                        if (texture == null)
+                            console.error("为什么他是空的呀");
+                        else
+                            console.error("不是空的呀");
                         cuber.materials[0].setTexture("_MainTex", texture);
 
                     }
@@ -92,7 +109,7 @@
                     let ref_cube = new gd3d.framework.transform();
                     ref_cube.name = "ref_cube";
                     ref_cube.localScale.x = ref_cube.localScale.y = ref_cube.localScale.z = 1;
-                   // ref_cube.localTranslate.x = 2;
+                    // ref_cube.localTranslate.x = 2;
                     this.scene.addChild(ref_cube);
                     var mesh = ref_cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
 
@@ -115,13 +132,13 @@
                 }
 
                 {
-                    this.cubetrail=new gd3d.framework.transform();
-                    this.cubetrail.localScale.x=this.cubetrail.localScale.y=this.cubetrail.localScale.z=0.2;
-                    this.cubetrail.localTranslate.x=-3;
-                    var mesh=this.cubetrail.gameObject.addComponent("meshFilter")as gd3d.framework.meshFilter;
+                    this.cubetrail = new gd3d.framework.transform();
+                    this.cubetrail.localScale.x = this.cubetrail.localScale.y = this.cubetrail.localScale.z = 0.2;
+                    this.cubetrail.localTranslate.x = -3;
+                    var mesh = this.cubetrail.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
                     var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
                     mesh.mesh = smesh;
-                    this.cubetrail.gameObject.addComponent("meshRenderer")as gd3d.framework.meshRenderer;
+                    this.cubetrail.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
                     this.scene.addChild(this.cubetrail);
                     this.cubetrail.markDirty();
                 }
@@ -129,7 +146,7 @@
             state.finish = true;
         }
 
-        cubetrail:gd3d.framework.transform;
+        cubetrail: gd3d.framework.transform;
         start(app: gd3d.framework.application)
         {
             console.log("i am here.");
@@ -139,6 +156,7 @@
             //任务排队执行系统
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
+            this.taskmgr.addTaskCall(this.loadPvr.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this))
             this.taskmgr.addTaskCall(this.addcam.bind(this));
         }
@@ -146,12 +164,12 @@
         private angularVelocity: gd3d.math.vector3 = new gd3d.math.vector3(10, 0, 0);
         private eulerAngle = gd3d.math.pool.new_vector3();
 
-        private  zeroPoint=new gd3d.math.vector3(0,0,0);
+        private zeroPoint = new gd3d.math.vector3(0, 0, 0);
 
         //--------------------
-        private startdir=new gd3d.math.vector3(-1,0,0);
-        private enddir=new gd3d.math.vector3(0,0,-1);
-        private targetdir=new gd3d.math.vector3();
+        private startdir = new gd3d.math.vector3(-1, 0, 0);
+        private enddir = new gd3d.math.vector3(0, 0, -1);
+        private targetdir = new gd3d.math.vector3();
         //-------------
         update(delta: number)
         {
@@ -161,28 +179,28 @@
 
             if (this.cube != null)
             {
-                this.cube.localTranslate.x=Math.cos(this.timer)*3.0;
-                this.cube.localTranslate.z=Math.sin(this.timer)*3.0;
-                
+                this.cube.localTranslate.x = Math.cos(this.timer) * 3.0;
+                this.cube.localTranslate.z = Math.sin(this.timer) * 3.0;
+
                 this.cube.lookatPoint(this.zeroPoint);
                 this.cube.markDirty();
             }
-            if(this.cube2)
+            if (this.cube2)
             {
                 //this.cube2.lookat(this.cube);
                 this.cube2.lookatPoint(this.cube.getWorldTranslate());
                 this.cube2.markDirty();
             }
-            if(this.cubetrail)
+            if (this.cubetrail)
             {
-                var cube= this.cubetrail.clone();
+                var cube = this.cubetrail.clone();
                 this.scene.addChild(cube);
-               //gd3d.framework.traillerp(this.startdir,this.enddir,this.timer*0.1,this.targetdir);
-                gd3d.math.vec3ScaleByNum(this.targetdir,3,this.targetdir);
-                gd3d.math.vec3Clone(this.targetdir,cube.localTranslate);
-               cube.markDirty();
+                //gd3d.framework.traillerp(this.startdir,this.enddir,this.timer*0.1,this.targetdir);
+                gd3d.math.vec3ScaleByNum(this.targetdir, 3, this.targetdir);
+                gd3d.math.vec3Clone(this.targetdir, cube.localTranslate);
+                cube.markDirty();
 
-               
+
             }
         }
     }

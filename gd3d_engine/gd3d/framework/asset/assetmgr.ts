@@ -27,7 +27,8 @@ namespace gd3d.framework
         TextAsset,
         PackBin,
         PackTxt,
-        pathAsset
+        pathAsset,
+        PVR,
     }
 
     /**
@@ -175,6 +176,7 @@ namespace gd3d.framework
             var prefabs: string[] = [];
             var scenes: string[] = [];
             var textassets: string[] = [];
+            var pvrs: string[] = [];
 
             var mapPackes: { [id: string]: number } = {};
             for (var i = 0; i < this.files.length; i++)
@@ -212,6 +214,8 @@ namespace gd3d.framework
                         scenes.push(url);
                     else if (type == AssetTypeEnum.TextAsset)
                         textassets.push(url);
+                    else if (type == AssetTypeEnum.PVR)
+                        pvrs.push(url);
                 }
             }
 
@@ -242,6 +246,10 @@ namespace gd3d.framework
             for (var i = 0; i < textures.length; i++)
             {
                 list.push({ url: textures[i], type: AssetTypeEnum.Texture });
+            }
+            for (let i = 0; i < pvrs.length; i++)
+            {
+                list.push({ url: pvrs[i], type: AssetTypeEnum.PVR });
             }
             for (var i = 0; i < texturedescs.length; i++)
             {
@@ -917,7 +925,8 @@ namespace gd3d.framework
             {
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -948,7 +957,8 @@ namespace gd3d.framework
             {
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -969,7 +979,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null }
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -988,7 +999,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null }
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1007,7 +1019,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null }
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1018,6 +1031,29 @@ namespace gd3d.framework
                     _shader.parse(this, JSON.parse(txt));
                     this.assetUrlDic[_shader.getGUID()] = url;
                     this.mapShader[filename] = _shader;
+                    onstate(state);
+                });
+            }
+            else if (type == AssetTypeEnum.PVR)
+            {
+                state.resstate[filename] = { state: 0, res: null };
+                gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
+                {
+                    if (err != null)
+                    {
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
+
+                    var _texture = new texture(filename);
+                    this.assetUrlDic[_texture.getGUID()] = url;
+                    let pvr: PVRHeader = new PVRHeader(this.webgl);
+                    _texture.glTexture = pvr.parse(_buffer);
+                    this.use(_texture);
+                    state.resstate[filename].state = 1;//完成
+                    state.resstate[filename].res = _texture;
                     onstate(state);
                 });
             }
@@ -1054,7 +1090,8 @@ namespace gd3d.framework
             {
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1131,7 +1168,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1152,7 +1190,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1172,7 +1211,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1192,7 +1232,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1212,7 +1253,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1233,7 +1275,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1254,7 +1297,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1274,7 +1318,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1294,7 +1339,8 @@ namespace gd3d.framework
                 state.resstate[filename] = { state: 0, res: null };
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1321,7 +1367,7 @@ namespace gd3d.framework
             if (this.waitStateDic[name] == null)
                 return;
             for (var key in this.waitStateDic[name])
-            { 
+            {
                 this.waitStateDic[name][key](state);
             }
             if (state.isfinish)
@@ -1357,7 +1403,8 @@ namespace gd3d.framework
             {
                 gd3d.io.loadText(url, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         this.curloadinfo.state.iserror = true;
                         this.curloadinfo.state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1373,13 +1420,14 @@ namespace gd3d.framework
                     this.mapBundle[filename] = ab;
                 });
             }
-            else if(type == AssetTypeEnum.CompressBundle)
+            else if (type == AssetTypeEnum.CompressBundle)
             {
                 //压缩的bundle在packs.txt中
                 let loadurl = url.replace(".assetbundle.json", ".packs.txt");
                 gd3d.io.loadText(loadurl, (txt, err) =>
                 {
-                    if(err!=null){
+                    if (err != null)
+                    {
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1410,6 +1458,10 @@ namespace gd3d.framework
                 }, state);
             }
         }
+
+
+
+
         /**
          * @public
          * @language zh_CN
@@ -1426,7 +1478,7 @@ namespace gd3d.framework
             var state = new stateLoad();
             this.mapInLoad[name] = state;
             state.url = url;
-            if(type != AssetTypeEnum.Bundle)
+            if (type != AssetTypeEnum.Bundle)
             {
                 state.errs.push(new Error("is not bundle compress type:" + url));
                 state.iserror = true;
@@ -1435,7 +1487,7 @@ namespace gd3d.framework
                 return;
             }
             type = AssetTypeEnum.CompressBundle;
-            this.queueState.push({state, type, onstate});
+            this.queueState.push({ state, type, onstate });
             this.loadByQueue();
         }
         /**
@@ -1549,7 +1601,7 @@ namespace gd3d.framework
                 _rawscene.useLightMap(this.app.getScene());
                 //fog
                 _rawscene.useFog(this.app.getScene());
-                
+
             }
             else
             {
@@ -1832,6 +1884,10 @@ namespace gd3d.framework
                 else if (extname == ".png" || extname == ".jpg")
                 {
                     return AssetTypeEnum.Texture;
+                }
+                else if (extname == ".pvr.czz" || extname == ".pvr")
+                {
+                    return AssetTypeEnum.PVR;
                 }
                 else if (extname == ".imgdesc.json")
                 {

@@ -3504,6 +3504,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["PackBin"] = 17] = "PackBin";
             AssetTypeEnum[AssetTypeEnum["PackTxt"] = 18] = "PackTxt";
             AssetTypeEnum[AssetTypeEnum["pathAsset"] = 19] = "pathAsset";
+            AssetTypeEnum[AssetTypeEnum["PVR"] = 20] = "PVR";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var stateLoad = (function () {
             function stateLoad() {
@@ -3576,6 +3577,7 @@ var gd3d;
                 var prefabs = [];
                 var scenes = [];
                 var textassets = [];
+                var pvrs = [];
                 var mapPackes = {};
                 for (var i = 0; i < this.files.length; i++) {
                     var fitem = this.files[i];
@@ -3607,6 +3609,8 @@ var gd3d;
                             scenes.push(url);
                         else if (type == AssetTypeEnum.TextAsset)
                             textassets.push(url);
+                        else if (type == AssetTypeEnum.PVR)
+                            pvrs.push(url);
                     }
                 }
                 var list = [];
@@ -3627,6 +3631,9 @@ var gd3d;
                 }
                 for (var i = 0; i < textures.length; i++) {
                     list.push({ url: textures[i], type: AssetTypeEnum.Texture });
+                }
+                for (var i_1 = 0; i_1 < pvrs.length; i_1++) {
+                    list.push({ url: pvrs[i_1], type: AssetTypeEnum.PVR });
                 }
                 for (var i = 0; i < texturedescs.length; i++) {
                     list.push({ url: texturedescs[i], type: AssetTypeEnum.TextureDesc });
@@ -4136,6 +4143,25 @@ var gd3d;
                         _shader.parse(_this, JSON.parse(txt));
                         _this.assetUrlDic[_shader.getGUID()] = url;
                         _this.mapShader[filename] = _shader;
+                        onstate(state);
+                    });
+                }
+                else if (type == AssetTypeEnum.PVR) {
+                    state.resstate[filename] = { state: 0, res: null };
+                    gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                        if (err != null) {
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
+                        var _texture = new framework.texture(filename);
+                        _this.assetUrlDic[_texture.getGUID()] = url;
+                        var pvr = new PVRHeader(_this.webgl);
+                        _texture.glTexture = pvr.parse(_buffer);
+                        _this.use(_texture);
+                        state.resstate[filename].state = 1;
+                        state.resstate[filename].res = _texture;
                         onstate(state);
                     });
                 }
@@ -4702,6 +4728,9 @@ var gd3d;
                     else if (extname == ".png" || extname == ".jpg") {
                         return AssetTypeEnum.Texture;
                     }
+                    else if (extname == ".pvr.czz" || extname == ".pvr") {
+                        return AssetTypeEnum.PVR;
+                    }
                     else if (extname == ".imgdesc.json") {
                         return AssetTypeEnum.TextureDesc;
                     }
@@ -4760,6 +4789,266 @@ var gd3d;
         framework.SaveInfo = SaveInfo;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var PVRHeader = (function () {
+    function PVRHeader(gl) {
+        this.version = 0x03525650;
+        this.flags = 0;
+        this.pixelFormatH = 0;
+        this.pixelFormatL = 0;
+        this.colourSpace = 0;
+        this.channelType = 0;
+        this.height = 1;
+        this.width = 1;
+        this.depth = 1;
+        this.numSurfaces = 1;
+        this.numFaces = 1;
+        this.MIPMapCount = 1;
+        this.metaDataSize = 0;
+        this.gl = gl;
+    }
+    PVRHeader.prototype.parse = function (_buffer) {
+        var t2d = new gd3d.render.glTexture2D(this.gl, gd3d.render.TextureFormatEnum.PVRTC);
+        var ar = new Uint8Array(_buffer);
+        var tool = new gd3d.io.binTool();
+        tool.writeUint8Array(ar);
+        var pvrMetaData = new Object();
+        this.version = tool.readUInt32();
+        if (this.version != 0x03525650) {
+            return null;
+        }
+        this.flags = tool.readUInt32();
+        this.pixelFormatH = tool.readUInt32();
+        this.pixelFormatL = tool.readUInt32();
+        this.colourSpace = tool.readUInt32();
+        this.channelType = tool.readUInt32();
+        this.height = tool.readUInt32();
+        this.width = tool.readUInt32();
+        this.depth = tool.readUInt32();
+        this.numSurfaces = tool.readUInt32();
+        this.numFaces = tool.readUInt32();
+        this.MIPMapCount = tool.readUInt32();
+        this.metaDataSize = tool.readUInt32();
+        var metaDataSize = 0;
+        while (metaDataSize < this.metaDataSize) {
+            var devFourCC = tool.readUInt32();
+            metaDataSize += 4;
+            var key = tool.readUInt32();
+            metaDataSize += 4;
+            var dataSize = tool.readUInt32();
+            metaDataSize += 4;
+            if (dataSize > 0) {
+                tool.readBytes(dataSize);
+                metaDataSize += dataSize;
+            }
+        }
+        var ret = this.getTextureFormat(this.gl, this);
+        var textureFormat = ret.format;
+        var textureInternalFormat = ret.internalFormat;
+        var textureType = ret.type;
+        if (textureInternalFormat == 0)
+            return null;
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+        var target = this.gl.TEXTURE_2D;
+        if (this.numFaces > 1) {
+            target = this.gl.TEXTURE_CUBE_MAP;
+        }
+        if (this.numSurfaces > 1) {
+            return null;
+        }
+        this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+        this.gl.bindTexture(target, t2d.texture);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        var currentMIPSize = 0;
+        if (this.numFaces > 1)
+            target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
+        var MIPWidth = this.width;
+        var MIPHeight = this.height;
+        for (var MIPLevel = 0; MIPLevel < this.MIPMapCount; ++MIPLevel) {
+            currentMIPSize = this.getDataSize(this, MIPLevel, false, false);
+            var eTextureTarget = target;
+            for (var face = 0; face < this.numFaces; ++face) {
+                if (MIPLevel >= 0) {
+                    var textureData = tool.readBytes(currentMIPSize);
+                    this.gl.texImage2D(eTextureTarget, MIPLevel - 0, textureInternalFormat, MIPWidth, MIPHeight, 0, textureFormat, textureType, textureData);
+                }
+                eTextureTarget++;
+            }
+            MIPWidth = Math.max(1, MIPWidth >> 1);
+            MIPHeight = Math.max(1, MIPHeight >> 1);
+        }
+        return t2d;
+    };
+    PVRHeader.prototype.getTextureFormat = function (gl, header) {
+        var ret = { format: 0, type: 0, internalFormat: 0 };
+        if (header.pixelFormatH == 0) {
+            return;
+        }
+        switch (header.channelType) {
+            case ChannelTypes.Float:
+                {
+                    return;
+                }
+            case ChannelTypes.UnsignedByteNorm:
+                {
+                    ret.type = gl.UNSIGNED_BYTE;
+                    switch (header.pixelFormatL) {
+                        case this.genPixelTypeL4(8, 8, 8, 8):
+                            if (header.pixelFormatH == this.genPixelTypeH4('r', 'g', 'b', 'a'))
+                                ret.format = ret.internalFormat = gl.RGBA;
+                            else
+                                ret.format = ret.internalFormat = gl.BGRA;
+                            break;
+                        case this.genPixelTypeL3(8, 8, 8):
+                            ret.format = ret.internalFormat = gl.RGB;
+                            break;
+                        case this.genPixelTypeL2(8, 8):
+                            ret.format = ret.internalFormat = gl.LUMINANCE_ALPHA;
+                            break;
+                        case this.genPixelTypeL1(8):
+                            if (header.pixelFormatH == this.genPixelTypeH1('l'))
+                                ret.format = ret.internalFormat = gl.LUMINANCE;
+                            else
+                                ret.format = ret.internalFormat = gl.ALPHA;
+                            break;
+                    }
+                }
+            case ChannelTypes.UnsignedShortNorm:
+                {
+                    switch (header.pixelFormatL) {
+                        case this.genPixelTypeL4(4, 4, 4, 4):
+                            ret.type = gl.UNSIGNED_SHORT_4_4_4_4;
+                            ret.format = ret.internalFormat = gl.BGRA;
+                            break;
+                        case this.genPixelTypeL4(5, 5, 5, 1):
+                            ret.type = gl.UNSIGNED_SHORT_5_5_5_1;
+                            ret.format = ret.internalFormat = gl.RGBA;
+                            break;
+                        case this.genPixelTypeL3(5, 6, 5):
+                            ret.type = gl.UNSIGNED_SHORT_5_6_5;
+                            ret.format = ret.internalFormat = gl.RGB;
+                            break;
+                    }
+                }
+        }
+        return ret;
+    };
+    PVRHeader.prototype.genPixelTypeH4 = function (c1Name, c2Name, c3Name, c4Name) {
+        var val = 0;
+        val |= c1Name.charCodeAt();
+        if (c2Name != undefined)
+            val |= c2Name.charCodeAt() << 8;
+        if (c3Name != undefined)
+            val |= c3Name.charCodeAt() << 16;
+        if (c4Name != undefined)
+            val |= c4Name.charCodeAt() << 24;
+        return val;
+    };
+    PVRHeader.prototype.genPixelTypeH1 = function (c1Name) {
+        var val = 0;
+        val |= c1Name.charCodeAt();
+        return val;
+    };
+    PVRHeader.prototype.genPixelTypeL3 = function (c1Bits, c2Bits, c3Bits) {
+        var val = 0;
+        val |= c1Bits;
+        if (c2Bits != undefined)
+            val |= c2Bits << 8;
+        if (c3Bits != undefined)
+            val |= c3Bits << 16;
+        return val;
+    };
+    PVRHeader.prototype.genPixelTypeL2 = function (c1Bits, c2Bits) {
+        var val = 0;
+        val |= c1Bits;
+        if (c2Bits != undefined)
+            val |= c2Bits << 8;
+        return val;
+    };
+    PVRHeader.prototype.genPixelTypeL1 = function (c1Bits) {
+        var val = 0;
+        val |= c1Bits;
+        return val;
+    };
+    PVRHeader.prototype.genPixelTypeL4 = function (c1Bits, c2Bits, c3Bits, c4Bits) {
+        var val = 0;
+        val |= c1Bits;
+        if (c2Bits != undefined)
+            val |= c2Bits << 8;
+        if (c3Bits != undefined)
+            val |= c3Bits << 16;
+        if (c4Bits != undefined)
+            val |= c4Bits << 24;
+        return val;
+    };
+    PVRHeader.prototype.getDataSize = function (header, MIPLevel, allSurfaces, allFaces) {
+        var smallestWidth = 1;
+        var smallestHeight = 1;
+        var smallestDepth = 1;
+        var pixelFormatH = header.pixelFormatH;
+        if (pixelFormatH == 0) {
+        }
+        var dataSize = 0;
+        if (MIPLevel == -1) {
+            for (var currentMIP = 0; currentMIP < header.MIPMapCount; ++currentMIP) {
+                var width = Math.max(1, header.width >> currentMIP);
+                var height = Math.max(1, header.height >> currentMIP);
+                var depth = Math.max(1, header.depth >> currentMIP);
+                if (header.pixelFormatH == 0) {
+                    width = width + ((-1 * width) % smallestWidth);
+                    height = height + ((-1 * height) % smallestHeight);
+                    depth = depth + ((-1 * depth) % smallestDepth);
+                }
+                dataSize += this.getBitsPerPixel(header) * width * height * depth;
+            }
+        }
+        else {
+            var width = Math.max(1, header.width >> MIPLevel);
+            var height = Math.max(1, header.height >> MIPLevel);
+            var depth = Math.max(1, header.depth >> MIPLevel);
+            if (header.pixelFormatH == 0) {
+                width = width + ((-1 * width) % smallestWidth);
+                height = height + ((-1 * height) % smallestHeight);
+                depth = depth + ((-1 * depth) % smallestDepth);
+            }
+            dataSize += this.getBitsPerPixel(header) * width * height * depth;
+        }
+        var numFaces = (allFaces ? header.numFaces : 1);
+        var numSurfs = (allSurfaces ? header.numSurfaces : 1);
+        return (dataSize / 8) * numSurfs * numFaces;
+    };
+    PVRHeader.prototype.getBitsPerPixel = function (header) {
+        if (header.pixelFormatH != 0) {
+            var lowPart = header.pixelFormatL;
+            var c1Bits = (lowPart >> 24) & 0xFF;
+            var c2Bits = (lowPart >> 16) & 0xFF;
+            var c3Bits = (lowPart >> 8) & 0xFF;
+            var c4Bits = lowPart & 0xFF;
+            return c1Bits + c2Bits + c3Bits + c4Bits;
+        }
+        return 0;
+    };
+    return PVRHeader;
+}());
+var ChannelTypes;
+(function (ChannelTypes) {
+    ChannelTypes[ChannelTypes["UnsignedByteNorm"] = 0] = "UnsignedByteNorm";
+    ChannelTypes[ChannelTypes["SignedByteNorm"] = 1] = "SignedByteNorm";
+    ChannelTypes[ChannelTypes["UnsignedByte"] = 2] = "UnsignedByte";
+    ChannelTypes[ChannelTypes["SignedByte"] = 3] = "SignedByte";
+    ChannelTypes[ChannelTypes["UnsignedShortNorm"] = 4] = "UnsignedShortNorm";
+    ChannelTypes[ChannelTypes["SignedShortNorm"] = 5] = "SignedShortNorm";
+    ChannelTypes[ChannelTypes["UnsignedShort"] = 6] = "UnsignedShort";
+    ChannelTypes[ChannelTypes["SignedShort"] = 7] = "SignedShort";
+    ChannelTypes[ChannelTypes["UnsignedIntegerNorm"] = 8] = "UnsignedIntegerNorm";
+    ChannelTypes[ChannelTypes["SignedIntegerNorm"] = 9] = "SignedIntegerNorm";
+    ChannelTypes[ChannelTypes["UnsignedInteger"] = 10] = "UnsignedInteger";
+    ChannelTypes[ChannelTypes["SignedInteger"] = 11] = "SignedInteger";
+    ChannelTypes[ChannelTypes["SignedFloat"] = 12] = "SignedFloat";
+    ChannelTypes[ChannelTypes["Float"] = 12] = "Float";
+    ChannelTypes[ChannelTypes["UnsignedFloat"] = 13] = "UnsignedFloat";
+})(ChannelTypes || (ChannelTypes = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -5181,15 +5470,15 @@ var gd3d;
                     var _frame = new Float32Array(this.boneCount * 7 + 1);
                     _frame[0] = _key ? 1 : 0;
                     var _boneInfo = new PoseBoneMatrix();
-                    for (var i_1 = 0; i_1 < this.boneCount; i_1++) {
+                    for (var i_2 = 0; i_2 < this.boneCount; i_2++) {
                         _boneInfo.load(read);
-                        _frame[i_1 * 7 + 1] = _boneInfo.r.x;
-                        _frame[i_1 * 7 + 2] = _boneInfo.r.y;
-                        _frame[i_1 * 7 + 3] = _boneInfo.r.z;
-                        _frame[i_1 * 7 + 4] = _boneInfo.r.w;
-                        _frame[i_1 * 7 + 5] = _boneInfo.t.x;
-                        _frame[i_1 * 7 + 6] = _boneInfo.t.y;
-                        _frame[i_1 * 7 + 7] = _boneInfo.t.z;
+                        _frame[i_2 * 7 + 1] = _boneInfo.r.x;
+                        _frame[i_2 * 7 + 2] = _boneInfo.r.y;
+                        _frame[i_2 * 7 + 3] = _boneInfo.r.z;
+                        _frame[i_2 * 7 + 4] = _boneInfo.r.w;
+                        _frame[i_2 * 7 + 5] = _boneInfo.t.x;
+                        _frame[i_2 * 7 + 6] = _boneInfo.t.y;
+                        _frame[i_2 * 7 + 7] = _boneInfo.t.z;
                     }
                     this.frames[_fid] = _frame;
                 }
@@ -8569,9 +8858,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_2 = 0; i_2 < this.matDataGroups.length; i_2++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_2], _initFrameData.attrsData.mat)) {
-                            index = i_2;
+                    for (var i_3 = 0; i_3 < this.matDataGroups.length; i_3++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_3], _initFrameData.attrsData.mat)) {
+                            index = i_3;
                             break;
                         }
                     }
@@ -8624,41 +8913,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_3 = 0; i_3 < vertexCount; i_3++) {
+                for (var i_4 = 0; i_4 < vertexCount; i_4++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_3 * vertexSize + 0];
-                        vertex.y = vertexArr[i_3 * vertexSize + 1];
-                        vertex.z = vertexArr[i_3 * vertexSize + 2];
+                        vertex.x = vertexArr[i_4 * vertexSize + 0];
+                        vertex.y = vertexArr[i_4 * vertexSize + 1];
+                        vertex.z = vertexArr[i_4 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 3] = vertexArr[i_3 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 4] = vertexArr[i_3 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 5] = vertexArr[i_3 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 3] = vertexArr[i_4 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 4] = vertexArr[i_4 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 5] = vertexArr[i_4 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 6] = vertexArr[i_3 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 7] = vertexArr[i_3 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 8] = vertexArr[i_3 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 6] = vertexArr[i_4 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 7] = vertexArr[i_4 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 8] = vertexArr[i_4 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_3 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_4 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 13] = vertexArr[i_3 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 14] = vertexArr[i_3 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 13] = vertexArr[i_4 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 14] = vertexArr[i_4 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -9374,13 +9663,13 @@ var gd3d;
                 if (this.player != null) {
                     context.updateModel(this.player.gameObject.transform);
                 }
-                for (var i_4 = 0; i_4 < this.materials.length; i_4++) {
+                for (var i_5 = 0; i_5 < this.materials.length; i_5++) {
                     if (this._skeletonMatrixData != null) {
                         if (this._efficient) {
-                            this.materials[i_4].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
+                            this.materials[i_5].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
                         }
                         else {
-                            this.materials[i_4].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
+                            this.materials[i_5].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
                         }
                     }
                 }
@@ -17319,8 +17608,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_5 = 0; obj.transform.children != undefined && i_5 < obj.transform.children.length; i_5++) {
-                    var _obj = obj.transform.children[i_5].gameObject;
+                for (var i_6 = 0; obj.transform.children != undefined && i_6 < obj.transform.children.length; i_6++) {
+                    var _obj = obj.transform.children[i_6].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };
@@ -19588,6 +19877,7 @@ var gd3d;
                     webglkit.ONE_MINUS_DST_ALPHA = webgl.ONE_MINUS_DST_ALPHA;
                     webglkit.ONE_MINUS_DST_COLOR = webgl.ONE_MINUS_DST_COLOR;
                     webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
+                    webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
                 }
             };
             return webglkit;
@@ -21327,6 +21617,7 @@ var gd3d;
             TextureFormatEnum[TextureFormatEnum["RGBA"] = 1] = "RGBA";
             TextureFormatEnum[TextureFormatEnum["RGB"] = 2] = "RGB";
             TextureFormatEnum[TextureFormatEnum["Gray"] = 3] = "Gray";
+            TextureFormatEnum[TextureFormatEnum["PVRTC"] = 4] = "PVRTC";
         })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
         var textureReader = (function () {
             function textureReader(webgl, texRGBA, width, height, gray) {
@@ -21440,6 +21731,8 @@ var gd3d;
                 this.webgl = webgl;
                 this.format = format;
                 this.texture = webgl.createTexture();
+                var extname = "WEBGL_compressed_texture_pvrtc";
+                this.ext = this.webgl.getExtension(extname) || this.webgl.getExtension('WEBKIT_' + extname);
             }
             glTexture2D.prototype.uploadImage = function (img, mipmap, linear, premultiply, repeat, mirroredU, mirroredV) {
                 if (premultiply === void 0) { premultiply = true; }
@@ -21519,7 +21812,13 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
+                console.error(data.length);
+                if (this.format == TextureFormatEnum.PVRTC && this.ext != null) {
+                    this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, 6407, width, height, 0, 6407, 5121, data);
+                }
+                else {
+                    this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
+                }
                 if (mipmap) {
                     this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
                     if (linear) {
@@ -21570,6 +21869,9 @@ var gd3d;
                     pixellen = 4;
                 }
                 else if (this.format == TextureFormatEnum.RGB) {
+                    pixellen = 3;
+                }
+                else if (this.format == TextureFormatEnum.PVRTC) {
                     pixellen = 3;
                 }
                 var len = this.width * this.height * pixellen;
