@@ -22,6 +22,7 @@ namespace gd3d.framework
         public localRotation: math.quaternion = new math.quaternion();
         public localScale: math.vector3;
         public color: math.vector3;
+        public colorRate: number;
         public uv: math.vector2;
         public alpha: number;
         public tilling: math.vector2 = new math.vector2(1, 1);
@@ -118,6 +119,10 @@ namespace gd3d.framework
             {
                 this.movespeed=new gd3d.math.vector3();
             }
+            if (this.data.colorRate == undefined)
+                this.colorRate = this.data.colorRate;
+            else
+                this.colorRate = 1;
             //记下初始scale
             gd3d.math.vec3Clone(this.localScale, this.startScale);
 
@@ -492,22 +497,29 @@ namespace gd3d.framework
 
                 {//color
                     //处理一下颜色，以防灰度值 > 1
-                    let r = math.floatClamp(this.sourceVbo[i * vertexSize + 3], 0, 1);
-                    let g = math.floatClamp(this.sourceVbo[i * vertexSize + 4], 0, 1);
-                    let b = math.floatClamp(this.sourceVbo[i * vertexSize + 5], 0, 1);
-                    let a = math.floatClamp(this.sourceVbo[i * vertexSize + 6], 0, 1);
+                    let r = math.floatClamp(this.sourceVbo[i * vertexSize + 9], 0, 1);
+                    let g = math.floatClamp(this.sourceVbo[i * vertexSize + 10], 0, 1);
+                    let b = math.floatClamp(this.sourceVbo[i * vertexSize + 11], 0, 1);
+                    let a = math.floatClamp(this.sourceVbo[i * vertexSize + 12], 0, 1);
                     if (this.color != undefined)
                     {
-                        r = math.floatClamp(this.color.x, 0, 1);
-                        g = math.floatClamp(this.color.y, 0, 1);
-                        b = math.floatClamp(this.color.z, 0, 1);
+                        r = this.color.x;
+                        g = this.color.y;
+                        b = this.color.z;
                     }
                     if (this.alpha != undefined)
-                        a = math.floatClamp(this.alpha, 0, 1);
-                    this.dataForVbo[i * vertexSize + 3] = r;
-                    this.dataForVbo[i * vertexSize + 4] = g;
-                    this.dataForVbo[i * vertexSize + 5] = b;
-                    this.dataForVbo[i * vertexSize + 6] = a;
+                        a = this.alpha;
+                    if (this.colorRate != undefined)
+                    {
+                        r *= this.colorRate;
+                        g *= this.colorRate;
+                        b *= this.colorRate;
+                        a *= this.colorRate;
+                    }
+                    this.dataForVbo[i * 15 + 9] = r;
+                    this.dataForVbo[i * 15 + 10] = g;
+                    this.dataForVbo[i * 15 + 11] = b;
+                    this.dataForVbo[i * 15 + 12] = a;
                 }
                 {
                     //uv
@@ -531,6 +543,7 @@ namespace gd3d.framework
             this.localTranslate = null;
             this.euler = null;
             this.localScale = null;
+            this.colorRate = 1;
             this.color = null;
             this.uv = null;
         }
