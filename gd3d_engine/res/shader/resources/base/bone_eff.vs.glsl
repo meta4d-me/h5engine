@@ -4,6 +4,7 @@ attribute vec4 _glesBlendWeight4;
 attribute vec4 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp vec4 glstate_vec4_bones[80];
+uniform highp vec4 _MainTex_ST; 
 varying highp vec2 xlv_TEXCOORD0;
 mat4 buildMat4(int index)
 {
@@ -44,5 +45,5 @@ void main()
 			 
     gl_Position = glstate_matrix_mvp * (mat* tmpvar_1);
 
-	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
+	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;  
 }
