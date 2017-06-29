@@ -16,6 +16,16 @@ namespace gd3d.framework
             var v = new gd3d.math.vector3(vec.x * num, vec.y * num, vec.z * num);
             return v;
         }
+
+        public static parseVector3(value:any):gd3d.math.vector3
+        {
+            var vector3=new gd3d.math.vector3();
+            vector3.x=value["x"];
+            vector3.y=value["y"];
+            vector3.z=value["z"];
+            return vector3;
+        }
+
         public static parseEffectVec3(value: any): ParticleNode
         {
             let node: ParticleNode = new ParticleNode();

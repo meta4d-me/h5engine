@@ -18,23 +18,28 @@ namespace gd3d.framework
         public static fps: number = 30;
         private playTimer: number = 0;
         private speed: number = 1;
+        public webgl:WebGLRenderingContext;
         // private time: number = 0;
 
         private parser = new gd3d.framework.EffectParser();
         //渲染数据
         public vf = gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Normal | render.VertexFormatMask.Tangent | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;
+        public particleVF=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
+
         private effectBatchers: EffectBatcher[] = [];
         private particles: Particles;//粒子系统 发射器统一管理
         private matDataGroups: EffectMatData[] = [];
 
         setEffect(effectConfig: string)
         {
+            this.webgl=gd3d.framework.sceneMgr.app.webgl;
             this.data = this.parser.Parse(effectConfig, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
         @gd3d.reflect.Field("textasset")
         jsonData: textasset;
         setJsonData(_jsonData: textasset)
         {
+            this.webgl=gd3d.framework.sceneMgr.app.webgl;
             this.jsonData = _jsonData;
             this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
@@ -73,17 +78,25 @@ namespace gd3d.framework
                 if (this.state == EffectPlayStateEnum.Play)
                     this.playTimer += delta * this.speed;
                 // console.log(this.playTimer);
-                if (this.playTimer >= this.data.life)
+                
+                // if (this.playTimer >= this.data.life)
+                // {
+                //     if (this.beLoop)
+                //     {
+                //         //this.playTimer=0;
+                //         //this.reset();//
+                //     }
+                //     else
+                //     {
+                //         this.stop();
+                //     }
+                // }
+                if(!this.beLoop)
                 {
-                    if (this.beLoop)
-                    {
-                        this.reset();
-                        this.play();
-                    }
-                    else 
-                    {
-                        this.stop();
-                    }
+                   if (this.playTimer >= this.data.life)
+                   {
+                       this.stop();
+                   }
                 }
                 this._update(delta);
             }
@@ -353,11 +366,17 @@ namespace gd3d.framework
          * 重置到初始状态
          * @memberof effectSystem
          */
-        reset()
+        reset(restSinglemesh:boolean=true,resetParticle:boolean=true)
         {
             this.state = EffectPlayStateEnum.BeReady;
             this.gameObject.visible = false;
             this.playTimer = 0;
+
+            this.resetSingleMesh();
+            this.resetparticle();
+        }
+        private resetSingleMesh()
+        {
             for (let i in this.effectBatchers)
             {
                 let subEffectBatcher = this.effectBatchers[i];
@@ -369,6 +388,9 @@ namespace gd3d.framework
                         element.curAttrData = element.data.initFrameData.attrsData.copyandinit();
                 }
             }
+        }
+        private resetparticle()
+        {
             if (this.particles != undefined)
                 this.particles.dispose();
 
@@ -381,10 +403,12 @@ namespace gd3d.framework
                     {
                         this.particles = new Particles(this);
                     }
-                    this.particles.addEmission(data.emissionData);
+                    this.particles.addEmission(data);
                 }
             }
         }
+
+
         /**
          * 向特效中增加元素
          */
@@ -399,7 +423,7 @@ namespace gd3d.framework
                     {
                         this.particles = new Particles(this);
                     }
-                    this.particles.addEmission(data.emissionData);
+                    this.particles.addEmission(data);
                 }
                 else if (data.type == EffectElementTypeEnum.SingleMeshType)
                 {

@@ -753,7 +753,7 @@
         mat.rawData[12] = 0;
         mat.rawData[13] = 0;
         mat.rawData[14] = 0;
-        mat.rawData[15] = 0;
+        mat.rawData[15] = 1;
     }
 
     export function matrixScaleByNum(value: number, mat: matrix)
