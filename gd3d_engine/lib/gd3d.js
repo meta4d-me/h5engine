@@ -17671,8 +17671,8 @@ var gd3d;
             gameObject.prototype.init = function () {
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
-                        this.components[i].comp.start();
-                        this.components[i].init = true;
+                        this.componentsInit[i].comp.start();
+                        this.componentsInit[i].init = true;
                     }
                     this.componentsInit.length = 0;
                 }
