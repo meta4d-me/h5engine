@@ -4862,17 +4862,20 @@ var PVRHeader = (function () {
         this.gl.bindTexture(target, t2d.texture);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        var currentMIPSize = 0;
+        var currentMipMapSize = 0;
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
         var mipWidth = this.width;
         var mipHeight = this.height;
         for (var mipLevel = 0; mipLevel < this.mipMapCount; ++mipLevel) {
-            currentMIPSize = this.getDataSize(mipLevel, false, false);
+            currentMipMapSize = this.getDataSize(mipLevel, false, false);
             for (var face = 0; face < this.numFaces; ++face) {
                 if (mipLevel >= 0) {
-                    var textureData = tool.readBytes(currentMIPSize);
-                    this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    var textureData = tool.readBytes(currentMipMapSize);
+                    if (this.numFaces > 1)
+                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    else
+                        this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
                 }
             }
             mipWidth = Math.max(1, mipWidth >> 1);

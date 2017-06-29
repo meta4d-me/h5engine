@@ -35,7 +35,7 @@ class PVRHeader
 
         this.flags = tool.readUInt32();//0:没有设置  0x02 ：alpha预乘
         this.pixelFormatH = tool.readUInt32();//高4位 rgba
-        this.pixelFormatL = tool.readUInt32();//低4位 4444/5551/565
+        this.pixelFormatL = tool.readUInt32();//低4位 8888/4444/5551/565    高四位和低四位共同决定了其格式RGBA（32位）、RGBA4（16位）、    RGB、RGB5_A1、RGB565、  LUMINANCE_ALPHA、LUMINANCE、ALPHA
         this.colourSpace = tool.readUInt32();//0:linear rgb   1:srgb
         this.channelType = tool.readUInt32();//格式
         this.height = tool.readUInt32();
@@ -46,6 +46,7 @@ class PVRHeader
         this.mipMapCount = tool.readUInt32();
         this.metaDataSize = tool.readUInt32();
 
+        //没搞明白metaData的作用是啥？
         var metaDataSize = 0;
         while (metaDataSize < this.metaDataSize)
         {
@@ -72,7 +73,7 @@ class PVRHeader
 
         if (textureInternalFormat == 0)
             return null;
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 2);
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 2);//对齐方式
         var target = this.gl.TEXTURE_2D;
 
         if (this.numFaces > 1)
@@ -91,9 +92,8 @@ class PVRHeader
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);//线性过滤
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);//mipmap之间执行线性过滤
 
-        var currentMIPSize = 0;
+        var currentMipMapSize = 0;
 
-        // Loop through the faces
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
 
@@ -102,14 +102,17 @@ class PVRHeader
 
         for (var mipLevel = 0; mipLevel < this.mipMapCount; ++mipLevel)
         {
-            currentMIPSize = this.getDataSize(mipLevel, false, false);
+            currentMipMapSize = this.getDataSize(mipLevel, false, false);
 
             for (var face = 0; face < this.numFaces; ++face)
             {
                 if (mipLevel >= 0)
                 {
-                    var textureData = tool.readBytes(currentMIPSize);
-                    this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    var textureData = tool.readBytes(currentMipMapSize);
+                    if (this.numFaces > 1)
+                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    else
+                        this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
                 }
             }
 
