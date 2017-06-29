@@ -2778,7 +2778,7 @@ var test_load = (function () {
                     if (s.isfinish) {
                         var smesh1 = _this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin");
                         var mesh1 = baihu.gameObject.addComponent("meshFilter");
-                        mesh1.mesh = (smesh1);
+                        mesh1.mesh = smesh1.clone();
                         var renderer = baihu.gameObject.addComponent("meshRenderer");
                         var collider = baihu.gameObject.addComponent("boxcollider");
                         baihu.markDirty();

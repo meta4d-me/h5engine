@@ -959,6 +959,7 @@ declare namespace gd3d.framework {
         submesh: subMeshInfo[];
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): void;
         intersects(ray: ray, matrix: gd3d.math.matrix): pickinfo;
+        clone(): mesh;
     }
     class subMeshInfo {
         matIndex: number;
@@ -1206,6 +1207,8 @@ declare namespace gd3d.framework {
         private beRevert;
         private playStyle;
         private percent;
+        mix: boolean;
+        readonly cacheKey: string | number;
         private init();
         start(): void;
         update(delta: number): void;
@@ -1532,6 +1535,11 @@ declare namespace gd3d.framework {
         size: math.vector3;
         maxBoneCount: number;
         private _skeletonMatrixData;
+        static dataCaches: {
+            key: string;
+            data: Float32Array;
+        }[];
+        private cacheData;
         private _efficient;
         start(): void;
         getMatByIndex(index: number): math.matrix;
