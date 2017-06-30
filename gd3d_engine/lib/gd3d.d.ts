@@ -2622,7 +2622,6 @@ declare namespace gd3d.framework {
         private speedDir;
         private movespeed;
         private simulationSpeed;
-        private uvSpriteFrameInternal;
         startFrameId: number;
         data: Emission;
         private batcher;
@@ -2659,6 +2658,7 @@ declare namespace gd3d.framework {
         private _curUVSpeedNode;
         private spriteIndex;
         private _updateUV(delta);
+        private tex_ST;
         private _updateVBO();
         dispose(): void;
     }
@@ -3347,6 +3347,7 @@ declare namespace gd3d.render {
         static addQuadVec3(array: gd3d.math.vector3[], quad: gd3d.math.vector3[]): void;
         static addQuadVec2(array: gd3d.math.vector2[], quad: gd3d.math.vector2[]): void;
         static genQuad(size: number): meshData;
+        static genQuad_forparticle(size: number): meshData;
         static genPlaneCCW(size: number): meshData;
         static genCylinderCCW(height: number, radius: number, segment?: number): meshData;
         static genPyramid(height: number, halfsize: number): meshData;

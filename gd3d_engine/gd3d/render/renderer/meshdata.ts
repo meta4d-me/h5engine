@@ -88,6 +88,33 @@
             meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
             return data;
         }
+
+        static genQuad_forparticle(size: number): meshData
+        {
+            var half = size * 0.5;
+            var data = new meshData();
+            data.pos = [];
+            data.trisindex = [];
+            data.normal = [];
+            data.tangent = [];
+            data.uv = [];
+
+            meshData.addQuadVec3ByValue(data.normal, new math.vector3(0, 0, 1));
+            meshData.addQuadPos(data, [
+                new math.vector3(0, half, 0),
+                new math.vector3(0, -half, 0),
+                new math.vector3(2*half, half, 0),
+                new math.vector3(2*half, -half, 0)
+            ]);
+            meshData.addQuadVec2(data.uv, [
+                new math.vector2(0, 0),
+                new math.vector2(0, 1),
+                new math.vector2(1, 0),
+                new math.vector2(1, 1)
+            ]);
+            meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
+            return data;
+        }
         static genPlaneCCW(size: number): meshData
         {
             var half = size * 0.5;

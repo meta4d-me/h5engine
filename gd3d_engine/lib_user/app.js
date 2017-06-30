@@ -2230,14 +2230,15 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword"];
-        var name = names[0];
+        var names = ["fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02"];
+        var name = names[5];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
                 _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
                 var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
                 _this.effect.setJsonData(text);
+                _this.scene.addChild(_this.tr);
                 _this.tr.markDirty();
                 state.finish = true;
                 _this.effectloaded = true;
@@ -2253,30 +2254,13 @@ var test_effect = (function () {
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, 50);
+        objCam.localTranslate = new gd3d.math.vector3(0, 15, 15);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
         state.finish = true;
     };
     test_effect.prototype.update = function (delta) {
         this.taskmgr.move(delta);
-        if (this.effectloaded) {
-            this.timer += delta;
-            if (this.timer > 1 && !this.beclone) {
-                this.beclone = true;
-                this.ttr = this.tr.clone();
-                this.eff = this.ttr.gameObject.getComponent("effectSystem");
-                this.scene.addChild(this.ttr);
-            }
-            if (this.timer > 3 && !this.bestop) {
-                this.bestop = true;
-                this.eff.stop();
-            }
-            if (this.timer > 6 && !this.bereplay) {
-                this.bereplay = true;
-                this.eff.play();
-            }
-        }
     };
     return test_effect;
 }());
