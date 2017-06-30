@@ -5056,6 +5056,7 @@ var gd3d;
             defMesh.initDefaultMesh = function (assetmgr) {
                 assetmgr.mapDefaultMesh["cube"] = defMesh.createDefaultMesh("cube", gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
                 assetmgr.mapDefaultMesh["quad"] = defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh["quad_particle"] = defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
                 assetmgr.mapDefaultMesh["plane"] = defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
                 assetmgr.mapDefaultMesh["sphere"] = defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
                 assetmgr.mapDefaultMesh["pyramid"] = defMesh.createDefaultMesh("pyramid", gd3d.render.meshData.genPyramid(2, 0.5), assetmgr.webgl);
@@ -15392,12 +15393,12 @@ var gd3d;
                 get: function () {
                     var randomAngle = Math.random() * Math.PI * 2;
                     var randomHeight = Math.random() * this.height;
-                    var radius = randomHeight * Math.tan(this.angle * Math.PI / 180) + this.radius;
-                    var radomRadius = Math.random() * radius;
+                    var upradius = randomHeight * Math.tan(this.angle * Math.PI / 180) + this.radius;
+                    var radomRadius = Math.random() * upradius;
                     var bottompos = gd3d.math.pool.new_vector3();
-                    bottompos.x = radius * Math.cos(randomAngle);
+                    bottompos.x = this.radius * Math.cos(randomAngle);
                     bottompos.y = 0;
-                    bottompos.z = radius * Math.sin(randomAngle);
+                    bottompos.z = this.radius * Math.sin(randomAngle);
                     if (this.emitFrom == emitfromenum.base) {
                         gd3d.math.vec3Clone(bottompos, this.randomPosition);
                     }
@@ -15406,8 +15407,8 @@ var gd3d;
                         this.randomPosition.z = radomRadius * Math.sin(randomAngle);
                         this.randomPosition.y = randomHeight;
                     }
-                    this._coneDirection.x = Math.cos(randomAngle);
-                    this._coneDirection.z = Math.sin(randomAngle);
+                    this._coneDirection.x = Math.cos(randomAngle) * Math.sin(this.angle * Math.PI / 180);
+                    this._coneDirection.z = Math.sin(randomAngle) * Math.sin(this.angle * Math.PI / 180);
                     this._coneDirection.y = Math.cos(this.angle * Math.PI / 180);
                     return this._coneDirection;
                 },
@@ -16954,6 +16955,7 @@ var gd3d;
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
                 this.actived = true;
                 this.matToBatcher = new gd3d.math.matrix();
+                this.tex_ST = new gd3d.math.vector4();
                 this.gameObject = batcher.effectSys.gameObject;
                 this.emisson = batcher.emissionElement;
                 this.batcher = batcher;
@@ -16998,7 +17000,7 @@ var gd3d;
                 else
                     this.alpha = this.data.alpha.getValueRandom();
                 if (this.data.uv == undefined)
-                    this.uv = new gd3d.math.vector2(1, 1);
+                    this.uv = new gd3d.math.vector2();
                 else
                     this.uv = this.data.uv.getValueRandom();
                 if (this.data.moveSpeed != undefined) {
@@ -17018,13 +17020,10 @@ var gd3d;
                         var localOrgin = gd3d.math.pool.vector3_zero;
                         gd3d.math.quatLookat(localOrgin, localRandomDirection, this.rotationByShape);
                         var initRot = gd3d.math.pool.new_quaternion();
-                        gd3d.math.quatFromEulerAngles(90, 0, 0, initRot);
+                        gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
                         gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
                         gd3d.math.pool.delete_quaternion(initRot);
                     }
-                }
-                if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
-                    this.uvSpriteFrameInternal = (this.totalLife * framework.effectSystem.fps) / this.data.uvSprite.totalCount;
                 }
             };
             Particle.prototype.update = function (delta) {
@@ -17096,7 +17095,7 @@ var gd3d;
                         gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
                         var angle = gd3d.math.pool.new_vector3();
                         gd3d.math.quatToEulerAngles(lookRot, angle);
-                        gd3d.math.quatFromEulerAngles(0, angle.y, 0, lookRot);
+                        gd3d.math.quatFromEulerAngles(angle.x, 0, 0, lookRot);
                         gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
                         gd3d.math.pool.delete_quaternion(inverRot);
                         gd3d.math.pool.delete_vector3(angle);
@@ -17264,12 +17263,8 @@ var gd3d;
                 }
                 else if (this.data.uvType == framework.UVTypeEnum.UVSprite) {
                     if (this.data.uvSprite != undefined) {
-                        this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
-                        this.spriteIndex %= this.data.uvSprite.totalCount;
-                        this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
-                        this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;
-                        this.tilling.x = this.data.uvSprite.column;
-                        this.tilling.y = this.data.uvSprite.row;
+                        var spriteindex = Math.floor(this.curLife / this.totalLife * this.data.uvSprite.totalCount);
+                        gd3d.math.spriteAnimation(this.data.uvSprite.row, this.data.uvSprite.column, spriteindex, this.tex_ST);
                     }
                 }
             };
@@ -17288,10 +17283,10 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        var r = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 9], 0, 1);
-                        var g = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 10], 0, 1);
-                        var b = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 11], 0, 1);
-                        var a = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 12], 0, 1);
+                        var r = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 3], 0, 1);
+                        var g = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 4], 0, 1);
+                        var b = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 5], 0, 1);
+                        var a = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 6], 0, 1);
                         if (this.color != undefined) {
                             r = this.color.x;
                             g = this.color.y;
@@ -17305,14 +17300,18 @@ var gd3d;
                             b *= this.colorRate;
                             a *= this.colorRate;
                         }
-                        this.dataForVbo[i * 15 + 9] = r;
-                        this.dataForVbo[i * 15 + 10] = g;
-                        this.dataForVbo[i * 15 + 11] = b;
-                        this.dataForVbo[i * 15 + 12] = a;
+                        r = gd3d.math.floatClamp(r, 0, 3);
+                        g = gd3d.math.floatClamp(r, 0, 3);
+                        b = gd3d.math.floatClamp(r, 0, 3);
+                        a = gd3d.math.floatClamp(r, 0, 3);
+                        this.dataForVbo[i * this.vertexSize + 3] = r;
+                        this.dataForVbo[i * this.vertexSize + 4] = g;
+                        this.dataForVbo[i * this.vertexSize + 5] = b;
+                        this.dataForVbo[i * this.vertexSize + 6] = a;
                     }
                     {
-                        this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] / this.tilling.x + this.uv.x;
-                        this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] / this.tilling.y + this.uv.y;
+                        this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] * this.tex_ST.x + this.tex_ST.z;
+                        this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] * this.tex_ST.y + this.tex_ST.w;
                     }
                 }
             };
@@ -20612,6 +20611,30 @@ var gd3d;
                     new gd3d.math.vector3(-half, -half, 0),
                     new gd3d.math.vector3(half, half, 0),
                     new gd3d.math.vector3(half, -half, 0)
+                ]);
+                meshData.addQuadVec2(data.uv, [
+                    new gd3d.math.vector2(0, 0),
+                    new gd3d.math.vector2(0, 1),
+                    new gd3d.math.vector2(1, 0),
+                    new gd3d.math.vector2(1, 1)
+                ]);
+                meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(1, 0, 0));
+                return data;
+            };
+            meshData.genQuad_forparticle = function (size) {
+                var half = size * 0.5;
+                var data = new meshData();
+                data.pos = [];
+                data.trisindex = [];
+                data.normal = [];
+                data.tangent = [];
+                data.uv = [];
+                meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(0, 0, 1));
+                meshData.addQuadPos(data, [
+                    new gd3d.math.vector3(0, half, 0),
+                    new gd3d.math.vector3(0, -half, 0),
+                    new gd3d.math.vector3(2 * half, half, 0),
+                    new gd3d.math.vector3(2 * half, -half, 0)
                 ]);
                 meshData.addQuadVec2(data.uv, [
                     new gd3d.math.vector2(0, 0),
