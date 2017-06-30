@@ -6,6 +6,7 @@ uniform highp vec4 glstate_lightmapOffset;
 uniform lowp float glstate_lightmapUV;
 uniform highp float glstate_fog_start;
 uniform highp float glstate_fog_end;
+uniform highp vec4 _MainTex_ST; 
 varying highp float factor;
 varying highp vec2 xlv_TEXCOORD0;
 varying highp vec2 xlv_TEXCOORD1;
@@ -14,8 +15,7 @@ void main()
     highp vec4 tmpvar_1;
     tmpvar_1.w = 1.0;
     tmpvar_1.xyz = _glesVertex.xyz;
-	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
-
+    xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;  
     highp vec2 beforelightUV = _glesMultiTexCoord1.xy;
     if(glstate_lightmapUV == 0.0)
     {

@@ -6,7 +6,7 @@ uniform highp mat4 glstate_matrix_mvp;
 uniform highp vec4 glstate_vec4_bones[80];
 uniform highp float glstate_fog_start;
 uniform highp float glstate_fog_end;
-
+uniform highp vec4 _MainTex_ST; 
 varying highp float factor;
 varying highp vec2 xlv_TEXCOORD0;
 mat4 buildMat4(int index)
@@ -51,5 +51,5 @@ void main()
     factor = clamp(factor, 0.0, 1.0);  
     gl_Position = pos;
 
-	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
+	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;  
 }

@@ -2,7 +2,8 @@
     "layer": "geometry",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5"
+        "_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5",
+        "_MainTex_ST('MainTex_ST',Vector) = (1,1,1,1)"
     ],
     "passes": {
         "base": [

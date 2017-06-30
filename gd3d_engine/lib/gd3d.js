@@ -4804,7 +4804,7 @@ var PVRHeader = (function () {
         this.depth = 1;
         this.numSurfaces = 1;
         this.numFaces = 1;
-        this.MIPMapCount = 1;
+        this.mipMapCount = 1;
         this.metaDataSize = 0;
         this.gl = gl;
     }
@@ -4828,7 +4828,7 @@ var PVRHeader = (function () {
         this.depth = tool.readUInt32();
         this.numSurfaces = tool.readUInt32();
         this.numFaces = tool.readUInt32();
-        this.MIPMapCount = tool.readUInt32();
+        this.mipMapCount = tool.readUInt32();
         this.metaDataSize = tool.readUInt32();
         var metaDataSize = 0;
         while (metaDataSize < this.metaDataSize) {
@@ -4843,13 +4843,13 @@ var PVRHeader = (function () {
                 metaDataSize += dataSize;
             }
         }
-        var ret = this.getTextureFormat(this.gl, this);
+        var ret = this.getTextureFormat();
         var textureFormat = ret.format;
         var textureInternalFormat = ret.internalFormat;
         var textureType = ret.type;
         if (textureInternalFormat == 0)
             return null;
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 2);
         var target = this.gl.TEXTURE_2D;
         if (this.numFaces > 1) {
             target = this.gl.TEXTURE_CUBE_MAP;
@@ -4862,74 +4862,69 @@ var PVRHeader = (function () {
         this.gl.bindTexture(target, t2d.texture);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        var currentMIPSize = 0;
+        var currentMipMapSize = 0;
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
-        var MIPWidth = this.width;
-        var MIPHeight = this.height;
-        for (var MIPLevel = 0; MIPLevel < this.MIPMapCount; ++MIPLevel) {
-            currentMIPSize = this.getDataSize(this, MIPLevel, false, false);
-            var eTextureTarget = target;
+        var mipWidth = this.width;
+        var mipHeight = this.height;
+        for (var mipLevel = 0; mipLevel < this.mipMapCount; ++mipLevel) {
+            currentMipMapSize = this.getDataSize(mipLevel, false, false);
             for (var face = 0; face < this.numFaces; ++face) {
-                if (MIPLevel >= 0) {
-                    var textureData = tool.readBytes(currentMIPSize);
-                    this.gl.texImage2D(eTextureTarget, MIPLevel - 0, textureInternalFormat, MIPWidth, MIPHeight, 0, textureFormat, textureType, textureData);
+                if (mipLevel >= 0) {
+                    var textureData = tool.readBytes(currentMipMapSize);
+                    if (this.numFaces > 1)
+                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    else
+                        this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
                 }
-                eTextureTarget++;
             }
-            MIPWidth = Math.max(1, MIPWidth >> 1);
-            MIPHeight = Math.max(1, MIPHeight >> 1);
+            mipWidth = Math.max(1, mipWidth >> 1);
+            mipHeight = Math.max(1, mipHeight >> 1);
         }
         return t2d;
     };
-    PVRHeader.prototype.getTextureFormat = function (gl, header) {
+    PVRHeader.prototype.getTextureFormat = function () {
         var ret = { format: 0, type: 0, internalFormat: 0 };
-        if (header.pixelFormatH == 0) {
+        if (this.pixelFormatH == 0) {
             return;
         }
-        switch (header.channelType) {
-            case ChannelTypes.Float:
-                {
-                    return;
-                }
+        switch (this.channelType) {
             case ChannelTypes.UnsignedByteNorm:
                 {
-                    ret.type = gl.UNSIGNED_BYTE;
-                    switch (header.pixelFormatL) {
+                    ret.type = this.gl.UNSIGNED_BYTE;
+                    switch (this.pixelFormatL) {
                         case this.genPixelTypeL4(8, 8, 8, 8):
-                            if (header.pixelFormatH == this.genPixelTypeH4('r', 'g', 'b', 'a'))
-                                ret.format = ret.internalFormat = gl.RGBA;
-                            else
-                                ret.format = ret.internalFormat = gl.BGRA;
+                            if (this.pixelFormatH == this.genPixelTypeH4('r', 'g', 'b', 'a'))
+                                ret.format = ret.internalFormat = this.gl.RGBA;
                             break;
                         case this.genPixelTypeL3(8, 8, 8):
-                            ret.format = ret.internalFormat = gl.RGB;
+                            ret.format = ret.internalFormat = this.gl.RGB;
                             break;
                         case this.genPixelTypeL2(8, 8):
-                            ret.format = ret.internalFormat = gl.LUMINANCE_ALPHA;
+                            ret.format = ret.internalFormat = this.gl.LUMINANCE_ALPHA;
                             break;
                         case this.genPixelTypeL1(8):
-                            if (header.pixelFormatH == this.genPixelTypeH1('l'))
-                                ret.format = ret.internalFormat = gl.LUMINANCE;
+                            if (this.pixelFormatH == this.genPixelTypeH1('l'))
+                                ret.format = ret.internalFormat = this.gl.LUMINANCE;
                             else
-                                ret.format = ret.internalFormat = gl.ALPHA;
+                                ret.format = ret.internalFormat = this.gl.ALPHA;
                             break;
                     }
                 }
             case ChannelTypes.UnsignedShortNorm:
                 {
-                    switch (header.pixelFormatL) {
+                    switch (this.pixelFormatL) {
                         case this.genPixelTypeL4(4, 4, 4, 4):
-                            ret.type = gl.UNSIGNED_SHORT_4_4_4_4;
-                            ret.format = ret.internalFormat = gl.BGRA;
+                            ret.type = this.gl.UNSIGNED_SHORT_4_4_4_4;
+                            ret.format = ret.internalFormat = this.gl.RGBA4;
                             break;
                         case this.genPixelTypeL4(5, 5, 5, 1):
-                            ret.type = gl.UNSIGNED_SHORT_5_5_5_1;
-                            ret.format = ret.internalFormat = gl.RGBA;
+                            ret.type = this.gl.UNSIGNED_SHORT_5_5_5_1;
+                            ret.format = ret.internalFormat = this.gl.RGB5_A1;
                             break;
                         case this.genPixelTypeL3(5, 6, 5):
-                            ret.type = gl.UNSIGNED_SHORT_5_6_5;
-                            ret.format = ret.internalFormat = gl.RGB;
+                            ret.type = this.gl.UNSIGNED_SHORT_5_6_5;
+                            ret.format = ret.internalFormat = this.gl.RGB565;
                             break;
                     }
                 }
@@ -4984,45 +4979,45 @@ var PVRHeader = (function () {
             val |= c4Bits << 24;
         return val;
     };
-    PVRHeader.prototype.getDataSize = function (header, MIPLevel, allSurfaces, allFaces) {
+    PVRHeader.prototype.getDataSize = function (mipLevel, allSurfaces, allFaces) {
         var smallestWidth = 1;
         var smallestHeight = 1;
         var smallestDepth = 1;
-        var pixelFormatH = header.pixelFormatH;
+        var pixelFormatH = this.pixelFormatH;
         if (pixelFormatH == 0) {
         }
         var dataSize = 0;
-        if (MIPLevel == -1) {
-            for (var currentMIP = 0; currentMIP < header.MIPMapCount; ++currentMIP) {
-                var width = Math.max(1, header.width >> currentMIP);
-                var height = Math.max(1, header.height >> currentMIP);
-                var depth = Math.max(1, header.depth >> currentMIP);
-                if (header.pixelFormatH == 0) {
+        if (mipLevel == -1) {
+            for (var currentMIP = 0; currentMIP < this.mipMapCount; ++currentMIP) {
+                var width = Math.max(1, this.width >> currentMIP);
+                var height = Math.max(1, this.height >> currentMIP);
+                var depth = Math.max(1, this.depth >> currentMIP);
+                if (this.pixelFormatH == 0) {
                     width = width + ((-1 * width) % smallestWidth);
                     height = height + ((-1 * height) % smallestHeight);
                     depth = depth + ((-1 * depth) % smallestDepth);
                 }
-                dataSize += this.getBitsPerPixel(header) * width * height * depth;
+                dataSize += this.getBitsPerPixel() * width * height * depth;
             }
         }
         else {
-            var width = Math.max(1, header.width >> MIPLevel);
-            var height = Math.max(1, header.height >> MIPLevel);
-            var depth = Math.max(1, header.depth >> MIPLevel);
-            if (header.pixelFormatH == 0) {
+            var width = Math.max(1, this.width >> mipLevel);
+            var height = Math.max(1, this.height >> mipLevel);
+            var depth = Math.max(1, this.depth >> mipLevel);
+            if (this.pixelFormatH == 0) {
                 width = width + ((-1 * width) % smallestWidth);
                 height = height + ((-1 * height) % smallestHeight);
                 depth = depth + ((-1 * depth) % smallestDepth);
             }
-            dataSize += this.getBitsPerPixel(header) * width * height * depth;
+            dataSize += this.getBitsPerPixel() * width * height * depth;
         }
-        var numFaces = (allFaces ? header.numFaces : 1);
-        var numSurfs = (allSurfaces ? header.numSurfaces : 1);
+        var numFaces = (allFaces ? this.numFaces : 1);
+        var numSurfs = (allSurfaces ? this.numSurfaces : 1);
         return (dataSize / 8) * numSurfs * numFaces;
     };
-    PVRHeader.prototype.getBitsPerPixel = function (header) {
-        if (header.pixelFormatH != 0) {
-            var lowPart = header.pixelFormatL;
+    PVRHeader.prototype.getBitsPerPixel = function () {
+        if (this.pixelFormatH != 0) {
+            var lowPart = this.pixelFormatL;
             var c1Bits = (lowPart >> 24) & 0xFF;
             var c2Bits = (lowPart >> 16) & 0xFF;
             var c3Bits = (lowPart >> 8) & 0xFF;
@@ -7551,7 +7546,7 @@ var gd3d;
                     console.log("audio Context inited");
                 }
                 catch (e) {
-                    throw new Error("!Your browser does not support AudioContext");
+                    console.error("!Your browser does not support AudioContext");
                 }
             }
             AudioEx.prototype.clickInit = function () {
@@ -17598,8 +17593,8 @@ var gd3d;
             gameObject.prototype.init = function () {
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
-                        this.components[i].comp.start();
-                        this.components[i].init = true;
+                        this.componentsInit[i].comp.start();
+                        this.componentsInit[i].init = true;
                     }
                     this.componentsInit.length = 0;
                 }
@@ -21918,7 +21913,6 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                console.error(data.length);
                 if (this.format == TextureFormatEnum.PVRTC && this.ext != null) {
                     this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, 6407, width, height, 0, 6407, 5121, data);
                 }

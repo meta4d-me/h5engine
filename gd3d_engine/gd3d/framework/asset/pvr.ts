@@ -11,7 +11,7 @@ class PVRHeader
     public depth = 1;
     public numSurfaces = 1;
     public numFaces = 1;
-    public MIPMapCount = 1;
+    public mipMapCount = 1;
     public metaDataSize = 0;
     public gl: WebGLRenderingContext;
     constructor(gl: WebGLRenderingContext)
@@ -29,22 +29,24 @@ class PVRHeader
 
         if (this.version != 0x03525650)
         {
+            //字节次序不匹配（等于0x50565203时匹配）
             return null;
         }
 
-        this.flags = tool.readUInt32();
-        this.pixelFormatH = tool.readUInt32();
-        this.pixelFormatL = tool.readUInt32();
-        this.colourSpace = tool.readUInt32();
-        this.channelType = tool.readUInt32();
+        this.flags = tool.readUInt32();//0:没有设置  0x02 ：alpha预乘
+        this.pixelFormatH = tool.readUInt32();//高4位 rgba
+        this.pixelFormatL = tool.readUInt32();//低4位 8888/4444/5551/565    高四位和低四位共同决定了其格式RGBA（32位）、RGBA4（16位）、    RGB、RGB5_A1、RGB565、  LUMINANCE_ALPHA、LUMINANCE、ALPHA
+        this.colourSpace = tool.readUInt32();//0:linear rgb   1:srgb
+        this.channelType = tool.readUInt32();//格式
         this.height = tool.readUInt32();
         this.width = tool.readUInt32();
         this.depth = tool.readUInt32();
         this.numSurfaces = tool.readUInt32();
         this.numFaces = tool.readUInt32();
-        this.MIPMapCount = tool.readUInt32();
+        this.mipMapCount = tool.readUInt32();
         this.metaDataSize = tool.readUInt32();
 
+        //没搞明白metaData的作用是啥？
         var metaDataSize = 0;
         while (metaDataSize < this.metaDataSize)
         {
@@ -64,14 +66,14 @@ class PVRHeader
             }
         }
 
-        var ret = this.getTextureFormat(this.gl, this);
+        var ret = this.getTextureFormat();
         var textureFormat = ret.format;
         var textureInternalFormat = ret.internalFormat;
         var textureType = ret.type;
 
         if (textureInternalFormat == 0)
             return null;
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 2);//对齐方式
         var target = this.gl.TEXTURE_2D;
 
         if (this.numFaces > 1)
@@ -84,99 +86,92 @@ class PVRHeader
             return null;
         }
 
-        this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+        this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);//开启预乘
+        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转
         this.gl.bindTexture(target, t2d.texture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);//线性过滤
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);//mipmap之间执行线性过滤
 
-        var currentMIPSize = 0;
+        var currentMipMapSize = 0;
 
-        // Loop through the faces
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
 
-        var MIPWidth = this.width;
-        var MIPHeight = this.height;
+        var mipWidth = this.width;
+        var mipHeight = this.height;
 
-        for (var MIPLevel = 0; MIPLevel < this.MIPMapCount; ++MIPLevel)
+        for (var mipLevel = 0; mipLevel < this.mipMapCount; ++mipLevel)
         {
-            currentMIPSize = this.getDataSize(this, MIPLevel, false, false);
-            var eTextureTarget = target;
+            currentMipMapSize = this.getDataSize(mipLevel, false, false);
 
             for (var face = 0; face < this.numFaces; ++face)
             {
-                if (MIPLevel >= 0)
+                if (mipLevel >= 0)
                 {
-                    var textureData = tool.readBytes(currentMIPSize);
-                    this.gl.texImage2D(eTextureTarget, MIPLevel - 0, textureInternalFormat, MIPWidth, MIPHeight, 0, textureFormat, textureType, textureData);
+                    var textureData = tool.readBytes(currentMipMapSize);
+                    if (this.numFaces > 1)
+                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    else
+                        this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
                 }
-                eTextureTarget++;
             }
 
-            // Reduce the MIP size
-            MIPWidth = Math.max(1, MIPWidth >> 1);
-            MIPHeight = Math.max(1, MIPHeight >> 1);
+            mipWidth = Math.max(1, mipWidth >> 1);
+            mipHeight = Math.max(1, mipHeight >> 1);
         }
         return t2d;
     }
 
-    private getTextureFormat(gl, header): { format: number, type: number, internalFormat: number }
+    private getTextureFormat(): { format: number, type: number, internalFormat: number }
     {
         var ret: { format: number, type: number, internalFormat: number } = { format: 0, type: 0, internalFormat: 0 };
-
-        if (header.pixelFormatH == 0)
+        //jpg、bmp用gl.RGB
+        //png用gl.RGBA
+        //灰度图用gl.LUMINANCE或gl.LUMINANCE_ALPHA，此外还有gl.ALPHA
+        if (this.pixelFormatH == 0)
         {
             return;
         }
-
-        switch (header.channelType)
+        switch (this.channelType)
         {
-            case ChannelTypes.Float:
-                {
-                    // TODO: Add support.
-                    return;
-                }
             case ChannelTypes.UnsignedByteNorm:
                 {
-                    ret.type = gl.UNSIGNED_BYTE;
-                    switch (header.pixelFormatL)
+                    ret.type = this.gl.UNSIGNED_BYTE;
+                    switch (this.pixelFormatL)
                     {
                         case this.genPixelTypeL4(8, 8, 8, 8):
-                            if (header.pixelFormatH == this.genPixelTypeH4('r', 'g', 'b', 'a'))
-                                ret.format = ret.internalFormat = gl.RGBA;
-                            else
-                                ret.format = ret.internalFormat = gl.BGRA;
+                            if (this.pixelFormatH == this.genPixelTypeH4('r', 'g', 'b', 'a'))
+                                ret.format = ret.internalFormat = this.gl.RGBA;
                             break;
                         case this.genPixelTypeL3(8, 8, 8):
-                            ret.format = ret.internalFormat = gl.RGB;
+                            ret.format = ret.internalFormat = this.gl.RGB;
                             break;
                         case this.genPixelTypeL2(8, 8):
-                            ret.format = ret.internalFormat = gl.LUMINANCE_ALPHA;
+                            ret.format = ret.internalFormat = this.gl.LUMINANCE_ALPHA;
                             break;
                         case this.genPixelTypeL1(8):
-                            if (header.pixelFormatH == this.genPixelTypeH1('l'))
-                                ret.format = ret.internalFormat = gl.LUMINANCE;
+                            if (this.pixelFormatH == this.genPixelTypeH1('l'))
+                                ret.format = ret.internalFormat = this.gl.LUMINANCE;
                             else
-                                ret.format = ret.internalFormat = gl.ALPHA;
+                                ret.format = ret.internalFormat = this.gl.ALPHA;
                             break;
                     }
                 }
             case ChannelTypes.UnsignedShortNorm:
                 {
-                    switch (header.pixelFormatL)
+                    switch (this.pixelFormatL)
                     {
                         case this.genPixelTypeL4(4, 4, 4, 4):
-                            ret.type = gl.UNSIGNED_SHORT_4_4_4_4;
-                            ret.format = ret.internalFormat = gl.BGRA;
+                            ret.type = this.gl.UNSIGNED_SHORT_4_4_4_4;
+                            ret.format = ret.internalFormat = this.gl.RGBA4;
                             break;
                         case this.genPixelTypeL4(5, 5, 5, 1):
-                            ret.type = gl.UNSIGNED_SHORT_5_5_5_1;
-                            ret.format = ret.internalFormat = gl.RGBA;
+                            ret.type = this.gl.UNSIGNED_SHORT_5_5_5_1;
+                            ret.format = ret.internalFormat = this.gl.RGB5_A1;
                             break;
                         case this.genPixelTypeL3(5, 6, 5):
-                            ret.type = gl.UNSIGNED_SHORT_5_6_5;
-                            ret.format = ret.internalFormat = gl.RGB;
+                            ret.type = this.gl.UNSIGNED_SHORT_5_6_5;
+                            ret.format = ret.internalFormat = this.gl.RGB565;
                             break;
                     }
                 }
@@ -255,70 +250,65 @@ class PVRHeader
         return val;
     }
 
-    private getDataSize(header, MIPLevel, allSurfaces, allFaces)
+    private getDataSize(mipLevel, allSurfaces, allFaces)
     {
         var smallestWidth = 1;
         var smallestHeight = 1;
         var smallestDepth = 1;
 
-        var pixelFormatH = header.pixelFormatH;
+        var pixelFormatH = this.pixelFormatH;
 
         if (pixelFormatH == 0)
         {
             // TODO: Handle compressed textures.
-            // PVRTexture.getFormatMinDims(header);
         }
 
         var dataSize = 0;
-        if (MIPLevel == -1)
+        if (mipLevel == -1)
         {
-            for (var currentMIP = 0; currentMIP < header.MIPMapCount; ++currentMIP)
+            for (var currentMIP = 0; currentMIP < this.mipMapCount; ++currentMIP)
             {
-                var width = Math.max(1, header.width >> currentMIP);
-                var height = Math.max(1, header.height >> currentMIP);
-                var depth = Math.max(1, header.depth >> currentMIP);
+                var width = Math.max(1, this.width >> currentMIP);
+                var height = Math.max(1, this.height >> currentMIP);
+                var depth = Math.max(1, this.depth >> currentMIP);
 
-                if (header.pixelFormatH == 0)
+                if (this.pixelFormatH == 0)//?
                 {
-                    // Pad the dimensions if the texture is compressed
                     width = width + ((-1 * width) % smallestWidth);
                     height = height + ((-1 * height) % smallestHeight);
                     depth = depth + ((-1 * depth) % smallestDepth);
                 }
 
-                // Add the current MIP map's data size
-                dataSize += this.getBitsPerPixel(header) * width * height * depth;
+                dataSize += this.getBitsPerPixel() * width * height * depth;
             }
         }
         else
         {
-            var width = Math.max(1, header.width >> MIPLevel);
-            var height = Math.max(1, header.height >> MIPLevel);
-            var depth = Math.max(1, header.depth >> MIPLevel);
+            var width = Math.max(1, this.width >> mipLevel);
+            var height = Math.max(1, this.height >> mipLevel);
+            var depth = Math.max(1, this.depth >> mipLevel);
 
-            if (header.pixelFormatH == 0)
+            if (this.pixelFormatH == 0)
             {
-                // Pad the dimensions if the texture is compressed
                 width = width + ((-1 * width) % smallestWidth);
                 height = height + ((-1 * height) % smallestHeight);
                 depth = depth + ((-1 * depth) % smallestDepth);
             }
 
-            // Add the current MIP map's data size
-            dataSize += this.getBitsPerPixel(header) * width * height * depth;
+            dataSize += this.getBitsPerPixel() * width * height * depth;
         }
 
-        var numFaces = (allFaces ? header.numFaces : 1);
-        var numSurfs = (allSurfaces ? header.numSurfaces : 1);
+        var numFaces = (allFaces ? this.numFaces : 1);
+        var numSurfs = (allSurfaces ? this.numSurfaces : 1);
 
         return (dataSize / 8) * numSurfs * numFaces;
     }
 
-    private getBitsPerPixel(header)
+    private getBitsPerPixel()
     {
-        if (header.pixelFormatH != 0)
+        if (this.pixelFormatH != 0)
         {
-            var lowPart = header.pixelFormatL;
+            var lowPart = this.pixelFormatL;
             var c1Bits = (lowPart >> 24) & 0xFF;
             var c2Bits = (lowPart >> 16) & 0xFF;
             var c3Bits = (lowPart >> 8) & 0xFF;
