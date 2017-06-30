@@ -229,7 +229,7 @@ namespace gd3d.framework
                     // gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
                     // gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
 
-                     gd3d.math.quatClone(this.rotationByShape, this.localRotation);
+                      gd3d.math.quatClone(this.rotationByShape, this.localRotation);
 
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 
@@ -456,9 +456,9 @@ namespace gd3d.framework
                     } else if (this.data.uvRoll.uvSpeed != undefined)
                     {
                         if (this.data.uvRoll.uvSpeed.u != undefined)
-                            this.uv.x += this.data.uvRoll.uvSpeed.u.getValue() * delta;
+                            this.tex_ST.z += this.data.uvRoll.uvSpeed.u.getValue() * delta;
                         if (this.data.uvRoll.uvSpeed.v != undefined)
-                            this.uv.y += this.data.uvRoll.uvSpeed.v.getValue() * delta;
+                            this.tex_ST.w += this.data.uvRoll.uvSpeed.v.getValue() * delta;
                     }
                 }
             } else if (this.data.uvType == UVTypeEnum.UVSprite)
@@ -473,7 +473,7 @@ namespace gd3d.framework
             }
 
         }
-        private tex_ST:gd3d.math.vector4=new gd3d.math.vector4();
+        private tex_ST:gd3d.math.vector4=new gd3d.math.vector4(1,1,0,0);
         private _updateVBO()
         {
             let vertexSize = this.vertexSize;

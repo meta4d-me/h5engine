@@ -16955,7 +16955,7 @@ var gd3d;
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
                 this.actived = true;
                 this.matToBatcher = new gd3d.math.matrix();
-                this.tex_ST = new gd3d.math.vector4();
+                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
                 this.gameObject = batcher.effectSys.gameObject;
                 this.emisson = batcher.emissionElement;
                 this.batcher = batcher;
@@ -17255,9 +17255,9 @@ var gd3d;
                         }
                         else if (this.data.uvRoll.uvSpeed != undefined) {
                             if (this.data.uvRoll.uvSpeed.u != undefined)
-                                this.uv.x += this.data.uvRoll.uvSpeed.u.getValue() * delta;
+                                this.tex_ST.z += this.data.uvRoll.uvSpeed.u.getValue() * delta;
                             if (this.data.uvRoll.uvSpeed.v != undefined)
-                                this.uv.y += this.data.uvRoll.uvSpeed.v.getValue() * delta;
+                                this.tex_ST.w += this.data.uvRoll.uvSpeed.v.getValue() * delta;
                         }
                     }
                 }
