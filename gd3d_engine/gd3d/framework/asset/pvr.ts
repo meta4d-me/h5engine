@@ -73,7 +73,7 @@ class PVRHeader
 
         if (textureInternalFormat == 0)
             return null;
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 2);//对齐方式
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
         var target = this.gl.TEXTURE_2D;
 
         if (this.numFaces > 1)
@@ -110,9 +110,9 @@ class PVRHeader
                 {
                     var textureData = tool.readBytes(currentMipMapSize);
                     if (this.numFaces > 1)
-                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
-                    else
                         this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    else
+                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
                 }
             }
 

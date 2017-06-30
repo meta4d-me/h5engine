@@ -42,7 +42,7 @@
 
         private loadPvr(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
-            this.app.getAssetMgr().load("res/resources/Image.pvr", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            this.app.getAssetMgr().load("res/resources/4022-1.pvr", gd3d.framework.AssetTypeEnum.Auto, (s) =>
             {
                 if (s.isfinish)
                 {
@@ -95,7 +95,7 @@
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);//----------------使用shader
-                        let texture = this.app.getAssetMgr().getAssetByName("Image.pvr") as gd3d.framework.texture;
+                        let texture = this.app.getAssetMgr().getAssetByName("4022-1.pvr") as gd3d.framework.texture;
                         if (texture == null)
                             console.error("为什么他是空的呀");
                         else

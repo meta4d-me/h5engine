@@ -4849,7 +4849,7 @@ var PVRHeader = (function () {
         var textureType = ret.type;
         if (textureInternalFormat == 0)
             return null;
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 2);
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
         var target = this.gl.TEXTURE_2D;
         if (this.numFaces > 1) {
             target = this.gl.TEXTURE_CUBE_MAP;
@@ -4873,9 +4873,9 @@ var PVRHeader = (function () {
                 if (mipLevel >= 0) {
                     var textureData = tool.readBytes(currentMipMapSize);
                     if (this.numFaces > 1)
-                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
-                    else
                         this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
+                    else
+                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
                 }
             }
             mipWidth = Math.max(1, mipWidth >> 1);
@@ -20210,7 +20210,15 @@ var gd3d;
                             webgl.uniform1fv(u.location, u.value);
                         }
                         else if (u.type == render.UniformTypeEnum.Float4 || u.type == render.UniformTypeEnum.Float4v) {
-                            webgl.uniform4fv(u.location, u.value);
+                            try {
+                                webgl.uniform4fv(u.location, u.value);
+                            }
+                            catch (e) {
+                                console.error(key + "  " + u.value);
+                                for (var k in this.uniforms) {
+                                    console.error(k);
+                                }
+                            }
                         }
                         else if (u.type == render.UniformTypeEnum.Float4x4 || u.type == render.UniformTypeEnum.Float4x4v) {
                             webgl.uniformMatrix4fv(u.location, false, u.value);
