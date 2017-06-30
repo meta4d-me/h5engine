@@ -21890,7 +21890,6 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                console.error(data.length);
                 if (this.format == TextureFormatEnum.PVRTC && this.ext != null) {
                     this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, 6407, width, height, 0, 6407, 5121, data);
                 }
