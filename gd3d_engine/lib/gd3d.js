@@ -7545,7 +7545,7 @@ var gd3d;
                     console.log("audio Context inited");
                 }
                 catch (e) {
-                    throw new Error("!Your browser does not support AudioContext");
+                    console.error("!Your browser does not support AudioContext");
                 }
             }
             AudioEx.prototype.clickInit = function () {

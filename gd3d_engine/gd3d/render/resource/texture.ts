@@ -293,7 +293,6 @@
                 formatGL = this.webgl.RGB;
             else if (this.format == TextureFormatEnum.Gray)
                 formatGL = this.webgl.LUMINANCE;
-            console.error(data.length);
             if (this.format == TextureFormatEnum.PVRTC && this.ext != null)
             {
                 this.webgl.texImage2D(this.webgl.TEXTURE_2D,
