@@ -278,13 +278,23 @@
                     {
                         webgl.uniform1f(u.location, u.value);
                     }
-                    else if(u.type==UniformTypeEnum.Floatv)
+                    else if (u.type == UniformTypeEnum.Floatv)
                     {
-                        webgl.uniform1fv(u.location,u.value as Float32Array);
+                        webgl.uniform1fv(u.location, u.value as Float32Array);
                     }
                     else if (u.type == UniformTypeEnum.Float4 || u.type == UniformTypeEnum.Float4v)
                     {
-                        webgl.uniform4fv(u.location, u.value as Float32Array);
+                        try
+                        {
+                            webgl.uniform4fv(u.location, u.value as Float32Array);
+                        } catch (e)
+                        {
+                            console.error(key + "  " + u.value);
+                            for(let k in this.uniforms)
+                            {
+                                console.error(k);
+                            }
+                        }
                     }
                     else if (u.type == UniformTypeEnum.Float4x4 || u.type == UniformTypeEnum.Float4x4v)
                     {

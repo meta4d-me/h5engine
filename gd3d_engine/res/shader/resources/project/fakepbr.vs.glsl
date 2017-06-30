@@ -4,6 +4,7 @@ attribute vec3 _glesTangent;
 attribute vec3 _glesNormal;
 uniform highp mat4 glstate_matrix_model;
 uniform highp mat4 glstate_matrix_mvp;
+uniform highp vec4 _MainTex_ST; 
 
 varying highp vec2 xlv_TEXCOORD0;
 varying highp vec3 posWorld;
@@ -12,7 +13,7 @@ varying highp vec3 tangentDir;
 varying highp vec3 bitangentDir;
 void main()
 {
-	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
+    xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw; 
     posWorld = (glstate_matrix_model * _glesVertex).xyz;
     highp mat3 normalmat = mat3(glstate_matrix_model);
 

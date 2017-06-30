@@ -8,6 +8,9 @@ uniform highp float _SpeedU;
 uniform highp float _SpeedV;
 uniform highp float glstate_timer;
 uniform highp vec4 _LightTex_ST;
+uniform highp vec4 _MainTex_ST; 
+
+
 varying highp vec2 xlv_TEXCOORD0;
 varying highp vec2 _StreamLightUV;
 mat4 buildMat4(int index)
@@ -49,7 +52,7 @@ void main()
 			 
     gl_Position = (glstate_matrix_mvp * mat)* tmpvar_1;
 
-	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
+	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;  
     highp vec2 _speed;
     _speed = vec2(_SpeedU,-_SpeedV);
     _StreamLightUV = (_glesMultiTexCoord0.xy * _LightTex_ST.xy + _LightTex_ST.zw)  + _speed * glstate_timer;
