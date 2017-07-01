@@ -10499,7 +10499,7 @@ var gd3d;
                 this.point = new pointinfo();
                 this.touches = {};
                 this.keyboardMap = {};
-                app.container.addEventListener("touchstart", function (ev) {
+                app.webgl.canvas.addEventListener("touchstart", function (ev) {
                     _this.point.x = ev.touches[0].clientX;
                     _this.point.y = ev.touches[0].clientY;
                     _this.point.touch = true;
@@ -10515,12 +10515,12 @@ var gd3d;
                         _this.touches[id].y = touch.clientY;
                     }
                 });
-                document.addEventListener("mousedown", function (ev) {
-                    _this.point.x = ev.clientX;
-                    _this.point.y = ev.clientY;
+                app.webgl.canvas.addEventListener("mousedown", function (ev) {
+                    _this.point.x = ev.offsetX;
+                    _this.point.y = ev.offsetY;
                     _this.point.touch = true;
                 });
-                document.addEventListener("touchend", function (ev) {
+                app.webgl.canvas.addEventListener("touchend", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -10536,7 +10536,7 @@ var gd3d;
                     }
                     _this.point.touch = false;
                 });
-                document.addEventListener("touchcancel", function (ev) {
+                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -10552,10 +10552,10 @@ var gd3d;
                     }
                     _this.point.touch = false;
                 });
-                document.addEventListener("mouseup", function (ev) {
+                app.webgl.canvas.addEventListener("mouseup", function (ev) {
                     _this.point.touch = false;
                 });
-                document.addEventListener("touchmove", function (ev) {
+                app.webgl.canvas.addEventListener("touchmove", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -10580,14 +10580,14 @@ var gd3d;
                     _this.point.x = x / count;
                     _this.point.y = y / count;
                 });
-                document.addEventListener("mousemove", function (ev) {
-                    _this.point.x = ev.clientX;
-                    _this.point.y = ev.clientY;
+                app.webgl.canvas.addEventListener("mousemove", function (ev) {
+                    _this.point.x = ev.offsetX;
+                    _this.point.y = ev.offsetY;
                 });
-                document.addEventListener("keydown", function (ev) {
+                app.webgl.canvas.addEventListener("keydown", function (ev) {
                     _this.keyboardMap[ev.keyCode] = true;
                 }, false);
-                document.addEventListener("keyup", function (ev) {
+                app.webgl.canvas.addEventListener("keyup", function (ev) {
                     _this.keyboardMap[ev.keyCode] = false;
                 }, false);
             }
@@ -16856,7 +16856,7 @@ var gd3d;
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
                 this.actived = true;
                 this.matToBatcher = new gd3d.math.matrix();
-                this.tex_ST = new gd3d.math.vector4();
+                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
                 this.gameObject = batcher.effectSys.gameObject;
                 this.emisson = batcher.emissionElement;
                 this.batcher = batcher;
@@ -17156,9 +17156,9 @@ var gd3d;
                         }
                         else if (this.data.uvRoll.uvSpeed != undefined) {
                             if (this.data.uvRoll.uvSpeed.u != undefined)
-                                this.uv.x += this.data.uvRoll.uvSpeed.u.getValue() * delta;
+                                this.tex_ST.z += this.data.uvRoll.uvSpeed.u.getValue() * delta;
                             if (this.data.uvRoll.uvSpeed.v != undefined)
-                                this.uv.y += this.data.uvRoll.uvSpeed.v.getValue() * delta;
+                                this.tex_ST.w += this.data.uvRoll.uvSpeed.v.getValue() * delta;
                         }
                     }
                 }

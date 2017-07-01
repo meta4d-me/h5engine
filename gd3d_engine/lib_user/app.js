@@ -2230,8 +2230,10 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02"];
+        var names = ["fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         var name = names[5];
+        name = names[3];
+        name = names[6];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
@@ -2254,7 +2256,7 @@ var test_effect = (function () {
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 15, 15);
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, 10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
         state.finish = true;

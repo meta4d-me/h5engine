@@ -16,7 +16,7 @@ namespace gd3d.framework
 
         constructor(app: application)
         {
-            app.container.addEventListener("touchstart", (ev: TouchEvent) =>
+            app.webgl.canvas.addEventListener("touchstart", (ev: TouchEvent) =>
             {
                 // console.log("引擎1111");
                 // if (this.inputlast != null)
@@ -49,14 +49,14 @@ namespace gd3d.framework
                 }
             }
             );
-            document.addEventListener("mousedown", (ev) =>
+            app.webgl.canvas.addEventListener("mousedown", (ev) =>
             {
-                this.point.x = ev.clientX;
-                this.point.y = ev.clientY;
+                this.point.x = ev.offsetX;
+                this.point.y = ev.offsetY;
                 this.point.touch = true;
             }
             );
-            document.addEventListener("touchend", (ev) =>
+            app.webgl.canvas.addEventListener("touchend", (ev) =>
             {
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
@@ -79,7 +79,7 @@ namespace gd3d.framework
                 this.point.touch = false;
             }
             );
-            document.addEventListener("touchcancel", (ev) =>
+            app.webgl.canvas.addEventListener("touchcancel", (ev) =>
             {
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
@@ -102,12 +102,12 @@ namespace gd3d.framework
                 this.point.touch = false;
             }
             );
-            document.addEventListener("mouseup", (ev) =>
+            app.webgl.canvas.addEventListener("mouseup", (ev) =>
             {
                 this.point.touch = false;
             }
             );
-            document.addEventListener("touchmove", (ev) =>
+            app.webgl.canvas.addEventListener("touchmove", (ev) =>
             {
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
@@ -140,19 +140,19 @@ namespace gd3d.framework
                 this.point.y = y / count;
             }
             );
-            document.addEventListener("mousemove", (ev) =>
+            app.webgl.canvas.addEventListener("mousemove", (ev) =>
             {
-                this.point.x = ev.clientX;
-                this.point.y = ev.clientY;
+                this.point.x = ev.offsetX;
+                this.point.y = ev.offsetY;
             }
             );
 
-            document.addEventListener("keydown", (ev: KeyboardEvent) =>
+            app.webgl.canvas.addEventListener("keydown", (ev: KeyboardEvent) =>
             {
                 this.keyboardMap[ev.keyCode] = true;
             }, false);
 
-            document.addEventListener("keyup", (ev: KeyboardEvent) =>
+            app.webgl.canvas.addEventListener("keyup", (ev: KeyboardEvent) =>
             {
                 this.keyboardMap[ev.keyCode] = false;
             }, false);
