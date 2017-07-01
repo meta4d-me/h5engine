@@ -38,7 +38,8 @@
             }
             catch (e)
             {
-                throw new Error("!Your browser does not support AudioContext");
+                // throw new Error("!Your browser does not support AudioContext");
+                console.error("!Your browser does not support AudioContext");
             }
         }
         clickInit()

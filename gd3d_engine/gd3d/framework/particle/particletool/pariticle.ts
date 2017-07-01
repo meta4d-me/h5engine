@@ -34,7 +34,7 @@ namespace gd3d.framework
         private speedDir: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
         private movespeed:gd3d.math.vector3;
         private simulationSpeed: number;
-        private uvSpriteFrameInternal: number;
+       // private uvSpriteFrameInternal: number;
         public startFrameId: number;
 
         public data: Emission;
@@ -107,7 +107,7 @@ namespace gd3d.framework
             else
                 this.alpha = this.data.alpha.getValueRandom();
             if (this.data.uv == undefined)
-                this.uv = new gd3d.math.vector2(1, 1);
+                this.uv = new gd3d.math.vector2();
             else
                 this.uv = this.data.uv.getValueRandom();
 
@@ -137,15 +137,15 @@ namespace gd3d.framework
                     gd3d.math.quatLookat(localOrgin, localRandomDirection, this.rotationByShape);
 
                     let initRot = gd3d.math.pool.new_quaternion();
-                    gd3d.math.quatFromEulerAngles(90, 0, 0, initRot);
+                    gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
                     gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
                     gd3d.math.pool.delete_quaternion(initRot);
                 }
             }
-            if (this.data.uvType == UVTypeEnum.UVSprite)
-            {
-                this.uvSpriteFrameInternal = (this.totalLife* effectSystem.fps) / this.data.uvSprite.totalCount;
-            }
+            // if (this.data.uvType == UVTypeEnum.UVSprite)
+            // {
+            //     this.uvSpriteFrameInternal = 1.0 / this.data.uvSprite.totalCount;
+            // }
         }
         actived:boolean=true;
         update(delta: number)
@@ -229,7 +229,7 @@ namespace gd3d.framework
                     // gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
                     // gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
 
-                    gd3d.math.quatClone(this.rotationByShape, this.localRotation);
+                      gd3d.math.quatClone(this.rotationByShape, this.localRotation);
 
                     gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
 
@@ -244,7 +244,7 @@ namespace gd3d.framework
 
                     let angle = gd3d.math.pool.new_vector3();
                     gd3d.math.quatToEulerAngles(lookRot, angle);
-                    gd3d.math.quatFromEulerAngles(0, angle.y, 0, lookRot);
+                    gd3d.math.quatFromEulerAngles(angle.x, 0, 0, lookRot);
                     gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
 
                     gd3d.math.pool.delete_quaternion(inverRot);
@@ -456,25 +456,24 @@ namespace gd3d.framework
                     } else if (this.data.uvRoll.uvSpeed != undefined)
                     {
                         if (this.data.uvRoll.uvSpeed.u != undefined)
-                            this.uv.x += this.data.uvRoll.uvSpeed.u.getValue() * delta;
+                            this.tex_ST.z += this.data.uvRoll.uvSpeed.u.getValue() * delta;
                         if (this.data.uvRoll.uvSpeed.v != undefined)
-                            this.uv.y += this.data.uvRoll.uvSpeed.v.getValue() * delta;
+                            this.tex_ST.w += this.data.uvRoll.uvSpeed.v.getValue() * delta;
                     }
                 }
             } else if (this.data.uvType == UVTypeEnum.UVSprite)
             {
                 if (this.data.uvSprite != undefined)
                 {
-                    this.spriteIndex = Math.floor((this.batcher.effectSys.frameId - this.startFrameId) / this.uvSpriteFrameInternal);
-                    this.spriteIndex %= this.data.uvSprite.totalCount;
-                    this.uv.x = (this.spriteIndex % this.data.uvSprite.column) / this.data.uvSprite.column;
-                    this.uv.y = Math.floor((this.spriteIndex / this.data.uvSprite.column)) / this.data.uvSprite.row;
-                    this.tilling.x = this.data.uvSprite.column;
-                    this.tilling.y = this.data.uvSprite.row;
+
+                    var spriteindex=Math.floor(this.curLife/this.totalLife*this.data.uvSprite.totalCount);
+
+                    gd3d.math.spriteAnimation(this.data.uvSprite.row,this.data.uvSprite.column,spriteindex,this.tex_ST);
                 }
             }
 
         }
+        private tex_ST:gd3d.math.vector4=new gd3d.math.vector4(1,1,0,0);
         private _updateVBO()
         {
             let vertexSize = this.vertexSize;
@@ -497,10 +496,10 @@ namespace gd3d.framework
 
                 {//color
                     //处理一下颜色，以防灰度值 > 1
-                    let r = math.floatClamp(this.sourceVbo[i * vertexSize + 9], 0, 1);
-                    let g = math.floatClamp(this.sourceVbo[i * vertexSize + 10], 0, 1);
-                    let b = math.floatClamp(this.sourceVbo[i * vertexSize + 11], 0, 1);
-                    let a = math.floatClamp(this.sourceVbo[i * vertexSize + 12], 0, 1);
+                    let r = math.floatClamp(this.sourceVbo[i * vertexSize + 3], 0, 1);
+                    let g = math.floatClamp(this.sourceVbo[i * vertexSize + 4], 0, 1);
+                    let b = math.floatClamp(this.sourceVbo[i * vertexSize + 5], 0, 1);
+                    let a = math.floatClamp(this.sourceVbo[i * vertexSize + 6], 0, 1);
                     if (this.color != undefined)
                     {
                         r = this.color.x;
@@ -516,15 +515,19 @@ namespace gd3d.framework
                         b *= this.colorRate;
                         a *= this.colorRate;
                     }
-                    this.dataForVbo[i * 15 + 9] = r;
-                    this.dataForVbo[i * 15 + 10] = g;
-                    this.dataForVbo[i * 15 + 11] = b;
-                    this.dataForVbo[i * 15 + 12] = a;
+                    r = math.floatClamp(r, 0, 3);
+                    g = math.floatClamp(r, 0, 3);
+                    b = math.floatClamp(r, 0, 3);
+                    a = math.floatClamp(r, 0, 3);
+                    this.dataForVbo[i * this.vertexSize + 3] = r;
+                    this.dataForVbo[i * this.vertexSize + 4] = g;
+                    this.dataForVbo[i * this.vertexSize + 5] = b;
+                    this.dataForVbo[i * this.vertexSize + 6] = a;
                 }
                 {
                     //uv
-                    this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] / this.tilling.x + this.uv.x;
-                    this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] / this.tilling.y + this.uv.y;
+                    this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] *this.tex_ST.x + this.tex_ST.z;
+                    this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] * this.tex_ST.y + this.tex_ST.w;
                 }
             }
         }

@@ -190,12 +190,13 @@
 
             var randomAngle=Math.random()*Math.PI*2;//弧度
             var randomHeight=Math.random()*this.height;
-            var radius=randomHeight*Math.tan(this.angle*Math.PI/180)+this.radius;
-            var radomRadius=Math.random()*radius;
+            var upradius=randomHeight*Math.tan(this.angle*Math.PI/180)+this.radius;
+            var radomRadius=Math.random()*upradius;
+
             var bottompos=gd3d.math.pool.new_vector3();
-            bottompos.x=radius*Math.cos(randomAngle);
+            bottompos.x=this.radius*Math.cos(randomAngle);
             bottompos.y=0;
-            bottompos.z=radius*Math.sin(randomAngle);
+            bottompos.z=this.radius*Math.sin(randomAngle);
 
             if(this.emitFrom==emitfromenum.base)
             {
@@ -208,8 +209,8 @@
                 this.randomPosition.z=radomRadius*Math.sin(randomAngle);
                 this.randomPosition.y=randomHeight;
             }
-            this._coneDirection.x=Math.cos(randomAngle);
-            this._coneDirection.z=Math.sin(randomAngle);
+            this._coneDirection.x=Math.cos(randomAngle)*Math.sin(this.angle*Math.PI/180);
+            this._coneDirection.z=Math.sin(randomAngle)*Math.sin(this.angle*Math.PI/180);
             this._coneDirection.y=Math.cos(this.angle*Math.PI/180);
             return this._coneDirection;
         }
