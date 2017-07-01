@@ -4462,7 +4462,7 @@ var t;
             });
         };
         TestRotate.prototype.loadPvr = function (laststate, state) {
-            this.app.getAssetMgr().load("res/resources/4022-1.pvr", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            this.app.getAssetMgr().load("res/resources/Image.pvr", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     state.finish = true;
                 }
@@ -4498,7 +4498,7 @@ var t;
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);
-                        var texture = this.app.getAssetMgr().getAssetByName("4022-1.pvr");
+                        var texture = this.app.getAssetMgr().getAssetByName("Image.pvr");
                         if (texture == null)
                             console.error("为什么他是空的呀");
                         else

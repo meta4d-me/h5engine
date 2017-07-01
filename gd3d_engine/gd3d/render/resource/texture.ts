@@ -295,17 +295,16 @@
                 formatGL = this.webgl.LUMINANCE;
             if (this.format == TextureFormatEnum.PVRTC && this.ext != null)
             {
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D,
-                    0,
-                    6407,
-                    width,
-                    height,
-                    0,
-                    6407,
-                    //最后这个type，可以管格式
-                    5121
-                    , data);
-
+                // this.webgl.texImage2D(this.webgl.TEXTURE_2D,
+                //     0,
+                //     6407,
+                //     width,
+                //     height,
+                //     0,
+                //     6407,
+                //     //最后这个type，可以管格式
+                //     5121
+                //     , data);
                // this.webgl.compressedTexImage2D(this.webgl.TEXTURE_2D, 0, this.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG, 128, 128, 0, data);
             } else
             {
