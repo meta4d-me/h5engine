@@ -9459,6 +9459,7 @@ var gd3d;
                 }
             };
             meshRenderer.prototype.remove = function () {
+                this.materials.length = 0;
             };
             meshRenderer.prototype.clone = function () {
             };
@@ -10312,8 +10313,6 @@ var gd3d;
                 }
                 this.updateTrailData();
             };
-            trailRender.prototype.remove = function () {
-            };
             Object.defineProperty(trailRender.prototype, "material", {
                 get: function () {
                     if (this._material != undefined) {
@@ -10476,6 +10475,8 @@ var gd3d;
                 }
             };
             trailRender.prototype.clone = function () {
+            };
+            trailRender.prototype.remove = function () {
             };
             return trailRender;
         }());
@@ -14307,11 +14308,11 @@ var gd3d;
                     var outVal = void 0;
                     if (fromVal instanceof gd3d.math.vector3) {
                         outVal = new gd3d.math.vector3();
-                        gd3d.math.vec3SLerp(fromVal, toVal, i / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec3SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
                     }
                     else if (fromVal instanceof gd3d.math.vector2) {
                         outVal = new gd3d.math.vector2();
-                        gd3d.math.vec2SLerp(fromVal, toVal, i / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec2SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
                     }
                     else if (typeof (fromVal) === 'number') {
                         outVal = gd3d.math.numberLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame));

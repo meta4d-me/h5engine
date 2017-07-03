@@ -1419,7 +1419,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class guidpath implements INodeComponent {
         private paths;
-        _pathasset: pathasset;
+        private _pathasset;
         pathasset: pathasset;
         speed: number;
         private isactived;
@@ -1654,7 +1654,6 @@ declare namespace gd3d.framework {
         extenedOneSide: boolean;
         update(delta: number): void;
         gameObject: gameObject;
-        remove(): void;
         material: gd3d.framework.material;
         color: gd3d.math.color;
         setspeed(upspeed: number): void;
@@ -1668,6 +1667,7 @@ declare namespace gd3d.framework {
         private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
+        remove(): void;
     }
     class trailStick {
         location: gd3d.math.vector3;
