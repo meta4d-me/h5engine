@@ -1,10 +1,16 @@
 //主要的入口
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export interface INotify
     {
         notify(trans: any, type: NotifyType);
     }
+    /**
+     * @private
+     */
     export enum NotifyType
     {
         AddChild,
@@ -13,32 +19,105 @@ namespace gd3d.framework
         AddCamera,
         AddCanvasRender,
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 引擎的主入口
+     * @version egret-gd3d 1.0
+     */
     export class application
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 全局webgl实例
+         * @version egret-gd3d 1.0
+         */
         webgl: WebGLRenderingContext;
         stats: Stats.Stats;
         container: HTMLDivElement;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 绘制区域宽度 像素单位
+         * @version egret-gd3d 1.0
+         */
         width: number;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 绘制区域高度 像素单位
+         * @version egret-gd3d 1.0
+         */
         height: number;
         limitFrame: boolean = true;
         notify: INotify;
-        timeScale: number;
-        version: string = "v0.0.1";
-        build: string = "b000010";
-        _tar: number = -1;
+        private _timeScale: number;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置timescale
+         * @version egret-gd3d 1.0
+         */
+        set timeScale(val:number)
+        {
+            this._timeScale = val;
+        }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取timescale
+         * @version egret-gd3d 1.0
+         */
+        get timeScale():number
+        {
+            return this._timeScale;
+        }
+        private version: string = "v0.0.1";
+        private build: string = "b000010";
+        private _tar: number = -1;
         private _standDeltaTime: number = -1;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置固定帧数 不设置即为不限制帧数
+         * @version egret-gd3d 1.0
+         */
         set targetFrame(val: number)
         {
-            //加个限制，防止传一个很小的数
-            if(val < 0.01)
-                return;
+            if(val == 0)
+                val = -1;
             this._tar = val;
             this._standDeltaTime = 1 / this._tar;
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前固定帧数
+         * @version egret-gd3d 1.0
+         */
         get targetFrame()
         {
             return this._tar;
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引擎的启动方法
+         * @param div 绘制区域的dom
+         * @version egret-gd3d 1.0
+         */
         start(div: HTMLDivElement)
         {
             console.log("version: " + this.version + "  build: " + this.build);
@@ -55,7 +134,7 @@ namespace gd3d.framework
             meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
 
             sceneMgr.app = this;
-            this.timeScale = 1;
+            this._timeScale = 1;
             this.container = div;
             var canvas = document.createElement("canvas");
             canvas.className = "full";
@@ -107,7 +186,10 @@ namespace gd3d.framework
                 }
             }
         }
-
+        /**
+         * @private
+         * @param trans 
+         */
         checkFilter(trans: any)
         {
             if (trans instanceof gd3d.framework.transform)
@@ -127,7 +209,14 @@ namespace gd3d.framework
             return true;
         }
 
-
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 显示性能参数面板
+         * @version egret-gd3d 1.0
+         */
         showFps()
         {
             if (this.stats == null)
@@ -144,6 +233,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 关闭性能参数面板
+         * @param div 绘制区域的dom
+         * @version egret-gd3d 1.0
+         */
         closeFps()
         {
             if (this.stats != null)
@@ -151,7 +248,7 @@ namespace gd3d.framework
                 this.container.removeChild(this.stats.container);
             }
         }
-        beStepNumber = 0;
+        private beStepNumber = 0;
         //delta 单位秒
         private update(delta: number)
         {
@@ -186,8 +283,17 @@ namespace gd3d.framework
                 this._scene.update(delta);
             }
         }
+        /**
+         * @private
+         */
         public preusercodetimer: number;
+        /**
+         * @private
+         */
         public usercodetime: number;
+        /**
+         * @private
+         */
         getUserUpdateTimer()
         {
             return this.usercodetime;
@@ -195,23 +301,35 @@ namespace gd3d.framework
         private beginTimer;
         private lastTimer;
         private totalTime;
+        /**
+         * @private
+         */
         getTotalTime(): number
         {
             return this.totalTime;
         }
 
         private _deltaTime;
+        /**
+         * @private
+         */
         public get deltaTime()
         {
-            return this._deltaTime * this.timeScale;
+            return this._deltaTime * this._timeScale;
         }
         private pretimer: number = 0;
         private updateTimer;
+        /**
+         * @private
+         */
         getUpdateTimer()
         {
             return this.updateTimer;
         }
 
+        /**
+         * @private
+         */
         public isFrustumCulling: boolean = true;
         private loop()
         {
@@ -268,6 +386,13 @@ namespace gd3d.framework
                 sceneMgr.scene = this._scene;
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取场景实例
+         * @version egret-gd3d 1.0
+         */
         getScene(): scene
         {
             return this._scene;
@@ -282,6 +407,13 @@ namespace gd3d.framework
                 this._assetmgr.initDefAsset();
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源管理器实例
+         * @version egret-gd3d 1.0
+         */
         getAssetMgr()
         {
             return this._assetmgr;
@@ -295,6 +427,13 @@ namespace gd3d.framework
                 this._inputmgr = new inputMgr(this);
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取输入管理器实例
+         * @version egret-gd3d 1.0
+         */
         getInputMgr()
         {
             return this._inputmgr;
@@ -306,30 +445,51 @@ namespace gd3d.framework
         private _editorCode: IUserCode[] = [];
         private _editorCodeNew: IUserCode[] = [];
         private _bePlay: boolean = false;
+        /**
+         * @private
+         */
         be2dstate: boolean = false;
         public curcameraindex: number = -1;
+        /**
+         * @private
+         */
         public get bePlay()
         {
             return this._bePlay;
         }
+        /**
+         * @private
+         */
         public set bePlay(value: boolean)
         {
             this._bePlay = value;
         }
         private _bePause: boolean = false;
+        /**
+         * @private
+         */
         public get bePause()
         {
             return this._bePause;
         }
+        /**
+         * @private
+         */
         public set bePause(value: boolean)
         {
             this._bePause = value;
         }
         private _beStepForward: boolean = false;
+        /**
+         * @private
+         */
         public get beStepForward()
         {
             return this._beStepForward;
         }
+        /**
+         * @private
+         */
         public set beStepForward(value: boolean)
         {
             this._beStepForward = value;
@@ -371,7 +531,7 @@ namespace gd3d.framework
             }
         }
 
-        updateEditorCode(delta: number)
+        private updateEditorCode(delta: number)
         {
             for (let i = this._editorCodeNew.length - 1; i >= 0; i--)
             {
@@ -396,10 +556,27 @@ namespace gd3d.framework
                 }
             }
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 直接添加usercode实例
+         * @param program usercode实例
+         * @version egret-gd3d 1.0
+         */
         addUserCodeDirect(program: IUserCode)
         {
             this._userCodeNew.push(program);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据classname添加usercode
+         * @param classname usercode类名
+         * @version egret-gd3d 1.0
+         */
         addUserCode(classname: string)
         {
             //反射创建实例的方法
@@ -411,6 +588,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据classname添加editorcode
+         * @param classname editorcode类名
+         * @version egret-gd3d 1.0
+         */
         addEditorCode(classname: string)
         {
             //反射创建实例的方法
@@ -421,11 +606,26 @@ namespace gd3d.framework
                 this.addEditorCodeDirect(code);
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 直接添加editorcode实例
+         * @param program editorcode实例
+         * @version egret-gd3d 1.0
+         */
         addEditorCodeDirect(program: IEditorCode)
         {
             this._editorCodeNew.push(program);
         }
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * usercode接口
+     * @version egret-gd3d 1.0
+     */
     export interface IUserCode
     {
         onStart(app: gd3d.framework.application);
@@ -433,6 +633,13 @@ namespace gd3d.framework
         onUpdate(delta: number);
         isClosed(): boolean;
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * editorcode接口
+     * @version egret-gd3d 1.0
+     */
     export interface IEditorCode
     {
         onStart(app: gd3d.framework.application);

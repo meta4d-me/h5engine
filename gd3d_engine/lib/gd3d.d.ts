@@ -18,10 +18,11 @@ declare namespace gd3d.framework {
         height: number;
         limitFrame: boolean;
         notify: INotify;
+        private _timeScale;
         timeScale: number;
-        version: string;
-        build: string;
-        _tar: number;
+        private version;
+        private build;
+        private _tar;
         private _standDeltaTime;
         targetFrame: number;
         start(div: HTMLDivElement): void;
@@ -30,7 +31,7 @@ declare namespace gd3d.framework {
         checkFilter(trans: any): boolean;
         showFps(): void;
         closeFps(): void;
-        beStepNumber: number;
+        private beStepNumber;
         private update(delta);
         preusercodetimer: number;
         usercodetime: number;
@@ -68,7 +69,7 @@ declare namespace gd3d.framework {
         private _beStepForward;
         beStepForward: boolean;
         private updateUserCode(delta);
-        updateEditorCode(delta: number): void;
+        private updateEditorCode(delta);
         addUserCodeDirect(program: IUserCode): void;
         addUserCode(classname: string): void;
         addEditorCode(classname: string): void;
@@ -2762,7 +2763,7 @@ declare namespace gd3d.framework {
         getComponentInParent(type: string): INodeComponent;
         addComponent(type: string): INodeComponent;
         removeComponent(comp: INodeComponent): void;
-        remove(comp: INodeComponent): void;
+        private remove(comp);
         removeComponentByTypeName(type: string): void;
         removeAllComponents(): void;
         dispose(): void;
@@ -2838,7 +2839,7 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         private RealCameraNumber;
         private _renderCamera(camindex);
-        updateScene(node: transform, delta: any): void;
+        private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);
         private collectCameraAndLight(node);
@@ -2968,7 +2969,7 @@ declare namespace gd3d.framework {
         find(name: string): transform;
         checkImpactTran(tran: transform): boolean;
         checkImpact(): Array<transform>;
-        doImpact(tran: transform, impacted: Array<transform>): void;
+        private doImpact(tran, impacted);
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
@@ -3001,7 +3002,8 @@ declare namespace gd3d.framework {
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
-        beDispose: boolean;
+        readonly beDispose: boolean;
+        private _beDispose;
         dispose(): void;
     }
     class insID {

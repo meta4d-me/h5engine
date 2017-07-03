@@ -49,13 +49,23 @@ var gd3d;
                 this._bePause = false;
                 this._beStepForward = false;
             }
+            Object.defineProperty(application.prototype, "timeScale", {
+                get: function () {
+                    return this._timeScale;
+                },
+                set: function (val) {
+                    this._timeScale = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(application.prototype, "targetFrame", {
                 get: function () {
                     return this._tar;
                 },
                 set: function (val) {
-                    if (val < 0.01)
-                        return;
+                    if (val == 0)
+                        val = -1;
                     this._tar = val;
                     this._standDeltaTime = 1 / this._tar;
                 },
@@ -75,7 +85,7 @@ var gd3d;
                     meta = metas[0];
                 meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
                 framework.sceneMgr.app = this;
-                this.timeScale = 1;
+                this._timeScale = 1;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 canvas.className = "full";
@@ -177,7 +187,7 @@ var gd3d;
             };
             Object.defineProperty(application.prototype, "deltaTime", {
                 get: function () {
-                    return this._deltaTime * this.timeScale;
+                    return this._deltaTime * this._timeScale;
                 },
                 enumerable: true,
                 configurable: true
@@ -17024,6 +17034,7 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(translation);
                         gd3d.math.pool.delete_quaternion(invTransformRotation);
                         gd3d.math.pool.delete_vector3(xaxis);
+                        gd3d.math.pool.delete_vector3(yaxis);
                         gd3d.math.pool.delete_vector3(zaxis);
                         return;
                     }
@@ -18719,14 +18730,14 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
-                this.beDispose = false;
+                this._beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
                     if (this._scene == null) {
                         if (this.parent == null)
                             return null;
-                        return this.parent.scene;
+                        this._scene = this.parent.scene;
                     }
                     return this._scene;
                 },
@@ -19101,8 +19112,15 @@ var gd3d;
             transform.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            Object.defineProperty(transform.prototype, "beDispose", {
+                get: function () {
+                    return this._beDispose;
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform.prototype.dispose = function () {
-                if (this.beDispose)
+                if (this._beDispose)
                     return;
                 if (this.children) {
                     for (var k in this.children) {
@@ -19111,7 +19129,7 @@ var gd3d;
                     this.removeAllChild();
                 }
                 this._gameObject.dispose();
-                this.beDispose = true;
+                this._beDispose = true;
             };
             return transform;
         }());
