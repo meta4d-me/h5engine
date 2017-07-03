@@ -1,10 +1,27 @@
 namespace gd3d.framework
 {
+     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 拖尾组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeRender
     @reflect.nodeComponent
     export class trailRender implements IRenderer
     {
+        /**
+         * @private
+         */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染层级
+         * @version egret-gd3d 1.0
+         */
         renderLayer: gd3d.framework.CullingMask = CullingMask.default;
         queue: number = 0;
 
@@ -21,6 +38,13 @@ namespace gd3d.framework
         // private targetpos:Float32Array;
         private active: boolean = false;
         private reInit: boolean = false;
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * start
+         * @version egret-gd3d 1.0
+         */
         start()
         {
             this.app = this.gameObject.getScene().app;
@@ -31,8 +55,21 @@ namespace gd3d.framework
         private webgl: WebGLRenderingContext;
 
         private camerapositon: gd3d.math.vector3;
-
+          /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 拖尾mesh是否向经过路径的两边延展
+         * @version egret-gd3d 1.0
+         */
         extenedOneSide: boolean = true;//延展方向
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * update
+         * @version egret-gd3d 1.0
+         */
         update(delta: number)
         {
             if (!this.active) return;
@@ -90,17 +127,36 @@ namespace gd3d.framework
             }
             this.updateTrailData();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
-        remove()
-        {
 
-        }
         //-----------------------------------------------------------------------------------------------
+        /**
+         * @public
+         * @language zh_CN
+        * @param material 材质
+         * @classdesc
+         * 设置拖尾的材质
+         * @version egret-gd3d 1.0
+         */
         public set material(material: gd3d.framework.material)
         {
             this._material = material;
             this.layer = this.material.getLayer();
         }
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 得到拖尾上的材质
+         * @version egret-gd3d 1.0
+         */
         public get material()
         {
             if (this._material != undefined)
@@ -115,7 +171,13 @@ namespace gd3d.framework
                 return this._material;
             }
         }
-
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * matrial调色
+         * @version egret-gd3d 1.0
+         */        
         public get color()
         {
             if (this._color == undefined)
@@ -124,31 +186,70 @@ namespace gd3d.framework
             }
             return this._color;
         }
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * matrial调色
+         * @version egret-gd3d 1.0
+         */    
         public set color(color: gd3d.math.color)
         {
             this._color = color;
         }
-
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 拖尾速度，调节拖尾长短（0-1）
+         * @version egret-gd3d 1.0
+         */  
         public setspeed(upspeed: number)
         {
             this.speed = upspeed;
         }
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 调节拖尾宽度
+         * @version egret-gd3d 1.0
+         */ 
         public setWidth(Width: number)
         {
             this.width = Width;
         }
-        //播放
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 开始拖尾
+         * @version egret-gd3d 1.0
+         */ 
         public play()
         {
             //this.intidata();//项目喜欢添加组件后立刻播放，会报错，此时组件的start还没走
             this.reInit = true;
             this.active = true;
         }
-        //停止
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 关闭拖尾
+         * @version egret-gd3d 1.0
+         */ 
         public stop()
         {
             this.active = false;
         }
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 拖尾是否朝向相机
+         * @version egret-gd3d 1.0
+         */ 
         lookAtCamera: boolean = false;
         //------------------------------------------------------------------------------------------------------
         private initmesh()
@@ -291,7 +392,13 @@ namespace gd3d.framework
             }
 
         }
-
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * render
+         * @version egret-gd3d 1.0
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
             if (!this.active) return;
@@ -307,7 +414,17 @@ namespace gd3d.framework
                 this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
             }
         }
+         /**
+         * @private
+         */
         clone()
+        {
+
+        }
+         /**
+         * @private
+         */
+        remove()
         {
 
         }
