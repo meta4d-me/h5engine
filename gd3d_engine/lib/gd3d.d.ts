@@ -2005,7 +2005,7 @@ declare namespace gd3d.math {
     function quatToEulerAngles(src: quaternion, out: vector3): void;
     function quatReset(src: quaternion): void;
     function quatLookat(pos: vector3, targetpos: vector3, out: quaternion): void;
-    function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion): void;
+    function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir?: gd3d.math.vector3): void;
     function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion): void;
 }
 declare namespace gd3d.math {
@@ -2556,6 +2556,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class EffectUtil {
+        static lookatbyXAxis(pos: gd3d.math.vector3, xAxis: gd3d.math.vector3, yAxis: gd3d.math.vector3, zAxis: gd3d.math.vector3, targetpos: gd3d.math.vector3, quat: gd3d.math.quaternion): void;
         static RandomRange(min: number, max: number, isInteger?: boolean): number;
         static vecMuliNum(vec: gd3d.math.vector3, num: number): gd3d.math.vector3;
         static parseVector3(value: any): gd3d.math.vector3;

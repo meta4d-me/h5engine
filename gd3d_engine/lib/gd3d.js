@@ -13846,25 +13846,28 @@ var gd3d;
             math.quatNormalize(out, out);
         }
         math.quatLookat = quatLookat;
-        function quat2Lookat(pos, targetpos, out) {
+        function quat2Lookat(pos, targetpos, out, updir) {
+            if (updir === void 0) { updir = gd3d.math.pool.vector3_up; }
             var dir = gd3d.math.pool.new_vector3();
             math.vec3Subtract(targetpos, pos, dir);
             math.vec3Normalize(dir, dir);
             var dot = gd3d.math.vec3Dot(gd3d.math.pool.vector3_forward, dir);
-            if (Math.abs(dot - (-1.0)) < 0.000001) {
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 180, out);
-                return;
-            }
-            if (Math.abs(dot - 1.0) < 0.000001) {
+            dot = gd3d.math.floatClamp(dot, -1, 1);
+            var rotangle = Math.acos(dot) * 180 / Math.PI;
+            if (rotangle < 0.01) {
                 out.x = 0;
                 out.y = 0;
                 out.z = 0;
                 out.w = 1;
+                return;
             }
-            dot = gd3d.math.floatClamp(dot, -1, 1);
-            var rotangle = Math.acos(dot);
+            if (rotangle > 179.9) {
+                gd3d.math.quatFromAxisAngle(updir, 180, out);
+                return;
+            }
             var rotAxis = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Cross(gd3d.math.pool.vector3_forward, dir, rotAxis);
+            gd3d.math.vec3Normalize(rotAxis, rotAxis);
             gd3d.math.quatFromAxisAngle(rotAxis, rotangle, out);
         }
         math.quat2Lookat = quat2Lookat;
@@ -16608,6 +16611,24 @@ var gd3d;
         var EffectUtil = (function () {
             function EffectUtil() {
             }
+            EffectUtil.lookatbyXAxis = function (pos, xAxis, yAxis, zAxis, targetpos, quat) {
+                var dir = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(targetpos, pos, dir);
+                gd3d.math.vec3Normalize(dir, dir);
+                var crossup = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Cross(dir, xAxis, crossup);
+                gd3d.math.vec3Normalize(crossup, crossup);
+                var anglerot = gd3d.math.vec3Dot(yAxis, crossup);
+                anglerot = Math.acos(anglerot) * 180 / Math.PI;
+                var dot = gd3d.math.vec3Dot(zAxis, crossup);
+                dot = Math.acos(dot) * 180 / Math.PI;
+                if (dot > 90) {
+                    anglerot = -anglerot;
+                }
+                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, anglerot, quat);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(crossup);
+            };
             EffectUtil.RandomRange = function (min, max, isInteger) {
                 if (isInteger === void 0) { isInteger = false; }
                 if (isInteger) {
@@ -16955,6 +16976,7 @@ var gd3d;
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
                 this.actived = true;
                 this.matToBatcher = new gd3d.math.matrix();
+                this.matToworld = new gd3d.math.matrix();
                 this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
                 this.gameObject = batcher.effectSys.gameObject;
                 this.emisson = batcher.emissionElement;
@@ -17022,6 +17044,7 @@ var gd3d;
                         var initRot = gd3d.math.pool.new_quaternion();
                         gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
                         gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
+                        gd3d.math.quatClone(this.rotationByShape, this.localRotation);
                         gd3d.math.pool.delete_quaternion(initRot);
                     }
                 }
@@ -17064,8 +17087,7 @@ var gd3d;
                 var worldTranslation = gd3d.math.pool.new_vector3();
                 var invTransformRotation = gd3d.math.pool.new_quaternion();
                 gd3d.math.vec3Clone(this.localTranslate, translation);
-                this.matToworld = this.emisson.getmatrixToWorld();
-                gd3d.math.matrixTransformVector3(translation, this.matToworld, worldTranslation);
+                gd3d.math.matrixTransformVector3(translation, this.emisson.getmatrixToWorld(), worldTranslation);
                 if (this.renderModel != framework.RenderModel.Mesh) {
                     if (this.renderModel == framework.RenderModel.BillBoard) {
                         gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
@@ -17084,22 +17106,24 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(forwardTarget);
                     }
                     else if (this.renderModel == framework.RenderModel.StretchedBillBoard) {
-                        gd3d.math.quatClone(this.rotationByShape, this.localRotation);
-                        gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
-                        var lookRot = new gd3d.math.quaternion();
-                        gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
-                        gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                        gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
-                        var inverRot = gd3d.math.pool.new_quaternion();
-                        gd3d.math.quatInverse(this.localRotation, inverRot);
-                        gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
-                        var angle = gd3d.math.pool.new_vector3();
-                        gd3d.math.quatToEulerAngles(lookRot, angle);
-                        gd3d.math.quatFromEulerAngles(angle.x, 0, 0, lookRot);
-                        gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
-                        gd3d.math.pool.delete_quaternion(inverRot);
-                        gd3d.math.pool.delete_vector3(angle);
-                        gd3d.math.pool.delete_quaternion(lookRot);
+                        gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                        gd3d.math.matrixMultiply(this.emisson.getmatrixToWorld(), this.localMatrix, this.matToworld);
+                        var xaxis = gd3d.math.pool.new_vector3();
+                        var yaxis = gd3d.math.pool.new_vector3();
+                        var zaxis = gd3d.math.pool.new_vector3();
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.matToworld, xaxis);
+                        gd3d.math.vec3Normalize(xaxis, xaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.matToworld, yaxis);
+                        gd3d.math.vec3Normalize(yaxis, yaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
+                        gd3d.math.vec3Normalize(zaxis, zaxis);
+                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, cameraTransform.getWorldTranslate(), worldRotation);
+                        gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
+                        gd3d.math.pool.delete_quaternion(worldRotation);
+                        gd3d.math.pool.delete_vector3(translation);
+                        gd3d.math.pool.delete_quaternion(invTransformRotation);
+                        gd3d.math.pool.delete_vector3(xaxis);
+                        gd3d.math.pool.delete_vector3(zaxis);
                         return;
                     }
                     gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);
