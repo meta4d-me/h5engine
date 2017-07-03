@@ -736,15 +736,7 @@ declare class PVRHeader {
     gl: WebGLRenderingContext;
     constructor(gl: WebGLRenderingContext);
     parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D;
-    private getTextureFormat();
-    private genPixelTypeH4(c1Name, c2Name, c3Name, c4Name);
-    private genPixelTypeH1(c1Name);
-    private genPixelTypeL3(c1Bits, c2Bits, c3Bits);
-    private genPixelTypeL2(c1Bits, c2Bits);
-    private genPixelTypeL1(c1Bits);
-    private genPixelTypeL4(c1Bits, c2Bits, c3Bits, c4Bits);
-    private getDataSize(mipLevel, allSurfaces, allFaces);
-    private getBitsPerPixel();
+    private parseV3(tool);
 }
 declare enum ChannelTypes {
     UnsignedByteNorm = 0,
@@ -3476,7 +3468,10 @@ declare namespace gd3d.render {
         RGBA = 1,
         RGB = 2,
         Gray = 3,
-        PVRTC = 4,
+        PVRTC4_RGB = 4,
+        PVRTC4_RGBA = 4,
+        PVRTC2_RGB = 4,
+        PVRTC2_RGBA = 4,
     }
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
@@ -3508,8 +3503,9 @@ declare namespace gd3d.render {
         isFrameBuffer(): boolean;
     }
     class glTexture2D implements ITexture {
-        private ext;
+        ext: any;
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
+        private getExt(name);
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         webgl: WebGLRenderingContext;

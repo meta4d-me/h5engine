@@ -5,7 +5,11 @@
         RGBA = 1,// WebGLRenderingContext.RGBA,
         RGB = 2,//WebGLRenderingContext.RGB,
         Gray = 3,//WebGLRenderingContext.LUMINANCE,
-        PVRTC = 4,
+        PVRTC4_RGB = 4,
+        PVRTC4_RGBA = 4,
+        PVRTC2_RGB = 4,
+        PVRTC2_RGBA = 4,
+
         //ALPHA = this.webgl.ALPHA,
     }
     export class textureReader
@@ -158,7 +162,7 @@
     }
     export class glTexture2D implements ITexture
     {
-        private ext: any;
+        public ext: any;
         constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true)
         {
             this.webgl = webgl;
@@ -168,26 +172,27 @@
             //    return;
             this.texture = webgl.createTexture();
             let extname = "WEBGL_compressed_texture_pvrtc";
-            this.ext = this.webgl.getExtension(extname) || this.webgl.getExtension('WEBKIT_' + extname);
-            // if (this.ext)
-            // {
-            //     console.log("支持pvr");
-            // } else
-            // {
-            //     console.error("not support pvr");
-            // }
-            //this.img = new Image();// HTMLImageElement(); //ness
-            //this.img.src = url;
-            //this.img.onload = () =>
-            //{
-            //    if (this.disposeit)
-            //    {
-            //        this.img = null;
-            //        return;
-            //    }
-            //    this._loadimg(mipmap, linear);
-            //}
-
+            // this.ext = this.webgl.getExtension(extname) || this.webgl.getExtension('WEBKIT_' + extname);
+            this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
+        }
+        private getExt(name: string)//WEBGL_compressed_texture_pvrtc
+        {
+            var browserPrefixes = [
+                "",
+                "MOZ_",
+                "OP_",
+                "WEBKIT_"
+            ];
+            for (var ii = 0; ii < browserPrefixes.length; ++ii)
+            {
+                var prefixedName = browserPrefixes[ii] + name;
+                let ext = this.webgl.getExtension(prefixedName);
+                if (ext)
+                {
+                    return ext;
+                }
+            }
+            return null;
         }
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void
         {
@@ -286,42 +291,22 @@
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
             this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
 
-
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
                 formatGL = this.webgl.RGB;
             else if (this.format == TextureFormatEnum.Gray)
                 formatGL = this.webgl.LUMINANCE;
-            if (this.format == TextureFormatEnum.PVRTC && this.ext != null)
-            {
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D,
-                    0,
-                    6407,
-                    width,
-                    height,
-                    0,
-                    6407,
-                    //最后这个type，可以管格式
-                    5121
-                    , data);
-
-               // this.webgl.compressedTexImage2D(this.webgl.TEXTURE_2D, 0, this.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG, 128, 128, 0, data);
-            } else
-            {
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D,
-                    0,
-                    formatGL,
-                    width,
-                    height,
-                    0,
-                    formatGL,
-                    //最后这个type，可以管格式
-                    this.webgl.UNSIGNED_BYTE
-                    , data);
-
-            }
-
+            this.webgl.texImage2D(this.webgl.TEXTURE_2D,
+                0,
+                formatGL,
+                width,
+                height,
+                0,
+                formatGL,
+                //最后这个type，可以管格式
+                this.webgl.UNSIGNED_BYTE
+                , data);
             if (mipmap)
             {
                 //生成mipmap
@@ -402,10 +387,6 @@
                 pixellen = 4;
             }
             else if (this.format == TextureFormatEnum.RGB)
-            {
-                pixellen = 3;
-            }
-            else if (this.format == TextureFormatEnum.PVRTC)
             {
                 pixellen = 3;
             }

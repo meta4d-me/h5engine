@@ -4809,15 +4809,25 @@ var PVRHeader = (function () {
         this.gl = gl;
     }
     PVRHeader.prototype.parse = function (_buffer) {
-        var t2d = new gd3d.render.glTexture2D(this.gl, gd3d.render.TextureFormatEnum.PVRTC);
         var ar = new Uint8Array(_buffer);
         var tool = new gd3d.io.binTool();
         tool.writeUint8Array(ar);
-        var pvrMetaData = new Object();
         this.version = tool.readUInt32();
-        if (this.version != 0x03525650) {
+        if (this.version === 0x03525650) {
+            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
+            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+            return this.parseV3(tool);
+        }
+        else if (this.version === 0x50565203) {
+            console.error("v2");
+        }
+        else {
+            console.error("pvr parse error!:" + this.version);
             return null;
         }
+    };
+    PVRHeader.prototype.parseV3 = function (tool) {
         this.flags = tool.readUInt32();
         this.pixelFormatH = tool.readUInt32();
         this.pixelFormatL = tool.readUInt32();
@@ -4830,201 +4840,92 @@ var PVRHeader = (function () {
         this.numFaces = tool.readUInt32();
         this.mipMapCount = tool.readUInt32();
         this.metaDataSize = tool.readUInt32();
-        var metaDataSize = 0;
-        while (metaDataSize < this.metaDataSize) {
-            var devFourCC = tool.readUInt32();
-            metaDataSize += 4;
-            var key = tool.readUInt32();
-            metaDataSize += 4;
-            var dataSize = tool.readUInt32();
-            metaDataSize += 4;
-            if (dataSize > 0) {
-                tool.readBytes(dataSize);
-                metaDataSize += dataSize;
-            }
+        tool.readBytes(this.metaDataSize);
+        var engineFormat;
+        var textureFormat;
+        var textureType;
+        var t2d = new gd3d.render.glTexture2D(this.gl);
+        switch (this.pixelFormatH) {
+            case 0:
+                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                break;
+            case 1:
+                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGBA;
+                break;
+            case 2:
+                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGB;
+                break;
+            case 3:
+                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGBA;
+                break;
+            default:
+                textureFormat = this.gl.RGB;
+                engineFormat = gd3d.render.TextureFormatEnum.RGB;
+                console.log("unknow pixel format::" + this.pixelFormatH);
         }
-        var ret = this.getTextureFormat();
-        var textureFormat = ret.format;
-        var textureInternalFormat = ret.internalFormat;
-        var textureType = ret.type;
-        if (textureInternalFormat == 0)
-            return null;
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+        t2d.format = engineFormat;
+        switch (this.channelType) {
+            case ChannelTypes.UnsignedByteNorm:
+                textureType = this.gl.UNSIGNED_BYTE;
+                break;
+            case ChannelTypes.UnsignedShortNorm:
+                break;
+        }
         var target = this.gl.TEXTURE_2D;
-        if (this.numFaces > 1) {
+        if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP;
-        }
-        if (this.numSurfaces > 1) {
-            return null;
-        }
-        this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+        this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(target, t2d.texture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
         var currentMipMapSize = 0;
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
-        var mipWidth = this.width;
-        var mipHeight = this.height;
-        for (var mipLevel = 0; mipLevel < this.mipMapCount; ++mipLevel) {
-            currentMipMapSize = this.getDataSize(mipLevel, false, false);
-            for (var face = 0; face < this.numFaces; ++face) {
-                if (mipLevel >= 0) {
-                    var textureData = tool.readBytes(currentMipMapSize);
-                    if (this.numFaces > 1)
-                        this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
-                    else
-                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
-                }
+        function textureLevelSize(format, width, height) {
+            switch (format) {
+                case t2d.ext.COMPRESSED_RGB_S3TC_DXT1_EXT:
+                case t2d.ext.COMPRESSED_RGB_ATC_WEBGL:
+                case t2d.ext.COMPRESSED_RGB_ETC1_WEBGL:
+                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 8;
+                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT3_EXT:
+                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT5_EXT:
+                case t2d.ext.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL:
+                case t2d.ext.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL:
+                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
+                case t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
+                case t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
+                    return Math.floor((Math.max(width, 8) * Math.max(height, 8) * 4 + 7) / 8);
+                case t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
+                case t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
+                    return Math.floor((Math.max(width, 16) * Math.max(height, 8) * 2 + 7) / 8);
+                default:
+                    return 0;
             }
-            mipWidth = Math.max(1, mipWidth >> 1);
-            mipHeight = Math.max(1, mipHeight >> 1);
         }
-        return t2d;
-    };
-    PVRHeader.prototype.getTextureFormat = function () {
-        var ret = { format: 0, type: 0, internalFormat: 0 };
-        if (this.pixelFormatH == 0) {
-            return;
+        var offset = 0;
+        for (var i = 0; i < this.mipMapCount; ++i) {
+            var levelSize = textureLevelSize(textureFormat, this.width, this.height);
+            var data = tool.readBytes(levelSize);
+            this.gl.compressedTexImage2D(this.gl.TEXTURE_2D, i, textureFormat, this.width, this.height, 0, data);
+            this.width = this.width >> 1;
+            if (this.width < 1)
+                this.width = 1;
+            this.height = this.height >> 1;
+            if (this.height < 1)
+                this.height = 1;
+            offset += levelSize;
         }
-        switch (this.channelType) {
-            case ChannelTypes.UnsignedByteNorm:
-                {
-                    ret.type = this.gl.UNSIGNED_BYTE;
-                    switch (this.pixelFormatL) {
-                        case this.genPixelTypeL4(8, 8, 8, 8):
-                            if (this.pixelFormatH == this.genPixelTypeH4('r', 'g', 'b', 'a'))
-                                ret.format = ret.internalFormat = this.gl.RGBA;
-                            break;
-                        case this.genPixelTypeL3(8, 8, 8):
-                            ret.format = ret.internalFormat = this.gl.RGB;
-                            break;
-                        case this.genPixelTypeL2(8, 8):
-                            ret.format = ret.internalFormat = this.gl.LUMINANCE_ALPHA;
-                            break;
-                        case this.genPixelTypeL1(8):
-                            if (this.pixelFormatH == this.genPixelTypeH1('l'))
-                                ret.format = ret.internalFormat = this.gl.LUMINANCE;
-                            else
-                                ret.format = ret.internalFormat = this.gl.ALPHA;
-                            break;
-                    }
-                }
-            case ChannelTypes.UnsignedShortNorm:
-                {
-                    switch (this.pixelFormatL) {
-                        case this.genPixelTypeL4(4, 4, 4, 4):
-                            ret.type = this.gl.UNSIGNED_SHORT_4_4_4_4;
-                            ret.format = ret.internalFormat = this.gl.RGBA4;
-                            break;
-                        case this.genPixelTypeL4(5, 5, 5, 1):
-                            ret.type = this.gl.UNSIGNED_SHORT_5_5_5_1;
-                            ret.format = ret.internalFormat = this.gl.RGB5_A1;
-                            break;
-                        case this.genPixelTypeL3(5, 6, 5):
-                            ret.type = this.gl.UNSIGNED_SHORT_5_6_5;
-                            ret.format = ret.internalFormat = this.gl.RGB565;
-                            break;
-                    }
-                }
-        }
-        return ret;
-    };
-    PVRHeader.prototype.genPixelTypeH4 = function (c1Name, c2Name, c3Name, c4Name) {
-        var val = 0;
-        val |= c1Name.charCodeAt();
-        if (c2Name != undefined)
-            val |= c2Name.charCodeAt() << 8;
-        if (c3Name != undefined)
-            val |= c3Name.charCodeAt() << 16;
-        if (c4Name != undefined)
-            val |= c4Name.charCodeAt() << 24;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeH1 = function (c1Name) {
-        var val = 0;
-        val |= c1Name.charCodeAt();
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL3 = function (c1Bits, c2Bits, c3Bits) {
-        var val = 0;
-        val |= c1Bits;
-        if (c2Bits != undefined)
-            val |= c2Bits << 8;
-        if (c3Bits != undefined)
-            val |= c3Bits << 16;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL2 = function (c1Bits, c2Bits) {
-        var val = 0;
-        val |= c1Bits;
-        if (c2Bits != undefined)
-            val |= c2Bits << 8;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL1 = function (c1Bits) {
-        var val = 0;
-        val |= c1Bits;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL4 = function (c1Bits, c2Bits, c3Bits, c4Bits) {
-        var val = 0;
-        val |= c1Bits;
-        if (c2Bits != undefined)
-            val |= c2Bits << 8;
-        if (c3Bits != undefined)
-            val |= c3Bits << 16;
-        if (c4Bits != undefined)
-            val |= c4Bits << 24;
-        return val;
-    };
-    PVRHeader.prototype.getDataSize = function (mipLevel, allSurfaces, allFaces) {
-        var smallestWidth = 1;
-        var smallestHeight = 1;
-        var smallestDepth = 1;
-        var pixelFormatH = this.pixelFormatH;
-        if (pixelFormatH == 0) {
-        }
-        var dataSize = 0;
-        if (mipLevel == -1) {
-            for (var currentMIP = 0; currentMIP < this.mipMapCount; ++currentMIP) {
-                var width = Math.max(1, this.width >> currentMIP);
-                var height = Math.max(1, this.height >> currentMIP);
-                var depth = Math.max(1, this.depth >> currentMIP);
-                if (this.pixelFormatH == 0) {
-                    width = width + ((-1 * width) % smallestWidth);
-                    height = height + ((-1 * height) % smallestHeight);
-                    depth = depth + ((-1 * depth) % smallestDepth);
-                }
-                dataSize += this.getBitsPerPixel() * width * height * depth;
-            }
+        if (this.mipMapCount > 1) {
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
         }
         else {
-            var width = Math.max(1, this.width >> mipLevel);
-            var height = Math.max(1, this.height >> mipLevel);
-            var depth = Math.max(1, this.depth >> mipLevel);
-            if (this.pixelFormatH == 0) {
-                width = width + ((-1 * width) % smallestWidth);
-                height = height + ((-1 * height) % smallestHeight);
-                depth = depth + ((-1 * depth) % smallestDepth);
-            }
-            dataSize += this.getBitsPerPixel() * width * height * depth;
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         }
-        var numFaces = (allFaces ? this.numFaces : 1);
-        var numSurfs = (allSurfaces ? this.numSurfaces : 1);
-        return (dataSize / 8) * numSurfs * numFaces;
-    };
-    PVRHeader.prototype.getBitsPerPixel = function () {
-        if (this.pixelFormatH != 0) {
-            var lowPart = this.pixelFormatL;
-            var c1Bits = (lowPart >> 24) & 0xFF;
-            var c2Bits = (lowPart >> 16) & 0xFF;
-            var c3Bits = (lowPart >> 8) & 0xFF;
-            var c4Bits = lowPart & 0xFF;
-            return c1Bits + c2Bits + c3Bits + c4Bits;
-        }
-        return 0;
+        return t2d;
     };
     return PVRHeader;
 }());
@@ -10598,7 +10499,7 @@ var gd3d;
                 this.point = new pointinfo();
                 this.touches = {};
                 this.keyboardMap = {};
-                app.container.addEventListener("touchstart", function (ev) {
+                app.webgl.canvas.addEventListener("touchstart", function (ev) {
                     _this.point.x = ev.touches[0].clientX;
                     _this.point.y = ev.touches[0].clientY;
                     _this.point.touch = true;
@@ -10614,12 +10515,12 @@ var gd3d;
                         _this.touches[id].y = touch.clientY;
                     }
                 });
-                document.addEventListener("mousedown", function (ev) {
-                    _this.point.x = ev.clientX;
-                    _this.point.y = ev.clientY;
+                app.webgl.canvas.addEventListener("mousedown", function (ev) {
+                    _this.point.x = ev.offsetX;
+                    _this.point.y = ev.offsetY;
                     _this.point.touch = true;
                 });
-                document.addEventListener("touchend", function (ev) {
+                app.webgl.canvas.addEventListener("touchend", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -10635,7 +10536,7 @@ var gd3d;
                     }
                     _this.point.touch = false;
                 });
-                document.addEventListener("touchcancel", function (ev) {
+                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -10651,10 +10552,10 @@ var gd3d;
                     }
                     _this.point.touch = false;
                 });
-                document.addEventListener("mouseup", function (ev) {
+                app.webgl.canvas.addEventListener("mouseup", function (ev) {
                     _this.point.touch = false;
                 });
-                document.addEventListener("touchmove", function (ev) {
+                app.webgl.canvas.addEventListener("touchmove", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -10679,14 +10580,14 @@ var gd3d;
                     _this.point.x = x / count;
                     _this.point.y = y / count;
                 });
-                document.addEventListener("mousemove", function (ev) {
-                    _this.point.x = ev.clientX;
-                    _this.point.y = ev.clientY;
+                app.webgl.canvas.addEventListener("mousemove", function (ev) {
+                    _this.point.x = ev.offsetX;
+                    _this.point.y = ev.offsetY;
                 });
-                document.addEventListener("keydown", function (ev) {
+                app.webgl.canvas.addEventListener("keydown", function (ev) {
                     _this.keyboardMap[ev.keyCode] = true;
                 }, false);
-                document.addEventListener("keyup", function (ev) {
+                app.webgl.canvas.addEventListener("keyup", function (ev) {
                     _this.keyboardMap[ev.keyCode] = false;
                 }, false);
             }
@@ -21750,7 +21651,10 @@ var gd3d;
             TextureFormatEnum[TextureFormatEnum["RGBA"] = 1] = "RGBA";
             TextureFormatEnum[TextureFormatEnum["RGB"] = 2] = "RGB";
             TextureFormatEnum[TextureFormatEnum["Gray"] = 3] = "Gray";
-            TextureFormatEnum[TextureFormatEnum["PVRTC"] = 4] = "PVRTC";
+            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGB"] = 4] = "PVRTC4_RGB";
+            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGBA"] = 4] = "PVRTC4_RGBA";
+            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGB"] = 4] = "PVRTC2_RGB";
+            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGBA"] = 4] = "PVRTC2_RGBA";
         })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
         var textureReader = (function () {
             function textureReader(webgl, texRGBA, width, height, gray) {
@@ -21865,8 +21769,24 @@ var gd3d;
                 this.format = format;
                 this.texture = webgl.createTexture();
                 var extname = "WEBGL_compressed_texture_pvrtc";
-                this.ext = this.webgl.getExtension(extname) || this.webgl.getExtension('WEBKIT_' + extname);
+                this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
             }
+            glTexture2D.prototype.getExt = function (name) {
+                var browserPrefixes = [
+                    "",
+                    "MOZ_",
+                    "OP_",
+                    "WEBKIT_"
+                ];
+                for (var ii = 0; ii < browserPrefixes.length; ++ii) {
+                    var prefixedName = browserPrefixes[ii] + name;
+                    var ext = this.webgl.getExtension(prefixedName);
+                    if (ext) {
+                        return ext;
+                    }
+                }
+                return null;
+            };
             glTexture2D.prototype.uploadImage = function (img, mipmap, linear, premultiply, repeat, mirroredU, mirroredV) {
                 if (premultiply === void 0) { premultiply = true; }
                 if (repeat === void 0) { repeat = false; }
@@ -21945,12 +21865,7 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                if (this.format == TextureFormatEnum.PVRTC && this.ext != null) {
-                    this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, 6407, width, height, 0, 6407, 5121, data);
-                }
-                else {
-                    this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
-                }
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
                 if (mipmap) {
                     this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
                     if (linear) {
@@ -22001,9 +21916,6 @@ var gd3d;
                     pixellen = 4;
                 }
                 else if (this.format == TextureFormatEnum.RGB) {
-                    pixellen = 3;
-                }
-                else if (this.format == TextureFormatEnum.PVRTC) {
                     pixellen = 3;
                 }
                 var len = this.width * this.height * pixellen;
