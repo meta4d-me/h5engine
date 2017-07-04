@@ -1,7 +1,7 @@
 namespace gd3d.framework
 {
      /**
-     * @public
+     * @private
      * @language zh_CN
      * @classdesc
      * 拖尾组件，废弃
@@ -144,6 +144,9 @@ namespace gd3d.framework
             this.updateTrailData(_time);
         }
         gameObject: gameObject;
+         /**
+         * @private
+         */
         remove()
         {
 
@@ -350,6 +353,9 @@ namespace gd3d.framework
                 this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
             }
         }
+         /**
+         * @private
+         */
         clone()
         {
 

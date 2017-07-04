@@ -39,21 +39,62 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 表示球碰撞盒
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     @reflect.nodeComponent
     @reflect.nodeSphereCollider
     export class spherecollider implements INodeComponent, ICollider
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
         subTran: transform;
+         /**
+         * @private
+         */
         filter: meshFilter;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞球数据
+         * @version egret-gd3d 1.0
+         */
         spherestruct: spherestruct;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞球中心点
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("vector3")
         center: math.vector3;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞球大小
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("number")
         radius: number;
+        /**
+         * @private
+         */
         _worldCenter:math.vector3 = new math.vector3();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞球中心点
+         * @version egret-gd3d 1.0
+         */
         public get worldCenter():math.vector3
         {
             math.vec3Clone(this.center, this._worldCenter);
@@ -69,7 +110,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 获取该碰撞盒物体的世界矩阵
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         */
         public get matrix(): gd3d.math.matrix
         {
@@ -89,7 +130,9 @@ namespace gd3d.framework
                 this.spherestruct.update(this.matrix);
             }
         }
-
+         /**
+         * @private
+         */
         _colliderVisible: boolean = false;
         get colliderVisible(): boolean
         {
@@ -145,7 +188,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 构建碰撞盒
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         */
         private build()
         {
@@ -160,7 +203,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 构建碰撞盒mesh 并显示
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         */
         private buildMesh()
         {
@@ -184,7 +227,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 获取碰撞盒mesh
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         */
         private getColliderMesh(): mesh
         {
