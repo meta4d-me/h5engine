@@ -3,31 +3,152 @@ namespace gd3d.framework
     /**
      * @public
      * @language zh_CN
+     * @classdesc
      * 资源类型
      * @version egret-gd3d 1.0
      */
     export enum AssetTypeEnum
     {
+        /**
+         * @public
+         * @language zh_CN
+         * 未知
+         * @version egret-gd3d 1.0
+         */
         Unknown,
+        /**
+         * @public
+         * @language zh_CN
+         * 根据后缀 动态识别
+         * @version egret-gd3d 1.0
+         */
         Auto,
+        /**
+         * @public
+         * @language zh_CN
+         * 资源包
+         * @version egret-gd3d 1.0
+         */
         Bundle,
+        /**
+         * @public
+         * @language zh_CN
+         * 压缩的资源包
+         * @version egret-gd3d 1.0
+         */
         CompressBundle,
+        /**
+         * @public
+         * @language zh_CN
+         * glsl vs
+         * @version egret-gd3d 1.0
+         */
         GLVertexShader,
+        /**
+         * @public
+         * @language zh_CN
+         * glsl fs
+         * @version egret-gd3d 1.0
+         */
         GLFragmentShader,
+        /**
+         * @public
+         * @language zh_CN
+         * shader
+         * @version egret-gd3d 1.0
+         */
         Shader,
+        /**
+         * @public
+         * @language zh_CN
+         * 贴图
+         * @version egret-gd3d 1.0
+         */
         Texture,
+        /**
+         * @public
+         * @language zh_CN
+         * 贴图desc
+         * @version egret-gd3d 1.0
+         */
         TextureDesc,
+        /**
+         * @public
+         * @language zh_CN
+         * 模型
+         * @version egret-gd3d 1.0
+         */
         Mesh,
+        /**
+         * @public
+         * @language zh_CN
+         * 预设
+         * @version egret-gd3d 1.0
+         */
         Prefab,
+        /**
+         * @public
+         * @language zh_CN
+         * 材质
+         * @version egret-gd3d 1.0
+         */
         Material,
+        /**
+         * @public
+         * @language zh_CN
+         * 动画片段
+         * @version egret-gd3d 1.0
+         */
         Aniclip,
+        /**
+         * @public
+         * @language zh_CN
+         * 场景
+         * @version egret-gd3d 1.0
+         */
         Scene,
+        /**
+         * @public
+         * @language zh_CN
+         * 图集
+         * @version egret-gd3d 1.0
+         */
         Atlas,
+        /**
+         * @public
+         * @language zh_CN
+         * 字体
+         * @version egret-gd3d 1.0
+         */
         Font,
+        /**
+         * @public
+         * @language zh_CN
+         * 文本
+         * @version egret-gd3d 1.0
+         */
         TextAsset,
+        /**
+         * @private
+         */
         PackBin,
+        /**
+         * @private
+         */
         PackTxt,
+        /**
+         * @public
+         * @language zh_CN
+         * 可编辑路径
+         * @version egret-gd3d 1.0
+         */
         pathAsset,
+        /**
+         * @public
+         * @language zh_CN
+         * pvr贴图
+         * @version egret-gd3d 1.0
+         */
         PVR,
     }
 
@@ -1163,7 +1284,7 @@ namespace gd3d.framework
 
                     var _texture = new texture(filename);
                     this.assetUrlDic[_texture.getGUID()] = url;
-                    let pvr: PVRHeader = new PVRHeader(this.webgl);
+                    let pvr: PvrParse = new PvrParse(this.webgl);
                     _texture.glTexture = pvr.parse(_buffer);
                     this.use(_texture);
                     state.resstate[filename].state = 1;//完成
@@ -1262,7 +1383,7 @@ namespace gd3d.framework
 
                             var _texture = new texture(filename);
                             this.assetUrlDic[_texture.getGUID()] = url;
-                            let pvr: PVRHeader = new PVRHeader(this.webgl);
+                            let pvr: PvrParse = new PvrParse(this.webgl);
                             console.log(_textureSrc);
                             _texture.glTexture = pvr.parse(_buffer);
                             this.use(_texture);

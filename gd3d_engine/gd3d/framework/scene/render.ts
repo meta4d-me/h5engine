@@ -106,13 +106,47 @@ namespace gd3d.framework
             gd3d.math.matrixClone(this.matrixViewProject, this.matrixModelViewProject);
         }
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 渲染的层级
+     * @version egret-gd3d 1.0
+     */
     export enum RenderLayerEnum
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 不透明
+         * @version egret-gd3d 1.0
+         */
         Common,
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 半透明
+         * @version egret-gd3d 1.0
+         */
         Transparent,
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * Overlay层
+         * @version egret-gd3d 1.0
+         */
         Overlay,
     }
-    //渲染器
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 渲染器接口 继承自组件接口
+     * @version egret-gd3d 1.0
+     */
     export interface IRenderer extends INodeComponent
     {
         layer: RenderLayerEnum;
@@ -120,11 +154,11 @@ namespace gd3d.framework
         queue: number;
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera);
-        //box: 碰撞盒
-        //worldPos;//中心点
     }
 
-    //渲染列表
+    /**
+     * @private
+     */
     export class renderList
     {
         constructor()
@@ -162,6 +196,9 @@ namespace gd3d.framework
         //此处应该根据绘制分类处理
         renderLayers: renderLayer[];
     }
+    /**
+     * @private
+     */
     export class renderLayer
     {
         needSort: boolean = false;

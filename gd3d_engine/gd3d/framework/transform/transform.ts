@@ -30,7 +30,6 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取所在场景
-         * @param value 场景实例
          * @version egret-gd3d 1.0
          */
         public get scene(): scene

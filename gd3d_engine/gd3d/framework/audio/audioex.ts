@@ -5,10 +5,25 @@
         source: AudioBufferSourceNode;
         gainNode: GainNode;
         pannerNode: PannerNode;
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取音量大小
+         * @version egret-gd3d 1.0
+         */
         get volume(): number
         {
             return this.gainNode.gain.value;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置音量大小
+         * @param value 音量值
+         * @version egret-gd3d 1.0
+         */
         set volume(val: number)//-1~1
         {
             val = val > 1 ? 1 : val;
@@ -16,6 +31,13 @@
             this.gainNode.gain.value = val;
         }
         isplay: boolean;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 停止播放声音
+         * @version egret-gd3d 1.0
+         */
         stop()
         {
             if (this.source != null)
@@ -42,6 +64,13 @@
                 console.error("!Your browser does not support AudioContext");
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 初始化声音api，注意：在ios上面必须手动点击某个按钮来调用初始化，否则无法播放声音
+         * @version egret-gd3d 1.0
+         */
         clickInit()
         {
             if (!this.isAvailable())
@@ -94,12 +123,27 @@
             req.send();
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 初始化声音api，注意：在ios上面必须手动点击某个按钮来调用初始化，否则无法播放声音
+         * @version egret-gd3d 1.0
+         */
         public isAvailable(): boolean
         {
             return this.audioContext ? true : false;
         }
 
-        //加载声音的api
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 从arraybuffer转成audiobuffer
+         * @version egret-gd3d 1.0
+         * @param ab  二进制声音数据
+         * @param fun 
+         */
         loadAudioBufferFromArrayBuffer(ab: ArrayBuffer, fun: (buf: AudioBuffer, _err: Error) => void): void
         {
             this.audioContext.decodeAudioData(ab, (audiobuffer) =>
@@ -107,6 +151,16 @@
                 fun(audiobuffer, null);
             });
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 从本地文件加载音频数据，返回audiobuffer
+         * @version egret-gd3d 1.0
+         * @param url  文件地址
+         * @param fun 
+         */
         loadAudioBuffer(url: string, fun: (buf: AudioBuffer, _err: Error) => void): void
         {
             AudioEx.loadArrayBuffer(url, (_ab, __err) =>
@@ -155,8 +209,18 @@
 
         private channelOnce: { [id: string]: AudioChannel } = {};
 
-        //播放一次性声音，注意，别把长声音弄进来
-        //如果要关闭，记住这个函数的返回值，里面有个stop函数
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 播放一次性声音,两个相同的声音可同时播放，注意，别把长声音弄进来，如果要关闭，记住这个函数的返回值，里面有个stop函数
+         * @version egret-gd3d 1.0
+         * @param name  声音文件名字
+         * @param buf 声音数据
+         * @param x 音源在3D空间中的播放位置
+         * @param y 音源在3D空间中的播放位置
+         * @param z 音源在3D空间中的播放位置
+         */
         playOnce(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel
         {
             var c = this.getFreeChannelOnce();
@@ -175,7 +239,18 @@
             this.channelOnce[name] = c;
             return c;
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 播放一次性声音，相同的声音一次只能播放一个，后播放的会把先播放的停掉，然后从头开始播放，注意，别把长声音弄进来，如果要关闭，记住这个函数的返回值，里面有个stop函数
+         * @version egret-gd3d 1.0
+         * @param name  声音文件名字
+         * @param buf 声音数据
+         * @param x 音源在3D空间中的播放位置
+         * @param y 音源在3D空间中的播放位置
+         * @param z 音源在3D空间中的播放位置
+         */
         playOnceInterrupt(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel
         {
             for (let key in this.channelOnce)
@@ -202,7 +277,18 @@
             this.channelOnce[name] = cc;
             return cc;
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 播放一次性声音，相同的声音一次只能播放一个，当一个声音开始播放时，如果有个相同的声音已经在播放了，则后播放的会被先播放的阻塞住不会播放。注意，别把长声音弄进来，如果要关闭，记住这个函数的返回值，里面有个stop函数
+         * @version egret-gd3d 1.0
+         * @param name  声音文件名字
+         * @param buf 声音数据
+         * @param x 音源在3D空间中的播放位置
+         * @param y 音源在3D空间中的播放位置
+         * @param z 音源在3D空间中的播放位置
+         */
         playOnceBlocking(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel
         {
             for (let key in this.channelOnce)
@@ -231,7 +317,15 @@
         }
         
         private channelLoop: { [id: string]: AudioChannel } = {};
-        //播放一个循环声音,并制定一个名字（测试通过）
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 循环播放声音
+         * @version egret-gd3d 1.0
+         * @param name  声音文件名字
+         * @param buf 声音数据
+         */
         playLooped(name: string, buf: AudioBuffer): void
         {
             if (this.channelLoop[name] != undefined)
@@ -252,7 +346,14 @@
             this.channelLoop[name].source.start();
             this.channelLoop[name].isplay = true;
         }
-        //通过名字停止一个循环声音
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过名字停止一个循环声音
+         * @version egret-gd3d 1.0
+         * @param name  声音文件名字
+         */
         stopLooped(name: string): void
         {
             if (this.channelLoop[name] == undefined || this.channelLoop[name] == null || this.channelLoop[name].source == null) return;
@@ -262,6 +363,14 @@
         }
 
         private _soundVolume = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置音效大小
+         * @version egret-gd3d 1.0
+         * @param val  音效大小
+         */
         setSoundVolume(val: number)
         {
             this._soundVolume = val;
@@ -275,6 +384,14 @@
         }
 
         private _musicVolume = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置背景音乐大小
+         * @version egret-gd3d 1.0
+         * @param val  音乐声音大小
+         */
         setMusicVolume(val: number)
         {
             this._musicVolume = val;
