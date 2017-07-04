@@ -2,15 +2,27 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2d图片组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.node2DComponent
     @reflect.nodeRender
     export class image2D implements IRectRenderer
     {
+        /**
+         * @private
+         */
         constructor()
         {
             gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
             gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
         }
+        //2d使用固定的顶点格式
+        //pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13
         private datar: number[] = [
             0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
             0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
@@ -20,16 +32,36 @@ namespace gd3d.framework
             0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
         ];
 
-
         private _sprite: sprite;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 颜色
+         * @version egret-gd3d 1.0
+         */
         @reflect.Field("color")
         @reflect.UIStyle("vector4")
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 材质
+         * @version egret-gd3d 1.0
+         */
         mat: material;
-        //图片显示方式
+
         private _imageType: ImageType = ImageType.Simple;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 图片显示模式
+         * @version egret-gd3d 1.0
+         */
         @reflect.Field("number")
         @reflect.UIStyle("ImageType")
         get imageType()
@@ -44,8 +76,14 @@ namespace gd3d.framework
                 this.transform.markDirty();
         }
 
-        //图片填充方式
         private _fillMethod: FillMethod = FillMethod.Horizontal;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 图片填充方式
+         * @version egret-gd3d 1.0
+         */
         @reflect.Field("number")
         @reflect.UIStyle("FillMethod")
         get fillMethod()
@@ -60,8 +98,14 @@ namespace gd3d.framework
                 this.transform.markDirty();
         }
 
-        //填充率
         private _fillAmmount: number = 1;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 填充率
+         * @version egret-gd3d 1.0
+         */
         get fillAmmount()
         {
             return this._fillAmmount;
@@ -73,6 +117,16 @@ namespace gd3d.framework
                 this.transform.markDirty();
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置图片
+         * @param texture 图片
+         * @param border 切片信息
+         * @param rect 显示范围
+         * @version egret-gd3d 1.0
+         */
         setTexture(texture: texture, border?: math.border, rect?: math.rect)
         {
             var _sprite = new sprite();
@@ -93,6 +147,13 @@ namespace gd3d.framework
                 this.transform.markDirty();
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 精灵
+         * @version egret-gd3d 1.0
+         */
         public set sprite(_sprite: sprite)
         {
             if(this._sprite)
@@ -108,6 +169,10 @@ namespace gd3d.framework
         {
             return this._sprite;
         }
+
+        /**
+         * @private
+         */
         render(canvas: canvas)
         {
             if (this.mat == null)
@@ -132,29 +197,43 @@ namespace gd3d.framework
             canvas.pushRawData(this.mat, this.datar);
         }
 
-        //2d使用固定的顶点格式
-        //pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13
+        
+        /**
+         * @private
+         */
         start()
         {
 
         }
+
+        /**
+         * @private
+         */
         update(delta: number)
         {
 
         }
         transform: transform2D;
 
+        /**
+         * @private
+         */
         remove()
         {
             this._sprite.unuse(true);
             this.datar.length = 0;
         }
+
+        /**
+         * @private
+         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
         {
 
         }
 
         /**
+         * @private
          * 根据显示方式来准备数据
          */
         private prepareData()
@@ -325,6 +404,9 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @private
+         */
         updateTran()
         {
             var m = this.transform.getWorldMatrix();
@@ -373,9 +455,8 @@ namespace gd3d.framework
         }
 
         /**
+         * @private
          * 更新quad的顶点数据
-         * @param quadIndex quad的索引
-         * @param mirror
          */
         private updateQuadData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, quadIndex = 0, mirror: boolean = false)
         {
@@ -413,6 +494,7 @@ namespace gd3d.framework
         }
 
         /**
+         * @private
          * 更新常规数据
          */
         private updateSimpleData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
@@ -421,6 +503,7 @@ namespace gd3d.framework
         }
 
         /**
+         * @private
          * 更新9宫数据
          */
         private updateSlicedData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
@@ -624,7 +707,9 @@ namespace gd3d.framework
             math.pool.delete_vector2Array(uvs);
             math.pool.delete_vector2Array([help1, help2, help3]);
         }
+
         /**
+         * @private
          * 更新填充数据
          */
         private updateFilledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
@@ -948,6 +1033,7 @@ namespace gd3d.framework
         }
 
         /**
+         * @private
          * 更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多
          */
         private updateTiledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
@@ -1072,9 +1158,12 @@ namespace gd3d.framework
         }
     }
 
-
     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
      * 贴图的显示方式
+     * @version egret-gd3d 1.0
      */
     export enum ImageType
     {
@@ -1085,7 +1174,11 @@ namespace gd3d.framework
     }
 
     /**
-     * 填充方式
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多
+     * @version egret-gd3d 1.0
      */
     export enum FillMethod
     {

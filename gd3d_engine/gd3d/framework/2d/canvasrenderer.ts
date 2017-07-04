@@ -263,11 +263,27 @@ namespace gd3d.framework
             return this.canvas.getChildCount();
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取2d子节点
+         * @param index 索引
+         * @version egret-gd3d 1.0
+         */
         getChild(index: number): transform2D
         {
             return this.canvas.getChild(index);
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 更新
+         * @param delta 两次update的时间间隔
+         * @version egret-gd3d 1.0
+         */
         update(delta: number)
         {
             var asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
@@ -302,6 +318,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 射线检测
+         * @param ray 射线
+         * @version egret-gd3d 1.0
+         */
         pick2d(ray:gd3d.framework.ray):transform2D
         {
             var pinfo = ray.intersectPlaneTransform(this.gameObject.transform);
@@ -321,6 +345,9 @@ namespace gd3d.framework
             return null;
         }
 
+        /**
+         * @private
+         */
         dopick2d(outv:math.vector2, tran:transform2D):transform2D
         {
             if (tran.components != null)
@@ -347,7 +374,16 @@ namespace gd3d.framework
             return null;
         }
 
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理类实例
+         * @param camera 相机实例
+         * @version egret-gd3d 1.0
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
            // if (!(camera.CullingMask & this.renderLayer)) return;
@@ -355,14 +391,23 @@ namespace gd3d.framework
             this.canvas.render(context, assetmgr);
         }
 
+        /**
+         * @private
+         */
         jsonToAttribute(json, assetmgr: gd3d.framework.assetMgr)
         {
 
         }
+        /**
+         * @private
+         */
         remove()
         {
 
         }
+        /**
+         * @private
+         */
         clone()
         {
             

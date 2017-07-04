@@ -209,13 +209,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 事件处理
-         * @param outv canvas下的坐标
-         * @param tran 2d节点
-         * @version egret-gd3d 1.0
+         * @private
          */
         dopick2d(outv: math.vector2, tran: transform2D): transform2D
         {
