@@ -712,21 +712,21 @@ declare namespace gd3d.framework {
         };
     }
 }
-declare class PVRHeader {
-    version: number;
-    flags: number;
-    pixelFormatH: number;
-    pixelFormatL: number;
-    colourSpace: number;
-    channelType: number;
-    height: number;
-    width: number;
-    depth: number;
-    numSurfaces: number;
-    numFaces: number;
-    mipMapCount: number;
-    metaDataSize: number;
-    gl: WebGLRenderingContext;
+declare class PvrParse {
+    private version;
+    private flags;
+    private pixelFormatH;
+    private pixelFormatL;
+    private colourSpace;
+    private channelType;
+    private height;
+    private width;
+    private depth;
+    private numSurfaces;
+    private numFaces;
+    private mipMapCount;
+    private metaDataSize;
+    private gl;
     constructor(gl: WebGLRenderingContext);
     parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D;
     private parseV3(tool);

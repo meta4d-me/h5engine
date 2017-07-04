@@ -1163,7 +1163,7 @@ namespace gd3d.framework
 
                     var _texture = new texture(filename);
                     this.assetUrlDic[_texture.getGUID()] = url;
-                    let pvr: PVRHeader = new PVRHeader(this.webgl);
+                    let pvr: PvrParse = new PvrParse(this.webgl);
                     _texture.glTexture = pvr.parse(_buffer);
                     this.use(_texture);
                     state.resstate[filename].state = 1;//完成
@@ -1262,7 +1262,7 @@ namespace gd3d.framework
 
                             var _texture = new texture(filename);
                             this.assetUrlDic[_texture.getGUID()] = url;
-                            let pvr: PVRHeader = new PVRHeader(this.webgl);
+                            let pvr: PvrParse = new PvrParse(this.webgl);
                             console.log(_textureSrc);
                             _texture.glTexture = pvr.parse(_buffer);
                             this.use(_texture);

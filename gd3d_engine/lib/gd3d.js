@@ -4168,7 +4168,7 @@ var gd3d;
                         }
                         var _texture = new framework.texture(filename);
                         _this.assetUrlDic[_texture.getGUID()] = url;
-                        var pvr = new PVRHeader(_this.webgl);
+                        var pvr = new PvrParse(_this.webgl);
                         _texture.glTexture = pvr.parse(_buffer);
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4245,7 +4245,7 @@ var gd3d;
                                 }
                                 var _texture = new framework.texture(filename);
                                 _this.assetUrlDic[_texture.getGUID()] = url;
-                                var pvr = new PVRHeader(_this.webgl);
+                                var pvr = new PvrParse(_this.webgl);
                                 console.log(_textureSrc);
                                 _texture.glTexture = pvr.parse(_buffer);
                                 _this.use(_texture);
@@ -4821,8 +4821,8 @@ var gd3d;
         framework.SaveInfo = SaveInfo;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-var PVRHeader = (function () {
-    function PVRHeader(gl) {
+var PvrParse = (function () {
+    function PvrParse(gl) {
         this.version = 0x03525650;
         this.flags = 0;
         this.pixelFormatH = 0;
@@ -4838,7 +4838,7 @@ var PVRHeader = (function () {
         this.metaDataSize = 0;
         this.gl = gl;
     }
-    PVRHeader.prototype.parse = function (_buffer) {
+    PvrParse.prototype.parse = function (_buffer) {
         var ar = new Uint8Array(_buffer);
         var tool = new gd3d.io.binTool();
         tool.writeUint8Array(ar);
@@ -4857,7 +4857,7 @@ var PVRHeader = (function () {
             return null;
         }
     };
-    PVRHeader.prototype.parseV3 = function (tool) {
+    PvrParse.prototype.parseV3 = function (tool) {
         this.flags = tool.readUInt32();
         this.pixelFormatH = tool.readUInt32();
         this.pixelFormatL = tool.readUInt32();
@@ -4956,7 +4956,7 @@ var PVRHeader = (function () {
         }
         return t2d;
     };
-    return PVRHeader;
+    return PvrParse;
 }());
 var ChannelTypes;
 (function (ChannelTypes) {
