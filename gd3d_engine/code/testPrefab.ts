@@ -85,6 +85,7 @@ class test_loadprefab implements IState
             for (let i = 0; i < this.renderer[j].materials.length; i++)
             {
                 this.renderer[j].materials[i].changeShader(sha);
+                // this.renderer[j].materials[i].setVector4("_TintColor", new gd3d.math.vector4(0,1,0,1));
             }
         }
         for (let j = 0; j < this.skinRenders.length; j++)
@@ -92,6 +93,7 @@ class test_loadprefab implements IState
             for (let i = 0; i < this.skinRenders[j].materials.length; i++)
             {
                 this.skinRenders[j].materials[i].changeShader(sha);
+                // this.renderer[j].materials[i].setVector4("_TintColor", new gd3d.math.vector4(0,1,0,1));
             }
         }
     }
