@@ -20,15 +20,29 @@ namespace gd3d.framework
     @reflect.nodeBoxCollider
     export class boxcollider implements INodeComponent, ICollider
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
-         /**
-         * @private
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 子transform
+         * @version egret-gd3d 1.0
          */
         subTran: transform;
          /**
          * @private
          */
         filter: meshFilter;
+         /**
+         * @private
+         */
         obb: obb;
         /**
         * @public
@@ -48,6 +62,9 @@ namespace gd3d.framework
         */
         @gd3d.reflect.Field("vector3")
         size: math.vector3;
+         /**
+         * @private
+         */
         getBound()
         {
             return this.obb;

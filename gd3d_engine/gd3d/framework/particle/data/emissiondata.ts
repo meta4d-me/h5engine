@@ -9,9 +9,6 @@
         continue
     }
     /**
-    * 粒子发射器
-    */
-    /**
      * @private
      */
     export class EmissionData

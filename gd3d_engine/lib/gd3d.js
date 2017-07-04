@@ -1134,7 +1134,6 @@ var gd3d;
             function overlay2D() {
                 this.init = false;
                 this.autoAsp = true;
-                this.renderLayer = framework.CullingMask.ui;
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
@@ -1773,6 +1772,19 @@ var gd3d;
                     }
                 }
             };
+            transform2D.prototype.addComponent = function (type) {
+                if (this.components == null)
+                    this.components = [];
+                for (var key in this.components) {
+                    var st = this.components[key]["comp"]["constructor"]["name"];
+                    if (st == type) {
+                        throw new Error("已经有一个" + type + "的组件了，不能俩");
+                    }
+                }
+                var pp = gd3d.reflect.getPrototype(type);
+                var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
+                return this.addComponentDirect(comp);
+            };
             transform2D.prototype.addComponentDirect = function (comp) {
                 if (comp.transform != null) {
                     throw new Error("this components has added to a  gameObject");
@@ -1791,6 +1803,33 @@ var gd3d;
                     }
                 }
                 return comp;
+            };
+            transform2D.prototype.removeComponent = function (comp) {
+                for (var i = 0; i < this.components.length; i++) {
+                    if (this.components[i].comp == comp) {
+                        if (this.components[i].init) {
+                        }
+                        this.components.splice(i, 1);
+                    }
+                }
+            };
+            transform2D.prototype.removeComponentByTypeName = function (type) {
+                for (var i = 0; i < this.components.length; i++) {
+                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
+                        var p = this.components.splice(i, 1);
+                        if (p[0].comp == this.renderer)
+                            this.renderer = null;
+                        return p[0];
+                    }
+                }
+            };
+            transform2D.prototype.removeAllComponents = function () {
+                for (var i = 0; i < this.components.length; i++) {
+                    this.components[i].comp.remove();
+                    if (this.components[i].comp == this.renderer)
+                        this.renderer = null;
+                }
+                this.components.length = 0;
             };
             transform2D.prototype.getComponent = function (type) {
                 for (var i = 0; i < this.components.length; i++) {
@@ -1826,46 +1865,6 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.addComponent = function (type) {
-                if (this.components == null)
-                    this.components = [];
-                for (var key in this.components) {
-                    var st = this.components[key]["comp"]["constructor"]["name"];
-                    if (st == type) {
-                        throw new Error("已经有一个" + type + "的组件了，不能俩");
-                    }
-                }
-                var pp = gd3d.reflect.getPrototype(type);
-                var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
-                return this.addComponentDirect(comp);
-            };
-            transform2D.prototype.removeComponent = function (comp) {
-                for (var i = 0; i < this.components.length; i++) {
-                    if (this.components[i].comp == comp) {
-                        if (this.components[i].init) {
-                        }
-                        this.components.splice(i, 1);
-                    }
-                }
-            };
-            transform2D.prototype.removeComponentByTypeName = function (type) {
-                for (var i = 0; i < this.components.length; i++) {
-                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
-                        var p = this.components.splice(i, 1);
-                        if (p[0].comp == this.renderer)
-                            this.renderer = null;
-                        return p[0];
-                    }
-                }
-            };
-            transform2D.prototype.removeAllComponents = function () {
-                for (var i = 0; i < this.components.length; i++) {
-                    this.components[i].comp.remove();
-                    if (this.components[i].comp == this.renderer)
-                        this.renderer = null;
-                }
-                this.components.length = 0;
-            };
             transform2D.prototype.onCapturePointEvent = function (canvas, ev) {
                 if (this.components != null) {
                     for (var i = 0; i <= this.components.length; i++) {
@@ -1887,12 +1886,6 @@ var gd3d;
                         }
                     }
                 }
-            };
-            transform2D.prototype.ContainsPoint = function (p) {
-                var p2 = new gd3d.math.vector2();
-                p2.x = p.x + this.pivot.x * this.width;
-                p2.y = p.y + this.pivot.y * this.height;
-                return p2.x >= 0 && p2.y >= 0 && p2.x < this.width && p2.y < this.height;
             };
             transform2D.prototype.ContainsCanvasPoint = function (pworld) {
                 var mworld = this.getWorldMatrix();
@@ -4168,7 +4161,7 @@ var gd3d;
                         }
                         var _texture = new framework.texture(filename);
                         _this.assetUrlDic[_texture.getGUID()] = url;
-                        var pvr = new PVRHeader(_this.webgl);
+                        var pvr = new PvrParse(_this.webgl);
                         _texture.glTexture = pvr.parse(_buffer);
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
@@ -4245,7 +4238,7 @@ var gd3d;
                                 }
                                 var _texture = new framework.texture(filename);
                                 _this.assetUrlDic[_texture.getGUID()] = url;
-                                var pvr = new PVRHeader(_this.webgl);
+                                var pvr = new PvrParse(_this.webgl);
                                 console.log(_textureSrc);
                                 _texture.glTexture = pvr.parse(_buffer);
                                 _this.use(_texture);
@@ -4821,8 +4814,8 @@ var gd3d;
         framework.SaveInfo = SaveInfo;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-var PVRHeader = (function () {
-    function PVRHeader(gl) {
+var PvrParse = (function () {
+    function PvrParse(gl) {
         this.version = 0x03525650;
         this.flags = 0;
         this.pixelFormatH = 0;
@@ -4838,7 +4831,7 @@ var PVRHeader = (function () {
         this.metaDataSize = 0;
         this.gl = gl;
     }
-    PVRHeader.prototype.parse = function (_buffer) {
+    PvrParse.prototype.parse = function (_buffer) {
         var ar = new Uint8Array(_buffer);
         var tool = new gd3d.io.binTool();
         tool.writeUint8Array(ar);
@@ -4857,7 +4850,7 @@ var PVRHeader = (function () {
             return null;
         }
     };
-    PVRHeader.prototype.parseV3 = function (tool) {
+    PvrParse.prototype.parseV3 = function (tool) {
         this.flags = tool.readUInt32();
         this.pixelFormatH = tool.readUInt32();
         this.pixelFormatL = tool.readUInt32();
@@ -4956,7 +4949,7 @@ var PVRHeader = (function () {
         }
         return t2d;
     };
-    return PVRHeader;
+    return PvrParse;
 }());
 var ChannelTypes;
 (function (ChannelTypes) {

@@ -1,9 +1,37 @@
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 球形碰撞盒结构体
+     * @version egret-gd3d 1.0
+     */
     export class spherestruct
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 球形碰撞盒中心点
+         * @version egret-gd3d 1.0
+         */
         public center:gd3d.math.vector3;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 球形碰撞盒半径（缩放处理过的半径）
+         * @version egret-gd3d 1.0
+         */
         public radius:number;//缩放处理过的半径
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 球形碰撞盒半径（collider定义的源半径）
+         * @version egret-gd3d 1.0
+         */
         public srcradius:number;//collider定义的源半径
         private tempScale:gd3d.math.vector3;
         constructor(_center:math.vector3, _r:number)
@@ -20,6 +48,14 @@ namespace gd3d.framework
             if(this.tempScale.x < this.tempScale.z) this.tempScale.x = this.tempScale.z;
             this.radius = this.srcradius * this.tempScale.x;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @param bound 球形碰撞盒结构体
+         * @classdesc
+         * 球形碰撞盒结构体互相检测碰撞
+         * @version egret-gd3d 1.0
+         */
         public intersects(bound:any)
         {
             if(bound instanceof spherestruct)
@@ -38,7 +74,7 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * @classdesc
-     * 表示球碰撞盒
+     * 球形碰撞盒组件
      * @version egret-gd3d 1.0
      */
     @reflect.nodeComponent
@@ -53,6 +89,13 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         gameObject: gameObject;
+          /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 子transform
+         * @version egret-gd3d 1.0
+         */
         subTran: transform;
          /**
          * @private
@@ -101,6 +144,13 @@ namespace gd3d.framework
             math.matrixTransformVector3(this._worldCenter, this.gameObject.transform.getWorldMatrix(), this._worldCenter);
             return this._worldCenter;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞球数据
+         * @version egret-gd3d 1.0
+         */
         getBound()
         {
             return this.spherestruct;
@@ -134,10 +184,24 @@ namespace gd3d.framework
          * @private
          */
         _colliderVisible: boolean = false;
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 返回碰撞盒可见性
+        * @version egret-gd3d 1.0
+        */
         get colliderVisible(): boolean
         {
             return this._colliderVisible;
         }
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置碰撞盒是否可见
+        * @version egret-gd3d 1.0
+        */
         set colliderVisible(value: boolean)
         {
             this._colliderVisible = value;
@@ -147,7 +211,9 @@ namespace gd3d.framework
             }
 
         }
-
+         /**
+         * @private
+         */
         caclPlaneInDir(v0: math.vector3, v1:math.vector3, v2: math.vector3)
         {
             let subv0 = math.pool.new_vector3();
@@ -174,7 +240,14 @@ namespace gd3d.framework
 
             return false;
         }
-
+        /**
+        * @public
+        * @language zh_CN
+        * @param tran 目标transform
+        * @classdesc
+        * 检测碰撞
+        * @version egret-gd3d 1.0
+        */
         intersectsTransform(tran: transform): boolean
         {
             if (tran.gameObject.collider == null) return false;
@@ -257,7 +330,9 @@ namespace gd3d.framework
             // }
             return _mesh;
         }
-
+         /**
+         * @private
+         */
         remove()
         {
             if (this.subTran)
@@ -265,6 +340,9 @@ namespace gd3d.framework
                 this.subTran.dispose();
             }
         }
+         /**
+         * @private
+         */
         clone()
         {
 

@@ -14,6 +14,13 @@ namespace gd3d.framework
         {
 
         }
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
 
         start()

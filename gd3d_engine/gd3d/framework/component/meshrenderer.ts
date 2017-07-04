@@ -45,13 +45,19 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("vector4")
         lightmapScaleOffset: math.vector4 = new math.vector4(1, 1, 0, 0);
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 场景渲染层级（common、transparent、overlay）
+         * @version egret-gd3d 1.0
+         */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * 渲染层级
+         * 渲染mask层级（和相机相对应）
          * @version egret-gd3d 1.0
          */
         renderLayer: gd3d.framework.CullingMask = CullingMask.default;
@@ -64,7 +70,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 同层级渲染排序依据
+         * 返回此组件的场景渲染层级排序依据queue大小
          * @version egret-gd3d 1.0
          */
         get queue(): number
@@ -75,7 +81,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 同层级渲染排序
+         * 设置此组件的场景渲染层级排序number大小
          * @version egret-gd3d 1.0
          */
         set queue(value: number)

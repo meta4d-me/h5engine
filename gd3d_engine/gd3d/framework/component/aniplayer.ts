@@ -2,13 +2,34 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 动画播放器
+     * @version egret-gd3d 1.0
+     */    
     @reflect.nodeComponent
     export class aniplayer implements INodeComponent
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
 
         private _clipnameCount = 0;
         private _clipnames: { [key: string]: number } = null;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 返回动画数组（clips）所有动画的名字
+         * @version egret-gd3d 1.0
+         */    
         get clipnames()
         {
             if (this._clipnames == null || this._clipnameCount != this.clips.length)
@@ -22,39 +43,101 @@ namespace gd3d.framework
             }
             return this._clipnames;
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 动画数组
+         * @version egret-gd3d 1.0
+         */    
         @reflect.Field("animationClip[]")
         clips: animationClip[];
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否自动播放
+         * @version egret-gd3d 1.0
+         */   
         @reflect.Field("boolean")
         public autoplay: boolean = true;
         private playIndex: number = 0;
         private _playClip: animationClip = null;
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 骨骼数组
+         * @version egret-gd3d 1.0
+         */   
         @reflect.Field("tPoseInfo[]")
         bones: tPoseInfo[];
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 初始位置
+         * @version egret-gd3d 1.0
+         */ 
         @reflect.Field("PoseBoneMatrix[]")
         startPos: PoseBoneMatrix[];
-
+        /**
+         * @private
+         */
         tpose: { [key: string]: PoseBoneMatrix } = {};
+        /**
+         * @private
+         */
         nowpose: { [key: string]: PoseBoneMatrix } = {};
+        /**
+         * @private
+         */
         lerppose: { [key: string]: PoseBoneMatrix } = {};
-
+        /**
+         * @private
+         */
         carelist: { [id: string]: transform } = {};
 
         private _playFrameid: number = 0;
+         /**
+         * @private
+         */       
         public _playTimer: number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 播放速度
+         * @version egret-gd3d 1.0
+         */    
         speed: number = 1.0;
+         /**
+         * @private
+         */  
         crossdelta: number = 0;
+         /**
+         * @private
+         */  
         crossspeed: number = 0;
 
         private beRevert: boolean = false;
         private playStyle: PlayStyle = PlayStyle.NormalPlay;
         private percent: number = 0;
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否动画融合
+         * @version egret-gd3d 1.0
+         */    
         public mix:boolean = false;
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 返回当前播放帧数
+         * @version egret-gd3d 1.0
+         */    
         get cacheKey(){
             if(this._playClip)
                 return this._playClip.getGUID()+"_"+this._playFrameid;
@@ -177,13 +260,16 @@ namespace gd3d.framework
                 }
             }
         }
-
         /**
-         * 根据动画片段索引播放普通动画
+         * @public
+         * @language zh_CN
          * @param animIndex 动画片段索引
          * @param speed 播放速度
          * @param beRevert 是否倒播
-         */
+         * @classdesc
+         * 根据动画片段索引播放普通动画
+         * @version egret-gd3d 1.0
+         */   
         playByIndex(animIndex: number, speed: number = 1.0, beRevert: boolean = false)
         {
             this.playIndex = animIndex;
@@ -197,10 +283,15 @@ namespace gd3d.framework
         }
 
         /**
-         * 根据动画片段索引播放动画
+         * @public
+         * @language zh_CN
          * @param animIndex 动画片段索引
+         * @param crosstimer 融合时间
          * @param speed 播放速度
          * @param beRevert 是否倒播
+         * @classdesc
+         * 根据动画片段索引播放动画
+         * @version egret-gd3d 1.0
          */
         playCrossByIndex(animIndex: number, crosstimer: number, speed: number = 1.0, beRevert: boolean = false)
         {
@@ -214,7 +305,16 @@ namespace gd3d.framework
             this.crossspeed = 1.0 / crosstimer;
             this.crossdelta = 1;
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @param animName 动画片段名字
+         * @param speed 播放速度
+         * @param beRevert 是否倒播
+         * @classdesc
+         * 根据动画片段名字播放动画
+         * @version egret-gd3d 1.0
+         */
         play(animName: string, speed: number = 1.0, beRevert: boolean = false)
         {
             if (this.clipnames[animName] == null)
@@ -224,7 +324,17 @@ namespace gd3d.framework
             }
             this.playByIndex(this.clipnames[animName], speed, beRevert);
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @param animName 动画片段名字
+         * @param crosstimer 融合时间
+         * @param speed 播放速度
+         * @param beRevert 是否倒播
+         * @classdesc
+         * 根据动画片段名字播放动画
+         * @version egret-gd3d 1.0
+         */
         playCross(animName: string, crosstimer: number, speed: number = 1.0, beRevert: boolean = false)
         {
             if (this.clipnames[animName] == null)
@@ -241,7 +351,16 @@ namespace gd3d.framework
                 this.playCrossByIndex(this.clipnames[animName], crosstimer, speed, beRevert);
             }
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @param animName 动画片段名字
+         * @param speed 播放速度
+         * @param beRevert 是否倒播
+         * @classdesc
+         * 根据动画片段索引播放动画
+         * @version egret-gd3d 1.0
+         */
         private playAniamtion(index: string, speed: number = 1.0, beRevert: boolean = false)
         {
             if (this.clips[index] == undefined) return;
@@ -262,17 +381,35 @@ namespace gd3d.framework
                 this.lerppose[key] = src.Clone();
             }
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 停止播放动画
+         * @version egret-gd3d 1.0
+         */
         stop(): void
         {
             this._playClip = null;
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否在播放动画
+         * @version egret-gd3d 1.0
+         */
         isPlay(): boolean
         {
             return this._playClip != null;
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否在停止动画
+         * @version egret-gd3d 1.0
+         */
         isStop(): boolean
         {
             if (this._playClip == null) return false;
@@ -282,7 +419,9 @@ namespace gd3d.framework
                 return true;
             return false;
         }
-
+        /**
+         * @private
+         */
         remove()
         {
             this.clips.length = 0;
@@ -294,12 +433,24 @@ namespace gd3d.framework
             delete this.carelist;
             delete this._clipnames;
         }
+        /**
+         * @private
+         */
         clone()
         {
 
         }
         private finishCallBack: Function;
         private thisObject: any;
+        /**
+         * @public
+         * @language zh_CN
+         * @param finishCallBack 事件
+         * @param thisObject 对象
+         * @classdesc
+         * 给动画添加结束事件
+         * @version egret-gd3d 1.0
+         */
         public addFinishedEventListener(finishCallBack: Function, thisObject: any): void
         {
             this.finishCallBack = finishCallBack;
@@ -348,7 +499,9 @@ namespace gd3d.framework
                 }
             }
         }
-
+        /**
+         * @private
+         */
         fillPoseData(data: Float32Array, bones: transform[], efficient: boolean = true): void
         {
             var seek: number = 0;
@@ -415,7 +568,9 @@ namespace gd3d.framework
                 seek++;
             }
         }
-
+        /**
+         * @private
+         */
         care(node: transform)
         {
             var pnode = node;
@@ -438,7 +593,9 @@ namespace gd3d.framework
             }
         }
     }
-
+    /**
+     * @private
+     */
     @reflect.SerializeType
     export class tPoseInfo
     {

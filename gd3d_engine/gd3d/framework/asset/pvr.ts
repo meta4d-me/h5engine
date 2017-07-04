@@ -1,23 +1,31 @@
-class PVRHeader
+class PvrParse
 {
-    public version = 0x03525650;
-    public flags = 0;
-    public pixelFormatH = 0;
-    public pixelFormatL = 0;
-    public colourSpace = 0;
-    public channelType = 0;
-    public height = 1;
-    public width = 1;
-    public depth = 1;
-    public numSurfaces = 1;
-    public numFaces = 1;
-    public mipMapCount = 1;
-    public metaDataSize = 0;
-    public gl: WebGLRenderingContext;
+    private version = 0x03525650;
+    private flags = 0;
+    private pixelFormatH = 0;
+    private pixelFormatL = 0;
+    private colourSpace = 0;
+    private channelType = 0;
+    private height = 1;
+    private width = 1;
+    private depth = 1;
+    private numSurfaces = 1;
+    private numFaces = 1;
+    private mipMapCount = 1;
+    private metaDataSize = 0;
+    private gl: WebGLRenderingContext;
     constructor(gl: WebGLRenderingContext)
     {
         this.gl = gl;
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 解析pvr图片
+     * @param _buffer 图片二进制数据
+     * @version egret-gd3d 1.0
+     */
     public parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D
     {
         let ar: Uint8Array = new Uint8Array(_buffer);

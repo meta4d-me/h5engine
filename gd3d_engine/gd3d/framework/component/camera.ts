@@ -2,11 +2,17 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export interface ICameraPostQueue
     {
         render(scene: scene, context: renderContext, camera: camera);
         renderTarget: render.glRenderTarget;
     }
+    /**
+     * @private
+     */
     export class cameraPostQueue_Depth implements ICameraPostQueue
     {
         constructor()
@@ -27,6 +33,9 @@ namespace gd3d.framework
         }
         renderTarget: render.glRenderTarget;
     }
+    /**
+     * @private
+     */
     export class cameraPostQueue_Quad implements ICameraPostQueue
     {
         material: material;//shader & uniform
@@ -52,6 +61,9 @@ namespace gd3d.framework
         }
         renderTarget: render.glRenderTarget;
     }
+    /**
+     * @private
+     */
     export class cameraPostQueue_Color implements ICameraPostQueue
     {
         constructor()
@@ -66,6 +78,9 @@ namespace gd3d.framework
         }
         renderTarget: render.glRenderTarget;
     }
+    /**
+     * @private
+     */
     export interface IOverLay
     {
         init: boolean;
@@ -73,32 +88,47 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: camera);
         update(delta: number);
     }
-    // //相机绘制也可以是好几层的，如果没有，就来一组标准输出
-    // export class cameraLayer
-    // {
-    //     drawQueue: number = 0;//绘制顺序，越小的越往前
-    //     asRenderTarget: string;//是否使用renderTarget
-    //     //clear info
-    //     clearOption_Color: boolean = true;
-    //     clearOption_Depth: boolean = true;
-
-    //     //customDraw//是绘制场景 还是 绘制别的东西
-    //     renderTag: {} = null;
-    //     screenRenderer: IOverLay = null;//没有screenRenderer 就画场景
-    // }
+     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 视锥剔除组件，作为标记存在
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeComponent
     @reflect.nodeCamera
     export class camera implements INodeComponent
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
 
         private _near: number = 0.01;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 相机到近裁剪面距离
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2)//加上这个标记，编辑器就能读取这个显示ui了
         @gd3d.reflect.Field("number")
         get near(): number
         {
             return this._near;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置相机到近裁剪面距离
+         * @version egret-gd3d 1.0
+         */
         set near(val: number)
         {
             if (val >= this.far) val = this.far - 1;
@@ -106,22 +136,56 @@ namespace gd3d.framework
             this._near = val;
         }
         private _far: number = 1000;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 相机到远裁剪面距离
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 999)
         @gd3d.reflect.Field("number")
         get far(): number
         {
             return this._far;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置相机到远裁剪面距离
+         * @version egret-gd3d 1.0
+         */
         set far(val: number)
         {
             if (val <= this.near) val = this.near + 1;
             if (val >= 1000) val = 1000;
             this._far = val;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为主相机
+         * @version egret-gd3d 1.0
+         */
         public isMainCamera:boolean = false;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 相机的渲染层级
+         * @version egret-gd3d 1.0
+         */
         CullingMask: CullingMask = CullingMask.default | CullingMask.ui;
         //CullingMask: CullingMask = CullingMask.everything;
+        /**
+         * @private
+         */
         index: number;
+        /**
+         * @private
+         */
         @reflect.compCall({ "use": "dirty", "display": "刷新camera" })
         markDirty()
         {
@@ -142,16 +206,65 @@ namespace gd3d.framework
                 this.overlays[i].update(delta);
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否清除颜色缓冲区
+         * @version egret-gd3d 1.0
+         */
         clearOption_Color: boolean = true;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否清除深度缓冲区
+         * @version egret-gd3d 1.0
+         */
         clearOption_Depth: boolean = true;
         // backgroundColor: gd3d.math.color = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 背景色
+         * @version egret-gd3d 1.0
+         */
         backgroundColor: gd3d.math.color = new gd3d.math.color(0.5, 0.8, 1, 1);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 相机视窗
+         * @version egret-gd3d 1.0
+         */
         viewport: gd3d.math.rect = new gd3d.math.rect(0, 0, 1, 1);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染目标
+         * @version egret-gd3d 1.0
+         */
         renderTarget: gd3d.render.glRenderTarget = null;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * camera 渲染排序标记
+         * @version egret-gd3d 1.0
+         */
         order: number = 0;//camera 渲染顺序
         @gd3d.reflect.Field("IOverLay[]")
         private overlays: IOverLay[] = [];
-
+        /**
+         * @public
+         * @language zh_CN
+         * @param overlay 2d组件
+         * @classdesc
+         * 添加2d渲染组件
+         * @version egret-gd3d 1.0
+         */
         addOverLay(overLay: IOverLay)
         {
             // if (overLay instanceof overlay2D)
@@ -164,6 +277,15 @@ namespace gd3d.framework
             // }
             this.overlays.push(overLay);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @param overlay 2d组件
+         * @param index 在overlays对应位置添加组件
+         * @classdesc
+         * 添加2d渲染组件
+         * @version egret-gd3d 1.0
+         */
         addOverLayAt(overLay: IOverLay, index: number)
         {
             // if (overLay instanceof overlay2D)
@@ -176,10 +298,24 @@ namespace gd3d.framework
             // }
             this.overlays.splice(index, 0, overLay);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 返回此相机上的overlays数组
+         * @version egret-gd3d 1.0
+         */
         getOverLays()
         {
             return this.overlays;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除相机上的所有overly
+         * @version egret-gd3d 1.0
+         */
         removeOverLay(overLay: IOverLay)
         {
             if (this.overlays == null)
@@ -188,7 +324,14 @@ namespace gd3d.framework
             if (index >= 0)
                 this.overlays.splice(index, 1);
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @param matrix 返回的视矩阵
+         * @classdesc
+         * 计算相机的viewmatrix（视矩阵）
+         * @version egret-gd3d 1.0
+         */
         calcViewMatrix(matrix: gd3d.math.matrix)
         {
             var camworld = this.gameObject.transform.getWorldMatrix();
@@ -200,6 +343,15 @@ namespace gd3d.framework
             gd3d.math.matrixClone(this.matView, matrix);
             return;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @param app 主程序
+         * @param viewportpixel 视口rect
+         * @classdesc
+         * 计算相机视口像素rect
+         * @version egret-gd3d 1.0
+         */
         calcViewPortPixel(app: application, viewPortPixel: math.rect)
         {
 
@@ -222,6 +374,15 @@ namespace gd3d.framework
             //asp = this.viewPortPixel.w / this.viewPortPixel.h;
 
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @param app 主程序
+         * @param matrix projectmatrix（投影矩阵）
+         * @classdesc
+         * 计算相机投影矩阵
+         * @version egret-gd3d 1.0
+         */
         calcProjectMatrix(asp: number, matrix: gd3d.math.matrix)
         {
             if (this.opvalue > 0)
@@ -238,7 +399,15 @@ namespace gd3d.framework
             //投影矩阵函数缺一个
             gd3d.math.matrixClone(this.matProj, matrix);
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @param screenpos 屏幕坐标
+         * @param app 主程序
+         * @classdesc
+         * 由屏幕坐标发射射线
+         * @version egret-gd3d 1.0
+         */
         public creatRayByScreen(screenpos: gd3d.math.vector2, app: application): ray
         {
             var src1 = gd3d.math.pool.new_vector3();
@@ -266,6 +435,16 @@ namespace gd3d.framework
             gd3d.math.pool.delete_vector3(dir);
             return ray;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @param app 主程序
+         * @param screenpos 屏幕坐标
+         * @param outWorldPos 世界坐标
+         * @classdesc
+         * 由屏幕坐标得到世界坐标
+         * @version egret-gd3d 1.0
+         */
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3)
         {
             var vpp = new math.rect();
@@ -284,7 +463,16 @@ namespace gd3d.framework
             gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
 
         }
-        
+        /**
+         * @public
+         * @language zh_CN
+         * @param app 主程序
+         * @param worldPos 世界坐标
+         * @param outScreenPos 屏幕坐标
+         * @classdesc
+         * 由世界坐标得到屏幕坐标
+         * @version egret-gd3d 1.0
+         */
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2)
         {
             var vpp = new math.rect();
@@ -302,7 +490,10 @@ namespace gd3d.framework
             outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
             outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
         }
-        
+        /**
+         * @private
+         * @param app
+         */
         calcCameraFrame(app: application)
         {
             var _vpp = new math.rect();
@@ -350,10 +541,33 @@ namespace gd3d.framework
         private matProj: math.matrix = new math.matrix;
 
         private frameVecs:math.vector3[] = [];
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 透视投影的fov
+         * @version egret-gd3d 1.0
+         */
         fov: number = Math.PI * 0.25;//透视投影的fov
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 正交投影的竖向size
+         * @version egret-gd3d 1.0
+         */
         size: number = 2;//正交投影的竖向size
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 0=正交， 1=透视 中间值可以在两种相机间过度
+         * @version egret-gd3d 1.0
+         */
         opvalue: number = 1;//0=正交， 1=透视 中间值可以在两种相机间过度
+        /**
+         * @private
+         */
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
             var vpp = new math.rect();
@@ -373,7 +587,9 @@ namespace gd3d.framework
             out.x = nearpos.x - (nearpos.x - farpos.x) * rate;
             out.y = nearpos.y - (nearpos.y - farpos.y) * rate;
         }
-        //检查可见的列表
+         /**
+         * @private
+         */
         fillRenderer(scene: scene)
         {
             scene.renderList.clear();
@@ -396,6 +612,9 @@ namespace gd3d.framework
                 }
             }
         }
+         /**
+         * @private
+         */
         testFrustumCulling(scene: scene, node:transform)
         {
             if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
@@ -410,7 +629,9 @@ namespace gd3d.framework
             if(!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3])) return false;
             return true;
         }
-
+         /**
+         * @private
+         */
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean)
         {
             {
@@ -462,6 +683,9 @@ namespace gd3d.framework
 
             }
         }
+         /**
+         * @private
+         */
         _renderOnce(scene: scene, context: renderContext, drawtype: string)
         {
             context.drawtype = drawtype;
@@ -483,7 +707,13 @@ namespace gd3d.framework
             }
 
         }
+         /**
+         * @private
+         */
         postQueues: ICameraPostQueue[] = [];
+         /**
+         * @private
+         */
         renderScene(scene: scene, context: renderContext)
         {
             for (var i = 0; i < scene.renderList.renderLayers.length; i++)
@@ -533,16 +763,28 @@ namespace gd3d.framework
 
 
         }
+         /**
+         * @private
+         */
         remove()
         {
 
         }
+         /**
+         * @private
+         */
         clone()
         {
 
         }
     }
-
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 渲染层级枚举
+     * @version egret-gd3d 1.0
+     */
     export enum CullingMask
     {
         ui = 0x00000001,
