@@ -1,6 +1,9 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export class EffectSystemData
     {
         public life: number;
@@ -26,7 +29,9 @@ namespace gd3d.framework
             this.elements.length = 0;
         }
     }
-
+    /**
+     * @private
+     */
     export class EffectElement
     {
         /**整个特效 */
@@ -351,6 +356,9 @@ namespace gd3d.framework
     }
 
 
+    /**
+     * @private
+     */
     export class EffectElementData
     {
         public name: string;
@@ -408,6 +416,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class EffectAttrsData
     {
 
@@ -656,6 +667,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class EffectFrameData
     {
         public frameIndex: number;
@@ -680,6 +694,9 @@ namespace gd3d.framework
                 this.lerpDatas.length = 0;
         }
     }
+    /**
+     * @private
+     */
     export class EffectLerpData
     {
         public type: EffectLerpTypeEnum;
@@ -702,6 +719,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class EffectActionData
     {
         public actionType: string;
@@ -722,6 +742,9 @@ namespace gd3d.framework
             return actiondata;
         }
     }
+    /**
+     * @private
+     */
     export class EffectMatData 
     {
         public shader: shader;
@@ -742,6 +765,9 @@ namespace gd3d.framework
             return data;
         }
     }
+    /**
+     * @private
+     */
     export class EffectBatcher
     {
         public mesh: mesh;
@@ -836,6 +862,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export enum EffectPlayStateEnum
     {
         None,//未加载完成
@@ -846,16 +875,25 @@ namespace gd3d.framework
         Dispose,//特效已被回收
     }
 
+    /**
+     * @private
+     */
     export enum EffectElementTypeEnum
     {
         SingleMeshType,//单mesh
         EmissionType,//发射器
         MultiMeshType//多mesh
     }
+    /**
+     * @private
+     */
     export enum EffectLerpTypeEnum
     {
         Linear//线性插值
     }
+    /**
+     * @private
+     */
     export enum RenderModel
     {
         None,

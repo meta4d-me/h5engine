@@ -58,10 +58,23 @@ namespace gd3d.framework
          */
         state: EffectPlayStateEnum = EffectPlayStateEnum.None;
         private curFrameId: number = -1;
+         /**
+         * @private
+         */
         public frameId: number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 特效播放速度
+         * @version egret-gd3d 1.0
+         */
         public static fps: number = 30;
         private playTimer: number = 0;
         private speed: number = 1;
+         /**
+         * @private
+         */
         public webgl:WebGLRenderingContext;
         // private time: number = 0;
 
@@ -412,7 +425,12 @@ namespace gd3d.framework
 
         }
         /**
+         * @public
+         * @language zh_CN
+         * @param speed 播放速度
+         * @classdesc
          * 播放特效
+         * @version egret-gd3d 1.0
          */
         play(speed: number = 1)
         {
@@ -422,16 +440,24 @@ namespace gd3d.framework
             this.gameObject.transform.markDirty();
         }
         /**
+         * @public
+         * @language zh_CN
+         * @param speed 播放速度
+         * @classdesc
          * 暂停播放
-         * @memberof effectSystem
+         * @version egret-gd3d 1.0
          */
         pause()
         {
             this.state = EffectPlayStateEnum.Pause;
         }
         /**
+         * @public
+         * @language zh_CN
+         * @param speed 播放速度
+         * @classdesc
          * 停止播放
-         * @memberof effectSystem
+         * @version egret-gd3d 1.0
          */
         stop()
         {
@@ -439,8 +465,12 @@ namespace gd3d.framework
             this.state = EffectPlayStateEnum.Stop;
         }
         /**
+         * @public
+         * @language zh_CN
+         * @param speed 播放速度
+         * @classdesc
          * 重置到初始状态
-         * @memberof effectSystem
+         * @version egret-gd3d 1.0
          */
         reset(restSinglemesh:boolean=true,resetParticle:boolean=true)
         {

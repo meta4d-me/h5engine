@@ -1,5 +1,8 @@
 ﻿namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export enum ParticleEmissionType
     {
         burst,
@@ -8,6 +11,9 @@
     /**
     * 粒子发射器
     */
+    /**
+     * @private
+     */
     export class EmissionData
     {
         /**

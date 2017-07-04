@@ -175,7 +175,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * matrial调色
+         *  返回 matrial调色
          * @version egret-gd3d 1.0
          */        
         public get color()
@@ -190,7 +190,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * matrial调色
+         *设置 matrial颜色
          * @version egret-gd3d 1.0
          */    
         public set color(color: gd3d.math.color)

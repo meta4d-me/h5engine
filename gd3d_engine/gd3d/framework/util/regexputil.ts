@@ -1,5 +1,12 @@
 namespace gd3d.framework
 {
+    /**
+     * @private
+     * @language zh_CN
+     * @classdesc
+     * 正则表达式的工具类，提供一些引擎用到的正则表达式
+     * @version egret-gd3d 1.0
+     */
     export class RegexpUtil
     {
         //shader properties

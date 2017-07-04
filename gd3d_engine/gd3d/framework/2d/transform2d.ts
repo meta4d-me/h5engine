@@ -3,6 +3,13 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2d组件的接口
+     * @version egret-gd3d 1.0
+     */
     export interface I2DComponent
     {
         start();
@@ -12,6 +19,13 @@ namespace gd3d.framework
         remove();
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2D渲染组件的接口
+     * @version egret-gd3d 1.0
+     */
     export interface IRectRenderer extends I2DComponent
     {
         render(canvas: canvas);
@@ -32,16 +46,28 @@ namespace gd3d.framework
         }
     }
 
-    //也走transform 那一套，不过是2d版，
-    //因为统一有 pivot 和 size,而且2d并不继承自3d
-    //所以我不想让他继承transform2d
-    //那么问题来了，gameobject 还要不要，要，gameobject 管组件的，
-    //gameobject 区分清自己现在挂载的transform 是 2d 还是 3d 就好
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2d的节点类<p/>
+     * 相当于3d的tranform和gameobject的合集<p/>
+     * 自身包含父子关系和组件
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class transform2D
     {
         // public notify: INotify;
         private _canvas: canvas;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点所属的canvas
+         * @version egret-gd3d 1.0
+         */
         set canvas(val: canvas)
         {
             this._canvas = val;
@@ -56,20 +82,85 @@ namespace gd3d.framework
             }
             return this._canvas;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的名字
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("string")
         name: string = "noname";
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的父亲节点
+         * @version egret-gd3d 1.0
+         */
         parent: transform2D;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的孩子节点
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("transform2D[]")
         children: transform2D[];
-        //尺寸
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的宽
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("number")
         width: number;//2d位置
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的高
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("number")
         height: number;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的中心点位置
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("vector2")
-        pivot: math.vector2 = new math.vector2(0, 0);//中心点位置
+        pivot: math.vector2 = new math.vector2(0, 0);
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的hideFlag，用来控制2d节点各种形态下的显示隐藏
+         * @version egret-gd3d 1.0
+         */
         hideFlags: HideFlags = HideFlags.None;
-        _visible = true;
+
+        private _visible = true;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点在场景中是否可见</p>
+         * 如果其父节点不可见，其同样不可见
+         * @version egret-gd3d 1.0
+         */
         get visibleInScene()
         {
             let obj: transform2D = this;
@@ -79,10 +170,18 @@ namespace gd3d.framework
             }
             return obj.visible;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的隐藏状态
+         * @version egret-gd3d 1.0
+         */
         get visible(): boolean
         {
             return this._visible;
-        };//自否可见
+        };
         set visible(val: boolean)
         {
             if (val != this._visible)
@@ -92,21 +191,57 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @private
+         * @language zh_CN
+         * @classdesc
+         * 获取自身
+         * @version egret-gd3d 1.0
+         */
         get transform()
         {
             return this;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前节点的唯一id
+         * @version egret-gd3d 1.0
+         */
         public insId: insID = new insID();
         private dirty: boolean = true;//自己是否需要更新
         private dirtyChild: boolean = true;//子层是否需要更新
         private dirtyWorldDecompose: boolean = false;
 
-        //位置信息
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的位置
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("vector2")
-        localTranslate: math.vector2 = new math.vector2(0, 0);//显示位置
+        localTranslate: math.vector2 = new math.vector2(0, 0);
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的缩放
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("vector2")
-        localScale: math.vector2 = new math.vector2(1, 1);//缩放位置
+        localScale: math.vector2 = new math.vector2(1, 1);
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前2d节点的旋转
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("number")
         localRotate: number = 0;//旋转
 
@@ -117,6 +252,15 @@ namespace gd3d.framework
         private worldRotate: math.angelref = new math.angelref();
         private worldTranslate: gd3d.math.vector2 = new gd3d.math.vector2(0, 0);
         private worldScale: gd3d.math.vector2 = new gd3d.math.vector2(1, 1);
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 为当前2d节点添加子节点
+         * @param node 要添加的子节点
+         * @version egret-gd3d 1.0
+         */
         addChild(node: transform2D)
         {
             if (node.parent != null)
@@ -130,6 +274,16 @@ namespace gd3d.framework
             node.canvas = this.canvas;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 为当前2d节点添加子节点,并插入到指定位置
+         * @param node 要添加的子节点
+         * @param index 要插入到的位置
+         * @version egret-gd3d 1.0
+         */
         addChildAt(node: transform2D, index: number)
         {
             if (index < 0)
@@ -147,6 +301,15 @@ namespace gd3d.framework
             node.parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 为当前2d节点移除子节点
+         * @param 要移除的子节点
+         * @version egret-gd3d 1.0
+         */
         removeChild(node: transform2D)
         {
             if (node.parent != this || this.children == null)
@@ -161,7 +324,13 @@ namespace gd3d.framework
             sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
         }
 
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 为当前2d节点移除所有子节点
+         * @version egret-gd3d 1.0
+         */
         removeAllChild()
         {
             while(this.children.length>0)
@@ -170,8 +339,13 @@ namespace gd3d.framework
             }
         }
 
-        //矩阵关系
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 标记自身脏了
+         * @version egret-gd3d 1.0
+         */
         markDirty()
         {
             this.dirty = true;
@@ -182,6 +356,15 @@ namespace gd3d.framework
                 p = p.parent;
             }
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 用脏机制来检查自身和子节点。更新位置、缩放、旋转等信息
+         * @param parentChange 父节点是否发生变化
+         * @version egret-gd3d 1.0
+         */
         updateTran(parentChange: boolean)
         {
             //无刷
@@ -219,6 +402,14 @@ namespace gd3d.framework
             this.dirty = false;
             this.dirtyChild = false;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 更新整个节点结构
+         * @version egret-gd3d 1.0
+         */
         updateWorldTran()
         {
             //parent 找到顶，第一个dirty的
@@ -234,6 +425,14 @@ namespace gd3d.framework
             var top = dirtylist.pop();
             top.updateTran(false);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的相对于canvas的位置
+         * @version egret-gd3d 1.0
+         */
         getWorldTranslate()
         {
             if (this.dirtyWorldDecompose)
@@ -243,6 +442,14 @@ namespace gd3d.framework
             }
             return this.worldTranslate;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的相对于canvas的缩放
+         * @version egret-gd3d 1.0
+         */
         getWorldScale()
         {
             if (this.dirtyWorldDecompose)
@@ -252,6 +459,14 @@ namespace gd3d.framework
             }
             return this.worldScale;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的相对于canvas的旋转
+         * @version egret-gd3d 1.0
+         */
         getWorldRotate()
         {
             if (this.dirtyWorldDecompose)
@@ -261,16 +476,39 @@ namespace gd3d.framework
             }
             return this.worldRotate;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的本地变换矩阵
+         * @version egret-gd3d 1.0
+         */
         getLocalMatrix(): gd3d.math.matrix3x2
         {
             return this.localMatrix;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的世界变换矩阵
+         * @version egret-gd3d 1.0
+         */
         getWorldMatrix(): gd3d.math.matrix3x2
         {
             return this.worldMatrix;
         }
 
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置当前节点的相对于canvas的位置
+         * @param pos 相对于canvas的位置
+         * @version egret-gd3d 1.0
+         */
         setWorldPosition(pos: math.vector2)
         {
             this.dirty = true;
@@ -303,6 +541,14 @@ namespace gd3d.framework
             math.pool.delete_vector2(dir);
             math.pool.delete_vector2(dirinv);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放当前节点，包括其子节点
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             if(this.children)
@@ -315,12 +561,34 @@ namespace gd3d.framework
             }
             this.removeAllComponents();
         }
-        //组件管理，原unity gameobject的部分
-        //待渲染的数据
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前节点的渲染组件，一个节点同时只能存在一个渲染组件
+         * @version egret-gd3d 1.0
+         */
         renderer: IRectRenderer;
-        // collider2d: boxcollider2d;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前节点的所有组件
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("C2DComponent[]")
         components: C2DComponent[] = [];
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前节点的update
+         * @param delta 两次update的间隔时间
+         * @version egret-gd3d 1.0
+         */
         update(delta: number)
         {
             if (this.components != null)
@@ -344,6 +612,40 @@ namespace gd3d.framework
                 }
             }
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 为当前节点添加一个组件
+         * @param type 组件名称
+         * @version egret-gd3d 1.0
+         */
+        addComponent(type: string): I2DComponent
+        {
+            if (this.components == null)
+                this.components = [];
+            for (var key in this.components)
+            {
+                var st = this.components[key]["comp"]["constructor"]["name"];
+                if (st == type)
+                {
+                    throw new Error("已经有一个" + type + "的组件了，不能俩");
+                }
+            }
+            var pp = gd3d.reflect.getPrototype(type);
+            var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
+            return this.addComponentDirect(comp);
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 为当前节点添加组件
+         * @param comp 2d组件实例
+         * @version egret-gd3d 1.0
+         */
         addComponentDirect(comp: I2DComponent): I2DComponent
         {
             if (comp.transform != null)
@@ -382,6 +684,77 @@ namespace gd3d.framework
             // }
             return comp;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除当前节点下的组件
+         * @param comp 2d组件实例
+         * @version egret-gd3d 1.0
+         */
+        removeComponent(comp: I2DComponent)
+        {
+            for (var i = 0; i < this.components.length; i++)
+            {
+                if (this.components[i].comp == comp)
+                {
+                    if (this.components[i].init)
+                    {//已经初始化过
+
+                    }
+                    this.components.splice(i, 1);
+                }
+            }
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除当前节点下的组件
+         * @param type 2d组件名称
+         * @version egret-gd3d 1.0
+         */
+        removeComponentByTypeName(type: string)
+        {
+            for (var i = 0; i < this.components.length; i++)
+            {
+                if (reflect.getClassName(this.components[i].comp) == type)
+                {
+                    var p = this.components.splice(i, 1);
+                    if (p[0].comp == this.renderer) this.renderer = null;
+                    return p[0];
+                }
+            }
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除当前节点下的所有组件
+         * @param type 2d组件名称
+         * @version egret-gd3d 1.0
+         */
+        removeAllComponents()
+        {
+            for (var i = 0; i < this.components.length; i++)
+            {
+                this.components[i].comp.remove();
+                if (this.components[i].comp == this.renderer) this.renderer = null;
+            }
+            this.components.length = 0;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的指定组件实例
+         * @param type 2d组件的名字
+         * @version egret-gd3d 1.0
+         */
         getComponent(type: string): I2DComponent
         {
             for (var i = 0; i < this.components.length; i++)
@@ -394,7 +767,14 @@ namespace gd3d.framework
             }
             return null;
         }
-        //获取身上所有的组件
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点身上所有的组件
+         * @version egret-gd3d 1.0
+         */
         getComponents(): I2DComponent[]
         {
             let components: I2DComponent[] = [];
@@ -404,7 +784,15 @@ namespace gd3d.framework
             }
             return components;
         }
-        //包含自己
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点下所有的特定组件
+         * @param type 组件名称
+         * @version egret-gd3d 1.0
+         */
         getComponentsInChildren(type: string): I2DComponent[]
         {
             let components: I2DComponent[] = [];
@@ -413,6 +801,13 @@ namespace gd3d.framework
             return components;
         }
 
+        /**
+         * @private
+         * 之前给编辑器开的接口
+         * @param node 
+         * @param _type 
+         * @param comps 
+         */
         private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[])
         {
             for (var i in node.components)
@@ -432,60 +827,15 @@ namespace gd3d.framework
             }
         }
 
-
-        addComponent(type: string): I2DComponent
-        {
-            if (this.components == null)
-                this.components = [];
-            for (var key in this.components)
-            {
-                var st = this.components[key]["comp"]["constructor"]["name"];
-                if (st == type)
-                {
-                    throw new Error("已经有一个" + type + "的组件了，不能俩");
-                }
-            }
-            var pp = gd3d.reflect.getPrototype(type);
-            var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
-            return this.addComponentDirect(comp);
-        }
-        removeComponent(comp: I2DComponent)
-        {
-            for (var i = 0; i < this.components.length; i++)
-            {
-                if (this.components[i].comp == comp)
-                {
-                    if (this.components[i].init)
-                    {//已经初始化过
-
-                    }
-                    this.components.splice(i, 1);
-                }
-            }
-        }
-        removeComponentByTypeName(type: string)
-        {
-            for (var i = 0; i < this.components.length; i++)
-            {
-                if (reflect.getClassName(this.components[i].comp) == type)
-                {
-                    var p = this.components.splice(i, 1);
-                    if (p[0].comp == this.renderer) this.renderer = null;
-                    return p[0];
-                }
-            }
-        }
-
-        removeAllComponents()
-        {
-            for (var i = 0; i < this.components.length; i++)
-            {
-                this.components[i].comp.remove();
-                if (this.components[i].comp == this.renderer) this.renderer = null;
-            }
-            this.components.length = 0;
-        }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 捕获事件
+         * @param canvas canvas实例
+         * @param ev 事件对象
+         * @version egret-gd3d 1.0
+         */
         onCapturePointEvent(canvas: canvas, ev: PointEvent)
         {
             //event 捕捉阶段，正向
@@ -517,13 +867,23 @@ namespace gd3d.framework
                 }
             }
         }
-        ContainsPoint(p: math.vector2): boolean
-        {
-            var p2 = new math.vector2();
-            p2.x = p.x + this.pivot.x * this.width;
-            p2.y = p.y + this.pivot.y * this.height;
-            return p2.x >= 0 && p2.y >= 0 && p2.x < this.width && p2.y < this.height;
-        }
+
+        // ContainsPoint(p: math.vector2): boolean
+        // {
+        //     var p2 = new math.vector2();
+        //     p2.x = p.x + this.pivot.x * this.width;
+        //     p2.y = p.y + this.pivot.y * this.height;
+        //     return p2.x >= 0 && p2.y >= 0 && p2.x < this.width && p2.y < this.height;
+        // }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 检测以canvas为参考的位置，是否在节点的范围内
+         * @param pworld 位置
+         * @version egret-gd3d 1.0
+         */
         ContainsCanvasPoint(pworld: math.vector2): boolean
         {
             var mworld = this.getWorldMatrix();
@@ -535,9 +895,17 @@ namespace gd3d.framework
             p2.x += this.pivot.x * this.width;
             p2.y += this.pivot.y * this.height;
             return p2.x >= 0 && p2.y >= 0 && p2.x < this.width && p2.y < this.height;
-
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 事件分发
+         * @param canvas canvas实例
+         * @param ev 事件对象
+         * @version egret-gd3d 1.0
+         */
         onPointEvent(canvas: canvas, ev: PointEvent)
         {
             //event 上升阶段,上升阶段事件会被吞掉

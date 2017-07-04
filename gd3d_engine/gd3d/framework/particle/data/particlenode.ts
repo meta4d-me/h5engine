@@ -3,6 +3,9 @@
     /**
      * 粒子节点
      */
+    /**
+     * @private
+     */
     export class ParticleNode
     {
         x: ValueData = new ValueData();
@@ -37,6 +40,9 @@
         }
     }
 
+    /**
+     * @private
+     */
     export class AlphaNode
     {
         alpha: ValueData = new ValueData();
@@ -48,6 +54,9 @@
         }
 
     }
+    /**
+     * @private
+     */
     export class UVSpeedNode
     {
         u: ValueData = new ValueData();
@@ -73,6 +82,9 @@
         }
     }
 
+    /**
+     * @private
+     */
     export class ParticleNodeVec2
     {
         x: ValueData = new ValueData();
@@ -98,6 +110,9 @@
         }
     }
 
+    /**
+     * @private
+     */
     export class ParticleNodeNumber
     {
         num: ValueData = new ValueData();

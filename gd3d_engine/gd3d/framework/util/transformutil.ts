@@ -1,5 +1,12 @@
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 原生3d模型类型
+     * @version egret-gd3d 1.0
+     */
     export enum PrimitiveType
     {
         Sphere,
@@ -11,6 +18,13 @@ namespace gd3d.framework
         Pyramid
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 原生2d类型
+     * @version egret-gd3d 1.0
+     */
     export enum Primitive2DType
     {
         RawImage2D,
@@ -19,11 +33,26 @@ namespace gd3d.framework
         Button
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * Transform工具类
+     * @version egret-gd3d 1.0
+     */
     export class TransformUtil
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 创建默认的3d对象
+         * @param type 原生3d对象类型
+         * @param app application的实例
+         * @version egret-gd3d 1.0
+         */
         static CreatePrimitive(type: PrimitiveType, app: application): transform
         {
-            // let enumObj = EnumUtil.getEnumObjByType("gd3d.framework.PrimitiveType");
             let objName = (PrimitiveType[type] as string);
 
             let trans = new transform();
@@ -38,6 +67,15 @@ namespace gd3d.framework
             return trans;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 创建默认的2d控件
+         * @param type 2d控件类型
+         * @param app application的实例
+         * @version egret-gd3d 1.0
+         */
         static Create2DPrimitive(type: Primitive2DType, app: application): transform2D
         {
             // let enumObj = EnumUtil.getEnumObjByType("gd3d.framework.Primitive2DType");

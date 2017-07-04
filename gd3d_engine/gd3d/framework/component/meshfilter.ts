@@ -47,7 +47,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @param mesh 此组件的mesh
          * @classdesc
-         * mesh数据
+         * 设置mesh数据
          * @version egret-gd3d 1.0
          */
         set mesh(mesh: mesh)
@@ -66,7 +66,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * mesh数据
+         * 返回mesh数据
          * @version egret-gd3d 1.0
          */
         getMeshOutput()
