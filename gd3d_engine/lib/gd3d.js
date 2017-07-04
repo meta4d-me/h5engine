@@ -4226,28 +4226,49 @@ var gd3d;
                         }
                         var _textureSrc = url.replace(filename, _name);
                         state.resstate[filename] = { state: 0, res: null };
-                        var img = new Image();
-                        img.src = _textureSrc;
-                        img.crossOrigin = "anonymous";
-                        img.onerror = function (error) {
-                            if (error != null) {
-                                state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
-                                state.iserror = true;
+                        if (_textureSrc.indexOf(".pvr.bin") >= 0) {
+                            gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
+                                if (err != null) {
+                                    state.iserror = true;
+                                    state.errs.push(new Error(err.message));
+                                    onstate(state);
+                                    return;
+                                }
+                                var _texture = new framework.texture(filename);
+                                _this.assetUrlDic[_texture.getGUID()] = url;
+                                var pvr = new PVRHeader(_this.webgl);
+                                console.log(_textureSrc);
+                                _texture.glTexture = pvr.parse(_buffer);
+                                _this.use(_texture);
+                                state.resstate[filename].state = 1;
+                                state.resstate[filename].res = _texture;
                                 onstate(state);
-                            }
-                        };
-                        img.onload = function () {
-                            var _texture = new framework.texture(filename);
-                            _texture.realName = _name;
-                            _this.assetUrlDic[_texture.getGUID()] = url;
-                            var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
-                            _texture.glTexture = t2d;
-                            _this.use(_texture);
-                            state.resstate[filename].state = 1;
-                            state.resstate[filename].res = _texture;
-                            onstate(state);
-                        };
+                            });
+                        }
+                        else {
+                            var img = new Image();
+                            img.src = _textureSrc;
+                            img.crossOrigin = "anonymous";
+                            img.onerror = function (error) {
+                                if (error != null) {
+                                    state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
+                                    state.iserror = true;
+                                    onstate(state);
+                                }
+                            };
+                            img.onload = function () {
+                                var _texture = new framework.texture(filename);
+                                _texture.realName = _name;
+                                _this.assetUrlDic[_texture.getGUID()] = url;
+                                var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
+                                t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                                _texture.glTexture = t2d;
+                                _this.use(_texture);
+                                state.resstate[filename].state = 1;
+                                state.resstate[filename].res = _texture;
+                                onstate(state);
+                            };
+                        }
                     });
                 }
                 else if (type == AssetTypeEnum.Material) {
@@ -4730,7 +4751,7 @@ var gd3d;
                     else if (extname == ".png" || extname == ".jpg") {
                         return AssetTypeEnum.Texture;
                     }
-                    else if (extname == ".pvr.czz" || extname == ".pvr") {
+                    else if (extname == ".pvr.bin" || extname == ".pvr") {
                         return AssetTypeEnum.PVR;
                     }
                     else if (extname == ".imgdesc.json") {
@@ -4880,7 +4901,6 @@ var PVRHeader = (function () {
             target = this.gl.TEXTURE_CUBE_MAP;
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(target, t2d.texture);
-        var currentMipMapSize = 0;
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
         function textureLevelSize(format, width, height) {

@@ -102,8 +102,6 @@ class PVRHeader
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(target, t2d.texture);
 
-        var currentMipMapSize = 0;
-
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
 

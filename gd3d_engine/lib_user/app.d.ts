@@ -635,6 +635,7 @@ declare namespace t {
         taskmgr: gd3d.framework.taskMgr;
         count: number;
         counttimer: number;
+        name: string;
         private loadShader(laststate, state);
         private loadText(laststate, state);
         private loadPvr(laststate, state);
