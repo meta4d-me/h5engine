@@ -1,0 +1,35 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.UVSpeedNode",
+			"name": "uvSpeed",
+			"memberof": "gd3d.framework.UVRoll",
+			"scope": "instance",
+			"description": "uv滚动"
+		},
+		{
+			"kind": "member",
+			"type": "Array<gd3d.framework.UVSpeedNode>",
+			"name": "uvSpeedNodes",
+			"memberof": "gd3d.framework.UVRoll",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.UVRoll",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "UVRoll",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlealldata.ts"
+	}
+}

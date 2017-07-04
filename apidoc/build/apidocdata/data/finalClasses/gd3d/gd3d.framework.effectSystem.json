@@ -1,0 +1,229 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "autoplay",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "自动播放",
+			"version": "egret-gd3d 1.0",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "beLoop",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "特效是否循环",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "fps",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "static",
+			"default": "30"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "frameId",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "挂载的gameobject",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderLayerEnum",
+			"name": "layer",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"default": "RenderLayerEnum.Transparent"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "queue",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "同层级渲染排序依据",
+			"version": "egret-gd3d 1.0",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.CullingMask",
+			"name": "renderLayer",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "渲染层级",
+			"version": "egret-gd3d 1.0",
+			"default": "CullingMask.default"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "pause",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "暂停播放"
+		},
+		{
+			"kind": "function",
+			"name": "play",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "播放特效",
+			"params": [
+				{
+					"name": "speed",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "提交各个EffectBatcher中的数据进行渲染",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "reset",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "重置到初始状态",
+			"params": [
+				{
+					"name": "restSinglemesh",
+					"type": "boolean",
+					"default": "true",
+					"description": ""
+				},
+				{
+					"name": "resetParticle",
+					"type": "boolean",
+					"default": "true",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setEffect",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "设置特效数据 string",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "effectConfig",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setJsonData",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "设置特效数据 textasset",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "_jsonData",
+					"type": "gd3d.framework.textasset",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "stop",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"description": "停止播放"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "effectSystem",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\effectsystem.ts",
+		"description": "特效组件",
+		"version": "egret-gd3d 1.0",
+		"implements": [
+			{
+				"name": "gd3d.framework.IRenderer"
+			}
+		]
+	}
+}

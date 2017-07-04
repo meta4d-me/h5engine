@@ -28,6 +28,13 @@ namespace gd3d.framework
             return this.id;
         }
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 静态text 初始化后不可修改
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class constText
     {
@@ -41,6 +48,13 @@ namespace gd3d.framework
             return this.name;
         }
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 资源接口 扩展资源需要继承此接口
+     * @version egret-gd3d 1.0
+     */
     export interface IAsset //
     {
         defaultAsset:boolean;//是否为系统默认资源

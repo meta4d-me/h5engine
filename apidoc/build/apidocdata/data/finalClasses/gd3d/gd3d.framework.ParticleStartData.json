@@ -1,0 +1,142 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "angle",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "boxDirection",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "circleDirection",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "coneDirection",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "depth",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "direction",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "edgeDirection",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.emitfromenum",
+			"name": "emitFrom",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"default": "emitfromenum.base"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "hemisphereDirection",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "position",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "radius",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "randomDirection",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleSystemShape",
+			"name": "shapeType",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"default": "ParticleSystemShape.NORMAL"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "sphereDirection",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "ParticleStartData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlestartdata.ts",
+		"description": "粒子初始数据"
+	}
+}

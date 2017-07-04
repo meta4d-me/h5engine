@@ -1,0 +1,74 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "b",
+			"memberof": "gd3d.math.border",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "l",
+			"memberof": "gd3d.math.border",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "r",
+			"memberof": "gd3d.math.border",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "t",
+			"memberof": "gd3d.math.border",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "border",
+			"memberof": "gd3d.math.border",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "l",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "t",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "r",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "border",
+		"memberof": "gd3d.math",
+		"filename": "render\\struct.ts"
+	}
+}

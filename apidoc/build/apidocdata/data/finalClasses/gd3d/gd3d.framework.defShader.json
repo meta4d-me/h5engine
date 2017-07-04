@@ -1,0 +1,116 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "fscode",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"         \\\r\n    uniform sampler2D _MainTex;                                                 \\\r\n    varying lowp vec4 xlv_COLOR;                                                 \\\r\n    varying highp vec2 xlv_TEXCOORD0;   \\\r\n    void main() \\\r\n    {\\\r\n        lowp vec4 col_1;    \\\r\n        mediump vec4 prev_2;\\\r\n        lowp vec4 tmpvar_3;\\\r\n        tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\\\r\n        prev_2 = tmpvar_3;\\\r\n        mediump vec4 tmpvar_4;\\\r\n        tmpvar_4 = mix(vec4(1.0, 1.0, 1.0, 1.0), prev_2, prev_2.wwww);\\\r\n        col_1 = tmpvar_4;\\\r\n        col_1.x =xlv_TEXCOORD0.x;\\\r\n        col_1.y =xlv_TEXCOORD0.y;\\\r\n        gl_FragData[0] = col_1;\\\r\n    }\\\r\n    \""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "fscode2",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"         \\\r\n    void main() \\\r\n    {\\\r\n        gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\\\r\n    }\\\r\n    \""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "fscodeui",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"         \\\r\n    uniform sampler2D _MainTex;                                                 \\\r\n    varying lowp vec4 xlv_COLOR;                                                 \\\r\n    varying highp vec2 xlv_TEXCOORD0;   \\\r\n    void main() \\\r\n    {\\\r\n        lowp vec4 tmpvar_3;\\\r\n        tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\\\r\n        gl_FragData[0] = tmpvar_3;\\\r\n    }\\\r\n    \""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "fscodeuifont",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"\\\r\nprecision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \\n\\\r\nuniform sampler2D _MainTex; \\n\\\r\nvarying lowp vec4 xlv_COLOR;\\n\\\r\nvarying lowp vec4 xlv_COLOREx;\\n\\\r\nvarying highp vec2 xlv_TEXCOORD0;   \\n\\\r\nvoid main() \\n\\\r\n{\\n\\\r\nfloat scale = 10.0;//  \\n\\\r\nfloat d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  //0.5\\n\\\r\nfloat bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  //0.34\\n\\\r\n\\n\\\r\nfloat c=xlv_COLOR.a * clamp ( d,0.0,1.0); \\n\\\r\nfloat bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0); \\n\\\r\nbc =min(1.0-c,bc);\\n\\\r\n\\n\\\r\n\\n\\\r\n\\n\\\r\ngl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\\n\\\r\n}\""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "fsdiffuse",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"\\\r\n    uniform sampler2D _MainTex;\\\r\n    uniform lowp float _AlphaCut;\\\r\n    varying highp vec2 xlv_TEXCOORD0;\\\r\n    void main() \\\r\n    {\\\r\n        lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\\\r\n        if(tmpvar_3.a < _AlphaCut)\\\r\n            discard;\\\r\n        gl_FragData[0] = tmpvar_3;\\\r\n    }\""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "fsline",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"\\\r\n    varying lowp vec4 xlv_COLOR;\\\r\n    void main()\\\r\n    {\\\r\n        gl_FragData[0] = xlv_COLOR;\\\r\n    }\""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "vscode",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"\\\r\n    attribute vec4 _glesVertex;   \\\r\n    attribute vec4 _glesColor;                  \\\r\n    attribute vec4 _glesMultiTexCoord0;         \\\r\n    uniform highp mat4 glstate_matrix_mvp;      \\\r\n    varying lowp vec4 xlv_COLOR;                \\\r\n    varying highp vec2 xlv_TEXCOORD0;           \\\r\n    void main()                                     \\\r\n    {                                               \\\r\n        highp vec4 tmpvar_1;                        \\\r\n        tmpvar_1.w = 1.0;                           \\\r\n        tmpvar_1.xyz = _glesVertex.xyz;             \\\r\n        xlv_COLOR = _glesColor;                     \\\r\n        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \\\r\n        gl_Position = (glstate_matrix_mvp * tmpvar_1);  \\\r\n    }\""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "vscodeuifont",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"\\\r\n    attribute vec4 _glesVertex;   \\\r\n    attribute vec4 _glesColor;                  \\\r\n    attribute vec4 _glesColorEx;                  \\\r\n    attribute vec4 _glesMultiTexCoord0;         \\\r\n    uniform highp mat4 glstate_matrix_mvp;      \\\r\n    varying lowp vec4 xlv_COLOR;                \\\r\n    varying lowp vec4 xlv_COLOREx;                                                 \\\r\n    varying highp vec2 xlv_TEXCOORD0;           \\\r\n    void main()                                     \\\r\n    {                                               \\\r\n        highp vec4 tmpvar_1;                        \\\r\n        tmpvar_1.w = 1.0;                           \\\r\n        tmpvar_1.xyz = _glesVertex.xyz;             \\\r\n        xlv_COLOR = _glesColor;                     \\\r\n        xlv_COLOREx = _glesColorEx;                     \\\r\n        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \\\r\n        gl_Position = (glstate_matrix_mvp * tmpvar_1);  \\\r\n    }\""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "vsdiffuse",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"\\\r\n    attribute vec4 _glesVertex;\\\r\n    attribute vec4 _glesMultiTexCoord0;\\\r\n    uniform highp mat4 glstate_matrix_mvp;\\\r\n    varying highp vec2 xlv_TEXCOORD0;\\\r\n    void main()\\\r\n    {\\\r\n        highp vec4 tmpvar_1;\\\r\n        tmpvar_1.w = 1.0;\\\r\n        tmpvar_1.xyz = _glesVertex.xyz;\\\r\n        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\\\r\n        gl_Position = (glstate_matrix_mvp * tmpvar_1);\\\r\n    }\""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "vsline",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"description": "//editor",
+			"default": "\"\\\r\n    attribute vec4 _glesVertex;\\\r\n    attribute vec4 _glesColor;\\\r\n    uniform highp mat4 glstate_matrix_mvp;\\\r\n    varying lowp vec4 xlv_COLOR;\\\r\n    void main()\\\r\n    {\\\r\n        highp vec4 tmpvar_1;\\\r\n        tmpvar_1.w = 1.0;\\\r\n        tmpvar_1.xyz = _glesVertex.xyz;\\\r\n        xlv_COLOR = _glesColor;\\\r\n        gl_Position = (glstate_matrix_mvp * tmpvar_1);\\\r\n    }\""
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "vsmaterialcolor",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"default": "\"\\\r\n    attribute vec4 _glesVertex;\\\r\n    uniform vec4 _Color;\\\r\n    uniform highp mat4 glstate_matrix_mvp;\\\r\n    varying lowp vec4 xlv_COLOR;\\\r\n    void main()\\\r\n    {\\\r\n        highp vec4 tmpvar_1;\\\r\n        tmpvar_1.w = 1.0;\\\r\n        tmpvar_1.xyz = _glesVertex.xyz;\\\r\n        xlv_COLOR = _Color;\\\r\n        gl_Position = (glstate_matrix_mvp * tmpvar_1);\\\r\n    }\""
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "initDefaultShader",
+			"memberof": "gd3d.framework.defShader",
+			"scope": "static",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "defShader",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\default\\defshader.ts"
+	}
+}

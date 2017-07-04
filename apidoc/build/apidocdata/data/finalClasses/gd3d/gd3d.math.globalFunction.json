@@ -1,0 +1,2817 @@
+{
+	"globalFunction": [
+		{
+			"filename": "framework\\math\\utilMath.ts",
+			"kind": "globalFunction",
+			"name": "GetPointAlongCurve",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "curveStart",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "curveStartHandle",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "curveEnd",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "curveEndHandle",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "t",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "crease",
+					"type": "number",
+					"default": "0.3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\geometricoperation.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "Multiply",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "// 计算叉乘 |P0P1| × |P0P2|",
+			"params": [
+				{
+					"name": "p1",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "p2",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "p0",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\string.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "caclStringByteLength",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\geometricoperation.ts",
+			"kind": "globalFunction",
+			"name": "calPlaneLineIntersectPoint",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "planeVector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "planePoint",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "lineVector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "linePoint",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\color.ts",
+			"kind": "globalFunction",
+			"name": "colorClone",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.color",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.color",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\color.ts",
+			"kind": "globalFunction",
+			"name": "colorLerp",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "srca",
+					"type": "gd3d.math.color",
+					"description": ""
+				},
+				{
+					"name": "srcb",
+					"type": "gd3d.math.color",
+					"description": ""
+				},
+				{
+					"name": "t",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.color",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\color.ts",
+			"kind": "globalFunction",
+			"name": "colorMultiply",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "srca",
+					"type": "gd3d.math.color",
+					"description": ""
+				},
+				{
+					"name": "srcb",
+					"type": "gd3d.math.color",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.color",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\color.ts",
+			"kind": "globalFunction",
+			"name": "colorSet_Black",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "out",
+					"type": "gd3d.math.color",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\color.ts",
+			"kind": "globalFunction",
+			"name": "colorSet_Gray",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "out",
+					"type": "gd3d.math.color",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\color.ts",
+			"kind": "globalFunction",
+			"name": "colorSet_White",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "out",
+					"type": "gd3d.math.color",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\number.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "floatClamp",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "//临时写在这里",
+			"params": [
+				{
+					"name": "v",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "min",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "max",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "floatFormat",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "num",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "maxDot",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\number.ts",
+			"kind": "globalFunction",
+			"name": "getKeyCodeByAscii",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "ev",
+					"type": "KeyboardEvent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\geometricoperation.ts",
+			"kind": "globalFunction",
+			"name": "isContain",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "//判断点是否在矩形p1p2p3p4中",
+			"params": [
+				{
+					"name": "p1",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "p2",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "p3",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "p4",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "mp",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrix2Quaternion",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "matrix",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "result",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrix3x2Clone",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "boolean",
+			"name": "matrix3x2Decompose",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "rotation",
+					"type": "gd3d.math.angelref",
+					"description": ""
+				},
+				{
+					"name": "translation",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrix3x2Inverse",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrix3x2MakeIdentity",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrix3x2MakeRotate",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "angle",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrix3x2MakeScale",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "xScale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "yScale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrix3x2MakeTransformRTS",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "pos",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "rot",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrix3x2MakeTranslate",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "x",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrix3x2Multiply",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "lhs",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				},
+				{
+					"name": "rhs",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix3x2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrix3x2TransformNormal",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "inp",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrix3x2TransformVector2",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "inp",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixAdd",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "left",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "right",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixClone",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "boolean",
+			"name": "matrixDecompose",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "rotation",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "translation",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrixGetScale",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixGetTranslation",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrixGetVector3ByOffset",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "result",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixInverse",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixLerp",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "left",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "right",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "v",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixLookatLH",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "//lights fix",
+			"params": [
+				{
+					"name": "forward",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "up",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixMakeIdentity",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixMakeRotateAxisAngle",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "axis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "angle",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrixMakeScale",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "xScale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "yScale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "zScale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixMakeTransformRTS",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "pos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "rot",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrixMakeTranslate",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "x",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "z",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrixMultiply",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "lhs",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "rhs",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixProject_OrthoLH",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "width",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "height",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "znear",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "zfar",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixProject_PerspectiveLH",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "fov",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "aspect",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "znear",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "zfar",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixReset",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixScaleByNum",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "mat",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrixTransformNormal",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "//变换向量",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "transformation",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "result",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "matrixTransformVector3",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "transformation",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "result",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixTranspose",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "当前矩阵转置",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixViewLookatLH",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "eye",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "forward",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "up",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\matrix.ts",
+			"kind": "globalFunction",
+			"name": "matrixZero",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\number.ts",
+			"kind": "globalFunction",
+			"name": "numberLerp",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "fromV",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "toV",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "v",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quat2Lookat",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "pos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "targetpos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "updir",
+					"type": "gd3d.math.vector3",
+					"default": "gd3d.math.pool.vector3_up",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatClone",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatFromAxisAngle",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "axis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "angle",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatFromEulerAngles",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "ax",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "ay",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "az",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "quatFromYawPitchRoll",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "yaw",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "pitch",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "roll",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "result",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatInverse",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatLerp",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "srca",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "srcb",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "t",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatLookat",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "//获取一个注视目标的四元数",
+			"params": [
+				{
+					"name": "pos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "targetpos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "quatMagnitude",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatMultiply",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "srca",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "srcb",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatMultiplyDataAndQuat",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "srca",
+					"type": "Float32Array",
+					"description": ""
+				},
+				{
+					"name": "srcaseek",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "srcb",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatMultiplyVector",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "scr",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatNormalize",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatReset",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "quatToAxisAngle",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "axis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatToEulerAngles",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatToMatrix",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatTransformVector",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatTransformVectorDataAndQuat",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "Float32Array",
+					"description": ""
+				},
+				{
+					"name": "srcseek",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\quat.ts",
+			"kind": "globalFunction",
+			"name": "quatYAxis",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "pos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "targetpos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "quaternionFormat",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				},
+				{
+					"name": "maxDot",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\rect.ts",
+			"kind": "globalFunction",
+			"type": "boolean",
+			"name": "rectEqul",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src1",
+					"type": "gd3d.math.rect",
+					"description": ""
+				},
+				{
+					"name": "src2",
+					"type": "gd3d.math.rect",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\rect.ts",
+			"kind": "globalFunction",
+			"type": "boolean",
+			"name": "rectInner",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "x",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "src",
+					"type": "gd3d.math.rect",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\rect.ts",
+			"kind": "globalFunction",
+			"name": "rectSet_One",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "out",
+					"type": "gd3d.math.rect",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\rect.ts",
+			"kind": "globalFunction",
+			"name": "rectSet_Zero",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "out",
+					"type": "gd3d.math.rect",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\color.ts",
+			"kind": "globalFunction",
+			"name": "scaleToRef",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.math.color",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.color",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\number.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "sign",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\utilMath.ts",
+			"kind": "globalFunction",
+			"name": "spriteAnimation",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "//row：图片行数//column:图片列数//index：第几张图片（index从0开始计数）",
+			"params": [
+				{
+					"name": "row",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "column",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "index",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector4",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"name": "vec2Add",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"name": "vec2Clone",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "to",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec2Distance",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"type": "boolean",
+			"name": "vec2Equal",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "//阀值先写这里了，回头",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "vector2",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "threshold",
+					"default": "0.00001",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec2Length",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec2Multiply",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"name": "vec2Normalize",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"name": "vec2SLerp",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "vector2",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "v",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"name": "vec2ScaleByNum",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"name": "vec2Subtract",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Add",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec3Angle",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "to",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec3AngleBetween",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "to",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3ClampLength",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "maxLength",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Clone",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "// }",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "to",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Cross",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "lhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "rhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec3Distance",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec3Dot",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "lhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "rhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"type": "boolean",
+			"name": "vec3Equal",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"description": "////又有参数又有返回值的必须是static",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "vector2",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "threshold",
+					"default": "0.00001",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Exclude",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "excludeThis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "fromThat",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Format",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "maxDot",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec3Length",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Max",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "lhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "rhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Min",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "lhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "rhs",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Minus",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Normalize",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Product",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Project",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "onNormal",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3ProjectOnPlane",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "planeNormal",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Reflect",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "inDirection",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "inNormal",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Reset",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "val",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3SLerp",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vector",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "vector2",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "v",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3ScaleByNum",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3ScaleByVec3",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "scale",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3SetByFloat",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "x",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "z",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Set_Back",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Set_Down",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Set_Forward",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Set_Left",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Set_One",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Set_Right",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Set_Up",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"type": "number",
+			"name": "vec3SqrLength",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3Subtract",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "a",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector3.ts",
+			"kind": "globalFunction",
+			"name": "vec3ToString",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "result",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\vector2.ts",
+			"kind": "globalFunction",
+			"name": "vec4Clone",
+			"memberof": "gd3d.math",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "from",
+					"type": "gd3d.math.vector4",
+					"description": ""
+				},
+				{
+					"name": "to",
+					"type": "gd3d.math.vector4",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\math\\number.ts",
+			"kind": "globalFunction",
+			"name": "x_AXIS",
+			"memberof": "gd3d.math",
+			"scope": "instance"
+		},
+		{
+			"filename": "framework\\math\\number.ts",
+			"kind": "globalFunction",
+			"name": "y_AXIS",
+			"memberof": "gd3d.math",
+			"scope": "instance"
+		},
+		{
+			"filename": "framework\\math\\number.ts",
+			"kind": "globalFunction",
+			"name": "z_AXIS",
+			"memberof": "gd3d.math",
+			"scope": "instance"
+		}
+	]
+}

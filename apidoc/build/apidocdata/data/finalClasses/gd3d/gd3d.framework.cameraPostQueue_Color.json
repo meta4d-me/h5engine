@@ -1,0 +1,55 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.render.glRenderTarget",
+			"name": "renderTarget",
+			"memberof": "gd3d.framework.cameraPostQueue_Color",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "cameraPostQueue_Color",
+			"memberof": "gd3d.framework.cameraPostQueue_Color",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.cameraPostQueue_Color",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "scene",
+					"type": "gd3d.framework.scene",
+					"description": ""
+				},
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "cameraPostQueue_Color",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\camera.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.ICameraPostQueue"
+			}
+		]
+	}
+}

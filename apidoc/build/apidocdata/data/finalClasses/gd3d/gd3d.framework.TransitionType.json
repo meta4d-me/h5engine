@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "ColorTint",
+			"memberof": "gd3d.framework.TransitionType",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "None",
+			"memberof": "gd3d.framework.TransitionType",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "SpriteSwap",
+			"memberof": "gd3d.framework.TransitionType",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "TransitionType",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\component\\button.ts"
+	}
+}

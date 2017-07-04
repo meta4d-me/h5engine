@@ -1,0 +1,57 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "key",
+			"memberof": "gd3d.framework.UVSpeedNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "u",
+			"memberof": "gd3d.framework.UVSpeedNode",
+			"scope": "instance",
+			"default": "new ValueData()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "v",
+			"memberof": "gd3d.framework.UVSpeedNode",
+			"scope": "instance",
+			"default": "new ValueData()"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.UVSpeedNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.vector2",
+			"name": "getValue",
+			"memberof": "gd3d.framework.UVSpeedNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.vector2",
+			"name": "getValueRandom",
+			"memberof": "gd3d.framework.UVSpeedNode",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "UVSpeedNode",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlenode.ts"
+	}
+}

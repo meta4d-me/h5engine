@@ -1,0 +1,20 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "v",
+			"memberof": "gd3d.math.angelref",
+			"scope": "instance"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "angelref",
+		"memberof": "gd3d.math",
+		"filename": "framework\\math\\matrix.ts"
+	}
+}

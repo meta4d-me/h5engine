@@ -1,0 +1,253 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "AudioContext",
+			"name": "audioContext",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clickInit",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.AudioEx",
+			"name": "instance",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isAvailable",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "loadAudioBuffer",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(buf:AudioBuffer,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "loadAudioBufferFromArrayBuffer",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"description": "//加载声音的api",
+			"params": [
+				{
+					"name": "ab",
+					"type": "ArrayBuffer",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(buf:AudioBuffer,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "playLooped",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"description": "//播放一个循环声音,并制定一个名字（测试通过）",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "buf",
+					"type": "AudioBuffer",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.AudioChannel",
+			"name": "playOnce",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"description": "//如果要关闭，记住这个函数的返回值，里面有个stop函数",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "buf",
+					"type": "AudioBuffer",
+					"description": ""
+				},
+				{
+					"name": "x",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "z",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.AudioChannel",
+			"name": "playOnceBlocking",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "buf",
+					"type": "AudioBuffer",
+					"description": ""
+				},
+				{
+					"name": "x",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "z",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.AudioChannel",
+			"name": "playOnceInterrupt",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "buf",
+					"type": "AudioBuffer",
+					"description": ""
+				},
+				{
+					"name": "x",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "z",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setMusicVolume",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "val",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setSoundVolume",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "val",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "stopLooped",
+			"memberof": "gd3d.framework.AudioEx",
+			"scope": "instance",
+			"description": "//通过名字停止一个循环声音",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "AudioEx",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\audio\\audioex.ts"
+	}
+}

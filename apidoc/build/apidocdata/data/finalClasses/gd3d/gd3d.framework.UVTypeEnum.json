@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "NONE",
+			"memberof": "gd3d.framework.UVTypeEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "UVRoll",
+			"memberof": "gd3d.framework.UVTypeEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "UVSprite",
+			"memberof": "gd3d.framework.UVTypeEnum",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "UVTypeEnum",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlealldata.ts"
+	}
+}

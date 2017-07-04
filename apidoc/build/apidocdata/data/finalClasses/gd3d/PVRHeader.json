@@ -1,0 +1,139 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"name": "channelType",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"name": "colourSpace",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"name": "depth",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"name": "flags",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "gl",
+			"memberof": "PVRHeader",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "height",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"name": "metaDataSize",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"name": "mipMapCount",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"name": "numFaces",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"name": "numSurfaces",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"name": "pixelFormatH",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"name": "pixelFormatL",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"name": "version",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "0x03525650"
+		},
+		{
+			"kind": "member",
+			"name": "width",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"default": "1"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "PVRHeader",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "gl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glTexture2D",
+			"name": "parse",
+			"memberof": "PVRHeader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_buffer",
+					"type": "ArrayBuffer",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "PVRHeader",
+		"memberof": "",
+		"filename": "framework\\asset\\pvr.ts"
+	}
+}

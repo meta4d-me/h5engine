@@ -1,0 +1,61 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "BillBoard",
+			"memberof": "gd3d.framework.RenderModel",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "HorizontalBillBoard",
+			"memberof": "gd3d.framework.RenderModel",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Mesh",
+			"memberof": "gd3d.framework.RenderModel",
+			"scope": "static",
+			"default": "5"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "None",
+			"memberof": "gd3d.framework.RenderModel",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "StretchedBillBoard",
+			"memberof": "gd3d.framework.RenderModel",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "VerticalBillBoard",
+			"memberof": "gd3d.framework.RenderModel",
+			"scope": "static",
+			"default": "4"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "RenderModel",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

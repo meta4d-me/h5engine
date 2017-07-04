@@ -1,0 +1,155 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"name": "beizerPoints",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "bezierPointNum",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Curve3",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "points",
+					"type": "gd3d.math.vector3[]",
+					"description": ""
+				},
+				{
+					"name": "nbPoints",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Curve3",
+			"name": "CreateCubicBezier",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "static",
+			"description": "三次方贝塞尔曲线路径",
+			"params": [
+				{
+					"name": "v0",
+					"type": "gd3d.math.vector3",
+					"description": "v0"
+				},
+				{
+					"name": "v1",
+					"type": "gd3d.math.vector3",
+					"description": "v1"
+				},
+				{
+					"name": "v2",
+					"type": "gd3d.math.vector3",
+					"description": "v2"
+				},
+				{
+					"name": "v3",
+					"type": "gd3d.math.vector3",
+					"description": "v3"
+				},
+				{
+					"name": "bezierPointNum",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Curve3",
+			"name": "CreateLinearBezier",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "static",
+			"description": "线性贝塞尔曲线",
+			"params": [
+				{
+					"name": "start",
+					"type": "gd3d.math.vector3",
+					"description": "start"
+				},
+				{
+					"name": "end",
+					"type": "gd3d.math.vector3",
+					"description": "end"
+				},
+				{
+					"name": "indices",
+					"type": "number",
+					"description": "indices"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Curve3",
+			"name": "CreateQuadraticBezier",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "static",
+			"description": "二次方贝塞尔曲线路径",
+			"params": [
+				{
+					"name": "v0",
+					"type": "gd3d.math.vector3",
+					"description": "起始点"
+				},
+				{
+					"name": "v1",
+					"type": "gd3d.math.vector3",
+					"description": "选中的节点"
+				},
+				{
+					"name": "v2",
+					"type": "gd3d.math.vector3",
+					"description": "结尾点"
+				},
+				{
+					"name": "bezierPointNum",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "GetLerpBezier",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "static",
+			"params": [
+				{
+					"name": "nodes",
+					"type": "gd3d.framework.ParticleNode[]",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "getPoints",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "instance",
+			"description": "贝塞尔曲线上的点"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "Curve3",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\particletool\\curve.ts",
+		"description": "贝塞尔曲线，目前定义了三种：线性贝塞尔曲线(两个点形成),二次方贝塞尔曲线（三个点形成），三次方贝塞尔曲线（四个点形成）"
+	}
+}

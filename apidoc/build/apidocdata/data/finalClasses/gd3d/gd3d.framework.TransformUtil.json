@@ -1,0 +1,51 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform2D",
+			"name": "Create2DPrimitive",
+			"memberof": "gd3d.framework.TransformUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "type",
+					"type": "gd3d.framework.Primitive2DType",
+					"description": ""
+				},
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform",
+			"name": "CreatePrimitive",
+			"memberof": "gd3d.framework.TransformUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "type",
+					"type": "gd3d.framework.PrimitiveType",
+					"description": ""
+				},
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "TransformUtil",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\util\\transformutil.ts"
+	}
+}

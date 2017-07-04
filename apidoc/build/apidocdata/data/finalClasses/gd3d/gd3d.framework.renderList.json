@@ -1,0 +1,48 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.renderLayer[]",
+			"name": "renderLayers",
+			"memberof": "gd3d.framework.renderList",
+			"scope": "instance",
+			"description": "//此处应该根据绘制分类处理"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "renderList",
+			"memberof": "gd3d.framework.renderList",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "addRenderer",
+			"memberof": "gd3d.framework.renderList",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "renderer",
+					"type": "gd3d.framework.IRenderer",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "clear",
+			"memberof": "gd3d.framework.renderList",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "renderList",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\render.ts",
+		"description": "//渲染列表"
+	}
+}

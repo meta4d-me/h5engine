@@ -1,5 +1,12 @@
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * mesh资源
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class mesh implements IAsset
     {
@@ -12,12 +19,15 @@ namespace gd3d.framework
             {
                 assetName = "mesh_" + this.getGUID();
             }
-            if (!sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName))
-            {
-                throw new Error("already have name.");
-            }
             this.name = new constText(assetName);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             if (!this.name)
@@ -26,24 +36,59 @@ namespace gd3d.framework
             }
             return this.name.getText();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version egret-gd3d 1.0
+         */
         getGUID(): number
         {
             return this.id.getID();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version egret-gd3d 1.0
+         */
         use()
         {
             sceneMgr.app.getAssetMgr().use(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unuse(disposeNow: boolean = false)
         {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             this.glMesh.dispose(sceneMgr.app.getAssetMgr().webgl);
             this.data = null;
             delete this.submesh;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version egret-gd3d 1.0
+         */
         caclByteLength(): number
         {
             let total = 0;
@@ -54,10 +99,37 @@ namespace gd3d.framework
             }
             return total;
         }
+        /**
+         * @private
+         */
         glMesh: gd3d.render.glMesh;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * mesh数据实例
+         * @version egret-gd3d 1.0
+         */
         data: gd3d.render.meshData;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * submesh信息列表
+         * @version egret-gd3d 1.0
+         */
         submesh: subMeshInfo[] = [];
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析资源
+         * @param buf buffer数组
+         * @param webgl webgl实例
+         * @version egret-gd3d 1.0
+         */
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext)
         {
             var vf = 0;//顶点属性
@@ -288,6 +360,15 @@ namespace gd3d.framework
             this.glMesh.uploadIndexSubData(webgl, 0, indices);
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 检测射线碰撞
+         * @param ray 射线
+         * @param matrix 所在transform的矩阵
+         * @version egret-gd3d 1.0
+         */
         intersects(ray: ray, matrix: gd3d.math.matrix): pickinfo
         {
             var pickinfo = null;
@@ -342,7 +423,14 @@ namespace gd3d.framework
             }
             return pickinfo;
         }
-
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 克隆mesh
+         * @version egret-gd3d 1.0
+         */
         clone(): mesh
         {
             let _result = new mesh(this.getName());
@@ -473,6 +561,9 @@ namespace gd3d.framework
             return _result;
         }
     }
+    /**
+     * @private
+     */
     export class subMeshInfo
     {
         matIndex: number;

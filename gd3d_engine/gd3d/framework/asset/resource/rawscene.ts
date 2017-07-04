@@ -1,11 +1,32 @@
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 场景数据资源
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class rawscene implements IAsset
     {
         private name: constText;
         private id: resID = new resID();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version egret-gd3d 1.0
+         */
         defaultAsset: boolean = false;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 雾效
+         * @version egret-gd3d 1.0
+         */
         fog: Fog;
         constructor(assetName: string = null)
         {
@@ -13,36 +34,82 @@ namespace gd3d.framework
             {
                 assetName = "rawscene_" + this.getGUID();
             }
-            if (!sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName))
-            {
-                throw new Error("already have name.");
-            }
             this.name = new constText(assetName);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             return this.name.getText();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version egret-gd3d 1.0
+         */
         getGUID(): number
         {
             return this.id.getID();
         }
-        //prefab依赖的AssetBundle
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 依赖的AssetBundle
+         * @version egret-gd3d 1.0
+         */
         assetbundle: string = null;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version egret-gd3d 1.0
+         */
         use()
         {
             sceneMgr.app.getAssetMgr().use(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unuse(disposeNow: boolean = false)
         {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version egret-gd3d 1.0
+         */
         caclByteLength(): number
         {
             let total = 0;
             return total;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析资源
+         * @param txt json数据
+         * @param assetmgr 资源管理实例
+         * @version egret-gd3d 1.0
+         */
         Parse(txt: string, assetmgr: assetMgr)
         {
             let _json = JSON.parse(txt);
@@ -81,12 +148,27 @@ namespace gd3d.framework
                 this.fog._Density = <number>fogData["_Density"];
             }
         }
-
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取场景根节点的克隆
+         * @version egret-gd3d 1.0
+         */
         getSceneRoot(): transform
         {
             return io.cloneObj(this.rootNode);
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 应用lightmap到场景中
+         * @param scene 场景实例
+         * @version egret-gd3d 1.0
+         */
         useLightMap(scene: scene)
         {
             scene.lightmaps.length = 0;
@@ -95,11 +177,26 @@ namespace gd3d.framework
                 scene.lightmaps.push(this.lightmaps[i]);
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 应用雾效到场景中
+         * @param scene 场景实例
+         * @version egret-gd3d 1.0
+         */
         useFog(scene: scene)
         {
             scene.fog = this.fog;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             if (this.rootNode)
@@ -115,7 +212,9 @@ namespace gd3d.framework
         private rootNode: transform;
         private lightmaps: texture[];
     }
-
+    /**
+     * @private
+     */
     export class Fog
     {
         public _Start: number;

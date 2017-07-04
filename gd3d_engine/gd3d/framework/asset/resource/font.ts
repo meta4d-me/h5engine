@@ -1,10 +1,24 @@
 ﻿namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 字体资源
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class font implements IAsset
     {
         private name: constText;
         private id: resID = new resID();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version egret-gd3d 1.0
+         */
         defaultAsset: boolean;//是否为系统默认资源
         constructor(assetName: string = null)
         {
@@ -12,28 +26,59 @@
             {
                 assetName = "font_" + this.getGUID();
             }
-            if (!sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName))
-            {
-                throw new Error("already have name.");
-            }
             this.name = new constText(assetName);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             return this.name.getText();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version egret-gd3d 1.0
+         */
         getGUID(): number
         {
             return this.id.getID();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version egret-gd3d 1.0
+         */
         use()
         {
             sceneMgr.app.getAssetMgr().use(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unuse(disposeNow: boolean = false)
         {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             if (this.texture)
@@ -43,6 +88,13 @@
             delete this.cmap;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version egret-gd3d 1.0
+         */
         caclByteLength(): number
         {
             let total = 0;
@@ -69,6 +121,13 @@
         }
         //mat: spriteMat;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 字体信息map
+         * @version egret-gd3d 1.0
+         */
         cmap: { [id: string]: charinfo };
         fontname: string;
         pointSize: number;//像素尺寸
@@ -78,6 +137,15 @@
         atlasWidth: number;
         atlasHeight: number;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析资源
+         * @param jsonStr json数据
+         * @param assetmgr 资源管理实例
+         * @version egret-gd3d 1.0
+         */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
             let d1 = new Date().valueOf();
@@ -121,7 +189,9 @@
         }
 
     }
-
+    /**
+     * @private
+     */
     export class charinfo
     {
         x: number;//uv

@@ -1,0 +1,45 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.IRenderer[]",
+			"name": "list",
+			"memberof": "gd3d.framework.renderLayer",
+			"scope": "instance",
+			"description": "//先暂时分配 透明与不透明两组",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "needSort",
+			"memberof": "gd3d.framework.renderLayer",
+			"scope": "instance",
+			"default": "false"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "renderLayer",
+			"memberof": "gd3d.framework.renderLayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_sort",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "renderLayer",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\render.ts"
+	}
+}

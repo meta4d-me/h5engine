@@ -1,0 +1,173 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "alpha",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "any",
+			"name": "color",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectElement",
+			"name": "elements",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "endFrame",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "any",
+			"name": "eular",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "frameInternal",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "offsetTransalte",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance",
+			"default": "new gd3d.math.vector3()"
+		},
+		{
+			"kind": "member",
+			"type": "any",
+			"name": "params",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "any",
+			"name": "position",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "radius",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "speed",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "startFrame",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "startRotation",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "transform",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "type",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "init",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_startFrame",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "_endFrame",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "_params",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "_elements",
+					"type": "gd3d.framework.EffectElement",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.TrailAction",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "frameIndex",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "TrailAction",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\particletool\\effectaction.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IEffectAction"
+			}
+		]
+	}
+}

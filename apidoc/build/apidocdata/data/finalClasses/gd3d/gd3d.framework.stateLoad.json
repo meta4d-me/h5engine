@@ -1,0 +1,104 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "curtask",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "当前的进度",
+			"version": "egret-gd3d 1.0",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "Error[]",
+			"name": "errs",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "加载过程中记录的错误信息",
+			"version": "egret-gd3d 1.0",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "iserror",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "加载是否遇到错误",
+			"version": "egret-gd3d 1.0",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isfinish",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "加载是否完成",
+			"version": "egret-gd3d 1.0",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "string[]",
+			"name": "logs",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "加载过程中记录的log",
+			"version": "egret-gd3d 1.0",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "progress",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"rwType": 1,
+			"description": "获取加载进度",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:{res:IAsset, state}}",
+			"name": "resstate",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "记录需要加载的每一个的状态和资源引用",
+			"version": "egret-gd3d 1.0",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "totaltask",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "总进度",
+			"version": "egret-gd3d 1.0",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "url",
+			"memberof": "gd3d.framework.stateLoad",
+			"scope": "instance",
+			"description": "源url地址",
+			"version": "egret-gd3d 1.0"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "stateLoad",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\assetmgr.ts",
+		"description": "加载状态",
+		"version": "egret-gd3d 1.0"
+	}
+}

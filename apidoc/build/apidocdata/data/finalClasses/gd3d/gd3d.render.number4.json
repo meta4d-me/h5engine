@@ -1,0 +1,41 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "v0",
+			"memberof": "gd3d.render.number4",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "v1",
+			"memberof": "gd3d.render.number4",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "v2",
+			"memberof": "gd3d.render.number4",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "v3",
+			"memberof": "gd3d.render.number4",
+			"scope": "instance"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "number4",
+		"memberof": "gd3d.render",
+		"filename": "render\\renderer\\mesh.ts"
+	}
+}

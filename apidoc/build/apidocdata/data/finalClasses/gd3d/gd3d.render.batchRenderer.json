@@ -1,0 +1,143 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.render.glDrawPass",
+			"name": "curmaterial",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Uint16Array",
+			"name": "dataForEbo",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
+			"name": "dataForVbo",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.DrawModeEnum",
+			"name": "drawMode",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "eboCount",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.glMesh",
+			"name": "mesh",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "vboCount",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance",
+			"default": "0"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "begin",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "mat",
+					"type": "gd3d.render.glDrawPass",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "end",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "initBuffer",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "vf",
+					"type": "gd3d.render.VertexFormatMask",
+					"description": ""
+				},
+				{
+					"name": "drawMode",
+					"type": "gd3d.render.DrawModeEnum",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "push",
+			"memberof": "gd3d.render.batchRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "vbodata",
+					"type": "number[]",
+					"description": ""
+				},
+				{
+					"name": "ebodata",
+					"type": "number[]",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "batchRenderer",
+		"memberof": "gd3d.render",
+		"filename": "render\\renderer\\renderer.ts",
+		"description": "//一个批的渲染器"
+	}
+}

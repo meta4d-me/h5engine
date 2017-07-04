@@ -1,0 +1,72 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform2D",
+			"name": "transform",
+			"memberof": "gd3d.framework.I2DComponent",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "onPointEvent",
+			"memberof": "gd3d.framework.I2DComponent",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				},
+				{
+					"name": "ev",
+					"type": "gd3d.framework.PointEvent",
+					"description": ""
+				},
+				{
+					"name": "oncap",
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.I2DComponent",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.I2DComponent",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.I2DComponent",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "interface",
+		"name": "I2DComponent",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\transform2d.ts",
+		"children": [
+			"gd3d.framework.IRectRenderer"
+		]
+	}
+}

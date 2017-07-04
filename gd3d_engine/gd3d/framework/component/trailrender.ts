@@ -429,6 +429,9 @@ namespace gd3d.framework
 
         }
     }
+    /**
+     * @private
+     */
     export class trailStick
     {
         location: gd3d.math.vector3;

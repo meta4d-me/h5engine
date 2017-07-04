@@ -1,0 +1,114 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "beBufferInited",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "curTotalVertexCount",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Uint16Array",
+			"name": "dataForEbo",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
+			"name": "dataForVbo",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectElement[]",
+			"name": "effectElements",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"name": "indexStartIndex",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.material",
+			"name": "mat",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.mesh",
+			"name": "mesh",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "vertexSize",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance",
+			"description": "顶点大小",
+			"default": "0"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EffectBatcher",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "formate",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "resizeVboSize",
+			"memberof": "gd3d.framework.EffectBatcher",
+			"scope": "instance",
+			"description": "动态设定vbo大小",
+			"returns": "",
+			"params": [
+				{
+					"name": "value",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectBatcher",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

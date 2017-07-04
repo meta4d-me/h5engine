@@ -1,0 +1,36 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "alpha",
+			"memberof": "gd3d.framework.AlphaNode",
+			"scope": "instance",
+			"default": "new ValueData()"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "key",
+			"memberof": "gd3d.framework.AlphaNode",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getValue",
+			"memberof": "gd3d.framework.AlphaNode",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "AlphaNode",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlenode.ts"
+	}
+}
