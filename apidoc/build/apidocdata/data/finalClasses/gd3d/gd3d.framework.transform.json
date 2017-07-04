@@ -61,7 +61,9 @@
 			"type": "gd3d.math.vector3",
 			"name": "localEulerAngles",
 			"memberof": "gd3d.framework.transform",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取本地旋转的欧拉角",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -69,7 +71,8 @@
 			"name": "localRotate",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//本地rts",
+			"description": "本地旋转四元数",
+			"version": "egret-gd3d 1.0",
 			"default": "new gd3d.math.quaternion()"
 		},
 		{
@@ -78,6 +81,8 @@
 			"name": "localScale",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "本地缩放",
+			"version": "egret-gd3d 1.0",
 			"default": "new gd3d.math.vector3(1, 1, 1)"
 		},
 		{
@@ -86,6 +91,8 @@
 			"name": "localTranslate",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "本地位移",
+			"version": "egret-gd3d 1.0",
 			"default": "new gd3d.math.vector3(0, 0, 0)"
 		},
 		{

@@ -15,97 +15,7 @@
 			"scope": "instance"
 		}
 	],
-	"function": [
-		{
-			"kind": "function",
-			"type": "gd3d.framework.pickinfo",
-			"name": "intersectCollider",
-			"memberof": "gd3d.framework.ray",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "tran",
-					"type": "gd3d.framework.transform",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.math.vector3",
-			"name": "intersectPlane",
-			"memberof": "gd3d.framework.ray",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "planePoint",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				},
-				{
-					"name": "planeNormal",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.framework.pickinfo",
-			"name": "intersectPlaneTransform",
-			"memberof": "gd3d.framework.ray",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "tran",
-					"type": "gd3d.framework.transform",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "boolean",
-			"name": "intersectsSphere",
-			"memberof": "gd3d.framework.ray",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "center",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				},
-				{
-					"name": "radius",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.framework.pickinfo",
-			"name": "intersectsTriangle",
-			"memberof": "gd3d.framework.ray",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "vertex0",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				},
-				{
-					"name": "vertex1",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				},
-				{
-					"name": "vertex2",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				}
-			]
-		}
-	],
+	"function": [],
 	"globalMember": [],
 	"globalFunction": [],
 	"class": {
@@ -114,6 +24,6 @@
 		"memberof": "gd3d.framework",
 		"filename": "framework\\tool\\ray.ts",
 		"description": "射线",
-		"version": "gd3d 1.0"
+		"version": "egret-gd3d 1.0"
 	}
 }

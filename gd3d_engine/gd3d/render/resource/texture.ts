@@ -1,5 +1,8 @@
 ﻿namespace gd3d.render
 {
+    /**
+     * @private
+     */
     export enum TextureFormatEnum
     {
         RGBA = 1,// WebGLRenderingContext.RGBA,
@@ -9,9 +12,10 @@
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
-
-        //ALPHA = this.webgl.ALPHA,
     }
+    /**
+     * @private
+     */
     export class textureReader
     {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray: boolean = true)
@@ -66,6 +70,9 @@
             }
         }
     }
+    /**
+     * @private
+     */
     export interface ITexture
     {
         texture: WebGLTexture;
@@ -75,6 +82,9 @@
         dispose(webgl: WebGLRenderingContext);
         caclByteLength(): number;
     }
+    /**
+     * @private
+     */
     export class glRenderTarget implements ITexture
     {
         width: number;
@@ -160,6 +170,9 @@
             return true;
         }
     }
+    /**
+     * @private
+     */
     export class glTexture2D implements ITexture
     {
         public ext: any;
@@ -532,6 +545,9 @@
             return t;
         }
     }
+    /**
+     * @private
+     */
     export class WriteableTexture2D implements ITexture
     {
         constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, width: number, height: number, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false)

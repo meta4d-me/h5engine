@@ -12,7 +12,7 @@ class test_loadprefab implements IState
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         let names: string[] = ["0060_duyanshou", "Cube", "0001_fashion", "baihu"];
         let name = names[0];
-        name="Wing_11";
+        // name="Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
@@ -68,10 +68,10 @@ class test_loadprefab implements IState
         this.app.container.appendChild(btn);
 
         var btn2 = document.createElement("button");
-        btn2.textContent = "切换Shader到：transparent_additive.shader.json";
+        btn2.textContent = "切换Shader到：additive_alpha.shader.json";
         btn2.onclick = () =>
         {
-            var sh = this.app.getAssetMgr().getShader("transparent_additive.shader.json") as gd3d.framework.shader;
+            var sh = this.app.getAssetMgr().getShader("additive_alpha.shader.json") as gd3d.framework.shader;
             this.change(sh);
         }
         btn2.style.top = "124px";
@@ -86,6 +86,7 @@ class test_loadprefab implements IState
             for (let i = 0; i < this.renderer[j].materials.length; i++)
             {
                 this.renderer[j].materials[i].changeShader(sha);
+                // this.renderer[j].materials[i].setVector4("_TintColor", new gd3d.math.vector4(0,1,0,1));
             }
         }
         for (let j = 0; j < this.skinRenders.length; j++)
@@ -93,6 +94,7 @@ class test_loadprefab implements IState
             for (let i = 0; i < this.skinRenders[j].materials.length; i++)
             {
                 this.skinRenders[j].materials[i].changeShader(sha);
+                // this.renderer[j].materials[i].setVector4("_TintColor", new gd3d.math.vector4(0,1,0,1));
             }
         }
     }

@@ -5,21 +5,18 @@
 			"type": "gd3d.math.vector3",
 			"name": "center",
 			"memberof": "gd3d.framework.obb",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3[]",
-			"name": "directions",
-			"memberof": "gd3d.framework.obb",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "包围盒中心坐标",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "gd3d.math.vector3",
 			"name": "halfsize",
 			"memberof": "gd3d.framework.obb",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "包围盒各轴向半长",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -27,49 +24,29 @@
 			"name": "vectors",
 			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
+			"description": "包围盒世界空间下各个点坐标",
+			"version": "egret-gd3d 1.0",
 			"default": "new Array<gd3d.math.vector3>()"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"type": "boolean",
-			"name": "axisOverlap",
-			"memberof": "gd3d.framework.obb",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "axis",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				},
-				{
-					"name": "box0",
-					"type": "gd3d.framework.obb",
-					"description": ""
-				},
-				{
-					"name": "box1",
-					"type": "gd3d.framework.obb",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"name": "buildByCenterSize",
 			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
+			"description": "由中心点和各轴向长度构建定向包围盒",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "center",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "中心点坐标"
 				},
 				{
 					"name": "size",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "各轴向长度"
 				}
 			]
 		},
@@ -78,16 +55,18 @@
 			"name": "buildByMaxMin",
 			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
+			"description": "由最大最小点构建定向包围盒",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "minimum",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "最小点坐标"
 				},
 				{
 					"name": "maximum",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "最大点坐标"
 				}
 			]
 		},
@@ -96,16 +75,18 @@
 			"name": "caclWorldVecs",
 			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
+			"description": "计算世界空间下各点坐标",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "vecs",
 					"type": "gd3d.math.vector3[]",
-					"description": ""
+					"description": "结果数组"
 				},
 				{
 					"name": "worldmatrix",
 					"type": "gd3d.math.matrix",
-					"description": ""
+					"description": "物体的世界矩阵"
 				}
 			]
 		},
@@ -114,71 +95,45 @@
 			"type": "gd3d.framework.obb",
 			"name": "clone",
 			"memberof": "gd3d.framework.obb",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "computeBoxExtents",
-			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "axis",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				},
-				{
-					"name": "box",
-					"type": "gd3d.framework.obb",
-					"description": ""
-				}
-			]
+			"description": "克隆一个obb",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "dispose",
 			"memberof": "gd3d.framework.obb",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "boolean",
-			"name": "extentsOverlap",
-			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "min0",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "max0",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "min1",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "max1",
-					"type": "number",
-					"description": ""
-				}
-			]
+			"description": "释放",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "intersects",
 			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
+			"description": "obb的碰撞检测",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "_obb",
 					"type": "gd3d.framework.obb",
-					"description": ""
+					"description": "待检测obb"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"description": "刷新定向包围盒",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "worldmatrix",
+					"type": "gd3d.math.matrix",
+					"description": "物体的世界矩阵"
 				}
 			]
 		}

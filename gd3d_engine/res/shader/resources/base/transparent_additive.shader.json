@@ -2,7 +2,8 @@
     "layer": "transparent",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5"
+        "_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5",
+        "_TintColor ('Tint Color', Color) = (0.5,0.5,0.5,0.5)"
     ],
     "passes": {
         "base": [

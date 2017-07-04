@@ -1,5 +1,8 @@
 ﻿namespace gd3d.render
 {
+    /**
+     * @private
+     */
     export enum VertexFormatMask
     {
         Position = 0x00000001,
@@ -12,6 +15,9 @@
         BlendWeight4 = 0x00000080,
         ColorEX = 0x00000100,
     }
+    /**
+     * @private
+     */
     export class number4
     {
         v0: number;
@@ -19,13 +25,18 @@
         v2: number;
         v3: number;
     }
-    //原始模型数据
+    /**
+     * @private
+     */
     export enum MeshTypeEnum
     {
         Static,
         Dynamic,
         Stream,
     }
+    /**
+     * @private
+     */
     export class drawInfo
     {
         private static _ins: drawInfo;
@@ -39,6 +50,9 @@
         vboCount:number;
         renderCount:number;
     }
+    /**
+     * @private
+     */
     export class glMesh
     {
         initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, vertexCount: number, mode: MeshTypeEnum = MeshTypeEnum.Static)

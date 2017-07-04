@@ -1,8 +1,8 @@
 ﻿namespace gd3d.render
 {
-    //这俩玩意已经超越了渲染层对功能的定义，将搬运到框架层
-
-    //一个pass 的渲染器
+    /**
+     * @private
+     */
     export class staticMeshRenderer
     {
         material: glDrawPass;
@@ -34,7 +34,9 @@
         }
     }
 
-    //一个批的渲染器
+    /**
+     * @private
+     */
     export class batchRenderer
     {
         curmaterial: glDrawPass;
