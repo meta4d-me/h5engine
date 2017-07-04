@@ -50,13 +50,25 @@ class test_loadScene implements IState
                             this.app.getScene().lightmaps = [];
                             _scene.useLightMap(this.app.getScene());
                             _scene.useFog(this.app.getScene());
-                            // });
+
+                            // name="Wing_11";
+                            // this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                            //     (s) =>
+                            //     {
+                            //         if (s.isfinish)
+                            //         {
+                            //             var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
+                            //             this.baihu = _prefab.getCloneTrans();
+                            //             this.scene.addChild(this.baihu);
+                            //             this.camera.gameObject.transform.lookat(this.baihu);
+                            //         }
+                            //     });
                         }
                     });
 
             }
         });
-
+        
 
         //添加一个摄像机
         var objCam = new gd3d.framework.transform();
@@ -67,13 +79,15 @@ class test_loadScene implements IState
 
         // this.camera.near = 0.01;
         // this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(-50, 100, -50);
+        objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
         // objCam.lookatPoint(new gd3d.math.vector3(133.6694, 97.87, 67));
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
 
         objCam.markDirty();//标记为需要刷新
+
         // CameraController.instance().init(this.app, this.camera);
     }
+    baihu:gd3d.framework.transform;
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;
     cube2: gd3d.framework.transform;
