@@ -21,7 +21,7 @@ namespace gd3d.framework
         private dataForEbo: Uint16Array;
 
         /**
-         * private
+         * @private
          */
         initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum)
         {
@@ -37,7 +37,7 @@ namespace gd3d.framework
         }
 
         /**
-         * private
+         * @private
          */
         begin(webgl: WebGLRenderingContext, pass: render.glDrawPass)
         {
@@ -49,7 +49,7 @@ namespace gd3d.framework
         }
 
         /**
-         * private
+         * @private
          */
         push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[])
         {
@@ -103,7 +103,7 @@ namespace gd3d.framework
         }
 
         /**
-         * private
+         * @private
          */
         end(webgl: WebGLRenderingContext)
         {
@@ -151,11 +151,7 @@ namespace gd3d.framework
     export class canvasRenderer implements IRenderer, ICollider
     {
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 构造函数
-         * @version egret-gd3d 1.0
+         * @private
          */
         constructor()
         {
@@ -277,12 +273,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 更新
-         * @param delta 两次update的时间间隔
-         * @version egret-gd3d 1.0
+         * @private
          */
         update(delta: number)
         {
@@ -375,14 +366,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 渲染
-         * @param context 渲染上下文
-         * @param assetmgr 资源管理类实例
-         * @param camera 相机实例
-         * @version egret-gd3d 1.0
+         * @private
          */
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {

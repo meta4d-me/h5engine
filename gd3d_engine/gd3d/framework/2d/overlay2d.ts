@@ -129,14 +129,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 渲染
-         * @param context 渲染上下文
-         * @param assetmgr 资源管理类实例
-         * @param camera 相机实例
-         * @version egret-gd3d 1.0
+         * @private
          */
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
@@ -161,12 +154,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 更新
-         * @param delta 两次update的时间间隔
-         * @version egret-gd3d 1.0
+         * @private
          */
         update(delta: number)
         {
