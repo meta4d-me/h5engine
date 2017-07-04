@@ -31,202 +31,6 @@ declare class main implements gd3d.framework.IUserCode {
     onUpdate(delta: number): void;
     isClosed(): boolean;
 }
-declare namespace t {
-    class test_blend implements IState {
-        app: gd3d.framework.application;
-        scene: gd3d.framework.scene;
-        camera: gd3d.framework.camera;
-        background: gd3d.framework.transform;
-        parts: gd3d.framework.transform;
-        timer: number;
-        taskmgr: gd3d.framework.taskMgr;
-        count: number;
-        counttimer: number;
-        private angularVelocity;
-        private eulerAngle;
-        private loadShader(laststate, state);
-        private loadText(laststate, state);
-        private addcam(laststate, state);
-        foreground: gd3d.framework.transform;
-        private addplane(laststate, state);
-        start(app: gd3d.framework.application): void;
-        update(delta: number): void;
-    }
-}
-declare class test_fakepbr implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    light: gd3d.framework.light;
-    light2: gd3d.framework.light;
-    camera: gd3d.framework.camera;
-    baihu: gd3d.framework.transform;
-    timer: number;
-    update(delta: number): void;
-}
-declare namespace t {
-    class test_rendertexture implements IState {
-        app: gd3d.framework.application;
-        scene: gd3d.framework.scene;
-        private loadShader(laststate, state);
-        private loadText(laststate, state);
-        sh: gd3d.framework.shader;
-        private initscene(laststate, state);
-        private add3dmodelbeforeUi(laststate, state);
-        start(app: gd3d.framework.application): void;
-        wath_camer: gd3d.framework.camera;
-        target: gd3d.framework.transform;
-        targetMat: gd3d.framework.material;
-        show_cube: gd3d.framework.transform;
-        showcamera: gd3d.framework.camera;
-        timer: number;
-        taskmgr: gd3d.framework.taskMgr;
-        angle: number;
-        update(delta: number): void;
-    }
-}
-declare namespace demo {
-    class DragonTest implements IState {
-        app: gd3d.framework.application;
-        scene: gd3d.framework.scene;
-        camera: gd3d.framework.camera;
-        light: gd3d.framework.light;
-        dragon: gd3d.framework.transform;
-        camTran: gd3d.framework.transform;
-        cube: gd3d.framework.transform;
-        taskmgr: gd3d.framework.taskMgr;
-        private loadShader(laststate, state);
-        private loadLongPrefab(laststate, state);
-        private loadScene(laststate, state);
-        private addCameraAndLight(laststate, state);
-        start(app: gd3d.framework.application): void;
-        update(delta: number): void;
-    }
-}
-declare enum ShockType {
-    Vertical = 0,
-    Horizontal = 1,
-    Both = 2,
-}
-declare class CameraShock implements gd3d.framework.INodeComponent {
-    gameObject: gd3d.framework.gameObject;
-    private isPlaying;
-    private fade;
-    private oldTranslate;
-    private shockType;
-    private strength;
-    private life;
-    private ticker;
-    start(): void;
-    play(strength?: number, life?: number, fade?: boolean, shockType?: ShockType): void;
-    update(delta: number): void;
-    remove(): void;
-    clone(): void;
-}
-declare class Joystick {
-    app: gd3d.framework.application;
-    overlay2d: gd3d.framework.overlay2D;
-    private joystickLeft0;
-    private joystickLeft1;
-    private joystickRight0;
-    private joystickRight1;
-    private taskmgr;
-    triggerFunc: Function;
-    init(app: gd3d.framework.application, overlay2d: gd3d.framework.overlay2D): void;
-    private loadTexture(laststate, state);
-    private addJoystick(laststate, state);
-    leftAxis: gd3d.math.vector2;
-    rightAxis: gd3d.math.vector2;
-    private maxScale;
-    private touchLeft;
-    private touchRight;
-    private mouseLeft;
-    private mouseRight;
-    readonly leftTouching: boolean;
-    readonly rightTouching: boolean;
-    private onMouseDown(e);
-    private onMouseUp(e);
-    private onMouseMove(e);
-    private onTouchStart(e);
-    private onTouchEnd(e);
-    private onTouchMove(e);
-    update(delta: number): void;
-}
-declare namespace demo {
-    class TankGame implements IState {
-        app: gd3d.framework.application;
-        scene: gd3d.framework.scene;
-        camera: gd3d.framework.camera;
-        light: gd3d.framework.light;
-        heroTank: gd3d.framework.transform;
-        heroGun: gd3d.framework.transform;
-        heroSlot: gd3d.framework.transform;
-        enemyTank: gd3d.framework.transform;
-        enemyGun: gd3d.framework.transform;
-        enemySlot: gd3d.framework.transform;
-        ground: gd3d.framework.transform;
-        cubes: gd3d.framework.transform[];
-        walls: gd3d.framework.transform[];
-        overlay2d: gd3d.framework.overlay2D;
-        joystick: Joystick;
-        taskmgr: gd3d.framework.taskMgr;
-        tankMoveSpeed: number;
-        tankRotateSpeed: gd3d.math.vector3;
-        gunRotateSpeed: gd3d.math.vector3;
-        angleLimit: number;
-        colVisible: boolean;
-        private label;
-        private loadShader(laststate, state);
-        private loadTexture(laststate, state);
-        private loadHeroPrefab(laststate, state);
-        private loadEnemyPrefab(laststate, state);
-        private loadScene(laststate, state);
-        private cameraShock;
-        private addCameraAndLight(laststate, state);
-        private addJoystick(laststate, state);
-        private addObject(laststate, state);
-        private keyMap;
-        start(app: gd3d.framework.application): void;
-        update(delta: number): void;
-        testTankCol(tran: gd3d.framework.transform): boolean;
-        tempTran: gd3d.framework.transform;
-        tankControl(delta: number): void;
-        bulletId: number;
-        bulletList: any[];
-        bulletSpeed: number;
-        fireStep: number;
-        fireTick: number;
-        private fire();
-        private updateBullet(delta);
-    }
-}
-declare namespace t {
-    class test_three_leaved_rose_curve implements IState {
-        app: gd3d.framework.application;
-        scene: gd3d.framework.scene;
-        camera: gd3d.framework.camera;
-        cube: gd3d.framework.transform;
-        parts: gd3d.framework.transform;
-        timer: number;
-        cube2: gd3d.framework.transform;
-        taskmgr: gd3d.framework.taskMgr;
-        count: number;
-        counttimer: number;
-        private loadShader(laststate, state);
-        private loadText(laststate, state);
-        aniplayer: gd3d.framework.aniplayer;
-        role: gd3d.framework.transform;
-        private roleLength;
-        private loadRole(laststate, state);
-        private addcam(laststate, state);
-        private addcube(laststate, state);
-        start(app: gd3d.framework.application): void;
-        private angularVelocity;
-        private eulerAngle;
-        private zeroPoint;
-        update(delta: number): void;
-    }
-}
 declare class test_01 implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -606,7 +410,11 @@ declare namespace t {
 declare class test_loadprefab implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    renderer: gd3d.framework.meshRenderer[];
+    skinRenders: gd3d.framework.skinnedMeshRenderer[];
     start(app: gd3d.framework.application): void;
+    private changeShader();
+    change(sha: gd3d.framework.shader): void;
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;
     timer: number;
@@ -635,6 +443,7 @@ declare namespace t {
         taskmgr: gd3d.framework.taskMgr;
         count: number;
         counttimer: number;
+        name: string;
         private loadShader(laststate, state);
         private loadText(laststate, state);
         private loadPvr(laststate, state);
@@ -836,6 +645,202 @@ declare namespace t {
         totalframe: number;
         fps: number;
         private cycles;
+        update(delta: number): void;
+    }
+}
+declare namespace t {
+    class test_blend implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        background: gd3d.framework.transform;
+        parts: gd3d.framework.transform;
+        timer: number;
+        taskmgr: gd3d.framework.taskMgr;
+        count: number;
+        counttimer: number;
+        private angularVelocity;
+        private eulerAngle;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        private addcam(laststate, state);
+        foreground: gd3d.framework.transform;
+        private addplane(laststate, state);
+        start(app: gd3d.framework.application): void;
+        update(delta: number): void;
+    }
+}
+declare class test_fakepbr implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    light: gd3d.framework.light;
+    light2: gd3d.framework.light;
+    camera: gd3d.framework.camera;
+    baihu: gd3d.framework.transform;
+    timer: number;
+    update(delta: number): void;
+}
+declare namespace t {
+    class test_rendertexture implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        sh: gd3d.framework.shader;
+        private initscene(laststate, state);
+        private add3dmodelbeforeUi(laststate, state);
+        start(app: gd3d.framework.application): void;
+        wath_camer: gd3d.framework.camera;
+        target: gd3d.framework.transform;
+        targetMat: gd3d.framework.material;
+        show_cube: gd3d.framework.transform;
+        showcamera: gd3d.framework.camera;
+        timer: number;
+        taskmgr: gd3d.framework.taskMgr;
+        angle: number;
+        update(delta: number): void;
+    }
+}
+declare namespace demo {
+    class DragonTest implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        light: gd3d.framework.light;
+        dragon: gd3d.framework.transform;
+        camTran: gd3d.framework.transform;
+        cube: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        private loadShader(laststate, state);
+        private loadLongPrefab(laststate, state);
+        private loadScene(laststate, state);
+        private addCameraAndLight(laststate, state);
+        start(app: gd3d.framework.application): void;
+        update(delta: number): void;
+    }
+}
+declare enum ShockType {
+    Vertical = 0,
+    Horizontal = 1,
+    Both = 2,
+}
+declare class CameraShock implements gd3d.framework.INodeComponent {
+    gameObject: gd3d.framework.gameObject;
+    private isPlaying;
+    private fade;
+    private oldTranslate;
+    private shockType;
+    private strength;
+    private life;
+    private ticker;
+    start(): void;
+    play(strength?: number, life?: number, fade?: boolean, shockType?: ShockType): void;
+    update(delta: number): void;
+    remove(): void;
+    clone(): void;
+}
+declare class Joystick {
+    app: gd3d.framework.application;
+    overlay2d: gd3d.framework.overlay2D;
+    private joystickLeft0;
+    private joystickLeft1;
+    private joystickRight0;
+    private joystickRight1;
+    private taskmgr;
+    triggerFunc: Function;
+    init(app: gd3d.framework.application, overlay2d: gd3d.framework.overlay2D): void;
+    private loadTexture(laststate, state);
+    private addJoystick(laststate, state);
+    leftAxis: gd3d.math.vector2;
+    rightAxis: gd3d.math.vector2;
+    private maxScale;
+    private touchLeft;
+    private touchRight;
+    private mouseLeft;
+    private mouseRight;
+    readonly leftTouching: boolean;
+    readonly rightTouching: boolean;
+    private onMouseDown(e);
+    private onMouseUp(e);
+    private onMouseMove(e);
+    private onTouchStart(e);
+    private onTouchEnd(e);
+    private onTouchMove(e);
+    update(delta: number): void;
+}
+declare namespace demo {
+    class TankGame implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        light: gd3d.framework.light;
+        heroTank: gd3d.framework.transform;
+        heroGun: gd3d.framework.transform;
+        heroSlot: gd3d.framework.transform;
+        enemyTank: gd3d.framework.transform;
+        enemyGun: gd3d.framework.transform;
+        enemySlot: gd3d.framework.transform;
+        ground: gd3d.framework.transform;
+        cubes: gd3d.framework.transform[];
+        walls: gd3d.framework.transform[];
+        overlay2d: gd3d.framework.overlay2D;
+        joystick: Joystick;
+        taskmgr: gd3d.framework.taskMgr;
+        tankMoveSpeed: number;
+        tankRotateSpeed: gd3d.math.vector3;
+        gunRotateSpeed: gd3d.math.vector3;
+        angleLimit: number;
+        colVisible: boolean;
+        private label;
+        private loadShader(laststate, state);
+        private loadTexture(laststate, state);
+        private loadHeroPrefab(laststate, state);
+        private loadEnemyPrefab(laststate, state);
+        private loadScene(laststate, state);
+        private cameraShock;
+        private addCameraAndLight(laststate, state);
+        private addJoystick(laststate, state);
+        private addObject(laststate, state);
+        private keyMap;
+        start(app: gd3d.framework.application): void;
+        update(delta: number): void;
+        testTankCol(tran: gd3d.framework.transform): boolean;
+        tempTran: gd3d.framework.transform;
+        tankControl(delta: number): void;
+        bulletId: number;
+        bulletList: any[];
+        bulletSpeed: number;
+        fireStep: number;
+        fireTick: number;
+        private fire();
+        private updateBullet(delta);
+    }
+}
+declare namespace t {
+    class test_three_leaved_rose_curve implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        cube: gd3d.framework.transform;
+        parts: gd3d.framework.transform;
+        timer: number;
+        cube2: gd3d.framework.transform;
+        taskmgr: gd3d.framework.taskMgr;
+        count: number;
+        counttimer: number;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        aniplayer: gd3d.framework.aniplayer;
+        role: gd3d.framework.transform;
+        private roleLength;
+        private loadRole(laststate, state);
+        private addcam(laststate, state);
+        private addcube(laststate, state);
+        start(app: gd3d.framework.application): void;
+        private angularVelocity;
+        private eulerAngle;
+        private zeroPoint;
         update(delta: number): void;
     }
 }

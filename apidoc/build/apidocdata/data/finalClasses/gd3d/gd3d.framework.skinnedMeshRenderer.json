@@ -1,0 +1,215 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform[]",
+			"name": "bones",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "center",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{key:string, data}[]",
+			"name": "dataCaches",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "static",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderLayerEnum",
+			"name": "layer",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"default": "RenderLayerEnum.Common"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.material[]",
+			"name": "materials",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "maxBoneCount",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"name": "mesh",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.aniplayer",
+			"name": "player",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "queue",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.CullingMask",
+			"name": "renderLayer",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"default": "CullingMask.default"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "rootBone",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "size",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "skinnedMeshRenderer",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getMatByIndex",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "index",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.pickinfo",
+			"name": "intersects",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "ray",
+					"type": "gd3d.framework.ray",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "useBoneShader",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.framework.material",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "skinnedMeshRenderer",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\skinnedmeshrenderer.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IRenderer"
+			}
+		]
+	}
+}

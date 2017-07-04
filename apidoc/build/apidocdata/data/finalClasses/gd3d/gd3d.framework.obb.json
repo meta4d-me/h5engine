@@ -1,0 +1,194 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "center",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3[]",
+			"name": "directions",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "halfsize",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3[]",
+			"name": "vectors",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"default": "new Array<gd3d.math.vector3>()"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "axisOverlap",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "axis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "box0",
+					"type": "gd3d.framework.obb",
+					"description": ""
+				},
+				{
+					"name": "box1",
+					"type": "gd3d.framework.obb",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "buildByCenterSize",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "center",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "size",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "buildByMaxMin",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "minimum",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "maximum",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "caclWorldVecs",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vecs",
+					"type": "gd3d.math.vector3[]",
+					"description": ""
+				},
+				{
+					"name": "worldmatrix",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.obb",
+			"name": "clone",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "computeBoxExtents",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "axis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "box",
+					"type": "gd3d.framework.obb",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "extentsOverlap",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "min0",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "max0",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "min1",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "max1",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "intersects",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_obb",
+					"type": "gd3d.framework.obb",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "obb",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\tool\\obb.ts"
+	}
+}

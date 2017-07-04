@@ -1,0 +1,79 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "center",
+			"memberof": "gd3d.framework.spherestruct",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "radius",
+			"memberof": "gd3d.framework.spherestruct",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "srcradius",
+			"memberof": "gd3d.framework.spherestruct",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "spherestruct",
+			"memberof": "gd3d.framework.spherestruct",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_center",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "_r",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "intersects",
+			"memberof": "gd3d.framework.spherestruct",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "bound",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.spherestruct",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "worldmatrix",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "spherestruct",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\spherecollider.ts"
+	}
+}

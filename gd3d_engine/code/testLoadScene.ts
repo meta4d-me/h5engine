@@ -11,7 +11,7 @@ class test_loadScene implements IState
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
         let names: string[] = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
-        let name = names[2];
+        let name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
@@ -44,7 +44,9 @@ class test_loadScene implements IState
                             var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
                             var _root = _scene.getSceneRoot();
                             this.scene.addChild(_root);
-                            _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
+                            // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
+                            _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
+                            _root.markDirty();
                             this.app.getScene().lightmaps = [];
                             _scene.useLightMap(this.app.getScene());
                             _scene.useFog(this.app.getScene());
@@ -65,11 +67,12 @@ class test_loadScene implements IState
 
         // this.camera.near = 0.01;
         // this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(133, 100, 60);
-        this.cube.localTranslate = new gd3d.math.vector3(0, 0, 0);
-        objCam.lookatPoint(new gd3d.math.vector3(133.6694, 97.87, 67));
+        objCam.localTranslate = new gd3d.math.vector3(-50, 100, -50);
+        // objCam.lookatPoint(new gd3d.math.vector3(133.6694, 97.87, 67));
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+
         objCam.markDirty();//标记为需要刷新
-        CameraController.instance().init(this.app, this.camera);
+        // CameraController.instance().init(this.app, this.camera);
     }
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;
@@ -80,7 +83,7 @@ class test_loadScene implements IState
     update(delta: number)
     {
         this.timer += delta;
-        CameraController.instance().update(delta);
+        // CameraController.instance().update(delta);
         // var x = Math.sin(this.timer);
         // var z = Math.cos(this.timer);
         // var x2 = Math.sin(this.timer * 0.5);

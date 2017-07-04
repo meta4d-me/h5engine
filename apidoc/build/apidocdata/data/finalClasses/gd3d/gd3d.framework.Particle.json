@@ -1,0 +1,232 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "actived",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "alpha",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "color",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "colorRate",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Emission",
+			"name": "data",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Uint16Array",
+			"name": "dataForEbo",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
+			"name": "dataForVbo",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "euler",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "localMatrix",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"description": "//public mat: EffectMatData;",
+			"default": "new math.matrix()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "localRotation",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"default": "new math.quaternion()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "localScale",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "localTranslate",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"description": "//private startPitchYawRoll: gd3d.math.vector3 = new gd3d.math.vector3();"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderModel",
+			"name": "renderModel",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"default": "RenderModel.Mesh"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "rotationByEuler",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"default": "new math.quaternion()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "rotationByShape",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"default": "new math.quaternion()"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
+			"name": "sourceVbo",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "startFrameId",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"description": "// private uvSpriteFrameInternal: number;"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "startRotation",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"default": "new gd3d.math.quaternion()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "tilling",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"default": "new math.vector2(1, 1)"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "uv",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "vertexStartIndex",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Particle",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"description": "//根据发射器定义 初始化",
+			"params": [
+				{
+					"name": "batcher",
+					"type": "gd3d.framework.EmissionBatcher",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "initByData",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "uploadData",
+			"memberof": "gd3d.framework.Particle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "array",
+					"type": "Float32Array",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "Particle",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\particletool\\pariticle.ts",
+		"description": "//这里根据发射器定义的初始参数  计算当前要提交的数据"
+	}
+}

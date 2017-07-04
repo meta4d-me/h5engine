@@ -1,0 +1,61 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "BeReady",
+			"memberof": "gd3d.framework.EffectPlayStateEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Dispose",
+			"memberof": "gd3d.framework.EffectPlayStateEnum",
+			"scope": "static",
+			"default": "5"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "None",
+			"memberof": "gd3d.framework.EffectPlayStateEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Pause",
+			"memberof": "gd3d.framework.EffectPlayStateEnum",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Play",
+			"memberof": "gd3d.framework.EffectPlayStateEnum",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Stop",
+			"memberof": "gd3d.framework.EffectPlayStateEnum",
+			"scope": "static",
+			"default": "4"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "EffectPlayStateEnum",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

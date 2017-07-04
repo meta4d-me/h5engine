@@ -2,13 +2,15 @@ class test_loadprefab implements IState
 {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    renderer: gd3d.framework.meshRenderer[];
+    skinRenders:gd3d.framework.skinnedMeshRenderer[];
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        let names: string[] = ["Cube", "0001_fashion", "baihu"];
+        let names: string[] = ["0060_duyanshou", "Cube", "0001_fashion", "baihu"];
         let name = names[0];
         name="Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
@@ -30,6 +32,9 @@ class test_loadprefab implements IState
                             objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
                             objCam.lookatPoint(new gd3d.math.vector3(0.1, 0.1, 0.1));
                             objCam.markDirty();
+                            this.renderer = this.baihu.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
+                            this.skinRenders = this.baihu.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER) as gd3d.framework.skinnedMeshRenderer[];
+                            this.changeShader();
                         }
                     });
             }
@@ -43,9 +48,53 @@ class test_loadprefab implements IState
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
         this.camera.far = 100;
+        this.camera.backgroundColor = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);
         // objCam.localTranslate = new gd3d.math.vector3(0, 0, -30);
         objCam.markDirty();//标记为需要刷新
 
+    }
+
+    private changeShader()
+    {
+        var btn = document.createElement("button");
+        btn.textContent = "切换Shader到：diffuse.shader.json";
+        btn.onclick = () =>
+        {
+            var sh = this.app.getAssetMgr().getShader("diffuse.shader.json") as gd3d.framework.shader;
+            this.change(sh);
+        }
+        btn.style.top = "160px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+
+        var btn2 = document.createElement("button");
+        btn2.textContent = "切换Shader到：transparent_additive.shader.json";
+        btn2.onclick = () =>
+        {
+            var sh = this.app.getAssetMgr().getShader("transparent_additive.shader.json") as gd3d.framework.shader;
+            this.change(sh);
+        }
+        btn2.style.top = "124px";
+        btn2.style.position = "absolute";
+        this.app.container.appendChild(btn2);
+    }
+
+    change(sha: gd3d.framework.shader)
+    {
+        for (let j = 0; j < this.renderer.length; j++)
+        {
+            for (let i = 0; i < this.renderer[j].materials.length; i++)
+            {
+                this.renderer[j].materials[i].changeShader(sha);
+            }
+        }
+        for (let j = 0; j < this.skinRenders.length; j++)
+        {
+            for (let i = 0; i < this.skinRenders[j].materials.length; i++)
+            {
+                this.skinRenders[j].materials[i].changeShader(sha);
+            }
+        }
     }
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;

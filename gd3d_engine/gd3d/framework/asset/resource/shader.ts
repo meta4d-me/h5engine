@@ -2,12 +2,26 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * shader资源
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class shader implements IAsset
     {
         @gd3d.reflect.Field("constText")
         private name: constText = null;
         private id: resID = new resID();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version egret-gd3d 1.0
+         */
         defaultAsset: boolean = false;
         constructor(assetName: string = null)
         {
@@ -15,28 +29,59 @@ namespace gd3d.framework
             {
                 assetName = "shader_" + this.getGUID();
             }
-            if (!sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName))
-            {
-                throw new Error("already have name.");
-            }
             this.name = new constText(assetName);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             return this.name.getText();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version egret-gd3d 1.0
+         */
         getGUID(): number
         {
             return this.id.getID();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version egret-gd3d 1.0
+         */
         use()
         {
             sceneMgr.app.getAssetMgr().use(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unuse(disposeNow: boolean = false)
         {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             //shader 其实没有多大dispose的价值
@@ -48,6 +93,13 @@ namespace gd3d.framework
             // }
             //this.glMesh.dispose(webgl);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version egret-gd3d 1.0
+         */
         caclByteLength(): number
         {
             let total = 0;
@@ -56,9 +108,30 @@ namespace gd3d.framework
         passes: { [id: string]: gd3d.render.glDrawPass[] } = {};
 
         // @gd3d.reflect.Field("UniformData")
+        /**
+         * @private
+         */
         defaultValue: { [key: string]: { type: string, value?: any, defaultValue?: any, min?: number, max?: number } } = {};
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置渲染的层级
+         * @version egret-gd3d 1.0
+         */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
+        /**
+         * @private
+         */
         queue: number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析资源
+         * @param buf buffer数组
+         * @version egret-gd3d 1.0
+         */
         parse(assetmgr: assetMgr, json: any)
         {
             this._parseProperties(assetmgr, json.properties);

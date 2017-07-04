@@ -1,0 +1,236 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.application",
+			"name": "app",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "全局的application实例",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Fog",
+			"name": "fog",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "雾效",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.texture[]",
+			"name": "lightmaps",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "lightmap列表",
+			"version": "egret-gd3d 1.0",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"name": "mainCamera",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "获取当前主相机",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "场景名称",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.camera[]",
+			"name": "renderCameras",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "参与渲染的相机",
+			"version": "egret-gd3d 1.0",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.renderList",
+			"name": "renderList",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "渲染列表",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "全局的webgl实例",
+			"version": "egret-gd3d 1.0"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "addChild",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "场景根节点下添加物体",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform",
+					"description": "要添加的transform"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform",
+			"name": "getChild",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "根据索引获取child",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "index",
+					"type": "number",
+					"description": "索引"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform",
+			"name": "getChildByName",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "根据name获取child",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": "name"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getChildCount",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "获取children数量",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform[]",
+			"name": "getChildren",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "获取children列表",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "getRoot",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "获取场景根节点",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.pickinfo",
+			"name": "pick",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "获取射线拾取到的最近物体",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "ray",
+					"type": "gd3d.framework.ray",
+					"description": "射线实例"
+				},
+				{
+					"name": "isPickMesh",
+					"type": "boolean",
+					"default": "false",
+					"description": "是否为拾取mesh 否为拾取collider"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "Array<gd3d.framework.pickinfo>",
+			"name": "pickAll",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "获取射线路径上的所有物体",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "ray",
+					"type": "gd3d.framework.ray",
+					"description": "射线实例"
+				},
+				{
+					"name": "isPickMesh",
+					"type": "boolean",
+					"default": "false",
+					"description": "是否为拾取mesh 否为拾取collider"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "removeChild",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "场景根节点下移出物体",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform",
+					"description": "要移出的transform"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "场景的刷新函数",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": "delta"
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "scene",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\scene.ts",
+		"description": "场景是基础的功能，有场景图，相当于Unity的Level",
+		"version": "egret-gd3d 1.0"
+	}
+}

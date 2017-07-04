@@ -1,0 +1,191 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "alpha",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "color",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "colorRate",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "euler",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "localRotation",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance",
+			"description": "本地旋转(经过各种lerp和action后计算的最终值)",
+			"default": "new math.quaternion()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectMatData",
+			"name": "mat",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrix",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance",
+			"default": "new math.matrix()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.mesh",
+			"name": "mesh",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
+			"name": "meshdataVbo",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "pos",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderModel",
+			"name": "renderModel",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance",
+			"default": "RenderModel.None"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "rotationByEuler",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance",
+			"description": "lerp，action更新euler，再由euler合成rotationByEuler。下一步拿rotationByEuler乘以billboard生成的四元数得到最终的localRotation。再用localRotation,pos，scale计算出最终的matrix。matrix作用每个顶点，然后去渲染。",
+			"default": "new math.quaternion()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "scale",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "tilling",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "uv",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "gd3d.framework.EffectAttrsData",
+			"name": "clone",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.EffectAttrsData",
+			"name": "copyandinit",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "any",
+			"name": "getAttribute",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "attribute",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "initAttribute",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "attribute",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "resetMatrix",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setLerpAttribute",
+			"memberof": "gd3d.framework.EffectAttrsData",
+			"scope": "instance",
+			"description": "将计算出来的插值存入到帧属性数据",
+			"params": [
+				{
+					"name": "attribute",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "val",
+					"type": "any",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectAttrsData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

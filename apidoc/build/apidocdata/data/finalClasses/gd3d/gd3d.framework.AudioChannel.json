@@ -1,0 +1,55 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "GainNode",
+			"name": "gainNode",
+			"memberof": "gd3d.framework.AudioChannel",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isplay",
+			"memberof": "gd3d.framework.AudioChannel",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "PannerNode",
+			"name": "pannerNode",
+			"memberof": "gd3d.framework.AudioChannel",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "AudioBufferSourceNode",
+			"name": "source",
+			"memberof": "gd3d.framework.AudioChannel",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "volume",
+			"memberof": "gd3d.framework.AudioChannel",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "stop",
+			"memberof": "gd3d.framework.AudioChannel",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "AudioChannel",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\audio\\audioex.ts"
+	}
+}

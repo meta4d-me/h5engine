@@ -1,0 +1,179 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "curIndexCount",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "curVerCount",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Emission",
+			"name": "data",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Uint16Array",
+			"name": "dataForEbo",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
+			"name": "dataForVbo",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.effectSystem",
+			"name": "effectSys",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EmissionElement",
+			"name": "emissionElement",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "formate",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.material",
+			"name": "mat",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.mesh",
+			"name": "mesh",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Particle[]",
+			"name": "particles",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance",
+			"default": "[]"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EmissionBatcher",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_data",
+					"type": "gd3d.framework.Emission",
+					"description": ""
+				},
+				{
+					"name": "effectSys",
+					"type": "gd3d.framework.effectSystem",
+					"description": ""
+				},
+				{
+					"name": "emissionElement",
+					"type": "gd3d.framework.EmissionElement",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addParticle",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "initMesh",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.EmissionBatcher",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EmissionBatcher",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\particletool\\emissionbatcher.ts"
+	}
+}

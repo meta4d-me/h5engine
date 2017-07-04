@@ -1,0 +1,35 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "constText",
+			"memberof": "gd3d.framework.constText",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "text",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getText",
+			"memberof": "gd3d.framework.constText",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "constText",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\asset.ts",
+		"description": "静态text 初始化后不可修改",
+		"version": "egret-gd3d 1.0"
+	}
+}

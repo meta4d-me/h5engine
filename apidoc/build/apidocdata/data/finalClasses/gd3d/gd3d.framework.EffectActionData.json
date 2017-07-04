@@ -1,0 +1,48 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "actionType",
+			"memberof": "gd3d.framework.EffectActionData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "endFrame",
+			"memberof": "gd3d.framework.EffectActionData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "any[]",
+			"name": "params",
+			"memberof": "gd3d.framework.EffectActionData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "startFrame",
+			"memberof": "gd3d.framework.EffectActionData",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.EffectActionData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectActionData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

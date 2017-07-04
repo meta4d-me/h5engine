@@ -4,7 +4,7 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * 资源类型
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export enum AssetTypeEnum
     {
@@ -36,7 +36,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 加载状态
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export class stateLoad
     {
@@ -44,14 +44,14 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 加载是否遇到错误
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         iserror: boolean = false;
         /**
          * @public
          * @language zh_CN
          * 加载是否完成
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         isfinish: boolean = false;
 
@@ -59,22 +59,31 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 记录需要加载的每一个的状态和资源引用
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         resstate: { [id: string]: { res: IAsset, state: number } } = {};
 
         /**
+         * @public
+         * @language zh_CN
          * 当前的进度
+         * @version egret-gd3d 1.0
          */
         curtask: number = 0;
 
         /**
+         * @public
+         * @language zh_CN
          * 总进度
+         * @version egret-gd3d 1.0
          */
         totaltask: number = 0;
 
         /**
+         * @public
+         * @language zh_CN
          * 获取加载进度
+         * @version egret-gd3d 1.0
          */
         get progress(): number
         {
@@ -85,18 +94,21 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 加载过程中记录的log
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         logs: string[] = [];
         /**
          * @public
          * @language zh_CN
          * 加载过程中记录的错误信息
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         errs: Error[] = [];
         /**
+         * @public
+         * @language zh_CN
          * 源url地址
+         * @version egret-gd3d 1.0
          */
         url: string;
     }
@@ -106,16 +118,43 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 资源包
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export class assetBundle
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 包名
+         * @version egret-gd3d 1.0
+         */
         public name: string;
         private id: number;
+        /**
+         * @public
+         * @language zh_CN
+         * 资源管理器实例
+         * @version egret-gd3d 1.0
+         */
         assetmgr: assetMgr;
-        files: { name: string, length: number, packes: number }[] = [];
-        packages: string[] = [];
+        private files: { name: string, length: number, packes: number }[] = [];
+        private packages: string[] = [];
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 包完整路径
+         * @version egret-gd3d 1.0
+         */
         url: string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 不带包名路径
+         * @version egret-gd3d 1.0
+         */
         path: string;
         constructor(url: string)
         {
@@ -123,6 +162,14 @@ namespace gd3d.framework
             var i = url.lastIndexOf("/");
             this.path = url.substring(0, i);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析包
+         * @param json 
+         * @version egret-gd3d 1.0
+         */
         parse(json: any)
         {
             var files = json["files"];
@@ -143,6 +190,13 @@ namespace gd3d.framework
                 }
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 卸载包 包内对应的资源引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unload()
         {
             for (let key in this.mapNamed)
@@ -155,6 +209,15 @@ namespace gd3d.framework
             }
             this.assetmgr.removeAssetBundle(this.name);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 加载包
+         * @param assetmgr 资源管理器实例
+         * @param stateinfo 加载的状态信息实例
+         * @version egret-gd3d 1.0
+         */
         load(assetmgr: assetMgr, stateinfo: { state: stateLoad, type: AssetTypeEnum, onstate: (state: stateLoad) => void })
         {
             let state = stateinfo.state;
@@ -369,7 +432,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 资源GUID的字典，key为资源的名称
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         mapNamed: { [id: string]: number } = {};
     }
@@ -377,33 +440,66 @@ namespace gd3d.framework
     /**
      * @public
      * @language zh_CN
+     * @classdesc
      * 通用的资源管理器，你也可以自己搞个东西当资源，继承IResource即可<p/>
      * 资源管理器用引用计数法管理资源，计数混乱会导致问题，循环引用也会导致问题，需要注意<p/>
      * js 语法层面不能提供可靠的自动引用计数机制，所以如果你用乱了，哪啊就是乱了<p/>
      * 所有的资源都是从资源管理器get出来的<p/>
      * 所有的资源不用的时候都要还到资源管理器<p/>
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export class assetMgr
     {
+        /**
+         * @private
+         */
         app: application;
+        /**
+         * @private
+         */
         webgl: WebGLRenderingContext;
+        /**
+         * @private
+         */
         shaderPool: gd3d.render.shaderPool;
-        defMesh: defMesh;
+        /**
+         * @private
+         */
         constructor(app: application)
         {
             this.app = app;
             this.webgl = app.webgl;
             this.shaderPool = new gd3d.render.shaderPool();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 初始化默认资源
+         * @version egret-gd3d 1.0
+         */
         initDefAsset()
         {
             defShader.initDefaultShader(this);
             defMesh.initDefaultMesh(this);
             defTexture.initDefaultTexture(this);
         }
-        //资源获取方式三，静态资源
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * shader字典
+         * @version egret-gd3d 1.0
+         */
         mapShader: { [id: string]: shader } = {};
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过name获取shader资源
+         * @param name 
+         * @version egret-gd3d 1.0
+         */
         getShader(name: string): shader
         {
             return this.mapShader[name];
@@ -412,10 +508,19 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 默认Mesh资源
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         mapDefaultMesh: { [id: string]: mesh } = {};
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过name获取默认mesh资源
+         * @param name
+         * @version egret-gd3d 1.0
+         */
         getDefaultMesh(name: string): mesh
         {
             return this.mapDefaultMesh[name];
@@ -424,10 +529,19 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 默认图片资源
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         mapDefaultTexture: { [id: string]: texture } = {};
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过name获取默认贴图资源
+         * @param name
+         * @version egret-gd3d 1.0
+         */
         getDefaultTexture(name: string): texture
         {
             return this.mapDefaultTexture[name];
@@ -436,30 +550,34 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * assetbundle的字典，key为bundlename
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         mapBundle: { [id: string]: assetBundle } = {};
 
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 资源的字典，key为资源的GUID
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         mapRes: { [id: number]: assetRef } = {};
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 资源GUID的字典，key为资源的名称
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         mapNamed: { [id: string]: number[] } = {};
         /**
         * @public
         * @language zh_CN
+         * @classdesc
         * 通过资源的GUID获取资源
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @param id 资源的GUID
         */
         getAsset(id: number): IAsset
@@ -471,8 +589,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 通过资源的名称获取资源
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param name 资源的名称
          */
         getAssetByName(name: string, bundlename: string = null): IAsset
@@ -492,6 +611,14 @@ namespace gd3d.framework
             if (r == null) return null;
             return r.asset;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过assetbundle的名称获取包
+         * @param bundlename 包的名称
+         * @version egret-gd3d 1.0
+         */
         getAssetBundle(bundlename: string): assetBundle
         {
             if (this.mapBundle[bundlename])
@@ -501,10 +628,11 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 取消资源的引用，当前资源的引用计数减一
          * @param res 需要取消引用的资源
          * @param disposeNow 如果引用计数归零则立即释放
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         unuse(res: IAsset, disposeNow: boolean = false)
         {
@@ -541,9 +669,10 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 引用资源，当前资源的引用计数加一
          * @param res 需要引用的资源
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         use(res: IAsset)
         {
@@ -573,8 +702,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 释放所有引用为零的资源
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         releaseUnuseAsset()
         {
@@ -606,8 +736,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 返回所有资源引用计数
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          */
         getAssetsRefcount(): { [id: string]: number }
         {
@@ -632,24 +763,6 @@ namespace gd3d.framework
             return mapRefcout;
         }
 
-        nameDuplicateCheck(name: string): boolean
-        {
-            // if (this.mapNamed[name])
-            //     return false;
-            return true;
-        }
-        //加载资源接口，这个clone 以前 写的骨骼动画那部分的接口即可
-        //多个package 或者 fileGroup 有重复文件均不影响
-        //。。。
-        //loadFile //加载单个文件
-        //unloadFile
-
-        //loadFileGroup
-        //unloadFileGroup
-
-        //loadPackage
-        //unloadPackage
-
         private mapInLoad: { [id: string]: stateLoad } = {};
         removeAssetBundle(name: string)
         {
@@ -658,24 +771,14 @@ namespace gd3d.framework
             if (this.mapInLoad[name] != null)
                 delete this.mapInLoad[name];
         }
-        /**
-         * @public
-         * @language zh_CN
-         * 通过资源的url获取当前的加载状态
-         * @version gd3d 1.0
-         * @param url 资源的url
-         */
-        //getUrlLoadState(url: string): stateLoad
-        //{
-        //    return this.mapInLoad[url];
-        //}
 
         private assetUrlDic: { [id: number]: string } = {};
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 获取资源的url
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param asset 资源
          */
         getAssetUrl(asset: IAsset): string
@@ -683,9 +786,17 @@ namespace gd3d.framework
             return this.assetUrlDic[asset.getGUID()];
         }
 
-        bundlePackBin: { [name: string]: ArrayBuffer } = {};
-        bundlePackJson: JSON;
+        private bundlePackBin: { [name: string]: ArrayBuffer } = {};
+        private bundlePackJson: JSON;
         //packnum 0 txt 1 bin
+        /**
+         * @private
+         * @param packnum 
+         * @param url 
+         * @param type 
+         * @param onstate 
+         * @param state 
+         */
         loadResByPack(packnum: number, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad)
         {
             let bundlename = this.getFileName(state.url);
@@ -907,10 +1018,11 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 加载单个资源
          * 所有load进来的资源，均use一遍，引用计数为1
          * 再unload 一次 归0，则可dispose（）
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          * @param onstate 状态返回的回调
@@ -1134,32 +1246,57 @@ namespace gd3d.framework
                     var _textureSrc: string = url.replace(filename, _name);
 
                     state.resstate[filename] = { state: 0, res: null }
-                    var img = new Image();
-                    img.src = _textureSrc;
-                    img.crossOrigin = "anonymous";
-                    img.onerror = (error) =>
+                    if (_textureSrc.indexOf(".pvr.bin") >= 0)
                     {
-                        if (error != null)
+                        gd3d.io.loadArrayBuffer(_textureSrc, (_buffer, err) =>
                         {
-                            state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
-                            state.iserror = true;
+                            if (err != null)
+                            {
+                                state.iserror = true;
+                                state.errs.push(new Error(err.message));
+                                onstate(state);
+                                return;
+                            }
+
+                            var _texture = new texture(filename);
+                            this.assetUrlDic[_texture.getGUID()] = url;
+                            let pvr: PVRHeader = new PVRHeader(this.webgl);
+                            console.log(_textureSrc);
+                            _texture.glTexture = pvr.parse(_buffer);
+                            this.use(_texture);
+                            state.resstate[filename].state = 1;//完成
+                            state.resstate[filename].res = _texture;
+                            onstate(state);
+                        });
+                    } else
+                    {
+                        var img = new Image();
+                        img.src = _textureSrc;
+                        img.crossOrigin = "anonymous";
+                        img.onerror = (error) =>
+                        {
+                            if (error != null)
+                            {
+                                state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
+                                state.iserror = true;
+                                onstate(state);
+                            }
+                        }
+                        img.onload = () =>
+                        {
+                            var _texture = new texture(filename);
+                            _texture.realName = _name;
+                            this.assetUrlDic[_texture.getGUID()] = url;
+
+                            var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
+                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                            _texture.glTexture = t2d;
+
+                            this.use(_texture);
+                            state.resstate[filename].state = 1;//完成
+                            state.resstate[filename].res = _texture;
                             onstate(state);
                         }
-                    }
-                    img.onload = () =>
-                    {
-                        var _texture = new texture(filename);
-                        _texture.realName = _name;
-                        this.assetUrlDic[_texture.getGUID()] = url;
-
-                        var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                        t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
-                        _texture.glTexture = t2d;
-
-                        this.use(_texture);
-                        state.resstate[filename].state = 1;//完成
-                        state.resstate[filename].res = _texture;
-                        onstate(state);
                     }
                 })
             }
@@ -1362,6 +1499,11 @@ namespace gd3d.framework
         }
 
         private waitStateDic: { [name: string]: Function[] } = {};
+        /**
+         * @private
+         * @param name 
+         * @param state 
+         */
         public doWaitState(name: string, state: stateLoad)
         {
             if (this.waitStateDic[name] == null)
@@ -1378,6 +1520,9 @@ namespace gd3d.framework
 
         private queueState: { state: stateLoad, type: AssetTypeEnum, onstate: (state: stateLoad) => void }[] = [];
         private curloadinfo: { state: stateLoad, type: AssetTypeEnum, onstate: (state: stateLoad) => void };
+        /**
+         * @private
+         */
         public loadByQueue()
         {
             if (this.curloadinfo != null)
@@ -1465,8 +1610,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 加载压缩后的包
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          * @param onstate 状态返回的回调
@@ -1493,9 +1639,10 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 加载资源
          * 这里来区分assetbundle和单个资源
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          * @param onstate 状态返回的回调
@@ -1545,8 +1692,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 卸载资源
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          * @param onstate 状态返回的回调
          */
@@ -1567,9 +1715,10 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 加载场景
          * 只有先load完包含场景的assetbundle，才能load场景
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param sceneName 场景名称
          * @param onComplete 加载完成回调
          */
@@ -1577,18 +1726,6 @@ namespace gd3d.framework
         {
             if (sceneName.length > 0)
             {
-                //移除没有标记为不销毁的跟节点                          
-                // let sceneRoot = this.app.getScene().getRoot();
-                // let rootChildrenlength = sceneRoot.children.length;
-                // for (let i = rootChildrenlength - 1; i >= 0; i--)
-                // {
-                //     let tempChild = sceneRoot.children[i];
-                //     if (tempChild.gameObject.dontdestroyonload)
-                //         continue;
-                //     sceneRoot.removeChild(tempChild);
-                //     tempChild.dispose();
-                // }
-
                 var _rawscene: rawscene = this.getAssetByName(sceneName) as rawscene;
 
                 let willLoadRoot = _rawscene.getSceneRoot();
@@ -1618,11 +1755,12 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 保存场景
          * 这里只是把场景序列化
          * 具体保存要编辑器来进行
          * 保存的地址和内容通过回调返回
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param fun 回调
          */
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void)
@@ -1659,11 +1797,12 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 保存场景
          * 这里只是把场景序列化
          * 具体保存要编辑器来进行
          * 保存的地址和内容通过回调返回
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param fun 回调
          */
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[]) => void)
@@ -1687,6 +1826,7 @@ namespace gd3d.framework
 
         /**
          * @language zh_CN
+         * @classdesc
          * 保存材质
          * @param mat 
          * @param fun 
@@ -1732,9 +1872,10 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 同步加载单个资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）
          * 这个接口还需要完善
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          */
@@ -1801,10 +1942,11 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 同步加载资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）
          * 这个接口还需要完善
          * 这里有个问题，如果是assetbundle，那么实例究竟是个啥东西。
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          */
@@ -1838,8 +1980,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 通过url获取资源的名称
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          */
         getFileName(url: string): string
@@ -1851,8 +1994,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * @classdesc
          * 通过url获取资源的类型
-         * @version gd3d 1.0
+         * @version egret-gd3d 1.0
          * @param url 资源的url
          */
         calcType(url: string): AssetTypeEnum
@@ -1885,7 +2029,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.Texture;
                 }
-                else if (extname == ".pvr.czz" || extname == ".pvr")
+                else if (extname == ".pvr.bin" || extname == ".pvr")
                 {
                     return AssetTypeEnum.PVR;
                 }
@@ -1947,8 +2091,9 @@ namespace gd3d.framework
     /**
      * @public
      * @language zh_CN
+     * @classdesc
      * 资源引用计数的结构
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export class assetRef
     {
@@ -1956,6 +2101,9 @@ namespace gd3d.framework
         refcount: number;
     }
 
+    /**
+     * @private
+     */
     export class SaveInfo
     {
         files: { [key: string]: string } = {};
