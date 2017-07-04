@@ -9,16 +9,31 @@
      */
     export class aabb
     {
+        /**
+        * @public
+        * @language zh_CN
+        * 最小点
+        * @version gd3d 1.0
+        * @platform Web,Native
+        */
         public minimum: gd3d.math.vector3;
+        
+        /**
+        * @public
+        * @language zh_CN
+        * 最大点
+        * @version gd3d 1.0
+        * @platform Web,Native
+        */
         public maximum: gd3d.math.vector3;
-        srcmin: gd3d.math.vector3;
-        srcmax: gd3d.math.vector3;
-        opmin: gd3d.math.vector3 = new gd3d.math.vector3();
-        opmax: gd3d.math.vector3 = new gd3d.math.vector3();
-        _center: gd3d.math.vector3 = new gd3d.math.vector3();
+        private srcmin: gd3d.math.vector3;
+        private srcmax: gd3d.math.vector3;
+        private opmin: gd3d.math.vector3 = new gd3d.math.vector3();
+        private opmax: gd3d.math.vector3 = new gd3d.math.vector3();
+        private _center: gd3d.math.vector3 = new gd3d.math.vector3();
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 构建轴对称包围盒
         * @param _minimum 最小点
@@ -36,7 +51,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 刷新轴对称包围盒
         * @param worldmatrix 物体的世界矩阵
@@ -143,7 +158,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 包含一个点
         * @param vec 世界坐标
@@ -157,7 +172,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 检查是否包含点
         * @param vec 世界坐标
@@ -172,7 +187,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 检查是否与aabb相交
         * @param aabb 轴对称包围盒
@@ -191,7 +206,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 包含一个aabb
         * @param aabb 轴对称包围盒
@@ -208,7 +223,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 计算包围盒的中心位置
         * @version gd3d 1.0
@@ -222,7 +237,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 清空
         * @version gd3d 1.0
@@ -235,7 +250,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 克隆
         * @version gd3d 1.0
@@ -250,7 +265,7 @@
         }
 
         /**
-        * @private
+        * @public
         * @language zh_CN
         * 获取包围盒顶点数据
         * @param vecs 引用数组

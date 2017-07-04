@@ -64,6 +64,8 @@
 		"kind": "enum",
 		"name": "UniformTypeEnum",
 		"memberof": "gd3d.render",
-		"filename": "render\\resource\\shader.ts"
+		"filename": "render\\resource\\shader.ts",
+		"description": "uniform类型枚举",
+		"version": "egret-gd3d 1.0"
 	}
 }

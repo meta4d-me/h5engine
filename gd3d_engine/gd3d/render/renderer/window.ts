@@ -1,5 +1,8 @@
 ﻿namespace gd3d.render
 {
+    /**
+     * @private
+     */
     export class glWindow
     {
         renderTarget: gd3d.render.glRenderTarget;

@@ -6,13 +6,9 @@
 			"name": "color_one",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
-		},
-		{
-			"kind": "member",
-			"name": "n",
-			"memberof": "gd3d.math.pool",
-			"scope": "instance"
+			"rwType": 1,
+			"description": "获取1填充的color",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -20,7 +16,9 @@
 			"name": "vector2_right",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取v2朝x轴正向",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -28,7 +26,9 @@
 			"name": "vector2_up",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取v2朝y轴正向",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -36,7 +36,9 @@
 			"name": "vector3_forward",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取v3朝z轴正向",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -44,7 +46,9 @@
 			"name": "vector3_one",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取1填充的v3",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -52,7 +56,9 @@
 			"name": "vector3_right",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取v3朝x轴正向",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -60,7 +66,9 @@
 			"name": "vector3_up",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取v3朝y轴正向",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -68,7 +76,9 @@
 			"name": "vector3_zero",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取0填充的v3",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -76,7 +86,9 @@
 			"name": "vector4_one",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取1填充的v4",
+			"version": "gd3d 1.0"
 		}
 	],
 	"function": [
@@ -86,6 +98,8 @@
 			"name": "clone_matrix",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "带返回值的matrix克隆",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "src",
@@ -100,6 +114,8 @@
 			"name": "clone_matrix3x2",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "带返回值的3x2matrix克隆",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "src",
@@ -114,6 +130,8 @@
 			"name": "clone_quaternion",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "带返回值的quat克隆",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "src",
@@ -128,6 +146,8 @@
 			"name": "clone_vector2",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "带返回值的v2克隆",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "src",
@@ -142,6 +162,8 @@
 			"name": "clone_vector3",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "带返回值的v3克隆",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "src",
@@ -156,6 +178,8 @@
 			"name": "clone_vector4",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "有返回值的v4克隆",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "src",
@@ -168,49 +192,65 @@
 			"kind": "function",
 			"name": "collect_all",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "释放所有池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "collect_color",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "清除color池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "collect_matrix",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "清除matrix池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "collect_matrix3x2",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "清除3x2matrix池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "collect_quaternion",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "清除quat池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "collect_vector2",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "清除v2池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "collect_vector3",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "清除v3池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "collect_vector4",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "清除v4池",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -218,6 +258,8 @@
 			"name": "delete_color",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收color",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "v",
@@ -232,6 +274,8 @@
 			"name": "delete_matrix",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收一个matrix",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "v",
@@ -246,6 +290,8 @@
 			"name": "delete_matrix3x2",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收一个3x2matrix",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "v",
@@ -260,6 +306,8 @@
 			"name": "delete_quaternion",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收一个quat",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "v",
@@ -274,6 +322,8 @@
 			"name": "delete_vector2",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收一个v2",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "v",
@@ -288,6 +338,8 @@
 			"name": "delete_vector2Array",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收一个v2数组",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "vs",
@@ -302,6 +354,8 @@
 			"name": "delete_vector3",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收一个v3",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "v",
@@ -316,6 +370,8 @@
 			"name": "delete_vector4",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
+			"description": "回收一个v4",
+			"version": "gd3d 1.0",
 			"params": [
 				{
 					"name": "v",
@@ -329,49 +385,63 @@
 			"type": "gd3d.math.color",
 			"name": "new_color",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "获取一个color",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.math.matrix",
 			"name": "new_matrix",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "获取一个matrix",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.math.matrix3x2",
 			"name": "new_matrix3x2",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "获取一个3x2matrix",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.math.quaternion",
 			"name": "new_quaternion",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "获取一个quat",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.math.vector2",
 			"name": "new_vector2",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "获取一个v2",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.math.vector3",
 			"name": "new_vector3",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "获取一个v3",
+			"version": "gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.math.vector4",
 			"name": "new_vector4",
 			"memberof": "gd3d.math.pool",
-			"scope": "static"
+			"scope": "static",
+			"description": "获取一个v4",
+			"version": "gd3d 1.0"
 		}
 	],
 	"globalMember": [],
@@ -380,6 +450,8 @@
 		"kind": "class",
 		"name": "pool",
 		"memberof": "gd3d.math",
-		"filename": "render\\pool.ts"
+		"filename": "render\\pool.ts",
+		"description": "对常用结构类型数据进行池化处理，在大量使用结构类型数据的逻辑中尽量使用该结构",
+		"version": "gd3d 1.0"
 	}
 }

@@ -1,6 +1,15 @@
 ﻿namespace gd3d.io
 {
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 加载text资源
+     * @param url 加载路径
+     * @param fun 回调函数
+     * @version egret-gd3d 1.0
+     */
     export function loadText(url: string, fun: (_txt: string, _err: Error) => void): void
     {
         let req = new XMLHttpRequest();
@@ -27,6 +36,15 @@
     }
 
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 加载arraybuffer资源
+     * @param url 加载路径
+     * @param fun 回调函数
+     * @version egret-gd3d 1.0
+     */
     export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void): void
     {
         var req = new XMLHttpRequest();
@@ -54,6 +72,15 @@
         req.send();
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 加载二进制资源
+     * @param url 加载路径
+     * @param fun 回调函数
+     * @version egret-gd3d 1.0
+     */
     export function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void): void
     {
         var req = new XMLHttpRequest();
@@ -81,6 +108,16 @@
         req.send();
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 加载图片资源
+     * @param url 加载路径
+     * @param fun 回调函数
+     * @param progress 加载进度
+     * @version egret-gd3d 1.0
+     */
     export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, progress: (progre: number) => void): void
     {
         var img = new Image();

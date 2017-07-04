@@ -5,7 +5,7 @@
      * @language zh_CN
      * @classdesc
      * 射线
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export class ray
     {
@@ -14,10 +14,11 @@
         /**
         * @private
         * @language zh_CN
+        * @classdesc
         * 构建射线
         * @param _origin 射线起点
         * @param _dir 射线方向
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3)
@@ -29,16 +30,26 @@
         /**
         * @private
         * @language zh_CN
+        * @classdesc
         * 与aabb碰撞相交检测
         * @param _aabb 待检测aabb
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public intersectAABB(_aabb: aabb): boolean
         {
             return this.intersectBoxMinMax(_aabb.minimum, _aabb.maximum);
         }
-
+        
+        /**
+        * @private
+        * @language zh_CN
+        * @classdesc
+        * 与transform表示的plane碰撞相交检测，主要用于2d检测
+        * @param tran transform
+        * @version egret-gd3d 1.0
+        * @platform Web,Native
+        */
         public intersectPlaneTransform(tran: transform): pickinfo
         {
             var pickinfo = null;
@@ -56,7 +67,7 @@
             return pickinfo;
         }
 
-        public intersectPlane(planePoint: gd3d.math.vector3, planeNormal): gd3d.math.vector3
+        private intersectPlane(planePoint: gd3d.math.vector3, planeNormal): gd3d.math.vector3
         {
             var vp1 = planeNormal.x;
             var vp2 = planeNormal.y;
@@ -82,6 +93,15 @@
             }
         }
 
+        /**
+        * @private
+        * @language zh_CN
+        * @classdesc
+        * 与碰撞盒相交检测
+        * @param tran 待检测带碰撞盒的transform
+        * @version egret-gd3d 1.0
+        * @platform Web,Native
+        */
         public intersectCollider(tran: transform): pickinfo
         {
             var _collider: ICollider = tran.gameObject.collider;
@@ -134,10 +154,11 @@
         /**
         * @private
         * @language zh_CN
+        * @classdesc
         * 与最大最小点表示的box相交检测
         * @param minimum
         * @param maximum
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean
@@ -250,6 +271,16 @@
             }
             return true;
         }
+        /**
+        * @private
+        * @language zh_CN
+        * @classdesc
+        * 与球相交检测
+        * @param center 球圆心坐标
+        * @param radius 球半径
+        * @version egret-gd3d 1.0
+        * @platform Web,Native
+        */
         public intersectsSphere(center: gd3d.math.vector3, radius: number): boolean
         {
             var center_ori = gd3d.math.pool.new_vector3();
@@ -269,6 +300,17 @@
 
             return true;
         }
+        /**
+        * @private
+        * @language zh_CN
+        * @classdesc
+        * 与三角形相交检测
+        * @param vertex0 
+        * @param vertex1 
+        * @param vertex2 
+        * @version egret-gd3d 1.0
+        * @platform Web,Native
+        */
         public intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3): pickinfo
         {
             var _edge1 = gd3d.math.pool.new_vector3();

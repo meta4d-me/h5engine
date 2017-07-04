@@ -4,28 +4,45 @@
      * @language zh_CN
      * @classdesc
      * 表示定向包围盒
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export class obb
     {
-        center: gd3d.math.vector3;
-        halfsize: gd3d.math.vector3;
-        directions: gd3d.math.vector3[];
-        vectors: gd3d.math.vector3[] = new Array<gd3d.math.vector3>();
         /**
-        * @private
+        * @public
         * @language zh_CN
-        * 构建定向包围盒
-        * @param minimum 最小点
-        * @param maximum 最大点
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @classdesc
+        * 包围盒中心坐标
+        * @version egret-gd3d 1.0
         */
-        constructor()
-        {
+        center: gd3d.math.vector3;
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 包围盒各轴向半长
+        * @version egret-gd3d 1.0
+        */
+        halfsize: gd3d.math.vector3;
+        private directions: gd3d.math.vector3[];
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 包围盒世界空间下各个点坐标
+        * @version egret-gd3d 1.0
+        */
+        vectors: gd3d.math.vector3[] = new Array<gd3d.math.vector3>();
 
-        }
-
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 由最大最小点构建定向包围盒
+        * @param minimum 最小点坐标
+        * @param maximum 最大点坐标
+        * @version egret-gd3d 1.0
+        */
         buildByMaxMin(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3)
         {
             this.vectors[0] = math.pool.clone_vector3(minimum);
@@ -53,6 +70,15 @@
 
             this.directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
         }
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 由中心点和各轴向长度构建定向包围盒
+        * @param center 中心点坐标
+        * @param size 各轴向长度
+        * @version egret-gd3d 1.0
+        */
         buildByCenterSize(center:gd3d.math.vector3, size:gd3d.math.vector3)
         {
             this.center = math.pool.clone_vector3(center);
@@ -75,12 +101,12 @@
             this.directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
         }
         /**
-        * @private
+        * @public
         * @language zh_CN
+        * @classdesc
         * 刷新定向包围盒
         * @param worldmatrix 物体的世界矩阵
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @version egret-gd3d 1.0
         */
         public update(worldmatrix: gd3d.math.matrix)
         {
@@ -90,6 +116,15 @@
             gd3d.math.matrixGetVector3ByOffset(worldmatrix, 8, this.directions[2]);
         }
 
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 计算世界空间下各点坐标
+        * @param vecs 结果数组
+        * @param worldmatrix 物体的世界矩阵
+        * @version egret-gd3d 1.0
+        */
         public caclWorldVecs(vecs: gd3d.math.vector3[], worldmatrix: gd3d.math.matrix)
         {
             for (var index = 0; index < this.vectors.length; index++)
@@ -99,6 +134,14 @@
             }
         }
 
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * obb的碰撞检测
+        * @param _obb 待检测obb
+        * @version egret-gd3d 1.0
+        */
         public intersects(_obb: obb)
         {
             if (_obb == null) return false;
@@ -137,7 +180,7 @@
             return true;
         }
         
-        computeBoxExtents(axis: gd3d.math.vector3, box: obb)
+        private computeBoxExtents(axis: gd3d.math.vector3, box: obb)
         {
             var p = gd3d.math.vec3Dot(box.center, axis);
 
@@ -152,18 +195,25 @@
             return result;
         }
         
-        axisOverlap(axis: gd3d.math.vector3, box0: obb, box1: obb): boolean
+        private axisOverlap(axis: gd3d.math.vector3, box0: obb, box1: obb): boolean
         {
             var result0 = this.computeBoxExtents(axis, box0);
             var result1 = this.computeBoxExtents(axis, box1);
             return this.extentsOverlap(result0.x, result0.y, result1.x, result1.y);
         }
         
-        extentsOverlap(min0: number, max0: number, min1: number, max1: number): boolean
+        private extentsOverlap(min0: number, max0: number, min1: number, max1: number): boolean
         {
             return !(min0 > max1 || min1 > max0);
         }
 
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 克隆一个obb
+        * @version egret-gd3d 1.0
+        */
         clone():obb
         {
             let _obb = new obb();
@@ -175,6 +225,13 @@
             }
             return _obb;
         }
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 释放
+        * @version egret-gd3d 1.0
+        */
         dispose()
         {
             this.vectors.length = 0;

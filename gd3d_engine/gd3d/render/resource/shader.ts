@@ -1,5 +1,12 @@
 namespace gd3d.render
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * uniform类型枚举
+     * @version egret-gd3d 1.0
+     */
     export enum UniformTypeEnum
     {
         Texture,
@@ -10,6 +17,9 @@ namespace gd3d.render
         Float4x4,
         Float4x4v
     }
+    /**
+     * @private
+     */
     export class uniform
     {
         name: string;
@@ -17,11 +27,17 @@ namespace gd3d.render
         location: WebGLUniformLocation;
         //默认值跟着类型走即可
     }
+    /**
+     * @private
+     */
     export enum ShaderTypeEnum
     {
         VS,
         FS,
     }
+    /**
+     * @private
+     */
     export class glShader
     {
         constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string)
@@ -103,6 +119,9 @@ namespace gd3d.render
         }
 
     }
+    /**
+     * @private
+     */
     export class glProgram
     {
         constructor(vs: glShader, fs: glShader, program: WebGLProgram)
@@ -125,12 +144,6 @@ namespace gd3d.render
             this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
 
         }
-        //编译过程不关心，
-        //vscode: string;
-        //fscode: string;
-        //infocode: string;//配置式
-        //vs: WebGLShader;
-        //fs: WebGLShader;
         vs: glShader;
         fs: glShader;
         program: WebGLProgram;
@@ -148,28 +161,21 @@ namespace gd3d.render
 
         posColorEx: number = -1;
 
-        //uni不能穷尽,都去map里查好了
-        //unimapTexture: { [id: string]: WebGLUniformLocation } = {};
-        //unimapFloat: { [id: string]: WebGLUniformLocation } = {};
-        //unimapFloat4: { [id: string]: WebGLUniformLocation } = {};
-        //unimapFloat4x4: { [id: string]: WebGLUniformLocation } = {};
 
         mapUniform: { [id: string]: uniform } = {};
-        //info 是可以穷尽的，应该建模构筑出来，这个不在program层次
-        //mapInfo: { [id: string]: { [id: string]: string } } = {};
         use(webgl: WebGLRenderingContext)
         {
             webgl.useProgram(this.program);
         }
     }
 
+    /**
+     * @private
+     */
     export class shaderPool
     {
-
         mapVS: { [id: string]: glShader } = {};
         mapFS: { [id: string]: glShader } = {};
-        //mapVSUrl: { [id: string]: string } = {};
-        //mapFSUrl: { [id: string]: string }={};
         mapProgram: { [id: string]: glProgram } = {};
         disposeVS(webgl: WebGLRenderingContext, id: string)
         {

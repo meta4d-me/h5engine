@@ -1,5 +1,8 @@
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export class sceneMgr
     {
         private static _ins: sceneMgr;

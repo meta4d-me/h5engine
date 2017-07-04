@@ -1,11 +1,17 @@
 ﻿namespace gd3d.render
 {
+    /**
+     * @private
+     */
     export enum ShowFaceStateEnum
     {
         ALL,
         CCW,
         CW,
     }
+    /**
+     * @private
+     */
     export enum DrawModeEnum
     {
         VboTri,
@@ -13,6 +19,9 @@
         EboTri,
         EboLine,
     }
+    /**
+     * @private
+     */
     export enum BlendModeEnum
     {
         Close,
@@ -22,6 +31,9 @@
         Add_PreMultiply,
     }
 
+    /**
+     * @private
+     */
     export class glDrawPass
     {
         program: glProgram;
@@ -81,7 +93,6 @@
             if (mode == BlendModeEnum.Add)
             {
                 this.state_blend = true;
-                // this.state_zwrite = false;
                 this.state_blendEquation = webglkit.FUNC_ADD;
                 this.state_blendSrcRGB = webglkit.SRC_ALPHA;
                 this.state_blendDestRGB = webglkit.ONE;
@@ -91,7 +102,6 @@
             else if (mode == BlendModeEnum.Add_PreMultiply)
             {
                 this.state_blend = true;
-                // this.state_zwrite = false;
                 this.state_blendEquation = webglkit.FUNC_ADD;
                 this.state_blendSrcRGB = webglkit.ONE;
                 this.state_blendDestRGB = webglkit.ONE;
@@ -111,7 +121,6 @@
             else if (mode == BlendModeEnum.Blend_PreMultiply)
             {
                 this.state_blend = true;
-                // this.state_zwrite = false;
                 this.state_blendEquation = webglkit.FUNC_ADD;
                 this.state_blendSrcRGB = webglkit.ONE;
                 this.state_blendDestRGB = webglkit.ONE_MINUS_SRC_ALPHA;
