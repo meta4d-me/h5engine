@@ -2,6 +2,9 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class UniformData
     {
@@ -20,12 +23,27 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 材质资源
+     * @param buf buffer数组
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class material implements IAsset
     {
         @gd3d.reflect.Field("constText")
         private name: constText = null;
         private id: resID = new resID();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version egret-gd3d 1.0
+         */
         defaultAsset: boolean = false;
 
         constructor(assetName: string = null)
@@ -34,15 +52,18 @@ namespace gd3d.framework
             {
                 assetName = "material_" + this.getGUID();
             }
-            if (!sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName))
-            {
-                throw new Error("already have name.");
-            }
             this.name = new constText(assetName);
             gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = render.UniformTypeEnum;
             this.mapUniformTemp = {};
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             if (this.name == undefined)
@@ -51,11 +72,25 @@ namespace gd3d.framework
             }
             return this.name.getText();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version egret-gd3d 1.0
+         */
         getGUID(): number
         {
             return this.id.getID();
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             for (let id in this.mapUniform)
@@ -71,15 +106,36 @@ namespace gd3d.framework
             delete this.mapUniform;
             delete this.mapUniformTemp;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version egret-gd3d 1.0
+         */
         use()
         {
             sceneMgr.app.getAssetMgr().use(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unuse(disposeNow: boolean = false)
         {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version egret-gd3d 1.0
+         */
         caclByteLength(): number
         {
             let total = 0;
@@ -163,6 +219,9 @@ namespace gd3d.framework
             }
             return total;
         }
+        /**
+         * @private
+         */
         initUniformData(passes: render.glDrawPass[])
         {
             if (passes == null)
@@ -209,6 +268,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置shader 不保留原有数据
+         * @param shader shader实例
+         * @version egret-gd3d 1.0
+         */
         setShader(shader: shader)
         {
             this.shader = shader;
@@ -217,13 +284,22 @@ namespace gd3d.framework
             this.initUniformData(this.shader.passes["base"]);
         }
         private _changeShaderMap: { [name: string]: material } = {};
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 修改shader 保留原有数据
+         * @param shader shader实例
+         * @version egret-gd3d 1.0
+         */
         changeShader(shader: shader)
         {
             let map: { [id: string]: UniformData };
             if (this._changeShaderMap[shader.getName()] != undefined)
             {
                 map = this._changeShaderMap[shader.getName()].mapUniform;
-            } else
+            } 
+            else
             {
                 let mat: material = this.clone();
                 map = mat.mapUniform;
@@ -238,21 +314,45 @@ namespace gd3d.framework
                 }
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取shader的layer
+         * @version egret-gd3d 1.0
+         */
         getLayer()
         {
             return this.shader.layer;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取shader的queue
+         * @version egret-gd3d 1.0
+         */
         getQueue()
         {
             return this.shader.queue;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取shader
+         * @version egret-gd3d 1.0
+         */
         getShader()
         {
             return this.shader;
         }
         @gd3d.reflect.Field("shader")
         private shader: shader;
-
+        
+        /**
+         * @private
+         */
         @gd3d.reflect.Field("UniformDataDic")
         mapUniform: {
             [id: string]: UniformData
@@ -260,6 +360,9 @@ namespace gd3d.framework
         private mapUniformTemp: {
             [id: string]: UniformData
         };
+        /**
+         * @private
+         */
         setFloat(_id: string, _number: number)
         {
             if (this.mapUniform[_id] != undefined)
@@ -267,6 +370,9 @@ namespace gd3d.framework
             else
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float, _number);
         }
+        /**
+         * @private
+         */
         setFloatv(_id: string, _numbers: Float32Array)
         {
             if (this.mapUniform[_id] != undefined)
@@ -274,6 +380,9 @@ namespace gd3d.framework
             else
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Floatv, _numbers);
         }
+        /**
+         * @private
+         */
         setVector4(_id: string, _vector4: math.vector4)
         {
             if (this.mapUniform[_id] != undefined)
@@ -281,6 +390,9 @@ namespace gd3d.framework
             else
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
         }
+        /**
+         * @private
+         */
         setVector4v(_id: string, _vector4v: Float32Array)
         {
             if (this.mapUniform[_id] != undefined)
@@ -288,6 +400,9 @@ namespace gd3d.framework
             else
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4v, _vector4v);
         }
+        /**
+         * @private
+         */
         setMatrix(_id: string, _matrix: math.matrix)
         {
             if (this.mapUniform[_id] != undefined)
@@ -296,6 +411,9 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4x4, _matrix);
 
         }
+        /**
+         * @private
+         */
         setMatrixv(_id: string, _matrixv: Float32Array)
         {
             if (this.mapUniform[_id] != undefined)
@@ -303,6 +421,9 @@ namespace gd3d.framework
             else
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4x4v, _matrixv);
         }
+        /**
+         * @private
+         */
         setTexture(_id: string, _texture: gd3d.framework.texture)
         {
             if (this.mapUniform[_id] != undefined)
@@ -320,7 +441,9 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
             }
         }
-
+        /**
+         * @private
+         */
         uploadUniform(pass: render.glDrawPass)
         {
             for (let id in this.mapUniform)
@@ -402,6 +525,16 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 绘制
+         * @param context 渲染上下文
+         * @param mesh 渲染的mesh
+         * @param sm 渲染的submesh信息
+         * @version egret-gd3d 1.0
+         */
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base")
         {
 
@@ -514,6 +647,15 @@ namespace gd3d.framework
             this.mapUniformTemp = {};
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析资源
+         * @param assetmgr 资源管理实例
+         * @param json json数据
+         * @version egret-gd3d 1.0
+         */
         Parse(assetmgr: assetMgr, json: any)
         {
             var shaderName = json["shader"];
@@ -560,6 +702,13 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 克隆
+         * @version egret-gd3d 1.0
+         */
         public clone(): material
         {
             let mat: material = new material(this.getName());

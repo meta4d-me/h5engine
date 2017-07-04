@@ -2,12 +2,26 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 路径编辑资源
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class pathasset implements IAsset
     {
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version egret-gd3d 1.0
+         */
         defaultAsset: boolean = false;
         constructor(assetName: string = null)
         {
@@ -15,33 +29,71 @@ namespace gd3d.framework
             {
                 assetName = "path_" + this.getGUID();
             }
-            if (!sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName))
-            {
-                throw new Error("already have name.");
-            }
             this.name = new constText(assetName);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             return this.name.getText();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version egret-gd3d 1.0
+         */
         getGUID(): number
         {
             return this.id.getID();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version egret-gd3d 1.0
+         */
         use()
         {
             sceneMgr.app.getAssetMgr().use(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unuse()
         {
             sceneMgr.app.getAssetMgr().unuse(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
            this.paths.length=0;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version egret-gd3d 1.0
+         */
         caclByteLength(): number
         {
             if (this.paths)
@@ -51,10 +103,25 @@ namespace gd3d.framework
                 return value;
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 路径节点数据
+         * @version egret-gd3d 1.0
+         */
         paths:gd3d.math.vector3[]=[];
         private type:pathtype;
         private instertPointcount:number;
         private items:pointitem[]=[];
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析资源
+         * @param json json数据
+         * @version egret-gd3d 1.0
+         */
         Parse(json:JSON)
         {
            var type:string=json["type"];
@@ -215,18 +282,26 @@ namespace gd3d.framework
             gd3d.math.vec3Add(start,out,out);
         }
     }
+    /**
+     * @private
+     */
     export enum pathtype
     {
         once,
         loop,
         pingpong
     }
+    /**
+     * @private
+     */
     export enum epointtype
     {
         VertexPoint,
 	    ControlPoint
     }
-
+    /**
+     * @private
+     */
     export  class pointitem
     {
         point:gd3d.math.vector3;

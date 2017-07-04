@@ -2,12 +2,26 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 动画片段资源
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class animationClip implements IAsset
     {
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version egret-gd3d 1.0
+         */
         defaultAsset: boolean = false;
         constructor(assetName: string = null)
         {
@@ -15,28 +29,59 @@ namespace gd3d.framework
             {
                 assetName = "animationClip_" + this.getGUID();
             }
-            if (!sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName))
-            {
-                throw new Error("already have name.");
-            }
             this.name = new constText(assetName);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             return this.name.getText();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version egret-gd3d 1.0
+         */
         getGUID(): number
         {
             return this.id.getID();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version egret-gd3d 1.0
+         */
         use()
         {
             sceneMgr.app.getAssetMgr().use(this);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version egret-gd3d 1.0
+         */
         unuse(disposeNow: boolean = false)
         {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             this.bones.length = 0;
@@ -44,6 +89,13 @@ namespace gd3d.framework
             delete this.frames;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version egret-gd3d 1.0
+         */
         caclByteLength(): number
         {
             let total = 0;
@@ -64,6 +116,14 @@ namespace gd3d.framework
             return total;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析资源
+         * @param buf buffer数组
+         * @version egret-gd3d 1.0
+         */
         Parse(buf: ArrayBuffer): void
         {
             var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
@@ -98,7 +158,6 @@ namespace gd3d.framework
                 let _key = read.readBoolean();
                 let _frame = new Float32Array(this.boneCount * 7 + 1);
                 _frame[0] = _key ? 1 : 0;
-                //_frame.boneInfos = new Float32Array(this.boneCount * 7);
 
                 let _boneInfo = new PoseBoneMatrix();
                 for (let i = 0; i < this.boneCount; i++)
@@ -117,34 +176,59 @@ namespace gd3d.framework
             buf = null;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * 动画片段的帧率
+         * @version egret-gd3d 1.0
+         */
         fps: number;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否循环
+         * @version egret-gd3d 1.0
+         */
         loop: boolean;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 骨骼数量
+         * @version egret-gd3d 1.0
+         */
         boneCount: number;
+        /**
+         * @private
+         */
         bones: string[];
 
+        /**
+         * @private
+         */
         frameCount: number;
+        /**
+         * @private
+         */
         frames: { [fid: string]: Float32Array };
 
+        /**
+         * @private
+         */
         subclipCount: number;
+        /**
+         * @private
+         */
         subclips: subClip[];
 
     }
 
-    // export class Frame
-    // {
-    //     key: boolean;
-    //     //boneInfos: PoseBoneMatrix[];
-    //     boneInfos:Float32Array;
-    //     // caclByteLength(): number
-    //     // {
-    //     //     let total = 1;
-    //     //     if (this.boneInfos == undefined) return total;
-    //     //     total += this.boneInfos.length * PoseBoneMatrix.caclByteLength();
-    //     //     return total;
-    //     // }
-    // }
-
+    /**
+     * @private
+     */
     @reflect.SerializeType
     export class PoseBoneMatrix
     {
@@ -312,6 +396,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class subClip
     {
         name: string;
