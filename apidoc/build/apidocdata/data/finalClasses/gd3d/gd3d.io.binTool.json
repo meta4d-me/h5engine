@@ -129,6 +129,13 @@
 		{
 			"kind": "function",
 			"type": "number",
+			"name": "readLong",
+			"memberof": "gd3d.io.binTool",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
 			"name": "readShort",
 			"memberof": "gd3d.io.binTool",
 			"scope": "instance"
@@ -194,6 +201,13 @@
 			"kind": "function",
 			"type": "number",
 			"name": "readUInt8",
+			"memberof": "gd3d.io.binTool",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readULong",
 			"memberof": "gd3d.io.binTool",
 			"scope": "instance"
 		},
@@ -351,6 +365,20 @@
 		{
 			"kind": "function",
 			"type": "void",
+			"name": "writeLong",
+			"memberof": "gd3d.io.binTool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "num",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
 			"name": "writeShort",
 			"memberof": "gd3d.io.binTool",
 			"scope": "instance",
@@ -463,6 +491,20 @@
 			"kind": "function",
 			"type": "void",
 			"name": "writeUInt8",
+			"memberof": "gd3d.io.binTool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "num",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "writeULong",
 			"memberof": "gd3d.io.binTool",
 			"scope": "instance",
 			"params": [

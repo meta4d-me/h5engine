@@ -66,9 +66,25 @@
 		},
 		{
 			"kind": "function",
-			"name": "getValue",
+			"name": "clone",
 			"memberof": "gd3d.framework.ValueData",
 			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getValue",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance",
+			"description": "针对随机类型，只要随机过一次就保持这个值不变",
+			"returns": ""
+		},
+		{
+			"kind": "function",
+			"name": "getValueRandom",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance",
+			"description": "针对随机类型，调用一次就随机一个值",
+			"returns": ""
 		}
 	],
 	"globalMember": [],
@@ -77,6 +93,6 @@
 		"kind": "class",
 		"name": "ValueData",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\valuedata.ts"
+		"filename": "framework\\particle\\data\\valuedata.ts"
 	}
 }

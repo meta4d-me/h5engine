@@ -22,7 +22,7 @@
 			"name": "time",
 			"memberof": "gd3d.framework.EmissionData",
 			"scope": "instance",
-			"description": "发射器持续发射时间"
+			"description": "发射器持续发射时间或者延迟爆发时间"
 		},
 		{
 			"kind": "member",
@@ -48,7 +48,7 @@
 		"kind": "class",
 		"name": "EmissionData",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\emissiondata.ts",
+		"filename": "framework\\particle\\data\\emissiondata.ts",
 		"description": "粒子发射器"
 	}
 }

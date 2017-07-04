@@ -12,7 +12,9 @@
 			"type": "number",
 			"name": "getInsID",
 			"memberof": "gd3d.framework.insID",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取唯一id",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"globalMember": [],
@@ -21,6 +23,8 @@
 		"kind": "class",
 		"name": "insID",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\transform\\transform.ts"
+		"filename": "framework\\transform\\transform.ts",
+		"description": "作为引擎实例的唯一id使用 自增",
+		"version": "egret-gd3d 1.0"
 	}
 }

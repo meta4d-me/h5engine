@@ -2,6 +2,13 @@
 	"member": [
 		{
 			"kind": "member",
+			"type": "gd3d.framework.application",
+			"name": "app",
+			"memberof": "Stats.Stats",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
 			"type": "HTMLDivElement",
 			"name": "container",
 			"memberof": "Stats.Stats",
@@ -13,7 +20,14 @@
 			"kind": "function",
 			"name": "Stats",
 			"memberof": "Stats.Stats",
-			"scope": "instance"
+			"scope": "instance",
+			"params": [
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				}
+			]
 		},
 		{
 			"kind": "function",

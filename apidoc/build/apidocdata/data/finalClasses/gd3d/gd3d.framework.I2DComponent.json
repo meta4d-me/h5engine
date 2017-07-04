@@ -34,6 +34,12 @@
 		},
 		{
 			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.I2DComponent",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"name": "start",
 			"memberof": "gd3d.framework.I2DComponent",
 			"scope": "instance"

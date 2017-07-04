@@ -9,6 +9,13 @@
 		},
 		{
 			"kind": "member",
+			"name": "COMPONENT_BUTTON",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"button\""
+		},
+		{
+			"kind": "member",
 			"name": "COMPONENT_CAMERA",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
@@ -27,6 +34,27 @@
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
 			"default": "\"canvasRenderer\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_EFFECTSYSTEM",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"effectSystem\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_IMAGE",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"image2D\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_LABEL",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"label\""
 		},
 		{
 			"kind": "member",
@@ -51,6 +79,20 @@
 		},
 		{
 			"kind": "member",
+			"name": "COMPONENT_RAWIMAGE",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"rawImage2D\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_SKINMESHRENDER",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"skinnedMeshRenderer\""
+		},
+		{
+			"kind": "member",
 			"name": "RESOURCES_MESH_CUBE",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
@@ -71,7 +113,57 @@
 			"default": "\"rangeFloat\""
 		}
 	],
-	"function": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "firstCharToLowerCase",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "str",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "replaceAll",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "srcStr",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fromStr",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "toStr",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "trimAll",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "str",
+					"type": "string",
+					"description": ""
+				}
+			]
+		}
+	],
 	"globalMember": [],
 	"globalFunction": [],
 	"class": {

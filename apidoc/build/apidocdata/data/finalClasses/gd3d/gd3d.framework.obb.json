@@ -57,6 +57,42 @@
 		},
 		{
 			"kind": "function",
+			"name": "buildByCenterSize",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "center",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "size",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "buildByMaxMin",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "minimum",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "maximum",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"name": "caclWorldVecs",
 			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
@@ -75,6 +111,13 @@
 		},
 		{
 			"kind": "function",
+			"type": "gd3d.framework.obb",
+			"name": "clone",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"name": "computeBoxExtents",
 			"memberof": "gd3d.framework.obb",
 			"scope": "instance",
@@ -90,6 +133,12 @@
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.obb",
+			"scope": "instance"
 		},
 		{
 			"kind": "function",

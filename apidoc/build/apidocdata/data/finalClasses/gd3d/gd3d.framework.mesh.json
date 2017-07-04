@@ -5,7 +5,9 @@
 			"type": "gd3d.render.meshData",
 			"name": "data",
 			"memberof": "gd3d.framework.mesh",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "mesh数据实例",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -17,65 +19,93 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.render.glMesh",
-			"name": "glMesh",
-			"memberof": "gd3d.framework.mesh",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "gd3d.framework.subMeshInfo[]",
 			"name": "submesh",
 			"memberof": "gd3d.framework.mesh",
 			"scope": "instance",
+			"description": "submesh信息列表",
+			"version": "egret-gd3d 1.0",
 			"default": "[]"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"name": "Parse",
+			"name": "mesh",
 			"memberof": "gd3d.framework.mesh",
 			"scope": "instance",
 			"params": [
 				{
-					"name": "buf",
-					"type": "ArrayBuffer",
-					"description": ""
-				},
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
+					"name": "assetName",
+					"type": "string",
+					"default": "null",
 					"description": ""
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"name": "dispose",
+			"name": "Parse",
 			"memberof": "gd3d.framework.mesh",
 			"scope": "instance",
+			"description": "解析资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": ""
+					"name": "buf",
+					"type": "ArrayBuffer",
+					"description": "buffer数组"
+				},
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": "webgl实例"
 				}
 			]
 		},
 		{
 			"kind": "function",
 			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"description": "计算资源字节大小",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.mesh",
+			"name": "clone",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"description": "克隆mesh",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"description": "释放资源",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "number",
 			"name": "getGUID",
 			"memberof": "gd3d.framework.mesh",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取资源唯一id",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "string",
 			"name": "getName",
 			"memberof": "gd3d.framework.mesh",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取资源名称",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -83,42 +113,18 @@
 			"name": "intersects",
 			"memberof": "gd3d.framework.mesh",
 			"scope": "instance",
+			"description": "检测射线碰撞",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "ray",
 					"type": "gd3d.framework.ray",
-					"description": ""
+					"description": "射线"
 				},
 				{
 					"name": "matrix",
 					"type": "gd3d.math.matrix",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "setAssetMgr",
-			"memberof": "gd3d.framework.mesh",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "setName",
-			"memberof": "gd3d.framework.mesh",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
+					"description": "所在transform的矩阵"
 				}
 			]
 		},
@@ -126,13 +132,25 @@
 			"kind": "function",
 			"name": "unuse",
 			"memberof": "gd3d.framework.mesh",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数减一",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "disposeNow",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
 		},
 		{
 			"kind": "function",
 			"name": "use",
 			"memberof": "gd3d.framework.mesh",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数加一",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"globalMember": [],
@@ -142,6 +160,8 @@
 		"name": "mesh",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\asset\\resource\\mesh.ts",
+		"description": "mesh资源",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IAsset"

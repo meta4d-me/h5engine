@@ -1,7 +1,7 @@
 {
 	"globalFunction": [
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "Field",
 			"memberof": "gd3d.reflect",
@@ -18,32 +18,17 @@
 					"type": "any",
 					"default": "undefined",
 					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "(target:Object,propertyKey:string)=>void",
-			"name": "Field",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "valueType",
-					"type": "string",
-					"description": ""
 				},
 				{
-					"name": "defaultValue",
-					"question": true,
-					"type": "any",
+					"name": "enumRealType",
+					"type": "string",
+					"default": "undefined",
 					"description": ""
 				}
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "SerializeType",
 			"memberof": "gd3d.reflect",
@@ -58,22 +43,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "SerializeType",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "UIComment",
 			"memberof": "gd3d.reflect",
@@ -88,55 +58,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "(target:Object,propertyKey:string)=>void",
-			"name": "UIComment",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "comment",
-					"type": "string",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "(target:Object,propertyKey:string)=>void",
-			"name": "UIStyle",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "style",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "min",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "max",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "defvalue",
-					"question": true,
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "UIStyle",
 			"memberof": "gd3d.reflect",
@@ -169,22 +91,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "attr_Class",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "attr_Class",
 			"memberof": "gd3d.reflect",
@@ -198,23 +105,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "(target:Object,propertyKey:string)=>void",
-			"name": "attr_Field",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "customInfo",
-					"question": true,
-					"type": "{[id:string]:string;}",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "attr_Field",
 			"memberof": "gd3d.reflect",
@@ -230,23 +121,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "(target:any,propertyKey:string,value:any)=>void",
-			"name": "attr_Func",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "customInfo",
-					"question": true,
-					"type": "{[id:string]:string;}",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "attr_Func",
 			"memberof": "gd3d.reflect",
@@ -262,7 +137,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "compCall",
 			"memberof": "gd3d.reflect",
@@ -278,57 +153,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "(target:any,propertyKey:string,value:any)=>void",
-			"name": "compCall",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "customInfo",
-					"question": true,
-					"type": "{[id:string]:string;}",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "(target:Object,propertyKey:string)=>void",
-			"name": "compValue",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "integer",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "defvalue",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "min",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "max",
-					"question": true,
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "compValue",
 			"memberof": "gd3d.reflect",
@@ -362,27 +187,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "any",
-			"name": "createInstance",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "prototype",
-					"type": "any",
-					"description": ""
-				},
-				{
-					"name": "matchTag",
-					"type": "{[id:string]:string;}",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"type": "any",
 			"name": "createInstance",
@@ -402,7 +207,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "editorCode",
 			"memberof": "gd3d.reflect",
@@ -416,37 +221,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "editorCode",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "any",
-			"name": "getClassName",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "prototype",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "getClassName",
 			"memberof": "gd3d.reflect",
@@ -460,7 +235,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "getClassTag",
 			"memberof": "gd3d.reflect",
@@ -479,27 +254,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "any",
-			"name": "getClassTag",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "prototype",
-					"type": "any",
-					"description": ""
-				},
-				{
-					"name": "tag",
-					"type": "string",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"type": "any",
 			"name": "getMeta",
@@ -514,22 +269,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "any",
-			"name": "getMeta",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "prototype",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "getPrototype",
 			"memberof": "gd3d.reflect",
@@ -543,22 +283,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "any",
-			"name": "getPrototype",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"type": "{[id:string]:any}",
 			"name": "getPrototypes",
@@ -566,30 +291,7 @@
 			"scope": "instance"
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "{[id:string]:any;}",
-			"name": "getPrototypes",
-			"memberof": "gd3d.reflect",
-			"scope": "instance"
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "node2DComponent",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "node2DComponent",
 			"memberof": "gd3d.reflect",
@@ -603,7 +305,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeBoxCollider",
 			"memberof": "gd3d.reflect",
@@ -617,37 +319,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeBoxCollider",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeCamera",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeCamera",
 			"memberof": "gd3d.reflect",
@@ -661,22 +333,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeCanvasRendererCollider",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeCanvasRendererCollider",
 			"memberof": "gd3d.reflect",
@@ -690,7 +347,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeComponent",
 			"memberof": "gd3d.reflect",
@@ -705,22 +362,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeComponent",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeComponentInspector",
 			"memberof": "gd3d.reflect",
@@ -734,37 +376,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeComponentInspector",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeEffectBatcher",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeEffectBatcher",
 			"memberof": "gd3d.reflect",
@@ -778,7 +390,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeLight",
 			"memberof": "gd3d.reflect",
@@ -792,37 +404,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeLight",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeMeshCollider",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeMeshCollider",
 			"memberof": "gd3d.reflect",
@@ -836,22 +418,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "nodeRender",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "nodeRender",
 			"memberof": "gd3d.reflect",
@@ -865,9 +432,22 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
-			"type": "void",
+			"name": "nodeSphereCollider",
+			"memberof": "gd3d.reflect",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "constructorObj",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "io\\reflect.ts",
+			"kind": "globalFunction",
 			"name": "pluginExt",
 			"memberof": "gd3d.reflect",
 			"scope": "instance",
@@ -880,36 +460,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
-			"kind": "globalFunction",
-			"name": "pluginExt",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "pluginMenuItem",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "pluginMenuItem",
 			"memberof": "gd3d.reflect",
@@ -923,7 +474,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "pluginWindow",
 			"memberof": "gd3d.reflect",
@@ -937,12 +488,12 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
-			"type": "void",
-			"name": "pluginWindow",
+			"name": "selfClone",
 			"memberof": "gd3d.reflect",
 			"scope": "instance",
+			"description": "//这个标记了clone时调用实例自己的clone函数",
 			"params": [
 				{
 					"name": "constructorObj",
@@ -952,27 +503,12 @@
 			]
 		},
 		{
-			"filename": "jsloader\\reflect.ts",
+			"filename": "io\\reflect.ts",
 			"kind": "globalFunction",
 			"name": "userCode",
 			"memberof": "gd3d.reflect",
 			"scope": "instance",
 			"description": "///上面幾個是通用的",
-			"params": [
-				{
-					"name": "constructorObj",
-					"type": "any",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "userCode",
-			"memberof": "gd3d.reflect",
-			"scope": "instance",
 			"params": [
 				{
 					"name": "constructorObj",

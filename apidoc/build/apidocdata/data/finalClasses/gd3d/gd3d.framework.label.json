@@ -117,6 +117,12 @@
 		},
 		{
 			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.label",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"name": "render",
 			"memberof": "gd3d.framework.label",
 			"scope": "instance",

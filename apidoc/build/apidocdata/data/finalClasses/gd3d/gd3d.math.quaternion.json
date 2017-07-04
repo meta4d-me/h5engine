@@ -10,20 +10,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "w",
-			"memberof": "gd3d.math.quaternion",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "x",
-			"memberof": "gd3d.math.quaternion",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "x",
 			"memberof": "gd3d.math.quaternion",
 			"scope": "instance"
@@ -32,20 +18,6 @@
 			"kind": "member",
 			"type": "number",
 			"name": "y",
-			"memberof": "gd3d.math.quaternion",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "y",
-			"memberof": "gd3d.math.quaternion",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "z",
 			"memberof": "gd3d.math.quaternion",
 			"scope": "instance"
 		},
@@ -61,38 +33,6 @@
 		{
 			"kind": "function",
 			"name": "quaternion",
-			"memberof": "gd3d.math.quaternion",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "x",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "y",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "z",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "w",
-					"question": true,
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "constructor",
 			"memberof": "gd3d.math.quaternion",
 			"scope": "instance",
 			"params": [

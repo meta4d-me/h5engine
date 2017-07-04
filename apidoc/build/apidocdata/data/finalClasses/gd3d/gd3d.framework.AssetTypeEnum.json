@@ -6,7 +6,7 @@
 			"name": "Aniclip",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
-			"default": "11"
+			"default": "12"
 		},
 		{
 			"kind": "member",
@@ -14,7 +14,7 @@
 			"name": "Atlas",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
-			"default": "13"
+			"default": "14"
 		},
 		{
 			"kind": "member",
@@ -35,23 +35,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Font",
-			"memberof": "gd3d.framework.AssetTypeEnum",
-			"scope": "static",
-			"default": "14"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "GLFragmentShader",
-			"memberof": "gd3d.framework.AssetTypeEnum",
-			"scope": "static",
-			"default": "4"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "GLVertexShader",
+			"name": "CompressBundle",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
 			"default": "3"
@@ -59,39 +43,15 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Material",
+			"name": "Font",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
-			"default": "10"
+			"default": "15"
 		},
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Mesh",
-			"memberof": "gd3d.framework.AssetTypeEnum",
-			"scope": "static",
-			"default": "8"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Prefab",
-			"memberof": "gd3d.framework.AssetTypeEnum",
-			"scope": "static",
-			"default": "9"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Scene",
-			"memberof": "gd3d.framework.AssetTypeEnum",
-			"scope": "static",
-			"default": "12"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Shader",
+			"name": "GLFragmentShader",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
 			"default": "5"
@@ -99,7 +59,71 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Texture",
+			"name": "GLVertexShader",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "4"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Material",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "11"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Mesh",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "9"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "PVR",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "20"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "PackBin",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "17"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "PackTxt",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "18"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Prefab",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "10"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Scene",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "13"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Shader",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
 			"default": "6"
@@ -107,10 +131,26 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "TextureDesc",
+			"name": "TextAsset",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "16"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Texture",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
 			"default": "7"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "TextureDesc",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "8"
 		},
 		{
 			"kind": "member",
@@ -119,6 +159,14 @@
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
 			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "pathAsset",
+			"memberof": "gd3d.framework.AssetTypeEnum",
+			"scope": "static",
+			"default": "19"
 		}
 	],
 	"function": [],
@@ -130,6 +178,6 @@
 		"memberof": "gd3d.framework",
 		"filename": "framework\\asset\\assetmgr.ts",
 		"description": "资源类型",
-		"version": "gd3d 1.0"
+		"version": "egret-gd3d 1.0"
 	}
 }

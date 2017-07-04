@@ -13,6 +13,12 @@
 					"name": "obj",
 					"type": "any",
 					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"default": "null",
+					"description": ""
 				}
 			]
 		},
@@ -27,6 +33,93 @@
 				{
 					"name": "obj",
 					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\clone.ts",
+			"kind": "globalFunction",
+			"type": "any",
+			"name": "cloneObj",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "clonedObj",
+					"type": "any",
+					"default": "undefined",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\clone.ts",
+			"kind": "globalFunction",
+			"name": "cloneOtherType",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "clonedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "instanceParent",
+					"type": "any",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "clonedParent",
+					"type": "any",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "instanceKey",
+					"type": "string",
+					"default": "\"\"",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\clone.ts",
+			"kind": "globalFunction",
+			"name": "cloneOtherTypeOrArray",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "clonedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
 					"description": ""
 				}
 			]
@@ -53,6 +146,12 @@
 					"name": "assetMgr",
 					"type": "any",
 					"description": ""
+				},
+				{
+					"name": "bundlename",
+					"type": "string",
+					"default": "null",
+					"description": ""
 				}
 			]
 		},
@@ -77,6 +176,12 @@
 				{
 					"name": "assetMgr",
 					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "bundlename",
+					"type": "string",
+					"default": "null",
 					"description": ""
 				}
 			]
@@ -107,6 +212,12 @@
 					"name": "assetMgr",
 					"type": "any",
 					"description": ""
+				},
+				{
+					"name": "bundlename",
+					"type": "string",
+					"default": "null",
+					"description": ""
 				}
 			]
 		},
@@ -135,6 +246,12 @@
 				{
 					"name": "assetMgr",
 					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "bundlename",
+					"type": "string",
+					"default": "null",
 					"description": ""
 				}
 			]
@@ -177,6 +294,92 @@
 				},
 				{
 					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\clone.ts",
+			"kind": "globalFunction",
+			"type": "any",
+			"name": "fillCloneReference",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "clonedObj",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\clone.ts",
+			"kind": "globalFunction",
+			"name": "fillCloneReferenceType",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "clonedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "instanceParent",
+					"type": "any",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "clonedParent",
+					"type": "any",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "instanceKey",
+					"type": "string",
+					"default": "\"\"",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\clone.ts",
+			"kind": "globalFunction",
+			"name": "fillCloneReferenceTypeOrArray",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "clonedObj",
 					"type": "any",
 					"description": ""
 				},
@@ -263,7 +466,7 @@
 			]
 		},
 		{
-			"filename": "jsloader\\loadtool.ts",
+			"filename": "io\\loadtool.ts",
 			"kind": "globalFunction",
 			"type": "void",
 			"name": "loadArrayBuffer",
@@ -283,27 +486,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "loadArrayBuffer",
-			"memberof": "gd3d.io",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "url",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "fun",
-					"type": "(_bin:ArrayBuffer,_err:Error)=>void",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
+			"filename": "io\\loadtool.ts",
 			"kind": "globalFunction",
 			"type": "void",
 			"name": "loadBlob",
@@ -323,10 +506,10 @@
 			]
 		},
 		{
-			"filename": "jsloader\\loadtool.ts",
+			"filename": "io\\loadtool.ts",
 			"kind": "globalFunction",
 			"type": "void",
-			"name": "loadBlob",
+			"name": "loadImg",
 			"memberof": "gd3d.io",
 			"scope": "instance",
 			"params": [
@@ -337,33 +520,18 @@
 				},
 				{
 					"name": "fun",
-					"type": "(_blob:Blob,_err:Error)=>void",
-					"description": ""
-				}
-			]
-		},
-		{
-			"filename": "jsloader\\loadtool.ts",
-			"kind": "globalFunction",
-			"type": "void",
-			"name": "loadText",
-			"memberof": "gd3d.io",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "url",
-					"type": "string",
+					"type": "(_tex:HTMLImageElement,_err:Error)=>void",
 					"description": ""
 				},
 				{
-					"name": "fun",
-					"type": "(_txt:string,_err:Error)=>void",
+					"name": "progress",
+					"type": "(progre:number)=>void",
 					"description": ""
 				}
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
+			"filename": "io\\loadtool.ts",
 			"kind": "globalFunction",
 			"type": "void",
 			"name": "loadText",
@@ -400,6 +568,12 @@
 					"name": "serializedObj",
 					"type": "any",
 					"default": "undefined",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"default": "null",
 					"description": ""
 				}
 			]
@@ -454,6 +628,12 @@
 				},
 				{
 					"name": "arrayInst",
+					"type": "any",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
 					"type": "any",
 					"default": "null",
 					"description": ""
@@ -515,6 +695,12 @@
 				{
 					"name": "key",
 					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"default": "null",
 					"description": ""
 				}
 			]

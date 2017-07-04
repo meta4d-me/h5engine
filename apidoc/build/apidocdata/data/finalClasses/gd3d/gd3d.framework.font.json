@@ -27,14 +27,17 @@
 			"name": "cmap",
 			"memberof": "gd3d.framework.font",
 			"scope": "instance",
-			"description": "//mat: spriteMat;"
+			"description": "字体信息map",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "boolean",
 			"name": "defaultAsset",
 			"memberof": "gd3d.framework.font",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "是否为默认资源",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -66,7 +69,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.framework.texture",
 			"name": "texture",
 			"memberof": "gd3d.framework.font",
 			"scope": "instance"
@@ -75,86 +77,96 @@
 	"function": [
 		{
 			"kind": "function",
-			"name": "Parse",
+			"name": "font",
 			"memberof": "gd3d.framework.font",
 			"scope": "instance",
 			"params": [
 				{
-					"name": "jsonStr",
+					"name": "assetName",
 					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
+					"default": "null",
 					"description": ""
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"name": "dispose",
+			"name": "Parse",
 			"memberof": "gd3d.framework.font",
 			"scope": "instance",
+			"description": "解析资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
+				{
+					"name": "jsonStr",
+					"type": "string",
+					"description": "json数据"
+				},
 				{
 					"name": "assetmgr",
 					"type": "gd3d.framework.assetMgr",
-					"description": ""
+					"description": "资源管理实例"
 				}
 			]
 		},
 		{
 			"kind": "function",
 			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance",
+			"description": "计算资源字节大小",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance",
+			"description": "释放资源",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "number",
 			"name": "getGUID",
 			"memberof": "gd3d.framework.font",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取资源唯一id",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "string",
 			"name": "getName",
 			"memberof": "gd3d.framework.font",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "setAssetMgr",
-			"memberof": "gd3d.framework.font",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "setName",
-			"memberof": "gd3d.framework.font",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				}
-			]
+			"description": "获取资源名称",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "unuse",
 			"memberof": "gd3d.framework.font",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数减一",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "disposeNow",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
 		},
 		{
 			"kind": "function",
 			"name": "use",
 			"memberof": "gd3d.framework.font",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数加一",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"globalMember": [],
@@ -164,6 +176,8 @@
 		"name": "font",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\asset\\resource\\font.ts",
+		"description": "字体资源",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IAsset"

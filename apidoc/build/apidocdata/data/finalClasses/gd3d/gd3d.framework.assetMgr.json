@@ -2,17 +2,13 @@
 	"member": [
 		{
 			"kind": "member",
-			"type": "gd3d.framework.application",
-			"name": "app",
+			"type": "{[id:string]:gd3d.framework.assetBundle}",
+			"name": "mapBundle",
 			"memberof": "gd3d.framework.assetMgr",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.defMesh",
-			"name": "defMesh",
-			"memberof": "gd3d.framework.assetMgr",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "assetbundle的字典，key为bundlename",
+			"version": "egret-gd3d 1.0",
+			"default": "{}"
 		},
 		{
 			"kind": "member",
@@ -21,7 +17,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "默认Mesh资源",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"default": "{}"
 		},
 		{
@@ -31,17 +27,17 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "默认图片资源",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"default": "{}"
 		},
 		{
 			"kind": "member",
-			"type": "{[id:string]:number}",
+			"type": "{[id:string]:number[]}",
 			"name": "mapNamed",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "资源GUID的字典，key为资源的名称",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"default": "{}"
 		},
 		{
@@ -51,7 +47,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "资源的字典，key为资源的GUID",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"default": "{}"
 		},
 		{
@@ -60,38 +56,12 @@
 			"name": "mapShader",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
-			"description": "//资源获取方式三，静态资源",
+			"description": "shader字典",
+			"version": "egret-gd3d 1.0",
 			"default": "{}"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.shaderPool",
-			"name": "shaderPool",
-			"memberof": "gd3d.framework.assetMgr",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "WebGLRenderingContext",
-			"name": "webgl",
-			"memberof": "gd3d.framework.assetMgr",
-			"scope": "instance"
 		}
 	],
 	"function": [
-		{
-			"kind": "function",
-			"name": "assetMgr",
-			"memberof": "gd3d.framework.assetMgr",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "app",
-					"type": "gd3d.framework.application",
-					"description": ""
-				}
-			]
-		},
 		{
 			"kind": "function",
 			"type": "gd3d.framework.AssetTypeEnum",
@@ -99,7 +69,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "通过url获取资源的类型",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
@@ -110,30 +80,12 @@
 		},
 		{
 			"kind": "function",
-			"name": "doWaitState",
-			"memberof": "gd3d.framework.assetMgr",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "url",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "state",
-					"type": "gd3d.framework.stateLoad",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"type": "gd3d.framework.IAsset",
 			"name": "getAsset",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "通过资源的GUID获取资源",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "id",
@@ -144,17 +96,39 @@
 		},
 		{
 			"kind": "function",
+			"type": "gd3d.framework.assetBundle",
+			"name": "getAssetBundle",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "通过assetbundle的名称获取包",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "bundlename",
+					"type": "string",
+					"description": "包的名称"
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"type": "gd3d.framework.IAsset",
 			"name": "getAssetByName",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "通过资源的名称获取资源",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
 					"description": "资源的名称"
+				},
+				{
+					"name": "bundlename",
+					"type": "string",
+					"default": "null",
+					"description": ""
 				}
 			]
 		},
@@ -165,7 +139,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "获取资源的url",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "asset",
@@ -176,15 +150,26 @@
 		},
 		{
 			"kind": "function",
+			"type": "{[id:string]:number}",
+			"name": "getAssetsRefcount",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "返回所有资源引用计数",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
 			"type": "gd3d.framework.mesh",
 			"name": "getDefaultMesh",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
+			"description": "通过name获取默认mesh资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "name"
 				}
 			]
 		},
@@ -194,11 +179,13 @@
 			"name": "getDefaultTexture",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
+			"description": "通过name获取默认贴图资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "name"
 				}
 			]
 		},
@@ -209,7 +196,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "通过url获取资源的名称",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
@@ -224,29 +211,23 @@
 			"name": "getShader",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
+			"description": "通过name获取shader资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "name"
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.framework.stateLoad",
-			"name": "getUrlLoadState",
+			"name": "initDefAsset",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
-			"description": "通过资源的url获取当前的加载状态",
-			"version": "gd3d 1.0",
-			"params": [
-				{
-					"name": "url",
-					"type": "string",
-					"description": "资源的url"
-				}
-			]
+			"description": "初始化默认资源",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -254,7 +235,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "加载资源这里来区分assetbundle和单个资源",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
@@ -277,12 +258,33 @@
 		},
 		{
 			"kind": "function",
+			"name": "loadCompressBundle",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "加载压缩后的包",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				},
+				{
+					"name": "onstate",
+					"type": "(state:gd3d.framework.stateLoad)=>void",
+					"default": "null",
+					"description": "状态返回的回调"
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"type": "any",
 			"name": "loadImmediate",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "同步加载资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）这个接口还需要完善这里有个问题，如果是assetbundle，那么实例究竟是个啥东西。",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
@@ -303,7 +305,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "加载场景只有先load完包含场景的assetbundle，才能load场景",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "sceneName",
@@ -323,7 +325,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "加载单个资源所有load进来的资源，均use一遍，引用计数为1再unload 一次 归0，则可dispose（）",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
@@ -354,7 +356,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "同步加载单个资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）这个接口还需要完善",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
@@ -370,12 +372,57 @@
 		},
 		{
 			"kind": "function",
+			"name": "releaseUnuseAsset",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "释放所有引用为零的资源",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "removeAssetBundle",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "saveMaterial",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "保存材质",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.framework.material",
+					"description": "mat"
+				},
+				{
+					"name": "fun",
+					"type": "(data:gd3d.framework.SaveInfo)=>void",
+					"description": "fun"
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"name": "savePrefab",
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "保存场景这里只是把场景序列化具体保存要编辑器来进行保存的地址和内容通过回调返回",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
+				{
+					"name": "trans",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				},
 				{
 					"name": "prefabName",
 					"type": "string",
@@ -383,7 +430,7 @@
 				},
 				{
 					"name": "fun",
-					"type": "(data:gd3d.framework.SaveInfo)=>void",
+					"type": "(data:gd3d.framework.SaveInfo,resourses?:string[])=>void",
 					"description": "回调"
 				}
 			]
@@ -394,11 +441,11 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "保存场景这里只是把场景序列化具体保存要编辑器来进行保存的地址和内容通过回调返回",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "fun",
-					"type": "(data:gd3d.framework.SaveInfo)=>void",
+					"type": "(data:gd3d.framework.SaveInfo,resourses?:string[])=>void",
 					"description": "回调"
 				}
 			]
@@ -409,7 +456,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "卸载资源",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
@@ -430,7 +477,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "取消资源的引用，当前资源的引用计数减一",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "res",
@@ -451,7 +498,7 @@
 			"memberof": "gd3d.framework.assetMgr",
 			"scope": "instance",
 			"description": "引用资源，当前资源的引用计数加一",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "res",
@@ -469,6 +516,6 @@
 		"memberof": "gd3d.framework",
 		"filename": "framework\\asset\\assetmgr.ts",
 		"description": "通用的资源管理器，你也可以自己搞个东西当资源，继承IResource即可<p/>资源管理器用引用计数法管理资源，计数混乱会导致问题，循环引用也会导致问题，需要注意<p/>js 语法层面不能提供可靠的自动引用计数机制，所以如果你用乱了，哪啊就是乱了<p/>所有的资源都是从资源管理器get出来的<p/>所有的资源不用的时候都要还到资源管理器<p/>",
-		"version": "gd3d 1.0"
+		"version": "egret-gd3d 1.0"
 	}
 }

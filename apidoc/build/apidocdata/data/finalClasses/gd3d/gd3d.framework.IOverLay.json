@@ -1,5 +1,13 @@
 {
-	"member": [],
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "init",
+			"memberof": "gd3d.framework.IOverLay",
+			"scope": "instance"
+		}
+	],
 	"function": [
 		{
 			"kind": "function",

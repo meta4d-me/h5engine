@@ -11,34 +11,10 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "BlendIndex4",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "64"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "BlendWeight4",
 			"memberof": "gd3d.render.VertexFormatMask",
 			"scope": "static",
 			"default": "0x00000080"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "BlendWeight4",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "128"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Color",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "8"
 		},
 		{
 			"kind": "member",
@@ -59,34 +35,10 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "ColorEX",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "256"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Normal",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "2"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "Normal",
 			"memberof": "gd3d.render.VertexFormatMask",
 			"scope": "static",
 			"default": "0x00000002"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Position",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "1"
 		},
 		{
 			"kind": "member",
@@ -107,34 +59,10 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Tangent",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "4"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "UV0",
 			"memberof": "gd3d.render.VertexFormatMask",
 			"scope": "static",
 			"default": "0x00000010"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "UV0",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "16"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "UV1",
-			"memberof": "gd3d.render.VertexFormatMask",
-			"scope": "static",
-			"default": "32"
 		},
 		{
 			"kind": "member",

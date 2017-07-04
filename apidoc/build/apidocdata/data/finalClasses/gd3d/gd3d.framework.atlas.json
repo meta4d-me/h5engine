@@ -5,7 +5,9 @@
 			"type": "boolean",
 			"name": "defaultAsset",
 			"memberof": "gd3d.framework.atlas",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "是否为默认资源",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -13,21 +15,26 @@
 			"name": "sprites",
 			"memberof": "gd3d.framework.atlas",
 			"scope": "instance",
+			"description": "解析得到的sprite列表 key-->name",
+			"version": "egret-gd3d 1.0",
 			"default": "{}"
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.framework.texture",
 			"name": "texture",
 			"memberof": "gd3d.framework.atlas",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取当前texture",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "number",
 			"name": "textureheight",
 			"memberof": "gd3d.framework.atlas",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "贴图像素高度",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -35,92 +42,103 @@
 			"name": "texturewidth",
 			"memberof": "gd3d.framework.atlas",
 			"scope": "instance",
-			"description": "//这2属性应该没用"
+			"description": "贴图像素宽度",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"name": "Parse",
+			"name": "atlas",
 			"memberof": "gd3d.framework.atlas",
 			"scope": "instance",
 			"params": [
 				{
-					"name": "jsonStr",
+					"name": "assetName",
 					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
+					"default": "null",
 					"description": ""
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"name": "dispose",
+			"name": "Parse",
 			"memberof": "gd3d.framework.atlas",
 			"scope": "instance",
+			"description": "解析资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
+				{
+					"name": "jsonStr",
+					"type": "string",
+					"description": "json数据"
+				},
 				{
 					"name": "assetmgr",
 					"type": "gd3d.framework.assetMgr",
-					"description": ""
+					"description": "资源管理实例"
 				}
 			]
 		},
 		{
 			"kind": "function",
 			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"description": "计算资源字节大小",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"description": "释放资源",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "number",
 			"name": "getGUID",
 			"memberof": "gd3d.framework.atlas",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取资源唯一id",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "string",
 			"name": "getName",
 			"memberof": "gd3d.framework.atlas",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "setAssetMgr",
-			"memberof": "gd3d.framework.atlas",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "setName",
-			"memberof": "gd3d.framework.atlas",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				}
-			]
+			"description": "获取资源名称",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "unuse",
 			"memberof": "gd3d.framework.atlas",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数减一",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "disposeNow",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
 		},
 		{
 			"kind": "function",
 			"name": "use",
 			"memberof": "gd3d.framework.atlas",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数加一",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"globalMember": [],
@@ -130,6 +148,8 @@
 		"name": "atlas",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\asset\\resource\\atlas.ts",
+		"description": "图集资源",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IAsset"

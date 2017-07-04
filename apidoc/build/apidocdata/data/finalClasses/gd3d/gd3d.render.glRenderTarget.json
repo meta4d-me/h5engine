@@ -9,20 +9,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "WebGLFramebuffer",
-			"name": "fbo",
-			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "height",
-			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "number",
 			"name": "height",
 			"memberof": "gd3d.render.glRenderTarget",
@@ -37,29 +23,8 @@
 		},
 		{
 			"kind": "member",
-			"type": "WebGLRenderbuffer",
-			"name": "renderbuffer",
-			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "WebGLTexture",
 			"name": "texture",
-			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "WebGLTexture",
-			"name": "texture",
-			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "width",
 			"memberof": "gd3d.render.glRenderTarget",
 			"scope": "instance"
 		},
@@ -95,41 +60,6 @@
 				},
 				{
 					"name": "depth",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "stencil",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "constructor",
-			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "width",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "height",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "depth",
 					"type": "boolean",
 					"default": "false",
 					"description": ""
@@ -144,8 +74,14 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "use",
+			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.render.glRenderTarget",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
 			"memberof": "gd3d.render.glRenderTarget",
 			"scope": "instance",
 			"params": [
@@ -158,23 +94,16 @@
 		},
 		{
 			"kind": "function",
-			"name": "use",
+			"type": "boolean",
+			"name": "isFrameBuffer",
 			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
+			"scope": "instance"
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "useNull",
+			"name": "use",
 			"memberof": "gd3d.render.glRenderTarget",
-			"scope": "static",
+			"scope": "instance",
 			"params": [
 				{
 					"name": "webgl",

@@ -2,11 +2,15 @@
 	"member": [
 		{
 			"kind": "member",
-			"name": "nbPoints",
+			"name": "beizerPoints",
 			"memberof": "gd3d.framework.Curve3",
-			"scope": "instance",
-			"rwType": 1,
-			"description": "贝塞尔曲线上所有点的总数-1，"
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "bezierPointNum",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "instance"
 		}
 	],
 	"function": [
@@ -57,9 +61,9 @@
 					"description": "v3"
 				},
 				{
-					"name": "nbPoints",
+					"name": "bezierPointNum",
 					"type": "number",
-					"description": "nbPoints"
+					"description": ""
 				}
 			]
 		},
@@ -112,9 +116,22 @@
 					"description": "结尾点"
 				},
 				{
-					"name": "nbPoints",
+					"name": "bezierPointNum",
 					"type": "number",
-					"description": "将贝塞尔曲线拆分nbPoints段，一共有nbPoints+1个点"
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "GetLerpBezier",
+			"memberof": "gd3d.framework.Curve3",
+			"scope": "static",
+			"params": [
+				{
+					"name": "nodes",
+					"type": "gd3d.framework.ParticleNode[]",
+					"description": ""
 				}
 			]
 		},
@@ -132,7 +149,7 @@
 		"kind": "class",
 		"name": "Curve3",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\particletool\\curve.ts",
+		"filename": "framework\\particle\\particletool\\curve.ts",
 		"description": "贝塞尔曲线，目前定义了三种：线性贝塞尔曲线(两个点形成),二次方贝塞尔曲线（三个点形成），三次方贝塞尔曲线（四个点形成）"
 	}
 }

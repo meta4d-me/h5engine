@@ -6,7 +6,8 @@
 			"name": "aabb",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//自己的aabb"
+			"description": "自己的aabb",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -14,15 +15,18 @@
 			"name": "aabbchild",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//包含自己和所有子物体的aabb"
+			"description": "包含自己和所有子物体的aabb",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "abc",
+			"type": "boolean",
+			"name": "beDispose",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取当前transform是否被释放掉了",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -30,14 +34,17 @@
 			"name": "children",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//父子关系"
+			"description": "子物体列表",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"name": "gameObject",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"rwType": 1
+			"rwType": 1,
+			"description": "获取绑定的gameObject",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -45,7 +52,16 @@
 			"name": "insId",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "transform唯一的insid",
+			"version": "egret-gd3d 1.0",
 			"default": "new insID()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "localEulerAngles",
+			"memberof": "gd3d.framework.transform",
+			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -78,6 +94,8 @@
 			"name": "name",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "transform名称",
+			"version": "egret-gd3d 1.0",
 			"default": "\"noname\""
 		},
 		{
@@ -85,7 +103,9 @@
 			"type": "gd3d.framework.transform",
 			"name": "parent",
 			"memberof": "gd3d.framework.transform",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "父物体实例",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -93,7 +113,8 @@
 			"name": "prefab",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//当前节点依赖的prefab路径，如果不依赖，则为空",
+			"description": "当前节点依赖的prefab路径，如果不依赖，则为空",
+			"version": "egret-gd3d 1.0",
 			"default": "null"
 		},
 		{
@@ -101,7 +122,9 @@
 			"type": "gd3d.framework.scene",
 			"name": "scene",
 			"memberof": "gd3d.framework.transform",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "设置所在场景实例",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"function": [
@@ -110,11 +133,13 @@
 			"name": "addChild",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "添加子物体实例",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "node",
 					"type": "gd3d.framework.transform",
-					"description": ""
+					"description": "子物体实例"
 				}
 			]
 		},
@@ -123,16 +148,18 @@
 			"name": "addChildAt",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "添加子物体实例到索引位置",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "node",
 					"type": "gd3d.framework.transform",
-					"description": ""
+					"description": "场景实例"
 				},
 				{
 					"name": "index",
 					"type": "number",
-					"description": ""
+					"description": "索引位置"
 				}
 			]
 		},
@@ -142,7 +169,8 @@
 			"name": "checkImpact",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//返回场景中所有与当前tranform碰撞的transform"
+			"description": "返回场景中所有与当前tranform碰撞的transform",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -150,32 +178,32 @@
 			"name": "checkImpactTran",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//先丢在这",
+			"description": "判断是否与给定的transform有碰撞",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "tran",
 					"type": "gd3d.framework.transform",
-					"description": ""
+					"description": "指定的transform"
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"name": "doImpact",
+			"type": "gd3d.framework.transform",
+			"name": "clone",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "tran",
-					"type": "gd3d.framework.transform",
-					"description": ""
-				},
-				{
-					"name": "impacted",
-					"type": "Array<gd3d.framework.transform>",
-					"description": ""
-				}
-			]
+			"description": "获取当前transform的克隆",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.transform",
+			"scope": "instance",
+			"description": "释放当前transform",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -183,11 +211,13 @@
 			"name": "find",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "查找自己以及子物体中是否有指定名称的transform",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "name"
 				}
 			]
 		},
@@ -196,6 +226,8 @@
 			"name": "getForwardInWorld",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "获取世界坐标系下当前z轴的朝向",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "out",
@@ -209,13 +241,17 @@
 			"type": "gd3d.math.matrix",
 			"name": "getLocalMatrix",
 			"memberof": "gd3d.framework.transform",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取本地矩阵",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "getRightInWorld",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "获取世界坐标系下当前x轴的朝向",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "out",
@@ -229,6 +265,8 @@
 			"name": "getUpInWorld",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "获取世界坐标系下y轴的朝向",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "out",
@@ -242,38 +280,46 @@
 			"type": "gd3d.math.matrix",
 			"name": "getWorldMatrix",
 			"memberof": "gd3d.framework.transform",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取世界矩阵",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "getWorldRotate",
 			"memberof": "gd3d.framework.transform",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取世界坐标系下的旋转",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "getWorldScale",
 			"memberof": "gd3d.framework.transform",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取世界坐标系下的缩放",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "getWorldTranslate",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//得到世界信息要先updateWorldTran，并且解算"
+			"description": "获取世界坐标系下的位移",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "lookat",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//修改 localRotate",
+			"description": "旋转当前transform到z轴指向给定transform",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "trans",
 					"type": "gd3d.framework.transform",
-					"description": ""
+					"description": "给定的transform"
 				}
 			]
 		},
@@ -282,11 +328,13 @@
 			"name": "lookatPoint",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "旋转当前transform到z轴指向给定坐标",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "point",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "给定的坐标"
 				}
 			]
 		},
@@ -295,18 +343,29 @@
 			"name": "markDirty",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//矩阵关系"
+			"description": "标记需要刷新数据",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "removeAllChild",
+			"memberof": "gd3d.framework.transform",
+			"scope": "instance",
+			"description": "移除所有子物体",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "removeChild",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "移除指定子物体",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "node",
 					"type": "gd3d.framework.transform",
-					"description": ""
+					"description": "子物体实例"
 				}
 			]
 		},
@@ -315,12 +374,13 @@
 			"name": "setWorldMatrix",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//其他辅助功能,这个实现必须要通过修改 local sth 来完成",
+			"description": "设置transform的世界矩阵 通过计算得到本地矩阵实现",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "mat",
 					"type": "gd3d.math.matrix",
-					"description": ""
+					"description": "世界空间下矩阵"
 				}
 			]
 		},
@@ -329,11 +389,13 @@
 			"name": "setWorldPosition",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "设置transform世界空间下的位移",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "pos",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "世界空间下的坐标"
 				}
 			]
 		},
@@ -342,11 +404,13 @@
 			"name": "updateTran",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
+			"description": "刷新transform状态",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "parentChange",
 					"type": "boolean",
-					"description": ""
+					"description": "父物体是否需要刷新"
 				}
 			]
 		},
@@ -355,7 +419,8 @@
 			"name": "updateWorldTran",
 			"memberof": "gd3d.framework.transform",
 			"scope": "instance",
-			"description": "//刷新自己这一条线，以得到正确的worldMatrix信息"
+			"description": "刷新自己这一条线，以得到正确的worldMatrix信息",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"globalMember": [],
@@ -365,6 +430,7 @@
 		"name": "transform",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\transform\\transform.ts",
-		"description": "//还是拆开了"
+		"description": "transform类 对应unity中transform概念",
+		"version": "egret-gd3d 1.0"
 	}
 }

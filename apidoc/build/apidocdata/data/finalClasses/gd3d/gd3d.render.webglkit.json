@@ -10,28 +10,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "ALWAYS",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "EQUAL",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "EQUAL",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "FUNC_ADD",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static"
 		},
@@ -52,28 +31,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "FUNC_REVERSE_SUBTRACT",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "FUNC_SUBTRACT",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "FUNC_SUBTRACT",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "GEQUAL",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static"
 		},
@@ -94,20 +52,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "GREATER",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "LEQUAL",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "LEQUAL",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static"
@@ -122,14 +66,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "LESS",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "NOTEQUAL",
+			"name": "NEVER",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static"
 		},
@@ -150,28 +87,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "ONE",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "ONE_MINUS_DST_ALPHA",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "ONE_MINUS_DST_ALPHA",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "ONE_MINUS_DST_COLOR",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static"
 		},
@@ -192,28 +108,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "ONE_MINUS_SRC_ALPHA",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "ONE_MINUS_SRC_COLOR",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "ONE_MINUS_SRC_COLOR",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "SRC_ALPHA",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static"
 		},
@@ -234,23 +129,17 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "SRC_COLOR",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "ZERO",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static"
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "ZERO",
+			"type": "gd3d.render.caps",
+			"name": "caps",
 			"memberof": "gd3d.render.webglkit",
-			"scope": "static"
+			"scope": "static",
+			"default": "new caps()"
 		}
 	],
 	"function": [
@@ -275,26 +164,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "number",
-			"name": "GetTextureNumber",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "index",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "SetMaxVertexAttribArray",
 			"memberof": "gd3d.render.webglkit",
 			"scope": "static",
@@ -307,38 +176,6 @@
 				{
 					"name": "count",
 					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "SetMaxVertexAttribArray",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "count",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "initConst",
-			"memberof": "gd3d.render.webglkit",
-			"scope": "static",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
 					"description": ""
 				}
 			]

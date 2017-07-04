@@ -40,15 +40,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.framework.image2D[]",
-			"name": "testImage",
-			"memberof": "gd3d.framework.button",
-			"scope": "instance",
-			"description": "//测试",
-			"default": "[]"
-		},
-		{
-			"kind": "member",
 			"type": "gd3d.framework.transform2D",
 			"name": "transform",
 			"memberof": "gd3d.framework.button",
@@ -84,6 +75,12 @@
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
 		},
 		{
 			"kind": "function",

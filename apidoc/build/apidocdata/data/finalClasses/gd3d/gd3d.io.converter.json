@@ -103,8 +103,48 @@
 		},
 		{
 			"kind": "function",
+			"type": "number",
+			"name": "ArrayToLong",
+			"memberof": "gd3d.io.converter",
+			"scope": "static",
+			"params": [
+				{
+					"name": "buf",
+					"type": "Uint8Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"type": "string",
 			"name": "ArrayToString",
+			"memberof": "gd3d.io.converter",
+			"scope": "static",
+			"params": [
+				{
+					"name": "buf",
+					"type": "Uint8Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "ArrayToULong",
 			"memberof": "gd3d.io.converter",
 			"scope": "static",
 			"params": [
@@ -314,6 +354,32 @@
 		{
 			"kind": "function",
 			"type": "Uint8Array|number[]",
+			"name": "LongToArray",
+			"memberof": "gd3d.io.converter",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "target",
+					"type": "Uint8Array|number[]",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "Uint8Array|number[]",
 			"name": "StringToUtf8Array",
 			"memberof": "gd3d.io.converter",
 			"scope": "static",
@@ -321,6 +387,32 @@
 				{
 					"name": "str",
 					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "Uint8Array|number[]",
+			"name": "ULongToArray",
+			"memberof": "gd3d.io.converter",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "target",
+					"type": "Uint8Array|number[]",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
 					"description": ""
 				}
 			]
@@ -399,6 +491,20 @@
 					"name": "offset",
 					"type": "number",
 					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "any",
+			"name": "getApplyFun",
+			"memberof": "gd3d.io.converter",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
 					"description": ""
 				}
 			]

@@ -44,156 +44,6 @@
 				}
 			]
 		},
-		"gd3d": {
-			"class": [
-				{
-					"name": "jsLoader",
-					"description": ""
-				}
-			]
-		},
-		"gd3d.io": {
-			"globalFunction": [
-				{
-					"name": "Serialize",
-					"description": "序列化"
-				},
-				{
-					"name": "SerializeForInspector",
-					"description": ""
-				},
-				{
-					"name": "deSerialize",
-					"description": "反序列化  传入的源数据为json"
-				},
-				{
-					"name": "deSerializeObj",
-					"description": "//反序列化赋值"
-				},
-				{
-					"name": "deSerializeOtherType",
-					"description": ""
-				},
-				{
-					"name": "deSerializeOtherTypeOrArray",
-					"description": ""
-				},
-				{
-					"name": "dofillReference",
-					"description": ""
-				},
-				{
-					"name": "dofillReferenceOrArray",
-					"description": ""
-				},
-				{
-					"name": "fillReference",
-					"description": ""
-				},
-				{
-					"name": "isArray",
-					"description": ""
-				},
-				{
-					"name": "isArrayOrDic",
-					"description": ""
-				},
-				{
-					"name": "isAsset",
-					"description": ""
-				},
-				{
-					"name": "isAssetInspector",
-					"description": ""
-				},
-				{
-					"name": "loadArrayBuffer",
-					"description": ""
-				},
-				{
-					"name": "loadArrayBuffer",
-					"description": ""
-				},
-				{
-					"name": "loadBlob",
-					"description": ""
-				},
-				{
-					"name": "loadBlob",
-					"description": ""
-				},
-				{
-					"name": "loadText",
-					"description": ""
-				},
-				{
-					"name": "loadText",
-					"description": ""
-				},
-				{
-					"name": "serializeObj",
-					"description": "//根据反射类型将对象进行序列化"
-				},
-				{
-					"name": "serializeObjForInspector",
-					"description": ""
-				},
-				{
-					"name": "serializeOtherType",
-					"description": ""
-				},
-				{
-					"name": "serializeOtherTypeForInspector",
-					"description": ""
-				},
-				{
-					"name": "serializeOtherTypeOrArray",
-					"description": ""
-				},
-				{
-					"name": "serializeOtherTypeOrArrayForInspector",
-					"description": ""
-				},
-				{
-					"name": "stringToBlob",
-					"description": "// }"
-				},
-				{
-					"name": "stringToUtf8Array",
-					"description": ""
-				}
-			],
-			"class": [
-				{
-					"name": "binBuffer",
-					"description": ""
-				},
-				{
-					"name": "converter",
-					"description": ""
-				},
-				{
-					"name": "binTool",
-					"description": ""
-				},
-				{
-					"name": "referenceInfo",
-					"description": ""
-				},
-				{
-					"name": "enumMgr",
-					"description": ""
-				},
-				{
-					"name": "binReader",
-					"description": ""
-				},
-				{
-					"name": "binWriter",
-					"description": ""
-				}
-			]
-		},
 		"gd3d.reflect": {
 			"globalFunction": [
 				{
@@ -201,28 +51,12 @@
 					"description": "序列化修饰"
 				},
 				{
-					"name": "Field",
-					"description": ""
-				},
-				{
 					"name": "SerializeType",
 					"description": "//nodeComponent是挂载的脚本，SerializeType是结构化的脚本（比如Vector3）"
 				},
 				{
-					"name": "SerializeType",
-					"description": ""
-				},
-				{
 					"name": "UIComment",
 					"description": "属性面板提示修饰"
-				},
-				{
-					"name": "UIComment",
-					"description": ""
-				},
-				{
-					"name": "UIStyle",
-					"description": ""
 				},
 				{
 					"name": "UIStyle",
@@ -233,20 +67,8 @@
 					"description": ""
 				},
 				{
-					"name": "attr_Class",
-					"description": ""
-				},
-				{
-					"name": "attr_Field",
-					"description": ""
-				},
-				{
 					"name": "attr_Field",
 					"description": "//for 变量的修饰器，可以加参数"
-				},
-				{
-					"name": "attr_Func",
-					"description": ""
 				},
 				{
 					"name": "attr_Func",
@@ -257,14 +79,6 @@
 					"description": "///该函数为导出的函数"
 				},
 				{
-					"name": "compCall",
-					"description": ""
-				},
-				{
-					"name": "compValue",
-					"description": ""
-				},
-				{
 					"name": "compValue",
 					"description": "///defvalue 默认值"
 				},
@@ -273,19 +87,7 @@
 					"description": ""
 				},
 				{
-					"name": "createInstance",
-					"description": ""
-				},
-				{
 					"name": "editorCode",
-					"description": ""
-				},
-				{
-					"name": "editorCode",
-					"description": ""
-				},
-				{
-					"name": "getClassName",
 					"description": ""
 				},
 				{
@@ -297,19 +99,7 @@
 					"description": ""
 				},
 				{
-					"name": "getClassTag",
-					"description": ""
-				},
-				{
 					"name": "getMeta",
-					"description": ""
-				},
-				{
-					"name": "getMeta",
-					"description": ""
-				},
-				{
-					"name": "getPrototype",
 					"description": ""
 				},
 				{
@@ -321,14 +111,6 @@
 					"description": ""
 				},
 				{
-					"name": "getPrototypes",
-					"description": ""
-				},
-				{
-					"name": "node2DComponent",
-					"description": ""
-				},
-				{
 					"name": "node2DComponent",
 					"description": ""
 				},
@@ -337,19 +119,7 @@
 					"description": ""
 				},
 				{
-					"name": "nodeBoxCollider",
-					"description": ""
-				},
-				{
 					"name": "nodeCamera",
-					"description": ""
-				},
-				{
-					"name": "nodeCamera",
-					"description": ""
-				},
-				{
-					"name": "nodeCanvasRendererCollider",
 					"description": ""
 				},
 				{
@@ -361,19 +131,7 @@
 					"description": "//usercode 表示这是一个场景节点组件类，可以挂在场景节点上"
 				},
 				{
-					"name": "nodeComponent",
-					"description": ""
-				},
-				{
 					"name": "nodeComponentInspector",
-					"description": ""
-				},
-				{
-					"name": "nodeComponentInspector",
-					"description": ""
-				},
-				{
-					"name": "nodeEffectBatcher",
 					"description": ""
 				},
 				{
@@ -385,14 +143,6 @@
 					"description": ""
 				},
 				{
-					"name": "nodeLight",
-					"description": ""
-				},
-				{
-					"name": "nodeMeshCollider",
-					"description": ""
-				},
-				{
 					"name": "nodeMeshCollider",
 					"description": ""
 				},
@@ -401,11 +151,7 @@
 					"description": ""
 				},
 				{
-					"name": "nodeRender",
-					"description": ""
-				},
-				{
-					"name": "pluginExt",
+					"name": "nodeSphereCollider",
 					"description": ""
 				},
 				{
@@ -417,24 +163,16 @@
 					"description": ""
 				},
 				{
-					"name": "pluginMenuItem",
-					"description": ""
-				},
-				{
 					"name": "pluginWindow",
 					"description": ""
 				},
 				{
-					"name": "pluginWindow",
-					"description": ""
+					"name": "selfClone",
+					"description": "//这个标记了clone时调用实例自己的clone函数"
 				},
 				{
 					"name": "userCode",
 					"description": "///上面幾個是通用的"
-				},
-				{
-					"name": "userCode",
-					"description": ""
 				}
 			],
 			"class": [
@@ -444,11 +182,619 @@
 				}
 			]
 		},
+		"gd3d.framework": {
+			"class": [
+				{
+					"name": "canvas",
+					"description": ""
+				},
+				{
+					"name": "batcher2D",
+					"description": ""
+				},
+				{
+					"name": "canvasRenderer",
+					"description": ""
+				},
+				{
+					"name": "TransitionType",
+					"description": ""
+				},
+				{
+					"name": "button",
+					"description": ""
+				},
+				{
+					"name": "image2D",
+					"description": ""
+				},
+				{
+					"name": "ImageType",
+					"description": "贴图的显示方式"
+				},
+				{
+					"name": "FillMethod",
+					"description": "填充方式"
+				},
+				{
+					"name": "label",
+					"description": ""
+				},
+				{
+					"name": "HorizontalType",
+					"description": ""
+				},
+				{
+					"name": "VerticalType",
+					"description": ""
+				},
+				{
+					"name": "rawImage2D",
+					"description": "参照UGUI的思路，rawImage只拿整个图片来显示，不关心Sprite、九宫、填充等。这些统一都在iamge中处理"
+				},
+				{
+					"name": "PointEventEnum",
+					"description": ""
+				},
+				{
+					"name": "PointEvent",
+					"description": ""
+				},
+				{
+					"name": "UIEvent",
+					"description": ""
+				},
+				{
+					"name": "overlay2D",
+					"description": ""
+				},
+				{
+					"name": "I2DComponent",
+					"description": ""
+				},
+				{
+					"name": "IRectRenderer",
+					"description": ""
+				},
+				{
+					"name": "C2DComponent",
+					"description": ""
+				},
+				{
+					"name": "transform2D",
+					"description": "//gameobject 区分清自己现在挂载的transform 是 2d 还是 3d 就好"
+				},
+				{
+					"name": "application",
+					"description": "引擎的主入口"
+				},
+				{
+					"name": "IUserCode",
+					"description": "usercode接口"
+				},
+				{
+					"name": "IEditorCode",
+					"description": "editorcode接口"
+				},
+				{
+					"name": "resID",
+					"description": "//三，静态管理，这个是特殊的，不要为他设计"
+				},
+				{
+					"name": "constText",
+					"description": "静态text 初始化后不可修改"
+				},
+				{
+					"name": "IAsset",
+					"description": "资源接口 扩展资源需要继承此接口"
+				},
+				{
+					"name": "AssetTypeEnum",
+					"description": "资源类型"
+				},
+				{
+					"name": "stateLoad",
+					"description": "加载状态"
+				},
+				{
+					"name": "assetBundle",
+					"description": "资源包"
+				},
+				{
+					"name": "assetMgr",
+					"description": "通用的资源管理器，你也可以自己搞个东西当资源，继承IResource即可<p/>资源管理器用引用计数法管理资源，计数混乱会导致问题，循环引用也会导致问题，需要注意<p/>js 语法层面不能提供可靠的自动引用计数机制，所以如果你用乱了，哪啊就是乱了<p/>所有的资源都是从资源管理器get出来的<p/>所有的资源不用的时候都要还到资源管理器<p/>"
+				},
+				{
+					"name": "assetRef",
+					"description": "资源引用计数的结构"
+				},
+				{
+					"name": "defMesh",
+					"description": ""
+				},
+				{
+					"name": "defShader",
+					"description": ""
+				},
+				{
+					"name": "defTexture",
+					"description": ""
+				},
+				{
+					"name": "animationClip",
+					"description": "动画片段资源"
+				},
+				{
+					"name": "atlas",
+					"description": "图集资源"
+				},
+				{
+					"name": "font",
+					"description": "字体资源"
+				},
+				{
+					"name": "material",
+					"description": "材质资源"
+				},
+				{
+					"name": "mesh",
+					"description": "mesh资源"
+				},
+				{
+					"name": "pathasset",
+					"description": "路径编辑资源"
+				},
+				{
+					"name": "prefab",
+					"description": "预设资源"
+				},
+				{
+					"name": "rawscene",
+					"description": "场景数据资源"
+				},
+				{
+					"name": "shader",
+					"description": "shader资源"
+				},
+				{
+					"name": "sprite",
+					"description": "sprite资源"
+				},
+				{
+					"name": "textasset",
+					"description": "文本资源"
+				},
+				{
+					"name": "texture",
+					"description": "texture资源"
+				},
+				{
+					"name": "AudioChannel",
+					"description": ""
+				},
+				{
+					"name": "AudioEx",
+					"description": ""
+				},
+				{
+					"name": "aniplayer",
+					"description": ""
+				},
+				{
+					"name": "tPoseInfo",
+					"description": ""
+				},
+				{
+					"name": "PlayStyle",
+					"description": ""
+				},
+				{
+					"name": "asbone",
+					"description": ""
+				},
+				{
+					"name": "ICollider",
+					"description": ""
+				},
+				{
+					"name": "boxcollider",
+					"description": "表示矩形碰撞盒"
+				},
+				{
+					"name": "ICameraPostQueue",
+					"description": ""
+				},
+				{
+					"name": "cameraPostQueue_Depth",
+					"description": ""
+				},
+				{
+					"name": "cameraPostQueue_Quad",
+					"description": ""
+				},
+				{
+					"name": "cameraPostQueue_Color",
+					"description": ""
+				},
+				{
+					"name": "IOverLay",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"description": "// }"
+				},
+				{
+					"name": "CullingMask",
+					"description": ""
+				},
+				{
+					"name": "effectSystem",
+					"description": "特效组件"
+				},
+				{
+					"name": "frustumculling",
+					"description": "视锥剔除组件，作为标记存在"
+				},
+				{
+					"name": "guidpath",
+					"description": "路径组件"
+				},
+				{
+					"name": "LightTypeEnum",
+					"description": ""
+				},
+				{
+					"name": "light",
+					"description": "灯光组件"
+				},
+				{
+					"name": "meshcollider",
+					"description": "碰撞组件"
+				},
+				{
+					"name": "meshFilter",
+					"description": "mesh组件"
+				},
+				{
+					"name": "meshRenderer",
+					"description": "mesh的渲染组件"
+				},
+				{
+					"name": "skinnedMeshRenderer",
+					"description": ""
+				},
+				{
+					"name": "spherestruct",
+					"description": ""
+				},
+				{
+					"name": "spherecollider",
+					"description": "表示球碰撞盒"
+				},
+				{
+					"name": "trailRender",
+					"description": "拖尾组件"
+				},
+				{
+					"name": "trailStick",
+					"description": ""
+				},
+				{
+					"name": "trailRender_recorde",
+					"description": "拖尾组件，废弃"
+				},
+				{
+					"name": "trailNode",
+					"description": ""
+				},
+				{
+					"name": "pointinfo",
+					"description": ""
+				},
+				{
+					"name": "inputMgr",
+					"description": ""
+				},
+				{
+					"name": "EffectSystemData",
+					"description": ""
+				},
+				{
+					"name": "EffectElement",
+					"description": ""
+				},
+				{
+					"name": "EffectElementData",
+					"description": ""
+				},
+				{
+					"name": "EffectAttrsData",
+					"description": ""
+				},
+				{
+					"name": "EffectFrameData",
+					"description": ""
+				},
+				{
+					"name": "EffectLerpData",
+					"description": ""
+				},
+				{
+					"name": "EffectActionData",
+					"description": ""
+				},
+				{
+					"name": "EffectMatData",
+					"description": ""
+				},
+				{
+					"name": "EffectBatcher",
+					"description": ""
+				},
+				{
+					"name": "EffectPlayStateEnum",
+					"description": ""
+				},
+				{
+					"name": "EffectElementTypeEnum",
+					"description": ""
+				},
+				{
+					"name": "EffectLerpTypeEnum",
+					"description": ""
+				},
+				{
+					"name": "RenderModel",
+					"description": ""
+				},
+				{
+					"name": "ParticleEmissionType",
+					"description": ""
+				},
+				{
+					"name": "EmissionData",
+					"description": "粒子发射器"
+				},
+				{
+					"name": "Emission",
+					"description": ""
+				},
+				{
+					"name": "UVSprite",
+					"description": ""
+				},
+				{
+					"name": "UVRoll",
+					"description": ""
+				},
+				{
+					"name": "UVTypeEnum",
+					"description": ""
+				},
+				{
+					"name": "ParticleNode",
+					"description": "粒子节点"
+				},
+				{
+					"name": "AlphaNode",
+					"description": ""
+				},
+				{
+					"name": "UVSpeedNode",
+					"description": ""
+				},
+				{
+					"name": "ParticleNodeVec2",
+					"description": ""
+				},
+				{
+					"name": "ParticleNodeNumber",
+					"description": ""
+				},
+				{
+					"name": "ParticleSystemShape",
+					"description": "粒子初始方向类型"
+				},
+				{
+					"name": "ParticleStartData",
+					"description": "粒子初始数据"
+				},
+				{
+					"name": "emitfromenum",
+					"description": ""
+				},
+				{
+					"name": "ValueData",
+					"description": ""
+				},
+				{
+					"name": "Curve3",
+					"description": "贝塞尔曲线，目前定义了三种：线性贝塞尔曲线(两个点形成),二次方贝塞尔曲线（三个点形成），三次方贝塞尔曲线（四个点形成）"
+				},
+				{
+					"name": "IEffectAction",
+					"description": ""
+				},
+				{
+					"name": "LinearAction",
+					"description": ""
+				},
+				{
+					"name": "DestroyAction",
+					"description": ""
+				},
+				{
+					"name": "LoopAction",
+					"description": ""
+				},
+				{
+					"name": "UVRollAction",
+					"description": ""
+				},
+				{
+					"name": "UVSpriteAnimationAction",
+					"description": ""
+				},
+				{
+					"name": "RotationAction",
+					"description": ""
+				},
+				{
+					"name": "RoseCurveAction",
+					"description": ""
+				},
+				{
+					"name": "TrailAction",
+					"description": ""
+				},
+				{
+					"name": "BreathAction",
+					"description": ""
+				},
+				{
+					"name": "EffectParser",
+					"description": ""
+				},
+				{
+					"name": "EffectUtil",
+					"description": ""
+				},
+				{
+					"name": "EmissionBatcher",
+					"description": ""
+				},
+				{
+					"name": "Particle",
+					"description": "//这里根据发射器定义的初始参数  计算当前要提交的数据"
+				},
+				{
+					"name": "nodeType",
+					"description": ""
+				},
+				{
+					"name": "Particles",
+					"description": "//特效系统中的发射器都丢在这里"
+				},
+				{
+					"name": "EmissionElement",
+					"description": "//发射器也作为特效系统的一个元素"
+				},
+				{
+					"name": "INodeComponent",
+					"description": "组件实例接口"
+				},
+				{
+					"name": "nodeComponent",
+					"description": "组件接口"
+				},
+				{
+					"name": "gameObject",
+					"description": "gameObject类 对应unity中gameObject概念"
+				},
+				{
+					"name": "renderContext",
+					"description": "//渲染上下文,渲染所需要的所有参数"
+				},
+				{
+					"name": "RenderLayerEnum",
+					"description": ""
+				},
+				{
+					"name": "IRenderer",
+					"description": "//渲染器"
+				},
+				{
+					"name": "renderList",
+					"description": "//渲染列表"
+				},
+				{
+					"name": "renderLayer",
+					"description": ""
+				},
+				{
+					"name": "scene",
+					"description": "场景是基础的功能，有场景图，相当于Unity的Level"
+				},
+				{
+					"name": "sceneMgr",
+					"description": ""
+				},
+				{
+					"name": "taskstate",
+					"description": ""
+				},
+				{
+					"name": "ITask",
+					"description": ""
+				},
+				{
+					"name": "taskMgr",
+					"description": ""
+				},
+				{
+					"name": "aabb",
+					"description": "表示轴对称包围盒"
+				},
+				{
+					"name": "obb",
+					"description": ""
+				},
+				{
+					"name": "pickinfo",
+					"description": ""
+				},
+				{
+					"name": "ray",
+					"description": "射线"
+				},
+				{
+					"name": "transform",
+					"description": "transform类 对应unity中transform概念"
+				},
+				{
+					"name": "insID",
+					"description": "作为引擎实例的唯一id使用 自增"
+				},
+				{
+					"name": "NumberUtil",
+					"description": "获取键盘Keycode的工具类"
+				},
+				{
+					"name": "RegexpUtil",
+					"description": ""
+				},
+				{
+					"name": "StringUtil",
+					"description": ""
+				},
+				{
+					"name": "PrimitiveType",
+					"description": ""
+				},
+				{
+					"name": "Primitive2DType",
+					"description": ""
+				},
+				{
+					"name": "TransformUtil",
+					"description": ""
+				}
+			]
+		},
 		"gd3d.math": {
 			"globalFunction": [
 				{
+					"name": "GetPointAlongCurve",
+					"description": ""
+				},
+				{
 					"name": "Multiply",
 					"description": "// 计算叉乘 |P0P1| × |P0P2|"
+				},
+				{
+					"name": "caclStringByteLength",
+					"description": ""
 				},
 				{
 					"name": "calPlaneLineIntersectPoint",
@@ -543,11 +889,19 @@
 					"description": ""
 				},
 				{
+					"name": "matrixAdd",
+					"description": ""
+				},
+				{
 					"name": "matrixClone",
 					"description": ""
 				},
 				{
 					"name": "matrixDecompose",
+					"description": ""
+				},
+				{
+					"name": "matrixGetScale",
 					"description": ""
 				},
 				{
@@ -607,6 +961,10 @@
 					"description": ""
 				},
 				{
+					"name": "matrixScaleByNum",
+					"description": ""
+				},
+				{
 					"name": "matrixTransformNormal",
 					"description": "//变换向量"
 				},
@@ -615,11 +973,23 @@
 					"description": ""
 				},
 				{
+					"name": "matrixTranspose",
+					"description": "当前矩阵转置"
+				},
+				{
 					"name": "matrixViewLookatLH",
 					"description": ""
 				},
 				{
 					"name": "matrixZero",
+					"description": ""
+				},
+				{
+					"name": "numberLerp",
+					"description": ""
+				},
+				{
+					"name": "quat2Lookat",
 					"description": ""
 				},
 				{
@@ -659,6 +1029,10 @@
 					"description": ""
 				},
 				{
+					"name": "quatMultiplyDataAndQuat",
+					"description": ""
+				},
+				{
 					"name": "quatMultiplyVector",
 					"description": ""
 				},
@@ -684,6 +1058,14 @@
 				},
 				{
 					"name": "quatTransformVector",
+					"description": ""
+				},
+				{
+					"name": "quatTransformVectorDataAndQuat",
+					"description": ""
+				},
+				{
+					"name": "quatYAxis",
 					"description": ""
 				},
 				{
@@ -715,6 +1097,10 @@
 					"description": ""
 				},
 				{
+					"name": "spriteAnimation",
+					"description": "//row：图片行数//column:图片列数//index：第几张图片（index从0开始计数）"
+				},
+				{
 					"name": "vec2Add",
 					"description": ""
 				},
@@ -727,6 +1113,10 @@
 					"description": ""
 				},
 				{
+					"name": "vec2Equal",
+					"description": "//阀值先写这里了，回头"
+				},
+				{
 					"name": "vec2Length",
 					"description": ""
 				},
@@ -736,6 +1126,10 @@
 				},
 				{
 					"name": "vec2Normalize",
+					"description": ""
+				},
+				{
+					"name": "vec2SLerp",
 					"description": ""
 				},
 				{
@@ -777,6 +1171,10 @@
 				{
 					"name": "vec3Dot",
 					"description": ""
+				},
+				{
+					"name": "vec3Equal",
+					"description": "////又有参数又有返回值的必须是static"
 				},
 				{
 					"name": "vec3Exclude",
@@ -887,10 +1285,6 @@
 					"description": ""
 				},
 				{
-					"name": "vec4Lerp",
-					"description": ""
-				},
-				{
 					"name": "x_AXIS",
 					"description": ""
 				},
@@ -904,10 +1298,6 @@
 				}
 			],
 			"class": [
-				{
-					"name": "pool",
-					"description": ""
-				},
 				{
 					"name": "vector2",
 					"description": "//重构原则1，将结构和计算函数全部分离"
@@ -951,13 +1341,199 @@
 				{
 					"name": "commonStatic",
 					"description": ""
+				},
+				{
+					"name": "pool",
+					"description": ""
+				}
+			]
+		},
+		"": {
+			"class": [
+				{
+					"name": "PVRHeader",
+					"description": ""
+				},
+				{
+					"name": "ChannelTypes",
+					"description": ""
+				}
+			]
+		},
+		"gd3d.io": {
+			"globalFunction": [
+				{
+					"name": "Serialize",
+					"description": "序列化"
+				},
+				{
+					"name": "SerializeForInspector",
+					"description": ""
+				},
+				{
+					"name": "cloneObj",
+					"description": ""
+				},
+				{
+					"name": "cloneOtherType",
+					"description": ""
+				},
+				{
+					"name": "cloneOtherTypeOrArray",
+					"description": ""
+				},
+				{
+					"name": "deSerialize",
+					"description": "反序列化  传入的源数据为json"
+				},
+				{
+					"name": "deSerializeObj",
+					"description": "//反序列化赋值"
+				},
+				{
+					"name": "deSerializeOtherType",
+					"description": ""
+				},
+				{
+					"name": "deSerializeOtherTypeOrArray",
+					"description": ""
+				},
+				{
+					"name": "dofillReference",
+					"description": ""
+				},
+				{
+					"name": "dofillReferenceOrArray",
+					"description": ""
+				},
+				{
+					"name": "fillCloneReference",
+					"description": ""
+				},
+				{
+					"name": "fillCloneReferenceType",
+					"description": ""
+				},
+				{
+					"name": "fillCloneReferenceTypeOrArray",
+					"description": ""
+				},
+				{
+					"name": "fillReference",
+					"description": ""
+				},
+				{
+					"name": "isArray",
+					"description": ""
+				},
+				{
+					"name": "isArrayOrDic",
+					"description": ""
+				},
+				{
+					"name": "isAsset",
+					"description": ""
+				},
+				{
+					"name": "isAssetInspector",
+					"description": ""
+				},
+				{
+					"name": "loadArrayBuffer",
+					"description": ""
+				},
+				{
+					"name": "loadBlob",
+					"description": ""
+				},
+				{
+					"name": "loadImg",
+					"description": ""
+				},
+				{
+					"name": "loadText",
+					"description": ""
+				},
+				{
+					"name": "serializeObj",
+					"description": "//根据反射类型将对象进行序列化"
+				},
+				{
+					"name": "serializeObjForInspector",
+					"description": ""
+				},
+				{
+					"name": "serializeOtherType",
+					"description": ""
+				},
+				{
+					"name": "serializeOtherTypeForInspector",
+					"description": ""
+				},
+				{
+					"name": "serializeOtherTypeOrArray",
+					"description": ""
+				},
+				{
+					"name": "serializeOtherTypeOrArrayForInspector",
+					"description": ""
+				},
+				{
+					"name": "stringToBlob",
+					"description": "// }"
+				},
+				{
+					"name": "stringToUtf8Array",
+					"description": ""
+				}
+			],
+			"class": [
+				{
+					"name": "binBuffer",
+					"description": ""
+				},
+				{
+					"name": "converter",
+					"description": ""
+				},
+				{
+					"name": "binTool",
+					"description": ""
+				},
+				{
+					"name": "SerializeDependent",
+					"description": "//依赖的资源路径"
+				},
+				{
+					"name": "referenceInfo",
+					"description": ""
+				},
+				{
+					"name": "enumMgr",
+					"description": ""
+				},
+				{
+					"name": "binReader",
+					"description": ""
+				},
+				{
+					"name": "binWriter",
+					"description": ""
+				}
+			]
+		},
+		"Stats": {
+			"class": [
+				{
+					"name": "Stats",
+					"description": ""
 				}
 			]
 		},
 		"gd3d.render": {
 			"class": [
 				{
-					"name": "CullStateEnum",
+					"name": "ShowFaceStateEnum",
 					"description": ""
 				},
 				{
@@ -983,6 +1559,10 @@
 				{
 					"name": "MeshTypeEnum",
 					"description": "//原始模型数据"
+				},
+				{
+					"name": "drawInfo",
+					"description": ""
 				},
 				{
 					"name": "glMesh",
@@ -1049,516 +1629,16 @@
 					"description": ""
 				},
 				{
+					"name": "WriteableTexture2D",
+					"description": ""
+				},
+				{
+					"name": "caps",
+					"description": ""
+				},
+				{
 					"name": "webglkit",
 					"description": ""
-				}
-			]
-		},
-		"gd3d.framework": {
-			"class": [
-				{
-					"name": "canvas",
-					"description": ""
-				},
-				{
-					"name": "batcher2D",
-					"description": ""
-				},
-				{
-					"name": "canvasRenderer",
-					"description": ""
-				},
-				{
-					"name": "TransitionType",
-					"description": ""
-				},
-				{
-					"name": "button",
-					"description": ""
-				},
-				{
-					"name": "image2D",
-					"description": ""
-				},
-				{
-					"name": "ImageType",
-					"description": "贴图的显示方式"
-				},
-				{
-					"name": "FillMethod",
-					"description": "填充方式"
-				},
-				{
-					"name": "label",
-					"description": ""
-				},
-				{
-					"name": "HorizontalType",
-					"description": ""
-				},
-				{
-					"name": "VerticalType",
-					"description": ""
-				},
-				{
-					"name": "rawImage2D",
-					"description": "参照UGUI的思路，rawImage只拿整个图片来显示，不关心Sprite、九宫、填充等。这些统一都在iamge中处理"
-				},
-				{
-					"name": "PointEventEnum",
-					"description": ""
-				},
-				{
-					"name": "PointEvent",
-					"description": ""
-				},
-				{
-					"name": "UIEvent",
-					"description": ""
-				},
-				{
-					"name": "overlay2D",
-					"description": ""
-				},
-				{
-					"name": "I2DComponent",
-					"description": ""
-				},
-				{
-					"name": "IRectRenderer",
-					"description": ""
-				},
-				{
-					"name": "C2DComponent",
-					"description": ""
-				},
-				{
-					"name": "transform2D",
-					"description": "//gameobject 区分清自己现在挂载的transform 是 2d 还是 3d 就好"
-				},
-				{
-					"name": "INotify",
-					"description": ""
-				},
-				{
-					"name": "NotifyType",
-					"description": ""
-				},
-				{
-					"name": "application",
-					"description": ""
-				},
-				{
-					"name": "IUserCode",
-					"description": ""
-				},
-				{
-					"name": "IEditorCode",
-					"description": ""
-				},
-				{
-					"name": "resID",
-					"description": "//三，静态管理，这个是特殊的，不要为他设计"
-				},
-				{
-					"name": "constText",
-					"description": ""
-				},
-				{
-					"name": "IAsset",
-					"description": ""
-				},
-				{
-					"name": "AssetTypeEnum",
-					"description": "资源类型"
-				},
-				{
-					"name": "stateLoad",
-					"description": "加载状态"
-				},
-				{
-					"name": "assetBundle",
-					"description": "资源包"
-				},
-				{
-					"name": "assetMgr",
-					"description": "通用的资源管理器，你也可以自己搞个东西当资源，继承IResource即可<p/>资源管理器用引用计数法管理资源，计数混乱会导致问题，循环引用也会导致问题，需要注意<p/>js 语法层面不能提供可靠的自动引用计数机制，所以如果你用乱了，哪啊就是乱了<p/>所有的资源都是从资源管理器get出来的<p/>所有的资源不用的时候都要还到资源管理器<p/>"
-				},
-				{
-					"name": "assetRef",
-					"description": "资源引用计数的结构"
-				},
-				{
-					"name": "SaveInfo",
-					"description": ""
-				},
-				{
-					"name": "defMesh",
-					"description": ""
-				},
-				{
-					"name": "defShader",
-					"description": ""
-				},
-				{
-					"name": "defTexture",
-					"description": ""
-				},
-				{
-					"name": "animationClip",
-					"description": ""
-				},
-				{
-					"name": "Frame",
-					"description": ""
-				},
-				{
-					"name": "PoseBoneMatrix",
-					"description": ""
-				},
-				{
-					"name": "subClip",
-					"description": ""
-				},
-				{
-					"name": "atlas",
-					"description": ""
-				},
-				{
-					"name": "font",
-					"description": ""
-				},
-				{
-					"name": "charinfo",
-					"description": ""
-				},
-				{
-					"name": "UniformData",
-					"description": ""
-				},
-				{
-					"name": "material",
-					"description": ""
-				},
-				{
-					"name": "mesh",
-					"description": ""
-				},
-				{
-					"name": "subMeshInfo",
-					"description": ""
-				},
-				{
-					"name": "prefab",
-					"description": ""
-				},
-				{
-					"name": "rawscene",
-					"description": ""
-				},
-				{
-					"name": "shader",
-					"description": ""
-				},
-				{
-					"name": "sprite",
-					"description": ""
-				},
-				{
-					"name": "texture",
-					"description": ""
-				},
-				{
-					"name": "aniplayer",
-					"description": ""
-				},
-				{
-					"name": "tPoseInfo",
-					"description": ""
-				},
-				{
-					"name": "PlayStyle",
-					"description": ""
-				},
-				{
-					"name": "asbone",
-					"description": ""
-				},
-				{
-					"name": "ICollider",
-					"description": ""
-				},
-				{
-					"name": "boxcollider",
-					"description": "表示矩形碰撞盒"
-				},
-				{
-					"name": "IOverLay",
-					"description": ""
-				},
-				{
-					"name": "camera",
-					"description": "// }"
-				},
-				{
-					"name": "CullingMask",
-					"description": ""
-				},
-				{
-					"name": "cameraController",
-					"description": ""
-				},
-				{
-					"name": "light",
-					"description": "//灯光"
-				},
-				{
-					"name": "meshcollider",
-					"description": ""
-				},
-				{
-					"name": "meshFilter",
-					"description": ""
-				},
-				{
-					"name": "meshRenderer",
-					"description": ""
-				},
-				{
-					"name": "EffectSystemData",
-					"description": "特效系统数据"
-				},
-				{
-					"name": "ParticleListData",
-					"description": "单个粒子数据"
-				},
-				{
-					"name": "ParticleEmissionType",
-					"description": ""
-				},
-				{
-					"name": "EmissionData",
-					"description": "粒子发射器"
-				},
-				{
-					"name": "ParticleMatrialType",
-					"description": ""
-				},
-				{
-					"name": "MaterialData",
-					"description": "材质数据"
-				},
-				{
-					"name": "ParticleNode",
-					"description": "粒子节点"
-				},
-				{
-					"name": "AlphaNode",
-					"description": ""
-				},
-				{
-					"name": "ParticleSystemShape",
-					"description": "粒子初始方向类型"
-				},
-				{
-					"name": "ParticleStartData",
-					"description": "粒子初始数据"
-				},
-				{
-					"name": "RenderModel",
-					"description": ""
-				},
-				{
-					"name": "CParticleData",
-					"description": "粒子数据"
-				},
-				{
-					"name": "StartPositionShapeType",
-					"description": ""
-				},
-				{
-					"name": "StartPosData",
-					"description": ""
-				},
-				{
-					"name": "ValueData",
-					"description": ""
-				},
-				{
-					"name": "Curve3",
-					"description": "贝塞尔曲线，目前定义了三种：线性贝塞尔曲线(两个点形成),二次方贝塞尔曲线（三个点形成），三次方贝塞尔曲线（四个点形成）"
-				},
-				{
-					"name": "effectPlayer",
-					"description": ""
-				},
-				{
-					"name": "ParserTool",
-					"description": ""
-				},
-				{
-					"name": "effectSystem",
-					"description": ""
-				},
-				{
-					"name": "EffectUtil",
-					"description": ""
-				},
-				{
-					"name": "MeshBatcher",
-					"description": ""
-				},
-				{
-					"name": "Particle1",
-					"description": ""
-				},
-				{
-					"name": "EffectColorNode",
-					"description": ""
-				},
-				{
-					"name": "EffectScaleNode",
-					"description": ""
-				},
-				{
-					"name": "EffectAlphaNode",
-					"description": ""
-				},
-				{
-					"name": "particleSystem",
-					"description": ""
-				},
-				{
-					"name": "Emission",
-					"description": ""
-				},
-				{
-					"name": "TrailSection",
-					"description": ""
-				},
-				{
-					"name": "Color",
-					"description": ""
-				},
-				{
-					"name": "Trail",
-					"description": ""
-				},
-				{
-					"name": "skinnedMeshRenderer",
-					"description": ""
-				},
-				{
-					"name": "pointinfo",
-					"description": ""
-				},
-				{
-					"name": "inputMgr",
-					"description": ""
-				},
-				{
-					"name": "HideFlags",
-					"description": ""
-				},
-				{
-					"name": "INodeComponent",
-					"description": ""
-				},
-				{
-					"name": "nodeComponent",
-					"description": ""
-				},
-				{
-					"name": "gameObject",
-					"description": ""
-				},
-				{
-					"name": "renderContext",
-					"description": "//渲染上下文,渲染所需要的所有参数"
-				},
-				{
-					"name": "RenderLayerEnum",
-					"description": ""
-				},
-				{
-					"name": "IRenderer",
-					"description": "//渲染器"
-				},
-				{
-					"name": "renderList",
-					"description": "//渲染列表"
-				},
-				{
-					"name": "renderLayer",
-					"description": ""
-				},
-				{
-					"name": "scene",
-					"description": "//场景是基础的功能，有场景图，相当于Unity的Level"
-				},
-				{
-					"name": "sceneMgr",
-					"description": ""
-				},
-				{
-					"name": "taskstate",
-					"description": ""
-				},
-				{
-					"name": "ITask",
-					"description": ""
-				},
-				{
-					"name": "taskMgr",
-					"description": ""
-				},
-				{
-					"name": "aabb",
-					"description": "表示轴对称包围盒"
-				},
-				{
-					"name": "obb",
-					"description": ""
-				},
-				{
-					"name": "pickinfo",
-					"description": ""
-				},
-				{
-					"name": "ray",
-					"description": "射线"
-				},
-				{
-					"name": "transform",
-					"description": "//还是拆开了"
-				},
-				{
-					"name": "insID",
-					"description": ""
-				},
-				{
-					"name": "NumberUtil",
-					"description": ""
-				},
-				{
-					"name": "StringUtil",
-					"description": ""
-				}
-			]
-		},
-		"Stats": {
-			"class": [
-				{
-					"name": "Stats",
-					"description": ""
-				}
-			]
-		},
-		"testapi": {
-			"class": [
-				{
-					"name": "Test",
-					"description": "(注释说明)就是整理下常用的注释类型<p/>                    (<p/> 表示换行)等到都熟悉了，就将上面改为private"
 				}
 			]
 		}

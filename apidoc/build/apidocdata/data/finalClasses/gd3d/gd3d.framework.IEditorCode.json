@@ -42,6 +42,8 @@
 		"kind": "interface",
 		"name": "IEditorCode",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\application.ts"
+		"filename": "framework\\application.ts",
+		"description": "editorcode接口",
+		"version": "egret-gd3d 1.0"
 	}
 }

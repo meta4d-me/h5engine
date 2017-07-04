@@ -2,10 +2,25 @@
 	"member": [
 		{
 			"kind": "member",
+			"type": "boolean",
+			"name": "autoplay",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
 			"type": "gd3d.framework.tPoseInfo[]",
 			"name": "bones",
 			"memberof": "gd3d.framework.aniplayer",
 			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "cacheKey",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"rwType": 1
 		},
 		{
 			"kind": "member",
@@ -54,27 +69,19 @@
 		},
 		{
 			"kind": "member",
-			"type": "boolean",
-			"name": "inited",
-			"memberof": "gd3d.framework.aniplayer",
-			"scope": "instance",
-			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "isnoanim",
-			"memberof": "gd3d.framework.aniplayer",
-			"scope": "instance",
-			"default": "true"
-		},
-		{
-			"kind": "member",
 			"type": "{[key:string]:gd3d.framework.PoseBoneMatrix}",
 			"name": "lerppose",
 			"memberof": "gd3d.framework.aniplayer",
 			"scope": "instance",
 			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "mix",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "false"
 		},
 		{
 			"kind": "member",
@@ -143,6 +150,12 @@
 		},
 		{
 			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"type": "void",
 			"name": "fillPoseData",
 			"memberof": "gd3d.framework.aniplayer",
@@ -207,6 +220,32 @@
 		},
 		{
 			"kind": "function",
+			"name": "playByIndex",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"description": "根据动画片段索引播放普通动画",
+			"params": [
+				{
+					"name": "animIndex",
+					"type": "number",
+					"description": "动画片段索引"
+				},
+				{
+					"name": "speed",
+					"type": "number",
+					"default": "1.0",
+					"description": "播放速度"
+				},
+				{
+					"name": "beRevert",
+					"type": "boolean",
+					"default": "false",
+					"description": "是否倒播"
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"name": "playCross",
 			"memberof": "gd3d.framework.aniplayer",
 			"scope": "instance",
@@ -237,33 +276,7 @@
 		},
 		{
 			"kind": "function",
-			"name": "playIndex",
-			"memberof": "gd3d.framework.aniplayer",
-			"scope": "instance",
-			"description": "根据动画片段索引播放普通动画",
-			"params": [
-				{
-					"name": "animIndex",
-					"type": "number",
-					"description": "动画片段索引"
-				},
-				{
-					"name": "speed",
-					"type": "number",
-					"default": "1.0",
-					"description": "播放速度"
-				},
-				{
-					"name": "beRevert",
-					"type": "boolean",
-					"default": "false",
-					"description": "是否倒播"
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "playIndexCross",
+			"name": "playCrossByIndex",
 			"memberof": "gd3d.framework.aniplayer",
 			"scope": "instance",
 			"description": "根据动画片段索引播放动画",

@@ -9,20 +9,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.render.glDrawPass",
-			"name": "curmaterial",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "Uint16Array",
-			"name": "dataForEbo",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "Uint16Array",
 			"name": "dataForEbo",
 			"memberof": "gd3d.render.batchRenderer",
@@ -32,20 +18,6 @@
 			"kind": "member",
 			"type": "Float32Array",
 			"name": "dataForVbo",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "Float32Array",
-			"name": "dataForVbo",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.DrawModeEnum",
-			"name": "drawMode",
 			"memberof": "gd3d.render.batchRenderer",
 			"scope": "instance"
 		},
@@ -66,29 +38,8 @@
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "eboCount",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "gd3d.render.glMesh",
 			"name": "mesh",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.glMesh",
-			"name": "mesh",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "vboCount",
 			"memberof": "gd3d.render.batchRenderer",
 			"scope": "instance"
 		},
@@ -104,7 +55,6 @@
 	"function": [
 		{
 			"kind": "function",
-			"type": "void",
 			"name": "begin",
 			"memberof": "gd3d.render.batchRenderer",
 			"scope": "instance",
@@ -123,25 +73,6 @@
 		},
 		{
 			"kind": "function",
-			"name": "begin",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "mat",
-					"type": "gd3d.render.glDrawPass",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "end",
 			"memberof": "gd3d.render.batchRenderer",
 			"scope": "instance",
@@ -149,43 +80,6 @@
 				{
 					"name": "webgl",
 					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "end",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "initBuffer",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "vf",
-					"type": "gd3d.render.VertexFormatMask",
-					"description": ""
-				},
-				{
-					"name": "drawMode",
-					"type": "gd3d.render.DrawModeEnum",
 					"description": ""
 				}
 			]
@@ -209,30 +103,6 @@
 				{
 					"name": "drawMode",
 					"type": "gd3d.render.DrawModeEnum",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "push",
-			"memberof": "gd3d.render.batchRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "vbodata",
-					"type": "number[]",
-					"description": ""
-				},
-				{
-					"name": "ebodata",
-					"type": "number[]",
 					"description": ""
 				}
 			]

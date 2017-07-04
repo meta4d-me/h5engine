@@ -40,8 +40,23 @@
 		},
 		{
 			"kind": "member",
+			"type": "boolean",
+			"name": "is2dUI",
+			"memberof": "gd3d.framework.canvas",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
 			"type": "gd3d.framework.material",
 			"name": "lastMat",
+			"memberof": "gd3d.framework.canvas",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "parentTrans",
 			"memberof": "gd3d.framework.canvas",
 			"scope": "instance"
 		},

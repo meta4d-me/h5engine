@@ -17,6 +17,12 @@
 		},
 		{
 			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.io.binBuffer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"type": "number",
 			"name": "getBufLength",
 			"memberof": "gd3d.io.binBuffer",
@@ -75,6 +81,12 @@
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "reset",
+			"memberof": "gd3d.io.binBuffer",
+			"scope": "instance"
 		},
 		{
 			"kind": "function",

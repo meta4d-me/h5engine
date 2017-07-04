@@ -11,22 +11,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Add",
-			"memberof": "gd3d.render.BlendModeEnum",
-			"scope": "static",
-			"default": "3"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Add_PreMultiply",
-			"memberof": "gd3d.render.BlendModeEnum",
-			"scope": "static",
-			"default": "4"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "Add_PreMultiply",
 			"memberof": "gd3d.render.BlendModeEnum",
 			"scope": "static",
@@ -43,34 +27,10 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Blend",
-			"memberof": "gd3d.render.BlendModeEnum",
-			"scope": "static",
-			"default": "1"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "Blend_PreMultiply",
 			"memberof": "gd3d.render.BlendModeEnum",
 			"scope": "static",
 			"default": "2"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Blend_PreMultiply",
-			"memberof": "gd3d.render.BlendModeEnum",
-			"scope": "static",
-			"default": "2"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Close",
-			"memberof": "gd3d.render.BlendModeEnum",
-			"scope": "static",
-			"default": "0"
 		},
 		{
 			"kind": "member",

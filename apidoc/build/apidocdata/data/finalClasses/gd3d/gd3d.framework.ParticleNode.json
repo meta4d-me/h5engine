@@ -41,8 +41,21 @@
 		},
 		{
 			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"type": "gd3d.math.vector3",
 			"name": "getValue",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.vector3",
+			"name": "getValueRandom",
 			"memberof": "gd3d.framework.ParticleNode",
 			"scope": "instance"
 		}
@@ -53,7 +66,7 @@
 		"kind": "class",
 		"name": "ParticleNode",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\particlenode.ts",
+		"filename": "framework\\particle\\data\\particlenode.ts",
 		"description": "粒子节点"
 	}
 }

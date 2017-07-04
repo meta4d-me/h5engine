@@ -2,41 +2,38 @@
 	"member": [
 		{
 			"kind": "member",
-			"type": "Array<string>",
-			"name": "dependImgList",
+			"type": "boolean",
+			"name": "beLoop",
 			"memberof": "gd3d.framework.EffectSystemData",
 			"scope": "instance",
-			"default": "new Array<string>()"
+			"default": "false"
 		},
 		{
 			"kind": "member",
-			"type": "Array<string>",
-			"name": "dependShapeList",
+			"type": "gd3d.framework.EffectElementData[]",
+			"name": "elements",
 			"memberof": "gd3d.framework.EffectSystemData",
 			"scope": "instance",
-			"default": "new Array<string>()"
+			"default": "[]"
 		},
 		{
 			"kind": "member",
-			"type": "string",
-			"name": "name",
+			"type": "number",
+			"name": "life",
 			"memberof": "gd3d.framework.EffectSystemData",
-			"scope": "instance",
-			"default": "null"
-		},
-		{
-			"kind": "member",
-			"type": "Array<gd3d.framework.ParticleListData>",
-			"name": "particlelist",
-			"memberof": "gd3d.framework.EffectSystemData",
-			"scope": "instance",
-			"default": "new Array<ParticleListData>()"
+			"scope": "instance"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"name": "EffectSystemData",
+			"name": "clone",
+			"memberof": "gd3d.framework.EffectSystemData",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
 			"memberof": "gd3d.framework.EffectSystemData",
 			"scope": "instance"
 		}
@@ -47,7 +44,6 @@
 		"kind": "class",
 		"name": "EffectSystemData",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\effectsystemdata.ts",
-		"description": "特效系统数据"
+		"filename": "framework\\particle\\data\\effectalldata.ts"
 	}
 }

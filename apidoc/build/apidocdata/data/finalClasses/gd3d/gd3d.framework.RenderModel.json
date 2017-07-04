@@ -6,7 +6,7 @@
 			"name": "BillBoard",
 			"memberof": "gd3d.framework.RenderModel",
 			"scope": "static",
-			"default": "0"
+			"default": "1"
 		},
 		{
 			"kind": "member",
@@ -19,18 +19,26 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "StretchedBillBoardX",
+			"name": "Mesh",
 			"memberof": "gd3d.framework.RenderModel",
 			"scope": "static",
-			"default": "2"
+			"default": "5"
 		},
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "StretchedBillBoardZ",
+			"name": "None",
 			"memberof": "gd3d.framework.RenderModel",
 			"scope": "static",
-			"default": "1"
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "StretchedBillBoard",
+			"memberof": "gd3d.framework.RenderModel",
+			"scope": "static",
+			"default": "2"
 		},
 		{
 			"kind": "member",
@@ -48,6 +56,6 @@
 		"kind": "enum",
 		"name": "RenderModel",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\particlesystemdata.ts"
+		"filename": "framework\\particle\\data\\effectalldata.ts"
 	}
 }

@@ -9,13 +9,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "bottomRadius",
-			"memberof": "gd3d.framework.ParticleStartData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "gd3d.math.vector3",
 			"name": "boxDirection",
 			"memberof": "gd3d.framework.ParticleStartData",
@@ -62,6 +55,14 @@
 		},
 		{
 			"kind": "member",
+			"type": "gd3d.framework.emitfromenum",
+			"name": "emitFrom",
+			"memberof": "gd3d.framework.ParticleStartData",
+			"scope": "instance",
+			"default": "emitfromenum.base"
+		},
+		{
+			"kind": "member",
 			"type": "number",
 			"name": "height",
 			"memberof": "gd3d.framework.ParticleStartData",
@@ -99,17 +100,11 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.math.vector3",
-			"name": "randomPosition",
+			"type": "gd3d.framework.ParticleSystemShape",
+			"name": "shapeType",
 			"memberof": "gd3d.framework.ParticleStartData",
 			"scope": "instance",
-			"default": "new gd3d.math.vector3(0, 0, 0)"
-		},
-		{
-			"kind": "member",
-			"name": "s",
-			"memberof": "gd3d.framework.ParticleStartData",
-			"scope": "instance"
+			"default": "ParticleSystemShape.NORMAL"
 		},
 		{
 			"kind": "member",
@@ -118,14 +113,6 @@
 			"memberof": "gd3d.framework.ParticleStartData",
 			"scope": "instance",
 			"rwType": 1
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.ParticleSystemShape",
-			"name": "type",
-			"memberof": "gd3d.framework.ParticleStartData",
-			"scope": "instance",
-			"default": "ParticleSystemShape.BOX"
 		},
 		{
 			"kind": "member",
@@ -138,7 +125,7 @@
 	"function": [
 		{
 			"kind": "function",
-			"name": "ParticleStartData",
+			"name": "clone",
 			"memberof": "gd3d.framework.ParticleStartData",
 			"scope": "instance"
 		}
@@ -149,7 +136,7 @@
 		"kind": "class",
 		"name": "ParticleStartData",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\particlestartdata.ts",
+		"filename": "framework\\particle\\data\\particlestartdata.ts",
 		"description": "粒子初始数据"
 	}
 }

@@ -10,7 +10,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.framework.texture",
 			"name": "image",
 			"memberof": "gd3d.framework.rawImage2D",
 			"scope": "instance"
@@ -53,6 +52,12 @@
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.rawImage2D",
+			"scope": "instance"
 		},
 		{
 			"kind": "function",

@@ -2,58 +2,280 @@
 	"member": [
 		{
 			"kind": "member",
-			"type": "boolean",
-			"name": "b",
+			"type": "gd3d.framework.ParticleNodeNumber",
+			"name": "alpha",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "透明度相关"
+		},
+		{
+			"kind": "member",
+			"type": "Array<gd3d.framework.ParticleNodeNumber>",
+			"name": "alphaNodes",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance"
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.framework.ParticleEmissionType",
-			"name": "emissionType",
+			"type": "gd3d.framework.ParticleNodeNumber",
+			"name": "alphaSpeed",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance"
 		},
 		{
 			"kind": "member",
 			"type": "boolean",
-			"name": "isover",
+			"name": "beLoop",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance",
 			"default": "false"
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "maxCount",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "color",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "颜色相关"
+		},
+		{
+			"kind": "member",
+			"type": "Array<gd3d.framework.ParticleNode>",
+			"name": "colorNodes",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance"
 		},
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "numcount",
+			"name": "colorRate",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance"
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.framework.CParticleData",
-			"name": "particleData",
-			"memberof": "gd3d.framework.Emission",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "timer",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "colorSpeed",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance"
 		},
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "timespace",
+			"name": "emissionCount",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "发射数量（全类型）"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleEmissionType",
+			"name": "emissionType",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "发射器类型"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "euler",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "旋转相关"
+		},
+		{
+			"kind": "member",
+			"type": "Array<gd3d.framework.ParticleNode>",
+			"name": "eulerNodes",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "eulerSpeed",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "gravity",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "重力"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "life",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "生命周期"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectMatData",
+			"name": "mat",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "材质相关"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "maxEmissionCount",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "最大发射粒子数（全类型）"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.mesh",
+			"name": "mesh",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "moveSpeed",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "沿着本地坐标轴不同方向的速度"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "paricleLoop",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleStartData",
+			"name": "particleStartData",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"default": "new gd3d.framework.ParticleStartData()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "pos",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "位置相关"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderModel",
+			"name": "renderModel",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"default": "RenderModel.None"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "rootRotAngle",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "rootScale",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "rootpos",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "scale",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "缩放相关"
+		},
+		{
+			"kind": "member",
+			"type": "Array<gd3d.framework.ParticleNodeNumber>",
+			"name": "scaleNodes",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "scaleSpeed",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNodeNumber",
+			"name": "simulationSpeed",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "随机方向上的速度"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "singleMeshLoop",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "tilling",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "time",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "发射时间（continue类型时表示持续发射时间，burst时表示延时发射时间）"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleNodeVec2",
+			"name": "uv",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"description": "uv相关"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.UVRoll",
+			"name": "uvRoll",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.UVSprite",
+			"name": "uvSprite",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.UVTypeEnum",
+			"name": "uvType",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance"
 		}
@@ -61,50 +283,55 @@
 	"function": [
 		{
 			"kind": "function",
-			"name": "Emission",
-			"memberof": "gd3d.framework.Emission",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "_type",
-					"type": "gd3d.framework.ParticleEmissionType",
-					"default": "ParticleEmissionType.burst",
-					"description": ""
-				},
-				{
-					"name": "_maxCount",
-					"type": "number",
-					"default": "1",
-					"description": ""
-				},
-				{
-					"name": "_space",
-					"type": "number",
-					"default": "0",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "boolean",
-			"name": "isOver",
+			"name": "clone",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance"
 		},
 		{
 			"kind": "function",
-			"type": "boolean",
-			"name": "update",
+			"name": "cloneParticleNodeArray",
 			"memberof": "gd3d.framework.Emission",
 			"scope": "instance",
 			"params": [
 				{
-					"name": "delta",
+					"name": "_array",
+					"type": "Array<gd3d.framework.ParticleNode>",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "cloneParticleNodeNumberArray",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_array",
+					"type": "Array<gd3d.framework.ParticleNodeNumber>",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "Float32Array",
+			"name": "getVboData",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "vf",
 					"type": "number",
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "getworldRotation",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
 		}
 	],
 	"globalMember": [],
@@ -113,6 +340,6 @@
 		"kind": "class",
 		"name": "Emission",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\particletool\\particleSytem.ts"
+		"filename": "framework\\particle\\data\\particlealldata.ts"
 	}
 }

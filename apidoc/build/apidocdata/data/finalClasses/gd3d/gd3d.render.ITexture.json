@@ -9,29 +9,8 @@
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "height",
-			"memberof": "gd3d.render.ITexture",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "WebGLTexture",
 			"name": "texture",
-			"memberof": "gd3d.render.ITexture",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "WebGLTexture",
-			"name": "texture",
-			"memberof": "gd3d.render.ITexture",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "width",
 			"memberof": "gd3d.render.ITexture",
 			"scope": "instance"
 		},
@@ -43,7 +22,35 @@
 			"scope": "instance"
 		}
 	],
-	"function": [],
+	"function": [
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isFrameBuffer",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		}
+	],
 	"globalMember": [],
 	"globalFunction": [],
 	"class": {

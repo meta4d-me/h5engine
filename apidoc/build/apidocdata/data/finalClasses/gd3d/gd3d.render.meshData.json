@@ -10,20 +10,6 @@
 		{
 			"kind": "member",
 			"type": "gd3d.render.number4[]",
-			"name": "blendIndex",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.number4[]",
-			"name": "blendWeight",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.number4[]",
 			"name": "blendWeight",
 			"memberof": "gd3d.render.meshData",
 			"scope": "instance"
@@ -32,20 +18,6 @@
 			"kind": "member",
 			"type": "gd3d.math.color[]",
 			"name": "color",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.color[]",
-			"name": "color",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.color[]",
-			"name": "colorex",
 			"memberof": "gd3d.render.meshData",
 			"scope": "instance"
 		},
@@ -66,20 +38,6 @@
 		{
 			"kind": "member",
 			"type": "gd3d.math.vector3[]",
-			"name": "normal",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3[]",
-			"name": "pos",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3[]",
 			"name": "pos",
 			"memberof": "gd3d.render.meshData",
 			"scope": "instance"
@@ -88,20 +46,6 @@
 			"kind": "member",
 			"type": "gd3d.math.vector3[]",
 			"name": "tangent",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3[]",
-			"name": "tangent",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number[]",
-			"name": "trisindex",
 			"memberof": "gd3d.render.meshData",
 			"scope": "instance"
 		},
@@ -117,20 +61,6 @@
 			"kind": "member",
 			"type": "gd3d.math.vector2[]",
 			"name": "uv",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector2[]",
-			"name": "uv",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector2[]",
-			"name": "uv2",
 			"memberof": "gd3d.render.meshData",
 			"scope": "instance"
 		},
@@ -165,25 +95,6 @@
 		{
 			"kind": "function",
 			"type": "void",
-			"name": "addQuadPos",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "data",
-					"type": "gd3d.render.meshData",
-					"description": ""
-				},
-				{
-					"name": "quad",
-					"type": "gd3d.math.vector3[]",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "addQuadPos_Quad",
 			"memberof": "gd3d.render.meshData",
 			"scope": "static",
@@ -196,44 +107,6 @@
 				{
 					"name": "quad",
 					"type": "gd3d.math.vector3[]",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "addQuadPos_Quad",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "data",
-					"type": "gd3d.render.meshData",
-					"description": ""
-				},
-				{
-					"name": "quad",
-					"type": "gd3d.math.vector3[]",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "addQuadVec2",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "array",
-					"type": "gd3d.math.vector2[]",
-					"description": ""
-				},
-				{
-					"name": "quad",
-					"type": "gd3d.math.vector2[]",
 					"description": ""
 				}
 			]
@@ -279,44 +152,6 @@
 		{
 			"kind": "function",
 			"type": "void",
-			"name": "addQuadVec3",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "array",
-					"type": "gd3d.math.vector3[]",
-					"description": ""
-				},
-				{
-					"name": "quad",
-					"type": "gd3d.math.vector3[]",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "addQuadVec3ByValue",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "array",
-					"type": "gd3d.math.vector3[]",
-					"description": ""
-				},
-				{
-					"name": "value",
-					"type": "gd3d.math.vector3",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "addQuadVec3ByValue",
 			"memberof": "gd3d.render.meshData",
 			"scope": "static",
@@ -336,16 +171,9 @@
 		{
 			"kind": "function",
 			"type": "number",
-			"name": "calcByteSize",
+			"name": "caclByteLength",
 			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "vf",
-					"type": "gd3d.render.VertexFormatMask",
-					"description": ""
-				}
-			]
+			"scope": "instance"
 		},
 		{
 			"kind": "function",
@@ -365,34 +193,6 @@
 			"kind": "function",
 			"type": "gd3d.render.meshData",
 			"name": "genBoxByArray",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "array",
-					"type": "gd3d.math.vector3[]",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.meshData",
-			"name": "genBoxByArray",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "array",
-					"type": "gd3d.math.vector3[]",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.meshData",
-			"name": "genBoxByArray_Quad",
 			"memberof": "gd3d.render.meshData",
 			"scope": "static",
 			"params": [
@@ -434,20 +234,6 @@
 		{
 			"kind": "function",
 			"type": "gd3d.render.meshData",
-			"name": "genBoxCCW",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "size",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.meshData",
 			"name": "genCircleLineCCW",
 			"memberof": "gd3d.render.meshData",
 			"scope": "static",
@@ -458,33 +244,7 @@
 					"description": ""
 				},
 				{
-					"name": "n",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "wide",
-					"question": true,
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.meshData",
-			"name": "genCircleLineCCW",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "radius",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "n",
+					"name": "segment",
 					"type": "number",
 					"default": "64",
 					"description": ""
@@ -510,27 +270,13 @@
 					"description": ""
 				},
 				{
-					"name": "circler",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.meshData",
-			"name": "genCylinderCCW",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "height",
+					"name": "radius",
 					"type": "number",
 					"description": ""
 				},
 				{
-					"name": "circler",
-					"type": "number",
+					"name": "segment",
+					"default": "20",
 					"description": ""
 				}
 			]
@@ -545,28 +291,7 @@
 		{
 			"kind": "function",
 			"type": "Uint16Array",
-			"name": "genIndexDataArray",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "Uint16Array",
 			"name": "genIndexDataArrayQuad2Line",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "Uint16Array",
-			"name": "genIndexDataArrayQuad2Line",
-			"memberof": "gd3d.render.meshData",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "Uint16Array",
-			"name": "genIndexDataArrayTri2Line",
 			"memberof": "gd3d.render.meshData",
 			"scope": "instance"
 		},
@@ -594,20 +319,6 @@
 		{
 			"kind": "function",
 			"type": "gd3d.render.meshData",
-			"name": "genPlaneCCW",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "size",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.meshData",
 			"name": "genPyramid",
 			"memberof": "gd3d.render.meshData",
 			"scope": "static",
@@ -615,45 +326,10 @@
 				{
 					"name": "height",
 					"type": "number",
-					"default": "2.4",
 					"description": ""
 				},
 				{
-					"name": "width",
-					"type": "number",
-					"default": "1",
-					"description": ""
-				},
-				{
-					"name": "depth",
-					"type": "number",
-					"default": "1",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.meshData",
-			"name": "genPyramid",
-			"memberof": "gd3d.render.meshData",
-			"scope": "static",
-			"params": [
-				{
-					"name": "height",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "width",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "depth",
-					"question": true,
+					"name": "halfsize",
 					"type": "number",
 					"description": ""
 				}
@@ -676,7 +352,7 @@
 		{
 			"kind": "function",
 			"type": "gd3d.render.meshData",
-			"name": "genQuad",
+			"name": "genQuad_forparticle",
 			"memberof": "gd3d.render.meshData",
 			"scope": "static",
 			"params": [
@@ -689,14 +365,27 @@
 		},
 		{
 			"kind": "function",
-			"type": "Float32Array",
-			"name": "genVertexDataArray",
+			"type": "gd3d.render.meshData",
+			"name": "genSphereCCW",
 			"memberof": "gd3d.render.meshData",
-			"scope": "instance",
+			"scope": "static",
 			"params": [
 				{
-					"name": "vf",
-					"type": "gd3d.render.VertexFormatMask",
+					"name": "radius",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				},
+				{
+					"name": "widthSegments",
+					"type": "number",
+					"default": "24",
+					"description": ""
+				},
+				{
+					"name": "heightSegments",
+					"type": "number",
+					"default": "12",
 					"description": ""
 				}
 			]

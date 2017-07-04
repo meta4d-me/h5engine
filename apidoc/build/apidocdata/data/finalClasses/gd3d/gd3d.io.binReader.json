@@ -246,6 +246,31 @@
 		},
 		{
 			"kind": "function",
+			"type": "Uint8Array",
+			"name": "readUint8ArrayByOffset",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "target",
+					"type": "Uint8Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "length",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"type": "number",
 			"name": "readUnsignedInt",
 			"memberof": "gd3d.io.binReader",

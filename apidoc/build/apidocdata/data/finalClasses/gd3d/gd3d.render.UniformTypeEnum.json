@@ -11,31 +11,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Float",
-			"memberof": "gd3d.render.UniformTypeEnum",
-			"scope": "static",
-			"default": "1"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "Float4",
-			"memberof": "gd3d.render.UniformTypeEnum",
-			"scope": "static",
-			"default": "2"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Float4",
-			"memberof": "gd3d.render.UniformTypeEnum",
-			"scope": "static",
-			"default": "2"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Float4v",
 			"memberof": "gd3d.render.UniformTypeEnum",
 			"scope": "static",
 			"default": "3"
@@ -46,28 +22,12 @@
 			"name": "Float4v",
 			"memberof": "gd3d.render.UniformTypeEnum",
 			"scope": "static",
-			"default": "3"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Float4x4",
-			"memberof": "gd3d.render.UniformTypeEnum",
-			"scope": "static",
 			"default": "4"
 		},
 		{
 			"kind": "member",
 			"type": "number",
 			"name": "Float4x4",
-			"memberof": "gd3d.render.UniformTypeEnum",
-			"scope": "static",
-			"default": "4"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Float4x4v",
 			"memberof": "gd3d.render.UniformTypeEnum",
 			"scope": "static",
 			"default": "5"
@@ -78,15 +38,15 @@
 			"name": "Float4x4v",
 			"memberof": "gd3d.render.UniformTypeEnum",
 			"scope": "static",
-			"default": "5"
+			"default": "6"
 		},
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Texture",
+			"name": "Floatv",
 			"memberof": "gd3d.render.UniformTypeEnum",
 			"scope": "static",
-			"default": "0"
+			"default": "2"
 		},
 		{
 			"kind": "member",

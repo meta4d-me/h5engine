@@ -11,22 +11,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "FS",
-			"memberof": "gd3d.render.ShaderTypeEnum",
-			"scope": "static",
-			"default": "1"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "VS",
-			"memberof": "gd3d.render.ShaderTypeEnum",
-			"scope": "static",
-			"default": "0"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "VS",
 			"memberof": "gd3d.render.ShaderTypeEnum",
 			"scope": "static",

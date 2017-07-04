@@ -5,14 +5,18 @@
 			"type": "gd3d.framework.INodeComponent",
 			"name": "comp",
 			"memberof": "gd3d.framework.nodeComponent",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "组件实例",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "boolean",
 			"name": "init",
 			"memberof": "gd3d.framework.nodeComponent",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "是否初始化过",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"function": [
@@ -42,6 +46,8 @@
 		"kind": "class",
 		"name": "nodeComponent",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\scene\\gameobject.ts"
+		"filename": "framework\\scene\\gameobject.ts",
+		"description": "组件接口",
+		"version": "egret-gd3d 1.0"
 	}
 }

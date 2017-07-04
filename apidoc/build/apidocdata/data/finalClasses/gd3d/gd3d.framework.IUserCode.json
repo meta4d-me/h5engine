@@ -42,6 +42,8 @@
 		"kind": "interface",
 		"name": "IUserCode",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\application.ts"
+		"filename": "framework\\application.ts",
+		"description": "usercode接口",
+		"version": "egret-gd3d 1.0"
 	}
 }

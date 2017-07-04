@@ -31,6 +31,6 @@
 		"kind": "class",
 		"name": "AlphaNode",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\particlenode.ts"
+		"filename": "framework\\particle\\data\\particlenode.ts"
 	}
 }

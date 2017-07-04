@@ -64,7 +64,7 @@
 		"kind": "enum",
 		"name": "ParticleSystemShape",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\data\\particlestartdata.ts",
+		"filename": "framework\\particle\\data\\particlestartdata.ts",
 		"description": "粒子初始方向类型"
 	}
 }

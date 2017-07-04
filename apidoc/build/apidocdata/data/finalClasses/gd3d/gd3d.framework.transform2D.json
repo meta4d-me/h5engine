@@ -48,20 +48,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "boolean",
-			"name": "isvisible",
-			"memberof": "gd3d.framework.transform2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"name": "isvisibleInScene",
-			"memberof": "gd3d.framework.transform2D",
-			"scope": "instance",
-			"rwType": 1
-		},
-		{
-			"kind": "member",
 			"type": "number",
 			"name": "localRotate",
 			"memberof": "gd3d.framework.transform2D",
@@ -115,6 +101,27 @@
 			"memberof": "gd3d.framework.transform2D",
 			"scope": "instance",
 			"description": "//待渲染的数据"
+		},
+		{
+			"kind": "member",
+			"name": "transform",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "visible",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "visibleInScene",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"rwType": 1
 		},
 		{
 			"kind": "member",
@@ -215,6 +222,12 @@
 		},
 		{
 			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"type": "gd3d.framework.I2DComponent",
 			"name": "getComponent",
 			"memberof": "gd3d.framework.transform2D",
@@ -233,14 +246,7 @@
 			"name": "getComponents",
 			"memberof": "gd3d.framework.transform2D",
 			"scope": "instance",
-			"description": "//只含自己",
-			"params": [
-				{
-					"name": "type",
-					"type": "string",
-					"description": ""
-				}
-			]
+			"description": "//获取身上所有的组件"
 		},
 		{
 			"kind": "function",
@@ -331,6 +337,18 @@
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "removeAllChild",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "removeAllComponents",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
 		},
 		{
 			"kind": "function",

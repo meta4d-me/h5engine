@@ -5,22 +5,8 @@
 			"type": "gd3d.render.DrawModeEnum",
 			"name": "drawMode",
 			"memberof": "gd3d.render.staticMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.DrawModeEnum",
-			"name": "drawMode",
-			"memberof": "gd3d.render.staticMeshRenderer",
 			"scope": "instance",
 			"default": "DrawModeEnum.EboTri"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "drawbegin",
-			"memberof": "gd3d.render.staticMeshRenderer",
-			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -41,20 +27,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "drawcount",
-			"memberof": "gd3d.render.staticMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "eboIndex",
-			"memberof": "gd3d.render.staticMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "eboIndex",
 			"memberof": "gd3d.render.staticMeshRenderer",
 			"scope": "instance",
@@ -69,20 +41,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.render.glDrawPass",
-			"name": "material",
-			"memberof": "gd3d.render.staticMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.glMesh",
-			"name": "mesh",
-			"memberof": "gd3d.render.staticMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "gd3d.render.glMesh",
 			"name": "mesh",
 			"memberof": "gd3d.render.staticMeshRenderer",
@@ -90,20 +48,6 @@
 		}
 	],
 	"function": [
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "draw",
-			"memberof": "gd3d.render.staticMeshRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
-		},
 		{
 			"kind": "function",
 			"name": "draw",

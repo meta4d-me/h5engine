@@ -16,6 +16,14 @@
 		},
 		{
 			"kind": "member",
+			"type": "{key:string, data}[]",
+			"name": "dataCaches",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "static",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
 			"type": "gd3d.framework.gameObject",
 			"name": "gameObject",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
@@ -38,6 +46,14 @@
 		},
 		{
 			"kind": "member",
+			"type": "number",
+			"name": "maxBoneCount",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
 			"name": "mesh",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance"
@@ -47,7 +63,8 @@
 			"type": "gd3d.framework.aniplayer",
 			"name": "player",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
+			"scope": "instance",
+			"rwType": 1
 		},
 		{
 			"kind": "member",
@@ -62,7 +79,7 @@
 			"name": "renderLayer",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance",
-			"default": "CullingMask.Default"
+			"default": "CullingMask.default"
 		},
 		{
 			"kind": "member",
@@ -85,6 +102,39 @@
 			"name": "skinnedMeshRenderer",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getMatByIndex",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "index",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.pickinfo",
+			"name": "intersects",
+			"memberof": "gd3d.framework.skinnedMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "ray",
+					"type": "gd3d.framework.ray",
+					"description": ""
+				}
+			]
 		},
 		{
 			"kind": "function",
@@ -136,7 +186,7 @@
 		},
 		{
 			"kind": "function",
-			"type": "boolean",
+			"type": "number",
 			"name": "useBoneShader",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance",

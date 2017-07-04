@@ -24,6 +24,6 @@
 		"memberof": "gd3d.framework",
 		"filename": "framework\\asset\\assetmgr.ts",
 		"description": "资源引用计数的结构",
-		"version": "gd3d 1.0"
+		"version": "egret-gd3d 1.0"
 	}
 }

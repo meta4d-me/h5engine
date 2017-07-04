@@ -51,7 +51,7 @@
 			"name": "renderLayer",
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
-			"default": "CullingMask.UI"
+			"default": "CullingMask.default"
 		},
 		{
 			"kind": "member",
@@ -80,6 +80,12 @@
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.canvasRenderer",
+			"scope": "instance"
 		},
 		{
 			"kind": "function",

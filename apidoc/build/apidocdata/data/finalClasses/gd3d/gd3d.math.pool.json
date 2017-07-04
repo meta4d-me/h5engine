@@ -2,20 +2,21 @@
 	"member": [
 		{
 			"kind": "member",
-			"name": "readonly",
+			"type": "gd3d.math.color",
+			"name": "color_one",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
-			"default": "vector2_right"
+			"rwType": 1
 		},
 		{
 			"kind": "member",
-			"name": "vector2",
+			"name": "n",
 			"memberof": "gd3d.math.pool",
 			"scope": "instance"
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.math.vector3",
+			"type": "gd3d.math.vector2",
 			"name": "vector2_right",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
@@ -28,12 +29,6 @@
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
 			"rwType": 1
-		},
-		{
-			"kind": "member",
-			"name": "vector3",
-			"memberof": "gd3d.math.pool",
-			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -74,6 +69,14 @@
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
 			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector4",
+			"name": "vector4_one",
+			"memberof": "gd3d.math.pool",
+			"scope": "static",
+			"rwType": 1
 		}
 	],
 	"function": [
@@ -93,20 +96,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.math.matrix",
-			"name": "clone_matrix",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "src",
-					"type": "gd3d.math.matrix",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"type": "gd3d.math.matrix3x2",
 			"name": "clone_matrix3x2",
 			"memberof": "gd3d.math.pool",
@@ -115,34 +104,6 @@
 				{
 					"name": "src",
 					"type": "gd3d.math.matrix3x2",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.math.matrix3x2",
-			"name": "clone_matrix3x2",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "src",
-					"type": "gd3d.math.matrix3x2",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.math.quaternion",
-			"name": "clone_quaternion",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "src",
-					"type": "gd3d.math.quaternion",
 					"description": ""
 				}
 			]
@@ -177,20 +138,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.math.vector2",
-			"name": "clone_vector2",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "src",
-					"type": "gd3d.math.vector2",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"type": "gd3d.math.vector3",
 			"name": "clone_vector3",
 			"memberof": "gd3d.math.pool",
@@ -205,48 +152,33 @@
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.math.vector3",
-			"name": "clone_vector3",
+			"type": "gd3d.math.vector4",
+			"name": "clone_vector4",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
 			"params": [
 				{
 					"name": "src",
-					"type": "gd3d.math.vector3",
+					"type": "gd3d.math.vector4",
 					"description": ""
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"type": "void",
 			"name": "collect_all",
 			"memberof": "gd3d.math.pool",
 			"scope": "static"
 		},
 		{
 			"kind": "function",
-			"name": "collect_all",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "collect_matrix",
+			"name": "collect_color",
 			"memberof": "gd3d.math.pool",
 			"scope": "static"
 		},
 		{
 			"kind": "function",
 			"name": "collect_matrix",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "collect_matrix3x2",
 			"memberof": "gd3d.math.pool",
 			"scope": "static"
 		},
@@ -264,28 +196,7 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "collect_quaternion",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
 			"name": "collect_vector2",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "collect_vector2",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "collect_vector3",
 			"memberof": "gd3d.math.pool",
 			"scope": "static"
 		},
@@ -297,14 +208,20 @@
 		},
 		{
 			"kind": "function",
+			"name": "collect_vector4",
+			"memberof": "gd3d.math.pool",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
 			"type": "void",
-			"name": "delete_matrix",
+			"name": "delete_color",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
 			"params": [
 				{
 					"name": "v",
-					"type": "gd3d.math.matrix",
+					"type": "gd3d.math.color",
 					"description": ""
 				}
 			]
@@ -340,20 +257,6 @@
 		{
 			"kind": "function",
 			"type": "void",
-			"name": "delete_matrix3x2",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "v",
-					"type": "gd3d.math.matrix3x2",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "delete_quaternion",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
@@ -361,34 +264,6 @@
 				{
 					"name": "v",
 					"type": "gd3d.math.quaternion",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "delete_quaternion",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "v",
-					"type": "gd3d.math.quaternion",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "delete_vector2",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "v",
-					"type": "gd3d.math.vector2",
 					"description": ""
 				}
 			]
@@ -424,20 +299,6 @@
 		{
 			"kind": "function",
 			"type": "void",
-			"name": "delete_vector2Array",
-			"memberof": "gd3d.math.pool",
-			"scope": "static",
-			"params": [
-				{
-					"name": "vs",
-					"type": "gd3d.math.vector2[]",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "delete_vector3",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
@@ -452,21 +313,21 @@
 		{
 			"kind": "function",
 			"type": "void",
-			"name": "delete_vector3",
+			"name": "delete_vector4",
 			"memberof": "gd3d.math.pool",
 			"scope": "static",
 			"params": [
 				{
 					"name": "v",
-					"type": "gd3d.math.vector3",
+					"type": "gd3d.math.vector4",
 					"description": ""
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.math.matrix",
-			"name": "new_matrix",
+			"type": "gd3d.math.color",
+			"name": "new_color",
 			"memberof": "gd3d.math.pool",
 			"scope": "static"
 		},
@@ -486,29 +347,8 @@
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.math.matrix3x2",
-			"name": "new_matrix3x2",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
 			"type": "gd3d.math.quaternion",
 			"name": "new_quaternion",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.math.quaternion",
-			"name": "new_quaternion",
-			"memberof": "gd3d.math.pool",
-			"scope": "static"
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.math.vector2",
-			"name": "new_vector2",
 			"memberof": "gd3d.math.pool",
 			"scope": "static"
 		},
@@ -528,8 +368,8 @@
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.math.vector3",
-			"name": "new_vector3",
+			"type": "gd3d.math.vector4",
+			"name": "new_vector4",
 			"memberof": "gd3d.math.pool",
 			"scope": "static"
 		}

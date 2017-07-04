@@ -2,11 +2,75 @@
 	"member": [
 		{
 			"kind": "member",
+			"type": "string",
+			"name": "drawtype",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector4",
+			"name": "eyePos",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.vector4()"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
+			"name": "floatLightSpotAngleCos",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new Float32Array(8)"
+		},
+		{
+			"kind": "member",
 			"type": "number",
 			"name": "floatTimer",
 			"memberof": "gd3d.framework.renderContext",
 			"scope": "instance",
+			"description": "//matrixNormal: gd3d.math.matrix = new gd3d.math.matrix();",
 			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Fog",
+			"name": "fog",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "intLightCount",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"description": "//最多8灯，再多不管",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.texture",
+			"name": "lightmap",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "null"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector4",
+			"name": "lightmapOffset",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.vector4(1, 1, 0, 0)"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "lightmapUV",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "1"
 		},
 		{
 			"kind": "member",
@@ -58,11 +122,19 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.math.vector4[]",
+			"type": "Float32Array",
+			"name": "vec4LightDir",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new Float32Array(32)"
+		},
+		{
+			"kind": "member",
+			"type": "Float32Array",
 			"name": "vec4LightPos",
 			"memberof": "gd3d.framework.renderContext",
 			"scope": "instance",
-			"default": "[]"
+			"default": "new Float32Array(32)"
 		},
 		{
 			"kind": "member",
@@ -124,6 +196,13 @@
 					"description": ""
 				}
 			]
+		},
+		{
+			"kind": "function",
+			"name": "updateModeTrail",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"description": "//为特效拖尾服务"
 		},
 		{
 			"kind": "function",

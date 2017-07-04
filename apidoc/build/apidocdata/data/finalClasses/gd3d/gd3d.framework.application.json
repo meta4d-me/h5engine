@@ -2,30 +2,6 @@
 	"member": [
 		{
 			"kind": "member",
-			"type": "boolean",
-			"name": "bePause",
-			"memberof": "gd3d.framework.application",
-			"scope": "instance",
-			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "bePlay",
-			"memberof": "gd3d.framework.application",
-			"scope": "instance",
-			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "beStepForward",
-			"memberof": "gd3d.framework.application",
-			"scope": "instance",
-			"default": "false"
-		},
-		{
-			"kind": "member",
 			"type": "HTMLDivElement",
 			"name": "container",
 			"memberof": "gd3d.framework.application",
@@ -34,9 +10,19 @@
 		{
 			"kind": "member",
 			"type": "number",
+			"name": "curcameraindex",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"default": "-1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
 			"name": "height",
 			"memberof": "gd3d.framework.application",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "绘制区域高度 像素单位",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -62,17 +48,39 @@
 		},
 		{
 			"kind": "member",
+			"type": "number",
+			"name": "targetFrame",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "设置固定帧数 不设置即为不限制帧数",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "timeScale",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "设置timescale",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
 			"type": "WebGLRenderingContext",
 			"name": "webgl",
 			"memberof": "gd3d.framework.application",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "全局webgl实例",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "number",
 			"name": "width",
 			"memberof": "gd3d.framework.application",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "绘制区域宽度 像素单位",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"function": [
@@ -81,11 +89,13 @@
 			"name": "addEditorCode",
 			"memberof": "gd3d.framework.application",
 			"scope": "instance",
+			"description": "根据classname添加editorcode",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "classname",
 					"type": "string",
-					"description": ""
+					"description": "editorcode类名"
 				}
 			]
 		},
@@ -94,11 +104,13 @@
 			"name": "addEditorCodeDirect",
 			"memberof": "gd3d.framework.application",
 			"scope": "instance",
+			"description": "直接添加editorcode实例",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "program",
 					"type": "gd3d.framework.IEditorCode",
-					"description": ""
+					"description": "editorcode实例"
 				}
 			]
 		},
@@ -107,11 +119,13 @@
 			"name": "addUserCode",
 			"memberof": "gd3d.framework.application",
 			"scope": "instance",
+			"description": "根据classname添加usercode",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "classname",
 					"type": "string",
-					"description": ""
+					"description": "usercode类名"
 				}
 			]
 		},
@@ -120,59 +134,48 @@
 			"name": "addUserCodeDirect",
 			"memberof": "gd3d.framework.application",
 			"scope": "instance",
+			"description": "直接添加usercode实例",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "program",
 					"type": "gd3d.framework.IUserCode",
-					"description": ""
+					"description": "usercode实例"
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"name": "checkFilter",
+			"name": "closeFps",
 			"memberof": "gd3d.framework.application",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "trans",
-					"type": "any",
-					"description": ""
-				}
-			]
+			"description": "关闭性能参数面板",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "getAssetMgr",
 			"memberof": "gd3d.framework.application",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "number",
-			"name": "getDeltaTime",
-			"memberof": "gd3d.framework.application",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取资源管理器实例",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "getInputMgr",
 			"memberof": "gd3d.framework.application",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取输入管理器实例",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.framework.scene",
 			"name": "getScene",
 			"memberof": "gd3d.framework.application",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "number",
-			"name": "getTotalTime",
-			"memberof": "gd3d.framework.application",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取场景实例",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -196,31 +199,22 @@
 			"kind": "function",
 			"name": "showFps",
 			"memberof": "gd3d.framework.application",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "显示性能参数面板",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "start",
 			"memberof": "gd3d.framework.application",
 			"scope": "instance",
+			"description": "引擎的启动方法",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "div",
 					"type": "HTMLDivElement",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "updateEditorCode",
-			"memberof": "gd3d.framework.application",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "delta",
-					"type": "number",
-					"description": ""
+					"description": "绘制区域的dom"
 				}
 			]
 		}
@@ -231,6 +225,8 @@
 		"kind": "class",
 		"name": "application",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\application.ts"
+		"filename": "framework\\application.ts",
+		"description": "引擎的主入口",
+		"version": "egret-gd3d 1.0"
 	}
 }

@@ -11,10 +11,34 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Gray",
+			"name": "PVRTC2_RGB",
 			"memberof": "gd3d.render.TextureFormatEnum",
 			"scope": "static",
-			"default": "3"
+			"default": "4"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "PVRTC2_RGBA",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "4"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "PVRTC4_RGB",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "4"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "PVRTC4_RGBA",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "4"
 		},
 		{
 			"kind": "member",
@@ -23,22 +47,6 @@
 			"memberof": "gd3d.render.TextureFormatEnum",
 			"scope": "static",
 			"default": "2"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "RGB",
-			"memberof": "gd3d.render.TextureFormatEnum",
-			"scope": "static",
-			"default": "2"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "RGBA",
-			"memberof": "gd3d.render.TextureFormatEnum",
-			"scope": "static",
-			"default": "1"
 		},
 		{
 			"kind": "member",

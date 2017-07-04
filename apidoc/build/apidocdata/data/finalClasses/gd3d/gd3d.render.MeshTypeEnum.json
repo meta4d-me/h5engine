@@ -11,34 +11,10 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "Dynamic",
-			"memberof": "gd3d.render.MeshTypeEnum",
-			"scope": "static",
-			"default": "1"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "Static",
 			"memberof": "gd3d.render.MeshTypeEnum",
 			"scope": "static",
 			"default": "0"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Static",
-			"memberof": "gd3d.render.MeshTypeEnum",
-			"scope": "static",
-			"default": "0"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "Stream",
-			"memberof": "gd3d.render.MeshTypeEnum",
-			"scope": "static",
-			"default": "2"
 		},
 		{
 			"kind": "member",

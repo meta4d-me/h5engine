@@ -9,20 +9,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "Uint8Array",
-			"name": "data",
-			"memberof": "gd3d.render.textureReader",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "gray",
-			"memberof": "gd3d.render.textureReader",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "boolean",
 			"name": "gray",
 			"memberof": "gd3d.render.textureReader",
@@ -32,20 +18,6 @@
 			"kind": "member",
 			"type": "number",
 			"name": "height",
-			"memberof": "gd3d.render.textureReader",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "height",
-			"memberof": "gd3d.render.textureReader",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "width",
 			"memberof": "gd3d.render.textureReader",
 			"scope": "instance"
 		},
@@ -86,61 +58,8 @@
 				},
 				{
 					"name": "gray",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "constructor",
-			"memberof": "gd3d.render.textureReader",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "texRGBA",
-					"type": "WebGLTexture",
-					"description": ""
-				},
-				{
-					"name": "width",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "height",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "gray",
 					"type": "boolean",
 					"default": "true",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "any",
-			"name": "getPixel",
-			"memberof": "gd3d.render.textureReader",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "u",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "v",
-					"type": "number",
 					"description": ""
 				}
 			]

@@ -5,31 +5,21 @@
 			"type": "gd3d.framework.gameObject",
 			"name": "gameObject",
 			"memberof": "gd3d.framework.light",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "挂载的gameobject",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
-			"type": "boolean",
-			"name": "isOpen",
+			"type": "gd3d.framework.LightTypeEnum",
+			"name": "type",
 			"memberof": "gd3d.framework.light",
 			"scope": "instance",
-			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "string",
-			"name": "lightName",
-			"memberof": "gd3d.framework.light",
-			"scope": "instance"
+			"description": "光源类型",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"function": [
-		{
-			"kind": "function",
-			"name": "remove",
-			"memberof": "gd3d.framework.light",
-			"scope": "instance"
-		},
 		{
 			"kind": "function",
 			"name": "start",
@@ -57,7 +47,8 @@
 		"name": "light",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\component\\light.ts",
-		"description": "//灯光",
+		"description": "灯光组件",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.INodeComponent"

@@ -2,8 +2,8 @@
 	"member": [
 		{
 			"kind": "member",
-			"type": "gd3d.render.TextureFormatEnum",
-			"name": "format",
+			"type": "any",
+			"name": "ext",
 			"memberof": "gd3d.render.glTexture2D",
 			"scope": "instance"
 		},
@@ -24,13 +24,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "height",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "boolean",
 			"name": "loaded",
 			"memberof": "gd3d.render.glTexture2D",
@@ -41,16 +34,10 @@
 		{
 			"kind": "member",
 			"type": "boolean",
-			"name": "loaded",
+			"name": "mipmap",
 			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.textureReader",
-			"name": "reader",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance"
+			"scope": "instance",
+			"default": "false"
 		},
 		{
 			"kind": "member",
@@ -69,20 +56,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "WebGLTexture",
-			"name": "texture",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "WebGLRenderingContext",
-			"name": "webgl",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "WebGLRenderingContext",
 			"name": "webgl",
 			"memberof": "gd3d.render.glTexture2D",
@@ -95,50 +68,12 @@
 			"memberof": "gd3d.render.glTexture2D",
 			"scope": "instance",
 			"default": "0"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "width",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
 			"name": "glTexture2D",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "format",
-					"question": true,
-					"type": "gd3d.render.TextureFormatEnum",
-					"description": ""
-				},
-				{
-					"name": "mipmap",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "linear",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "constructor",
 			"memberof": "gd3d.render.glTexture2D",
 			"scope": "instance",
 			"params": [
@@ -169,17 +104,10 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "dispose",
+			"type": "number",
+			"name": "caclByteLength",
 			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
+			"scope": "instance"
 		},
 		{
 			"kind": "function",
@@ -197,7 +125,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.render.glTexture2D",
 			"name": "formGrayArray",
 			"memberof": "gd3d.render.glTexture2D",
 			"scope": "static",
@@ -220,49 +147,6 @@
 				{
 					"name": "height",
 					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "formGrayArray",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "static",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "array",
-					"type": "number[]|Float32Array|Float64Array",
-					"description": ""
-				},
-				{
-					"name": "width",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "height",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.render.textureReader",
-			"name": "getReader",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "redOnly",
-					"question": true,
-					"type": "boolean",
 					"description": ""
 				}
 			]
@@ -284,25 +168,13 @@
 		},
 		{
 			"kind": "function",
-			"name": "staticTexture",
+			"type": "boolean",
+			"name": "isFrameBuffer",
 			"memberof": "gd3d.render.glTexture2D",
-			"scope": "static",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				}
-			]
+			"scope": "instance"
 		},
 		{
 			"kind": "function",
-			"type": "gd3d.render.glTexture2D",
 			"name": "staticTexture",
 			"memberof": "gd3d.render.glTexture2D",
 			"scope": "static",
@@ -367,106 +239,6 @@
 					"name": "mirroredV",
 					"type": "boolean",
 					"default": "false",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "uploadByteArray",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "mipmap",
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "linear",
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "width",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "height",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "data",
-					"type": "Uint8Array",
-					"description": ""
-				},
-				{
-					"name": "repeat",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "mirroredU",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "mirroredV",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "uploadImage",
-			"memberof": "gd3d.render.glTexture2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "img",
-					"type": "HTMLImageElement",
-					"description": ""
-				},
-				{
-					"name": "mipmap",
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "linear",
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "premultiply",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "repeat",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "mirroredU",
-					"question": true,
-					"type": "boolean",
-					"description": ""
-				},
-				{
-					"name": "mirroredV",
-					"question": true,
-					"type": "boolean",
 					"description": ""
 				}
 			]

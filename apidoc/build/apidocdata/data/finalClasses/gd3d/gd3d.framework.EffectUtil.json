@@ -51,6 +51,24 @@
 		},
 		{
 			"kind": "function",
+			"name": "bindAxisBillboard",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "localAxis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "out",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
 			"name": "lookat",
 			"memberof": "gd3d.framework.EffectUtil",
 			"scope": "static",
@@ -103,6 +121,142 @@
 					"name": "up",
 					"type": "gd3d.math.vector3",
 					"default": "gd3d.math.pool.vector3_up",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "lookatbyXAxis",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "pos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "xAxis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "yAxis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "zAxis",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "targetpos",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "quat",
+					"type": "gd3d.math.quaternion",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.ParticleNodeNumber",
+			"name": "parseEffectNum",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.ParticleNodeNumber",
+			"name": "parseEffectNumNode",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.UVSpeedNode",
+			"name": "parseEffectUVSpeed",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.ValueData",
+			"name": "parseEffectValueData",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.ParticleNodeVec2",
+			"name": "parseEffectVec2",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.ParticleNode",
+			"name": "parseEffectVec3",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.vector3",
+			"name": "parseVector3",
+			"memberof": "gd3d.framework.EffectUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "value",
+					"type": "any",
 					"description": ""
 				}
 			]
@@ -193,6 +347,6 @@
 		"kind": "class",
 		"name": "EffectUtil",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\particle\\particletool\\effectutil.ts"
+		"filename": "framework\\particle\\particletool\\effectutil.ts"
 	}
 }

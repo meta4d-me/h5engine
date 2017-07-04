@@ -1,7 +1,7 @@
 {
 	"globalFunction": [
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "PropertyDescriptor",
 			"name": "decorate",
@@ -34,7 +34,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "void",
 			"name": "defineMetadata",
@@ -66,7 +66,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "boolean",
 			"name": "deleteMetadata",
@@ -94,7 +94,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "any",
 			"name": "getMetadata",
@@ -122,7 +122,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "any[]",
 			"name": "getMetadataKeys",
@@ -145,7 +145,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "any",
 			"name": "getOwnMetadata",
@@ -173,7 +173,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "any[]",
 			"name": "getOwnMetadataKeys",
@@ -196,7 +196,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "boolean",
 			"name": "hasMetadata",
@@ -224,7 +224,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "boolean",
 			"name": "hasOwnMetadata",
@@ -252,7 +252,7 @@
 			]
 		},
 		{
-			"filename": "..\\proj_sample\\scene_test\\lib\\Reflect.d.ts",
+			"filename": "..\\gd3d_engine\\lib\\Reflect.d.ts",
 			"kind": "globalFunction",
 			"type": "{(target:Function):void;(target:Object,targetKey:string|symbol):void;}",
 			"name": "metadata",

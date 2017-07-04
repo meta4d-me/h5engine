@@ -6,15 +6,9 @@
 			"name": "defaultAsset",
 			"memberof": "gd3d.framework.shader",
 			"scope": "instance",
+			"description": "是否为默认资源",
+			"version": "egret-gd3d 1.0",
 			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "{[key:string]:any}",
-			"name": "defaultValue",
-			"memberof": "gd3d.framework.shader",
-			"scope": "instance",
-			"default": "{}"
 		},
 		{
 			"kind": "member",
@@ -22,34 +16,30 @@
 			"name": "layer",
 			"memberof": "gd3d.framework.shader",
 			"scope": "instance",
+			"description": "设置渲染的层级",
+			"version": "egret-gd3d 1.0",
 			"default": "RenderLayerEnum.Common"
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.render.glDrawPass[]",
-			"name": "passes_Base",
-			"memberof": "gd3d.framework.shader",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "queue",
+			"type": "{[id:string]:gd3d.render.glDrawPass[]}",
+			"name": "passes",
 			"memberof": "gd3d.framework.shader",
 			"scope": "instance",
-			"default": "0"
+			"default": "{}"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"name": "dispose",
+			"name": "shader",
 			"memberof": "gd3d.framework.shader",
 			"scope": "instance",
 			"params": [
 				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
+					"name": "assetName",
+					"type": "string",
+					"default": "null",
 					"description": ""
 				}
 			]
@@ -57,22 +47,45 @@
 		{
 			"kind": "function",
 			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"description": "计算资源字节大小",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"description": "释放资源",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "number",
 			"name": "getGUID",
 			"memberof": "gd3d.framework.shader",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取资源唯一id",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "string",
 			"name": "getName",
 			"memberof": "gd3d.framework.shader",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取资源名称",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "parse",
 			"memberof": "gd3d.framework.shader",
 			"scope": "instance",
+			"description": "解析资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "assetmgr",
@@ -88,41 +101,27 @@
 		},
 		{
 			"kind": "function",
-			"name": "setAssetMgr",
-			"memberof": "gd3d.framework.shader",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "setName",
-			"memberof": "gd3d.framework.shader",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"name": "unuse",
 			"memberof": "gd3d.framework.shader",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数减一",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "disposeNow",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
 		},
 		{
 			"kind": "function",
 			"name": "use",
 			"memberof": "gd3d.framework.shader",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "引用计数加一",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"globalMember": [],
@@ -132,6 +131,8 @@
 		"name": "shader",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\asset\\resource\\shader.ts",
+		"description": "shader资源",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IAsset"

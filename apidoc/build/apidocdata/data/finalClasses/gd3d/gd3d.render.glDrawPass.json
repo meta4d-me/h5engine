@@ -9,13 +9,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.render.glProgram",
-			"name": "program",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "boolean",
 			"name": "state_blend",
 			"memberof": "gd3d.render.glDrawPass",
@@ -24,20 +17,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "boolean",
-			"name": "state_blend",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "state_blendDestALpha",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "number",
 			"name": "state_blendDestALpha",
 			"memberof": "gd3d.render.glDrawPass",
@@ -51,20 +30,6 @@
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
 			"default": "0"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "state_blendDestRGB",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "state_blendEquation",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -85,20 +50,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "state_blendSrcAlpha",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "state_blendSrcRGB",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "state_blendSrcRGB",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -106,25 +57,11 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.render.CullStateEnum",
-			"name": "state_cull",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.CullStateEnum",
-			"name": "state_cull",
+			"type": "gd3d.render.ShowFaceStateEnum",
+			"name": "state_showface",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
-			"default": "CullStateEnum.CCW"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "state_ztest",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
+			"default": "ShowFaceStateEnum.CCW"
 		},
 		{
 			"kind": "member",
@@ -144,32 +81,11 @@
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "state_ztest_method",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "boolean",
 			"name": "state_zwrite",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
 			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "state_zwrite",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number[]",
-			"name": "textureID",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "static"
 		},
 		{
 			"kind": "member",
@@ -184,22 +100,8 @@
 			"type": "boolean",
 			"name": "uniformallchange",
 			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "uniformallchange",
-			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
 			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "{[id:string]:{change:boolean;location:WebGLUniformLocation;type:gd3d.render.UniformTypeEnum;value:any;};}",
-			"name": "uniforms",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -213,7 +115,6 @@
 	"function": [
 		{
 			"kind": "function",
-			"type": "void",
 			"name": "applyUniformSaved",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -227,43 +128,6 @@
 		},
 		{
 			"kind": "function",
-			"name": "applyUniformSaved",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "applyUniform_Float",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "key",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "value",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "applyUniform_Float",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -310,54 +174,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "applyUniform_Float4",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "key",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "value",
-					"type": "gd3d.math.vector4",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "applyUniform_Float4v",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "key",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "values",
-					"type": "Float32Array",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "applyUniform_Float4v",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -404,54 +220,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "applyUniform_Float4x4",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "key",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "value",
-					"type": "gd3d.math.matrix",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "applyUniform_Float4x4v",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "key",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "values",
-					"type": "Float32Array",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "applyUniform_Float4x4v",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -503,19 +271,13 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "applyUniform_FloatTexture",
+			"name": "applyUniform_Floatv",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
 			"params": [
 				{
 					"name": "webgl",
 					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "texindex",
-					"type": "number",
 					"description": ""
 				},
 				{
@@ -525,50 +287,7 @@
 				},
 				{
 					"name": "value",
-					"type": "gd3d.render.ITexture",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "draw",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "mesh",
-					"type": "gd3d.render.glMesh",
-					"description": ""
-				},
-				{
-					"name": "drawmode",
-					"question": true,
-					"type": "gd3d.render.DrawModeEnum",
-					"description": ""
-				},
-				{
-					"name": "drawindexindex",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "drawbegin",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "drawcount",
-					"question": true,
-					"type": "number",
+					"type": "Float32Array",
 					"description": ""
 				}
 			]
@@ -617,7 +336,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
 			"name": "setAlphaBlend",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -625,39 +343,6 @@
 				{
 					"name": "mode",
 					"type": "gd3d.render.BlendModeEnum",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "setAlphaBlend",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "mode",
-					"type": "gd3d.render.BlendModeEnum",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "setProgram",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "program",
-					"type": "gd3d.render.glProgram",
-					"description": ""
-				},
-				{
-					"name": "uniformDefault",
-					"question": true,
-					"type": "boolean",
 					"description": ""
 				}
 			]
@@ -683,25 +368,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "uniformFloat",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "number",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"name": "uniformFloat",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -721,7 +387,7 @@
 		},
 		{
 			"kind": "function",
-			"name": "uniformMatrix",
+			"name": "uniformFloatv",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
 			"params": [
@@ -731,15 +397,14 @@
 					"description": ""
 				},
 				{
-					"name": "mat",
-					"type": "gd3d.math.matrix",
+					"name": "numbers",
+					"type": "Float32Array",
 					"description": ""
 				}
 			]
 		},
 		{
 			"kind": "function",
-			"type": "void",
 			"name": "uniformMatrix",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -776,44 +441,6 @@
 		},
 		{
 			"kind": "function",
-			"type": "void",
-			"name": "uniformMatrixV",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "matdata",
-					"type": "Float32Array",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "uniformTexture",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "tex",
-					"type": "gd3d.render.ITexture",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"name": "uniformTexture",
 			"memberof": "gd3d.render.glDrawPass",
 			"scope": "instance",
@@ -844,44 +471,6 @@
 				{
 					"name": "vec",
 					"type": "gd3d.math.vector4",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "uniformVec4",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "vec",
-					"type": "gd3d.math.vector4",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "uniformVec4v",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "name",
-					"type": "string",
-					"description": ""
-				},
-				{
-					"name": "vecdata",
-					"type": "Float32Array",
 					"description": ""
 				}
 			]
@@ -920,26 +509,6 @@
 					"name": "applyUniForm",
 					"type": "boolean",
 					"default": "true",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "use",
-			"memberof": "gd3d.render.glDrawPass",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				},
-				{
-					"name": "applyUniForm",
-					"question": true,
-					"type": "boolean",
 					"description": ""
 				}
 			]

@@ -80,6 +80,12 @@
 		},
 		{
 			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"name": "render",
 			"memberof": "gd3d.framework.image2D",
 			"scope": "instance",

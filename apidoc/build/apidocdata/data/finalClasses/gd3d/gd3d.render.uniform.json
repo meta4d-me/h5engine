@@ -9,29 +9,8 @@
 		},
 		{
 			"kind": "member",
-			"type": "WebGLUniformLocation",
-			"name": "location",
-			"memberof": "gd3d.render.uniform",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "string",
 			"name": "name",
-			"memberof": "gd3d.render.uniform",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "string",
-			"name": "name",
-			"memberof": "gd3d.render.uniform",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.UniformTypeEnum",
-			"name": "type",
 			"memberof": "gd3d.render.uniform",
 			"scope": "instance"
 		},

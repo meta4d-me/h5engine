@@ -5,13 +5,6 @@
 			"type": "gd3d.math.color",
 			"name": "backColor",
 			"memberof": "gd3d.render.glWindow",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.color",
-			"name": "backColor",
-			"memberof": "gd3d.render.glWindow",
 			"scope": "instance",
 			"default": "new gd3d.math.color(1, 0, 1, 1)"
 		},
@@ -20,22 +13,8 @@
 			"type": "boolean",
 			"name": "clearop_Color",
 			"memberof": "gd3d.render.glWindow",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "clearop_Color",
-			"memberof": "gd3d.render.glWindow",
 			"scope": "instance",
 			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "clearop_Depth",
-			"memberof": "gd3d.render.glWindow",
-			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -50,13 +29,6 @@
 			"type": "boolean",
 			"name": "clearop_Stencil",
 			"memberof": "gd3d.render.glWindow",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "clearop_Stencil",
-			"memberof": "gd3d.render.glWindow",
 			"scope": "instance",
 			"default": "false"
 		},
@@ -64,20 +36,6 @@
 			"kind": "member",
 			"type": "gd3d.render.glRenderTarget",
 			"name": "renderTarget",
-			"memberof": "gd3d.render.glWindow",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.glRenderTarget",
-			"name": "renderTarget",
-			"memberof": "gd3d.render.glWindow",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.rect",
-			"name": "viewport",
 			"memberof": "gd3d.render.glWindow",
 			"scope": "instance"
 		},
@@ -91,20 +49,6 @@
 		}
 	],
 	"function": [
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "use",
-			"memberof": "gd3d.render.glWindow",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
-		},
 		{
 			"kind": "function",
 			"name": "use",

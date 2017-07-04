@@ -31,6 +31,14 @@
 		},
 		{
 			"kind": "member",
+			"type": "boolean",
+			"name": "init",
+			"memberof": "gd3d.framework.overlay2D",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
 			"type": "gd3d.framework.inputMgr",
 			"name": "inputmgr",
 			"memberof": "gd3d.framework.overlay2D",
@@ -42,7 +50,7 @@
 			"name": "renderLayer",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
-			"default": "CullingMask.UI"
+			"default": "CullingMask.ui"
 		}
 	],
 	"function": [

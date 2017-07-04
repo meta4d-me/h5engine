@@ -10,20 +10,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "b",
-			"memberof": "gd3d.math.border",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "l",
-			"memberof": "gd3d.math.border",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "l",
 			"memberof": "gd3d.math.border",
 			"scope": "instance"
@@ -32,20 +18,6 @@
 			"kind": "member",
 			"type": "number",
 			"name": "r",
-			"memberof": "gd3d.math.border",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "r",
-			"memberof": "gd3d.math.border",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "t",
 			"memberof": "gd3d.math.border",
 			"scope": "instance"
 		},
@@ -61,38 +33,6 @@
 		{
 			"kind": "function",
 			"name": "border",
-			"memberof": "gd3d.math.border",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "l",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "t",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "r",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "b",
-					"question": true,
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "constructor",
 			"memberof": "gd3d.math.border",
 			"scope": "instance",
 			"params": [

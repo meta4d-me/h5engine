@@ -6,33 +6,12 @@
 			"name": "rawData",
 			"memberof": "gd3d.math.matrix3x2",
 			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "Float32Array",
-			"name": "rawData",
-			"memberof": "gd3d.math.matrix3x2",
-			"scope": "instance"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
 			"name": "matrix3x2",
-			"memberof": "gd3d.math.matrix3x2",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "datas",
-					"question": true,
-					"type": "Float32Array",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "constructor",
 			"memberof": "gd3d.math.matrix3x2",
 			"scope": "instance",
 			"params": [

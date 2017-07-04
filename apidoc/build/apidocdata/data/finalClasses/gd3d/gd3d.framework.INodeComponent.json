@@ -11,6 +11,12 @@
 	"function": [
 		{
 			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.INodeComponent",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
 			"name": "remove",
 			"memberof": "gd3d.framework.INodeComponent",
 			"scope": "instance"
@@ -42,6 +48,8 @@
 		"name": "INodeComponent",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\scene\\gameobject.ts",
+		"description": "组件实例接口",
+		"version": "egret-gd3d 1.0",
 		"children": [
 			"gd3d.framework.IRenderer"
 		]

@@ -10,28 +10,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "x",
-			"memberof": "gd3d.math.vector3",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "y",
-			"memberof": "gd3d.math.vector3",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "y",
-			"memberof": "gd3d.math.vector3",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "z",
 			"memberof": "gd3d.math.vector3",
 			"scope": "instance"
 		},
@@ -47,32 +26,6 @@
 		{
 			"kind": "function",
 			"name": "vector3",
-			"memberof": "gd3d.math.vector3",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "x",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "y",
-					"question": true,
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "z",
-					"question": true,
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "constructor",
 			"memberof": "gd3d.math.vector3",
 			"scope": "instance",
 			"params": [

@@ -9,20 +9,6 @@
 		},
 		{
 			"kind": "member",
-			"type": "gd3d.render.glShader",
-			"name": "fs",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "{[id:string]:gd3d.render.uniform;}",
-			"name": "mapUniform",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "{[id:string]:gd3d.render.uniform}",
 			"name": "mapUniform",
 			"memberof": "gd3d.render.glProgram",
@@ -37,20 +23,6 @@
 			"memberof": "gd3d.render.glProgram",
 			"scope": "instance",
 			"default": "-1"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "posBlendIndex4",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "posBlendWeight4",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -72,29 +44,7 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "posColor",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "posColorEx",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance",
-			"default": "-1"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "posColorEx",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "posNormal",
 			"memberof": "gd3d.render.glProgram",
 			"scope": "instance",
 			"default": "-1"
@@ -104,7 +54,8 @@
 			"type": "number",
 			"name": "posNormal",
 			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
+			"scope": "instance",
+			"default": "-1"
 		},
 		{
 			"kind": "member",
@@ -118,24 +69,10 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "posPos",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "posTangent",
 			"memberof": "gd3d.render.glProgram",
 			"scope": "instance",
 			"default": "-1"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "posTangent",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
 		},
 		{
 			"kind": "member",
@@ -148,13 +85,6 @@
 		{
 			"kind": "member",
 			"type": "number",
-			"name": "posUV0",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
 			"name": "posUV2",
 			"memberof": "gd3d.render.glProgram",
 			"scope": "instance",
@@ -162,29 +92,8 @@
 		},
 		{
 			"kind": "member",
-			"type": "number",
-			"name": "posUV2",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "WebGLProgram",
 			"name": "program",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "WebGLProgram",
-			"name": "program",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.glShader",
-			"name": "vs",
 			"memberof": "gd3d.render.glProgram",
 			"scope": "instance"
 		},
@@ -223,58 +132,7 @@
 		},
 		{
 			"kind": "function",
-			"name": "constructor",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "vs",
-					"type": "gd3d.render.glShader",
-					"description": ""
-				},
-				{
-					"name": "fs",
-					"type": "gd3d.render.glShader",
-					"description": ""
-				},
-				{
-					"name": "program",
-					"type": "WebGLProgram",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
 			"name": "initAttribute",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "initAttribute",
-			"memberof": "gd3d.render.glProgram",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "webgl",
-					"type": "WebGLRenderingContext",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "void",
-			"name": "use",
 			"memberof": "gd3d.render.glProgram",
 			"scope": "instance",
 			"params": [

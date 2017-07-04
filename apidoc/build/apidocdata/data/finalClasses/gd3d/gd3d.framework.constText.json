@@ -28,6 +28,8 @@
 		"kind": "class",
 		"name": "constText",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\asset\\asset.ts"
+		"filename": "framework\\asset\\asset.ts",
+		"description": "静态text 初始化后不可修改",
+		"version": "egret-gd3d 1.0"
 	}
 }
