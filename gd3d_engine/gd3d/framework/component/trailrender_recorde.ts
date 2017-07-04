@@ -1,5 +1,12 @@
 namespace gd3d.framework
 {
+     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 拖尾组件，废弃
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeRender
     @reflect.nodeComponent
     export class trailRender_recorde implements IRenderer

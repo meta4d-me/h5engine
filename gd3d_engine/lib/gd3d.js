@@ -49,13 +49,23 @@ var gd3d;
                 this._bePause = false;
                 this._beStepForward = false;
             }
+            Object.defineProperty(application.prototype, "timeScale", {
+                get: function () {
+                    return this._timeScale;
+                },
+                set: function (val) {
+                    this._timeScale = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(application.prototype, "targetFrame", {
                 get: function () {
                     return this._tar;
                 },
                 set: function (val) {
-                    if (val < 0.01)
-                        return;
+                    if (val == 0)
+                        val = -1;
                     this._tar = val;
                     this._standDeltaTime = 1 / this._tar;
                 },
@@ -75,7 +85,7 @@ var gd3d;
                     meta = metas[0];
                 meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
                 framework.sceneMgr.app = this;
-                this.timeScale = 1;
+                this._timeScale = 1;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 canvas.className = "full";
@@ -177,7 +187,7 @@ var gd3d;
             };
             Object.defineProperty(application.prototype, "deltaTime", {
                 get: function () {
-                    return this._deltaTime * this.timeScale;
+                    return this._deltaTime * this._timeScale;
                 },
                 enumerable: true,
                 configurable: true
@@ -9469,6 +9479,7 @@ var gd3d;
                 }
             };
             meshRenderer.prototype.remove = function () {
+                this.materials.length = 0;
             };
             meshRenderer.prototype.clone = function () {
             };
@@ -10322,8 +10333,6 @@ var gd3d;
                 }
                 this.updateTrailData();
             };
-            trailRender.prototype.remove = function () {
-            };
             Object.defineProperty(trailRender.prototype, "material", {
                 get: function () {
                     if (this._material != undefined) {
@@ -10486,6 +10495,8 @@ var gd3d;
                 }
             };
             trailRender.prototype.clone = function () {
+            };
+            trailRender.prototype.remove = function () {
             };
             return trailRender;
         }());
@@ -13767,25 +13778,28 @@ var gd3d;
             math.quatNormalize(out, out);
         }
         math.quatLookat = quatLookat;
-        function quat2Lookat(pos, targetpos, out) {
+        function quat2Lookat(pos, targetpos, out, updir) {
+            if (updir === void 0) { updir = gd3d.math.pool.vector3_up; }
             var dir = gd3d.math.pool.new_vector3();
             math.vec3Subtract(targetpos, pos, dir);
             math.vec3Normalize(dir, dir);
             var dot = gd3d.math.vec3Dot(gd3d.math.pool.vector3_forward, dir);
-            if (Math.abs(dot - (-1.0)) < 0.000001) {
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 180, out);
-                return;
-            }
-            if (Math.abs(dot - 1.0) < 0.000001) {
+            dot = gd3d.math.floatClamp(dot, -1, 1);
+            var rotangle = Math.acos(dot) * 180 / Math.PI;
+            if (rotangle < 0.01) {
                 out.x = 0;
                 out.y = 0;
                 out.z = 0;
                 out.w = 1;
+                return;
             }
-            dot = gd3d.math.floatClamp(dot, -1, 1);
-            var rotangle = Math.acos(dot);
+            if (rotangle > 179.9) {
+                gd3d.math.quatFromAxisAngle(updir, 180, out);
+                return;
+            }
             var rotAxis = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Cross(gd3d.math.pool.vector3_forward, dir, rotAxis);
+            gd3d.math.vec3Normalize(rotAxis, rotAxis);
             gd3d.math.quatFromAxisAngle(rotAxis, rotangle, out);
         }
         math.quat2Lookat = quat2Lookat;
@@ -14314,11 +14328,11 @@ var gd3d;
                     var outVal = void 0;
                     if (fromVal instanceof gd3d.math.vector3) {
                         outVal = new gd3d.math.vector3();
-                        gd3d.math.vec3SLerp(fromVal, toVal, i / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec3SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
                     }
                     else if (fromVal instanceof gd3d.math.vector2) {
                         outVal = new gd3d.math.vector2();
-                        gd3d.math.vec2SLerp(fromVal, toVal, i / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec2SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
                     }
                     else if (typeof (fromVal) === 'number') {
                         outVal = gd3d.math.numberLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame));
@@ -15165,14 +15179,6 @@ var gd3d;
                 this._radius = 0;
                 this._angle = 0;
                 this.emitFrom = emitfromenum.base;
-                this.randomPosition = new gd3d.math.vector3(0, 0, 0);
-                this._randomDirection = new gd3d.math.vector3(0, 1, 0);
-                this._boxDirection = new gd3d.math.vector3(0, 1, 0);
-                this._sphereDirection = new gd3d.math.vector3(0, 1, 0);
-                this._hemisphereDirection = new gd3d.math.vector3(0, 1, 0);
-                this._coneDirection = new gd3d.math.vector3(0, 1, 0);
-                this._circleDirection = new gd3d.math.vector3(0, 0, 1);
-                this._edgeDirection = new gd3d.math.vector3(0, 1, 0);
             }
             Object.defineProperty(ParticleStartData.prototype, "position", {
                 get: function () {
@@ -15238,42 +15244,30 @@ var gd3d;
                 get: function () {
                     switch (this.shapeType) {
                         case ParticleSystemShape.BOX:
-                            gd3d.math.vec3Clone(this.boxDirection, this._randomDirection);
-                            break;
+                            return this.boxDirection;
                         case ParticleSystemShape.SPHERE:
-                            gd3d.math.vec3Clone(this.sphereDirection, this._randomDirection);
-                            break;
+                            return this.sphereDirection;
                         case ParticleSystemShape.HEMISPHERE:
-                            gd3d.math.vec3Clone(this.hemisphereDirection, this._randomDirection);
-                            break;
+                            return this.hemisphereDirection;
                         case ParticleSystemShape.CONE:
-                            gd3d.math.vec3Clone(this.coneDirection, this._randomDirection);
-                            break;
+                            return this.coneDirection;
                         case ParticleSystemShape.CIRCLE:
-                            gd3d.math.vec3Clone(this.circleDirection, this._randomDirection);
-                            break;
+                            return this.circleDirection;
                         case ParticleSystemShape.EDGE:
-                            gd3d.math.vec3Clone(this.edgeDirection, this._randomDirection);
-                            break;
+                            return this.edgeDirection;
                         default:
-                            gd3d.math.vec3Clone(this.direction, this._randomDirection);
-                            break;
+                            return this.direction;
                     }
-                    gd3d.math.vec3Normalize(this._randomDirection, this._randomDirection);
-                    return this._randomDirection;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "boxDirection", {
                 get: function () {
-                    var boxpos = new gd3d.math.vector3(0, 0, 0);
-                    boxpos.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
-                    boxpos.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
-                    boxpos.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
-                    var length = gd3d.math.vec3Length(boxpos);
-                    gd3d.math.vec3Normalize(boxpos, this.direction);
-                    this.getRandomPosition(boxpos, length);
+                    this.position.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
+                    this.position.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
+                    this.position.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
+                    gd3d.math.vec3Normalize(this.position, this.direction);
                     return this.direction;
                 },
                 enumerable: true,
@@ -15281,31 +15275,28 @@ var gd3d;
             });
             Object.defineProperty(ParticleStartData.prototype, "sphereDirection", {
                 get: function () {
-                    var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    var θ = framework.ValueData.RandomRange(0, Math.PI);
-                    var φ = framework.ValueData.RandomRange(-Math.PI, Math.PI);
-                    this._sphereDirection.x = _radius * Math.sin(θ) * Math.cos(φ);
-                    this._sphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-                    this._sphereDirection.z = _radius * Math.cos(θ);
-                    gd3d.math.vec3Normalize(this._sphereDirection, this._sphereDirection);
-                    this.getRandomPosition(this._sphereDirection, _radius);
-                    return this._sphereDirection;
+                    var θ = Math.random() * Math.PI * 2;
+                    var φ = Math.random() * Math.PI;
+                    var radius = Math.random() * this.radius;
+                    this.direction.x = Math.sin(φ) * Math.cos(θ);
+                    this.direction.y = Math.cos(φ);
+                    this.direction.z = Math.sin(φ) * Math.sin(θ);
+                    gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "hemisphereDirection", {
                 get: function () {
-                    var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    var θ = framework.ValueData.RandomRange(0, Math.PI / 2);
-                    var φ = framework.ValueData.RandomRange(-Math.PI, Math.PI);
-                    this._hemisphereDirection.z = _radius * Math.cos(θ);
-                    this._hemisphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-                    this._hemisphereDirection.x = _radius * Math.sin(θ) * Math.cos(φ);
-                    gd3d.math.vec3Normalize(this._hemisphereDirection, this._hemisphereDirection);
-                    framework.EffectUtil.RotateVector3(this._hemisphereDirection, this.direction, this._hemisphereDirection);
-                    this.getRandomPosition(this._hemisphereDirection, _radius);
-                    return this._hemisphereDirection;
+                    var θ = Math.random() * Math.PI * 2;
+                    var φ = Math.random() * Math.PI * 0.5;
+                    var radius = Math.random() * this.radius;
+                    this.direction.x = Math.sin(φ) * Math.cos(θ);
+                    this.direction.y = Math.cos(φ);
+                    this.direction.z = Math.sin(φ) * Math.sin(θ);
+                    gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -15321,17 +15312,17 @@ var gd3d;
                     bottompos.y = 0;
                     bottompos.z = this.radius * Math.sin(randomAngle);
                     if (this.emitFrom == emitfromenum.base) {
-                        gd3d.math.vec3Clone(bottompos, this.randomPosition);
+                        gd3d.math.vec3Clone(bottompos, this.position);
                     }
                     else if (this.emitFrom == emitfromenum.volume) {
-                        this.randomPosition.x = radomRadius * Math.cos(randomAngle);
-                        this.randomPosition.z = radomRadius * Math.sin(randomAngle);
-                        this.randomPosition.y = randomHeight;
+                        this.position.x = radomRadius * Math.cos(randomAngle);
+                        this.position.z = radomRadius * Math.sin(randomAngle);
+                        this.position.y = randomHeight;
                     }
-                    this._coneDirection.x = Math.cos(randomAngle) * Math.sin(this.angle * Math.PI / 180);
-                    this._coneDirection.z = Math.sin(randomAngle) * Math.sin(this.angle * Math.PI / 180);
-                    this._coneDirection.y = Math.cos(this.angle * Math.PI / 180);
-                    return this._coneDirection;
+                    this.direction.x = Math.cos(randomAngle) * Math.sin(this.angle * Math.PI / 180);
+                    this.direction.z = Math.sin(randomAngle) * Math.sin(this.angle * Math.PI / 180);
+                    this.direction.y = Math.cos(this.angle * Math.PI / 180);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -15341,14 +15332,14 @@ var gd3d;
                     var _arc = this.angle * (Math.PI / 180);
                     var a = framework.ValueData.RandomRange(-_arc / 2, _arc / 2);
                     var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    this._circleDirection.x = _radius * Math.cos(a);
-                    this._circleDirection.z = _radius * Math.sin(a);
-                    this._circleDirection.y = 0;
-                    var length = gd3d.math.vec3Length(this._circleDirection);
-                    gd3d.math.vec3Normalize(this._circleDirection, this._circleDirection);
-                    framework.EffectUtil.RotateVector3(this._circleDirection, this.direction, this._circleDirection);
-                    this.getRandomPosition(this._circleDirection, length);
-                    return this._circleDirection;
+                    this.direction.x = _radius * Math.cos(a);
+                    this.direction.z = _radius * Math.sin(a);
+                    this.direction.y = 0;
+                    var length = gd3d.math.vec3Length(this.direction);
+                    gd3d.math.vec3Normalize(this.direction, this.direction);
+                    framework.EffectUtil.RotateVector3(this.direction, this.direction, this.direction);
+                    this.getposition(this.direction, length);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -15359,18 +15350,18 @@ var gd3d;
                     edgePos.y += framework.ValueData.RandomRange(-this.radius / 2, this.radius / 2);
                     var lenght = gd3d.math.vec3Length(edgePos);
                     framework.EffectUtil.RotateVector3(edgePos, this.direction, edgePos);
-                    gd3d.math.vec3Clone(this.direction, this._edgeDirection);
-                    this.getRandomPosition(edgePos, length);
-                    return this._edgeDirection;
+                    gd3d.math.vec3Clone(this.direction, this.direction);
+                    this.getposition(edgePos, length);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
             });
-            ParticleStartData.prototype.getRandomPosition = function (dir, length) {
+            ParticleStartData.prototype.getposition = function (dir, length) {
                 gd3d.math.vec3ScaleByNum(dir, length, dir);
-                this.randomPosition.x = dir.x;
-                this.randomPosition.y = dir.y;
-                this.randomPosition.z = dir.z;
+                this.position.x = dir.x;
+                this.position.y = dir.y;
+                this.position.z = dir.z;
             };
             ParticleStartData.prototype.clone = function () {
                 var data = new ParticleStartData();
@@ -15384,22 +15375,10 @@ var gd3d;
                 data.depth = this.depth;
                 data._radius = this._radius;
                 data._angle = this._angle;
-                data._randomDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._randomDirection, data._randomDirection);
-                data.randomPosition = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this.randomPosition, data.randomPosition);
-                data._boxDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._boxDirection, data._boxDirection);
-                data._sphereDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._sphereDirection, data._sphereDirection);
-                data._hemisphereDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._hemisphereDirection, data._hemisphereDirection);
-                data._coneDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._coneDirection, data._coneDirection);
-                data._circleDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._circleDirection, data._circleDirection);
-                data._edgeDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._edgeDirection, data._edgeDirection);
+                data.position = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(this.position, data.position);
+                data.direction = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(this.direction, data.direction);
                 return data;
             };
             return ParticleStartData;
@@ -16529,6 +16508,24 @@ var gd3d;
         var EffectUtil = (function () {
             function EffectUtil() {
             }
+            EffectUtil.lookatbyXAxis = function (pos, xAxis, yAxis, zAxis, targetpos, quat) {
+                var dir = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(targetpos, pos, dir);
+                gd3d.math.vec3Normalize(dir, dir);
+                var crossup = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Cross(dir, xAxis, crossup);
+                gd3d.math.vec3Normalize(crossup, crossup);
+                var anglerot = gd3d.math.vec3Dot(yAxis, crossup);
+                anglerot = Math.acos(anglerot) * 180 / Math.PI;
+                var dot = gd3d.math.vec3Dot(zAxis, crossup);
+                dot = Math.acos(dot) * 180 / Math.PI;
+                if (dot > 90) {
+                    anglerot = -anglerot;
+                }
+                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, anglerot, quat);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(crossup);
+            };
             EffectUtil.RandomRange = function (min, max, isInteger) {
                 if (isInteger === void 0) { isInteger = false; }
                 if (isInteger) {
@@ -16876,6 +16873,7 @@ var gd3d;
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
                 this.actived = true;
                 this.matToBatcher = new gd3d.math.matrix();
+                this.matToworld = new gd3d.math.matrix();
                 this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
                 this.gameObject = batcher.effectSys.gameObject;
                 this.emisson = batcher.emissionElement;
@@ -16899,9 +16897,9 @@ var gd3d;
                 this.renderModel = this.data.renderModel;
                 this.curLife = 0;
                 this.startFrameId = this.batcher.effectSys.frameId;
-                var localRandomDirection = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomDirection);
+                var localRandomDirection = this.data.particleStartData.randomDirection;
                 this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
-                var localRandomTranslate = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomPosition);
+                var localRandomTranslate = this.data.particleStartData.position;
                 this.localTranslate = gd3d.math.pool.clone_vector3(localRandomTranslate);
                 this.simulationSpeed = this.data.simulationSpeed != undefined ? this.data.simulationSpeed.getValue() : 0;
                 if (this.data.euler == undefined)
@@ -16935,14 +16933,15 @@ var gd3d;
                 else
                     this.colorRate = 1;
                 gd3d.math.vec3Clone(this.localScale, this.startScale);
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
-                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                     if (this.data.particleStartData.shapeType != framework.ParticleSystemShape.NORMAL) {
                         var localOrgin = gd3d.math.pool.vector3_zero;
                         gd3d.math.quatLookat(localOrgin, localRandomDirection, this.rotationByShape);
                         var initRot = gd3d.math.pool.new_quaternion();
                         gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
                         gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
+                        gd3d.math.quatClone(this.rotationByShape, this.localRotation);
                         gd3d.math.pool.delete_quaternion(initRot);
                     }
                 }
@@ -16974,7 +16973,6 @@ var gd3d;
                 gd3d.math.matrixMultiply(this.emisson.matToBatcher, this.localMatrix, this.matToBatcher);
             };
             Particle.prototype._updateRotation = function (delta) {
-                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 this._updateElementRotation();
             };
             Particle.prototype._updateElementRotation = function () {
@@ -16985,8 +16983,7 @@ var gd3d;
                 var worldTranslation = gd3d.math.pool.new_vector3();
                 var invTransformRotation = gd3d.math.pool.new_quaternion();
                 gd3d.math.vec3Clone(this.localTranslate, translation);
-                this.matToworld = this.emisson.getmatrixToWorld();
-                gd3d.math.matrixTransformVector3(translation, this.matToworld, worldTranslation);
+                gd3d.math.matrixTransformVector3(translation, this.emisson.getmatrixToWorld(), worldTranslation);
                 if (this.renderModel != framework.RenderModel.Mesh) {
                     if (this.renderModel == framework.RenderModel.BillBoard) {
                         gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
@@ -17005,28 +17002,31 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(forwardTarget);
                     }
                     else if (this.renderModel == framework.RenderModel.StretchedBillBoard) {
-                        gd3d.math.quatClone(this.rotationByShape, this.localRotation);
-                        gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
-                        var lookRot = new gd3d.math.quaternion();
-                        gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
-                        gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                        gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
-                        var inverRot = gd3d.math.pool.new_quaternion();
-                        gd3d.math.quatInverse(this.localRotation, inverRot);
-                        gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
-                        var angle = gd3d.math.pool.new_vector3();
-                        gd3d.math.quatToEulerAngles(lookRot, angle);
-                        gd3d.math.quatFromEulerAngles(angle.x, 0, 0, lookRot);
-                        gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
-                        gd3d.math.pool.delete_quaternion(inverRot);
-                        gd3d.math.pool.delete_vector3(angle);
-                        gd3d.math.pool.delete_quaternion(lookRot);
+                        gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                        gd3d.math.matrixMultiply(this.emisson.getmatrixToWorld(), this.localMatrix, this.matToworld);
+                        var xaxis = gd3d.math.pool.new_vector3();
+                        var yaxis = gd3d.math.pool.new_vector3();
+                        var zaxis = gd3d.math.pool.new_vector3();
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.matToworld, xaxis);
+                        gd3d.math.vec3Normalize(xaxis, xaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.matToworld, yaxis);
+                        gd3d.math.vec3Normalize(yaxis, yaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
+                        gd3d.math.vec3Normalize(zaxis, zaxis);
+                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, cameraTransform.getWorldTranslate(), worldRotation);
+                        gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
+                        gd3d.math.pool.delete_quaternion(worldRotation);
+                        gd3d.math.pool.delete_vector3(translation);
+                        gd3d.math.pool.delete_quaternion(invTransformRotation);
+                        gd3d.math.pool.delete_vector3(xaxis);
+                        gd3d.math.pool.delete_vector3(yaxis);
+                        gd3d.math.pool.delete_vector3(zaxis);
                         return;
                     }
-                    gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);
                     gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                     gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
+                    gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
                 }
                 else {
                     gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
@@ -17053,6 +17053,7 @@ var gd3d;
                 }
                 if (this.data.eulerNodes != undefined) {
                     this._updateNode(this.data.eulerNodes, this.totalLife, this.euler);
+                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 }
                 else if (this.data.eulerSpeed != undefined) {
                     if (this.data.eulerSpeed.x != undefined)
@@ -17061,6 +17062,7 @@ var gd3d;
                         this.euler.y += this.data.eulerSpeed.y.getValue() * delta;
                     if (this.data.eulerSpeed.z != undefined)
                         this.euler.z += this.data.eulerSpeed.z.getValue() * delta;
+                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 }
             };
             Particle.prototype._updateScale = function (delta) {
@@ -18715,14 +18717,14 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
-                this.beDispose = false;
+                this._beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
                     if (this._scene == null) {
                         if (this.parent == null)
                             return null;
-                        return this.parent.scene;
+                        this._scene = this.parent.scene;
                     }
                     return this._scene;
                 },
@@ -19097,8 +19099,15 @@ var gd3d;
             transform.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            Object.defineProperty(transform.prototype, "beDispose", {
+                get: function () {
+                    return this._beDispose;
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform.prototype.dispose = function () {
-                if (this.beDispose)
+                if (this._beDispose)
                     return;
                 if (this.children) {
                     for (var k in this.children) {
@@ -19107,7 +19116,7 @@ var gd3d;
                     this.removeAllChild();
                 }
                 this._gameObject.dispose();
-                this.beDispose = true;
+                this._beDispose = true;
             };
             return transform;
         }());

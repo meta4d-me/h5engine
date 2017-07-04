@@ -446,14 +446,6 @@ namespace gd3d.framework
         {
             let startdata = element.emissionData.particleStartData;
 
-            // if (_startdata["center"] != undefined)
-            // {
-            //     let _startpos = _startdata["center"];
-            //     startdata.position.x = _startpos["0"];
-            //     startdata.position.y = _startpos["1"];
-            //     startdata.position.z = _startpos["2"];
-            // }
-
             switch (_startdata["type"])
             {
                 case "normal":
@@ -481,12 +473,6 @@ namespace gd3d.framework
                     startdata.shapeType = gd3d.framework.ParticleSystemShape.NORMAL;
                     break;
             }
-
-
-            // if (_startdata["bottomradius"] != undefined)
-            // {
-            //     startdata.bottomRadius = _startdata["bottomradius"];
-            // }
 
             if (_startdata["width"] != undefined)
             {

@@ -2,6 +2,9 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export enum HideFlags
     {
         None = 0x00000000,
@@ -14,7 +17,14 @@ namespace gd3d.framework
         DontSave = 0x00000034,
         HideAndDontSave = 0x0000003D,
     }
-
+    
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 组件实例接口
+     * @version egret-gd3d 1.0
+     */
     export interface INodeComponent
     {
         start();
@@ -25,11 +35,32 @@ namespace gd3d.framework
         // jsonToAttribute(json: any, assetmgr: assetMgr);
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 组件接口
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class nodeComponent
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 组件实例
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("INodeComponent")
         comp: INodeComponent;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否初始化过
+         * @version egret-gd3d 1.0
+         */
         init: boolean;
 
         constructor(comp: INodeComponent, init: boolean = false)
@@ -39,9 +70,23 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * gameObject类 对应unity中gameObject概念
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class gameObject
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取物体所在场景实例
+         * @version egret-gd3d 1.0
+         */
         getScene(): scene
         {
             return this.transform.scene;
@@ -49,20 +94,76 @@ namespace gd3d.framework
         @gd3d.reflect.Field("number")
         @gd3d.reflect.UIStyle("enum")
         layer: number = 0;//物件有一个layer 取值范围0~31，各种功能都可以用layer mask 去过滤作用范围
+        /**
+         * @private
+         */
         hideFlags: HideFlags = HideFlags.None;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * gameObject必须依赖transform存在
+         * @version egret-gd3d 1.0
+         */
         transform: transform;
         // dontdestroyonload:boolean = false;//加载新场景的时候是否销毁。
         // transform2d: transform2D;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 组件列表
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("nodeComponent[]")
         components: nodeComponent[] = [];
         private  componentsInit:nodeComponent[]=[];
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染组件 可为空
+         * @version egret-gd3d 1.0
+         */
         renderer: IRenderer;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 相机组件 可为空
+         * @version egret-gd3d 1.0
+         */
         camera: camera;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 灯光组件 可为空
+         * @param
+         * @version egret-gd3d 1.0
+         */
         light: light;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞盒组件 可为空
+         * @version egret-gd3d 1.0
+         */
         collider: ICollider;
         private _visible = true;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取在场景中的可见状态
+         * @version egret-gd3d 1.0
+         */
         get visibleInScene()
         {
             let obj: gameObject = this;
@@ -72,10 +173,26 @@ namespace gd3d.framework
             }
             return obj.visible;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取自身的可见状态
+         * @version egret-gd3d 1.0
+         */
         get visible(): boolean
         {
             return this._visible;
-        };//自否可见
+        };
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置自身的可见状态
+         * @param val 
+         * @version egret-gd3d 1.0
+         */
         set visible(val: boolean)
         {
             if (val != this._visible)
@@ -84,12 +201,27 @@ namespace gd3d.framework
                 sceneMgr.app.markNotify(this.transform, NotifyType.ChangeVisible);
             }
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取对应transform的name
+         * @version egret-gd3d 1.0
+         */
         getName(): string
         {
             return this.transform.name;
             // return this.transform != null ? this.transform.name : this.transform2d.name;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 初始化 主要是组件的初始化
+         * @version egret-gd3d 1.0
+         */
         init()
         {
             if(this.componentsInit.length>0)
@@ -103,6 +235,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 主update
+         * @param delta
+         * @version egret-gd3d 1.0
+         */
         update(delta: number)
         {
             if (this.components.length == 0) return;
@@ -126,6 +266,14 @@ namespace gd3d.framework
                 this.components[i].comp.update(delta);
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 添加组件实例
+         * @param comp 组件实例
+         * @version egret-gd3d 1.0
+         */
         addComponentDirect(comp: INodeComponent): INodeComponent
         {
             if (comp.gameObject != null)
@@ -211,7 +359,14 @@ namespace gd3d.framework
             }
             return comp;
         }
-        //只是自己身上找到的第一个
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据类型获取组件 只是自己身上找到的第一个
+         * @param type 组件类型
+         * @version egret-gd3d 1.0
+         */
         getComponent(type: string): INodeComponent
         {
             for (var i = 0; i < this.components.length; i++)
@@ -224,7 +379,13 @@ namespace gd3d.framework
             }
             return null;
         }
-        //获取身上所有的组件
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取身上所有的组件
+         * @version egret-gd3d 1.0
+         */
         getComponents(): INodeComponent[]
         {
             let components: INodeComponent[] = [];
@@ -234,7 +395,14 @@ namespace gd3d.framework
             }
             return components;
         }
-        //包含自己（未测试）
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取自己和所有子物体中 所有该类型的组件
+         * @param type 组件类型
+         * @version egret-gd3d 1.0
+         */
         getComponentsInChildren(type: string): INodeComponent[]
         {
             let components: INodeComponent[] = [];
@@ -259,6 +427,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据组件类型获取自己这条分支上父物体中该类型的组件 一直上溯到根节点
+         * @param type 组件类型
+         * @version egret-gd3d 1.0
+         */
         getComponentInParent(type: string): INodeComponent
         {
             let result: INodeComponent = null;
@@ -270,6 +446,14 @@ namespace gd3d.framework
             }
             return result;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据组件类型添加一个组件
+         * @param type 组件类型
+         * @version egret-gd3d 1.0
+         */
         addComponent(type: string): INodeComponent
         {
             // if (this.components == null)
@@ -286,6 +470,14 @@ namespace gd3d.framework
             var comp = gd3d.reflect.createInstance(pp, { "nodecomp": "1" });
             return this.addComponentDirect(comp);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据组件实例移出组件
+         * @param comp 组件实例
+         * @version egret-gd3d 1.0
+         */
         removeComponent(comp: INodeComponent)
         {
             for (var i = 0; i < this.components.length; i++)
@@ -303,7 +495,7 @@ namespace gd3d.framework
             }
         }
 
-        remove(comp: INodeComponent)
+        private remove(comp: INodeComponent)
         {
             if (reflect.getClassTag(comp["__proto__"], "renderer") == "1")
             {//这货是个渲染器
@@ -323,6 +515,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据组件类型移出组件
+         * @param type 组件类型
+         * @version egret-gd3d 1.0
+         */
         removeComponentByTypeName(type: string)
         {
             for (var i = 0; i < this.components.length; i++)
@@ -339,6 +539,13 @@ namespace gd3d.framework
                 }
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移出所有组件
+         * @version egret-gd3d 1.0
+         */
         removeAllComponents()
         {
             for (var i = 0; i < this.components.length; i++)
@@ -351,6 +558,13 @@ namespace gd3d.framework
             }
             this.components.length = 0;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放gameObject
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
             this.removeAllComponents();

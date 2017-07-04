@@ -2,6 +2,31 @@ namespace gd3d.framework
 {
     export class EffectUtil
     {
+
+        public static lookatbyXAxis(pos:gd3d.math.vector3,xAxis:gd3d.math.vector3,yAxis:gd3d.math.vector3,zAxis:gd3d.math.vector3,targetpos:gd3d.math.vector3,quat:gd3d.math.quaternion)
+        {
+            var dir=gd3d.math.pool.new_vector3();
+            gd3d.math.vec3Subtract(targetpos,pos,dir);
+            gd3d.math.vec3Normalize(dir,dir);
+
+            var crossup=gd3d.math.pool.new_vector3();
+            gd3d.math.vec3Cross(dir,xAxis,crossup);
+            gd3d.math.vec3Normalize(crossup,crossup);
+
+            var anglerot=gd3d.math.vec3Dot(yAxis,crossup);
+            anglerot=Math.acos(anglerot)*180/Math.PI;
+
+            var dot=gd3d.math.vec3Dot(zAxis,crossup);
+            dot=Math.acos(dot)*180/Math.PI;
+            if(dot>90)
+            {
+                anglerot=-anglerot;
+            }
+            gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right,anglerot,quat);
+
+            gd3d.math.pool.delete_vector3(dir);
+            gd3d.math.pool.delete_vector3(crossup);
+        }
         //范围内随机  isInteger是否为整数
         public static RandomRange(min: number, max: number, isInteger: boolean = false)
         {

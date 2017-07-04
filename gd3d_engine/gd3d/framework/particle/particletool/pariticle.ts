@@ -82,10 +82,10 @@ namespace gd3d.framework
             this.startFrameId = this.batcher.effectSys.frameId;
 
             //box方向随着中心轴朝向
-            let localRandomDirection = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomDirection);
+            let localRandomDirection = this.data.particleStartData.randomDirection;
             this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
 
-            let localRandomTranslate = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomPosition);
+            let localRandomTranslate = this.data.particleStartData.position;
             this.localTranslate=gd3d.math.pool.clone_vector3(localRandomTranslate);
 
             this.simulationSpeed = this.data.simulationSpeed != undefined ? this.data.simulationSpeed.getValue() : 0;
@@ -126,11 +126,10 @@ namespace gd3d.framework
             //记下初始scale
             gd3d.math.vec3Clone(this.localScale, this.startScale);
 
+            gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
             //模型初始旋转量
             if (this.renderModel == RenderModel.None || this.renderModel == RenderModel.StretchedBillBoard)
             {
-                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
-
                 if (this.data.particleStartData.shapeType != ParticleSystemShape.NORMAL)
                 {
                     let localOrgin = gd3d.math.pool.vector3_zero;
@@ -139,6 +138,9 @@ namespace gd3d.framework
                     let initRot = gd3d.math.pool.new_quaternion();
                     gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
                     gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
+                    gd3d.math.quatClone(this.rotationByShape,this.localRotation);
+                    //gd3d.math.quatMultiply(initRot, this.rotationByShape, this.rotationByShape);
+                    
                     gd3d.math.pool.delete_quaternion(initRot);
                 }
             }
@@ -181,11 +183,11 @@ namespace gd3d.framework
 
         private _updateRotation(delta: number)
         {
-            gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
+            
             this._updateElementRotation();
         }
         
-        private matToworld:gd3d.math.matrix;
+        private matToworld:gd3d.math.matrix=new gd3d.math.matrix();
         private _updateElementRotation()
         {
 
@@ -197,9 +199,9 @@ namespace gd3d.framework
             let invTransformRotation = gd3d.math.pool.new_quaternion();
 
             gd3d.math.vec3Clone(this.localTranslate, translation);
-            this.matToworld=this.emisson.getmatrixToWorld();
+            //this.matToworld=this.emisson.getmatrixToWorld();
 
-            gd3d.math.matrixTransformVector3(translation, this.matToworld, worldTranslation);
+            gd3d.math.matrixTransformVector3(translation, this.emisson.getmatrixToWorld(), worldTranslation);
 
             if (this.renderModel != RenderModel.Mesh)
             {
@@ -226,37 +228,55 @@ namespace gd3d.framework
                 }
                 else if (this.renderModel == RenderModel.StretchedBillBoard)
                 {
-                    // gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, this.localRotation);
-                    // gd3d.math.quatMultiply(this.rotationByShape, this.localRotation, this.localRotation);
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                    gd3d.math.matrixMultiply(this.emisson.getmatrixToWorld(),this.localMatrix,this.matToworld);
+                    //-------------------------------------------------------------------------------
+                    // gd3d.math.quatClone(this.rotationByShape, this.localRotation);
+                    // gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    // let lookRot = new gd3d.math.quaternion();
+                    // gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
+                    // gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+                    // gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
 
-                      gd3d.math.quatClone(this.rotationByShape, this.localRotation);
+                    // let inverRot = gd3d.math.pool.new_quaternion();
+                    // gd3d.math.quatInverse(this.localRotation, inverRot);
+                    // gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
 
-                    gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    // let angle = gd3d.math.pool.new_vector3();
+                    // gd3d.math.quatToEulerAngles(lookRot, angle);
+                    // gd3d.math.quatFromEulerAngles(0, angle.x, 0, lookRot);
+                    // gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
+                    //----------------------------------------------------------------------------
+                    var xaxis=gd3d.math.pool.new_vector3();
+                    var yaxis=gd3d.math.pool.new_vector3();
+                    var zaxis=gd3d.math.pool.new_vector3();
+                    gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right,this.matToworld,xaxis);
+                    gd3d.math.vec3Normalize(xaxis,xaxis);
+                    gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up,this.matToworld,yaxis);
+                    gd3d.math.vec3Normalize(yaxis,yaxis);
+                    gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward,this.matToworld,zaxis);
+                    gd3d.math.vec3Normalize(zaxis,zaxis);
+                    
+                    EffectUtil.lookatbyXAxis(worldTranslation,xaxis,yaxis,zaxis,cameraTransform.getWorldTranslate(),worldRotation);
+                    gd3d.math.quatMultiply(this.localRotation,worldRotation,this.localRotation);
+                    
 
-                    let lookRot = new gd3d.math.quaternion();
-                    gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
-                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
 
-                    let inverRot = gd3d.math.pool.new_quaternion();
-                    gd3d.math.quatInverse(this.localRotation, inverRot);
-                    gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
-
-                    let angle = gd3d.math.pool.new_vector3();
-                    gd3d.math.quatToEulerAngles(lookRot, angle);
-                    gd3d.math.quatFromEulerAngles(angle.x, 0, 0, lookRot);
-                    gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
-
-                    gd3d.math.pool.delete_quaternion(inverRot);
-                    gd3d.math.pool.delete_vector3(angle);
-                    gd3d.math.pool.delete_quaternion(lookRot);
+                    gd3d.math.pool.delete_quaternion(worldRotation);
+                    gd3d.math.pool.delete_vector3(translation);
+                    gd3d.math.pool.delete_quaternion(invTransformRotation);
+                    gd3d.math.pool.delete_vector3(xaxis);
+                    gd3d.math.pool.delete_vector3(yaxis);                    
+                    gd3d.math.pool.delete_vector3(zaxis);
                     return;
                 }
-                gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);//eulerrot有的不是必要的，todo
+                
                 //消除transform组件对粒子本身的影响
                 gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
                 gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                 gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
+                
+                gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);//eulerrot有的不是必要的，todo
             } else
             {
                 gd3d.math.quatClone(this.rotationByEuler,this.localRotation);
@@ -292,6 +312,7 @@ namespace gd3d.framework
             if (this.data.eulerNodes != undefined)
             {
                 this._updateNode(this.data.eulerNodes, this.totalLife, this.euler);
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
             } else if (this.data.eulerSpeed != undefined)
             {
                 if (this.data.eulerSpeed.x != undefined)
@@ -300,6 +321,7 @@ namespace gd3d.framework
                     this.euler.y += this.data.eulerSpeed.y.getValue() * delta;
                 if (this.data.eulerSpeed.z != undefined)
                     this.euler.z += this.data.eulerSpeed.z.getValue() * delta;
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
             }
         }
         private _startNode: ParticleNode;

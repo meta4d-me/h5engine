@@ -288,28 +288,32 @@
         math.quatNormalize(out, out);
     }
 
-    export function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion)
+    export function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion,updir:gd3d.math.vector3=gd3d.math.pool.vector3_up)
     {
         var dir = gd3d.math.pool.new_vector3();
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
         var dot = gd3d.math.vec3Dot(gd3d.math.pool.vector3_forward, dir);
-        if (Math.abs(dot - (-1.0)) < 0.000001)
+        dot = gd3d.math.floatClamp(dot, -1, 1);
+        var rotangle = Math.acos(dot)*180/Math.PI;
+        
+
+        if (rotangle< 0.01)
         {
-            gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 180, out);
+            out.x=0;
+            out.y=0;
+            out.z=0;
+            out.w=1;
             return;
         }
-        if (Math.abs(dot - 1.0) < 0.000001)
+        if (rotangle >179.9)
         {
-            out.x = 0;
-            out.y = 0;
-            out.z = 0;
-            out.w = 1;
+            gd3d.math.quatFromAxisAngle(updir,180,out);
+            return;
         }
-        dot = gd3d.math.floatClamp(dot, -1, 1);
-        var rotangle = Math.acos(dot);
         var rotAxis = gd3d.math.pool.new_vector3();
         gd3d.math.vec3Cross(gd3d.math.pool.vector3_forward, dir, rotAxis);
+        gd3d.math.vec3Normalize(rotAxis,rotAxis);
         gd3d.math.quatFromAxisAngle(rotAxis, rotangle, out);
     }
 

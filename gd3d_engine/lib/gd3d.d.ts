@@ -18,10 +18,11 @@ declare namespace gd3d.framework {
         height: number;
         limitFrame: boolean;
         notify: INotify;
+        private _timeScale;
         timeScale: number;
-        version: string;
-        build: string;
-        _tar: number;
+        private version;
+        private build;
+        private _tar;
         private _standDeltaTime;
         targetFrame: number;
         start(div: HTMLDivElement): void;
@@ -30,7 +31,7 @@ declare namespace gd3d.framework {
         checkFilter(trans: any): boolean;
         showFps(): void;
         closeFps(): void;
-        beStepNumber: number;
+        private beStepNumber;
         private update(delta);
         preusercodetimer: number;
         usercodetime: number;
@@ -68,7 +69,7 @@ declare namespace gd3d.framework {
         private _beStepForward;
         beStepForward: boolean;
         private updateUserCode(delta);
-        updateEditorCode(delta: number): void;
+        private updateEditorCode(delta);
         addUserCodeDirect(program: IUserCode): void;
         addUserCode(classname: string): void;
         addEditorCode(classname: string): void;
@@ -1387,7 +1388,7 @@ declare namespace gd3d.framework {
         start(): void;
         update(delta: number): void;
         private _update(delta);
-        mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, curFrameData: EffectFrameData): void;
+        private mergeLerpAttribData(realUseCurFrameData, curFrameData);
         private updateEffectBatcher(effectBatcher, curAttrsData, initFrameData, vertexStartIndex);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         clone(): effectSystem;
@@ -1418,7 +1419,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class guidpath implements INodeComponent {
         private paths;
-        _pathasset: pathasset;
+        private _pathasset;
         pathasset: pathasset;
         speed: number;
         private isactived;
@@ -1653,7 +1654,6 @@ declare namespace gd3d.framework {
         extenedOneSide: boolean;
         update(delta: number): void;
         gameObject: gameObject;
-        remove(): void;
         material: gd3d.framework.material;
         color: gd3d.math.color;
         setspeed(upspeed: number): void;
@@ -1667,6 +1667,7 @@ declare namespace gd3d.framework {
         private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
+        remove(): void;
     }
     class trailStick {
         location: gd3d.math.vector3;
@@ -1997,7 +1998,7 @@ declare namespace gd3d.math {
     function quatToEulerAngles(src: quaternion, out: vector3): void;
     function quatReset(src: quaternion): void;
     function quatLookat(pos: vector3, targetpos: vector3, out: quaternion): void;
-    function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion): void;
+    function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir?: gd3d.math.vector3): void;
     function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion): void;
 }
 declare namespace gd3d.math {
@@ -2348,24 +2349,15 @@ declare namespace gd3d.framework {
         radius: number;
         private _angle;
         angle: number;
-        emitFrom: emitfromenum;
-        randomPosition: gd3d.math.vector3;
-        private _randomDirection;
         readonly randomDirection: gd3d.math.vector3;
-        private _boxDirection;
         readonly boxDirection: gd3d.math.vector3;
-        private _sphereDirection;
         readonly sphereDirection: gd3d.math.vector3;
-        private _hemisphereDirection;
         readonly hemisphereDirection: gd3d.math.vector3;
-        private _coneDirection;
+        emitFrom: emitfromenum;
         readonly coneDirection: gd3d.math.vector3;
-        private _circleDirection;
         readonly circleDirection: gd3d.math.vector3;
-        private _edgeDirection;
         readonly edgeDirection: math.vector3;
-        constructor();
-        private getRandomPosition(dir, length);
+        private getposition(dir, length);
         clone(): ParticleStartData;
     }
     enum emitfromenum {
@@ -2548,6 +2540,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class EffectUtil {
+        static lookatbyXAxis(pos: gd3d.math.vector3, xAxis: gd3d.math.vector3, yAxis: gd3d.math.vector3, zAxis: gd3d.math.vector3, targetpos: gd3d.math.vector3, quat: gd3d.math.quaternion): void;
         static RandomRange(min: number, max: number, isInteger?: boolean): number;
         static vecMuliNum(vec: gd3d.math.vector3, num: number): gd3d.math.vector3;
         static parseVector3(value: any): gd3d.math.vector3;
@@ -2761,7 +2754,7 @@ declare namespace gd3d.framework {
         getComponentInParent(type: string): INodeComponent;
         addComponent(type: string): INodeComponent;
         removeComponent(comp: INodeComponent): void;
-        remove(comp: INodeComponent): void;
+        private remove(comp);
         removeComponentByTypeName(type: string): void;
         removeAllComponents(): void;
         dispose(): void;
@@ -2837,7 +2830,7 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         private RealCameraNumber;
         private _renderCamera(camindex);
-        updateScene(node: transform, delta: any): void;
+        private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);
         private collectCameraAndLight(node);
@@ -2967,7 +2960,7 @@ declare namespace gd3d.framework {
         find(name: string): transform;
         checkImpactTran(tran: transform): boolean;
         checkImpact(): Array<transform>;
-        doImpact(tran: transform, impacted: Array<transform>): void;
+        private doImpact(tran, impacted);
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
@@ -3000,7 +2993,8 @@ declare namespace gd3d.framework {
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
-        beDispose: boolean;
+        readonly beDispose: boolean;
+        private _beDispose;
         dispose(): void;
     }
     class insID {

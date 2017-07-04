@@ -1,10 +1,34 @@
 namespace gd3d.framework
 {
-    //场景是基础的功能，有场景图，相当于Unity的Level
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 场景是基础的功能，有场景图，相当于Unity的Level
+     * @version egret-gd3d 1.0
+     */
     export class scene
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 全局的application实例
+         * @version egret-gd3d 1.0
+         */
         app: application;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 全局的webgl实例
+         * @version egret-gd3d 1.0
+         */
         webgl: WebGLRenderingContext;
+        /**
+         * @private
+         * @param app 
+         */
         constructor(app: application)
         {
             this.app = app;
@@ -15,14 +39,42 @@ namespace gd3d.framework
             this.rootNode.scene = this;
             this.renderList = new renderList();
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 场景名称
+         * @version egret-gd3d 1.0
+         */
         name: string;
         private rootNode: transform;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染列表
+         * @version egret-gd3d 1.0
+         */
         renderList: renderList;
         private assetmgr: assetMgr;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 参与渲染的相机
+         * @version egret-gd3d 1.0
+         */
         public renderCameras: camera[] = [];//需要camera class 
 
         private _mainCamera: camera = null;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前主相机
+         * @version egret-gd3d 1.0
+         */
         public get mainCamera()
          {
             if(this._mainCamera == null)
@@ -31,6 +83,14 @@ namespace gd3d.framework
             }
              return this._mainCamera;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置当前主相机
+         * @param _camera 相机组件实例
+         * @version egret-gd3d 1.0
+         */
         public set mainCamera(_camera: camera) {
             for (let i in this.renderCameras) {
                 if (this.renderCameras[i] == _camera)
@@ -41,8 +101,30 @@ namespace gd3d.framework
         }
         private renderContext: renderContext[] = [];
         private renderLights: light[] = [];//需要光源 class
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * lightmap列表
+         * @version egret-gd3d 1.0
+         */
         lightmaps: texture[] = [];//lightmap
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 雾效
+         * @version egret-gd3d 1.0
+         */
         fog:Fog;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 场景的刷新函数
+         * @param delta
+         * @version egret-gd3d 1.0
+         */
         update(delta: number)
         {
             //更新矩阵
@@ -57,13 +139,6 @@ namespace gd3d.framework
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
 
-            //但是场景管理的优化，可能针对每个camera 跑一遍
-            //log coll
-            // document["log"] = {};
-
-            // document["log"].lights = this.renderLights.length;
-            // document["log"].cameras = [];
-
             //排序
             //排序camera 并绘制
             if (this.renderCameras.length > 1)
@@ -74,14 +149,6 @@ namespace gd3d.framework
                 })
             }
 
-
-            // for (var i = 0; i < this.renderCameras.length; i++)
-            // {
-            //     this.renderCameras[i].index = i;
-            //     document["log"].cameras.push({});
-            //     document["log"].cameras[i].name = this.renderCameras[i].gameObject.getName();
-            //     document["log"].cameras[i].objs = [];
-            // }
 
             this.RealCameraNumber = 0;
             for (var i = 0; i < this.renderCameras.length; i++)
@@ -160,19 +227,7 @@ namespace gd3d.framework
 
         }
 
-
-        // //要应用可见判断 和 场景管理，就是这里
-        // private fillRenderer(node: transform, cam: camera) {
-        //     if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
-        //         this.renderList.addRenderer(node.gameObject.renderer);
-        //     }
-        //     if (node.children != null) {
-        //         for (var i = 0; i < node.children.length; i++) {
-        //             this.fillRenderer(node.children[i], cam);
-        //         }
-        //     }
-        // }
-        updateScene(node: transform, delta)
+        private updateScene(node: transform, delta)
         {
             if(this.app.bePlay)
             {
@@ -246,37 +301,105 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 场景根节点下添加物体
+         * @param node 要添加的transform
+         * @version egret-gd3d 1.0
+         */
         addChild(node: transform)
         {
             this.rootNode.addChild(node);
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 场景根节点下移出物体
+         * @param node 要移出的transform
+         * @version egret-gd3d 1.0
+         */
         removeChild(node: transform)
         {
             this.rootNode.removeChild(node);
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取children列表
+         * @version egret-gd3d 1.0
+         */
         getChildren(): transform[]
         {
             return this.rootNode.children;
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取children数量
+         * @version egret-gd3d 1.0
+         */
         getChildCount(): number
         {
             if (this.rootNode.children == null) return 0;
             return this.rootNode.children.length;
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据索引获取child
+         * @param index 索引
+         * @version egret-gd3d 1.0
+         */
         getChild(index: number): transform
         {
             return this.rootNode.children[index];
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 根据name获取child
+         * @param name
+         * @version egret-gd3d 1.0
+         */
         getChildByName(name: string): transform
         {
             let res = this.rootNode.find(name);
             return res;
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取场景根节点
+         * @version egret-gd3d 1.0
+         */
         getRoot()
         {
             return this.rootNode;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取射线路径上的所有物体
+         * @param ray 射线实例
+         * @param isPickMesh 是否为拾取mesh 否为拾取collider
+         * @version egret-gd3d 1.0
+         */
         public pickAll(ray: ray, isPickMesh: boolean = false): Array<pickinfo>
         {
             var picked = this.doPick(ray, true, isPickMesh) as Array<pickinfo>;
@@ -284,6 +407,15 @@ namespace gd3d.framework
             return picked;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取射线拾取到的最近物体
+         * @param ray 射线实例
+         * @param isPickMesh 是否为拾取mesh 否为拾取collider
+         * @version egret-gd3d 1.0
+         */
         public pick(ray: ray, isPickMesh: boolean = false): pickinfo
         {
             var pickinfo = this.doPick(ray, false, isPickMesh) as pickinfo;
