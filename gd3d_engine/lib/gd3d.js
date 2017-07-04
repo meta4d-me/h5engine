@@ -1183,7 +1183,10 @@ var gd3d;
             TextureFormatEnum[TextureFormatEnum["RGBA"] = 1] = "RGBA";
             TextureFormatEnum[TextureFormatEnum["RGB"] = 2] = "RGB";
             TextureFormatEnum[TextureFormatEnum["Gray"] = 3] = "Gray";
-            TextureFormatEnum[TextureFormatEnum["PVRTC"] = 4] = "PVRTC";
+            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGB"] = 4] = "PVRTC4_RGB";
+            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGBA"] = 4] = "PVRTC4_RGBA";
+            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGB"] = 4] = "PVRTC2_RGB";
+            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGBA"] = 4] = "PVRTC2_RGBA";
         })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
         var textureReader = (function () {
             function textureReader(webgl, texRGBA, width, height, gray) {
@@ -1298,8 +1301,24 @@ var gd3d;
                 this.format = format;
                 this.texture = webgl.createTexture();
                 var extname = "WEBGL_compressed_texture_pvrtc";
-                this.ext = this.webgl.getExtension(extname) || this.webgl.getExtension('WEBKIT_' + extname);
+                this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
             }
+            glTexture2D.prototype.getExt = function (name) {
+                var browserPrefixes = [
+                    "",
+                    "MOZ_",
+                    "OP_",
+                    "WEBKIT_"
+                ];
+                for (var ii = 0; ii < browserPrefixes.length; ++ii) {
+                    var prefixedName = browserPrefixes[ii] + name;
+                    var ext = this.webgl.getExtension(prefixedName);
+                    if (ext) {
+                        return ext;
+                    }
+                }
+                return null;
+            };
             glTexture2D.prototype.uploadImage = function (img, mipmap, linear, premultiply, repeat, mirroredU, mirroredV) {
                 if (premultiply === void 0) { premultiply = true; }
                 if (repeat === void 0) { repeat = false; }
@@ -1378,12 +1397,7 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                if (this.format == TextureFormatEnum.PVRTC && this.ext != null) {
-                    this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, 6407, width, height, 0, 6407, 5121, data);
-                }
-                else {
-                    this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
-                }
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
                 if (mipmap) {
                     this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
                     if (linear) {
@@ -1434,9 +1448,6 @@ var gd3d;
                     pixellen = 4;
                 }
                 else if (this.format == TextureFormatEnum.RGB) {
-                    pixellen = 3;
-                }
-                else if (this.format == TextureFormatEnum.PVRTC) {
                     pixellen = 3;
                 }
                 var len = this.width * this.height * pixellen;
@@ -3295,13 +3306,23 @@ var gd3d;
                 this._bePause = false;
                 this._beStepForward = false;
             }
+            Object.defineProperty(application.prototype, "timeScale", {
+                get: function () {
+                    return this._timeScale;
+                },
+                set: function (val) {
+                    this._timeScale = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(application.prototype, "targetFrame", {
                 get: function () {
                     return this._tar;
                 },
                 set: function (val) {
-                    if (val < 0.01)
-                        return;
+                    if (val == 0)
+                        val = -1;
                     this._tar = val;
                     this._standDeltaTime = 1 / this._tar;
                 },
@@ -3321,7 +3342,7 @@ var gd3d;
                     meta = metas[0];
                 meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
                 framework.sceneMgr.app = this;
-                this.timeScale = 1;
+                this._timeScale = 1;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 canvas.className = "full";
@@ -3423,7 +3444,7 @@ var gd3d;
             };
             Object.defineProperty(application.prototype, "deltaTime", {
                 get: function () {
-                    return this._deltaTime * this.timeScale;
+                    return this._deltaTime * this._timeScale;
                 },
                 enumerable: true,
                 configurable: true
@@ -3979,14 +4000,14 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
-                this.beDispose = false;
+                this._beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
                     if (this._scene == null) {
                         if (this.parent == null)
                             return null;
-                        return this.parent.scene;
+                        this._scene = this.parent.scene;
                     }
                     return this._scene;
                 },
@@ -4361,8 +4382,15 @@ var gd3d;
             transform.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            Object.defineProperty(transform.prototype, "beDispose", {
+                get: function () {
+                    return this._beDispose;
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform.prototype.dispose = function () {
-                if (this.beDispose)
+                if (this._beDispose)
                     return;
                 if (this.children) {
                     for (var k in this.children) {
@@ -4371,7 +4399,7 @@ var gd3d;
                     this.removeAllChild();
                 }
                 this._gameObject.dispose();
-                this.beDispose = true;
+                this._beDispose = true;
             };
             return transform;
         }());
@@ -6721,6 +6749,24 @@ var gd3d;
         var EffectUtil = (function () {
             function EffectUtil() {
             }
+            EffectUtil.lookatbyXAxis = function (pos, xAxis, yAxis, zAxis, targetpos, quat) {
+                var dir = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(targetpos, pos, dir);
+                gd3d.math.vec3Normalize(dir, dir);
+                var crossup = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Cross(dir, xAxis, crossup);
+                gd3d.math.vec3Normalize(crossup, crossup);
+                var anglerot = gd3d.math.vec3Dot(yAxis, crossup);
+                anglerot = Math.acos(anglerot) * 180 / Math.PI;
+                var dot = gd3d.math.vec3Dot(zAxis, crossup);
+                dot = Math.acos(dot) * 180 / Math.PI;
+                if (dot > 90) {
+                    anglerot = -anglerot;
+                }
+                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right, anglerot, quat);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(crossup);
+            };
             EffectUtil.RandomRange = function (min, max, isInteger) {
                 if (isInteger === void 0) { isInteger = false; }
                 if (isInteger) {
@@ -7068,6 +7114,7 @@ var gd3d;
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
                 this.actived = true;
                 this.matToBatcher = new gd3d.math.matrix();
+                this.matToworld = new gd3d.math.matrix();
                 this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
                 this.gameObject = batcher.effectSys.gameObject;
                 this.emisson = batcher.emissionElement;
@@ -7091,9 +7138,9 @@ var gd3d;
                 this.renderModel = this.data.renderModel;
                 this.curLife = 0;
                 this.startFrameId = this.batcher.effectSys.frameId;
-                var localRandomDirection = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomDirection);
+                var localRandomDirection = this.data.particleStartData.randomDirection;
                 this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
-                var localRandomTranslate = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomPosition);
+                var localRandomTranslate = this.data.particleStartData.position;
                 this.localTranslate = gd3d.math.pool.clone_vector3(localRandomTranslate);
                 this.simulationSpeed = this.data.simulationSpeed != undefined ? this.data.simulationSpeed.getValue() : 0;
                 if (this.data.euler == undefined)
@@ -7127,14 +7174,15 @@ var gd3d;
                 else
                     this.colorRate = 1;
                 gd3d.math.vec3Clone(this.localScale, this.startScale);
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
-                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                     if (this.data.particleStartData.shapeType != framework.ParticleSystemShape.NORMAL) {
                         var localOrgin = gd3d.math.pool.vector3_zero;
                         gd3d.math.quatLookat(localOrgin, localRandomDirection, this.rotationByShape);
                         var initRot = gd3d.math.pool.new_quaternion();
                         gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
                         gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
+                        gd3d.math.quatClone(this.rotationByShape, this.localRotation);
                         gd3d.math.pool.delete_quaternion(initRot);
                     }
                 }
@@ -7166,7 +7214,6 @@ var gd3d;
                 gd3d.math.matrixMultiply(this.emisson.matToBatcher, this.localMatrix, this.matToBatcher);
             };
             Particle.prototype._updateRotation = function (delta) {
-                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 this._updateElementRotation();
             };
             Particle.prototype._updateElementRotation = function () {
@@ -7177,8 +7224,7 @@ var gd3d;
                 var worldTranslation = gd3d.math.pool.new_vector3();
                 var invTransformRotation = gd3d.math.pool.new_quaternion();
                 gd3d.math.vec3Clone(this.localTranslate, translation);
-                this.matToworld = this.emisson.getmatrixToWorld();
-                gd3d.math.matrixTransformVector3(translation, this.matToworld, worldTranslation);
+                gd3d.math.matrixTransformVector3(translation, this.emisson.getmatrixToWorld(), worldTranslation);
                 if (this.renderModel != framework.RenderModel.Mesh) {
                     if (this.renderModel == framework.RenderModel.BillBoard) {
                         gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
@@ -7197,28 +7243,31 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(forwardTarget);
                     }
                     else if (this.renderModel == framework.RenderModel.StretchedBillBoard) {
-                        gd3d.math.quatClone(this.rotationByShape, this.localRotation);
-                        gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
-                        var lookRot = new gd3d.math.quaternion();
-                        gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
-                        gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                        gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
-                        var inverRot = gd3d.math.pool.new_quaternion();
-                        gd3d.math.quatInverse(this.localRotation, inverRot);
-                        gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
-                        var angle = gd3d.math.pool.new_vector3();
-                        gd3d.math.quatToEulerAngles(lookRot, angle);
-                        gd3d.math.quatFromEulerAngles(angle.x, 0, 0, lookRot);
-                        gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
-                        gd3d.math.pool.delete_quaternion(inverRot);
-                        gd3d.math.pool.delete_vector3(angle);
-                        gd3d.math.pool.delete_quaternion(lookRot);
+                        gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                        gd3d.math.matrixMultiply(this.emisson.getmatrixToWorld(), this.localMatrix, this.matToworld);
+                        var xaxis = gd3d.math.pool.new_vector3();
+                        var yaxis = gd3d.math.pool.new_vector3();
+                        var zaxis = gd3d.math.pool.new_vector3();
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.matToworld, xaxis);
+                        gd3d.math.vec3Normalize(xaxis, xaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.matToworld, yaxis);
+                        gd3d.math.vec3Normalize(yaxis, yaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
+                        gd3d.math.vec3Normalize(zaxis, zaxis);
+                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, cameraTransform.getWorldTranslate(), worldRotation);
+                        gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
+                        gd3d.math.pool.delete_quaternion(worldRotation);
+                        gd3d.math.pool.delete_vector3(translation);
+                        gd3d.math.pool.delete_quaternion(invTransformRotation);
+                        gd3d.math.pool.delete_vector3(xaxis);
+                        gd3d.math.pool.delete_vector3(yaxis);
+                        gd3d.math.pool.delete_vector3(zaxis);
                         return;
                     }
-                    gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);
                     gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                     gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
+                    gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
                 }
                 else {
                     gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
@@ -7245,6 +7294,7 @@ var gd3d;
                 }
                 if (this.data.eulerNodes != undefined) {
                     this._updateNode(this.data.eulerNodes, this.totalLife, this.euler);
+                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 }
                 else if (this.data.eulerSpeed != undefined) {
                     if (this.data.eulerSpeed.x != undefined)
@@ -7253,6 +7303,7 @@ var gd3d;
                         this.euler.y += this.data.eulerSpeed.y.getValue() * delta;
                     if (this.data.eulerSpeed.z != undefined)
                         this.euler.z += this.data.eulerSpeed.z.getValue() * delta;
+                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 }
             };
             Particle.prototype._updateScale = function (delta) {
@@ -7714,11 +7765,11 @@ var gd3d;
                     var outVal = void 0;
                     if (fromVal instanceof gd3d.math.vector3) {
                         outVal = new gd3d.math.vector3();
-                        gd3d.math.vec3SLerp(fromVal, toVal, i / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec3SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
                     }
                     else if (fromVal instanceof gd3d.math.vector2) {
                         outVal = new gd3d.math.vector2();
-                        gd3d.math.vec2SLerp(fromVal, toVal, i / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec2SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
                     }
                     else if (typeof (fromVal) === 'number') {
                         outVal = gd3d.math.numberLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame));
@@ -8565,14 +8616,6 @@ var gd3d;
                 this._radius = 0;
                 this._angle = 0;
                 this.emitFrom = emitfromenum.base;
-                this.randomPosition = new gd3d.math.vector3(0, 0, 0);
-                this._randomDirection = new gd3d.math.vector3(0, 1, 0);
-                this._boxDirection = new gd3d.math.vector3(0, 1, 0);
-                this._sphereDirection = new gd3d.math.vector3(0, 1, 0);
-                this._hemisphereDirection = new gd3d.math.vector3(0, 1, 0);
-                this._coneDirection = new gd3d.math.vector3(0, 1, 0);
-                this._circleDirection = new gd3d.math.vector3(0, 0, 1);
-                this._edgeDirection = new gd3d.math.vector3(0, 1, 0);
             }
             Object.defineProperty(ParticleStartData.prototype, "position", {
                 get: function () {
@@ -8638,42 +8681,30 @@ var gd3d;
                 get: function () {
                     switch (this.shapeType) {
                         case ParticleSystemShape.BOX:
-                            gd3d.math.vec3Clone(this.boxDirection, this._randomDirection);
-                            break;
+                            return this.boxDirection;
                         case ParticleSystemShape.SPHERE:
-                            gd3d.math.vec3Clone(this.sphereDirection, this._randomDirection);
-                            break;
+                            return this.sphereDirection;
                         case ParticleSystemShape.HEMISPHERE:
-                            gd3d.math.vec3Clone(this.hemisphereDirection, this._randomDirection);
-                            break;
+                            return this.hemisphereDirection;
                         case ParticleSystemShape.CONE:
-                            gd3d.math.vec3Clone(this.coneDirection, this._randomDirection);
-                            break;
+                            return this.coneDirection;
                         case ParticleSystemShape.CIRCLE:
-                            gd3d.math.vec3Clone(this.circleDirection, this._randomDirection);
-                            break;
+                            return this.circleDirection;
                         case ParticleSystemShape.EDGE:
-                            gd3d.math.vec3Clone(this.edgeDirection, this._randomDirection);
-                            break;
+                            return this.edgeDirection;
                         default:
-                            gd3d.math.vec3Clone(this.direction, this._randomDirection);
-                            break;
+                            return this.direction;
                     }
-                    gd3d.math.vec3Normalize(this._randomDirection, this._randomDirection);
-                    return this._randomDirection;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "boxDirection", {
                 get: function () {
-                    var boxpos = new gd3d.math.vector3(0, 0, 0);
-                    boxpos.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
-                    boxpos.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
-                    boxpos.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
-                    var length = gd3d.math.vec3Length(boxpos);
-                    gd3d.math.vec3Normalize(boxpos, this.direction);
-                    this.getRandomPosition(boxpos, length);
+                    this.position.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
+                    this.position.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
+                    this.position.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
+                    gd3d.math.vec3Normalize(this.position, this.direction);
                     return this.direction;
                 },
                 enumerable: true,
@@ -8681,31 +8712,28 @@ var gd3d;
             });
             Object.defineProperty(ParticleStartData.prototype, "sphereDirection", {
                 get: function () {
-                    var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    var θ = framework.ValueData.RandomRange(0, Math.PI);
-                    var φ = framework.ValueData.RandomRange(-Math.PI, Math.PI);
-                    this._sphereDirection.x = _radius * Math.sin(θ) * Math.cos(φ);
-                    this._sphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-                    this._sphereDirection.z = _radius * Math.cos(θ);
-                    gd3d.math.vec3Normalize(this._sphereDirection, this._sphereDirection);
-                    this.getRandomPosition(this._sphereDirection, _radius);
-                    return this._sphereDirection;
+                    var θ = Math.random() * Math.PI * 2;
+                    var φ = Math.random() * Math.PI;
+                    var radius = Math.random() * this.radius;
+                    this.direction.x = Math.sin(φ) * Math.cos(θ);
+                    this.direction.y = Math.cos(φ);
+                    this.direction.z = Math.sin(φ) * Math.sin(θ);
+                    gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "hemisphereDirection", {
                 get: function () {
-                    var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    var θ = framework.ValueData.RandomRange(0, Math.PI / 2);
-                    var φ = framework.ValueData.RandomRange(-Math.PI, Math.PI);
-                    this._hemisphereDirection.z = _radius * Math.cos(θ);
-                    this._hemisphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-                    this._hemisphereDirection.x = _radius * Math.sin(θ) * Math.cos(φ);
-                    gd3d.math.vec3Normalize(this._hemisphereDirection, this._hemisphereDirection);
-                    framework.EffectUtil.RotateVector3(this._hemisphereDirection, this.direction, this._hemisphereDirection);
-                    this.getRandomPosition(this._hemisphereDirection, _radius);
-                    return this._hemisphereDirection;
+                    var θ = Math.random() * Math.PI * 2;
+                    var φ = Math.random() * Math.PI * 0.5;
+                    var radius = Math.random() * this.radius;
+                    this.direction.x = Math.sin(φ) * Math.cos(θ);
+                    this.direction.y = Math.cos(φ);
+                    this.direction.z = Math.sin(φ) * Math.sin(θ);
+                    gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -8721,17 +8749,17 @@ var gd3d;
                     bottompos.y = 0;
                     bottompos.z = this.radius * Math.sin(randomAngle);
                     if (this.emitFrom == emitfromenum.base) {
-                        gd3d.math.vec3Clone(bottompos, this.randomPosition);
+                        gd3d.math.vec3Clone(bottompos, this.position);
                     }
                     else if (this.emitFrom == emitfromenum.volume) {
-                        this.randomPosition.x = radomRadius * Math.cos(randomAngle);
-                        this.randomPosition.z = radomRadius * Math.sin(randomAngle);
-                        this.randomPosition.y = randomHeight;
+                        this.position.x = radomRadius * Math.cos(randomAngle);
+                        this.position.z = radomRadius * Math.sin(randomAngle);
+                        this.position.y = randomHeight;
                     }
-                    this._coneDirection.x = Math.cos(randomAngle) * Math.sin(this.angle * Math.PI / 180);
-                    this._coneDirection.z = Math.sin(randomAngle) * Math.sin(this.angle * Math.PI / 180);
-                    this._coneDirection.y = Math.cos(this.angle * Math.PI / 180);
-                    return this._coneDirection;
+                    this.direction.x = Math.cos(randomAngle) * Math.sin(this.angle * Math.PI / 180);
+                    this.direction.z = Math.sin(randomAngle) * Math.sin(this.angle * Math.PI / 180);
+                    this.direction.y = Math.cos(this.angle * Math.PI / 180);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -8741,14 +8769,14 @@ var gd3d;
                     var _arc = this.angle * (Math.PI / 180);
                     var a = framework.ValueData.RandomRange(-_arc / 2, _arc / 2);
                     var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    this._circleDirection.x = _radius * Math.cos(a);
-                    this._circleDirection.z = _radius * Math.sin(a);
-                    this._circleDirection.y = 0;
-                    var length = gd3d.math.vec3Length(this._circleDirection);
-                    gd3d.math.vec3Normalize(this._circleDirection, this._circleDirection);
-                    framework.EffectUtil.RotateVector3(this._circleDirection, this.direction, this._circleDirection);
-                    this.getRandomPosition(this._circleDirection, length);
-                    return this._circleDirection;
+                    this.direction.x = _radius * Math.cos(a);
+                    this.direction.z = _radius * Math.sin(a);
+                    this.direction.y = 0;
+                    var length = gd3d.math.vec3Length(this.direction);
+                    gd3d.math.vec3Normalize(this.direction, this.direction);
+                    framework.EffectUtil.RotateVector3(this.direction, this.direction, this.direction);
+                    this.getposition(this.direction, length);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -8759,18 +8787,18 @@ var gd3d;
                     edgePos.y += framework.ValueData.RandomRange(-this.radius / 2, this.radius / 2);
                     var lenght = gd3d.math.vec3Length(edgePos);
                     framework.EffectUtil.RotateVector3(edgePos, this.direction, edgePos);
-                    gd3d.math.vec3Clone(this.direction, this._edgeDirection);
-                    this.getRandomPosition(edgePos, length);
-                    return this._edgeDirection;
+                    gd3d.math.vec3Clone(this.direction, this.direction);
+                    this.getposition(edgePos, length);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
             });
-            ParticleStartData.prototype.getRandomPosition = function (dir, length) {
+            ParticleStartData.prototype.getposition = function (dir, length) {
                 gd3d.math.vec3ScaleByNum(dir, length, dir);
-                this.randomPosition.x = dir.x;
-                this.randomPosition.y = dir.y;
-                this.randomPosition.z = dir.z;
+                this.position.x = dir.x;
+                this.position.y = dir.y;
+                this.position.z = dir.z;
             };
             ParticleStartData.prototype.clone = function () {
                 var data = new ParticleStartData();
@@ -8784,22 +8812,10 @@ var gd3d;
                 data.depth = this.depth;
                 data._radius = this._radius;
                 data._angle = this._angle;
-                data._randomDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._randomDirection, data._randomDirection);
-                data.randomPosition = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this.randomPosition, data.randomPosition);
-                data._boxDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._boxDirection, data._boxDirection);
-                data._sphereDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._sphereDirection, data._sphereDirection);
-                data._hemisphereDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._hemisphereDirection, data._hemisphereDirection);
-                data._coneDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._coneDirection, data._coneDirection);
-                data._circleDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._circleDirection, data._circleDirection);
-                data._edgeDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._edgeDirection, data._edgeDirection);
+                data.position = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(this.position, data.position);
+                data.direction = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(this.direction, data.direction);
                 return data;
             };
             return ParticleStartData;
@@ -9971,25 +9987,28 @@ var gd3d;
             math.quatNormalize(out, out);
         }
         math.quatLookat = quatLookat;
-        function quat2Lookat(pos, targetpos, out) {
+        function quat2Lookat(pos, targetpos, out, updir) {
+            if (updir === void 0) { updir = gd3d.math.pool.vector3_up; }
             var dir = gd3d.math.pool.new_vector3();
             math.vec3Subtract(targetpos, pos, dir);
             math.vec3Normalize(dir, dir);
             var dot = gd3d.math.vec3Dot(gd3d.math.pool.vector3_forward, dir);
-            if (Math.abs(dot - (-1.0)) < 0.000001) {
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 180, out);
-                return;
-            }
-            if (Math.abs(dot - 1.0) < 0.000001) {
+            dot = gd3d.math.floatClamp(dot, -1, 1);
+            var rotangle = Math.acos(dot) * 180 / Math.PI;
+            if (rotangle < 0.01) {
                 out.x = 0;
                 out.y = 0;
                 out.z = 0;
                 out.w = 1;
+                return;
             }
-            dot = gd3d.math.floatClamp(dot, -1, 1);
-            var rotangle = Math.acos(dot);
+            if (rotangle > 179.9) {
+                gd3d.math.quatFromAxisAngle(updir, 180, out);
+                return;
+            }
             var rotAxis = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Cross(gd3d.math.pool.vector3_forward, dir, rotAxis);
+            gd3d.math.vec3Normalize(rotAxis, rotAxis);
             gd3d.math.quatFromAxisAngle(rotAxis, rotangle, out);
         }
         math.quat2Lookat = quat2Lookat;
@@ -12515,7 +12534,7 @@ var gd3d;
                 this.point = new pointinfo();
                 this.touches = {};
                 this.keyboardMap = {};
-                app.container.addEventListener("touchstart", function (ev) {
+                app.webgl.canvas.addEventListener("touchstart", function (ev) {
                     _this.point.x = ev.touches[0].clientX;
                     _this.point.y = ev.touches[0].clientY;
                     _this.point.touch = true;
@@ -12531,12 +12550,12 @@ var gd3d;
                         _this.touches[id].y = touch.clientY;
                     }
                 });
-                document.addEventListener("mousedown", function (ev) {
-                    _this.point.x = ev.clientX;
-                    _this.point.y = ev.clientY;
+                app.webgl.canvas.addEventListener("mousedown", function (ev) {
+                    _this.point.x = ev.offsetX;
+                    _this.point.y = ev.offsetY;
                     _this.point.touch = true;
                 });
-                document.addEventListener("touchend", function (ev) {
+                app.webgl.canvas.addEventListener("touchend", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -12552,7 +12571,7 @@ var gd3d;
                     }
                     _this.point.touch = false;
                 });
-                document.addEventListener("touchcancel", function (ev) {
+                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -12568,10 +12587,10 @@ var gd3d;
                     }
                     _this.point.touch = false;
                 });
-                document.addEventListener("mouseup", function (ev) {
+                app.webgl.canvas.addEventListener("mouseup", function (ev) {
                     _this.point.touch = false;
                 });
-                document.addEventListener("touchmove", function (ev) {
+                app.webgl.canvas.addEventListener("touchmove", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
                         var id = touch.identifier;
@@ -12596,14 +12615,14 @@ var gd3d;
                     _this.point.x = x / count;
                     _this.point.y = y / count;
                 });
-                document.addEventListener("mousemove", function (ev) {
-                    _this.point.x = ev.clientX;
-                    _this.point.y = ev.clientY;
+                app.webgl.canvas.addEventListener("mousemove", function (ev) {
+                    _this.point.x = ev.offsetX;
+                    _this.point.y = ev.offsetY;
                 });
-                document.addEventListener("keydown", function (ev) {
+                app.webgl.canvas.addEventListener("keydown", function (ev) {
                     _this.keyboardMap[ev.keyCode] = true;
                 }, false);
-                document.addEventListener("keyup", function (ev) {
+                app.webgl.canvas.addEventListener("keyup", function (ev) {
                     _this.keyboardMap[ev.keyCode] = false;
                 }, false);
             }
@@ -14435,6 +14454,7 @@ var gd3d;
                 }
             };
             meshRenderer.prototype.remove = function () {
+                this.materials.length = 0;
             };
             meshRenderer.prototype.clone = function () {
             };
@@ -15020,8 +15040,6 @@ var gd3d;
                 }
                 this.updateTrailData();
             };
-            trailRender.prototype.remove = function () {
-            };
             Object.defineProperty(trailRender.prototype, "material", {
                 get: function () {
                     if (this._material != undefined) {
@@ -15184,6 +15202,8 @@ var gd3d;
                 }
             };
             trailRender.prototype.clone = function () {
+            };
+            trailRender.prototype.remove = function () {
             };
             return trailRender;
         }());
@@ -16470,28 +16490,49 @@ var gd3d;
                         }
                         var _textureSrc = url.replace(filename, _name);
                         state.resstate[filename] = { state: 0, res: null };
-                        var img = new Image();
-                        img.src = _textureSrc;
-                        img.crossOrigin = "anonymous";
-                        img.onerror = function (error) {
-                            if (error != null) {
-                                state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
-                                state.iserror = true;
+                        if (_textureSrc.indexOf(".pvr.bin") >= 0) {
+                            gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
+                                if (err != null) {
+                                    state.iserror = true;
+                                    state.errs.push(new Error(err.message));
+                                    onstate(state);
+                                    return;
+                                }
+                                var _texture = new framework.texture(filename);
+                                _this.assetUrlDic[_texture.getGUID()] = url;
+                                var pvr = new PVRHeader(_this.webgl);
+                                console.log(_textureSrc);
+                                _texture.glTexture = pvr.parse(_buffer);
+                                _this.use(_texture);
+                                state.resstate[filename].state = 1;
+                                state.resstate[filename].res = _texture;
                                 onstate(state);
-                            }
-                        };
-                        img.onload = function () {
-                            var _texture = new framework.texture(filename);
-                            _texture.realName = _name;
-                            _this.assetUrlDic[_texture.getGUID()] = url;
-                            var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
-                            _texture.glTexture = t2d;
-                            _this.use(_texture);
-                            state.resstate[filename].state = 1;
-                            state.resstate[filename].res = _texture;
-                            onstate(state);
-                        };
+                            });
+                        }
+                        else {
+                            var img = new Image();
+                            img.src = _textureSrc;
+                            img.crossOrigin = "anonymous";
+                            img.onerror = function (error) {
+                                if (error != null) {
+                                    state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
+                                    state.iserror = true;
+                                    onstate(state);
+                                }
+                            };
+                            img.onload = function () {
+                                var _texture = new framework.texture(filename);
+                                _texture.realName = _name;
+                                _this.assetUrlDic[_texture.getGUID()] = url;
+                                var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
+                                t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                                _texture.glTexture = t2d;
+                                _this.use(_texture);
+                                state.resstate[filename].state = 1;
+                                state.resstate[filename].res = _texture;
+                                onstate(state);
+                            };
+                        }
                     });
                 }
                 else if (type == AssetTypeEnum.Material) {
@@ -16974,7 +17015,7 @@ var gd3d;
                     else if (extname == ".png" || extname == ".jpg") {
                         return AssetTypeEnum.Texture;
                     }
-                    else if (extname == ".pvr.czz" || extname == ".pvr") {
+                    else if (extname == ".pvr.bin" || extname == ".pvr") {
                         return AssetTypeEnum.PVR;
                     }
                     else if (extname == ".imgdesc.json") {
@@ -17053,15 +17094,25 @@ var PVRHeader = (function () {
         this.gl = gl;
     }
     PVRHeader.prototype.parse = function (_buffer) {
-        var t2d = new gd3d.render.glTexture2D(this.gl, gd3d.render.TextureFormatEnum.PVRTC);
         var ar = new Uint8Array(_buffer);
         var tool = new gd3d.io.binTool();
         tool.writeUint8Array(ar);
-        var pvrMetaData = new Object();
         this.version = tool.readUInt32();
-        if (this.version != 0x03525650) {
+        if (this.version === 0x03525650) {
+            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
+            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+            return this.parseV3(tool);
+        }
+        else if (this.version === 0x50565203) {
+            console.error("v2");
+        }
+        else {
+            console.error("pvr parse error!:" + this.version);
             return null;
         }
+    };
+    PVRHeader.prototype.parseV3 = function (tool) {
         this.flags = tool.readUInt32();
         this.pixelFormatH = tool.readUInt32();
         this.pixelFormatL = tool.readUInt32();
@@ -17074,201 +17125,91 @@ var PVRHeader = (function () {
         this.numFaces = tool.readUInt32();
         this.mipMapCount = tool.readUInt32();
         this.metaDataSize = tool.readUInt32();
-        var metaDataSize = 0;
-        while (metaDataSize < this.metaDataSize) {
-            var devFourCC = tool.readUInt32();
-            metaDataSize += 4;
-            var key = tool.readUInt32();
-            metaDataSize += 4;
-            var dataSize = tool.readUInt32();
-            metaDataSize += 4;
-            if (dataSize > 0) {
-                tool.readBytes(dataSize);
-                metaDataSize += dataSize;
-            }
+        tool.readBytes(this.metaDataSize);
+        var engineFormat;
+        var textureFormat;
+        var textureType;
+        var t2d = new gd3d.render.glTexture2D(this.gl);
+        switch (this.pixelFormatH) {
+            case 0:
+                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                break;
+            case 1:
+                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGBA;
+                break;
+            case 2:
+                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGB;
+                break;
+            case 3:
+                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGBA;
+                break;
+            default:
+                textureFormat = this.gl.RGB;
+                engineFormat = gd3d.render.TextureFormatEnum.RGB;
+                console.log("unknow pixel format::" + this.pixelFormatH);
         }
-        var ret = this.getTextureFormat();
-        var textureFormat = ret.format;
-        var textureInternalFormat = ret.internalFormat;
-        var textureType = ret.type;
-        if (textureInternalFormat == 0)
-            return null;
-        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
-        var target = this.gl.TEXTURE_2D;
-        if (this.numFaces > 1) {
-            target = this.gl.TEXTURE_CUBE_MAP;
-        }
-        if (this.numSurfaces > 1) {
-            return null;
-        }
-        this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
-        this.gl.bindTexture(target, t2d.texture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_LINEAR);
-        var currentMipMapSize = 0;
-        if (this.numFaces > 1)
-            target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
-        var mipWidth = this.width;
-        var mipHeight = this.height;
-        for (var mipLevel = 0; mipLevel < this.mipMapCount; ++mipLevel) {
-            currentMipMapSize = this.getDataSize(mipLevel, false, false);
-            for (var face = 0; face < this.numFaces; ++face) {
-                if (mipLevel >= 0) {
-                    var textureData = tool.readBytes(currentMipMapSize);
-                    if (this.numFaces > 1)
-                        this.gl.texImage2D(target + face, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
-                    else
-                        this.gl.texImage2D(target, mipLevel, textureInternalFormat, mipWidth, mipHeight, 0, textureFormat, textureType, textureData);
-                }
-            }
-            mipWidth = Math.max(1, mipWidth >> 1);
-            mipHeight = Math.max(1, mipHeight >> 1);
-        }
-        return t2d;
-    };
-    PVRHeader.prototype.getTextureFormat = function () {
-        var ret = { format: 0, type: 0, internalFormat: 0 };
-        if (this.pixelFormatH == 0) {
-            return;
-        }
+        t2d.format = engineFormat;
         switch (this.channelType) {
             case ChannelTypes.UnsignedByteNorm:
-                {
-                    ret.type = this.gl.UNSIGNED_BYTE;
-                    switch (this.pixelFormatL) {
-                        case this.genPixelTypeL4(8, 8, 8, 8):
-                            if (this.pixelFormatH == this.genPixelTypeH4('r', 'g', 'b', 'a'))
-                                ret.format = ret.internalFormat = this.gl.RGBA;
-                            break;
-                        case this.genPixelTypeL3(8, 8, 8):
-                            ret.format = ret.internalFormat = this.gl.RGB;
-                            break;
-                        case this.genPixelTypeL2(8, 8):
-                            ret.format = ret.internalFormat = this.gl.LUMINANCE_ALPHA;
-                            break;
-                        case this.genPixelTypeL1(8):
-                            if (this.pixelFormatH == this.genPixelTypeH1('l'))
-                                ret.format = ret.internalFormat = this.gl.LUMINANCE;
-                            else
-                                ret.format = ret.internalFormat = this.gl.ALPHA;
-                            break;
-                    }
-                }
+                textureType = this.gl.UNSIGNED_BYTE;
+                break;
             case ChannelTypes.UnsignedShortNorm:
-                {
-                    switch (this.pixelFormatL) {
-                        case this.genPixelTypeL4(4, 4, 4, 4):
-                            ret.type = this.gl.UNSIGNED_SHORT_4_4_4_4;
-                            ret.format = ret.internalFormat = this.gl.RGBA4;
-                            break;
-                        case this.genPixelTypeL4(5, 5, 5, 1):
-                            ret.type = this.gl.UNSIGNED_SHORT_5_5_5_1;
-                            ret.format = ret.internalFormat = this.gl.RGB5_A1;
-                            break;
-                        case this.genPixelTypeL3(5, 6, 5):
-                            ret.type = this.gl.UNSIGNED_SHORT_5_6_5;
-                            ret.format = ret.internalFormat = this.gl.RGB565;
-                            break;
-                    }
-                }
+                break;
         }
-        return ret;
-    };
-    PVRHeader.prototype.genPixelTypeH4 = function (c1Name, c2Name, c3Name, c4Name) {
-        var val = 0;
-        val |= c1Name.charCodeAt();
-        if (c2Name != undefined)
-            val |= c2Name.charCodeAt() << 8;
-        if (c3Name != undefined)
-            val |= c3Name.charCodeAt() << 16;
-        if (c4Name != undefined)
-            val |= c4Name.charCodeAt() << 24;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeH1 = function (c1Name) {
-        var val = 0;
-        val |= c1Name.charCodeAt();
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL3 = function (c1Bits, c2Bits, c3Bits) {
-        var val = 0;
-        val |= c1Bits;
-        if (c2Bits != undefined)
-            val |= c2Bits << 8;
-        if (c3Bits != undefined)
-            val |= c3Bits << 16;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL2 = function (c1Bits, c2Bits) {
-        var val = 0;
-        val |= c1Bits;
-        if (c2Bits != undefined)
-            val |= c2Bits << 8;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL1 = function (c1Bits) {
-        var val = 0;
-        val |= c1Bits;
-        return val;
-    };
-    PVRHeader.prototype.genPixelTypeL4 = function (c1Bits, c2Bits, c3Bits, c4Bits) {
-        var val = 0;
-        val |= c1Bits;
-        if (c2Bits != undefined)
-            val |= c2Bits << 8;
-        if (c3Bits != undefined)
-            val |= c3Bits << 16;
-        if (c4Bits != undefined)
-            val |= c4Bits << 24;
-        return val;
-    };
-    PVRHeader.prototype.getDataSize = function (mipLevel, allSurfaces, allFaces) {
-        var smallestWidth = 1;
-        var smallestHeight = 1;
-        var smallestDepth = 1;
-        var pixelFormatH = this.pixelFormatH;
-        if (pixelFormatH == 0) {
-        }
-        var dataSize = 0;
-        if (mipLevel == -1) {
-            for (var currentMIP = 0; currentMIP < this.mipMapCount; ++currentMIP) {
-                var width = Math.max(1, this.width >> currentMIP);
-                var height = Math.max(1, this.height >> currentMIP);
-                var depth = Math.max(1, this.depth >> currentMIP);
-                if (this.pixelFormatH == 0) {
-                    width = width + ((-1 * width) % smallestWidth);
-                    height = height + ((-1 * height) % smallestHeight);
-                    depth = depth + ((-1 * depth) % smallestDepth);
-                }
-                dataSize += this.getBitsPerPixel() * width * height * depth;
+        var target = this.gl.TEXTURE_2D;
+        if (this.numFaces > 1)
+            target = this.gl.TEXTURE_CUBE_MAP;
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(target, t2d.texture);
+        if (this.numFaces > 1)
+            target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
+        function textureLevelSize(format, width, height) {
+            switch (format) {
+                case t2d.ext.COMPRESSED_RGB_S3TC_DXT1_EXT:
+                case t2d.ext.COMPRESSED_RGB_ATC_WEBGL:
+                case t2d.ext.COMPRESSED_RGB_ETC1_WEBGL:
+                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 8;
+                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT3_EXT:
+                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT5_EXT:
+                case t2d.ext.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL:
+                case t2d.ext.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL:
+                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
+                case t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
+                case t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
+                    return Math.floor((Math.max(width, 8) * Math.max(height, 8) * 4 + 7) / 8);
+                case t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
+                case t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
+                    return Math.floor((Math.max(width, 16) * Math.max(height, 8) * 2 + 7) / 8);
+                default:
+                    return 0;
             }
+        }
+        var offset = 0;
+        for (var i = 0; i < this.mipMapCount; ++i) {
+            var levelSize = textureLevelSize(textureFormat, this.width, this.height);
+            var data = tool.readBytes(levelSize);
+            this.gl.compressedTexImage2D(this.gl.TEXTURE_2D, i, textureFormat, this.width, this.height, 0, data);
+            this.width = this.width >> 1;
+            if (this.width < 1)
+                this.width = 1;
+            this.height = this.height >> 1;
+            if (this.height < 1)
+                this.height = 1;
+            offset += levelSize;
+        }
+        if (this.mipMapCount > 1) {
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
         }
         else {
-            var width = Math.max(1, this.width >> mipLevel);
-            var height = Math.max(1, this.height >> mipLevel);
-            var depth = Math.max(1, this.depth >> mipLevel);
-            if (this.pixelFormatH == 0) {
-                width = width + ((-1 * width) % smallestWidth);
-                height = height + ((-1 * height) % smallestHeight);
-                depth = depth + ((-1 * depth) % smallestDepth);
-            }
-            dataSize += this.getBitsPerPixel() * width * height * depth;
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
         }
-        var numFaces = (allFaces ? this.numFaces : 1);
-        var numSurfs = (allSurfaces ? this.numSurfaces : 1);
-        return (dataSize / 8) * numSurfs * numFaces;
-    };
-    PVRHeader.prototype.getBitsPerPixel = function () {
-        if (this.pixelFormatH != 0) {
-            var lowPart = this.pixelFormatL;
-            var c1Bits = (lowPart >> 24) & 0xFF;
-            var c2Bits = (lowPart >> 16) & 0xFF;
-            var c3Bits = (lowPart >> 8) & 0xFF;
-            var c4Bits = lowPart & 0xFF;
-            return c1Bits + c2Bits + c3Bits + c4Bits;
-        }
-        return 0;
+        return t2d;
     };
     return PVRHeader;
 }());

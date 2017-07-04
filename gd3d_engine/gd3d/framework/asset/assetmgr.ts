@@ -1134,32 +1134,57 @@ namespace gd3d.framework
                     var _textureSrc: string = url.replace(filename, _name);
 
                     state.resstate[filename] = { state: 0, res: null }
-                    var img = new Image();
-                    img.src = _textureSrc;
-                    img.crossOrigin = "anonymous";
-                    img.onerror = (error) =>
+                    if (_textureSrc.indexOf(".pvr.bin") >= 0)
                     {
-                        if (error != null)
+                        gd3d.io.loadArrayBuffer(_textureSrc, (_buffer, err) =>
                         {
-                            state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
-                            state.iserror = true;
+                            if (err != null)
+                            {
+                                state.iserror = true;
+                                state.errs.push(new Error(err.message));
+                                onstate(state);
+                                return;
+                            }
+
+                            var _texture = new texture(filename);
+                            this.assetUrlDic[_texture.getGUID()] = url;
+                            let pvr: PVRHeader = new PVRHeader(this.webgl);
+                            console.log(_textureSrc);
+                            _texture.glTexture = pvr.parse(_buffer);
+                            this.use(_texture);
+                            state.resstate[filename].state = 1;//完成
+                            state.resstate[filename].res = _texture;
+                            onstate(state);
+                        });
+                    } else
+                    {
+                        var img = new Image();
+                        img.src = _textureSrc;
+                        img.crossOrigin = "anonymous";
+                        img.onerror = (error) =>
+                        {
+                            if (error != null)
+                            {
+                                state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
+                                state.iserror = true;
+                                onstate(state);
+                            }
+                        }
+                        img.onload = () =>
+                        {
+                            var _texture = new texture(filename);
+                            _texture.realName = _name;
+                            this.assetUrlDic[_texture.getGUID()] = url;
+
+                            var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
+                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                            _texture.glTexture = t2d;
+
+                            this.use(_texture);
+                            state.resstate[filename].state = 1;//完成
+                            state.resstate[filename].res = _texture;
                             onstate(state);
                         }
-                    }
-                    img.onload = () =>
-                    {
-                        var _texture = new texture(filename);
-                        _texture.realName = _name;
-                        this.assetUrlDic[_texture.getGUID()] = url;
-
-                        var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                        t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
-                        _texture.glTexture = t2d;
-
-                        this.use(_texture);
-                        state.resstate[filename].state = 1;//完成
-                        state.resstate[filename].res = _texture;
-                        onstate(state);
                     }
                 })
             }
@@ -1885,7 +1910,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.Texture;
                 }
-                else if (extname == ".pvr.czz" || extname == ".pvr")
+                else if (extname == ".pvr.bin" || extname == ".pvr")
                 {
                     return AssetTypeEnum.PVR;
                 }

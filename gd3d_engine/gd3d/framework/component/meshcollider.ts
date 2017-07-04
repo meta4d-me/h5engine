@@ -1,12 +1,35 @@
 ﻿namespace gd3d.framework
 {
+     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 碰撞组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeComponent
     @reflect.nodeMeshCollider
     export class meshcollider implements INodeComponent, ICollider
     {
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
+         /**
+         * @private
+         */
         subTran: transform;
+         /**
+         * @private
+         */
         mesh: mesh;
+         /**
+         * @private
+         */
         getBound()
         {
             return this.mesh;
@@ -24,12 +47,29 @@
         {
 
         }
-
+         /**
+         * @private
+         */
         _colliderVisible: boolean = false;
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞体的可见性
+         * @version egret-gd3d 1.0
+         */
         get colliderVisible(): boolean
         {
             return this._colliderVisible;
         }
+         /**
+         * @public
+         * @language zh_CN
+         * @param value boolbean
+         * @classdesc
+         * 碰撞体的可见性
+         * @version egret-gd3d 1.0
+         */
         set colliderVisible(value: boolean)
         {
             this._colliderVisible = value;
@@ -38,6 +78,9 @@
                 this.subTran.gameObject.visible = this._colliderVisible;
             }
         }
+         /**
+         * @private
+         */
         intersectsTransform(tran: transform): boolean
         {
             //obb-mesh  obb-obb  mesh-mesh
@@ -89,6 +132,9 @@
             }
             return _mesh;
         }
+         /**
+         * @private
+         */
         remove()
         {
             if(this.subTran)
@@ -96,6 +142,9 @@
                 this.subTran.dispose();
             }
         }
+         /**
+         * @private
+         */
         clone()
         {
 

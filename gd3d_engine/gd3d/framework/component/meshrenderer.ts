@@ -2,6 +2,13 @@
 
 namespace gd3d.framework
 {
+     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * mesh的渲染组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeRender
     @reflect.nodeComponent
     export class meshRenderer implements IRenderer
@@ -10,30 +17,75 @@ namespace gd3d.framework
         {
 
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * mesh的材质数组
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("material[]")
         materials: material[]=[];
-
+        /**
+         * @private
+         */
         @gd3d.reflect.Field("number")
         lightmapIndex: number = -1;
+         /**
+         * @private
+         */
         @gd3d.reflect.Field("vector4")
         lightmapScaleOffset: math.vector4 = new math.vector4(1, 1, 0, 0);
 
         layer: RenderLayerEnum = RenderLayerEnum.Common;
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染层级
+         * @version egret-gd3d 1.0
+         */
         renderLayer: gd3d.framework.CullingMask = CullingMask.default;
         private issetq = false;
+         /**
+         * @private
+         */
         _queue: number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 同层级渲染排序依据
+         * @version egret-gd3d 1.0
+         */
         get queue(): number
         {
             return this._queue;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 同层级渲染排序
+         * @version egret-gd3d 1.0
+         */
         set queue(value: number)
         {
             this._queue = value;
             this.issetq = true;
         }
+         /**
+         * @private
+         */
         filter: meshFilter;
         start()
         {
@@ -113,11 +165,16 @@ namespace gd3d.framework
                 }
             }
         }
-
+         /**
+         * @private
+         */
         remove()
         {
-
+            this.materials.length=0;
         }
+         /**
+         * @private
+         */
         clone()
         {
 

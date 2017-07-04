@@ -13,7 +13,7 @@
         taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
         count: number = 0;
         counttimer: number = 0;
-
+        name: string = "10004_grass.pvr";
 
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
@@ -42,7 +42,7 @@
 
         private loadPvr(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
-            this.app.getAssetMgr().load("res/resources/4022-1.pvr", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            this.app.getAssetMgr().load("res/resources/" + this.name, gd3d.framework.AssetTypeEnum.Auto, (s) =>
             {
                 if (s.isfinish)
                 {
@@ -95,11 +95,10 @@
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);//----------------使用shader
-                        let texture = this.app.getAssetMgr().getAssetByName("4022-1.pvr") as gd3d.framework.texture;
+                        let texture = this.app.getAssetMgr().getAssetByName(this.name) as gd3d.framework.texture;
                         if (texture == null)
                             console.error("为什么他是空的呀");
                         else
-                            console.error("不是空的呀");
                         cuber.materials[0].setTexture("_MainTex", texture);
 
                     }
