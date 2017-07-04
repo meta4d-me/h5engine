@@ -1,12 +1,13 @@
 uniform sampler2D _MainTex;
 uniform lowp float _AlphaCut;
 uniform highp vec4 glstate_fog_color; 
- 
+uniform lowp vec4 _TintColor;
+
 varying highp float factor; 
 varying highp vec2 xlv_TEXCOORD0;
 void main() 
 {
-    lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);
+    lowp vec4 tmpvar_3 = _TintColor * texture2D(_MainTex, xlv_TEXCOORD0);
     if(tmpvar_3.a < _AlphaCut)
         discard;
     lowp vec3 afterFog = mix(glstate_fog_color.rgb, tmpvar_3.rgb, factor);

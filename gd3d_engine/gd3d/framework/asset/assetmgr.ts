@@ -372,6 +372,8 @@ namespace gd3d.framework
                             && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
                         {
                             let _res = s.resstate[_fileName].res;
+                            if(_res==null)
+                            console.error("res is null:"+_fileName);
                             this.mapNamed[_fileName] = _res.getGUID();
                         }
 

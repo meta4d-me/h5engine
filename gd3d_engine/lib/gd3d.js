@@ -3687,6 +3687,8 @@ var gd3d;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                                 && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
                                 var _res = s.resstate[_fileName].res;
+                                if (_res == null)
+                                    console.error("res is null:" + _fileName);
                                 _this.mapNamed[_fileName] = _res.getGUID();
                             }
                             if (realTotal === 0) {
@@ -6019,8 +6021,7 @@ var gd3d;
                         _texture.use();
                         var _texelsizeName = _id + "_TexelSize";
                         var _gltexture = _texture.glTexture;
-                        var _texelsize = this.mapUniform[_texelsizeName].value;
-                        if (_texelsize != undefined) {
+                        if (this.mapUniform[_texelsizeName] != undefined) {
                             this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                         }
                     }

@@ -1,10 +1,12 @@
 {
     "layer": "transparent",
+    "queue": 0,
     "passes": {
         "base": [
             {
                 "blendmode": "add",
                 "showface": "all",
+
                 "zwrite": "off",
                 "vs": "additive_alpha",
                 "fs": "additive_alpha"
@@ -14,6 +16,7 @@
             {
                 "blendmode": "add",
                 "showface": "all",
+
                 "zwrite": "off",
                 "vs": "fog_additive_alpha",
                 "fs": "fog_additive_alpha"
@@ -23,6 +26,7 @@
             {
                 "blendmode": "add",
                 "showface": "all",
+
                 "zwrite": "off",
                 "vs": "additive_alpha_bone_eff",
                 "fs": "additive_alpha"
@@ -32,6 +36,7 @@
             {
                 "blendmode": "add",
                 "showface": "all",
+
                 "zwrite": "off",
                 "vs": "fog_additive_alpha_bone_eff",
                 "fs": "fog_additive_alpha"
