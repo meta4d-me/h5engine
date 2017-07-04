@@ -3,6 +3,15 @@
 namespace gd3d.io
 {
     
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 对可序列化实例的克隆
+     * @param instanceObj 被克隆实例
+     * @param clonedObj 克隆实例引用
+     * @version egret-gd3d 1.0
+     */
     export function cloneObj(instanceObj: any, clonedObj: any = undefined): any
     {
         referenceInfo.oldmap = {};
@@ -11,7 +20,9 @@ namespace gd3d.io
         fillCloneReference(instanceObj, clonedObj);
         return clonedObj;
     }
-
+    /**
+     * @private
+     */
     export function fillCloneReference(instanceObj: any, clonedObj: any): any
     {
         //过滤掉不需要序列化的对象
@@ -63,6 +74,9 @@ namespace gd3d.io
         return clonedObj;
     }
 
+    /**
+     * @private
+     */
     export function fillCloneReferenceTypeOrArray(instanceObj: any, clonedObj: any, key: string)
     {
         if (instanceObj[key])
@@ -94,6 +108,9 @@ namespace gd3d.io
         }
     }
 
+    /**
+     * @private
+     */
     export function fillCloneReferenceType(instanceObj: any, clonedObj: any, key: string, instanceParent: any = null, clonedParent: any = null, instanceKey: string = "")
     {
         let _meta = instanceObj[key]["__gdmeta__"];
@@ -157,6 +174,9 @@ namespace gd3d.io
         }
     }
 
+    /**
+     * @private
+     */
     export function _cloneObj(instanceObj: any, clonedObj: any = undefined): any
     {
         //过滤掉不需要序列化的对象
@@ -227,6 +247,9 @@ namespace gd3d.io
         return clonedObj;
     }
 
+    /**
+     * @private
+     */
     export function cloneOtherTypeOrArray(instanceObj: any, clonedObj: any, key: string)
     {
         if (instanceObj[key])
@@ -289,6 +312,9 @@ namespace gd3d.io
         }
     }
 
+    /**
+     * @private
+     */
     export function cloneOtherType(instanceObj: any, clonedObj: any, key: string, instanceParent: any = null, clonedParent: any = null, instanceKey: string = "")
     {
         let _meta = instanceObj[key]["__gdmeta__"];

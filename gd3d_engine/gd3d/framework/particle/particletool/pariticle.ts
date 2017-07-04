@@ -3,6 +3,9 @@ namespace gd3d.framework
 
     //还是要抽象出粒子的概念
     //这里根据发射器定义的初始参数  计算当前要提交的数据
+    /**
+     * @private
+     */
     export class Particle
     {
         public gameObject: gameObject;
@@ -573,6 +576,9 @@ namespace gd3d.framework
             this.uv = null;
         }
     }
+    /**
+     * @private
+     */
     export enum nodeType
     {
         none,

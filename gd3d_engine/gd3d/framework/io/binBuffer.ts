@@ -1,5 +1,8 @@
 namespace gd3d.io
 {
+    /**
+     * @private
+     */
     export class binBuffer
     {
         public _buf: Uint8Array[]//bufs 循环buf，用完的buf 转着圈用

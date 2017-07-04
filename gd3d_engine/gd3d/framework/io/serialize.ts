@@ -3,6 +3,9 @@
 namespace gd3d.io
 {
     //依赖的资源路径
+    /**
+     * @private
+     */
     export class SerializeDependent
     {
         static resoursePaths: string[] = [];
@@ -49,6 +52,9 @@ namespace gd3d.io
     }
 
 
+    /**
+     * @private
+     */
     export function SerializeForInspector(obj: any): string
     {
         var str = JSON.stringify(serializeObjForInspector(obj, false));
@@ -56,6 +62,9 @@ namespace gd3d.io
     }
 
 
+    /**
+     * @private
+     */
     export function serializeObjForInspector(instanceObj: any, beComponent: boolean, serializedObj: any = undefined): any
     {
         let _flag: gd3d.framework.HideFlags = gd3d.framework.HideFlags.None;
@@ -115,6 +124,9 @@ namespace gd3d.io
         }
         return serializedObj;
     }
+    /**
+     * @private
+     */
     export function serializeOtherTypeOrArrayForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean)
     {
         if (instanceObj[key])
@@ -201,6 +213,9 @@ namespace gd3d.io
         }
     }
 
+    /**
+     * @private
+     */
     export function serializeOtherTypeForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean, arrayInst: any = null)
     {
         let _meta = instanceObj[key]["__gdmeta__"];
@@ -318,12 +333,18 @@ namespace gd3d.io
     /**
      * 序列化
      */
+    /**
+     * @private
+     */
     export function Serialize(obj: any, assetMgr: any = null): string
     {
         return JSON.stringify(serializeObj(obj, null, assetMgr));
     }
 
     //根据反射类型将对象进行序列化
+    /**
+     * @private
+     */
     export function serializeObj(instanceObj: any, serializedObj: any = undefined, assetMgr: any = null): any
     {
         //过滤掉不需要序列化的对象
@@ -385,6 +406,9 @@ namespace gd3d.io
         return serializedObj;
     }
 
+    /**
+     * @private
+     */
     export function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string, assetMgr: any = null)
     {
         if (instanceObj[key])
@@ -446,6 +470,9 @@ namespace gd3d.io
         }
     }
 
+    /**
+     * @private
+     */
     export function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst: any = null, assetMgr: any = null)
     {
         let _meta = instanceObj[key]["__gdmeta__"];
@@ -545,6 +572,9 @@ namespace gd3d.io
     /**
      * 反序列化  传入的源数据为json
      */
+    /**
+     * @private
+     */
     export function deSerialize(serializedObj: string, instanceObj: any, assetMgr: any, bundlename: string = null)
     {
         referenceInfo.oldmap = {};
@@ -555,6 +585,9 @@ namespace gd3d.io
         fillReference(serializedObj["value"], instanceObj);
     }
 
+    /**
+     * @private
+     */
     export function fillReference(serializedObj: any, instanceObj: any)
     {
         for (let key in instanceObj["__gdmeta__"])
@@ -584,6 +617,9 @@ namespace gd3d.io
             }
         }
     }
+    /**
+     * @private
+     */
     export function dofillReferenceOrArray(serializedObj: any, instanceObj: any, key: string)
     {
         if (serializedObj[key])
@@ -629,6 +665,9 @@ namespace gd3d.io
             }
         }
     }
+    /**
+     * @private
+     */
     export function dofillReference(serializedObj: any, instanceObj: any, key: string)
     {
         let _isArray = instanceObj instanceof Array;
@@ -675,6 +714,9 @@ namespace gd3d.io
         }
     }
     //反序列化赋值
+    /**
+     * @private
+     */
     export function deSerializeObj(serializedObj: any, instanceObj: any, assetMgr: any, bundlename: string = null)
     {
         if (instanceObj == undefined)
@@ -720,6 +762,9 @@ namespace gd3d.io
 
 
 
+    /**
+     * @private
+     */
     export function deSerializeOtherTypeOrArray(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename: string = null)
     {
         if (serializedObj[key])
@@ -805,6 +850,9 @@ namespace gd3d.io
         }
     }
 
+    /**
+     * @private
+     */
     export function deSerializeOtherType(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename: string = null)
     {
         let _isArray = instanceObj instanceof Array;
@@ -882,6 +930,9 @@ namespace gd3d.io
     }
 
 
+    /**
+     * @private
+     */
     export function isArray(type: string)
     {
         if (type.indexOf("[]") > 0 || type.indexOf("array") >= 0)
@@ -891,6 +942,9 @@ namespace gd3d.io
         return false;
     }
 
+    /**
+     * @private
+     */
     export function isArrayOrDic(type: string)
     {
         if (type.indexOf("[]") > 0 || type.indexOf("array") >= 0 || type.indexOf("dic") >= 0)
@@ -900,6 +954,9 @@ namespace gd3d.io
         return false;
     }
 
+    /**
+     * @private
+     */
     export function isAsset(type: string)
     {
         //rawscene比较特殊、不可能存在结构中
@@ -910,12 +967,18 @@ namespace gd3d.io
         return false;
     }
 
+    /**
+     * @private
+     */
     export function isAssetInspector(type: string)
     {
         if (type == "prefab")
             return true;
     }
 
+    /**
+     * @private
+     */
     class valueInfo
     {
         value: any;
@@ -933,6 +996,9 @@ namespace gd3d.io
         }
     }
 
+    /**
+     * @private
+     */
     class inspectorValueInfo
     {
         value: any;
@@ -953,6 +1019,9 @@ namespace gd3d.io
             this.parse = _parse;
         }
     }
+    /**
+     * @private
+     */
     export class referenceInfo
     {
         static oldmap: { [id: number]: any } = {};
@@ -987,6 +1056,9 @@ namespace gd3d.io
         }
 
     }
+    /**
+     * @private
+     */
     export class enumMgr
     {
         static enumMap: { [id: string]: any } = {};
