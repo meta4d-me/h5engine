@@ -2,32 +2,73 @@
 
 namespace gd3d.framework
 {
-    //还是拆开了
+    /**
+     * @public
+     * @language zh_CN
+     * transform类 对应unity中transform概念
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class transform 
     {
         private _scene: scene;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置所在场景实例
+         * @param value 场景实例
+         * @version egret-gd3d 1.0
+         */
         public set scene(value: scene)
         {
             this._scene = value;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取所在场景
+         * @param value 场景实例
+         * @version egret-gd3d 1.0
+         */
         public get scene(): scene
         {
             if (this._scene == null)
             {
                 if (this.parent == null)
                     return null;
-                return this.parent.scene;
+                this._scene = this.parent.scene;
             }
             return this._scene;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * transform名称
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("string")
         name: string = "noname";
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * transform唯一的insid
+         * @version egret-gd3d 1.0
+         */
         public insId: insID = new insID();
 
-        //当前节点依赖的prefab路径，如果不依赖，则为空
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前节点依赖的prefab路径，如果不依赖，则为空
+         * @version egret-gd3d 1.0
+         */
         prefab: string = null;
 
         private aabbdirty: boolean = true;
@@ -36,8 +77,7 @@ namespace gd3d.framework
         * @private
         * @language zh_CN
         * 标记aabb已修改
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @version egret-gd3d 1.0
         */
         markAABBDirty()
         {
@@ -57,25 +97,35 @@ namespace gd3d.framework
         * @private
         * @language zh_CN
         * 标记aabb集合已修改
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @version egret-gd3d 1.0
         */
         markAABBChildDirty()
         {
             this.aabbchilddirty = true;
         }
-        //自己的aabb
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 自己的aabb
+         * @version egret-gd3d 1.0
+         */
         aabb: aabb;
 
-        //包含自己和所有子物体的aabb
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 包含自己和所有子物体的aabb
+         * @version egret-gd3d 1.0
+         */
         aabbchild: aabb;
 
         /**
         * @private
         * @language zh_CN
         * 计算aabb
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @version egret-gd3d 1.0
         */
         caclAABB()
         {
@@ -92,8 +142,7 @@ namespace gd3d.framework
         * @private
         * @language zh_CN
         * 计算aabb集合
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @version egret-gd3d 1.0
         */
         caclAABBChild()
         {
@@ -112,8 +161,7 @@ namespace gd3d.framework
         * @private
         * @language zh_CN
         * 构建aabb
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @version egret-gd3d 1.0
         */
         buildAABB(): aabb
         {
@@ -163,12 +211,33 @@ namespace gd3d.framework
             var _aabb = new aabb(minimum, maximum);
             return _aabb;
         }
-        //父子关系
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 子物体列表
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("transform[]")
         children: transform[];
 
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 父物体实例
+         * @version egret-gd3d 1.0
+         */
         parent: transform;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 添加子物体实例
+         * @param node 子物体实例
+         * @version egret-gd3d 1.0
+         */
         addChild(node: transform)
         {
             if (node.parent != null)
@@ -182,6 +251,15 @@ namespace gd3d.framework
             node.parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 添加子物体实例到索引位置
+         * @param node 场景实例
+         * @param index 索引位置
+         * @version egret-gd3d 1.0
+         */
         addChildAt(node: transform, index: number)
         {
             if (index < 0)
@@ -198,6 +276,13 @@ namespace gd3d.framework
             node.parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除所有子物体
+         * @version egret-gd3d 1.0
+         */
         removeAllChild()
         {
             if(this.children==undefined) return;
@@ -206,6 +291,14 @@ namespace gd3d.framework
                 this.removeChild(this.children[0]);
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除指定子物体
+         * @param node 子物体实例
+         * @version egret-gd3d 1.0
+         */
         removeChild(node: transform)
         {
             if (node.parent != this || this.children == null)
@@ -220,6 +313,14 @@ namespace gd3d.framework
                 node.parent = null;
             }
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 查找自己以及子物体中是否有指定名称的transform
+         * @param name
+         * @version egret-gd3d 1.0
+         */
         find(name: string): transform
         {
             if (this.name == name)
@@ -243,21 +344,35 @@ namespace gd3d.framework
             return null;
         }
 
-        //先丢在这
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 判断是否与给定的transform有碰撞
+         * @param tran 指定的transform
+         * @version egret-gd3d 1.0
+         */
         checkImpactTran(tran: transform): boolean
         {
             if (this.gameObject.collider == null) return false;
             return this.gameObject.collider.intersectsTransform(tran);
         }
 
-        //返回场景中所有与当前tranform碰撞的transform
+        //
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 返回场景中所有与当前tranform碰撞的transform
+         * @version egret-gd3d 1.0
+         */
         checkImpact(): Array<transform>
         {
             var trans: Array<transform> = new Array<transform>();
             this.doImpact(this.scene.getRoot(), trans);
             return trans;
         }
-        doImpact(tran: transform, impacted: Array<transform>)
+        private doImpact(tran: transform, impacted: Array<transform>)
         {
             if (tran == this) return;
             if (tran.gameObject != null && tran.gameObject.collider != null)
@@ -277,6 +392,13 @@ namespace gd3d.framework
         }
         //矩阵关系
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 标记需要刷新数据
+         * @version egret-gd3d 1.0
+         */
         markDirty()
         {
             this.dirty = true;
@@ -288,6 +410,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 刷新transform状态
+         * @param parentChange 父物体是否需要刷新
+         * @version egret-gd3d 1.0
+         */
         updateTran(parentChange: boolean)
         {
             //无刷
@@ -329,7 +459,13 @@ namespace gd3d.framework
                 this.aabbdirty = false;
             }
         }
-        //刷新自己这一条线，以得到正确的worldMatrix信息
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 刷新自己这一条线，以得到正确的worldMatrix信息
+         * @version egret-gd3d 1.0
+         */
         updateWorldTran()
         {
             //parent 找到顶，第一个dirty的
@@ -350,9 +486,9 @@ namespace gd3d.framework
         /**
         * @private
         * @language zh_CN
+        * @classdesc
         * 刷新自己的aabb集合
-        * @version gd3d 1.0
-        * @platform Web,Native
+        * @version egret-gd3d 1.0
         */
         updateAABBChild()
         {
@@ -401,6 +537,13 @@ namespace gd3d.framework
         private worldTranslate: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
         private worldScale: gd3d.math.vector3 = new gd3d.math.vector3(1, 1, 1);
         //得到世界信息要先updateWorldTran，并且解算
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取世界坐标系下的位移
+         * @version egret-gd3d 1.0
+         */
         getWorldTranslate()
         {
             if (this.dirtyWorldDecompose)
@@ -411,6 +554,13 @@ namespace gd3d.framework
             //math.vec3Format(this.worldTranslate, 4, this.worldTranslate);
             return this.worldTranslate;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取世界坐标系下的缩放
+         * @version egret-gd3d 1.0
+         */
         getWorldScale()
         {
             if (this.dirtyWorldDecompose)
@@ -421,6 +571,13 @@ namespace gd3d.framework
             //math.vec3Format(this.worldScale, 4, this.worldScale);
             return this.worldScale;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取世界坐标系下的旋转
+         * @version egret-gd3d 1.0
+         */
         getWorldRotate()
         {
             if (this.dirtyWorldDecompose)
@@ -431,14 +588,35 @@ namespace gd3d.framework
             //math.quaternionFormat(this.worldRotate, 4, this.worldRotate);
             return this.worldRotate;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取本地矩阵
+         * @version egret-gd3d 1.0
+         */
         getLocalMatrix(): gd3d.math.matrix
         {
             return this.localMatrix;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取世界矩阵
+         * @version egret-gd3d 1.0
+         */
         getWorldMatrix(): gd3d.math.matrix
         {
             return this.worldMatrix;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取世界坐标系下当前z轴的朝向
+         * @version egret-gd3d 1.0
+         */
         getForwardInWorld(out: gd3d.math.vector3)
         {
             var forward = gd3d.math.pool.new_vector3();
@@ -450,6 +628,13 @@ namespace gd3d.framework
             gd3d.math.pool.delete_vector3(forward);
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取世界坐标系下当前x轴的朝向
+         * @version egret-gd3d 1.0
+         */
         getRightInWorld(out: gd3d.math.vector3)
         {
             var right = gd3d.math.pool.new_vector3();
@@ -461,6 +646,13 @@ namespace gd3d.framework
             gd3d.math.pool.delete_vector3(right);
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取世界坐标系下y轴的朝向
+         * @version egret-gd3d 1.0
+         */
         getUpInWorld(out: gd3d.math.vector3)
         {
             var up = gd3d.math.pool.new_vector3();
@@ -471,7 +663,14 @@ namespace gd3d.framework
             gd3d.math.vec3Normalize(out, out);
             gd3d.math.pool.delete_vector3(up);
         }
-        //其他辅助功能,这个实现必须要通过修改 local sth 来完成
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置transform的世界矩阵 通过计算得到本地矩阵实现
+         * @param mat 世界空间下矩阵
+         * @version egret-gd3d 1.0
+         */
         setWorldMatrix(mat: math.matrix)
         {
             this.dirty = true;
@@ -500,6 +699,14 @@ namespace gd3d.framework
             math.pool.delete_matrix(pworld);
             math.pool.delete_matrix(invparentworld);
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置transform世界空间下的位移
+         * @param pos 世界空间下的坐标
+         * @version egret-gd3d 1.0
+         */
         setWorldPosition(pos: math.vector3)
         {
             this.dirty = true;
@@ -567,6 +774,14 @@ namespace gd3d.framework
             // math.pool.delete_vector3(dirinv);
         }
         //修改 localRotate
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 旋转当前transform到z轴指向给定transform
+         * @param trans 给定的transform
+         * @version egret-gd3d 1.0
+         */
         lookat(trans: transform)
         {
             //这个dirty的机制容易造成一些问题，注意
@@ -604,6 +819,14 @@ namespace gd3d.framework
             math.pool.delete_quaternion(quat);
             // math.pool.collect_vector3();//丢弃未使用的vector3
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 旋转当前transform到z轴指向给定坐标
+         * @param point 给定的坐标
+         * @version egret-gd3d 1.0
+         */
         lookatPoint(point: math.vector3)
         {
             //这个dirty的机制容易造成一些问题，注意
@@ -639,6 +862,13 @@ namespace gd3d.framework
         }
         //组件管理，原unity gameobject的部分
         private _gameObject: gameObject;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取绑定的gameObject
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("gameObject")
         get gameObject()
         {
@@ -650,14 +880,41 @@ namespace gd3d.framework
             return this._gameObject;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前transform的克隆
+         * @version egret-gd3d 1.0
+         */
         clone(): transform
         {
             return io.cloneObj(this) as transform;
         }
-        beDispose:boolean = false;//是否被释放了
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前transform是否被释放掉了
+         * @version egret-gd3d 1.0
+         */
+        get beDispose():boolean
+        {
+            return this._beDispose;
+        }
+        private _beDispose:boolean = false;//是否被释放了 
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放当前transform
+         * @version egret-gd3d 1.0
+         */
         dispose()
         {
-            if(this.beDispose)  return;
+            if(this._beDispose)  return;
             if (this.children)
             {
                 for (var k in this.children)
@@ -667,10 +924,17 @@ namespace gd3d.framework
                 this.removeAllChild();
             }
             this._gameObject.dispose();
-            this.beDispose = true;
+            this._beDispose = true;
         }
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 作为引擎实例的唯一id使用 自增
+     * @version egret-gd3d 1.0
+     */
     export class insID
     {
         constructor()
@@ -685,6 +949,13 @@ namespace gd3d.framework
             return next;
         }
         private id: number;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取唯一id
+         * @version egret-gd3d 1.0
+         */
         getInsID(): number
         {
             return this.id;
