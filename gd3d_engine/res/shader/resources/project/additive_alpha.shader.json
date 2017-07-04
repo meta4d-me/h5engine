@@ -4,33 +4,33 @@
         "base": [
             {
                 "blendmode": "blend",
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "additive_alpha",
-                "fs": "flowwater"
+                "fs": "additive_alpha"
             }
         ],
         "base_fog": [
             {
                 "blendmode": "blend",
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "fog_additive_alpha",
-                "fs": "fog_flowwater"
+                "fs": "fog_additive_alpha"
             }
         ],
         "skin": [
             {
                 "blendmode": "blend",
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "additive_alpha_bone_eff",
-                "fs": "flowwater"
+                "fs": "additive_alpha"
             }
         ],
         "skin_fog": [
             {
                 "blendmode": "blend",
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "fog_additive_alpha_bone_eff",
-                "fs": "fog_flowwater"
+                "fs": "fog_additive_alpha"
             }
         ],
         "shadowgen": [],
