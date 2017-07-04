@@ -2,19 +2,45 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2DUI的容器类，与canvasrender(3DUI)相对应。
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class overlay2D implements IOverLay
     {
-        // public notify: INotify;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 构造函数
+         * @version egret-gd3d 1.0
+         */
         constructor()
         {
             this.canvas = new canvas();
             sceneMgr.app.markNotify(this.canvas.getRoot(), NotifyType.AddChild);
         }
+
+        /**
+         * @private
+         * @language zh_CN
+         * @classdesc
+         * 是否初始化完成，在执行完start之后设置为true
+         * @version egret-gd3d 1.0
+         */
         init: boolean = false;
-        camera: camera;
-        app: application;
-        inputmgr: inputMgr;
+
+        private camera: camera;
+        private app: application;
+        private inputmgr: inputMgr;
+
+        /**
+         * @private
+         */
         start(camera: camera)
         {
             this.camera = camera;
@@ -22,32 +48,96 @@ namespace gd3d.framework
             this.canvas.scene = camera.gameObject.getScene();
             this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
         }
+        
+        /**
+         * @private
+         */
         @gd3d.reflect.Field("canvas")
-        canvas: canvas;//2d huabu
+        canvas: canvas;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否自适应
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("boolean")
         autoAsp: boolean = true;
 
-        renderLayer: CullingMask = CullingMask.ui;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 添加2d子节点
+         * @param node 2d节点实例
+         * @version egret-gd3d 1.0
+         */
         addChild(node: transform2D)
         {
             this.canvas.addChild(node);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除2d子节点
+         * @param node 2d节点实例
+         * @version egret-gd3d 1.0
+         */
         removeChild(node: transform2D)
         {
             this.canvas.removeChild(node);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取所有的2d子节点
+         * @version egret-gd3d 1.0
+         */
         getChildren(): transform2D[]
         {
             return this.canvas.getChildren();
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取2d子节点的数量
+         * @version egret-gd3d 1.0
+         */
         getChildCount(): number
         {
             return this.canvas.getChildCount();
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取2d子节点
+         * @param index 索引
+         * @version egret-gd3d 1.0
+         */
         getChild(index: number): transform2D
         {
             return this.canvas.getChild(index);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染
+         * @param context 渲染上下文
+         * @param assetmgr 资源管理类实例
+         * @param camera 相机实例
+         * @version egret-gd3d 1.0
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
             if (!this.canvas.getRoot().visible) return;
@@ -69,6 +159,15 @@ namespace gd3d.framework
             context.updateOverlay();
             this.canvas.render(context, assetmgr);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 更新
+         * @param delta 两次update的时间间隔
+         * @version egret-gd3d 1.0
+         */
         update(delta: number)
         {
             var vp = new math.rect();
@@ -85,6 +184,15 @@ namespace gd3d.framework
 
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 事件检测
+         * @param mx x偏移
+         * @param my y偏移
+         * @version egret-gd3d 1.0
+         */
         pick2d(mx: number, my: number): transform2D
         {
             if (this.camera == null) return null;
@@ -98,9 +206,17 @@ namespace gd3d.framework
             outv2.y = sy;
             var root = this.canvas.getRoot();
             return this.dopick2d(outv2, root);
-
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 事件处理
+         * @param outv canvas下的坐标
+         * @param tran 2d节点
+         * @version egret-gd3d 1.0
+         */
         dopick2d(outv: math.vector2, tran: transform2D): transform2D
         {
             if (tran.components != null)
@@ -127,6 +243,9 @@ namespace gd3d.framework
             return null;
         }
 
+        /**
+         * @private
+         */
         calScreenPosToCanvasPos(mousePos: gd3d.math.vector2, canvasPos: gd3d.math.vector2)
         {
             var vp = new math.rect();
@@ -141,7 +260,6 @@ namespace gd3d.framework
             gd3d.math.matrix3x2TransformVector2(mat, temt, canvasPos);
             gd3d.math.pool.delete_vector2(temt);
         }
-
     }
 
 }

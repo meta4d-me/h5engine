@@ -2,16 +2,27 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2d批处理类
+     * @version egret-gd3d 1.0
+     */
     export class batcher2D
     {
-        mesh: render.glMesh;
-        drawMode: render.DrawModeEnum;
-        vboCount: number = 0;
-        curPass: render.glDrawPass;
+        private mesh: render.glMesh;
+        private drawMode: render.DrawModeEnum;
+        private vboCount: number = 0;
+        private curPass: render.glDrawPass;
 
-        eboCount: number = 0;
-        dataForVbo: Float32Array;
-        dataForEbo: Uint16Array;
+        private eboCount: number = 0;
+        private dataForVbo: Float32Array;
+        private dataForEbo: Uint16Array;
+
+        /**
+         * private
+         */
         initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum)
         {
             this.mesh = new render.glMesh();
@@ -24,6 +35,10 @@ namespace gd3d.framework
                 this.dataForEbo = new Uint16Array(128);
             }
         }
+
+        /**
+         * private
+         */
         begin(webgl: WebGLRenderingContext, pass: render.glDrawPass)
         {
             // if (mat == this.curmaterial) return;
@@ -32,6 +47,10 @@ namespace gd3d.framework
                 this.end(webgl);
             this.curPass = pass;
         }
+
+        /**
+         * private
+         */
         push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[])
         {
             if (this.vboCount + vbodata.length > 2048
@@ -82,6 +101,10 @@ namespace gd3d.framework
 
 
         }
+
+        /**
+         * private
+         */
         end(webgl: WebGLRenderingContext)
         {
             if (this.vboCount == 0) return;
@@ -113,55 +136,133 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 3DUI的容器类</p>
+     * 3d组件</p>
+     * 与overlay(2DUI)相对应。
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeRender
     @reflect.nodeComponent
     @reflect.nodeCanvasRendererCollider
     export class canvasRenderer implements IRenderer, ICollider
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 构造函数
+         * @version egret-gd3d 1.0
+         */
         constructor()
         {
             this.canvas = new canvas();
             this.canvas.is2dUI = false;
         }
+
+        /**
+         * @private
+         */
         subTran: transform;
+
+        /**
+         * @private
+         */
         getBound()
         {
             return null;
         }
+
+        /**
+         * @private
+         */
         intersectsTransform(tran: transform): boolean
         {
             return false;
         }
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * layer类型
+         * @version egret-gd3d 1.0
+         */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
+
+        /**
+         * @private
+         */
         queue: number = 0;
+        
         gameObject: gameObject;
         @gd3d.reflect.Field("canvas")
         canvas: canvas;
         inputmgr: inputMgr;
         //绑定这个canvas 从哪个camera 响应事件
         cameraTouch: camera;
+
+        /**
+         * @private
+         */
         start()
         {
             this.canvas.scene = this.gameObject.getScene();
             this.canvas.parentTrans=this.gameObject.transform;
             this.inputmgr = this.gameObject.getScene().app.getInputMgr();
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 添加2d子节点
+         * @version egret-gd3d 1.0
+         */
         addChild(node: transform2D)
         {
             this.canvas.addChild(node);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 移除2d子节点
+         * @version egret-gd3d 1.0
+         */
         removeChild(node: transform2D)
         {
             this.canvas.removeChild(node);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取所有2d子节点
+         * @version egret-gd3d 1.0
+         */
         getChildren(): transform2D[]
         {
             return this.canvas.getChildren();
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取2d子节点的数量
+         * @version egret-gd3d 1.0
+         */
         getChildCount(): number
         {
             return this.canvas.getChildCount();
         }
+
         getChild(index: number): transform2D
         {
             return this.canvas.getChild(index);
@@ -245,6 +346,7 @@ namespace gd3d.framework
             }
             return null;
         }
+
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
