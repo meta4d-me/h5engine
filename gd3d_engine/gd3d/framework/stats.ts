@@ -4,6 +4,9 @@ namespace Stats
      * @author mrdoob / http://mrdoob.com/
      * @modify lights translate -> typescript
      */
+    /**
+     * @private
+     */
     export class Stats
     {
         constructor(app:gd3d.framework.application)
@@ -116,6 +119,9 @@ namespace Stats
 
 
     }
+    /**
+     * @private
+     */
     class Panel
     {
         constructor(name: string, fg: string, bg: string)

@@ -3,49 +3,175 @@
 		{
 			"kind": "member",
 			"type": "gd3d.math.vector3",
+			"name": "center",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"rwType": 1,
+			"description": "计算包围盒的中心位置",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
 			"name": "maximum",
 			"memberof": "gd3d.framework.aabb",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "最大点",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native"
 		},
 		{
 			"kind": "member",
 			"type": "gd3d.math.vector3",
 			"name": "minimum",
 			"memberof": "gd3d.framework.aabb",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3",
-			"name": "opmax",
-			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
-			"default": "new gd3d.math.vector3()"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3",
-			"name": "opmin",
-			"memberof": "gd3d.framework.aabb",
-			"scope": "instance",
-			"default": "new gd3d.math.vector3()"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3",
-			"name": "srcmax",
-			"memberof": "gd3d.framework.aabb",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3",
-			"name": "srcmin",
-			"memberof": "gd3d.framework.aabb",
-			"scope": "instance"
+			"description": "最小点",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native"
 		}
 	],
-	"function": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "aabb",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "构建轴对称包围盒",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "_minimum",
+					"type": "gd3d.math.vector3",
+					"description": "最小点"
+				},
+				{
+					"name": "_maximum",
+					"type": "gd3d.math.vector3",
+					"description": "最大点"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addAABB",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "包含一个aabb",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "aabb",
+					"type": "gd3d.framework.aabb",
+					"description": "轴对称包围盒"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addVector3",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "包含一个点",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "vec",
+					"type": "gd3d.math.vector3",
+					"description": "世界坐标"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "clear",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "清空",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.aabb",
+			"name": "clone",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "克隆",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "containsVector3",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "检查是否包含点",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "vec",
+					"type": "gd3d.math.vector3",
+					"description": "世界坐标"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "getVec3",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "获取包围盒顶点数据",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "vecs",
+					"type": "gd3d.math.vector3[]",
+					"description": "引用数组"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "intersectAABB",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "检查是否与aabb相交",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "aabb",
+					"type": "gd3d.framework.aabb",
+					"description": "轴对称包围盒"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"description": "刷新轴对称包围盒",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native",
+			"params": [
+				{
+					"name": "worldmatrix",
+					"type": "gd3d.math.matrix",
+					"description": "物体的世界矩阵"
+				}
+			]
+		}
+	],
 	"globalMember": [],
 	"globalFunction": [],
 	"class": {

@@ -1,6 +1,9 @@
 ﻿
 namespace gd3d.render
 {
+    /**
+     * @private
+     */
     export class caps
     {
         public maxTexturesImageUnits: number;
@@ -21,6 +24,9 @@ namespace gd3d.render
         public drawBuffersExtension;
         public pvrtcExtension: any;
     }
+    /**
+     * @private
+     */
     export class webglkit
     {
         private static _maxVertexAttribArray: number = 0;

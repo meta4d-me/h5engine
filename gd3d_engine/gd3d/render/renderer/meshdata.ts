@@ -1,5 +1,8 @@
 ﻿namespace gd3d.render
 {
+    /**
+     * @private
+     */
     export class meshData
     {
         pos: gd3d.math.vector3[];//use pos.length 作为定点数量
@@ -37,12 +40,7 @@
         {
             for (var i = 0; i < 4; i++)
             {
-                // var v = new math.vector3();
-                // v.x = value.x;
-                // v.y = value.y;
-                // v.z = value.z;
                 var v = math.pool.clone_vector3(value);
-                // .vec3Clone(value, v);
                 array.push(v);
             }
         }

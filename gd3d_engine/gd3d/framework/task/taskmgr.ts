@@ -1,5 +1,8 @@
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export class taskstate
     {
         finish: boolean = false;
@@ -9,10 +12,16 @@ namespace gd3d.framework
         taskCall: (taskstate, state: taskstate) => void = null;
         taskInterface: ITask = null;
     }
+    /**
+     * @private
+     */
     export interface ITask
     {
         move(delta: number, laststate: taskstate, state: taskstate);
     }
+    /**
+     * @private
+     */
     export class taskMgr
     {
         tasks: taskstate[] = [];

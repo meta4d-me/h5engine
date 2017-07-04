@@ -472,16 +472,18 @@
 			"name": "loadArrayBuffer",
 			"memberof": "gd3d.io",
 			"scope": "instance",
+			"description": "加载arraybuffer资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
 					"type": "string",
-					"description": ""
+					"description": "加载路径"
 				},
 				{
 					"name": "fun",
 					"type": "(_bin:ArrayBuffer,_err:Error)=>void",
-					"description": ""
+					"description": "回调函数"
 				}
 			]
 		},
@@ -492,16 +494,18 @@
 			"name": "loadBlob",
 			"memberof": "gd3d.io",
 			"scope": "instance",
+			"description": "加载二进制资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
 					"type": "string",
-					"description": ""
+					"description": "加载路径"
 				},
 				{
 					"name": "fun",
 					"type": "(_blob:Blob,_err:Error)=>void",
-					"description": ""
+					"description": "回调函数"
 				}
 			]
 		},
@@ -512,21 +516,23 @@
 			"name": "loadImg",
 			"memberof": "gd3d.io",
 			"scope": "instance",
+			"description": "加载图片资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
 					"type": "string",
-					"description": ""
+					"description": "加载路径"
 				},
 				{
 					"name": "fun",
 					"type": "(_tex:HTMLImageElement,_err:Error)=>void",
-					"description": ""
+					"description": "回调函数"
 				},
 				{
 					"name": "progress",
 					"type": "(progre:number)=>void",
-					"description": ""
+					"description": "加载进度"
 				}
 			]
 		},
@@ -537,16 +543,18 @@
 			"name": "loadText",
 			"memberof": "gd3d.io",
 			"scope": "instance",
+			"description": "加载text资源",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
 					"type": "string",
-					"description": ""
+					"description": "加载路径"
 				},
 				{
 					"name": "fun",
 					"type": "(_txt:string,_err:Error)=>void",
-					"description": ""
+					"description": "回调函数"
 				}
 			]
 		},

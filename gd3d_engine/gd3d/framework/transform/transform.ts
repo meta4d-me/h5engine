@@ -510,22 +510,55 @@ namespace gd3d.framework
         private dirtyChild: boolean = true;//子层是否需要更新
 
         private dirtyWorldDecompose: boolean = false;
-        //本地rts
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 本地旋转四元数
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("quaternion")
         localRotate: gd3d.math.quaternion = new gd3d.math.quaternion();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 本地位移
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0))
         localTranslate: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 本地缩放
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1))
         localScale: gd3d.math.vector3 = new gd3d.math.vector3(1, 1, 1);
-        //local rts->local matrix
         private localMatrix: gd3d.math.matrix = new gd3d.math.matrix();
 
         private _localEulerAngles: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取本地旋转的欧拉角
+         * @version egret-gd3d 1.0
+         */
         get localEulerAngles(): gd3d.math.vector3
         {
             math.quatToEulerAngles(this.localRotate, this._localEulerAngles);
             return this._localEulerAngles;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置本地旋转的欧拉角
+         * @version egret-gd3d 1.0
+         */
         set localEulerAngles(angle: gd3d.math.vector3)
         {
             math.quatFromEulerAngles(angle.x, angle.y, angle.z, this.localRotate);
@@ -536,7 +569,6 @@ namespace gd3d.framework
         private worldRotate: gd3d.math.quaternion = new gd3d.math.quaternion();
         private worldTranslate: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
         private worldScale: gd3d.math.vector3 = new gd3d.math.vector3(1, 1, 1);
-        //得到世界信息要先updateWorldTran，并且解算
         /**
          * @public
          * @language zh_CN
@@ -773,7 +805,6 @@ namespace gd3d.framework
             // math.pool.delete_vector3(dir);
             // math.pool.delete_vector3(dirinv);
         }
-        //修改 localRotate
         /**
          * @public
          * @language zh_CN
@@ -784,25 +815,16 @@ namespace gd3d.framework
          */
         lookat(trans: transform)
         {
-            //这个dirty的机制容易造成一些问题，注意
             this.dirty = true;
             trans.updateWorldTran();//确保worldmatrix正确，这个计算比较慢
             this.updateWorldTran();
 
-
-
             var p0 = this.getWorldTranslate();
             var p1 = trans.getWorldTranslate();
-
-            //quatworld.quadLookat(p0,p1,up);
-            //quat = -this.getWorldRotate();
-            //this.setLocalQuat(quatworld*quat);
 
             var d = math.pool.new_vector3();//池化处理
 
             gd3d.math.vec3Subtract(p1, p0, d);
-
-
 
             var quatworld = math.pool.new_quaternion();
             var quat = math.pool.new_quaternion();
@@ -811,13 +833,9 @@ namespace gd3d.framework
             math.quatInverse(quatworldCur, quat);
             math.quatMultiply(quat, quatworld, this.localRotate);
 
-            //math.quatClone(quat,this.localRotate);
-
-
             math.pool.delete_vector3(d);//归还vector3,不归还也没多大毛病，多几个gc而已，也许v8能搞定
             math.pool.delete_quaternion(quatworld);
             math.pool.delete_quaternion(quat);
-            // math.pool.collect_vector3();//丢弃未使用的vector3
         }
         /**
          * @public
@@ -829,21 +847,13 @@ namespace gd3d.framework
          */
         lookatPoint(point: math.vector3)
         {
-            //这个dirty的机制容易造成一些问题，注意
             this.dirty = true;
             this.updateWorldTran();
-
-
 
             var p0 = this.getWorldTranslate();
             var p1 = point;
 
-            //quatworld.quadLookat(p0,p1,up);
-            //quat = -this.getWorldRotate();
-            //this.setLocalQuat(quatworld*quat);
-
             var d = math.pool.new_vector3();//池化处理
-
             gd3d.math.vec3Subtract(p1, p0, d);
 
             var quatworld = math.pool.new_quaternion();
@@ -853,14 +863,12 @@ namespace gd3d.framework
             math.quatInverse(quatworldCur, quat);
             math.quatMultiply(quat, quatworld, this.localRotate);
 
-            //math.quatClone(quat,this.localRotate);
             this.markDirty();
 
             math.pool.delete_vector3(d);//归还vector3,不归还也没多大毛病，多几个gc而已，也许v8能搞定
             math.pool.delete_quaternion(quatworld);
             math.pool.delete_quaternion(quat);
         }
-        //组件管理，原unity gameobject的部分
         private _gameObject: gameObject;
         /**
          * @public
