@@ -1387,7 +1387,7 @@ declare namespace gd3d.framework {
         start(): void;
         update(delta: number): void;
         private _update(delta);
-        mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, curFrameData: EffectFrameData): void;
+        private mergeLerpAttribData(realUseCurFrameData, curFrameData);
         private updateEffectBatcher(effectBatcher, curAttrsData, initFrameData, vertexStartIndex);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         clone(): effectSystem;
@@ -2348,24 +2348,15 @@ declare namespace gd3d.framework {
         radius: number;
         private _angle;
         angle: number;
-        emitFrom: emitfromenum;
-        randomPosition: gd3d.math.vector3;
-        private _randomDirection;
         readonly randomDirection: gd3d.math.vector3;
-        private _boxDirection;
         readonly boxDirection: gd3d.math.vector3;
-        private _sphereDirection;
         readonly sphereDirection: gd3d.math.vector3;
-        private _hemisphereDirection;
         readonly hemisphereDirection: gd3d.math.vector3;
-        private _coneDirection;
+        emitFrom: emitfromenum;
         readonly coneDirection: gd3d.math.vector3;
-        private _circleDirection;
         readonly circleDirection: gd3d.math.vector3;
-        private _edgeDirection;
         readonly edgeDirection: math.vector3;
-        constructor();
-        private getRandomPosition(dir, length);
+        private getposition(dir, length);
         clone(): ParticleStartData;
     }
     enum emitfromenum {

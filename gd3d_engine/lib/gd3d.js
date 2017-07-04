@@ -15149,14 +15149,6 @@ var gd3d;
                 this._radius = 0;
                 this._angle = 0;
                 this.emitFrom = emitfromenum.base;
-                this.randomPosition = new gd3d.math.vector3(0, 0, 0);
-                this._randomDirection = new gd3d.math.vector3(0, 1, 0);
-                this._boxDirection = new gd3d.math.vector3(0, 1, 0);
-                this._sphereDirection = new gd3d.math.vector3(0, 1, 0);
-                this._hemisphereDirection = new gd3d.math.vector3(0, 1, 0);
-                this._coneDirection = new gd3d.math.vector3(0, 1, 0);
-                this._circleDirection = new gd3d.math.vector3(0, 0, 1);
-                this._edgeDirection = new gd3d.math.vector3(0, 1, 0);
             }
             Object.defineProperty(ParticleStartData.prototype, "position", {
                 get: function () {
@@ -15222,42 +15214,30 @@ var gd3d;
                 get: function () {
                     switch (this.shapeType) {
                         case ParticleSystemShape.BOX:
-                            gd3d.math.vec3Clone(this.boxDirection, this._randomDirection);
-                            break;
+                            return this.boxDirection;
                         case ParticleSystemShape.SPHERE:
-                            gd3d.math.vec3Clone(this.sphereDirection, this._randomDirection);
-                            break;
+                            return this.sphereDirection;
                         case ParticleSystemShape.HEMISPHERE:
-                            gd3d.math.vec3Clone(this.hemisphereDirection, this._randomDirection);
-                            break;
+                            return this.hemisphereDirection;
                         case ParticleSystemShape.CONE:
-                            gd3d.math.vec3Clone(this.coneDirection, this._randomDirection);
-                            break;
+                            return this.coneDirection;
                         case ParticleSystemShape.CIRCLE:
-                            gd3d.math.vec3Clone(this.circleDirection, this._randomDirection);
-                            break;
+                            return this.circleDirection;
                         case ParticleSystemShape.EDGE:
-                            gd3d.math.vec3Clone(this.edgeDirection, this._randomDirection);
-                            break;
+                            return this.edgeDirection;
                         default:
-                            gd3d.math.vec3Clone(this.direction, this._randomDirection);
-                            break;
+                            return this.direction;
                     }
-                    gd3d.math.vec3Normalize(this._randomDirection, this._randomDirection);
-                    return this._randomDirection;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "boxDirection", {
                 get: function () {
-                    var boxpos = new gd3d.math.vector3(0, 0, 0);
-                    boxpos.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
-                    boxpos.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
-                    boxpos.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
-                    var length = gd3d.math.vec3Length(boxpos);
-                    gd3d.math.vec3Normalize(boxpos, this.direction);
-                    this.getRandomPosition(boxpos, length);
+                    this.position.x = framework.ValueData.RandomRange(-this.width / 2, this.width / 2);
+                    this.position.y = framework.ValueData.RandomRange(-this.height / 2, this.height / 2);
+                    this.position.z = framework.ValueData.RandomRange(-this.depth / 2, this.depth / 2);
+                    gd3d.math.vec3Normalize(this.position, this.direction);
                     return this.direction;
                 },
                 enumerable: true,
@@ -15265,31 +15245,28 @@ var gd3d;
             });
             Object.defineProperty(ParticleStartData.prototype, "sphereDirection", {
                 get: function () {
-                    var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    var θ = framework.ValueData.RandomRange(0, Math.PI);
-                    var φ = framework.ValueData.RandomRange(-Math.PI, Math.PI);
-                    this._sphereDirection.x = _radius * Math.sin(θ) * Math.cos(φ);
-                    this._sphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-                    this._sphereDirection.z = _radius * Math.cos(θ);
-                    gd3d.math.vec3Normalize(this._sphereDirection, this._sphereDirection);
-                    this.getRandomPosition(this._sphereDirection, _radius);
-                    return this._sphereDirection;
+                    var θ = Math.random() * Math.PI * 2;
+                    var φ = Math.random() * Math.PI;
+                    var radius = Math.random() * this.radius;
+                    this.direction.x = Math.sin(φ) * Math.cos(θ);
+                    this.direction.y = Math.cos(φ);
+                    this.direction.z = Math.sin(φ) * Math.sin(θ);
+                    gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "hemisphereDirection", {
                 get: function () {
-                    var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    var θ = framework.ValueData.RandomRange(0, Math.PI / 2);
-                    var φ = framework.ValueData.RandomRange(-Math.PI, Math.PI);
-                    this._hemisphereDirection.z = _radius * Math.cos(θ);
-                    this._hemisphereDirection.y = _radius * Math.sin(θ) * Math.sin(φ);
-                    this._hemisphereDirection.x = _radius * Math.sin(θ) * Math.cos(φ);
-                    gd3d.math.vec3Normalize(this._hemisphereDirection, this._hemisphereDirection);
-                    framework.EffectUtil.RotateVector3(this._hemisphereDirection, this.direction, this._hemisphereDirection);
-                    this.getRandomPosition(this._hemisphereDirection, _radius);
-                    return this._hemisphereDirection;
+                    var θ = Math.random() * Math.PI * 2;
+                    var φ = Math.random() * Math.PI * 0.5;
+                    var radius = Math.random() * this.radius;
+                    this.direction.x = Math.sin(φ) * Math.cos(θ);
+                    this.direction.y = Math.cos(φ);
+                    this.direction.z = Math.sin(φ) * Math.sin(θ);
+                    gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -15305,17 +15282,17 @@ var gd3d;
                     bottompos.y = 0;
                     bottompos.z = this.radius * Math.sin(randomAngle);
                     if (this.emitFrom == emitfromenum.base) {
-                        gd3d.math.vec3Clone(bottompos, this.randomPosition);
+                        gd3d.math.vec3Clone(bottompos, this.position);
                     }
                     else if (this.emitFrom == emitfromenum.volume) {
-                        this.randomPosition.x = radomRadius * Math.cos(randomAngle);
-                        this.randomPosition.z = radomRadius * Math.sin(randomAngle);
-                        this.randomPosition.y = randomHeight;
+                        this.position.x = radomRadius * Math.cos(randomAngle);
+                        this.position.z = radomRadius * Math.sin(randomAngle);
+                        this.position.y = randomHeight;
                     }
-                    this._coneDirection.x = Math.cos(randomAngle) * Math.sin(this.angle * Math.PI / 180);
-                    this._coneDirection.z = Math.sin(randomAngle) * Math.sin(this.angle * Math.PI / 180);
-                    this._coneDirection.y = Math.cos(this.angle * Math.PI / 180);
-                    return this._coneDirection;
+                    this.direction.x = Math.cos(randomAngle) * Math.sin(this.angle * Math.PI / 180);
+                    this.direction.z = Math.sin(randomAngle) * Math.sin(this.angle * Math.PI / 180);
+                    this.direction.y = Math.cos(this.angle * Math.PI / 180);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -15325,14 +15302,14 @@ var gd3d;
                     var _arc = this.angle * (Math.PI / 180);
                     var a = framework.ValueData.RandomRange(-_arc / 2, _arc / 2);
                     var _radius = framework.ValueData.RandomRange(0, this.radius);
-                    this._circleDirection.x = _radius * Math.cos(a);
-                    this._circleDirection.z = _radius * Math.sin(a);
-                    this._circleDirection.y = 0;
-                    var length = gd3d.math.vec3Length(this._circleDirection);
-                    gd3d.math.vec3Normalize(this._circleDirection, this._circleDirection);
-                    framework.EffectUtil.RotateVector3(this._circleDirection, this.direction, this._circleDirection);
-                    this.getRandomPosition(this._circleDirection, length);
-                    return this._circleDirection;
+                    this.direction.x = _radius * Math.cos(a);
+                    this.direction.z = _radius * Math.sin(a);
+                    this.direction.y = 0;
+                    var length = gd3d.math.vec3Length(this.direction);
+                    gd3d.math.vec3Normalize(this.direction, this.direction);
+                    framework.EffectUtil.RotateVector3(this.direction, this.direction, this.direction);
+                    this.getposition(this.direction, length);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
@@ -15343,18 +15320,18 @@ var gd3d;
                     edgePos.y += framework.ValueData.RandomRange(-this.radius / 2, this.radius / 2);
                     var lenght = gd3d.math.vec3Length(edgePos);
                     framework.EffectUtil.RotateVector3(edgePos, this.direction, edgePos);
-                    gd3d.math.vec3Clone(this.direction, this._edgeDirection);
-                    this.getRandomPosition(edgePos, length);
-                    return this._edgeDirection;
+                    gd3d.math.vec3Clone(this.direction, this.direction);
+                    this.getposition(edgePos, length);
+                    return this.direction;
                 },
                 enumerable: true,
                 configurable: true
             });
-            ParticleStartData.prototype.getRandomPosition = function (dir, length) {
+            ParticleStartData.prototype.getposition = function (dir, length) {
                 gd3d.math.vec3ScaleByNum(dir, length, dir);
-                this.randomPosition.x = dir.x;
-                this.randomPosition.y = dir.y;
-                this.randomPosition.z = dir.z;
+                this.position.x = dir.x;
+                this.position.y = dir.y;
+                this.position.z = dir.z;
             };
             ParticleStartData.prototype.clone = function () {
                 var data = new ParticleStartData();
@@ -15368,22 +15345,10 @@ var gd3d;
                 data.depth = this.depth;
                 data._radius = this._radius;
                 data._angle = this._angle;
-                data._randomDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._randomDirection, data._randomDirection);
-                data.randomPosition = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this.randomPosition, data.randomPosition);
-                data._boxDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._boxDirection, data._boxDirection);
-                data._sphereDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._sphereDirection, data._sphereDirection);
-                data._hemisphereDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._hemisphereDirection, data._hemisphereDirection);
-                data._coneDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._coneDirection, data._coneDirection);
-                data._circleDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._circleDirection, data._circleDirection);
-                data._edgeDirection = new gd3d.math.vector3();
-                gd3d.math.vec3Clone(this._edgeDirection, data._edgeDirection);
+                data.position = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(this.position, data.position);
+                data.direction = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(this.direction, data.direction);
                 return data;
             };
             return ParticleStartData;
@@ -16902,9 +16867,9 @@ var gd3d;
                 this.renderModel = this.data.renderModel;
                 this.curLife = 0;
                 this.startFrameId = this.batcher.effectSys.frameId;
-                var localRandomDirection = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomDirection);
+                var localRandomDirection = this.data.particleStartData.randomDirection;
                 this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
-                var localRandomTranslate = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomPosition);
+                var localRandomTranslate = this.data.particleStartData.position;
                 this.localTranslate = gd3d.math.pool.clone_vector3(localRandomTranslate);
                 this.simulationSpeed = this.data.simulationSpeed != undefined ? this.data.simulationSpeed.getValue() : 0;
                 if (this.data.euler == undefined)
@@ -16938,8 +16903,8 @@ var gd3d;
                 else
                     this.colorRate = 1;
                 gd3d.math.vec3Clone(this.localScale, this.startScale);
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 if (this.renderModel == framework.RenderModel.None || this.renderModel == framework.RenderModel.StretchedBillBoard) {
-                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                     if (this.data.particleStartData.shapeType != framework.ParticleSystemShape.NORMAL) {
                         var localOrgin = gd3d.math.pool.vector3_zero;
                         gd3d.math.quatLookat(localOrgin, localRandomDirection, this.rotationByShape);
@@ -16978,7 +16943,6 @@ var gd3d;
                 gd3d.math.matrixMultiply(this.emisson.matToBatcher, this.localMatrix, this.matToBatcher);
             };
             Particle.prototype._updateRotation = function (delta) {
-                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 this._updateElementRotation();
             };
             Particle.prototype._updateElementRotation = function () {
@@ -17029,10 +16993,10 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(zaxis);
                         return;
                     }
-                    gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);
                     gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                     gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
+                    gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
                 }
                 else {
                     gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
@@ -17059,6 +17023,7 @@ var gd3d;
                 }
                 if (this.data.eulerNodes != undefined) {
                     this._updateNode(this.data.eulerNodes, this.totalLife, this.euler);
+                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 }
                 else if (this.data.eulerSpeed != undefined) {
                     if (this.data.eulerSpeed.x != undefined)
@@ -17067,6 +17032,7 @@ var gd3d;
                         this.euler.y += this.data.eulerSpeed.y.getValue() * delta;
                     if (this.data.eulerSpeed.z != undefined)
                         this.euler.z += this.data.eulerSpeed.z.getValue() * delta;
+                    gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
                 }
             };
             Particle.prototype._updateScale = function (delta) {

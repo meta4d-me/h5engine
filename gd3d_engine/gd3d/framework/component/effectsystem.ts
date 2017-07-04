@@ -1,17 +1,61 @@
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 特效组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeRender
     @reflect.nodeComponent
     @reflect.selfClone
     export class effectSystem implements IRenderer
     {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
         layer: RenderLayerEnum = RenderLayerEnum.Transparent;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染层级
+         * @version egret-gd3d 1.0
+         */
         renderLayer: CullingMask = CullingMask.default;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 同层级渲染排序依据
+         * @version egret-gd3d 1.0
+         */
         queue: number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 自动播放
+         * @version egret-gd3d 1.0
+         */
         autoplay: boolean = true;
-        //特效数据
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 特效是否循环
+         * @version egret-gd3d 1.0
+         */
         beLoop: boolean;
+         /**
+         * @private
+         */
         state: EffectPlayStateEnum = EffectPlayStateEnum.None;
         private curFrameId: number = -1;
         public frameId: number = 0;
@@ -22,35 +66,65 @@ namespace gd3d.framework
         // private time: number = 0;
 
         private parser = new gd3d.framework.EffectParser();
-        //渲染数据
+         /**
+         * @private
+         */
         public vf = gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Normal | render.VertexFormatMask.Tangent | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;
+         /**
+         * @private
+         */
         public particleVF=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
 
         private effectBatchers: EffectBatcher[] = [];
         private particles: Particles;//粒子系统 发射器统一管理
         private matDataGroups: EffectMatData[] = [];
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置特效数据 string
+         * @version egret-gd3d 1.0
+         */
         setEffect(effectConfig: string)
         {
             this.webgl=gd3d.framework.sceneMgr.app.webgl;
             this.data = this.parser.Parse(effectConfig, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
+         /**
+         * @private
+         */
         @gd3d.reflect.Field("textasset")
         jsonData: textasset;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置特效数据 textasset
+         * @version egret-gd3d 1.0
+         */
         setJsonData(_jsonData: textasset)
         {
             this.webgl=gd3d.framework.sceneMgr.app.webgl;
             this.jsonData = _jsonData;
             this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
+         /**
+         * @private
+         */
         set data(value: EffectSystemData)
         {
             this._data = value;
         }
+         /**
+         * @private
+         */
         get data(): EffectSystemData
         {
             return this._data;
         }
+         /**
+         * @private
+         */
         init()
         {
             if (this._data)
@@ -59,7 +133,9 @@ namespace gd3d.framework
             }
         }
         private _data: EffectSystemData;
-
+         /**
+         * @private
+         */
         get totalFrameCount(): number
         {
             return this.data.life * effectSystem.fps;
@@ -170,7 +246,7 @@ namespace gd3d.framework
          * 
          * @memberof effectSystem
          */
-        mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, curFrameData: EffectFrameData)
+        private mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, curFrameData: EffectFrameData)
         {
             if (curFrameData == undefined)
                 return;
@@ -579,7 +655,9 @@ namespace gd3d.framework
             this.effectBatchers[index].beBufferInited = false;
 
         }
-
+         /**
+         * @private
+         */
         public setFrameId(id: number)
         {
             if (this.state == EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
@@ -606,7 +684,9 @@ namespace gd3d.framework
             }
             return false;
         }
-
+         /**
+         * @private
+         */
         remove()
         {
             this.state = EffectPlayStateEnum.Dispose;
@@ -618,7 +698,8 @@ namespace gd3d.framework
             if (this.particles)
                 this.particles.dispose();
         }
-        /**
+         /**
+         * @private
          * 临时测试时显示使用
          * @readonly
          * @type {number}
