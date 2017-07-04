@@ -5,7 +5,7 @@
      * @language zh_CN
      * @classdesc
      * 表示轴对称包围盒
-     * @version gd3d 1.0
+     * @version egret-gd3d 1.0
      */
     export class aabb
     {
@@ -13,7 +13,7 @@
         * @public
         * @language zh_CN
         * 最小点
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public minimum: gd3d.math.vector3;
@@ -22,7 +22,7 @@
         * @public
         * @language zh_CN
         * 最大点
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public maximum: gd3d.math.vector3;
@@ -38,7 +38,7 @@
         * 构建轴对称包围盒
         * @param _minimum 最小点
         * @param _maximum 最大点
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         constructor(_minimum: gd3d.math.vector3, _maximum: gd3d.math.vector3)
@@ -55,7 +55,7 @@
         * @language zh_CN
         * 刷新轴对称包围盒
         * @param worldmatrix 物体的世界矩阵
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public update(worldmatrix: gd3d.math.matrix)
@@ -162,7 +162,7 @@
         * @language zh_CN
         * 包含一个点
         * @param vec 世界坐标
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public addVector3(vec: gd3d.math.vector3)
@@ -176,7 +176,7 @@
         * @language zh_CN
         * 检查是否包含点
         * @param vec 世界坐标
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public containsVector3(vec: gd3d.math.vector3): boolean
@@ -191,7 +191,7 @@
         * @language zh_CN
         * 检查是否与aabb相交
         * @param aabb 轴对称包围盒
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public intersectAABB(aabb: aabb): boolean
@@ -210,7 +210,7 @@
         * @language zh_CN
         * 包含一个aabb
         * @param aabb 轴对称包围盒
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public addAABB(aabb: gd3d.framework.aabb)
@@ -226,7 +226,7 @@
         * @public
         * @language zh_CN
         * 计算包围盒的中心位置
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public get center(): gd3d.math.vector3
@@ -240,7 +240,7 @@
         * @public
         * @language zh_CN
         * 清空
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public clear()
@@ -253,7 +253,7 @@
         * @public
         * @language zh_CN
         * 克隆
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public clone(): aabb
@@ -269,7 +269,7 @@
         * @language zh_CN
         * 获取包围盒顶点数据
         * @param vecs 引用数组
-        * @version gd3d 1.0
+        * @version egret-gd3d 1.0
         * @platform Web,Native
         */
         public getVec3(vecs: gd3d.math.vector3[])
