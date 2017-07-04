@@ -606,7 +606,11 @@ declare namespace t {
 declare class test_loadprefab implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    renderer: gd3d.framework.meshRenderer[];
+    skinRenders: gd3d.framework.skinnedMeshRenderer[];
     start(app: gd3d.framework.application): void;
+    private changeShader();
+    change(sha: gd3d.framework.shader): void;
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;
     timer: number;

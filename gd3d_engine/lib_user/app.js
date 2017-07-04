@@ -4249,7 +4249,7 @@ var test_loadprefab = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        var names = ["Cube", "0001_fashion", "baihu"];
+        var names = ["0060_duyanshou", "Cube", "0001_fashion", "baihu"];
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -4264,6 +4264,9 @@ var test_loadprefab = (function () {
                         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
                         objCam.lookatPoint(new gd3d.math.vector3(0.1, 0.1, 0.1));
                         objCam.markDirty();
+                        _this.renderer = _this.baihu.gameObject.getComponentsInChildren("meshRenderer");
+                        _this.skinRenders = _this.baihu.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER);
+                        _this.changeShader();
                     }
                 });
             }
@@ -4274,7 +4277,41 @@ var test_loadprefab = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
+        this.camera.backgroundColor = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);
         objCam.markDirty();
+    };
+    test_loadprefab.prototype.changeShader = function () {
+        var _this = this;
+        var btn = document.createElement("button");
+        btn.textContent = "切换Shader到：diffuse.shader.json";
+        btn.onclick = function () {
+            var sh = _this.app.getAssetMgr().getShader("diffuse.shader.json");
+            _this.change(sh);
+        };
+        btn.style.top = "160px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+        var btn2 = document.createElement("button");
+        btn2.textContent = "切换Shader到：transparent_additive.shader.json";
+        btn2.onclick = function () {
+            var sh = _this.app.getAssetMgr().getShader("transparent_additive.shader.json");
+            _this.change(sh);
+        };
+        btn2.style.top = "124px";
+        btn2.style.position = "absolute";
+        this.app.container.appendChild(btn2);
+    };
+    test_loadprefab.prototype.change = function (sha) {
+        for (var j = 0; j < this.renderer.length; j++) {
+            for (var i = 0; i < this.renderer[j].materials.length; i++) {
+                this.renderer[j].materials[i].changeShader(sha);
+            }
+        }
+        for (var j = 0; j < this.skinRenders.length; j++) {
+            for (var i = 0; i < this.skinRenders[j].materials.length; i++) {
+                this.skinRenders[j].materials[i].changeShader(sha);
+            }
+        }
     };
     test_loadprefab.prototype.update = function (delta) {
         this.timer += delta;
