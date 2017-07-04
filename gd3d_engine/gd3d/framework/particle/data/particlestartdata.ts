@@ -3,6 +3,9 @@
     /**
     * 粒子初始方向类型
     */
+    /**
+     * @private
+     */
     export enum ParticleSystemShape 
     {
         NORMAL,
@@ -16,6 +19,9 @@
 
     /**
      *  粒子初始数据
+     */
+    /**
+     * @private
      */
     export class ParticleStartData 
     {
@@ -245,6 +251,9 @@
             return data;
         }
     }
+    /**
+     * @private
+     */
     export enum emitfromenum
     {
         base,

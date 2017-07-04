@@ -1,6 +1,9 @@
 namespace gd3d.framework
 {
     //特效系统中的发射器都丢在这里
+    /**
+     * @private
+     */
     export class Particles
     {
         public gameObject: gameObject;
@@ -43,6 +46,9 @@ namespace gd3d.framework
         }
     }
     //发射器也作为特效系统的一个元素
+    /**
+     * @private
+     */
     export class EmissionElement
     {
         public webgl:WebGLRenderingContext;

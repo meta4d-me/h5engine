@@ -1,5 +1,8 @@
 namespace gd3d.framework
 {
+    /**
+     * @private
+     */
     export interface IEffectAction
     {
         type: string;
@@ -11,6 +14,9 @@ namespace gd3d.framework
         update(frameIndex: number);
     }
 
+    /**
+     * @private
+     */
     export class LinearAction implements IEffectAction
     {
         public type: string;
@@ -84,6 +90,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class DestroyAction implements IEffectAction
     {
         public type: string;
@@ -108,6 +117,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class LoopAction implements IEffectAction
     {
         public type: string;
@@ -132,6 +144,9 @@ namespace gd3d.framework
             }
         }
     }
+    /**
+     * @private
+     */
     export class UVRollAction implements IEffectAction
     {
         type: string;
@@ -182,6 +197,9 @@ namespace gd3d.framework
             this.elements.curAttrData.uv.y += this.speedv;
         }
     }
+    /**
+     * @private
+     */
     export class UVSpriteAnimationAction implements IEffectAction
     {
         type: string;
@@ -246,6 +264,9 @@ namespace gd3d.framework
             }
         }
     }
+    /**
+     * @private
+     */
     export class RotationAction implements IEffectAction
     {
         public type: string;
@@ -295,6 +316,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class RoseCurveAction implements IEffectAction
     {
         public type: string;
@@ -367,6 +391,9 @@ namespace gd3d.framework
     }
 
 
+    /**
+     * @private
+     */
     export class TrailAction implements IEffectAction
     {
         public type: string;
@@ -491,6 +518,9 @@ namespace gd3d.framework
         }
     }
 
+    /**
+     * @private
+     */
     export class BreathAction implements IEffectAction
     {
         type: string;
