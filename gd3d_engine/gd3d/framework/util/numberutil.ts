@@ -3,7 +3,7 @@ namespace gd3d.framework
     /**
      * @public
      * @language zh_CN
-     * 获取键盘Keycode的工具类
+     * Number类型的工具类
      * @version egret-gd3d 1.0
      */
     export class NumberUtil
