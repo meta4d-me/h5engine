@@ -499,6 +499,14 @@
         {
             "name": "resources/project/fog_additive_alpha_bone_eff.vs.glsl",
             "length": 0
+        },
+        {
+            "name": "resources/project/additive_alpha.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/project/fog_additive_alpha.fs.glsl",
+            "length": 0
         }
     ]
 }
