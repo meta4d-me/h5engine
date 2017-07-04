@@ -6,7 +6,14 @@ namespace gd3d.io
     //     saveText(path:string,fun:()=>string);
     //     saveMap(pathMap: { [id: string]: string }, fun:Function)
     // }
-
+    
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * string转换为blob
+     * @version egret-gd3d 1.0
+     */
     export function stringToBlob(content:string)
     {
         var u8 = new Uint8Array(stringToUtf8Array(content));
@@ -14,6 +21,13 @@ namespace gd3d.io
         return blob;
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * string转换为utf8数组
+     * @version egret-gd3d 1.0
+     */
     export function stringToUtf8Array(str: string): number[]
     {
         var bstr: number[] = [];

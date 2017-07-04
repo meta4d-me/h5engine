@@ -1,5 +1,13 @@
 namespace gd3d.framework
 {
+    
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 鼠标(触屏)点击信息
+     * @version egret-gd3d 1.0
+     */
     export class pointinfo
     {
         id: number;
@@ -7,6 +15,13 @@ namespace gd3d.framework
         x: number;
         y: number;
     }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 键盘、鼠标(触屏)事件管理类 应用状态机区分状态
+     * @version egret-gd3d 1.0
+     */
     export class inputMgr
     {
         private inputlast: HTMLInputElement = null;

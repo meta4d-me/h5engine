@@ -2,6 +2,9 @@
 //处理utf8 string 还是不能用encode decode，有些特殊情况没覆盖
 namespace gd3d.io
 {
+    /**
+     * @private
+     */
     export class binReader
     {
         private _data: DataView;

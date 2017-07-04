@@ -1,6 +1,8 @@
 namespace gd3d.framework
 {
-    //渲染上下文,渲染所需要的所有参数
+    /**
+     * @private
+     */
     export class renderContext
     {
         constructor(webgl: WebGLRenderingContext)
