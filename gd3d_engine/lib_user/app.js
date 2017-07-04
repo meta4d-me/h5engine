@@ -4253,6 +4253,7 @@ var test_loadprefab = (function () {
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         var names = ["Cube", "0001_fashion", "baihu"];
         var name = names[0];
+        name = "Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {

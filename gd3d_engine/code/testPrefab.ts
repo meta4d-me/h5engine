@@ -10,6 +10,7 @@ class test_loadprefab implements IState
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         let names: string[] = ["Cube", "0001_fashion", "baihu"];
         let name = names[0];
+        name="Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
