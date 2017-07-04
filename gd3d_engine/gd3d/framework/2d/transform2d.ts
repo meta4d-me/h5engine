@@ -33,6 +33,13 @@ namespace gd3d.framework
         updateTran();
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2D组件实例接口
+     * @version egret-gd3d 1.0
+     */
     @gd3d.reflect.SerializeType
     export class C2DComponent
     {
