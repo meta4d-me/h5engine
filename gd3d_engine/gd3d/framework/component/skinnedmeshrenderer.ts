@@ -2,6 +2,13 @@
 
 namespace gd3d.framework
 {
+     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 蒙皮网格渲染组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.nodeRender
     @reflect.nodeComponent
     export class skinnedMeshRenderer implements IRenderer
@@ -9,25 +16,72 @@ namespace gd3d.framework
         constructor()
         {
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 挂载的gameobject
+         * @version egret-gd3d 1.0
+         */
         gameObject: gameObject;
 
         layer: RenderLayerEnum = RenderLayerEnum.Common;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染层级
+         * @version egret-gd3d 1.0
+         */
         renderLayer: CullingMask = CullingMask.default;
         private issetq = false;
+        /**
+         * @private
+         */
         _queue: number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 同渲染层级排序标记
+         * @version egret-gd3d 1.0
+         */
         get queue(): number
         {
             return this._queue;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 同渲染层级排序标记
+         * @version egret-gd3d 1.0
+         */
         set queue(value: number)
         {
             this._queue = value;
             this.issetq = true;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 材质数组
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("material[]")
         materials: material[];
-
+        /**
+         * @private
+         */
         _player: aniplayer;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 动画播放组件
+         * @version egret-gd3d 1.0
+         */
         get player(): aniplayer
         {
             if (this._player == null)
@@ -38,12 +92,25 @@ namespace gd3d.framework
         }
 
         private _mesh: mesh;
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * mesh数据
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("mesh")
         get mesh()
         {
             return this._mesh;
         }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置mesh数据
+         * @version egret-gd3d 1.0
+         */
         set mesh(mesh: mesh)
         {
             if (this._mesh != null)
@@ -56,23 +123,40 @@ namespace gd3d.framework
                 this._mesh.use();
             }
         }
-
+        /**
+         * @private
+         */
         @gd3d.reflect.Field("transform[]")
         bones: transform[];
-
+        /**
+         * @private
+         */
         @gd3d.reflect.Field("transform")
         rootBone: transform;
-
+        /**
+         * @private
+         */
         @gd3d.reflect.Field("vector3")
         center: math.vector3;
+        /**
+         * @private
+         */
         @gd3d.reflect.Field("vector3")
         size: math.vector3;
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 最大骨骼数量
+         * @version egret-gd3d 1.0
+         */
         maxBoneCount: number = 0;
 
         //这个数据是扣掉tpose之后的
         private _skeletonMatrixData: Float32Array;
-
+        /**
+         * @private
+         */
         public static dataCaches: { key: string, data: Float32Array }[] = [];
         private cacheData: Float32Array;
 
@@ -82,7 +166,10 @@ namespace gd3d.framework
         {
 
         }
-
+        /**
+         * @private
+         * @param index 
+         */
         getMatByIndex(index: number)
         {
             let data = this.mesh.data;
@@ -196,7 +283,14 @@ namespace gd3d.framework
             }
             return mat;
         }
-
+        /**
+         * @public
+         * @language zh_CN
+         * @param ray 射线
+         * @classdesc
+         * 射线检测
+         * @version egret-gd3d 1.0
+         */
         intersects(ray: ray): pickinfo
         {
             let mvpmat = this.player.gameObject.transform.getWorldMatrix();
@@ -376,18 +470,25 @@ namespace gd3d.framework
                 }
             }
         }
-
+        /**
+         * @private
+         */
         remove()
         {
             if (this.mesh)
                 this.mesh.unuse(true);
             this.bones.length = 0;
         }
-
+        /**
+         * @private
+         */
         clone()
         {
 
         }
+        /**
+         * @private
+         */
         useBoneShader(mat: material): number
         {
             var matpasses: gd3d.render.glDrawPass[] = mat.getShader().passes["skin"];

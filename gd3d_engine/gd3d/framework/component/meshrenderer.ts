@@ -75,7 +75,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 同层级渲染排序
+         * 同层级渲染排序标记
          * @version egret-gd3d 1.0
          */
         set queue(value: number)
