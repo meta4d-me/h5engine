@@ -24,13 +24,19 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         gameObject: gameObject;
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 场景渲染层级（common、transparent、overlay）
+         * @version egret-gd3d 1.0
+         */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * 渲染层级
+         * 渲染mask层级（和相机相对应）
          * @version egret-gd3d 1.0
          */
         renderLayer: CullingMask = CullingMask.default;
@@ -43,7 +49,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 同渲染层级排序标记
+         * 返回此组件的场景渲染层级排序依据queue大小
          * @version egret-gd3d 1.0
          */
         get queue(): number
@@ -54,7 +60,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 同渲染层级排序标记
+         * 设置此组件的场景渲染层级排序number大小
          * @version egret-gd3d 1.0
          */
         set queue(value: number)
@@ -79,7 +85,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 动画播放组件
+         * 返回动画播放组件
          * @version egret-gd3d 1.0
          */
         get player(): aniplayer
@@ -96,7 +102,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * mesh数据
+         * 返回mesh数据
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("mesh")

@@ -417,6 +417,9 @@ namespace gd3d.framework
                 }
             }
         }
+        /**
+         * @private
+         */
         clone()
         {
             let effect = new effectSystem();

@@ -31,11 +31,16 @@ namespace gd3d.framework
         {
 
         }
-
+        /**
+         * @private
+         */
         remove()
         {
 
         }
+        /**
+         * @private
+         */
         clone()
         {
 
