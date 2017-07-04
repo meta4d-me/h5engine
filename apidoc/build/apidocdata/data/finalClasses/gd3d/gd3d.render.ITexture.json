@@ -1,0 +1,55 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLTexture",
+			"name": "texture",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLTexture",
+			"name": "texture",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.render.ITexture",
+			"scope": "instance"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "interface",
+		"name": "ITexture",
+		"memberof": "gd3d.render",
+		"filename": "render\\resource\\texture.ts"
+	}
+}

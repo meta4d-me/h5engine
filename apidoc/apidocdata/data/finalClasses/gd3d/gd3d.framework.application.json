@@ -1,0 +1,232 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "HTMLDivElement",
+			"name": "container",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "curcameraindex",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"default": "-1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "绘制区域高度 像素单位",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "limitFrame",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.INotify",
+			"name": "notify",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Stats.Stats",
+			"name": "stats",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "targetFrame",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "设置固定帧数 不设置即为不限制帧数",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "timeScale",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "设置timescale",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "全局webgl实例",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "绘制区域宽度 像素单位",
+			"version": "egret-gd3d 1.0"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "addEditorCode",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "根据classname添加editorcode",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "classname",
+					"type": "string",
+					"description": "editorcode类名"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addEditorCodeDirect",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "直接添加editorcode实例",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "program",
+					"type": "gd3d.framework.IEditorCode",
+					"description": "editorcode实例"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addUserCode",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "根据classname添加usercode",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "classname",
+					"type": "string",
+					"description": "usercode类名"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addUserCodeDirect",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "直接添加usercode实例",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "program",
+					"type": "gd3d.framework.IUserCode",
+					"description": "usercode实例"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "closeFps",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "关闭性能参数面板",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "getAssetMgr",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "获取资源管理器实例",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "getInputMgr",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "获取输入管理器实例",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.scene",
+			"name": "getScene",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "获取场景实例",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "markNotify",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "trans",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "type",
+					"type": "gd3d.framework.NotifyType",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "showFps",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "显示性能参数面板",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"description": "引擎的启动方法",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "div",
+					"type": "HTMLDivElement",
+					"description": "绘制区域的dom"
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "application",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\application.ts",
+		"description": "引擎的主入口",
+		"version": "egret-gd3d 1.0"
+	}
+}

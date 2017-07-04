@@ -1,0 +1,139 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "{[key:string]:{type:string, value?}}",
+			"name": "defaultValue",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"description": "// @gd3d.reflect.Field(\"UniformData\")",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderLayerEnum",
+			"name": "layer",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"default": "RenderLayerEnum.Common"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.render.glDrawPass[]}",
+			"name": "passes",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "queue",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"default": "0"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "shader",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetName",
+					"type": "string",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "parse",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "json",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "disposeNow",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.shader",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "shader",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\shader.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

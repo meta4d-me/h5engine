@@ -1,0 +1,27 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "resID",
+			"memberof": "gd3d.framework.resID",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getID",
+			"memberof": "gd3d.framework.resID",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "resID",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\asset.ts",
+		"description": "//三，静态管理，这个是特殊的，不要为他设计"
+	}
+}

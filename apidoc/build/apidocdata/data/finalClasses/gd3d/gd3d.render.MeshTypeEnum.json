@@ -1,0 +1,62 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Dynamic",
+			"memberof": "gd3d.render.MeshTypeEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Dynamic",
+			"memberof": "gd3d.render.MeshTypeEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Static",
+			"memberof": "gd3d.render.MeshTypeEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Static",
+			"memberof": "gd3d.render.MeshTypeEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Stream",
+			"memberof": "gd3d.render.MeshTypeEnum",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Stream",
+			"memberof": "gd3d.render.MeshTypeEnum",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "MeshTypeEnum",
+		"memberof": "gd3d.render",
+		"filename": "render\\renderer\\mesh.ts",
+		"description": "//原始模型数据"
+	}
+}

@@ -1,0 +1,638 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.application",
+			"name": "app",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[name:string]:ArrayBuffer}",
+			"name": "bundlePackBin",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "JSON",
+			"name": "bundlePackJson",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.defMesh",
+			"name": "defMesh",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.assetBundle}",
+			"name": "mapBundle",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "assetbundle的字典，key为bundlename",
+			"version": "gd3d 1.0",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.mesh}",
+			"name": "mapDefaultMesh",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "默认Mesh资源",
+			"version": "gd3d 1.0",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.texture}",
+			"name": "mapDefaultTexture",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "默认图片资源",
+			"version": "gd3d 1.0",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:number[]}",
+			"name": "mapNamed",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "资源GUID的字典，key为资源的名称",
+			"version": "gd3d 1.0",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:number]:gd3d.framework.assetRef}",
+			"name": "mapRes",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "资源的字典，key为资源的GUID",
+			"version": "gd3d 1.0",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.shader}",
+			"name": "mapShader",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "//资源获取方式三，静态资源",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.shaderPool",
+			"name": "shaderPool",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "assetMgr",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.AssetTypeEnum",
+			"name": "calcType",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "通过url获取资源的类型",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "doWaitState",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "state",
+					"type": "gd3d.framework.stateLoad",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.IAsset",
+			"name": "getAsset",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "通过资源的GUID获取资源",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "id",
+					"type": "number",
+					"description": "资源的GUID"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.assetBundle",
+			"name": "getAssetBundle",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "bundlename",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.IAsset",
+			"name": "getAssetByName",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "通过资源的名称获取资源",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": "资源的名称"
+				},
+				{
+					"name": "bundlename",
+					"type": "string",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getAssetUrl",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "获取资源的url",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "asset",
+					"type": "gd3d.framework.IAsset",
+					"description": "资源"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "{[id:string]:number}",
+			"name": "getAssetsRefcount",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "返回所有资源引用计数",
+			"version": "gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.mesh",
+			"name": "getDefaultMesh",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.texture",
+			"name": "getDefaultTexture",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getFileName",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "通过url获取资源的名称",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.shader",
+			"name": "getShader",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "initDefAsset",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "load",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "加载资源这里来区分assetbundle和单个资源",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				},
+				{
+					"name": "type",
+					"type": "gd3d.framework.AssetTypeEnum",
+					"default": "AssetTypeEnum.Auto",
+					"description": "资源的类型"
+				},
+				{
+					"name": "onstate",
+					"type": "(state:gd3d.framework.stateLoad)=>void",
+					"default": "null",
+					"description": "状态返回的回调"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "loadByQueue",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "loadCompressBundle",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "加载压缩后的包",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				},
+				{
+					"name": "onstate",
+					"type": "(state:gd3d.framework.stateLoad)=>void",
+					"default": "null",
+					"description": "状态返回的回调"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "any",
+			"name": "loadImmediate",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "同步加载资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）这个接口还需要完善这里有个问题，如果是assetbundle，那么实例究竟是个啥东西。",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				},
+				{
+					"name": "type",
+					"type": "gd3d.framework.AssetTypeEnum",
+					"default": "AssetTypeEnum.Auto",
+					"description": "资源的类型"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "loadResByPack",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "//packnum 0 txt 1 bin",
+			"params": [
+				{
+					"name": "packnum",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "type",
+					"type": "gd3d.framework.AssetTypeEnum",
+					"description": ""
+				},
+				{
+					"name": "onstate",
+					"type": "(state:gd3d.framework.stateLoad)=>void",
+					"description": ""
+				},
+				{
+					"name": "state",
+					"type": "gd3d.framework.stateLoad",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "loadScene",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "加载场景只有先load完包含场景的assetbundle，才能load场景",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "sceneName",
+					"type": "string",
+					"description": "场景名称"
+				},
+				{
+					"name": "onComplete",
+					"type": "()=>void",
+					"description": "加载完成回调"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "loadSingleRes",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "加载单个资源所有load进来的资源，均use一遍，引用计数为1再unload 一次 归0，则可dispose（）",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				},
+				{
+					"name": "type",
+					"type": "gd3d.framework.AssetTypeEnum",
+					"description": "资源的类型"
+				},
+				{
+					"name": "onstate",
+					"type": "(state:gd3d.framework.stateLoad)=>void",
+					"description": "状态返回的回调"
+				},
+				{
+					"name": "state",
+					"type": "gd3d.framework.stateLoad",
+					"description": "资源加载的总状态"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "any",
+			"name": "loadSingleResImmediate",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "同步加载单个资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）这个接口还需要完善",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				},
+				{
+					"name": "type",
+					"type": "gd3d.framework.AssetTypeEnum",
+					"description": "资源的类型"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "nameDuplicateCheck",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "releaseUnuseAsset",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "释放所有引用为零的资源",
+			"version": "gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "removeAssetBundle",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "saveMaterial",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "保存材质",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.framework.material",
+					"description": "mat"
+				},
+				{
+					"name": "fun",
+					"type": "(data:gd3d.framework.SaveInfo)=>void",
+					"description": "fun"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "savePrefab",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "保存场景这里只是把场景序列化具体保存要编辑器来进行保存的地址和内容通过回调返回",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "trans",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				},
+				{
+					"name": "prefabName",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(data:gd3d.framework.SaveInfo,resourses?:string[])=>void",
+					"description": "回调"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "saveScene",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "保存场景这里只是把场景序列化具体保存要编辑器来进行保存的地址和内容通过回调返回",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "fun",
+					"type": "(data:gd3d.framework.SaveInfo,resourses?:string[])=>void",
+					"description": "回调"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unload",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "卸载资源",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": "资源的url"
+				},
+				{
+					"name": "onstate",
+					"type": "()=>void",
+					"default": "null",
+					"description": "状态返回的回调"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "取消资源的引用，当前资源的引用计数减一",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "res",
+					"type": "gd3d.framework.IAsset",
+					"description": "需要取消引用的资源"
+				},
+				{
+					"name": "disposeNow",
+					"type": "boolean",
+					"default": "false",
+					"description": "如果引用计数归零则立即释放"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.assetMgr",
+			"scope": "instance",
+			"description": "引用资源，当前资源的引用计数加一",
+			"version": "gd3d 1.0",
+			"params": [
+				{
+					"name": "res",
+					"type": "gd3d.framework.IAsset",
+					"description": "需要引用的资源"
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "assetMgr",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\assetmgr.ts",
+		"description": "通用的资源管理器，你也可以自己搞个东西当资源，继承IResource即可<p/>资源管理器用引用计数法管理资源，计数混乱会导致问题，循环引用也会导致问题，需要注意<p/>js 语法层面不能提供可靠的自动引用计数机制，所以如果你用乱了，哪啊就是乱了<p/>所有的资源都是从资源管理器get出来的<p/>所有的资源不用的时候都要还到资源管理器<p/>",
+		"version": "gd3d 1.0"
+	}
+}

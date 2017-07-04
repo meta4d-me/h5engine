@@ -1,0 +1,73 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "appid",
+			"memberof": "testapi.Test",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "id",
+			"memberof": "testapi.Test",
+			"scope": "instance",
+			"rwType": 1
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "display",
+			"memberof": "testapi.Test",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getStr",
+			"memberof": "testapi.Test",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setStr",
+			"memberof": "testapi.Test",
+			"scope": "instance",
+			"description": "设置字符串就是测试下跳转用，发布前也改为private",
+			"version": "gd3d 1.0",
+			"deprecated": "(表示已废弃)",
+			"see": [
+				"testapi.Test2"
+			],
+			"params": [
+				{
+					"name": "str1",
+					"type": "string",
+					"description": "字符串1"
+				},
+				{
+					"name": "str2",
+					"type": "string",
+					"description": "字符串2"
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "Test",
+		"memberof": "testapi",
+		"filename": "testapi.ts",
+		"description": "(注释说明)就是整理下常用的注释类型<p/>                    (<p/> 表示换行)等到都熟悉了，就将上面改为private",
+		"version": "gd3d 1.0                             (内部版本号)",
+		"see": [
+			"testapi.Test2                            (表示查看相关类型的资料)",
+			"http://www.baidu.com 百度一下             (表示查看相关链接)"
+		],
+		"example": "(使用样例)<pre><br/>var&nbsp;str:string&nbsp;=&nbsp;&quot;&quot;;<br/>var&nbsp;str1:string&nbsp;=&nbsp;&quot;&quot;;<br/></pre>"
+	}
+}

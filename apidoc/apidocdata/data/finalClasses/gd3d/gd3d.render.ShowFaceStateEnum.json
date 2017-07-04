@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "ALL",
+			"memberof": "gd3d.render.ShowFaceStateEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "CCW",
+			"memberof": "gd3d.render.ShowFaceStateEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "CW",
+			"memberof": "gd3d.render.ShowFaceStateEnum",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "ShowFaceStateEnum",
+		"memberof": "gd3d.render",
+		"filename": "render\\renderer\\drawpass.ts"
+	}
+}

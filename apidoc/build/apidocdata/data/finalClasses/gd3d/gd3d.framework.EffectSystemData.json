@@ -1,0 +1,53 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "Array<string>",
+			"name": "dependImgList",
+			"memberof": "gd3d.framework.EffectSystemData",
+			"scope": "instance",
+			"default": "new Array<string>()"
+		},
+		{
+			"kind": "member",
+			"type": "Array<string>",
+			"name": "dependShapeList",
+			"memberof": "gd3d.framework.EffectSystemData",
+			"scope": "instance",
+			"default": "new Array<string>()"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.EffectSystemData",
+			"scope": "instance",
+			"default": "null"
+		},
+		{
+			"kind": "member",
+			"type": "Array<gd3d.framework.ParticleListData>",
+			"name": "particlelist",
+			"memberof": "gd3d.framework.EffectSystemData",
+			"scope": "instance",
+			"default": "new Array<ParticleListData>()"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EffectSystemData",
+			"memberof": "gd3d.framework.EffectSystemData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectSystemData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\effectsystemdata.ts",
+		"description": "特效系统数据"
+	}
+}

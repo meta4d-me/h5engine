@@ -1,0 +1,51 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "line",
+			"memberof": "gd3d.framework.subMeshInfo",
+			"scope": "instance",
+			"description": "//通常都是用第一个indexbuffer，只有用wireframe显示模式，使用第二个部分",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "matIndex",
+			"memberof": "gd3d.framework.subMeshInfo",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "size",
+			"memberof": "gd3d.framework.subMeshInfo",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "start",
+			"memberof": "gd3d.framework.subMeshInfo",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "useVertexIndex",
+			"memberof": "gd3d.framework.subMeshInfo",
+			"scope": "instance",
+			"default": "0"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "subMeshInfo",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\mesh.ts"
+	}
+}

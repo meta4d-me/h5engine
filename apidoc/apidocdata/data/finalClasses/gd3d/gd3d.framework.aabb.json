@@ -1,0 +1,59 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "maximum",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "minimum",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "opmax",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"default": "new gd3d.math.vector3()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "opmin",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance",
+			"default": "new gd3d.math.vector3()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "srcmax",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "srcmin",
+			"memberof": "gd3d.framework.aabb",
+			"scope": "instance"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "aabb",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\tool\\aabb.ts",
+		"description": "表示轴对称包围盒",
+		"version": "gd3d 1.0"
+	}
+}

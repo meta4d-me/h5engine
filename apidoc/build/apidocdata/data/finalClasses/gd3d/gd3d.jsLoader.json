@@ -1,0 +1,121 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "addImportScript",
+			"memberof": "gd3d.jsLoader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "path",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "addImportScript",
+			"memberof": "gd3d.jsLoader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "path",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.jsLoader",
+			"name": "instance",
+			"memberof": "gd3d.jsLoader",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.jsLoader",
+			"name": "instance",
+			"memberof": "gd3d.jsLoader",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "preload",
+			"memberof": "gd3d.jsLoader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "complete",
+					"type": "()=>void",
+					"description": ""
+				},
+				{
+					"name": "process",
+					"question": true,
+					"type": "(total:number,left:number)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "preload",
+			"memberof": "gd3d.jsLoader",
+			"scope": "instance",
+			"description": "///process: (total: number, left: number) => void，加载进度变化时回掉，总数和剩余任务数量，剩余0 就是完成了",
+			"params": [
+				{
+					"name": "complete",
+					"type": "()=>void",
+					"description": ""
+				},
+				{
+					"name": "process",
+					"type": "(total:number,left:number)=>void",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "startApp",
+			"memberof": "gd3d.jsLoader",
+			"scope": "static",
+			"params": [
+				{
+					"name": "jscode",
+					"type": "string[]",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "startApp",
+			"memberof": "gd3d.jsLoader",
+			"scope": "static",
+			"params": [
+				{
+					"name": "jscode",
+					"type": "string[]",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "jsLoader",
+		"memberof": "gd3d",
+		"filename": "jsloader\\jsloader.ts"
+	}
+}

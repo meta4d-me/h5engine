@@ -1,0 +1,159 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.color",
+			"name": "color",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance",
+			"default": "new math.color(1.0, 1.0, 1.0, 1.0)"
+		},
+		{
+			"kind": "member",
+			"name": "fillAmmount",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "fillMethod",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "imageType",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.material",
+			"name": "mat",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.sprite",
+			"name": "sprite",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform2D",
+			"name": "transform",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "image2D",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "onPointEvent",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				},
+				{
+					"name": "ev",
+					"type": "gd3d.framework.PointEvent",
+					"description": ""
+				},
+				{
+					"name": "oncap",
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setTexture",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "texture",
+					"type": "gd3d.framework.texture",
+					"description": ""
+				},
+				{
+					"name": "border",
+					"question": true,
+					"type": "gd3d.math.border",
+					"description": ""
+				},
+				{
+					"name": "rect",
+					"question": true,
+					"type": "gd3d.math.rect",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance",
+			"description": "//pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateTran",
+			"memberof": "gd3d.framework.image2D",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "image2D",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\component\\image.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IRectRenderer"
+			}
+		]
+	}
+}

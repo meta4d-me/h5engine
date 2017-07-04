@@ -1,0 +1,72 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.IAsset",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.IAsset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.IAsset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.IAsset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.IAsset",
+			"scope": "instance",
+			"description": "//setName(name: string);//名字只能设置一次"
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "unuse",
+			"memberof": "gd3d.framework.IAsset",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "disposeNow",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "use",
+			"memberof": "gd3d.framework.IAsset",
+			"scope": "instance",
+			"description": "// init(assetmgr: assetMgr, name: string, guid: number);"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "interface",
+		"name": "IAsset",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\asset.ts"
+	}
+}

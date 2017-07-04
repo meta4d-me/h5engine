@@ -1,0 +1,63 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "{[id:number]:any}",
+			"name": "oldmap",
+			"memberof": "gd3d.io.referenceInfo",
+			"scope": "static",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "string[]",
+			"name": "regtypelist",
+			"memberof": "gd3d.io.referenceInfo",
+			"scope": "static",
+			"default": "[]"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isRegType",
+			"memberof": "gd3d.io.referenceInfo",
+			"scope": "static",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "regDefaultType",
+			"memberof": "gd3d.io.referenceInfo",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"name": "regType",
+			"memberof": "gd3d.io.referenceInfo",
+			"scope": "static",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "referenceInfo",
+		"memberof": "gd3d.io",
+		"filename": "framework\\io\\serialize.ts"
+	}
+}

@@ -1,0 +1,161 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "挂载的gameobject",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isloop",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "lookforward",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "挂载此组件的gameobject是否朝向前方",
+			"version": "egret-gd3d 1.0",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.pathasset",
+			"name": "pathasset",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "设置路径组件需要的路径资源",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "speed",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "移动速度",
+			"version": "egret-gd3d 1.0",
+			"default": "1"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "pause",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "暂停移动",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "play",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "按照路径开始移动",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "loopCount",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "replay",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "重新按照路径移动",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "loopCount",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setpathasset",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "设置路径组件的需要的参数",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "pathasset",
+					"type": "gd3d.framework.pathasset",
+					"description": "路径资源"
+				},
+				{
+					"name": "speed",
+					"type": "number",
+					"default": "1",
+					"description": "移动速度"
+				},
+				{
+					"name": "oncomplete",
+					"type": "()=>void",
+					"default": "null",
+					"description": "按照路径移动结束需要执行的事件"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "stop",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"description": "停止移动",
+			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.guidpath",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "guidpath",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\guidpath.ts",
+		"description": "路径组件",
+		"version": "egret-gd3d 1.0",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			}
+		]
+	}
+}

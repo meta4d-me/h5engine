@@ -1,0 +1,127 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "{[id:string]:{name:string;type:gd3d.render.UniformTypeEnum;};}",
+			"name": "mapUniform",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:{name:string, type}}",
+			"name": "mapUniform",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLShader",
+			"name": "shader",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLShader",
+			"name": "shader",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.ShaderTypeEnum",
+			"name": "type",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.ShaderTypeEnum",
+			"name": "type",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "glShader",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "type",
+					"type": "gd3d.render.ShaderTypeEnum",
+					"description": ""
+				},
+				{
+					"name": "shader",
+					"type": "WebGLShader",
+					"description": ""
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "constructor",
+			"memberof": "gd3d.render.glShader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "type",
+					"type": "gd3d.render.ShaderTypeEnum",
+					"description": ""
+				},
+				{
+					"name": "shader",
+					"type": "WebGLShader",
+					"description": ""
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "glShader",
+		"memberof": "gd3d.render",
+		"filename": "render\\resource\\shader.ts"
+	}
+}

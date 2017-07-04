@@ -1,0 +1,72 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "key",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "x",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance",
+			"default": "new ValueData()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "y",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance",
+			"default": "new ValueData()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "z",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance",
+			"default": "new ValueData()"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "ParticleNode",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.vector3",
+			"name": "getValue",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.vector3",
+			"name": "getValueRandom",
+			"memberof": "gd3d.framework.ParticleNode",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "ParticleNode",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlenode.ts",
+		"description": "粒子节点"
+	}
+}

@@ -1,0 +1,45 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EmissionData",
+			"name": "emissionData",
+			"memberof": "gd3d.framework.ParticleListData",
+			"scope": "instance",
+			"default": "new EmissionData()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.MaterialData",
+			"name": "materialData",
+			"memberof": "gd3d.framework.ParticleListData",
+			"scope": "instance",
+			"default": "new MaterialData()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.CParticleData",
+			"name": "particleData",
+			"memberof": "gd3d.framework.ParticleListData",
+			"scope": "instance",
+			"default": "new CParticleData()"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "ParticleListData",
+			"memberof": "gd3d.framework.ParticleListData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "ParticleListData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\effectsystemdata.ts",
+		"description": "单个粒子数据"
+	}
+}

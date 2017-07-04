@@ -1,0 +1,107 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.meshFilter",
+			"name": "filter",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrix",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance",
+			"rwType": 1,
+			"description": "获取该碰撞盒物体的世界矩阵",
+			"version": "gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.obb",
+			"name": "obb",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "subTran",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "getBound",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "intersectsTransform",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "tran",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.boxcollider",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "boxcollider",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\boxcollider.ts",
+		"description": "表示矩形碰撞盒",
+		"version": "gd3d 1.0",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			},
+			{
+				"name": "gd3d.framework.ICollider"
+			}
+		]
+	}
+}

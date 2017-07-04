@@ -1,0 +1,72 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "handle",
+			"memberof": "gd3d.framework.trailNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "location",
+			"memberof": "gd3d.framework.trailNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "time",
+			"memberof": "gd3d.framework.trailNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.trailNode[]",
+			"name": "trailNodes",
+			"memberof": "gd3d.framework.trailNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "updir",
+			"memberof": "gd3d.framework.trailNode",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "trailNode",
+			"memberof": "gd3d.framework.trailNode",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "p",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "updir",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "t",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "trailNode",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\trailrender_recorde.ts"
+	}
+}

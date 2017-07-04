@@ -1,0 +1,42 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "column",
+			"memberof": "gd3d.framework.UVSprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "row",
+			"memberof": "gd3d.framework.UVSprite",
+			"scope": "instance",
+			"description": "//uv序列帧动画"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "totalCount",
+			"memberof": "gd3d.framework.UVSprite",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.UVSprite",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "UVSprite",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlealldata.ts"
+	}
+}

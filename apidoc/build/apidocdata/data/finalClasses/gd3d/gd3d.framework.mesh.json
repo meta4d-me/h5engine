@@ -1,0 +1,151 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.render.meshData",
+			"name": "data",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.glMesh",
+			"name": "glMesh",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.subMeshInfo[]",
+			"name": "submesh",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"default": "[]"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Parse",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "buf",
+					"type": "ArrayBuffer",
+					"description": ""
+				},
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.pickinfo",
+			"name": "intersects",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "ray",
+					"type": "gd3d.framework.ray",
+					"description": ""
+				},
+				{
+					"name": "matrix",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setAssetMgr",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setName",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.mesh",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "mesh",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\mesh.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

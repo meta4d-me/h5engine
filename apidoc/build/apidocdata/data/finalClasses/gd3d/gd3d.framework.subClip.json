@@ -1,0 +1,41 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "endframe",
+			"memberof": "gd3d.framework.subClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "loop",
+			"memberof": "gd3d.framework.subClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.subClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "startframe",
+			"memberof": "gd3d.framework.subClip",
+			"scope": "instance"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "subClip",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\animationclip.ts"
+	}
+}

@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Common",
+			"memberof": "gd3d.framework.RenderLayerEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Overlay",
+			"memberof": "gd3d.framework.RenderLayerEnum",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Transparent",
+			"memberof": "gd3d.framework.RenderLayerEnum",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "RenderLayerEnum",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\render.ts"
+	}
+}

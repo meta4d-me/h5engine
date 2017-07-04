@@ -82,10 +82,10 @@ namespace gd3d.framework
             this.startFrameId = this.batcher.effectSys.frameId;
 
             //box方向随着中心轴朝向
-            let localRandomDirection = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomDirection);
+            let localRandomDirection = this.data.particleStartData.randomDirection;
             this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
 
-            let localRandomTranslate = gd3d.math.pool.clone_vector3(this.data.particleStartData.randomPosition);
+            let localRandomTranslate = this.data.particleStartData.position;
             this.localTranslate=gd3d.math.pool.clone_vector3(localRandomTranslate);
 
             this.simulationSpeed = this.data.simulationSpeed != undefined ? this.data.simulationSpeed.getValue() : 0;
@@ -126,11 +126,10 @@ namespace gd3d.framework
             //记下初始scale
             gd3d.math.vec3Clone(this.localScale, this.startScale);
 
+            gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
             //模型初始旋转量
             if (this.renderModel == RenderModel.None || this.renderModel == RenderModel.StretchedBillBoard)
             {
-                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
-
                 if (this.data.particleStartData.shapeType != ParticleSystemShape.NORMAL)
                 {
                     let localOrgin = gd3d.math.pool.vector3_zero;
@@ -184,7 +183,7 @@ namespace gd3d.framework
 
         private _updateRotation(delta: number)
         {
-            gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
+            
             this._updateElementRotation();
         }
         
@@ -248,7 +247,6 @@ namespace gd3d.framework
                     // gd3d.math.quatFromEulerAngles(0, angle.x, 0, lookRot);
                     // gd3d.math.quatMultiply(this.localRotation, lookRot, this.localRotation);
                     //----------------------------------------------------------------------------
-                    //gd3d.math.quatClone(this.rotationByShape, this.localRotation);
                     var xaxis=gd3d.math.pool.new_vector3();
                     var yaxis=gd3d.math.pool.new_vector3();
                     var zaxis=gd3d.math.pool.new_vector3();
@@ -260,8 +258,6 @@ namespace gd3d.framework
                     gd3d.math.vec3Normalize(zaxis,zaxis);
                     
                     EffectUtil.lookatbyXAxis(worldTranslation,xaxis,yaxis,zaxis,cameraTransform.getWorldTranslate(),worldRotation);
-                    //gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right,90,worldRotation);
-                   // gd3d.math.quatMultiply(worldRotation,this.localRotation,this.localRotation);
                     gd3d.math.quatMultiply(this.localRotation,worldRotation,this.localRotation);
                     
 
@@ -274,11 +270,13 @@ namespace gd3d.framework
                     gd3d.math.pool.delete_vector3(zaxis);
                     return;
                 }
-                gd3d.math.quatMultiply(worldRotation, this.rotationByEuler, worldRotation);//eulerrot有的不是必要的，todo
+                
                 //消除transform组件对粒子本身的影响
                 gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
                 gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                 gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
+                
+                gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);//eulerrot有的不是必要的，todo
             } else
             {
                 gd3d.math.quatClone(this.rotationByEuler,this.localRotation);
@@ -314,6 +312,7 @@ namespace gd3d.framework
             if (this.data.eulerNodes != undefined)
             {
                 this._updateNode(this.data.eulerNodes, this.totalLife, this.euler);
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
             } else if (this.data.eulerSpeed != undefined)
             {
                 if (this.data.eulerSpeed.x != undefined)
@@ -322,6 +321,7 @@ namespace gd3d.framework
                     this.euler.y += this.data.eulerSpeed.y.getValue() * delta;
                 if (this.data.eulerSpeed.z != undefined)
                     this.euler.z += this.data.eulerSpeed.z.getValue() * delta;
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.rotationByEuler);
             }
         }
         private _startNode: ParticleNode;

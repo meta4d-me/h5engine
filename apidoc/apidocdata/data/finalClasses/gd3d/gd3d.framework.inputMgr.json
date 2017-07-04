@@ -1,0 +1,51 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "{[id:number]:boolean}",
+			"name": "keyboardMap",
+			"memberof": "gd3d.framework.inputMgr",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.pointinfo",
+			"name": "point",
+			"memberof": "gd3d.framework.inputMgr",
+			"scope": "instance",
+			"default": "new pointinfo()"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:number]:gd3d.framework.pointinfo}",
+			"name": "touches",
+			"memberof": "gd3d.framework.inputMgr",
+			"scope": "instance",
+			"default": "{}"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "inputMgr",
+			"memberof": "gd3d.framework.inputMgr",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "inputMgr",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\input\\inputmgr.ts"
+	}
+}

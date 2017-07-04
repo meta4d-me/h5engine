@@ -1,0 +1,82 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isRandom",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "value",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance",
+			"rwType": 2
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "valueLimitMax",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance",
+			"rwType": 2
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "valueLimitMin",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance",
+			"rwType": 2
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "ValueData",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "RandomRange",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "static",
+			"params": [
+				{
+					"name": "min",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "max",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "isInteger",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "getValue",
+			"memberof": "gd3d.framework.ValueData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "ValueData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\valuedata.ts"
+	}
+}

@@ -1,0 +1,429 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.canvas",
+			"name": "canvas",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform2D[]",
+			"name": "children",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.C2DComponent[]",
+			"name": "components",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"description": "// collider2d: boxcollider2d;",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.HideFlags",
+			"name": "hideFlags",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"default": "HideFlags.None"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.insID",
+			"name": "insId",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"default": "new insID()"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isvisible",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "isvisibleInScene",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "localRotate",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "localScale",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"default": "new math.vector2(1, 1)"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "localTranslate",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"description": "//位置信息",
+			"default": "new math.vector2(0, 0)"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"default": "\"noname\""
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform2D",
+			"name": "parent",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector2",
+			"name": "pivot",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"default": "new math.vector2(0, 0)"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.IRectRenderer",
+			"name": "renderer",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"description": "//待渲染的数据"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"description": "//尺寸"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "ContainsCanvasPoint",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "pworld",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "ContainsPoint",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "p",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addChild",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform2D",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addChildAt",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform2D",
+					"description": ""
+				},
+				{
+					"name": "index",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.I2DComponent",
+			"name": "addComponent",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.I2DComponent",
+			"name": "addComponentDirect",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "comp",
+					"type": "gd3d.framework.I2DComponent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.I2DComponent",
+			"name": "getComponent",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.I2DComponent[]",
+			"name": "getComponents",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"description": "//只含自己",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.I2DComponent[]",
+			"name": "getComponentsInChildren",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"description": "//包含自己",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.matrix3x2",
+			"name": "getLocalMatrix",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.matrix3x2",
+			"name": "getWorldMatrix",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getWorldRotate",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getWorldScale",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getWorldTranslate",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "markDirty",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"description": "//矩阵关系"
+		},
+		{
+			"kind": "function",
+			"name": "onCapturePointEvent",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				},
+				{
+					"name": "ev",
+					"type": "gd3d.framework.PointEvent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "onPointEvent",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				},
+				{
+					"name": "ev",
+					"type": "gd3d.framework.PointEvent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "removeChild",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform2D",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "removeComponent",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "comp",
+					"type": "gd3d.framework.I2DComponent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "removeComponentByTypeName",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setWorldPosition",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "pos",
+					"type": "gd3d.math.vector2",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateTran",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "parentChange",
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateWorldTran",
+			"memberof": "gd3d.framework.transform2D",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "transform2D",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\transform2d.ts",
+		"description": "//gameobject 区分清自己现在挂载的transform 是 2d 还是 3d 就好"
+	}
+}

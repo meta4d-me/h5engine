@@ -1,0 +1,161 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "actionActive",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.IEffectAction[]",
+			"name": "actions",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "active",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectAttrsData",
+			"name": "curAttrData",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectElementData",
+			"name": "data",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectBatcher",
+			"name": "effectBatcher",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "loopFrame",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"default": "Number.MAX_VALUE"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "ref",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "startIndex",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "{[frameIndex:number]:gd3d.framework.EffectFrameData}",
+			"name": "timelineFrame",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "transform",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"description": "整个特效"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EffectElement",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_data",
+					"type": "gd3d.framework.EffectElementData",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "initActions",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isActiveFrame",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "frameIndex",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setActive",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_active",
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.EffectElement",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectElement",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

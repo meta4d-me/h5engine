@@ -1,0 +1,118 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "b",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleEmissionType",
+			"name": "emissionType",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isover",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "maxCount",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "numcount",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.CParticleData",
+			"name": "particleData",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "timer",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "timespace",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Emission",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_type",
+					"type": "gd3d.framework.ParticleEmissionType",
+					"default": "ParticleEmissionType.burst",
+					"description": ""
+				},
+				{
+					"name": "_maxCount",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				},
+				{
+					"name": "_space",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isOver",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "update",
+			"memberof": "gd3d.framework.Emission",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "Emission",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\particleSytem.ts"
+	}
+}

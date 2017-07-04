@@ -1,0 +1,162 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "boneCount",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string[]",
+			"name": "bones",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "fps",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "frameCount",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[fid:string]:gd3d.framework.Frame}",
+			"name": "frames",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "loop",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "subclipCount",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.subClip[]",
+			"name": "subclips",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "Parse",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "buf",
+					"type": "ArrayBuffer",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setAssetMgr",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setName",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.animationClip",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "animationClip",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\animationclip.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

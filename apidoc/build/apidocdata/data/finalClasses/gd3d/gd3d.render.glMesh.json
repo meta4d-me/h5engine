@@ -1,0 +1,699 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "bindIndex",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"default": "-1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "bindIndex",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLBuffer[]",
+			"name": "ebos",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLBuffer[]",
+			"name": "ebos",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number[]",
+			"name": "indexCounts",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number[]",
+			"name": "indexCounts",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "mode",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "mode",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLBuffer",
+			"name": "vbo",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLBuffer",
+			"name": "vbo",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "vertexByteSize",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "vertexByteSize",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "vertexCount",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "vertexCount",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.VertexFormatMask",
+			"name": "vertexFormat",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.VertexFormatMask",
+			"name": "vertexFormat",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"default": "VertexFormatMask.Position"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "addIndex",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "indexcount",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "addIndex",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "indexcount",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "bind",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "shadercode",
+					"type": "gd3d.render.glProgram",
+					"description": ""
+				},
+				{
+					"name": "bindEbo",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "bind",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "shadercode",
+					"type": "gd3d.render.glProgram",
+					"description": ""
+				},
+				{
+					"name": "bindEbo",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "dispose",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "drawArrayLines",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"description": "//直线应用vbo",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"type": "number",
+					"default": "-1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "drawArrayLines",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "drawArrayTris",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"description": "//三角形应用vbo",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"type": "number",
+					"default": "-1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "drawArrayTris",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "drawElementLines",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "drawElementLines",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"type": "number",
+					"default": "-1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "drawElementTris",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "drawElementTris",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "start",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"type": "number",
+					"default": "-1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "initBuffer",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "vf",
+					"type": "gd3d.render.VertexFormatMask",
+					"description": ""
+				},
+				{
+					"name": "vertexCount",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "mode",
+					"question": true,
+					"type": "gd3d.render.MeshTypeEnum",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "initBuffer",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "vf",
+					"type": "gd3d.render.VertexFormatMask",
+					"description": ""
+				},
+				{
+					"name": "vertexCount",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "mode",
+					"type": "gd3d.render.MeshTypeEnum",
+					"default": "MeshTypeEnum.Static",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "resetEboSize",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "eboindex",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "indexcount",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "resetEboSize",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "eboindex",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "indexcount",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "resetVboSize",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "vertexCount",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "resetVboSize",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "vertexCount",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "uploadIndexSubData",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "eboindex",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "data",
+					"type": "Uint16Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "uploadIndexSubData",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "eboindex",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "data",
+					"type": "Uint16Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "uploadVertexSubData",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "varray",
+					"type": "Float32Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "uploadVertexSubData",
+			"memberof": "gd3d.render.glMesh",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "varray",
+					"type": "Float32Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "glMesh",
+		"memberof": "gd3d.render",
+		"filename": "render\\renderer\\mesh.ts"
+	}
+}

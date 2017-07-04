@@ -1,0 +1,40 @@
+{
+    "layer": "geometry",
+    "passes": {
+        "base": [
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "additive_alpha",
+                "fs": "additive_alpha"
+            }
+        ],
+        "base_fog": [
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "fog_additive_alpha",
+                "fs": "fog_additive_alpha"
+            }
+        ],
+        "skin": [
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "additive_alpha_bone_eff",
+                "fs": "additive_alpha"
+            }
+        ],
+        "skin_fog": [
+            {
+                "blendmode": "blend",
+                "showface": "all",
+                "vs": "fog_additive_alpha_bone_eff",
+                "fs": "fog_additive_alpha"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}

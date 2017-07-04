@@ -1,0 +1,211 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.application",
+			"name": "app",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "beRightClick",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:number]:boolean}",
+			"name": "keyMap",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "moveSpeed",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "10"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "movemul",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "5"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "rotAngle",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "rotAngleX",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "rotAngleY",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "rotateSpeed",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "0.1"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.camera",
+			"name": "target",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "wheelSpeed",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"default": "1"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "checkOnRightClick",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mouseEvent",
+					"type": "MouseEvent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "doMove",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "doRotate",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "rotateX",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "rotateY",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "init",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				},
+				{
+					"name": "target",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "lookat",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "trans",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.cameraController",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "cameraController",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\cameracontroller.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			}
+		]
+	}
+}

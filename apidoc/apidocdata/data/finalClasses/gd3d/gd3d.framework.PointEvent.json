@@ -1,0 +1,48 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "eated",
+			"memberof": "gd3d.framework.PointEvent",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform2D",
+			"name": "selected",
+			"memberof": "gd3d.framework.PointEvent",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.PointEventEnum",
+			"name": "type",
+			"memberof": "gd3d.framework.PointEvent",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "x",
+			"memberof": "gd3d.framework.PointEvent",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "y",
+			"memberof": "gd3d.framework.PointEvent",
+			"scope": "instance"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "PointEvent",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\event2d.ts"
+	}
+}

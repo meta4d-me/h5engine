@@ -1,0 +1,41 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "string[]",
+			"name": "resoursePaths",
+			"memberof": "gd3d.io.SerializeDependent",
+			"scope": "static",
+			"default": "[]"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "GetAssetUrl",
+			"memberof": "gd3d.io.SerializeDependent",
+			"scope": "static",
+			"params": [
+				{
+					"name": "asset",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "SerializeDependent",
+		"memberof": "gd3d.io",
+		"filename": "framework\\io\\serialize.ts",
+		"description": "//依赖的资源路径"
+	}
+}

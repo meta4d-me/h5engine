@@ -1,0 +1,120 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.assetMgr",
+			"name": "assetmgr",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{name:string, length}[]",
+			"name": "files",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:number}",
+			"name": "mapNamed",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"description": "资源GUID的字典，key为资源的名称",
+			"version": "gd3d 1.0",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string[]",
+			"name": "packages",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "path",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "url",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "assetBundle",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "load",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "stateinfo",
+					"type": "{state:stateLoad, type}",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "parse",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "json",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unload",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "assetBundle",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\assetmgr.ts",
+		"description": "资源包",
+		"version": "gd3d 1.0"
+	}
+}

@@ -1,0 +1,12 @@
+{
+	"member": [],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "Fog",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\rawscene.ts"
+	}
+}

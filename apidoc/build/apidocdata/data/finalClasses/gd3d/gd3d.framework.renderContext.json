@@ -1,0 +1,157 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "floatTimer",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrixModel",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.matrix()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrixModelView",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.matrix"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrixModelViewProject",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.matrix"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrixProject",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.matrix()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrixView",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.matrix()"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrixViewProject",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.matrix"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector4[]",
+			"name": "vec4LightPos",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.rect",
+			"name": "viewPortPixel",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"default": "new gd3d.math.rect(0, 0, 0, 0)"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "renderContext",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateCamera",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateLights",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "lights",
+					"type": "gd3d.framework.light[]",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateModel",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "model",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateOverlay",
+			"memberof": "gd3d.framework.renderContext",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "renderContext",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\render.ts",
+		"description": "//渲染上下文,渲染所需要的所有参数"
+	}
+}

@@ -1,0 +1,140 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"name": "fadeDuration",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "normalColor",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.UIEvent",
+			"name": "onClick",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance",
+			"default": "new UIEvent()"
+		},
+		{
+			"kind": "member",
+			"name": "pressedColor",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "pressedGraphic",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "targetImage",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.image2D[]",
+			"name": "testImage",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance",
+			"description": "//测试",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform2D",
+			"name": "transform",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "transition",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "onPointEvent",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				},
+				{
+					"name": "ev",
+					"type": "gd3d.framework.PointEvent",
+					"description": ""
+				},
+				{
+					"name": "oncap",
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateTran",
+			"memberof": "gd3d.framework.button",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "button",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\component\\button.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IRectRenderer"
+			}
+		]
+	}
+}

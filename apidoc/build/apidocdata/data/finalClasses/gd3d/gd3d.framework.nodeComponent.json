@@ -1,0 +1,47 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.INodeComponent",
+			"name": "comp",
+			"memberof": "gd3d.framework.nodeComponent",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "init",
+			"memberof": "gd3d.framework.nodeComponent",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "nodeComponent",
+			"memberof": "gd3d.framework.nodeComponent",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "comp",
+					"type": "gd3d.framework.INodeComponent",
+					"description": ""
+				},
+				{
+					"name": "init",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "nodeComponent",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\gameobject.ts"
+	}
+}

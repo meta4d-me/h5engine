@@ -1,0 +1,322 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "position",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "binReader",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "buf",
+					"type": "ArrayBuffer",
+					"description": ""
+				},
+				{
+					"name": "seek",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "canread",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "length",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "peek",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "readBoolean",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readByte",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "Uint8Array",
+			"name": "readBytes",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "target",
+					"type": "Uint8Array",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "length",
+					"type": "number",
+					"default": "-1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readDouble",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readFloat",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readInt",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readInt16",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readInt32",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readInt8",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readShort",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readSingle",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "readStringAnsi",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "readStringUtf8",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "readStringUtf8FixLength",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "length",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readSymbolByte",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"description": "/// </summary>"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readUInt16",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readUInt32",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readUInt8",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "readUTFBytes",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "length",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "Uint8Array",
+			"name": "readUint8Array",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "target",
+					"type": "Uint8Array",
+					"default": "null",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "length",
+					"type": "number",
+					"default": "-1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "Uint8Array",
+			"name": "readUint8ArrayByOffset",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "target",
+					"type": "Uint8Array",
+					"description": ""
+				},
+				{
+					"name": "offset",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "length",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readUnsignedInt",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "readUnsignedShort",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "seek",
+			"memberof": "gd3d.io.binReader",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "seek",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "utf8ArrayToString",
+			"memberof": "gd3d.io.binReader",
+			"scope": "static",
+			"params": [
+				{
+					"name": "array",
+					"type": "Uint8Array|number[]",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "binReader",
+		"memberof": "gd3d.io",
+		"filename": "framework\\io\\stream.ts"
+	}
+}

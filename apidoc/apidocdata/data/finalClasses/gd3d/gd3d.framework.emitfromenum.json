@@ -1,0 +1,29 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "base",
+			"memberof": "gd3d.framework.emitfromenum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "volume",
+			"memberof": "gd3d.framework.emitfromenum",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "emitfromenum",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlestartdata.ts"
+	}
+}

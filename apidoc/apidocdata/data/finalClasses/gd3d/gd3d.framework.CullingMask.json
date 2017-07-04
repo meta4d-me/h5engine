@@ -1,0 +1,69 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "default",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0x00000002"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "editor",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0x00000004"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "everything",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0xffffffff"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "model",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0x00000008"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "modelbeforeui",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0x00000008"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "nothing",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0x00000000"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "ui",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0x00000001"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "CullingMask",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\camera.ts"
+	}
+}

@@ -1,0 +1,87 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "{name:string, length}[]",
+			"name": "files",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "path",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "url",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "assetBundle",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "load",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "onstate",
+					"type": "(state:gd3d.framework.stateLoad)=>void",
+					"description": ""
+				},
+				{
+					"name": "state",
+					"type": "gd3d.framework.stateLoad",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "parse",
+			"memberof": "gd3d.framework.assetBundle",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "json",
+					"type": "any",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "assetBundle",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\assetmgr.ts",
+		"description": "资源包",
+		"version": "gd3d 1.0"
+	}
+}

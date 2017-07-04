@@ -1,0 +1,208 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "active",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Particle[]",
+			"name": "deadParticles",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.effectSystem",
+			"name": "effectSys",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Emission",
+			"name": "emission",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EmissionBatcher[]",
+			"name": "emissionBatchers",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matToBatcher",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"default": "new gd3d.math.matrix()"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "perIndexxCount",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "perVertexCount",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EmissionElement",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_emission",
+					"type": "gd3d.framework.EffectElementData",
+					"description": ""
+				},
+				{
+					"name": "sys",
+					"type": "gd3d.framework.effectSystem",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addParticle",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "count",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.quaternion",
+			"name": "getWorldRotation",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.matrix",
+			"name": "getmatrixToWorld",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isOver",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateBatcher",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateEmission",
+			"memberof": "gd3d.framework.EmissionElement",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EmissionElement",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\particletool\\particles.ts",
+		"description": "//发射器也作为特效系统的一个元素"
+	}
+}

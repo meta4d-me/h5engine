@@ -1,0 +1,536 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.render.TextureFormatEnum",
+			"name": "format",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.TextureFormatEnum",
+			"name": "format",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "loaded",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"description": "//img: HTMLImageElement = null;",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "loaded",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.textureReader",
+			"name": "reader",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.textureReader",
+			"name": "reader",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"description": "//创建读取器，有可能失败"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLTexture",
+			"name": "texture",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLTexture",
+			"name": "texture",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "glTexture2D",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "format",
+					"question": true,
+					"type": "gd3d.render.TextureFormatEnum",
+					"description": ""
+				},
+				{
+					"name": "mipmap",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "linear",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "constructor",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "format",
+					"type": "gd3d.render.TextureFormatEnum",
+					"default": "TextureFormatEnum.RGBA",
+					"description": ""
+				},
+				{
+					"name": "mipmap",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				},
+				{
+					"name": "linear",
+					"type": "boolean",
+					"default": "true",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "dispose",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"description": "//disposeit: boolean = false;",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glTexture2D",
+			"name": "formGrayArray",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "static",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "array",
+					"type": "number[]|Float32Array|Float64Array",
+					"description": ""
+				},
+				{
+					"name": "width",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "height",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "formGrayArray",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "static",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "array",
+					"type": "number[]|Float32Array|Float64Array",
+					"description": ""
+				},
+				{
+					"name": "width",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "height",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.textureReader",
+			"name": "getReader",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "redOnly",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.textureReader",
+			"name": "getReader",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "redOnly",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "staticTexture",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "static",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glTexture2D",
+			"name": "staticTexture",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "static",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "uploadByteArray",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mipmap",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "linear",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "width",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "height",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "data",
+					"type": "Uint8Array",
+					"description": ""
+				},
+				{
+					"name": "repeat",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				},
+				{
+					"name": "mirroredU",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				},
+				{
+					"name": "mirroredV",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "uploadByteArray",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "mipmap",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "linear",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "width",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "height",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "data",
+					"type": "Uint8Array",
+					"description": ""
+				},
+				{
+					"name": "repeat",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "mirroredU",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "mirroredV",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "uploadImage",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "img",
+					"type": "HTMLImageElement",
+					"description": ""
+				},
+				{
+					"name": "mipmap",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "linear",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "premultiply",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "repeat",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "mirroredU",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "mirroredV",
+					"question": true,
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "uploadImage",
+			"memberof": "gd3d.render.glTexture2D",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "img",
+					"type": "HTMLImageElement",
+					"description": ""
+				},
+				{
+					"name": "mipmap",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "linear",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "premultiply",
+					"type": "boolean",
+					"default": "true",
+					"description": ""
+				},
+				{
+					"name": "repeat",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				},
+				{
+					"name": "mirroredU",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				},
+				{
+					"name": "mirroredV",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "glTexture2D",
+		"memberof": "gd3d.render",
+		"filename": "render\\resource\\texture.ts",
+		"implements": [
+			{
+				"name": "gd3d.render.ITexture"
+			}
+		]
+	}
+}

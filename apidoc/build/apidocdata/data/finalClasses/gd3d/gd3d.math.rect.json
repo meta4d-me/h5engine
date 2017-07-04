@@ -1,0 +1,134 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "h",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "h",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "w",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "w",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "x",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "x",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "y",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "y",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "rect",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "x",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "w",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "h",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "constructor",
+			"memberof": "gd3d.math.rect",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "x",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "w",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "h",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "rect",
+		"memberof": "gd3d.math",
+		"filename": "render\\struct.ts"
+	}
+}

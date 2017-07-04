@@ -1,0 +1,26 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "initDefaultTexture",
+			"memberof": "gd3d.framework.defTexture",
+			"scope": "static",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "defTexture",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\default\\deftexture.ts"
+	}
+}

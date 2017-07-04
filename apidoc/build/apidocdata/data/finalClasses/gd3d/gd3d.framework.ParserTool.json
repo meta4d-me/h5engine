@@ -1,0 +1,106 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "{[name:string]:any}",
+			"name": "particleMap",
+			"memberof": "gd3d.framework.ParserTool",
+			"scope": "instance",
+			"default": "{}"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "ParserTool",
+			"memberof": "gd3d.framework.ParserTool",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "load",
+			"memberof": "gd3d.framework.ParserTool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "indexurl",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "callback",
+					"type": "(effecsystemdata:gd3d.framework.EffectSystemData)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "loadEmission",
+			"memberof": "gd3d.framework.ParserTool",
+			"scope": "instance",
+			"description": "加载粒子发射器",
+			"params": [
+				{
+					"name": "baseUrl",
+					"type": "string",
+					"description": "材质路径"
+				},
+				{
+					"name": "callback",
+					"type": "(emissionArray:Array<gd3d.framework.EmissionData>,_err:Error)=>void",
+					"description": "回调函数"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "loadMatrial",
+			"memberof": "gd3d.framework.ParserTool",
+			"scope": "instance",
+			"description": "j加载粒子材质",
+			"params": [
+				{
+					"name": "indexurl",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "callback",
+					"type": "(material:Array<gd3d.framework.MaterialData>,_err:Error)=>void",
+					"description": "回调函数"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "loadParticle",
+			"memberof": "gd3d.framework.ParserTool",
+			"scope": "instance",
+			"description": "加载粒子",
+			"params": [
+				{
+					"name": "indexurl",
+					"type": "string",
+					"description": "粒子路径"
+				},
+				{
+					"name": "callback",
+					"type": "(p:Array<gd3d.framework.CParticleData>,_err:Error)=>void",
+					"description": "回掉函数"
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "ParserTool",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\effectplayer.ts"
+	}
+}

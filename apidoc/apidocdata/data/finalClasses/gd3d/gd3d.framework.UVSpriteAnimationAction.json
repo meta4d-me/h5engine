@@ -1,0 +1,122 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "colum",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance",
+			"description": "列",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectElement",
+			"name": "elements",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "endFrame",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "fps",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance",
+			"description": "控制播放速度",
+			"default": "30"
+		},
+		{
+			"kind": "member",
+			"type": "any",
+			"name": "params",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "row",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance",
+			"description": "行",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "startFrame",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "type",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "init",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_startFrame",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "_endFrame",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "_params",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "_elements",
+					"type": "gd3d.framework.EffectElement",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.UVSpriteAnimationAction",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "frameIndex",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "UVSpriteAnimationAction",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\particletool\\effectaction.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IEffectAction"
+			}
+		]
+	}
+}

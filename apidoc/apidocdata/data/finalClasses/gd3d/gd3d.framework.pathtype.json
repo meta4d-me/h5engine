@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "loop",
+			"memberof": "gd3d.framework.pathtype",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "once",
+			"memberof": "gd3d.framework.pathtype",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "pingpong",
+			"memberof": "gd3d.framework.pathtype",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "pathtype",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\pathasset.ts"
+	}
+}

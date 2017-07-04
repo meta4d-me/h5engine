@@ -1,0 +1,46 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform2D",
+			"name": "transform",
+			"memberof": "gd3d.framework.I2DComponent",
+			"scope": "instance",
+			"inherited": true,
+			"inherits": "gd3d.framework.I2DComponent"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.IRectRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "canvas",
+					"type": "gd3d.framework.canvas",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateTran",
+			"memberof": "gd3d.framework.IRectRenderer",
+			"scope": "instance",
+			"description": "//刷新顶点信息"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "interface",
+		"name": "IRectRenderer",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\transform2d.ts",
+		"augments": [
+			"gd3d.framework.I2DComponent"
+		]
+	}
+}
