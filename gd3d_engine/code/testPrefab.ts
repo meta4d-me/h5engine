@@ -3,14 +3,14 @@ class test_loadprefab implements IState
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     renderer: gd3d.framework.meshRenderer[];
-    skinRenders:gd3d.framework.skinnedMeshRenderer[];
+    skinRenders: gd3d.framework.skinnedMeshRenderer[];
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        let names: string[] = ["0060_duyanshou", "Cube", "0001_fashion", "baihu"];
+        let names: string[] = ["193_meirenyu", "0060_duyanshou", "Cube", "0001_fashion", "baihu"];
         let name = names[0];
         // name="Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
@@ -27,6 +27,8 @@ class test_loadprefab implements IState
                             this.scene.addChild(this.baihu);
                             this.baihu.localScale = new gd3d.math.vector3(1, 1, 1);
                             this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                            this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
+
                             // this.baihu.localEulerAngles = new gd3d.math.vector3();
                             this.baihu = _prefab.getCloneTrans();
                             objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);

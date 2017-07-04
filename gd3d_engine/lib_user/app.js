@@ -2230,9 +2230,8 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
-        var name = names[5];
-        name = "fx_chibang_xx";
+        var names = ["fx_ss_female@attack_04", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
@@ -4249,7 +4248,7 @@ var test_loadprefab = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        var names = ["0060_duyanshou", "Cube", "0001_fashion", "baihu"];
+        var names = ["193_meirenyu", "0060_duyanshou", "Cube", "0001_fashion", "baihu"];
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -4260,6 +4259,7 @@ var test_loadprefab = (function () {
                         _this.scene.addChild(_this.baihu);
                         _this.baihu.localScale = new gd3d.math.vector3(1, 1, 1);
                         _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
                         _this.baihu = _prefab.getCloneTrans();
                         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
                         objCam.lookatPoint(new gd3d.math.vector3(0.1, 0.1, 0.1));
