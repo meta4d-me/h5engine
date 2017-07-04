@@ -2865,11 +2865,11 @@ declare namespace gd3d.framework {
     class aabb {
         minimum: gd3d.math.vector3;
         maximum: gd3d.math.vector3;
-        srcmin: gd3d.math.vector3;
-        srcmax: gd3d.math.vector3;
-        opmin: gd3d.math.vector3;
-        opmax: gd3d.math.vector3;
-        _center: gd3d.math.vector3;
+        private srcmin;
+        private srcmax;
+        private opmin;
+        private opmax;
+        private _center;
         constructor(_minimum: gd3d.math.vector3, _maximum: gd3d.math.vector3);
         update(worldmatrix: gd3d.math.matrix): void;
         addVector3(vec: gd3d.math.vector3): void;
@@ -2886,17 +2886,16 @@ declare namespace gd3d.framework {
     class obb {
         center: gd3d.math.vector3;
         halfsize: gd3d.math.vector3;
-        directions: gd3d.math.vector3[];
+        private directions;
         vectors: gd3d.math.vector3[];
-        constructor();
         buildByMaxMin(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): void;
         buildByCenterSize(center: gd3d.math.vector3, size: gd3d.math.vector3): void;
         update(worldmatrix: gd3d.math.matrix): void;
         caclWorldVecs(vecs: gd3d.math.vector3[], worldmatrix: gd3d.math.matrix): void;
         intersects(_obb: obb): boolean;
-        computeBoxExtents(axis: gd3d.math.vector3, box: obb): math.vector3;
-        axisOverlap(axis: gd3d.math.vector3, box0: obb, box1: obb): boolean;
-        extentsOverlap(min0: number, max0: number, min1: number, max1: number): boolean;
+        private computeBoxExtents(axis, box);
+        private axisOverlap(axis, box0, box1);
+        private extentsOverlap(min0, max0, min1, max1);
         clone(): obb;
         dispose(): void;
     }
@@ -2920,7 +2919,7 @@ declare namespace gd3d.framework {
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3);
         intersectAABB(_aabb: aabb): boolean;
         intersectPlaneTransform(tran: transform): pickinfo;
-        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: any): gd3d.math.vector3;
+        private intersectPlane(planePoint, planeNormal);
         intersectCollider(tran: transform): pickinfo;
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
@@ -3106,7 +3105,6 @@ declare namespace gd3d.math {
         static readonly vector3_right: vector3;
         private static _vector3_forward;
         static readonly vector3_forward: vector3;
-        n: any;
         private static _vector3_zero;
         static readonly vector3_zero: vector3;
         private static _vector3_one;
