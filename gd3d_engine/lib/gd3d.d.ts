@@ -185,12 +185,11 @@ declare namespace gd3d.framework {
         private pointX;
         private pointY;
         update(delta: number, touch: Boolean, XOnScreenSpace: number, YOnScreenSpace: number): void;
-        lastMat: material;
-        static defmat: material;
+        private lastMat;
         afterRender: Function;
         render(context: renderContext, assetmgr: assetMgr): void;
         pushRawData(mat: material, data: number[]): void;
-        context: renderContext;
+        private context;
         assetmgr: assetMgr;
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr): void;
         pixelWidth: number;
@@ -201,13 +200,13 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class batcher2D {
-        mesh: render.glMesh;
-        drawMode: render.DrawModeEnum;
-        vboCount: number;
-        curPass: render.glDrawPass;
-        eboCount: number;
-        dataForVbo: Float32Array;
-        dataForEbo: Uint16Array;
+        private mesh;
+        private drawMode;
+        private vboCount;
+        private curPass;
+        private eboCount;
+        private dataForVbo;
+        private dataForEbo;
         initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
         begin(webgl: WebGLRenderingContext, pass: render.glDrawPass): void;
         push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]): void;
@@ -265,13 +264,12 @@ declare namespace gd3d.framework {
     class overlay2D implements IOverLay {
         constructor();
         init: boolean;
-        camera: camera;
-        app: application;
-        inputmgr: inputMgr;
+        private camera;
+        private app;
+        private inputmgr;
         start(camera: camera): void;
         canvas: canvas;
         autoAsp: boolean;
-        renderLayer: CullingMask;
         addChild(node: transform2D): void;
         removeChild(node: transform2D): void;
         getChildren(): transform2D[];
@@ -375,7 +373,7 @@ declare namespace gd3d.framework {
         height: number;
         pivot: math.vector2;
         hideFlags: HideFlags;
-        _visible: boolean;
+        private _visible;
         readonly visibleInScene: boolean;
         visible: boolean;
         readonly transform: this;
@@ -408,17 +406,16 @@ declare namespace gd3d.framework {
         renderer: IRectRenderer;
         components: C2DComponent[];
         update(delta: number): void;
+        addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
+        removeComponent(comp: I2DComponent): void;
+        removeComponentByTypeName(type: string): C2DComponent;
+        removeAllComponents(): void;
         getComponent(type: string): I2DComponent;
         getComponents(): I2DComponent[];
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents(node, _type, comps);
-        addComponent(type: string): I2DComponent;
-        removeComponent(comp: I2DComponent): void;
-        removeComponentByTypeName(type: string): C2DComponent;
-        removeAllComponents(): void;
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
-        ContainsPoint(p: math.vector2): boolean;
         ContainsCanvasPoint(pworld: math.vector2): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
     }
