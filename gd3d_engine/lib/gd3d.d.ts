@@ -625,12 +625,8 @@ declare namespace gd3d.framework {
         name: string;
         private id;
         assetmgr: assetMgr;
-        files: {
-            name: string;
-            length: number;
-            packes: number;
-        }[];
-        packages: string[];
+        private files;
+        private packages;
         url: string;
         path: string;
         constructor(url: string);
@@ -649,7 +645,6 @@ declare namespace gd3d.framework {
         app: application;
         webgl: WebGLRenderingContext;
         shaderPool: gd3d.render.shaderPool;
-        defMesh: defMesh;
         constructor(app: application);
         initDefAsset(): void;
         mapShader: {
@@ -682,15 +677,12 @@ declare namespace gd3d.framework {
         getAssetsRefcount(): {
             [id: string]: number;
         };
-        nameDuplicateCheck(name: string): boolean;
         private mapInLoad;
         removeAssetBundle(name: string): void;
         private assetUrlDic;
         getAssetUrl(asset: IAsset): string;
-        bundlePackBin: {
-            [name: string]: ArrayBuffer;
-        };
-        bundlePackJson: JSON;
+        private bundlePackBin;
+        private bundlePackJson;
         loadResByPack(packnum: number, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
         loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private waitStateDic;

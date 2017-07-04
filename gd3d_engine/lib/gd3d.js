@@ -3687,6 +3687,8 @@ var gd3d;
                             if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                                 && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
                                 var _res = s.resstate[_fileName].res;
+                                if (_res == null)
+                                    console.error("res is null:" + _fileName);
                                 _this.mapNamed[_fileName] = _res.getGUID();
                             }
                             if (realTotal === 0) {
@@ -3869,9 +3871,6 @@ var gd3d;
                     }
                 }
                 return mapRefcout;
-            };
-            assetMgr.prototype.nameDuplicateCheck = function (name) {
-                return true;
             };
             assetMgr.prototype.removeAssetBundle = function (name) {
                 if (this.mapBundle[name] != null)
@@ -5338,9 +5337,6 @@ var gd3d;
                 if (!assetName) {
                     assetName = "animationClip_" + this.getGUID();
                 }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
-                }
                 this.name = new framework.constText(assetName);
             }
             animationClip.prototype.getName = function () {
@@ -5585,9 +5581,6 @@ var gd3d;
                 if (!assetName) {
                     assetName = "atlas_" + this.getGUID();
                 }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
-                }
                 this.name = new framework.constText(assetName);
             }
             atlas.prototype.getName = function () {
@@ -5675,9 +5668,6 @@ var gd3d;
                 this.id = new framework.resID();
                 if (!assetName) {
                     assetName = "font_" + this.getGUID();
-                }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
                 }
                 this.name = new framework.constText(assetName);
             }
@@ -5810,9 +5800,6 @@ var gd3d;
                 this.mapUniform = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
-                }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
                 }
                 this.name = new framework.constText(assetName);
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
@@ -6030,8 +6017,14 @@ var gd3d;
                         this.mapUniform[_id].value.unuse();
                     }
                     this.mapUniform[_id].value = _texture;
-                    if (_texture != null)
+                    if (_texture != null) {
                         _texture.use();
+                        var _texelsizeName = _id + "_TexelSize";
+                        var _gltexture = _texture.glTexture;
+                        if (this.mapUniform[_texelsizeName] != undefined) {
+                            this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                        }
+                    }
                 }
                 else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Texture, _texture);
@@ -6299,9 +6292,6 @@ var gd3d;
                 this.submesh = [];
                 if (!assetName) {
                     assetName = "mesh_" + this.getGUID();
-                }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
                 }
                 this.name = new framework.constText(assetName);
             }
@@ -6687,9 +6677,6 @@ var gd3d;
                 if (!assetName) {
                     assetName = "path_" + this.getGUID();
                 }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
-                }
                 this.name = new framework.constText(assetName);
             }
             pathasset.prototype.getName = function () {
@@ -6883,9 +6870,6 @@ var gd3d;
                 if (!assetName) {
                     assetName = "prefab_" + this.getGUID();
                 }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
-                }
                 this.name = new framework.constText(assetName);
             }
             prefab.prototype.getName = function () {
@@ -6941,9 +6925,6 @@ var gd3d;
                 this.assetbundle = null;
                 if (!assetName) {
                     assetName = "rawscene_" + this.getGUID();
-                }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
                 }
                 this.name = new framework.constText(assetName);
             }
@@ -7045,9 +7026,6 @@ var gd3d;
                 this.queue = 0;
                 if (!assetName) {
                     assetName = "shader_" + this.getGUID();
-                }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
                 }
                 this.name = new framework.constText(assetName);
             }
@@ -7248,9 +7226,6 @@ var gd3d;
                 if (!assetName) {
                     assetName = "sprite_" + this.getGUID();
                 }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
-                }
                 this.name = new framework.constText(assetName);
             }
             sprite.prototype.getName = function () {
@@ -7337,9 +7312,6 @@ var gd3d;
                 if (!assetName) {
                     assetName = "texture_" + this.getGUID();
                 }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
-                }
                 this.name = new framework.constText(assetName);
             }
             textasset.prototype.getName = function () {
@@ -7386,9 +7358,6 @@ var gd3d;
                 this.defaultAsset = false;
                 if (!assetName) {
                     assetName = "texture_" + this.getGUID();
-                }
-                if (!framework.sceneMgr.app.getAssetMgr().nameDuplicateCheck(assetName)) {
-                    throw new Error("already have name.");
                 }
                 this.name = new framework.constText(assetName);
             }

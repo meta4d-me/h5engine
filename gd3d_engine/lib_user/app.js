@@ -4251,7 +4251,6 @@ var test_loadprefab = (function () {
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         var names = ["0060_duyanshou", "Cube", "0001_fashion", "baihu"];
         var name = names[0];
-        name = "Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
@@ -4293,9 +4292,9 @@ var test_loadprefab = (function () {
         btn.style.position = "absolute";
         this.app.container.appendChild(btn);
         var btn2 = document.createElement("button");
-        btn2.textContent = "切换Shader到：transparent_additive.shader.json";
+        btn2.textContent = "切换Shader到：additive_alpha.shader.json";
         btn2.onclick = function () {
-            var sh = _this.app.getAssetMgr().getShader("transparent_additive.shader.json");
+            var sh = _this.app.getAssetMgr().getShader("additive_alpha.shader.json");
             _this.change(sh);
         };
         btn2.style.top = "124px";
