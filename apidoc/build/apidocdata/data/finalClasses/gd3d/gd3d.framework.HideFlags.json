@@ -1,0 +1,85 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "DontSave",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000034"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "DontSaveInBuild",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000010"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "DontSaveInEditor",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000004"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "DontUnloadUnusedAsset",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000020"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "HideAndDontSave",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x0000003D"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "HideInHierarchy",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000001"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "HideInInspector",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000002"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "None",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000000"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "NotEditable",
+			"memberof": "gd3d.framework.HideFlags",
+			"scope": "static",
+			"default": "0x00000008"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "HideFlags",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\gameobject.ts"
+	}
+}

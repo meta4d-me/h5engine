@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "base",
+			"memberof": "gd3d.framework.ParticleMatrialType",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "uvroll",
+			"memberof": "gd3d.framework.ParticleMatrialType",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "uvsprite",
+			"memberof": "gd3d.framework.ParticleMatrialType",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "ParticleMatrialType",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\particlematrialdata.ts"
+	}
+}

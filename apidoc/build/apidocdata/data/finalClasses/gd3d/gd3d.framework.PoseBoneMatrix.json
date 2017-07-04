@@ -1,0 +1,157 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.quaternion",
+			"name": "r",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "t",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "gd3d.framework.PoseBoneMatrix",
+			"name": "Clone",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "copyFrom",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "src",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.PoseBoneMatrix",
+			"name": "createDefault",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"name": "invert",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "lerpInWorld",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_tpose",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				},
+				{
+					"name": "from",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				},
+				{
+					"name": "to",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				},
+				{
+					"name": "v",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "load",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "read",
+					"type": "gd3d.io.binReader",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.PoseBoneMatrix",
+			"name": "sLerp",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "static",
+			"params": [
+				{
+					"name": "left",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				},
+				{
+					"name": "right",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				},
+				{
+					"name": "v",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "target",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.PoseBoneMatrix",
+			"name": "sMultiply",
+			"memberof": "gd3d.framework.PoseBoneMatrix",
+			"scope": "static",
+			"params": [
+				{
+					"name": "left",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				},
+				{
+					"name": "right",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"description": ""
+				},
+				{
+					"name": "target",
+					"type": "gd3d.framework.PoseBoneMatrix",
+					"default": "null",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "PoseBoneMatrix",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\animationclip.ts"
+	}
+}

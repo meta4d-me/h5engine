@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Direction",
+			"memberof": "gd3d.framework.LightTypeEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Point",
+			"memberof": "gd3d.framework.LightTypeEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Spot",
+			"memberof": "gd3d.framework.LightTypeEnum",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "LightTypeEnum",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\light.ts"
+	}
+}

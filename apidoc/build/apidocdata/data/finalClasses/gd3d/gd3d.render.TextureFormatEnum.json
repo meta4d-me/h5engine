@@ -1,0 +1,61 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Gray",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Gray",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "RGB",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "RGB",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "RGBA",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "RGBA",
+			"memberof": "gd3d.render.TextureFormatEnum",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "TextureFormatEnum",
+		"memberof": "gd3d.render",
+		"filename": "render\\resource\\texture.ts"
+	}
+}

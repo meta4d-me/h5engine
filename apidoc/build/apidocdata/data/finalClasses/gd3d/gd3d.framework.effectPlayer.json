@@ -1,0 +1,51 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.assetMgr",
+			"name": "assetmgr",
+			"memberof": "gd3d.framework.effectPlayer",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "gd3d.framework.effectPlayer",
+			"name": "Instance",
+			"memberof": "gd3d.framework.effectPlayer",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"name": "load",
+			"memberof": "gd3d.framework.effectPlayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "scene",
+					"type": "gd3d.framework.scene",
+					"description": ""
+				},
+				{
+					"name": "oncomplete",
+					"type": "(effctTrans:gd3d.framework.transform)=>void",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "effectPlayer",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\effectplayer.ts"
+	}
+}

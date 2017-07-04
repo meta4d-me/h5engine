@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "x_axis",
+			"memberof": "gd3d.math.commonStatic",
+			"scope": "static",
+			"default": "new gd3d.math.vector3(1, 0, 0)"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "y_axis",
+			"memberof": "gd3d.math.commonStatic",
+			"scope": "static",
+			"default": "new gd3d.math.vector3(0, 1, 0)"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "z_axis",
+			"memberof": "gd3d.math.commonStatic",
+			"scope": "static",
+			"default": "new gd3d.math.vector3(0, 0, 1)"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "commonStatic",
+		"memberof": "gd3d.math",
+		"filename": "framework\\math\\number.ts"
+	}
+}

@@ -1,0 +1,83 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"name": "COMPONENT_BOXCOLLIDER",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"boxcollider\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_CAMERA",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"camera\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_CAMERACONTROLLER",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"cameraController\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_CANVASRENDER",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"canvasRenderer\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_LIGHT",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"light\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_MESHFILTER",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"meshFilter\""
+		},
+		{
+			"kind": "member",
+			"name": "COMPONENT_MESHRENDER",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"meshRenderer\""
+		},
+		{
+			"kind": "member",
+			"name": "RESOURCES_MESH_CUBE",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"cube\""
+		},
+		{
+			"kind": "member",
+			"name": "UIStyle_Enum",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"enum\""
+		},
+		{
+			"kind": "member",
+			"name": "UIStyle_RangeFloat",
+			"memberof": "gd3d.framework.StringUtil",
+			"scope": "static",
+			"default": "\"rangeFloat\""
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "StringUtil",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\util\\stringutil.ts"
+	}
+}

@@ -1,0 +1,77 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Enum",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Enum",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "MultiLineString",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "MultiLineString",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "None",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "None",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "RangeFloat",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "RangeFloat",
+			"memberof": "gd3d.reflect.FieldUIStyle",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "FieldUIStyle",
+		"memberof": "gd3d.reflect",
+		"filename": "jsloader\\reflect.ts"
+	}
+}

@@ -1,0 +1,102 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.ITexture",
+			"name": "glTexture",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "realName",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "texture",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetName",
+					"type": "string",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "disposeNow",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.texture",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "texture",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\texture.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

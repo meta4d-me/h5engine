@@ -1,0 +1,78 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "addParticleSystem",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "particleData",
+					"type": "gd3d.framework.ParticleListData",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "parseEffectSystemData",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "effectsystemdata",
+					"type": "gd3d.framework.EffectSystemData",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.effectSystem",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "effectSystem",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\effectsystem.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			}
+		]
+	}
+}

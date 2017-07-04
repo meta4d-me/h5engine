@@ -1,0 +1,124 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "any",
+			"name": "other",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "any",
+			"name": "rootNode",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Parse",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "txt",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setAssetMgr",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setName",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.rawscene",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "rawscene",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\rawscene.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

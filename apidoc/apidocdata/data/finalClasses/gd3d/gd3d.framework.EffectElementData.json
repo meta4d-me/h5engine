@@ -1,0 +1,82 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectActionData[]",
+			"name": "actionData",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "beloop",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.Emission",
+			"name": "emissionData",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectFrameData",
+			"name": "initFrameData",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "ref",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[frameIndex:number]:gd3d.framework.EffectFrameData}",
+			"name": "timelineFrame",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectElementTypeEnum",
+			"name": "type",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.EffectElementData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectElementData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

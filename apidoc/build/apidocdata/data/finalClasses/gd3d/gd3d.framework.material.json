@@ -1,0 +1,299 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.UniformData}",
+			"name": "mapUniform",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"description": "// matjson: string;"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "material",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "Parse",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "json",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "draw",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "mesh",
+					"type": "gd3d.framework.mesh",
+					"description": ""
+				},
+				{
+					"name": "sm",
+					"type": "gd3d.framework.subMeshInfo",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getLayer",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getQueue",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getShader",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setAssetMgr",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setFloat",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_id",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "_number",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setMatrix",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_id",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "_matrix",
+					"type": "gd3d.math.matrix",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setMatrixv",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_id",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "_matrixv",
+					"type": "Float32Array",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setName",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setShader",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "shader",
+					"type": "gd3d.framework.shader",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setTexture",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_id",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "_texture",
+					"type": "gd3d.framework.texture",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setVector4",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_id",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "_vector4",
+					"type": "gd3d.math.vector4",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setVector4v",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_id",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "_vector4v",
+					"type": "Float32Array",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "uploadUniform",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "pass",
+					"type": "gd3d.render.glDrawPass",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.material",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "material",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\material.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

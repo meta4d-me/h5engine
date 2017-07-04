@@ -1,0 +1,55 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectAttrsData",
+			"name": "attrsData",
+			"memberof": "gd3d.framework.EffectLerpData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "attrsList",
+			"memberof": "gd3d.framework.EffectLerpData",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "fromFrame",
+			"memberof": "gd3d.framework.EffectLerpData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "toFrame",
+			"memberof": "gd3d.framework.EffectLerpData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.EffectLerpTypeEnum",
+			"name": "type",
+			"memberof": "gd3d.framework.EffectLerpData",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.EffectLerpData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectLerpData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\effectalldata.ts"
+	}
+}

@@ -1,0 +1,165 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "center",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "colliderVisible",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.meshFilter",
+			"name": "filter",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.matrix",
+			"name": "matrix",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance",
+			"rwType": 1,
+			"description": "获取该碰撞盒物体的世界矩阵",
+			"version": "gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "radius",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.spherestruct",
+			"name": "spherestruct",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "subTran",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "worldCenter",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance",
+			"rwType": 1
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "caclPlaneInDir",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "v0",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "v1",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				},
+				{
+					"name": "v2",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getBound",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "intersectsTransform",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "tran",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.spherecollider",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "spherecollider",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\spherecollider.ts",
+		"description": "表示球碰撞盒",
+		"version": "gd3d 1.0",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			},
+			{
+				"name": "gd3d.framework.ICollider"
+			}
+		]
+	}
+}

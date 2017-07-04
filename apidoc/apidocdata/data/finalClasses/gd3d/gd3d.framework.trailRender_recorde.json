@@ -1,0 +1,210 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.color",
+			"name": "endColor",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "interpNumber",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.trailNode[]",
+			"name": "interpPath",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "interpolate",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderLayerEnum",
+			"name": "layer",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"description": "//記錄軌跡",
+			"default": "RenderLayerEnum.Common"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "lifetime",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "0.35"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.material",
+			"name": "material",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"description": "//-----------------------------------------------------------------------------------------------"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "maxStickCout",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "12"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "minStickDistance",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "0.1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "queue",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.CullingMask",
+			"name": "renderLayer",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"default": "CullingMask.default"
+		},
+		{
+			"kind": "member",
+			"name": "startColor",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setMaxpointcontroll",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "value",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setWidth",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "startWidth",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "endWidth",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"description": "//------------------------------------------------------------------------------------------------------"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.trailRender_recorde",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "trailRender_recorde",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\trailrender_recorde.ts",
+		"description": "拖尾组件，废弃",
+		"version": "egret-gd3d 1.0",
+		"implements": [
+			{
+				"name": "gd3d.framework.IRenderer"
+			}
+		]
+	}
+}

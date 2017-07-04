@@ -1,0 +1,45 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "box",
+			"memberof": "gd3d.framework.StartPositionShapeType",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "hemisphere",
+			"memberof": "gd3d.framework.StartPositionShapeType",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "normal",
+			"memberof": "gd3d.framework.StartPositionShapeType",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "sphere",
+			"memberof": "gd3d.framework.StartPositionShapeType",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "StartPositionShapeType",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\startposdata.ts"
+	}
+}

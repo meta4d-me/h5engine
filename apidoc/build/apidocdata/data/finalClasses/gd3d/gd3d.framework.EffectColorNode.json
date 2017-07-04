@@ -1,0 +1,46 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "keyColor",
+			"memberof": "gd3d.framework.EffectColorNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "lifeLocation",
+			"memberof": "gd3d.framework.EffectColorNode",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EffectColorNode",
+			"memberof": "gd3d.framework.EffectColorNode",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_location",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "_color",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectColorNode",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\meshbatcher.ts"
+	}
+}

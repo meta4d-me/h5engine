@@ -1,0 +1,54 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "count",
+			"memberof": "gd3d.framework.EmissionData",
+			"scope": "instance",
+			"description": "在发射时间内发射粒子个数"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "emissionName",
+			"memberof": "gd3d.framework.EmissionData",
+			"scope": "instance",
+			"description": "发射器名字"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "time",
+			"memberof": "gd3d.framework.EmissionData",
+			"scope": "instance",
+			"description": "发射器持续发射时间"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleEmissionType",
+			"name": "type",
+			"memberof": "gd3d.framework.EmissionData",
+			"scope": "instance",
+			"description": "发射器类型",
+			"default": "ParticleEmissionType.burst"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EmissionData",
+			"memberof": "gd3d.framework.EmissionData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EmissionData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\emissiondata.ts",
+		"description": "粒子发射器"
+	}
+}

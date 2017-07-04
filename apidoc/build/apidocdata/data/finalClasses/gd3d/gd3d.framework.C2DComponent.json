@@ -1,0 +1,47 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.I2DComponent",
+			"name": "comp",
+			"memberof": "gd3d.framework.C2DComponent",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "init",
+			"memberof": "gd3d.framework.C2DComponent",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "C2DComponent",
+			"memberof": "gd3d.framework.C2DComponent",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "comp",
+					"type": "gd3d.framework.I2DComponent",
+					"description": ""
+				},
+				{
+					"name": "init",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "C2DComponent",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\transform2d.ts"
+	}
+}

@@ -313,7 +313,18 @@ namespace gd3d.framework
                 }
                 this.mapUniform[_id].value = _texture;
                 if (_texture != null)
+                {
                     _texture.use();
+
+                    //图片的尺寸信息(1/width,1/height,width,height)
+                    let _texelsizeName = _id + "_TexelSize";
+                    let _gltexture = _texture.glTexture;
+                    let _texelsize = this.mapUniform[_texelsizeName].value;
+                    if(_texelsize != undefined)
+                    {
+                        this.setVector4(_texelsizeName,new math.vector4(1.0/_gltexture.width,1.0/_gltexture.height,_gltexture.width,_gltexture.height));
+                    }
+                }
             }
             else
             {

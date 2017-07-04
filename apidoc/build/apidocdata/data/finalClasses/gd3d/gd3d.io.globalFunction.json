@@ -1,0 +1,582 @@
+{
+	"globalFunction": [
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"type": "string",
+			"name": "Serialize",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"description": "序列化",
+			"params": [
+				{
+					"name": "obj",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"type": "string",
+			"name": "SerializeForInspector",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "obj",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "deSerialize",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"description": "反序列化  传入的源数据为json",
+			"params": [
+				{
+					"name": "serializedObj",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "deSerializeObj",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"description": "//反序列化赋值",
+			"params": [
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "deSerializeOtherType",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "deSerializeOtherTypeOrArray",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "assetMgr",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "dofillReference",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "dofillReferenceOrArray",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "fillReference",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "isArray",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "isArrayOrDic",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "isAsset",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "isAssetInspector",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "jsloader\\loadtool.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "loadArrayBuffer",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(_bin:ArrayBuffer,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "loadArrayBuffer",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(_bin:ArrayBuffer,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "loadBlob",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(_blob:Blob,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "jsloader\\loadtool.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "loadBlob",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(_blob:Blob,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "jsloader\\loadtool.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "loadText",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(_txt:string,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "..\\proj_sample\\scene_test\\lib\\gd3d_jsloader.d.ts",
+			"kind": "globalFunction",
+			"type": "void",
+			"name": "loadText",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "url",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "fun",
+					"type": "(_txt:string,_err:Error)=>void",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"type": "any",
+			"name": "serializeObj",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"description": "//根据反射类型将对象进行序列化",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"default": "undefined",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"type": "any",
+			"name": "serializeObjForInspector",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "beComponent",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"default": "undefined",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "serializeOtherType",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "arrayInst",
+					"type": "any",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "serializeOtherTypeForInspector",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "beComponent",
+					"type": "boolean",
+					"description": ""
+				},
+				{
+					"name": "arrayInst",
+					"type": "any",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "serializeOtherTypeOrArray",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\serialize.ts",
+			"kind": "globalFunction",
+			"name": "serializeOtherTypeOrArrayForInspector",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "instanceObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "serializedObj",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "key",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "beComponent",
+					"type": "boolean",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\iointerface.ts",
+			"kind": "globalFunction",
+			"name": "stringToBlob",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"description": "// }",
+			"params": [
+				{
+					"name": "content",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"filename": "framework\\io\\iointerface.ts",
+			"kind": "globalFunction",
+			"type": "number[]",
+			"name": "stringToUtf8Array",
+			"memberof": "gd3d.io",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "str",
+					"type": "string",
+					"description": ""
+				}
+			]
+		}
+	]
+}

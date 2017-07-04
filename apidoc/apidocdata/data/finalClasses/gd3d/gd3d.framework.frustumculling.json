@@ -1,0 +1,65 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.frustumculling",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "frustumculling",
+			"memberof": "gd3d.framework.frustumculling",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.frustumculling",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.frustumculling",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.frustumculling",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.frustumculling",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "frustumculling",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\frustumculling.ts",
+		"description": "视锥剔除组件，作为标记存在",
+		"version": "egret-gd3d 1.0",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			}
+		]
+	}
+}

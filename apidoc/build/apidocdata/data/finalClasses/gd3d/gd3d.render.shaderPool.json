@@ -1,0 +1,345 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.render.glShader;}",
+			"name": "mapFS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.render.glShader}",
+			"name": "mapFS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.render.glProgram;}",
+			"name": "mapProgram",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.render.glProgram}",
+			"name": "mapProgram",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"description": "//mapFSUrl: { [id: string]: string }={};",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.render.glShader;}",
+			"name": "mapVS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.render.glShader}",
+			"name": "mapVS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"default": "{}"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "gd3d.render.glShader",
+			"name": "compileFS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"description": "//编译并扫描 attribute 和 uniform",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glShader",
+			"name": "compileFS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glShader",
+			"name": "compileVS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glShader",
+			"name": "compileVS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"description": "//编译并扫描 attribute 和 uniform",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "code",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "disposeAll",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "disposeAll",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "disposeFS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "id",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "disposeFS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "id",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "disposeProgram",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "id",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "disposeProgram",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "id",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "disposeVS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "id",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "disposeVS",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "id",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glProgram",
+			"name": "linkProgram",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "nameVS",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "nameFS",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glProgram",
+			"name": "linkProgram",
+			"memberof": "gd3d.render.shaderPool",
+			"scope": "instance",
+			"description": "//link 并寻找出 attribute pos 和 uniform组",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				},
+				{
+					"name": "nameVS",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "nameFS",
+					"type": "string",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "shaderPool",
+		"memberof": "gd3d.render",
+		"filename": "render\\resource\\shader.ts"
+	}
+}

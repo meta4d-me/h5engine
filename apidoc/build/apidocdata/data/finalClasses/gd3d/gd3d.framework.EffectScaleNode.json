@@ -1,0 +1,46 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "keyScale",
+			"memberof": "gd3d.framework.EffectScaleNode",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "lifeLocation",
+			"memberof": "gd3d.framework.EffectScaleNode",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "EffectScaleNode",
+			"memberof": "gd3d.framework.EffectScaleNode",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "_location",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "_scale",
+					"type": "gd3d.math.vector3",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EffectScaleNode",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\meshbatcher.ts"
+	}
+}

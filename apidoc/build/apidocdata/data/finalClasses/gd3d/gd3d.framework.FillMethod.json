@@ -1,0 +1,54 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Horizontal",
+			"memberof": "gd3d.framework.FillMethod",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Radial_180",
+			"memberof": "gd3d.framework.FillMethod",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Radial_360",
+			"memberof": "gd3d.framework.FillMethod",
+			"scope": "static",
+			"default": "4"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Radial_90",
+			"memberof": "gd3d.framework.FillMethod",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Vertical",
+			"memberof": "gd3d.framework.FillMethod",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "FillMethod",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\2d\\component\\image.ts",
+		"description": "填充方式"
+	}
+}

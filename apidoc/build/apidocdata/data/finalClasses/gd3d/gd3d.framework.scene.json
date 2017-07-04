@@ -1,0 +1,211 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.application",
+			"name": "app",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "name",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.camera[]",
+			"name": "renderCameras",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.renderList",
+			"name": "renderList",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.camera",
+			"name": "testOverlayCamera",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "//测试UI编辑用的测试相机，用于保存当前ui相机"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "scene",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "app",
+					"type": "gd3d.framework.application",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addChild",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform",
+			"name": "getChild",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "index",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform",
+			"name": "getChildByName",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getChildCount",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.transform[]",
+			"name": "getChildren",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getRoot",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.pickinfo",
+			"name": "pick",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "ray",
+					"type": "gd3d.framework.ray",
+					"description": ""
+				},
+				{
+					"name": "isPickMesh",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "Array<gd3d.framework.pickinfo>",
+			"name": "pickAll",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "ray",
+					"type": "gd3d.framework.ray",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "removeChild",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateScene",
+			"memberof": "gd3d.framework.scene",
+			"scope": "instance",
+			"description": "// }",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				},
+				{
+					"name": "delta",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "scene",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\scene.ts",
+		"description": "//场景是基础的功能，有场景图，相当于Unity的Level"
+	}
+}

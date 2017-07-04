@@ -1,0 +1,61 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "x",
+			"memberof": "gd3d.math.vector3",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "y",
+			"memberof": "gd3d.math.vector3",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "z",
+			"memberof": "gd3d.math.vector3",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "vector3",
+			"memberof": "gd3d.math.vector3",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "x",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "y",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				},
+				{
+					"name": "z",
+					"type": "number",
+					"default": "0",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "vector3",
+		"memberof": "gd3d.math",
+		"filename": "render\\struct.ts"
+	}
+}

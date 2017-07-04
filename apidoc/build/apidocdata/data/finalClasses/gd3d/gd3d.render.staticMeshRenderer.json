@@ -1,0 +1,130 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.render.DrawModeEnum",
+			"name": "drawMode",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.DrawModeEnum",
+			"name": "drawMode",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance",
+			"default": "DrawModeEnum.EboTri"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "drawbegin",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "drawbegin",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "drawcount",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance",
+			"default": "-1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "drawcount",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "eboIndex",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "eboIndex",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.glDrawPass",
+			"name": "material",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.glDrawPass",
+			"name": "material",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.glMesh",
+			"name": "mesh",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.render.glMesh",
+			"name": "mesh",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "draw",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "draw",
+			"memberof": "gd3d.render.staticMeshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "webgl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "staticMeshRenderer",
+		"memberof": "gd3d.render",
+		"filename": "render\\renderer\\renderer.ts",
+		"description": "//一个pass 的渲染器"
+	}
+}

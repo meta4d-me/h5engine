@@ -1,0 +1,88 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.meshFilter",
+			"name": "filter",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "subTran",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "getBound",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "intersectsTransform",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "tran",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.meshcollider",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "meshcollider",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\meshcollider.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			},
+			{
+				"name": "gd3d.framework.ICollider"
+			}
+		]
+	}
+}

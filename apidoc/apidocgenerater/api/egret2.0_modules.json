@@ -1,0 +1,14 @@
+{
+    "modules": {
+        "egret": ["egret", "jslib"],
+        "gui": "extension/gui",
+        "res": "extension/resource",
+        "socket": "extension/socket",
+        "version": "extension/version",
+        "oldVersion": "extension/oldVersion",
+        "dragonbones": "extension/dragonBones"
+    },
+    "exclude" : [
+        "oldVersion.*NativeVersionController.ts"
+    ]
+}

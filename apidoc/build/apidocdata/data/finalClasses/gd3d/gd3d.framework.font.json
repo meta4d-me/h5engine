@@ -1,0 +1,173 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "atlasHeight",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "atlasWidth",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "baseline",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.charinfo}",
+			"name": "cmap",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance",
+			"description": "//mat: spriteMat;"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "fontname",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "lineHeight",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "padding",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "pointSize",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.texture",
+			"name": "texture",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Parse",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "jsonStr",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setAssetMgr",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setName",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.font",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "font",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\font.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

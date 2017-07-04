@@ -1,0 +1,82 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "center",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance",
+			"default": "new gd3d.math.vector3()"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "depth",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "dir",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "radius",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.StartPositionShapeType",
+			"name": "type",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance",
+			"default": "StartPositionShapeType.box"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance",
+			"default": "0"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "StartPosData",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.math.vector3",
+			"name": "getPosition",
+			"memberof": "gd3d.framework.StartPosData",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "StartPosData",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\startposdata.ts"
+	}
+}

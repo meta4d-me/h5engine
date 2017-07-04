@@ -1,0 +1,49 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "key",
+			"memberof": "gd3d.framework.ParticleNodeNumber",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ValueData",
+			"name": "num",
+			"memberof": "gd3d.framework.ParticleNodeNumber",
+			"scope": "instance",
+			"default": "new ValueData()"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "clone",
+			"memberof": "gd3d.framework.ParticleNodeNumber",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getValue",
+			"memberof": "gd3d.framework.ParticleNodeNumber",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getValueRandom",
+			"memberof": "gd3d.framework.ParticleNodeNumber",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "ParticleNodeNumber",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\particle\\data\\particlenode.ts"
+	}
+}

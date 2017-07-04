@@ -1,0 +1,27 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"type": "any",
+			"name": "getEnumObjByType",
+			"memberof": "gd3d.framework.EnumUtil",
+			"scope": "static",
+			"params": [
+				{
+					"name": "enumType",
+					"type": "string",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "EnumUtil",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\util\\enumutil.ts"
+	}
+}

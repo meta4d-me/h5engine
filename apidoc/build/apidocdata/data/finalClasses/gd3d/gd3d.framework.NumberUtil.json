@@ -1,0 +1,97 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"name": "KEY_A",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "65"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_D",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "68"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_E",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "69"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_R",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "82"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_S",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "83"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_W",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "87"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_a",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "97"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_d",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "100"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_e",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "101"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_r",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "114"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_s",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "115"
+		},
+		{
+			"kind": "member",
+			"name": "KEY_w",
+			"memberof": "gd3d.framework.NumberUtil",
+			"scope": "static",
+			"default": "119"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "NumberUtil",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\util\\numberutil.ts"
+	}
+}

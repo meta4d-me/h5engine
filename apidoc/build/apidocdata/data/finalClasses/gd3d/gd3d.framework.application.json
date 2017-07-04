@@ -1,0 +1,236 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "bePause",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "bePlay",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "beStepForward",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "HTMLDivElement",
+			"name": "container",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "height",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "limitFrame",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.INotify",
+			"name": "notify",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "Stats.Stats",
+			"name": "stats",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "WebGLRenderingContext",
+			"name": "webgl",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "width",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "addEditorCode",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "classname",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addEditorCodeDirect",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "program",
+					"type": "gd3d.framework.IEditorCode",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addUserCode",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "classname",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "addUserCodeDirect",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "program",
+					"type": "gd3d.framework.IUserCode",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "checkFilter",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "trans",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "getAssetMgr",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getDeltaTime",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "getInputMgr",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.scene",
+			"name": "getScene",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getTotalTime",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "markNotify",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "trans",
+					"type": "any",
+					"description": ""
+				},
+				{
+					"name": "type",
+					"type": "gd3d.framework.NotifyType",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "showFps",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "div",
+					"type": "HTMLDivElement",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "updateEditorCode",
+			"memberof": "gd3d.framework.application",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "application",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\application.ts"
+	}
+}

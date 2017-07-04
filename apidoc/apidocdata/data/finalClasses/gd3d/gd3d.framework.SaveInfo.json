@@ -1,0 +1,21 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "{[key:string]:string}",
+			"name": "files",
+			"memberof": "gd3d.framework.SaveInfo",
+			"scope": "instance",
+			"default": "{}"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "SaveInfo",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\assetmgr.ts"
+	}
+}

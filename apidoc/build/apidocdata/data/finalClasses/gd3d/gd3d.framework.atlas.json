@@ -1,0 +1,139 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.sprite}",
+			"name": "sprites",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.texture",
+			"name": "texture",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "textureheight",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "texturewidth",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"description": "//这2属性应该没用"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Parse",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "jsonStr",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setAssetMgr",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setName",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.atlas",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "atlas",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\atlas.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

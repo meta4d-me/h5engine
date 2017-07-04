@@ -1,0 +1,61 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "cancel",
+			"memberof": "gd3d.framework.taskstate",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "error",
+			"memberof": "gd3d.framework.taskstate",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "finish",
+			"memberof": "gd3d.framework.taskstate",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "message",
+			"memberof": "gd3d.framework.taskstate",
+			"scope": "instance",
+			"default": "null"
+		},
+		{
+			"kind": "member",
+			"type": "(taskstate,state:gd3d.framework.taskstate)=>void",
+			"name": "taskCall",
+			"memberof": "gd3d.framework.taskstate",
+			"scope": "instance",
+			"default": "null"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ITask",
+			"name": "taskInterface",
+			"memberof": "gd3d.framework.taskstate",
+			"scope": "instance",
+			"default": "null"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "taskstate",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\task\\taskmgr.ts"
+	}
+}

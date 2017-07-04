@@ -1,0 +1,205 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "delayTime",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderLayerEnum",
+			"name": "layer",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"default": "RenderLayerEnum.Common"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ParticleListData",
+			"name": "particleListData",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "queue",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.CullingMask",
+			"name": "renderLayer",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"default": "CullingMask.Default"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "speed",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "speedU",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"description": "用来UV u的滚动速度",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "speedV",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"description": "用来UV v的滚动速度",
+			"version": "gd3d 1.0",
+			"platform": "Web,Native"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "gd3d.framework.MeshBatcher",
+			"name": "checkEmissionBatcher",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"description": "//emission发射粒子，检查是否创建新batcher",
+			"params": [
+				{
+					"name": "emission",
+					"type": "gd3d.framework.Emission",
+					"description": ""
+				},
+				{
+					"name": "count",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.MeshBatcher",
+			"name": "creatMeshbatcher",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"description": "//根据需要的数据大小创建batcher，但是一次只创建一个batcher",
+			"params": [
+				{
+					"name": "mat",
+					"type": "gd3d.framework.material",
+					"description": ""
+				},
+				{
+					"name": "needCount",
+					"type": "number",
+					"default": "128",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "playUVRoll",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "rest",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "stopUVRoll",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"description": "停止播放uv动画",
+			"version": "Egret 3.0",
+			"platform": "Web,Native"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.particleSystem",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "particleSystem",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\particleSytem.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IRenderer"
+			}
+		]
+	}
+}

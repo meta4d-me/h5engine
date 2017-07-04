@@ -1,0 +1,26 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "insID",
+			"memberof": "gd3d.framework.insID",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getInsID",
+			"memberof": "gd3d.framework.insID",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "insID",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\transform\\transform.ts"
+	}
+}

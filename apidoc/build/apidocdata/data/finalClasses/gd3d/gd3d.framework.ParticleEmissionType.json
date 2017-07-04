@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "burst",
+			"memberof": "gd3d.framework.ParticleEmissionType",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "continue",
+			"memberof": "gd3d.framework.ParticleEmissionType",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "timespace",
+			"memberof": "gd3d.framework.ParticleEmissionType",
+			"scope": "static",
+			"default": "2"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "ParticleEmissionType",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\data\\emissiondata.ts"
+	}
+}

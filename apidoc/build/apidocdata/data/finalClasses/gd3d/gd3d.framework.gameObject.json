@@ -1,0 +1,227 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.camera",
+			"name": "camera",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.ICollider",
+			"name": "collider",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.nodeComponent[]",
+			"name": "components",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"description": "// transform2d: transform2D;",
+			"default": "[]"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.HideFlags",
+			"name": "hideFlags",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"default": "HideFlags.None"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isvisible",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "isvisibleInScene",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "layer",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.light",
+			"name": "light",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.IRenderer",
+			"name": "renderer",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.transform",
+			"name": "transform",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "gd3d.framework.INodeComponent",
+			"name": "addComponent",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.INodeComponent",
+			"name": "addComponentDirect",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "comp",
+					"type": "gd3d.framework.INodeComponent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.INodeComponent",
+			"name": "getComponent",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"description": "//只是自己身上找到的第一个",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.INodeComponent[]",
+			"name": "getComponents",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"description": "//只含自己",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.INodeComponent[]",
+			"name": "getComponentsInChildren",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"description": "//包含自己（未测试）",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.scene",
+			"name": "getScene",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "comp",
+					"type": "gd3d.framework.INodeComponent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "removeComponent",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "comp",
+					"type": "gd3d.framework.INodeComponent",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "removeComponentByTypeName",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "type",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.gameObject",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "gameObject",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\scene\\gameobject.ts"
+	}
+}

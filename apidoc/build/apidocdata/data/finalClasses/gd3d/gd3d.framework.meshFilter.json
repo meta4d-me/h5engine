@@ -1,0 +1,64 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.meshFilter",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "mesh",
+			"memberof": "gd3d.framework.meshFilter",
+			"scope": "instance",
+			"description": "//先直进直出吧"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "getMeshOutput",
+			"memberof": "gd3d.framework.meshFilter",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.meshFilter",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.meshFilter",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.meshFilter",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "meshFilter",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\meshfilter.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			}
+		]
+	}
+}

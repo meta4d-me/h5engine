@@ -1,0 +1,53 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "Default",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "UI",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "editor",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "4"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "everything",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "nothing",
+			"memberof": "gd3d.framework.CullingMask",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "CullingMask",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\camera.ts"
+	}
+}

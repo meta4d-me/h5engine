@@ -1,0 +1,118 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.meshFilter",
+			"name": "filter",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderLayerEnum",
+			"name": "layer",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance",
+			"description": "// __material: gd3d.render.glDrawPass;",
+			"default": "RenderLayerEnum.Common"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.material[]",
+			"name": "materials",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "queue",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.CullingMask",
+			"name": "renderLayer",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance",
+			"default": "CullingMask.Default"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "meshRenderer",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "render",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "context",
+					"type": "gd3d.framework.renderContext",
+					"description": ""
+				},
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				},
+				{
+					"name": "camera",
+					"type": "gd3d.framework.camera",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.meshRenderer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "meshRenderer",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\meshrenderer.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IRenderer"
+			}
+		]
+	}
+}

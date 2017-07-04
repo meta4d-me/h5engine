@@ -1,0 +1,87 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "content",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance",
+			"default": "false"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "textasset",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetName",
+					"type": "string",
+					"default": "null",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "caclByteLength",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.textasset",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "textasset",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\textasset.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

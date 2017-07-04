@@ -1,0 +1,133 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "string",
+			"name": "atlas",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.border",
+			"name": "border",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "defaultAsset",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.rect",
+			"name": "rect",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.texture",
+			"name": "texture",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"name": "urange",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"name": "vrange",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance",
+			"rwType": 1
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "dispose",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "number",
+			"name": "getGUID",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "string",
+			"name": "getName",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "setAssetMgr",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "assetmgr",
+					"type": "gd3d.framework.assetMgr",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "setName",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "name",
+					"type": "string",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "unuse",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "use",
+			"memberof": "gd3d.framework.sprite",
+			"scope": "instance"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "sprite",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\asset\\resource\\sprite.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.IAsset"
+			}
+		]
+	}
+}

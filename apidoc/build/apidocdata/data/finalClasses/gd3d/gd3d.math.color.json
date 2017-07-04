@@ -1,0 +1,134 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "a",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "a",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "b",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "b",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "g",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "g",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "r",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "r",
+			"memberof": "gd3d.math.color",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "color",
+			"memberof": "gd3d.math.color",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "r",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "g",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "a",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "constructor",
+			"memberof": "gd3d.math.color",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "r",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				},
+				{
+					"name": "g",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				},
+				{
+					"name": "a",
+					"type": "number",
+					"default": "1",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "color",
+		"memberof": "gd3d.math",
+		"filename": "render\\struct.ts"
+	}
+}

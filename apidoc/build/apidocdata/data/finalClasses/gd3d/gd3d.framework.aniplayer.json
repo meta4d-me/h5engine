@@ -1,0 +1,341 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.framework.tPoseInfo[]",
+			"name": "bones",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[id:string]:gd3d.framework.transform}",
+			"name": "carelist",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"name": "clipnames",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"rwType": 1
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.animationClip[]",
+			"name": "clips",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "crossdelta",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "crossspeed",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.gameObject",
+			"name": "gameObject",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "inited",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "false"
+		},
+		{
+			"kind": "member",
+			"type": "boolean",
+			"name": "isnoanim",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "true"
+		},
+		{
+			"kind": "member",
+			"type": "{[key:string]:gd3d.framework.PoseBoneMatrix}",
+			"name": "lerppose",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "{[key:string]:gd3d.framework.PoseBoneMatrix}",
+			"name": "nowpose",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "{}"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "speed",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "1.0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.PoseBoneMatrix[]",
+			"name": "startPos",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "{[key:string]:gd3d.framework.PoseBoneMatrix}",
+			"name": "tpose",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"default": "{}"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "addFinishedEventListener",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "finishCallBack",
+					"type": "Function",
+					"description": ""
+				},
+				{
+					"name": "thisObject",
+					"type": "any",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "care",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "node",
+					"type": "gd3d.framework.transform",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "fillPoseData",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "data",
+					"type": "Float32Array",
+					"description": ""
+				},
+				{
+					"name": "bones",
+					"type": "gd3d.framework.transform[]",
+					"description": ""
+				},
+				{
+					"name": "efficient",
+					"type": "boolean",
+					"default": "true",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isPlay",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "boolean",
+			"name": "isStop",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "play",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "animName",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "speed",
+					"type": "number",
+					"default": "1.0",
+					"description": ""
+				},
+				{
+					"name": "beRevert",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "playCross",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "animName",
+					"type": "string",
+					"description": ""
+				},
+				{
+					"name": "crosstimer",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "speed",
+					"type": "number",
+					"default": "1.0",
+					"description": ""
+				},
+				{
+					"name": "beRevert",
+					"type": "boolean",
+					"default": "false",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "playIndex",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"description": "根据动画片段索引播放普通动画",
+			"params": [
+				{
+					"name": "animIndex",
+					"type": "number",
+					"description": "动画片段索引"
+				},
+				{
+					"name": "speed",
+					"type": "number",
+					"default": "1.0",
+					"description": "播放速度"
+				},
+				{
+					"name": "beRevert",
+					"type": "boolean",
+					"default": "false",
+					"description": "是否倒播"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "playIndexCross",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"description": "根据动画片段索引播放动画",
+			"params": [
+				{
+					"name": "animIndex",
+					"type": "number",
+					"description": "动画片段索引"
+				},
+				{
+					"name": "crosstimer",
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "speed",
+					"type": "number",
+					"default": "1.0",
+					"description": "播放速度"
+				},
+				{
+					"name": "beRevert",
+					"type": "boolean",
+					"default": "false",
+					"description": "是否倒播"
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"name": "remove",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "start",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"type": "void",
+			"name": "stop",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance"
+		},
+		{
+			"kind": "function",
+			"name": "update",
+			"memberof": "gd3d.framework.aniplayer",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "delta",
+					"type": "number",
+					"description": ""
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "aniplayer",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\aniplayer.ts",
+		"implements": [
+			{
+				"name": "gd3d.framework.INodeComponent"
+			}
+		]
+	}
+}

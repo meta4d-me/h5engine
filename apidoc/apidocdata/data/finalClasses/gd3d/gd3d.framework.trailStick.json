@@ -1,0 +1,27 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "location",
+			"memberof": "gd3d.framework.trailStick",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.math.vector3",
+			"name": "updir",
+			"memberof": "gd3d.framework.trailStick",
+			"scope": "instance"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "trailStick",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\trailrender.ts"
+	}
+}

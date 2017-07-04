@@ -1,0 +1,37 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "AddChild",
+			"memberof": "gd3d.framework.NotifyType",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "ChangeVisible",
+			"memberof": "gd3d.framework.NotifyType",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "RemoveChild",
+			"memberof": "gd3d.framework.NotifyType",
+			"scope": "static",
+			"default": "1"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "NotifyType",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\application.ts"
+	}
+}

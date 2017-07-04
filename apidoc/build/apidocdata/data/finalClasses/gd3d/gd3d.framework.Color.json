@@ -1,0 +1,109 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "a",
+			"memberof": "gd3d.framework.Color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "b",
+			"memberof": "gd3d.framework.Color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "g",
+			"memberof": "gd3d.framework.Color",
+			"scope": "instance"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "r",
+			"memberof": "gd3d.framework.Color",
+			"scope": "instance"
+		}
+	],
+	"function": [
+		{
+			"kind": "function",
+			"name": "Color",
+			"memberof": "gd3d.framework.Color",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "r",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "g",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "b",
+					"question": true,
+					"type": "number",
+					"description": ""
+				},
+				{
+					"name": "a",
+					"question": true,
+					"type": "number",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Color",
+			"name": "black",
+			"memberof": "gd3d.framework.Color",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Color",
+			"name": "blue",
+			"memberof": "gd3d.framework.Color",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Color",
+			"name": "green",
+			"memberof": "gd3d.framework.Color",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Color",
+			"name": "red",
+			"memberof": "gd3d.framework.Color",
+			"scope": "static"
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.framework.Color",
+			"name": "white",
+			"memberof": "gd3d.framework.Color",
+			"scope": "static"
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "Color",
+		"memberof": "gd3d.framework",
+		"filename": "framework\\component\\particle\\particletool\\trail.ts"
+	}
+}

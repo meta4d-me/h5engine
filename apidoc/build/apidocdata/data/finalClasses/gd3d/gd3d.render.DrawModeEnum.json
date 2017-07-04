@@ -1,0 +1,77 @@
+{
+	"member": [
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "EboLine",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "EboLine",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "3"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "EboTri",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "EboTri",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "2"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "VboLine",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "VboLine",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "1"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "VboTri",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "0"
+		},
+		{
+			"kind": "member",
+			"type": "number",
+			"name": "VboTri",
+			"memberof": "gd3d.render.DrawModeEnum",
+			"scope": "static",
+			"default": "0"
+		}
+	],
+	"function": [],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "enum",
+		"name": "DrawModeEnum",
+		"memberof": "gd3d.render",
+		"filename": "render\\renderer\\drawpass.ts"
+	}
+}
