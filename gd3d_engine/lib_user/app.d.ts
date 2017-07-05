@@ -598,11 +598,16 @@ declare namespace t {
         private addcamandlight(laststate, state);
         start(app: gd3d.framework.application): void;
         camera: gd3d.framework.camera;
+        postEffectType: PostEffectType;
         light: gd3d.framework.light;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
     }
+}
+declare enum PostEffectType {
+    GrayAndOutline = 0,
+    Mask = 1,
 }
 declare class test_loadprefab implements IState {
     app: gd3d.framework.application;
