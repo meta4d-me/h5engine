@@ -17186,9 +17186,9 @@ var gd3d;
                             a *= this.colorRate;
                         }
                         r = gd3d.math.floatClamp(r, 0, 3);
-                        g = gd3d.math.floatClamp(r, 0, 3);
-                        b = gd3d.math.floatClamp(r, 0, 3);
-                        a = gd3d.math.floatClamp(r, 0, 3);
+                        g = gd3d.math.floatClamp(g, 0, 3);
+                        b = gd3d.math.floatClamp(b, 0, 3);
+                        a = gd3d.math.floatClamp(a, 0, 3);
                         this.dataForVbo[i * this.vertexSize + 3] = r;
                         this.dataForVbo[i * this.vertexSize + 4] = g;
                         this.dataForVbo[i * this.vertexSize + 5] = b;
