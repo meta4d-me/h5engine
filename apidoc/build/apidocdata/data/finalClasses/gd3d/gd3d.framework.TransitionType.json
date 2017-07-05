@@ -32,6 +32,8 @@
 		"kind": "enum",
 		"name": "TransitionType",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\2d\\component\\button.ts"
+		"filename": "framework\\2d\\component\\button.ts",
+		"description": "按钮变换类型",
+		"version": "egret-gd3d 1.0"
 	}
 }

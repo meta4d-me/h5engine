@@ -63,7 +63,8 @@
 		"name": "IRenderer",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\scene\\render.ts",
-		"description": "//渲染器",
+		"description": "渲染器接口 继承自组件接口",
+		"version": "egret-gd3d 1.0",
 		"augments": [
 			"gd3d.framework.INodeComponent"
 		]

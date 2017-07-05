@@ -5,25 +5,15 @@
 			"type": "gd3d.framework.gameObject",
 			"name": "gameObject",
 			"memberof": "gd3d.framework.asbone",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "挂载的gameobject",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
 			"name": "asbone",
-			"memberof": "gd3d.framework.asbone",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "clone",
-			"memberof": "gd3d.framework.asbone",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "remove",
 			"memberof": "gd3d.framework.asbone",
 			"scope": "instance"
 		},
@@ -54,6 +44,8 @@
 		"name": "asbone",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\component\\asbone.ts",
+		"description": "骨骼组件",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.INodeComponent"

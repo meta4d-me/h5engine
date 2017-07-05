@@ -6,99 +6,38 @@
 			"name": "color",
 			"memberof": "gd3d.framework.rawImage2D",
 			"scope": "instance",
+			"description": "颜色",
+			"version": "egret-gd3d 1.0",
 			"default": "new math.color(1.0, 1.0, 1.0, 1.0)"
 		},
 		{
 			"kind": "member",
 			"name": "image",
 			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "图片",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "gd3d.framework.material",
 			"name": "mat",
 			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "材质",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "gd3d.framework.transform2D",
 			"name": "transform",
 			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "当前组件的2d节点",
+			"version": "egret-gd3d 1.0"
 		}
 	],
-	"function": [
-		{
-			"kind": "function",
-			"name": "onPointEvent",
-			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "canvas",
-					"type": "gd3d.framework.canvas",
-					"description": ""
-				},
-				{
-					"name": "ev",
-					"type": "gd3d.framework.PointEvent",
-					"description": ""
-				},
-				{
-					"name": "oncap",
-					"type": "boolean",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "remove",
-			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "render",
-			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "canvas",
-					"type": "gd3d.framework.canvas",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "start",
-			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance",
-			"description": "//pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13"
-		},
-		{
-			"kind": "function",
-			"name": "update",
-			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "delta",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "updateTran",
-			"memberof": "gd3d.framework.rawImage2D",
-			"scope": "instance"
-		}
-	],
+	"function": [],
 	"globalMember": [],
 	"globalFunction": [],
 	"class": {
@@ -106,7 +45,8 @@
 		"name": "rawImage2D",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\component\\rawimage.ts",
-		"description": "参照UGUI的思路，rawImage只拿整个图片来显示，不关心Sprite、九宫、填充等。这些统一都在iamge中处理",
+		"description": "2d图片组件</p>参照UGUI的思路，rawImage只拿整个图片来显示，不关心Sprite、九宫、填充等。这些统一都在iamge中处理",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IRectRenderer"

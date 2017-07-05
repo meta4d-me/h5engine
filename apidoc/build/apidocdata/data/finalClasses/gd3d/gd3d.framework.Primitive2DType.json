@@ -40,6 +40,8 @@
 		"kind": "enum",
 		"name": "Primitive2DType",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\util\\transformutil.ts"
+		"filename": "framework\\util\\transformutil.ts",
+		"description": "原生2d类型",
+		"version": "egret-gd3d 1.0"
 	}
 }

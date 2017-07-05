@@ -14,7 +14,7 @@
 			"name": "mesh",
 			"memberof": "gd3d.framework.meshFilter",
 			"scope": "instance",
-			"description": "mesh数据",
+			"description": "设置mesh数据",
 			"version": "egret-gd3d 1.0"
 		}
 	],
@@ -24,7 +24,7 @@
 			"name": "getMeshOutput",
 			"memberof": "gd3d.framework.meshFilter",
 			"scope": "instance",
-			"description": "mesh数据",
+			"description": "返回mesh数据",
 			"version": "egret-gd3d 1.0"
 		},
 		{

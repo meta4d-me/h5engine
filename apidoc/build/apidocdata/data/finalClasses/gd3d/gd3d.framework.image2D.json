@@ -6,39 +6,51 @@
 			"name": "color",
 			"memberof": "gd3d.framework.image2D",
 			"scope": "instance",
+			"description": "颜色",
+			"version": "egret-gd3d 1.0",
 			"default": "new math.color(1.0, 1.0, 1.0, 1.0)"
 		},
 		{
 			"kind": "member",
 			"name": "fillAmmount",
 			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "填充率",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"name": "fillMethod",
 			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "图片填充方式",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"name": "imageType",
 			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "图片显示模式",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "gd3d.framework.material",
 			"name": "mat",
 			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "材质",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "gd3d.framework.sprite",
 			"name": "sprite",
 			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "精灵",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -51,102 +63,30 @@
 	"function": [
 		{
 			"kind": "function",
-			"name": "image2D",
-			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "onPointEvent",
-			"memberof": "gd3d.framework.image2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "canvas",
-					"type": "gd3d.framework.canvas",
-					"description": ""
-				},
-				{
-					"name": "ev",
-					"type": "gd3d.framework.PointEvent",
-					"description": ""
-				},
-				{
-					"name": "oncap",
-					"type": "boolean",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "remove",
-			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "render",
-			"memberof": "gd3d.framework.image2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "canvas",
-					"type": "gd3d.framework.canvas",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"name": "setTexture",
 			"memberof": "gd3d.framework.image2D",
 			"scope": "instance",
+			"description": "设置图片",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "texture",
 					"type": "gd3d.framework.texture",
-					"description": ""
+					"description": "图片"
 				},
 				{
 					"name": "border",
 					"question": true,
 					"type": "gd3d.math.border",
-					"description": ""
+					"description": "切片信息"
 				},
 				{
 					"name": "rect",
 					"question": true,
 					"type": "gd3d.math.rect",
-					"description": ""
+					"description": "显示范围"
 				}
 			]
-		},
-		{
-			"kind": "function",
-			"name": "start",
-			"memberof": "gd3d.framework.image2D",
-			"scope": "instance",
-			"description": "//pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13"
-		},
-		{
-			"kind": "function",
-			"name": "update",
-			"memberof": "gd3d.framework.image2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "delta",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "updateTran",
-			"memberof": "gd3d.framework.image2D",
-			"scope": "instance"
 		}
 	],
 	"globalMember": [],
@@ -156,6 +96,8 @@
 		"name": "image2D",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\component\\image.ts",
+		"description": "2d图片组件",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IRectRenderer"

@@ -541,9 +541,9 @@ namespace gd3d.framework
                         a *= this.colorRate;
                     }
                     r = math.floatClamp(r, 0, 3);
-                    g = math.floatClamp(r, 0, 3);
-                    b = math.floatClamp(r, 0, 3);
-                    a = math.floatClamp(r, 0, 3);
+                    g = math.floatClamp(g, 0, 3);
+                    b = math.floatClamp(b, 0, 3);
+                    a = math.floatClamp(a, 0, 3);
                     this.dataForVbo[i * this.vertexSize + 3] = r;
                     this.dataForVbo[i * this.vertexSize + 4] = g;
                     this.dataForVbo[i * this.vertexSize + 5] = b;

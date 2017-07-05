@@ -4,13 +4,17 @@
 			"kind": "member",
 			"name": "fadeDuration",
 			"memberof": "gd3d.framework.button",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "颜色淡出持续时间",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"name": "normalColor",
 			"memberof": "gd3d.framework.button",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "正常的显示颜色",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -18,25 +22,33 @@
 			"name": "onClick",
 			"memberof": "gd3d.framework.button",
 			"scope": "instance",
+			"description": "点击事件",
+			"version": "egret-gd3d 1.0",
 			"default": "new UIEvent()"
 		},
 		{
 			"kind": "member",
 			"name": "pressedColor",
 			"memberof": "gd3d.framework.button",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "按下后的颜色",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"name": "pressedGraphic",
 			"memberof": "gd3d.framework.button",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "按下时要显示的sprite",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"name": "targetImage",
 			"memberof": "gd3d.framework.button",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "默认显示图像",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -49,78 +61,12 @@
 			"kind": "member",
 			"name": "transition",
 			"memberof": "gd3d.framework.button",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "按钮变换类型",
+			"version": "egret-gd3d 1.0"
 		}
 	],
-	"function": [
-		{
-			"kind": "function",
-			"name": "onPointEvent",
-			"memberof": "gd3d.framework.button",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "canvas",
-					"type": "gd3d.framework.canvas",
-					"description": ""
-				},
-				{
-					"name": "ev",
-					"type": "gd3d.framework.PointEvent",
-					"description": ""
-				},
-				{
-					"name": "oncap",
-					"type": "boolean",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "remove",
-			"memberof": "gd3d.framework.button",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "render",
-			"memberof": "gd3d.framework.button",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "canvas",
-					"type": "gd3d.framework.canvas",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "start",
-			"memberof": "gd3d.framework.button",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "update",
-			"memberof": "gd3d.framework.button",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "delta",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "updateTran",
-			"memberof": "gd3d.framework.button",
-			"scope": "instance"
-		}
-	],
+	"function": [],
 	"globalMember": [],
 	"globalFunction": [],
 	"class": {
@@ -128,6 +74,8 @@
 		"name": "button",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\component\\button.ts",
+		"description": "2d按钮组件",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IRectRenderer"

@@ -25,15 +25,9 @@
 			"name": "fps",
 			"memberof": "gd3d.framework.effectSystem",
 			"scope": "static",
+			"description": "特效播放速度",
+			"version": "egret-gd3d 1.0",
 			"default": "30"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "frameId",
-			"memberof": "gd3d.framework.effectSystem",
-			"scope": "instance",
-			"default": "0"
 		},
 		{
 			"kind": "member",
@@ -71,28 +65,16 @@
 			"description": "渲染层级",
 			"version": "egret-gd3d 1.0",
 			"default": "CullingMask.default"
-		},
-		{
-			"kind": "member",
-			"type": "WebGLRenderingContext",
-			"name": "webgl",
-			"memberof": "gd3d.framework.effectSystem",
-			"scope": "instance"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"name": "clone",
-			"memberof": "gd3d.framework.effectSystem",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
 			"name": "pause",
 			"memberof": "gd3d.framework.effectSystem",
 			"scope": "instance",
-			"description": "暂停播放"
+			"description": "暂停播放",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -100,12 +82,13 @@
 			"memberof": "gd3d.framework.effectSystem",
 			"scope": "instance",
 			"description": "播放特效",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "speed",
 					"type": "number",
 					"default": "1",
-					"description": ""
+					"description": "播放速度"
 				}
 			]
 		},
@@ -139,6 +122,7 @@
 			"memberof": "gd3d.framework.effectSystem",
 			"scope": "instance",
 			"description": "重置到初始状态",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "restSinglemesh",
@@ -195,7 +179,8 @@
 			"name": "stop",
 			"memberof": "gd3d.framework.effectSystem",
 			"scope": "instance",
-			"description": "停止播放"
+			"description": "停止播放",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",

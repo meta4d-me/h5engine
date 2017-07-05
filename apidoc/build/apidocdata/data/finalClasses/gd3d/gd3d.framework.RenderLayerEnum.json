@@ -6,6 +6,8 @@
 			"name": "Common",
 			"memberof": "gd3d.framework.RenderLayerEnum",
 			"scope": "static",
+			"description": "不透明",
+			"version": "egret-gd3d 1.0",
 			"default": "0"
 		},
 		{
@@ -14,6 +16,8 @@
 			"name": "Overlay",
 			"memberof": "gd3d.framework.RenderLayerEnum",
 			"scope": "static",
+			"description": "Overlay层",
+			"version": "egret-gd3d 1.0",
 			"default": "2"
 		},
 		{
@@ -22,6 +26,8 @@
 			"name": "Transparent",
 			"memberof": "gd3d.framework.RenderLayerEnum",
 			"scope": "static",
+			"description": "半透明",
+			"version": "egret-gd3d 1.0",
 			"default": "1"
 		}
 	],
@@ -32,6 +38,8 @@
 		"kind": "enum",
 		"name": "RenderLayerEnum",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\scene\\render.ts"
+		"filename": "framework\\scene\\render.ts",
+		"description": "渲染的层级",
+		"version": "egret-gd3d 1.0"
 	}
 }

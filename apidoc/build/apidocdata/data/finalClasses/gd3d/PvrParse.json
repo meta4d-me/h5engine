@@ -1,0 +1,42 @@
+{
+	"member": [],
+	"function": [
+		{
+			"kind": "function",
+			"name": "PvrParse",
+			"memberof": "PvrParse",
+			"scope": "instance",
+			"params": [
+				{
+					"name": "gl",
+					"type": "WebGLRenderingContext",
+					"description": ""
+				}
+			]
+		},
+		{
+			"kind": "function",
+			"type": "gd3d.render.glTexture2D",
+			"name": "parse",
+			"memberof": "PvrParse",
+			"scope": "instance",
+			"description": "解析pvr图片",
+			"version": "egret-gd3d 1.0",
+			"params": [
+				{
+					"name": "_buffer",
+					"type": "ArrayBuffer",
+					"description": "图片二进制数据"
+				}
+			]
+		}
+	],
+	"globalMember": [],
+	"globalFunction": [],
+	"class": {
+		"kind": "class",
+		"name": "PvrParse",
+		"memberof": "",
+		"filename": "framework\\asset\\pvr.ts"
+	}
+}

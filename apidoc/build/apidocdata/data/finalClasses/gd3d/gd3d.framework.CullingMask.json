@@ -64,6 +64,8 @@
 		"kind": "enum",
 		"name": "CullingMask",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\component\\camera.ts"
+		"filename": "framework\\component\\camera.ts",
+		"description": "渲染层级枚举",
+		"version": "egret-gd3d 1.0"
 	}
 }
