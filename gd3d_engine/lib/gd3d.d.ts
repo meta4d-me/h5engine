@@ -515,11 +515,11 @@ declare namespace gd3d.framework {
         private remainarrx;
         updateData(_font: gd3d.framework.font): void;
         private data_begin;
-        datar: number[];
+        private datar;
         color: math.color;
         color2: math.color;
         mat: material;
-        dirtyData: boolean;
+        private dirtyData;
         render(canvas: canvas): void;
         updateTran(): void;
         start(): void;
@@ -542,7 +542,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class rawImage2D implements IRectRenderer {
         private datar;
-        _image: texture;
+        private _image;
         image: texture;
         color: math.color;
         mat: material;
