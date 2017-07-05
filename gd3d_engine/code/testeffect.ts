@@ -109,7 +109,7 @@
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
-        let names: string[] = ["fx_ss_female@attack_04",   "fx_ss_female@attack_03",  "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword","fx_0_zs_male@attack_02","fx_fs_female@attack_02"];
+        let names: string[] = ["fx_ss_female@attack_04", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         let name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
@@ -140,15 +140,15 @@
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0,0,20);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, 20);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();//标记为需要刷新
         state.finish = true;
     }
 
-    tr:gd3d.framework.transform;
-    ttr:gd3d.framework.transform;
-    eff:gd3d.framework.effectSystem;
+    tr: gd3d.framework.transform;
+    ttr: gd3d.framework.transform;
+    eff: gd3d.framework.effectSystem;
     beclone = false;
     effectloaded = false;
     bestop = false;
