@@ -42,6 +42,8 @@
 		"kind": "class",
 		"name": "C2DComponent",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\2d\\transform2d.ts"
+		"filename": "framework\\2d\\transform2d.ts",
+		"description": "2D组件实例接口",
+		"version": "egret-gd3d 1.0"
 	}
 }

@@ -2,32 +2,12 @@
 	"member": [
 		{
 			"kind": "member",
-			"type": "gd3d.framework.transform[]",
-			"name": "bones",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3",
-			"name": "center",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "{key:string, data}[]",
-			"name": "dataCaches",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "static",
-			"default": "[]"
-		},
-		{
-			"kind": "member",
 			"type": "gd3d.framework.gameObject",
 			"name": "gameObject",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "挂载的gameobject",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -35,6 +15,8 @@
 			"name": "layer",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance",
+			"description": "场景渲染层级（common、transparent、overlay）",
+			"version": "egret-gd3d 1.0",
 			"default": "RenderLayerEnum.Common"
 		},
 		{
@@ -42,7 +24,9 @@
 			"type": "gd3d.framework.material[]",
 			"name": "materials",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "材质数组",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -50,13 +34,17 @@
 			"name": "maxBoneCount",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance",
+			"description": "最大骨骼数量",
+			"version": "egret-gd3d 1.0",
 			"default": "0"
 		},
 		{
 			"kind": "member",
 			"name": "mesh",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "返回mesh数据",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -64,14 +52,18 @@
 			"name": "player",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance",
-			"rwType": 1
+			"rwType": 1,
+			"description": "返回动画播放组件",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
 			"type": "number",
 			"name": "queue",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "返回此组件的场景渲染层级排序依据queue大小",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -79,21 +71,9 @@
 			"name": "renderLayer",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance",
+			"description": "渲染mask层级（和相机相对应）",
+			"version": "egret-gd3d 1.0",
 			"default": "CullingMask.default"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.transform",
-			"name": "rootBone",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.math.vector3",
-			"name": "size",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
 		}
 	],
 	"function": [
@@ -105,42 +85,19 @@
 		},
 		{
 			"kind": "function",
-			"name": "clone",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "getMatByIndex",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "index",
-					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"type": "gd3d.framework.pickinfo",
 			"name": "intersects",
 			"memberof": "gd3d.framework.skinnedMeshRenderer",
 			"scope": "instance",
+			"description": "射线检测",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "ray",
 					"type": "gd3d.framework.ray",
-					"description": ""
+					"description": "射线"
 				}
 			]
-		},
-		{
-			"kind": "function",
-			"name": "remove",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance"
 		},
 		{
 			"kind": "function",
@@ -183,20 +140,6 @@
 					"description": ""
 				}
 			]
-		},
-		{
-			"kind": "function",
-			"type": "number",
-			"name": "useBoneShader",
-			"memberof": "gd3d.framework.skinnedMeshRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "mat",
-					"type": "gd3d.framework.material",
-					"description": ""
-				}
-			]
 		}
 	],
 	"globalMember": [],
@@ -206,6 +149,8 @@
 		"name": "skinnedMeshRenderer",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\component\\skinnedmeshrenderer.ts",
+		"description": "蒙皮网格渲染组件",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IRenderer"

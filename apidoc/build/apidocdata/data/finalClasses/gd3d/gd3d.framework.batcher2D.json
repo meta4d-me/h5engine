@@ -1,63 +1,12 @@
 {
-	"member": [
-		{
-			"kind": "member",
-			"type": "gd3d.render.glDrawPass",
-			"name": "curPass",
-			"memberof": "gd3d.framework.batcher2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "Uint16Array",
-			"name": "dataForEbo",
-			"memberof": "gd3d.framework.batcher2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "Float32Array",
-			"name": "dataForVbo",
-			"memberof": "gd3d.framework.batcher2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.DrawModeEnum",
-			"name": "drawMode",
-			"memberof": "gd3d.framework.batcher2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "eboCount",
-			"memberof": "gd3d.framework.batcher2D",
-			"scope": "instance",
-			"default": "0"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.render.glMesh",
-			"name": "mesh",
-			"memberof": "gd3d.framework.batcher2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "vboCount",
-			"memberof": "gd3d.framework.batcher2D",
-			"scope": "instance",
-			"default": "0"
-		}
-	],
+	"member": [],
 	"function": [
 		{
 			"kind": "function",
 			"name": "begin",
 			"memberof": "gd3d.framework.batcher2D",
 			"scope": "instance",
+			"description": "private",
 			"params": [
 				{
 					"name": "webgl",
@@ -76,6 +25,7 @@
 			"name": "end",
 			"memberof": "gd3d.framework.batcher2D",
 			"scope": "instance",
+			"description": "private",
 			"params": [
 				{
 					"name": "webgl",
@@ -89,6 +39,7 @@
 			"name": "initBuffer",
 			"memberof": "gd3d.framework.batcher2D",
 			"scope": "instance",
+			"description": "private",
 			"params": [
 				{
 					"name": "webgl",
@@ -112,6 +63,7 @@
 			"name": "push",
 			"memberof": "gd3d.framework.batcher2D",
 			"scope": "instance",
+			"description": "private",
 			"params": [
 				{
 					"name": "webgl",
@@ -137,6 +89,8 @@
 		"kind": "class",
 		"name": "batcher2D",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\2d\\canvasrenderer.ts"
+		"filename": "framework\\2d\\canvasrenderer.ts",
+		"description": "2d批处理类",
+		"version": "egret-gd3d 1.0"
 	}
 }

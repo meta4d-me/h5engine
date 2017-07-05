@@ -46,6 +46,8 @@
 		"kind": "class",
 		"name": "inputMgr",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\input\\inputmgr.ts"
+		"filename": "framework\\input\\inputmgr.ts",
+		"description": "键盘、鼠标(触屏)事件管理类 应用状态机区分状态",
+		"version": "egret-gd3d 1.0"
 	}
 }

@@ -7,16 +7,18 @@
 			"name": "Create2DPrimitive",
 			"memberof": "gd3d.framework.TransformUtil",
 			"scope": "static",
+			"description": "创建默认的2d控件",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "type",
 					"type": "gd3d.framework.Primitive2DType",
-					"description": ""
+					"description": "2d控件类型"
 				},
 				{
 					"name": "app",
 					"type": "gd3d.framework.application",
-					"description": ""
+					"description": "application的实例"
 				}
 			]
 		},
@@ -26,16 +28,18 @@
 			"name": "CreatePrimitive",
 			"memberof": "gd3d.framework.TransformUtil",
 			"scope": "static",
+			"description": "创建默认的3d对象",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "type",
 					"type": "gd3d.framework.PrimitiveType",
-					"description": ""
+					"description": "原生3d对象类型"
 				},
 				{
 					"name": "app",
 					"type": "gd3d.framework.application",
-					"description": ""
+					"description": "application的实例"
 				}
 			]
 		}
@@ -46,6 +50,8 @@
 		"kind": "class",
 		"name": "TransformUtil",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\util\\transformutil.ts"
+		"filename": "framework\\util\\transformutil.ts",
+		"description": "Transform工具类",
+		"version": "egret-gd3d 1.0"
 	}
 }

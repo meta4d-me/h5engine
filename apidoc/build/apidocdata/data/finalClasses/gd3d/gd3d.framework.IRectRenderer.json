@@ -39,6 +39,8 @@
 		"name": "IRectRenderer",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\transform2d.ts",
+		"description": "2D渲染组件的接口",
+		"version": "egret-gd3d 1.0",
 		"augments": [
 			"gd3d.framework.I2DComponent"
 		]

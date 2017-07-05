@@ -2,55 +2,13 @@
 	"member": [
 		{
 			"kind": "member",
-			"type": "gd3d.framework.application",
-			"name": "app",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
 			"type": "boolean",
 			"name": "autoAsp",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
+			"description": "是否自适应",
+			"version": "egret-gd3d 1.0",
 			"default": "true"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.camera",
-			"name": "camera",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.canvas",
-			"name": "canvas",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "boolean",
-			"name": "init",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance",
-			"default": "false"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.inputMgr",
-			"name": "inputmgr",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.CullingMask",
-			"name": "renderLayer",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance",
-			"default": "CullingMask.ui"
 		}
 	],
 	"function": [
@@ -59,55 +17,21 @@
 			"name": "overlay2D",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
-			"description": "// public notify: INotify;"
+			"description": "构造函数",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "addChild",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
+			"description": "添加2d子节点",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "node",
 					"type": "gd3d.framework.transform2D",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "calScreenPosToCanvasPos",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "mousePos",
-					"type": "gd3d.math.vector2",
-					"description": ""
-				},
-				{
-					"name": "canvasPos",
-					"type": "gd3d.math.vector2",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.framework.transform2D",
-			"name": "dopick2d",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "outv",
-					"type": "gd3d.math.vector2",
-					"description": ""
-				},
-				{
-					"name": "tran",
-					"type": "gd3d.framework.transform2D",
-					"description": ""
+					"description": "2d节点实例"
 				}
 			]
 		},
@@ -117,11 +41,13 @@
 			"name": "getChild",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
+			"description": "获取2d子节点",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "index",
 					"type": "number",
-					"description": ""
+					"description": "索引"
 				}
 			]
 		},
@@ -130,14 +56,18 @@
 			"type": "number",
 			"name": "getChildCount",
 			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取2d子节点的数量",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.framework.transform2D[]",
 			"name": "getChildren",
 			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取所有的2d子节点",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -145,16 +75,18 @@
 			"name": "pick2d",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
+			"description": "事件检测",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "mx",
 					"type": "number",
-					"description": ""
+					"description": "x偏移"
 				},
 				{
 					"name": "my",
 					"type": "number",
-					"description": ""
+					"description": "y偏移"
 				}
 			]
 		},
@@ -163,11 +95,13 @@
 			"name": "removeChild",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
+			"description": "移除2d子节点",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "node",
 					"type": "gd3d.framework.transform2D",
-					"description": ""
+					"description": "2d节点实例"
 				}
 			]
 		},
@@ -176,34 +110,23 @@
 			"name": "render",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
+			"description": "渲染",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "context",
 					"type": "gd3d.framework.renderContext",
-					"description": ""
+					"description": "渲染上下文"
 				},
 				{
 					"name": "assetmgr",
 					"type": "gd3d.framework.assetMgr",
-					"description": ""
+					"description": "资源管理类实例"
 				},
 				{
 					"name": "camera",
 					"type": "gd3d.framework.camera",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "start",
-			"memberof": "gd3d.framework.overlay2D",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "camera",
-					"type": "gd3d.framework.camera",
-					"description": ""
+					"description": "相机实例"
 				}
 			]
 		},
@@ -212,11 +135,13 @@
 			"name": "update",
 			"memberof": "gd3d.framework.overlay2D",
 			"scope": "instance",
+			"description": "更新",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "delta",
 					"type": "number",
-					"description": ""
+					"description": "两次update的时间间隔"
 				}
 			]
 		}
@@ -228,10 +153,8 @@
 		"name": "overlay2D",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\overlay2d.ts",
-		"implements": [
-			{
-				"name": "gd3d.framework.IOverLay"
-			}
-		]
+		"description": "2DUI的容器类，与canvasrender(3DUI)相对应。",
+		"version": "egret-gd3d 1.0",
+		"implements": []
 	}
 }

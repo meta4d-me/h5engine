@@ -135,7 +135,7 @@
 		"name": "NumberUtil",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\util\\numberutil.ts",
-		"description": "获取键盘Keycode的工具类",
+		"description": "Number类型的工具类",
 		"version": "egret-gd3d 1.0"
 	}
 }

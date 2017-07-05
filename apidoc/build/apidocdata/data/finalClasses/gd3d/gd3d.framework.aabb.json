@@ -8,7 +8,7 @@
 			"scope": "instance",
 			"rwType": 1,
 			"description": "计算包围盒的中心位置",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native"
 		},
 		{
@@ -18,7 +18,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "最大点",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native"
 		},
 		{
@@ -28,7 +28,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "最小点",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native"
 		}
 	],
@@ -39,7 +39,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "构建轴对称包围盒",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native",
 			"params": [
 				{
@@ -60,7 +60,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "包含一个aabb",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native",
 			"params": [
 				{
@@ -76,7 +76,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "包含一个点",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native",
 			"params": [
 				{
@@ -92,7 +92,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "清空",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native"
 		},
 		{
@@ -102,7 +102,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "克隆",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native"
 		},
 		{
@@ -112,7 +112,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "检查是否包含点",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native",
 			"params": [
 				{
@@ -128,7 +128,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "获取包围盒顶点数据",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native",
 			"params": [
 				{
@@ -145,7 +145,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "检查是否与aabb相交",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native",
 			"params": [
 				{
@@ -161,7 +161,7 @@
 			"memberof": "gd3d.framework.aabb",
 			"scope": "instance",
 			"description": "刷新轴对称包围盒",
-			"version": "gd3d 1.0",
+			"version": "egret-gd3d 1.0",
 			"platform": "Web,Native",
 			"params": [
 				{
@@ -180,6 +180,6 @@
 		"memberof": "gd3d.framework",
 		"filename": "framework\\tool\\aabb.ts",
 		"description": "表示轴对称包围盒",
-		"version": "gd3d 1.0"
+		"version": "egret-gd3d 1.0"
 	}
 }

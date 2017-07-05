@@ -41,6 +41,7 @@
 		"name": "ImageType",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\component\\image.ts",
-		"description": "贴图的显示方式"
+		"description": "贴图的显示方式",
+		"version": "egret-gd3d 1.0"
 	}
 }

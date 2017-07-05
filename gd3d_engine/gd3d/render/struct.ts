@@ -2,7 +2,9 @@
 
 namespace gd3d.math
 {
-    //重构原则1，将结构和计算函数全部分离
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class vector2
     {
@@ -21,6 +23,9 @@ namespace gd3d.math
         }
     }
 
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class rect
     {
@@ -45,6 +50,9 @@ namespace gd3d.math
         }
     }
 
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class border
     {
@@ -65,6 +73,9 @@ namespace gd3d.math
         b: number;
     }
 
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class color
     {
@@ -89,6 +100,9 @@ namespace gd3d.math
         }
     }
 
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class vector3
     {
@@ -110,6 +124,9 @@ namespace gd3d.math
         }
     }
 
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class vector4
     {
@@ -134,6 +151,9 @@ namespace gd3d.math
         }
     }
 
+    /**
+     * @private
+     */
     @gd3d.reflect.SerializeType
     export class quaternion
     {
@@ -158,6 +178,9 @@ namespace gd3d.math
         }
     }
     
+    /**
+     * @private
+     */
     export class matrix
     {
         public rawData: Float32Array;
@@ -178,6 +201,9 @@ namespace gd3d.math
                 + "[" + this.rawData[12] + "," + this.rawData[13] + "," + this.rawData[14] + "," + this.rawData[15] + "]";
         }
     }
+    /**
+     * @private
+     */
     export class matrix3x2
     {
         public rawData: Float32Array;
