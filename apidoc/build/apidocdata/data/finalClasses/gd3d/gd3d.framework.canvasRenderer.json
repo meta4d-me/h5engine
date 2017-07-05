@@ -51,14 +51,6 @@
 	"function": [
 		{
 			"kind": "function",
-			"name": "canvasRenderer",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"description": "构造函数",
-			"version": "egret-gd3d 1.0"
-		},
-		{
-			"kind": "function",
 			"name": "addChild",
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
@@ -134,46 +126,6 @@
 					"name": "node",
 					"type": "gd3d.framework.transform2D",
 					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "render",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"description": "渲染",
-			"version": "egret-gd3d 1.0",
-			"params": [
-				{
-					"name": "context",
-					"type": "gd3d.framework.renderContext",
-					"description": "渲染上下文"
-				},
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": "资源管理类实例"
-				},
-				{
-					"name": "camera",
-					"type": "gd3d.framework.camera",
-					"description": "相机实例"
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "update",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"description": "更新",
-			"version": "egret-gd3d 1.0",
-			"params": [
-				{
-					"name": "delta",
-					"type": "number",
-					"description": "两次update的时间间隔"
 				}
 			]
 		}

@@ -941,42 +941,6 @@
 			],
 			"class": [
 				{
-					"name": "vector2",
-					"description": "//重构原则1，将结构和计算函数全部分离"
-				},
-				{
-					"name": "rect",
-					"description": ""
-				},
-				{
-					"name": "border",
-					"description": ""
-				},
-				{
-					"name": "color",
-					"description": ""
-				},
-				{
-					"name": "vector3",
-					"description": ""
-				},
-				{
-					"name": "vector4",
-					"description": ""
-				},
-				{
-					"name": "quaternion",
-					"description": ""
-				},
-				{
-					"name": "matrix",
-					"description": ""
-				},
-				{
-					"name": "matrix3x2",
-					"description": ""
-				},
-				{
 					"name": "angelref",
 					"description": ""
 				},
