@@ -590,8 +590,6 @@
 		"name": "binTool",
 		"memberof": "gd3d.io",
 		"filename": "framework\\io\\binBuffer.ts",
-		"augments": [
-			"gd3d.io.binBuffer"
-		]
+		"augments": []
 	}
 }

@@ -6,6 +6,8 @@
 			"name": "Aniclip",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "动画片段",
+			"version": "egret-gd3d 1.0",
 			"default": "12"
 		},
 		{
@@ -14,6 +16,8 @@
 			"name": "Atlas",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "图集",
+			"version": "egret-gd3d 1.0",
 			"default": "14"
 		},
 		{
@@ -22,6 +26,8 @@
 			"name": "Auto",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "根据后缀 动态识别",
+			"version": "egret-gd3d 1.0",
 			"default": "1"
 		},
 		{
@@ -30,6 +36,8 @@
 			"name": "Bundle",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "资源包",
+			"version": "egret-gd3d 1.0",
 			"default": "2"
 		},
 		{
@@ -38,6 +46,8 @@
 			"name": "CompressBundle",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "压缩的资源包",
+			"version": "egret-gd3d 1.0",
 			"default": "3"
 		},
 		{
@@ -46,6 +56,8 @@
 			"name": "Font",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "字体",
+			"version": "egret-gd3d 1.0",
 			"default": "15"
 		},
 		{
@@ -54,6 +66,8 @@
 			"name": "GLFragmentShader",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "glsl fs",
+			"version": "egret-gd3d 1.0",
 			"default": "5"
 		},
 		{
@@ -62,6 +76,8 @@
 			"name": "GLVertexShader",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "glsl vs",
+			"version": "egret-gd3d 1.0",
 			"default": "4"
 		},
 		{
@@ -70,6 +86,8 @@
 			"name": "Material",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "材质",
+			"version": "egret-gd3d 1.0",
 			"default": "11"
 		},
 		{
@@ -78,6 +96,8 @@
 			"name": "Mesh",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "模型",
+			"version": "egret-gd3d 1.0",
 			"default": "9"
 		},
 		{
@@ -86,23 +106,9 @@
 			"name": "PVR",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "pvr贴图",
+			"version": "egret-gd3d 1.0",
 			"default": "20"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "PackBin",
-			"memberof": "gd3d.framework.AssetTypeEnum",
-			"scope": "static",
-			"default": "17"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "PackTxt",
-			"memberof": "gd3d.framework.AssetTypeEnum",
-			"scope": "static",
-			"default": "18"
 		},
 		{
 			"kind": "member",
@@ -110,6 +116,8 @@
 			"name": "Prefab",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "预设",
+			"version": "egret-gd3d 1.0",
 			"default": "10"
 		},
 		{
@@ -118,6 +126,8 @@
 			"name": "Scene",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "场景",
+			"version": "egret-gd3d 1.0",
 			"default": "13"
 		},
 		{
@@ -126,6 +136,8 @@
 			"name": "Shader",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "shader",
+			"version": "egret-gd3d 1.0",
 			"default": "6"
 		},
 		{
@@ -134,6 +146,8 @@
 			"name": "TextAsset",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "文本",
+			"version": "egret-gd3d 1.0",
 			"default": "16"
 		},
 		{
@@ -142,6 +156,8 @@
 			"name": "Texture",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "贴图",
+			"version": "egret-gd3d 1.0",
 			"default": "7"
 		},
 		{
@@ -150,6 +166,8 @@
 			"name": "TextureDesc",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "贴图desc",
+			"version": "egret-gd3d 1.0",
 			"default": "8"
 		},
 		{
@@ -158,6 +176,8 @@
 			"name": "Unknown",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "未知",
+			"version": "egret-gd3d 1.0",
 			"default": "0"
 		},
 		{
@@ -166,6 +186,8 @@
 			"name": "pathAsset",
 			"memberof": "gd3d.framework.AssetTypeEnum",
 			"scope": "static",
+			"description": "可编辑路径",
+			"version": "egret-gd3d 1.0",
 			"default": "19"
 		}
 	],

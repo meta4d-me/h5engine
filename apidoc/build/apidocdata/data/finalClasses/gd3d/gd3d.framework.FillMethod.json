@@ -49,6 +49,7 @@
 		"name": "FillMethod",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\component\\image.ts",
-		"description": "填充方式"
+		"description": "更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多",
+		"version": "egret-gd3d 1.0"
 	}
 }

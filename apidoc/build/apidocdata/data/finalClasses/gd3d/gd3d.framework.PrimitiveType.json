@@ -64,6 +64,8 @@
 		"kind": "enum",
 		"name": "PrimitiveType",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\util\\transformutil.ts"
+		"filename": "framework\\util\\transformutil.ts",
+		"description": "原生3d模型类型",
+		"version": "egret-gd3d 1.0"
 	}
 }

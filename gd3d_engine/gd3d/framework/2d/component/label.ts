@@ -2,13 +2,25 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2d文本组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.node2DComponent
     @reflect.nodeRender
-
     export class label implements IRectRenderer
     {
-        //文字内容
         private _text: string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 文字内容
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("string")
         get text(): string
         {
@@ -38,8 +50,14 @@ namespace gd3d.framework
             this.dirtyData = true;
         }
 
-        //字体
         private _font: font;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 字体
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("font")
         get font()
         {
@@ -55,8 +73,14 @@ namespace gd3d.framework
             this._font.use();
         }
 
-        //字体大小
         private _fontsize: number = 14;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 字体大小
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("number")
         get fontsize()
         {
@@ -67,14 +91,40 @@ namespace gd3d.framework
             this._fontsize = size;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 行高
+         * @version egret-gd3d 1.0
+         */
         linespace: number = 1;//fontsize的倍数
-        horizontalType: HorizontalType = HorizontalType.Center;//水平排列方式
-        verticalType: VerticalType = VerticalType.Center;//垂直排列方式
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 水平排列方式
+         * @version egret-gd3d 1.0
+         */
+        horizontalType: HorizontalType = HorizontalType.Center;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 垂直排列方式
+         * @version egret-gd3d 1.0
+         */
+        verticalType: VerticalType = VerticalType.Center;
 
         //计算数组
         private indexarr = [];
         private remainarrx = [];
-        //原来代码写的太冗余，堆栈也太深了，改写
+        
+        /**
+         * @private
+         */
         updateData(_font: gd3d.framework.font)
         {
             this.dirtyData = false;
@@ -314,15 +364,39 @@ namespace gd3d.framework
         }
         private data_begin: math.vector2 = new math.vector2(0, 0);
 
+        private datar: number[] = [];
 
-        // selfdatar: number[];
-        datar: number[] = [];
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 填充颜色
+         * @version egret-gd3d 1.0
+         */
         color: math.color = new math.color(1, 1, 1, 1);
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 描边颜色
+         * @version egret-gd3d 1.0
+         */
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
         
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 材质
+         * @version egret-gd3d 1.0
+         */
         mat: material;
-        dirtyData: boolean = true;
+        private dirtyData: boolean = true;
+
+        /**
+         * @private
+         */
         render(canvas: canvas)
         {
             if (this._font != null)
@@ -358,6 +432,9 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @private
+         */
         updateTran()
         {
             var m = this.transform.getWorldMatrix();
@@ -369,18 +446,35 @@ namespace gd3d.framework
             //只把左上角算出来
             //this.dirtyData = true;
         }
-        //2d使用固定的顶点格式
-        //pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13
+
+        /**
+         * @private
+         */
         start()
         {
 
         }
+
+        /**
+         * @private
+         */
         update(delta: number)
         {
 
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前组件的2d节点
+         * @version egret-gd3d 1.0
+         */
         transform: transform2D;
 
+        /**
+         * @private
+         */
         remove()
         {
             this._font.unuse(true);
@@ -388,17 +482,37 @@ namespace gd3d.framework
             this.remainarrx.length = 0;
             this.datar.length = 0;
         }
+        
+        /**
+         * @private
+         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
         {
 
         }
     }
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 横向显示方式
+     * @version egret-gd3d 1.0
+     */
     export enum HorizontalType
     {
         Center,
         Left,
         Right
     }
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 纵向显示方式
+     * @version egret-gd3d 1.0
+     */
     export enum VerticalType
     {
         Center,

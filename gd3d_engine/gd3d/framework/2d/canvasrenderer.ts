@@ -21,7 +21,7 @@ namespace gd3d.framework
         private dataForEbo: Uint16Array;
 
         /**
-         * private
+         * @private
          */
         initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum)
         {
@@ -37,7 +37,7 @@ namespace gd3d.framework
         }
 
         /**
-         * private
+         * @private
          */
         begin(webgl: WebGLRenderingContext, pass: render.glDrawPass)
         {
@@ -49,7 +49,7 @@ namespace gd3d.framework
         }
 
         /**
-         * private
+         * @private
          */
         push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[])
         {
@@ -103,7 +103,7 @@ namespace gd3d.framework
         }
 
         /**
-         * private
+         * @private
          */
         end(webgl: WebGLRenderingContext)
         {
@@ -151,11 +151,7 @@ namespace gd3d.framework
     export class canvasRenderer implements IRenderer, ICollider
     {
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 构造函数
-         * @version egret-gd3d 1.0
+         * @private
          */
         constructor()
         {
@@ -263,11 +259,22 @@ namespace gd3d.framework
             return this.canvas.getChildCount();
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取2d子节点
+         * @param index 索引
+         * @version egret-gd3d 1.0
+         */
         getChild(index: number): transform2D
         {
             return this.canvas.getChild(index);
         }
 
+        /**
+         * @private
+         */
         update(delta: number)
         {
             var asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
@@ -302,6 +309,14 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 射线检测
+         * @param ray 射线
+         * @version egret-gd3d 1.0
+         */
         pick2d(ray:gd3d.framework.ray):transform2D
         {
             var pinfo = ray.intersectPlaneTransform(this.gameObject.transform);
@@ -321,6 +336,9 @@ namespace gd3d.framework
             return null;
         }
 
+        /**
+         * @private
+         */
         dopick2d(outv:math.vector2, tran:transform2D):transform2D
         {
             if (tran.components != null)
@@ -347,7 +365,9 @@ namespace gd3d.framework
             return null;
         }
 
-
+        /**
+         * @private
+         */
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
            // if (!(camera.CullingMask & this.renderLayer)) return;
@@ -355,14 +375,23 @@ namespace gd3d.framework
             this.canvas.render(context, assetmgr);
         }
 
+        /**
+         * @private
+         */
         jsonToAttribute(json, assetmgr: gd3d.framework.assetMgr)
         {
 
         }
+        /**
+         * @private
+         */
         remove()
         {
 
         }
+        /**
+         * @private
+         */
         clone()
         {
             

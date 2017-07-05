@@ -129,14 +129,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 渲染
-         * @param context 渲染上下文
-         * @param assetmgr 资源管理类实例
-         * @param camera 相机实例
-         * @version egret-gd3d 1.0
+         * @private
          */
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
@@ -161,12 +154,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 更新
-         * @param delta 两次update的时间间隔
-         * @version egret-gd3d 1.0
+         * @private
          */
         update(delta: number)
         {
@@ -209,13 +197,7 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 事件处理
-         * @param outv canvas下的坐标
-         * @param tran 2d节点
-         * @version egret-gd3d 1.0
+         * @private
          */
         dopick2d(outv: math.vector2, tran: transform2D): transform2D
         {

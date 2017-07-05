@@ -13,7 +13,9 @@
 			"kind": "function",
 			"name": "clickInit",
 			"memberof": "gd3d.framework.AudioEx",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "初始化声音api，注意：在ios上面必须手动点击某个按钮来调用初始化，否则无法播放声音",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -27,7 +29,9 @@
 			"type": "boolean",
 			"name": "isAvailable",
 			"memberof": "gd3d.framework.AudioEx",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "初始化声音api，注意：在ios上面必须手动点击某个按钮来调用初始化，否则无法播放声音",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -35,16 +39,18 @@
 			"name": "loadAudioBuffer",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
+			"description": "从本地文件加载音频数据，返回audiobuffer",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "url",
 					"type": "string",
-					"description": ""
+					"description": "文件地址"
 				},
 				{
 					"name": "fun",
 					"type": "(buf:AudioBuffer,_err:Error)=>void",
-					"description": ""
+					"description": "fun"
 				}
 			]
 		},
@@ -54,17 +60,18 @@
 			"name": "loadAudioBufferFromArrayBuffer",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
-			"description": "//加载声音的api",
+			"description": "从arraybuffer转成audiobuffer",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "ab",
 					"type": "ArrayBuffer",
-					"description": ""
+					"description": "二进制声音数据"
 				},
 				{
 					"name": "fun",
 					"type": "(buf:AudioBuffer,_err:Error)=>void",
-					"description": ""
+					"description": "fun"
 				}
 			]
 		},
@@ -74,17 +81,18 @@
 			"name": "playLooped",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
-			"description": "//播放一个循环声音,并制定一个名字（测试通过）",
+			"description": "循环播放声音",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "声音文件名字"
 				},
 				{
 					"name": "buf",
 					"type": "AudioBuffer",
-					"description": ""
+					"description": "声音数据"
 				}
 			]
 		},
@@ -94,35 +102,36 @@
 			"name": "playOnce",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
-			"description": "//如果要关闭，记住这个函数的返回值，里面有个stop函数",
+			"description": "播放一次性声音,两个相同的声音可同时播放，注意，别把长声音弄进来，如果要关闭，记住这个函数的返回值，里面有个stop函数",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "声音文件名字"
 				},
 				{
 					"name": "buf",
 					"type": "AudioBuffer",
-					"description": ""
+					"description": "声音数据"
 				},
 				{
 					"name": "x",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				},
 				{
 					"name": "y",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				},
 				{
 					"name": "z",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				}
 			]
 		},
@@ -132,34 +141,36 @@
 			"name": "playOnceBlocking",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
+			"description": "播放一次性声音，相同的声音一次只能播放一个，当一个声音开始播放时，如果有个相同的声音已经在播放了，则后播放的会被先播放的阻塞住不会播放。注意，别把长声音弄进来，如果要关闭，记住这个函数的返回值，里面有个stop函数",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "声音文件名字"
 				},
 				{
 					"name": "buf",
 					"type": "AudioBuffer",
-					"description": ""
+					"description": "声音数据"
 				},
 				{
 					"name": "x",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				},
 				{
 					"name": "y",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				},
 				{
 					"name": "z",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				}
 			]
 		},
@@ -169,34 +180,36 @@
 			"name": "playOnceInterrupt",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
+			"description": "播放一次性声音，相同的声音一次只能播放一个，后播放的会把先播放的停掉，然后从头开始播放，注意，别把长声音弄进来，如果要关闭，记住这个函数的返回值，里面有个stop函数",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "声音文件名字"
 				},
 				{
 					"name": "buf",
 					"type": "AudioBuffer",
-					"description": ""
+					"description": "声音数据"
 				},
 				{
 					"name": "x",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				},
 				{
 					"name": "y",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				},
 				{
 					"name": "z",
 					"question": true,
 					"type": "number",
-					"description": ""
+					"description": "音源在3D空间中的播放位置"
 				}
 			]
 		},
@@ -205,11 +218,13 @@
 			"name": "setMusicVolume",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
+			"description": "设置背景音乐大小",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "val",
 					"type": "number",
-					"description": ""
+					"description": "音乐声音大小"
 				}
 			]
 		},
@@ -218,11 +233,13 @@
 			"name": "setSoundVolume",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
+			"description": "设置音效大小",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "val",
 					"type": "number",
-					"description": ""
+					"description": "音效大小"
 				}
 			]
 		},
@@ -232,12 +249,13 @@
 			"name": "stopLooped",
 			"memberof": "gd3d.framework.AudioEx",
 			"scope": "instance",
-			"description": "//通过名字停止一个循环声音",
+			"description": "通过名字停止一个循环声音",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "name",
 					"type": "string",
-					"description": ""
+					"description": "声音文件名字"
 				}
 			]
 		}

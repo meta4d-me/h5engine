@@ -5,7 +5,7 @@
 			"name": "color",
 			"memberof": "gd3d.framework.trailRender",
 			"scope": "instance",
-			"description": "matrial调色",
+			"description": "返回 matrial调色",
 			"version": "egret-gd3d 1.0"
 		},
 		{
@@ -26,6 +26,16 @@
 			"scope": "instance",
 			"description": "挂载的gameobject",
 			"version": "egret-gd3d 1.0"
+		},
+		{
+			"kind": "member",
+			"type": "gd3d.framework.RenderLayerEnum",
+			"name": "layer",
+			"memberof": "gd3d.framework.trailRender",
+			"scope": "instance",
+			"description": "场景渲染层级（common、transparent、overlay）",
+			"version": "egret-gd3d 1.0",
+			"default": "RenderLayerEnum.Common"
 		},
 		{
 			"kind": "member",
@@ -52,6 +62,8 @@
 			"name": "queue",
 			"memberof": "gd3d.framework.trailRender",
 			"scope": "instance",
+			"description": "同场景渲染层级时候先后排序依据",
+			"version": "egret-gd3d 1.0",
 			"default": "0"
 		},
 		{
@@ -60,7 +72,7 @@
 			"name": "renderLayer",
 			"memberof": "gd3d.framework.trailRender",
 			"scope": "instance",
-			"description": "渲染层级",
+			"description": "渲染mask层级（和相机相对应）",
 			"version": "egret-gd3d 1.0",
 			"default": "CullingMask.default"
 		}

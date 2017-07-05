@@ -3,7 +3,12 @@
 namespace gd3d.framework
 {
     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2d图片组件</p>
      * 参照UGUI的思路，rawImage只拿整个图片来显示，不关心Sprite、九宫、填充等。这些统一都在iamge中处理
+     * @version egret-gd3d 1.0
      */
     @reflect.node2DComponent
     @reflect.nodeRender
@@ -19,7 +24,15 @@ namespace gd3d.framework
             0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
         ];
         @gd3d.reflect.Field("texture")
-        _image: texture;
+        private _image: texture;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 图片
+         * @version egret-gd3d 1.0
+         */
         public get image()
         {
             return this._image;
@@ -34,14 +47,31 @@ namespace gd3d.framework
             this._image.use();
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 颜色
+         * @version egret-gd3d 1.0
+         */
         @reflect.Field("color")
         @reflect.UIStyle("vector4")
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 材质
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("material")
         @gd3d.reflect.UIStyle("material")
         mat: material;
 
+        /**
+         * @private
+         */
         render(canvas: canvas)
         {
             if (this.mat == null)
@@ -63,6 +93,10 @@ namespace gd3d.framework
             }
             
         }
+
+        /**
+         * @private
+         */
         updateTran()
         {
             var m = this.transform.getWorldMatrix();
@@ -103,22 +137,43 @@ namespace gd3d.framework
             }
 
         }
-        //2d使用固定的顶点格式
-        //pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13
+        
+        /**
+         * @private
+         */
         start()
         {
 
         }
+
+        /**
+         * @private
+         */
         update(delta: number)
         {
 
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前组件的2d节点
+         * @version egret-gd3d 1.0
+         */
         transform: transform2D;
 
+        /**
+         * @private
+         */
         remove()
         {
             this._image.unuse(true);
         }
+
+        /**
+         * @private
+         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
         {
 

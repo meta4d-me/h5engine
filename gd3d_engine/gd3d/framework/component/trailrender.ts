@@ -12,17 +12,28 @@ namespace gd3d.framework
     export class trailRender implements IRenderer
     {
         /**
-         * @private
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 场景渲染层级（common、transparent、overlay）
+         * @version egret-gd3d 1.0
          */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * 渲染层级
+         * 渲染mask层级（和相机相对应）
          * @version egret-gd3d 1.0
          */
         renderLayer: gd3d.framework.CullingMask = CullingMask.default;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 同场景渲染层级时候先后排序依据
+         * @version egret-gd3d 1.0
+         */
         queue: number = 0;
 
         private width: number = 1.0;
