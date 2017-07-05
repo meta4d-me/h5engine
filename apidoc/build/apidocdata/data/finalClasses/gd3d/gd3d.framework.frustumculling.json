@@ -5,7 +5,9 @@
 			"type": "gd3d.framework.gameObject",
 			"name": "gameObject",
 			"memberof": "gd3d.framework.frustumculling",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "挂载的gameobject",
+			"version": "egret-gd3d 1.0"
 		}
 	],
 	"function": [

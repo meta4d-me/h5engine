@@ -5,6 +5,8 @@
 			"name": "COMPONENT_BOXCOLLIDER",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取boxcollider组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"boxcollider\""
 		},
 		{
@@ -12,6 +14,8 @@
 			"name": "COMPONENT_BUTTON",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取button组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"button\""
 		},
 		{
@@ -19,6 +23,8 @@
 			"name": "COMPONENT_CAMERA",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取camera组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"camera\""
 		},
 		{
@@ -26,6 +32,8 @@
 			"name": "COMPONENT_CAMERACONTROLLER",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取cameraController组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"cameraController\""
 		},
 		{
@@ -33,6 +41,8 @@
 			"name": "COMPONENT_CANVASRENDER",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取canvasRenderer组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"canvasRenderer\""
 		},
 		{
@@ -40,6 +50,8 @@
 			"name": "COMPONENT_EFFECTSYSTEM",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取effectSystem组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"effectSystem\""
 		},
 		{
@@ -47,6 +59,8 @@
 			"name": "COMPONENT_IMAGE",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取image2D组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"image2D\""
 		},
 		{
@@ -54,6 +68,8 @@
 			"name": "COMPONENT_LABEL",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取label组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"label\""
 		},
 		{
@@ -61,6 +77,8 @@
 			"name": "COMPONENT_LIGHT",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取light组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"light\""
 		},
 		{
@@ -68,6 +86,8 @@
 			"name": "COMPONENT_MESHFILTER",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取meshFilter组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"meshFilter\""
 		},
 		{
@@ -75,6 +95,8 @@
 			"name": "COMPONENT_MESHRENDER",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取meshRenderer组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"meshRenderer\""
 		},
 		{
@@ -82,6 +104,8 @@
 			"name": "COMPONENT_RAWIMAGE",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取rawImage2D组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"rawImage2D\""
 		},
 		{
@@ -89,64 +113,34 @@
 			"name": "COMPONENT_SKINMESHRENDER",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "获取skinnedMeshRenderer组件的名字",
+			"version": "egret-gd3d 1.0",
 			"default": "\"skinnedMeshRenderer\""
-		},
-		{
-			"kind": "member",
-			"name": "RESOURCES_MESH_CUBE",
-			"memberof": "gd3d.framework.StringUtil",
-			"scope": "static",
-			"default": "\"cube\""
-		},
-		{
-			"kind": "member",
-			"name": "UIStyle_Enum",
-			"memberof": "gd3d.framework.StringUtil",
-			"scope": "static",
-			"default": "\"enum\""
-		},
-		{
-			"kind": "member",
-			"name": "UIStyle_RangeFloat",
-			"memberof": "gd3d.framework.StringUtil",
-			"scope": "static",
-			"default": "\"rangeFloat\""
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"name": "firstCharToLowerCase",
-			"memberof": "gd3d.framework.StringUtil",
-			"scope": "static",
-			"params": [
-				{
-					"name": "str",
-					"type": "string",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"name": "replaceAll",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "将一个字符串中的所有指定字符替换为指定字符",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "srcStr",
 					"type": "string",
-					"description": ""
+					"description": "要处理的字符串"
 				},
 				{
 					"name": "fromStr",
 					"type": "string",
-					"description": ""
+					"description": "原字符串中的指定字符串"
 				},
 				{
 					"name": "toStr",
 					"type": "string",
-					"description": ""
+					"description": "将被替换为的字符串"
 				}
 			]
 		},
@@ -155,11 +149,13 @@
 			"name": "trimAll",
 			"memberof": "gd3d.framework.StringUtil",
 			"scope": "static",
+			"description": "剔除掉字符串中所有的空格",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "str",
 					"type": "string",
-					"description": ""
+					"description": "要处理的字符串"
 				}
 			]
 		}
@@ -170,6 +166,8 @@
 		"kind": "class",
 		"name": "StringUtil",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\util\\stringutil.ts"
+		"filename": "framework\\util\\stringutil.ts",
+		"description": "正则表达式的工具类，提供一些引擎用到的正则表达式",
+		"version": "egret-gd3d 1.0"
 	}
 }

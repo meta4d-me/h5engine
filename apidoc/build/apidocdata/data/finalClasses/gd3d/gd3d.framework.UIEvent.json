@@ -42,6 +42,8 @@
 		"kind": "class",
 		"name": "UIEvent",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\2d\\event2d.ts"
+		"filename": "framework\\2d\\event2d.ts",
+		"description": "ui事件",
+		"version": "egret-gd3d 1.0"
 	}
 }

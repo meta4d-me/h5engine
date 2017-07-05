@@ -35,15 +35,9 @@
 			"name": "layer",
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
+			"description": "layer类型",
+			"version": "egret-gd3d 1.0",
 			"default": "RenderLayerEnum.Common"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "queue",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"default": "0"
 		},
 		{
 			"kind": "member",
@@ -52,27 +46,16 @@
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
 			"default": "CullingMask.default"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.transform",
-			"name": "subTran",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
 		}
 	],
 	"function": [
 		{
 			"kind": "function",
-			"name": "canvasRenderer",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
 			"name": "addChild",
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
+			"description": "添加2d子节点",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "node",
@@ -83,46 +66,17 @@
 		},
 		{
 			"kind": "function",
-			"name": "clone",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "gd3d.framework.transform2D",
-			"name": "dopick2d",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "outv",
-					"type": "gd3d.math.vector2",
-					"description": ""
-				},
-				{
-					"name": "tran",
-					"type": "gd3d.framework.transform2D",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "getBound",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
 			"type": "gd3d.framework.transform2D",
 			"name": "getChild",
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
+			"description": "获取2d子节点",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "index",
 					"type": "number",
-					"description": ""
+					"description": "索引"
 				}
 			]
 		},
@@ -131,45 +85,18 @@
 			"type": "number",
 			"name": "getChildCount",
 			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "获取2d子节点的数量",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"type": "gd3d.framework.transform2D[]",
 			"name": "getChildren",
 			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"type": "boolean",
-			"name": "intersectsTransform",
-			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "tran",
-					"type": "gd3d.framework.transform",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "jsonToAttribute",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "json",
-					"description": ""
-				},
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": ""
-				}
-			]
+			"description": "获取所有2d子节点",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
@@ -177,71 +104,27 @@
 			"name": "pick2d",
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
+			"description": "射线检测",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "ray",
 					"type": "gd3d.framework.ray",
-					"description": ""
+					"description": "射线"
 				}
 			]
-		},
-		{
-			"kind": "function",
-			"name": "remove",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
 		},
 		{
 			"kind": "function",
 			"name": "removeChild",
 			"memberof": "gd3d.framework.canvasRenderer",
 			"scope": "instance",
+			"description": "移除2d子节点",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "node",
 					"type": "gd3d.framework.transform2D",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "render",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "context",
-					"type": "gd3d.framework.renderContext",
-					"description": ""
-				},
-				{
-					"name": "assetmgr",
-					"type": "gd3d.framework.assetMgr",
-					"description": ""
-				},
-				{
-					"name": "camera",
-					"type": "gd3d.framework.camera",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "start",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "update",
-			"memberof": "gd3d.framework.canvasRenderer",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "delta",
-					"type": "number",
 					"description": ""
 				}
 			]
@@ -254,6 +137,8 @@
 		"name": "canvasRenderer",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\2d\\canvasrenderer.ts",
+		"description": "3DUI的容器类</p>3d组件</p>与overlay(2DUI)相对应。",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.IRenderer"

@@ -32,6 +32,8 @@
 		"kind": "enum",
 		"name": "HorizontalType",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\2d\\component\\label.ts"
+		"filename": "framework\\2d\\component\\label.ts",
+		"description": "横向显示方式",
+		"version": "egret-gd3d 1.0"
 	}
 }

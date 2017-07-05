@@ -36,6 +36,8 @@
 		"kind": "class",
 		"name": "pointinfo",
 		"memberof": "gd3d.framework",
-		"filename": "framework\\input\\inputmgr.ts"
+		"filename": "framework\\input\\inputmgr.ts",
+		"description": "鼠标(触屏)点击信息",
+		"version": "egret-gd3d 1.0"
 	}
 }

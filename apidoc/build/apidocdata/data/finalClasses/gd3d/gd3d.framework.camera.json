@@ -6,6 +6,8 @@
 			"name": "CullingMask",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "相机的渲染层级",
+			"version": "egret-gd3d 1.0",
 			"default": "CullingMask.default | CullingMask.ui"
 		},
 		{
@@ -14,7 +16,8 @@
 			"name": "backgroundColor",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
-			"description": "// backgroundColor: gd3d.math.color = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);",
+			"description": "背景色",
+			"version": "egret-gd3d 1.0",
 			"default": "new gd3d.math.color(0.5, 0.8, 1, 1)"
 		},
 		{
@@ -23,6 +26,8 @@
 			"name": "clearOption_Color",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "是否清除颜色缓冲区",
+			"version": "egret-gd3d 1.0",
 			"default": "true"
 		},
 		{
@@ -31,6 +36,8 @@
 			"name": "clearOption_Depth",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "是否清除深度缓冲区",
+			"version": "egret-gd3d 1.0",
 			"default": "true"
 		},
 		{
@@ -38,7 +45,9 @@
 			"type": "number",
 			"name": "far",
 			"memberof": "gd3d.framework.camera",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "相机到远裁剪面距离",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -46,6 +55,8 @@
 			"name": "fov",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "透视投影的fov",
+			"version": "egret-gd3d 1.0",
 			"default": "Math.PI * 0.25"
 		},
 		{
@@ -53,15 +64,9 @@
 			"type": "gd3d.framework.gameObject",
 			"name": "gameObject",
 			"memberof": "gd3d.framework.camera",
-			"scope": "instance"
-		},
-		{
-			"kind": "member",
-			"type": "number",
-			"name": "index",
-			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
-			"description": "//CullingMask: CullingMask = CullingMask.everything;"
+			"description": "挂载的gameobject",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -69,6 +74,8 @@
 			"name": "isMainCamera",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "是否为主相机",
+			"version": "egret-gd3d 1.0",
 			"default": "false"
 		},
 		{
@@ -76,7 +83,9 @@
 			"type": "number",
 			"name": "near",
 			"memberof": "gd3d.framework.camera",
-			"scope": "instance"
+			"scope": "instance",
+			"description": "相机到近裁剪面距离",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "member",
@@ -84,6 +93,8 @@
 			"name": "opvalue",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "0=正交， 1=透视 中间值可以在两种相机间过度",
+			"version": "egret-gd3d 1.0",
 			"default": "1"
 		},
 		{
@@ -92,15 +103,9 @@
 			"name": "order",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "camera 渲染排序标记",
+			"version": "egret-gd3d 1.0",
 			"default": "0"
-		},
-		{
-			"kind": "member",
-			"type": "gd3d.framework.ICameraPostQueue[]",
-			"name": "postQueues",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance",
-			"default": "[]"
 		},
 		{
 			"kind": "member",
@@ -108,6 +113,8 @@
 			"name": "renderTarget",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "渲染目标",
+			"version": "egret-gd3d 1.0",
 			"default": "null"
 		},
 		{
@@ -116,6 +123,8 @@
 			"name": "size",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "正交投影的竖向size",
+			"version": "egret-gd3d 1.0",
 			"default": "2"
 		},
 		{
@@ -124,6 +133,8 @@
 			"name": "viewport",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "相机视窗",
+			"version": "egret-gd3d 1.0",
 			"default": "new gd3d.math.rect(0, 0, 1, 1)"
 		}
 	],
@@ -133,6 +144,8 @@
 			"name": "addOverLay",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "添加2d渲染组件",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "overLay",
@@ -146,6 +159,8 @@
 			"name": "addOverLayAt",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "添加2d渲染组件",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "overLay",
@@ -155,20 +170,7 @@
 				{
 					"name": "index",
 					"type": "number",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "calcCameraFrame",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "app",
-					"type": "gd3d.framework.application",
-					"description": ""
+					"description": "在overlays对应位置添加组件"
 				}
 			]
 		},
@@ -177,6 +179,8 @@
 			"name": "calcProjectMatrix",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "计算相机投影矩阵",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "asp",
@@ -186,7 +190,7 @@
 				{
 					"name": "matrix",
 					"type": "gd3d.math.matrix",
-					"description": ""
+					"description": "projectmatrix（投影矩阵）"
 				}
 			]
 		},
@@ -195,21 +199,23 @@
 			"name": "calcScreenPosFromWorldPos",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "由世界坐标得到屏幕坐标",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "app",
 					"type": "gd3d.framework.application",
-					"description": ""
+					"description": "主程序"
 				},
 				{
 					"name": "worldPos",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "世界坐标"
 				},
 				{
 					"name": "outScreenPos",
 					"type": "gd3d.math.vector2",
-					"description": ""
+					"description": "屏幕坐标"
 				}
 			]
 		},
@@ -218,11 +224,13 @@
 			"name": "calcViewMatrix",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "计算相机的viewmatrix（视矩阵）",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "matrix",
 					"type": "gd3d.math.matrix",
-					"description": ""
+					"description": "返回的视矩阵"
 				}
 			]
 		},
@@ -231,11 +239,13 @@
 			"name": "calcViewPortPixel",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "计算相机视口像素rect",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "app",
 					"type": "gd3d.framework.application",
-					"description": ""
+					"description": "主程序"
 				},
 				{
 					"name": "viewPortPixel",
@@ -249,11 +259,13 @@
 			"name": "calcWorldPosFromScreenPos",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "由屏幕坐标得到世界坐标",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "app",
 					"type": "gd3d.framework.application",
-					"description": ""
+					"description": "主程序"
 				},
 				{
 					"name": "screenPos",
@@ -263,15 +275,9 @@
 				{
 					"name": "outWorldPos",
 					"type": "gd3d.math.vector3",
-					"description": ""
+					"description": "世界坐标"
 				}
 			]
-		},
-		{
-			"kind": "function",
-			"name": "clone",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance"
 		},
 		{
 			"kind": "function",
@@ -279,30 +285,18 @@
 			"name": "creatRayByScreen",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "由屏幕坐标发射射线",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "screenpos",
 					"type": "gd3d.math.vector2",
-					"description": ""
+					"description": "屏幕坐标"
 				},
 				{
 					"name": "app",
 					"type": "gd3d.framework.application",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "fillRenderer",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance",
-			"description": "//检查可见的列表",
-			"params": [
-				{
-					"name": "scene",
-					"type": "gd3d.framework.scene",
-					"description": ""
+					"description": "主程序"
 				}
 			]
 		},
@@ -310,53 +304,17 @@
 			"kind": "function",
 			"name": "getOverLays",
 			"memberof": "gd3d.framework.camera",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "getPosAtXPanelInViewCoordinateByScreenPos",
-			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
-			"params": [
-				{
-					"name": "screenPos",
-					"type": "gd3d.math.vector2",
-					"description": ""
-				},
-				{
-					"name": "app",
-					"type": "gd3d.framework.application",
-					"description": ""
-				},
-				{
-					"name": "z",
-					"type": "number",
-					"description": ""
-				},
-				{
-					"name": "out",
-					"type": "gd3d.math.vector2",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
-			"name": "markDirty",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "remove",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance"
+			"description": "返回此相机上的overlays数组",
+			"version": "egret-gd3d 1.0"
 		},
 		{
 			"kind": "function",
 			"name": "removeOverLay",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance",
+			"description": "移除相机上的所有overly",
+			"version": "egret-gd3d 1.0",
 			"params": [
 				{
 					"name": "overLay",
@@ -367,45 +325,9 @@
 		},
 		{
 			"kind": "function",
-			"name": "renderScene",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "scene",
-					"type": "gd3d.framework.scene",
-					"description": ""
-				},
-				{
-					"name": "context",
-					"type": "gd3d.framework.renderContext",
-					"description": ""
-				}
-			]
-		},
-		{
-			"kind": "function",
 			"name": "start",
 			"memberof": "gd3d.framework.camera",
 			"scope": "instance"
-		},
-		{
-			"kind": "function",
-			"name": "testFrustumCulling",
-			"memberof": "gd3d.framework.camera",
-			"scope": "instance",
-			"params": [
-				{
-					"name": "scene",
-					"type": "gd3d.framework.scene",
-					"description": ""
-				},
-				{
-					"name": "node",
-					"type": "gd3d.framework.transform",
-					"description": ""
-				}
-			]
 		},
 		{
 			"kind": "function",
@@ -428,7 +350,8 @@
 		"name": "camera",
 		"memberof": "gd3d.framework",
 		"filename": "framework\\component\\camera.ts",
-		"description": "// }",
+		"description": "视锥剔除组件，作为标记存在",
+		"version": "egret-gd3d 1.0",
 		"implements": [
 			{
 				"name": "gd3d.framework.INodeComponent"

@@ -2,6 +2,13 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 按钮变换类型
+     * @version egret-gd3d 1.0
+     */
     export enum TransitionType
     {
         None,
@@ -9,11 +16,24 @@ namespace gd3d.framework
         SpriteSwap
     }
 
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 2d按钮组件
+     * @version egret-gd3d 1.0
+     */
     @reflect.node2DComponent
     export class button implements IRectRenderer
     {
-        //变换方式
         private _transition: TransitionType = TransitionType.ColorTint;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 按钮变换类型
+         * @version egret-gd3d 1.0
+         */
         @reflect.Field("number")
         get transition()
         {
@@ -35,10 +55,16 @@ namespace gd3d.framework
             }
         }
 
-        //图像
         private _originalColor: math.color;
         private _originalSprite: sprite;
         private _targetImage: image2D;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 默认显示图像
+         * @version egret-gd3d 1.0
+         */
         get targetImage()
         {
             return this._targetImage;
@@ -66,8 +92,14 @@ namespace gd3d.framework
             this._targetImage = graphic;
         }
 
-        //按下时要显示的sprite
         private _pressedSprite: sprite;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 按下时要显示的sprite
+         * @version egret-gd3d 1.0
+         */
         get pressedGraphic()
         {
             return this._pressedSprite;
@@ -77,8 +109,14 @@ namespace gd3d.framework
             this._pressedSprite = sprite;
         }
 
-        //正常的显示颜色
         private _normalColor: math.color = new math.color(1, 1, 1, 1);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 正常的显示颜色
+         * @version egret-gd3d 1.0
+         */
         @reflect.Field("color")
         get normalColor()
         {
@@ -93,8 +131,14 @@ namespace gd3d.framework
             }
         }
 
-        //按下后的颜色
         private _pressedColor: math.color = new math.color(0.5, 0.5, 0.5, 1);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 按下后的颜色
+         * @version egret-gd3d 1.0
+         */
         get pressedColor()
         {
             return this._pressedColor;
@@ -104,8 +148,14 @@ namespace gd3d.framework
             this._pressedColor = color;
         }
 
-        //颜色淡出持续时间
         private _fadeDuration: number = 0.1;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 颜色淡出持续时间
+         * @version egret-gd3d 1.0
+         */
         @reflect.Field("number")
         get fadeDuration()
         {
@@ -116,26 +166,42 @@ namespace gd3d.framework
             this._fadeDuration = duration;
         }
 
+        /**
+         * @private
+         */
         render(canvas: canvas)
         {
         }
+        /**
+         * @private
+         */
         updateTran()
         {
         }
-
+        /**
+         * @private
+         */
         start()
         {
         }
+        /**
+         * @private
+         */
         update(delta: number)
         {
             // math.colorLerp();
         }
         transform: transform2D;
-
+        /**
+         * @private
+         */
         remove()
         {
 
         }
+        /**
+         * @private
+         */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
         {
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
@@ -183,12 +249,21 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 点击事件
+         * @version egret-gd3d 1.0
+         */
         onClick: UIEvent = new UIEvent();
 
         private _downInThis = false;
         private _dragOut = false;
 
-
+        /**
+         * @private
+         */
         private showNormal()
         {
             if (this.transition == TransitionType.ColorTint)
@@ -201,6 +276,9 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @private
+         */
         private showPress()
         {
             if (this.transition == TransitionType.ColorTint)
@@ -216,6 +294,9 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @private
+         */
         private changeColor(targetColor: math.color): void
         {
             if (this._targetImage != null)
@@ -225,6 +306,9 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @private
+         */
         private changeSprite(sprite: sprite)
         {
             if(sprite == null) return;
