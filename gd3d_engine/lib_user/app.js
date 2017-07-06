@@ -2699,24 +2699,36 @@ var test_loadScene = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
-        this.cube = new gd3d.framework.transform();
-        this.scene.addChild(this.cube);
-        var names = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
-        var name = names[0];
+        var name = "Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    console.log(s.curtask + "/" + s.totaltask);
-                    console.log(s.progress);
+                _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
-                        var _root = _scene.getSceneRoot();
-                        _this.scene.addChild(_root);
-                        _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                        _root.markDirty();
-                        _this.app.getScene().lightmaps = [];
-                        _scene.useLightMap(_this.app.getScene());
-                        _scene.useFog(_this.app.getScene());
+                        var name = "Wing_11";
+                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                        _this.baihu = _prefab.getCloneTrans();
+                        _this.baihu.name = "chibang";
+                        _this.baihu.localTranslate.y = 50;
+                        _this.baihu.markDirty();
+                        _this.scene.addChild(_this.baihu);
+                        _this.camera.gameObject.transform.lookat(_this.baihu);
+                        _this.camera.gameObject.transform.markDirty();
+                        var name = "MainCity";
+                        _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            console.log(s.curtask + "/" + s.totaltask);
+                            console.log(s.progress);
+                            if (s.isfinish) {
+                                var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                                var _root = _scene.getSceneRoot();
+                                _root.name = "changjing";
+                                _this.scene.addChild(_root);
+                                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                                _root.markDirty();
+                                _this.app.getScene().lightmaps = [];
+                                _scene.useLightMap(_this.app.getScene());
+                                _scene.useFog(_this.app.getScene());
+                            }
+                        });
                     }
                 });
             }

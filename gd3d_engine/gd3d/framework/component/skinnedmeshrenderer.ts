@@ -376,6 +376,17 @@ namespace gd3d.framework
                 }
             }
 
+            if (this.materials != null && this.materials.length > 0)
+            {
+                let _mat = this.materials[0];
+                if (_mat)
+                {
+                    this.layer = _mat.getLayer();
+                    if (!this.issetq)
+                        this._queue = _mat.getQueue();
+                }
+            }
+            
             if (this.player != null)
             {
                 if (!this.player.mix)
@@ -399,16 +410,7 @@ namespace gd3d.framework
                 }
             }
 
-            if (this.materials != null && this.materials.length > 0)
-            {
-                let _mat = this.materials[0];
-                if (_mat)
-                {
-                    this.layer = _mat.getLayer();
-                    if (!this.issetq)
-                        this._queue = _mat.getQueue();
-                }
-            }
+
         }
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)

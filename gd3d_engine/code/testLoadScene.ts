@@ -8,68 +8,99 @@ class test_loadScene implements IState
         this.app = app;
         this.scene = this.app.getScene();
 
-        this.cube = new gd3d.framework.transform();
-        this.scene.addChild(this.cube);
-        let names: string[] = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
-        let name = names[0];
+        // let names: string[] = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        // let name = names[0];
+        // name="MainCity";
+        // this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        // {
+        //     if (state.isfinish)
+        //     {
+        //         this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+        //             // this.app.getAssetMgr().load("res/scenes/test/test.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+        //             (s) =>
+        //             {
+        //                 console.log(s.curtask + "/" + s.totaltask);
+        //                 console.log(s.progress);
+        //                 if (s.isfinish)
+        //                 {
+        //                     var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
+        //                     var _root = _scene.getSceneRoot();
+        //                     this.scene.addChild(_root);
+        //                     // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
+        //                     _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
+        //                     _root.markDirty();
+        //                     this.app.getScene().lightmaps = [];
+        //                     _scene.useLightMap(this.app.getScene());
+        //                     _scene.useFog(this.app.getScene());
+
+        //                     name="Wing_11";
+        //                     this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+        //                         (s) =>
+        //                         {
+        //                             if (s.isfinish)
+        //                             {
+        //                                 var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
+        //                                 this.baihu = _prefab.getCloneTrans();
+        //                                 this.baihu.localTranslate.y=50;
+        //                                 this.baihu.markDirty();
+        //                                 this.scene.addChild(this.baihu);
+        //                                 this.camera.gameObject.transform.lookat(this.baihu);
+        //                                 this.camera.gameObject.transform.markDirty();
+        //                             }
+        //                         });
+        //                 }
+        //             });
+
+        //     }
+        // });
+        var name="Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                    // this.app.getAssetMgr().load("res/scenes/test/test.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                     (s) =>
                     {
-                        console.log(s.curtask + "/" + s.totaltask);
-                        console.log(s.progress);
                         if (s.isfinish)
                         {
+                            var name="Wing_11";
+                            var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
+                            this.baihu = _prefab.getCloneTrans();
+                            this.baihu.name="chibang";
+                            this.baihu.localTranslate.y=50;
+                            this.baihu.markDirty();
+                            this.scene.addChild(this.baihu);
+                            this.camera.gameObject.transform.lookat(this.baihu);
+                            this.camera.gameObject.transform.markDirty();
 
-                            // this.app.getAssetMgr().loadScene("city.scene.json", () =>
-                            // {
-                            // this.app.getAssetMgr().load("res/particleEffect/fx_shuijing_cj/fx_shuijing_cj.effect.json", gd3d.framework.AssetTypeEnum.Effect, (state) =>
-                            // {
-                            //     if (state.isfinish)
-                            //     {
-                            //         // var effect = state.resstate["start.effect.json"].res as gd3d.framework.Effect;
-                            //         var effect = this.app.getAssetMgr().getAssetByName("fx_shuijing_cj.effect.json") as gd3d.framework.Effect;
-                            //         let trans = effect.clonetotran(this.camera);
-                            //         trans.localScale = new gd3d.math.vector3(1.5, 1.5, 1.5);
-                            //         trans.localTranslate = new gd3d.math.vector3(-13.72, -1.147, -26.23);
-                            //         this.scene.getChildByName("10004a_gemstone01").addChild(trans);
-                            //         trans.markDirty();
-                            //     }
-                            // });
+                            var name="MainCity";
+                            this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                                (s) =>
+                                {
+                                    console.log(s.curtask + "/" + s.totaltask);
+                                    console.log(s.progress);
+                                    if (s.isfinish)
+                                    {
+                                        var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
+                                        var _root = _scene.getSceneRoot();
+                                        _root.name="changjing";
+                                        this.scene.addChild(_root);
+                                        // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
+                                        _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
+                                        _root.markDirty();
+                                        this.app.getScene().lightmaps = [];
+                                        _scene.useLightMap(this.app.getScene());
+                                        _scene.useFog(this.app.getScene());
 
-                            var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
-                            var _root = _scene.getSceneRoot();
-                            this.scene.addChild(_root);
-                            // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
-                            _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
-                            _root.markDirty();
-                            this.app.getScene().lightmaps = [];
-                            _scene.useLightMap(this.app.getScene());
-                            _scene.useFog(this.app.getScene());
 
-                            // name="Wing_11";
-                            // this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                            //     (s) =>
-                            //     {
-                            //         if (s.isfinish)
-                            //         {
-                            //             var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
-                            //             this.baihu = _prefab.getCloneTrans();
-                            //             this.scene.addChild(this.baihu);
-                            //             this.camera.gameObject.transform.lookat(this.baihu);
-                            //         }
-                            //     });
+                                    }
+                                });
                         }
                     });
 
+
             }
         });
-        
-
         //添加一个摄像机
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
@@ -87,6 +118,7 @@ class test_loadScene implements IState
 
         // CameraController.instance().init(this.app, this.camera);
     }
+
     baihu:gd3d.framework.transform;
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;

@@ -9677,6 +9677,14 @@ var gd3d;
                         this._efficient = true;
                     }
                 }
+                if (this.materials != null && this.materials.length > 0) {
+                    var _mat = this.materials[0];
+                    if (_mat) {
+                        this.layer = _mat.getLayer();
+                        if (!this.issetq)
+                            this._queue = _mat.getQueue();
+                    }
+                }
                 if (this.player != null) {
                     if (!this.player.mix) {
                         var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
@@ -9692,14 +9700,6 @@ var gd3d;
                     this.cacheData = null;
                     if (this._skeletonMatrixData != null) {
                         this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
-                    }
-                }
-                if (this.materials != null && this.materials.length > 0) {
-                    var _mat = this.materials[0];
-                    if (_mat) {
-                        this.layer = _mat.getLayer();
-                        if (!this.issetq)
-                            this._queue = _mat.getQueue();
                     }
                 }
             };
