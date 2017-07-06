@@ -5,5 +5,5 @@ varying highp vec2 xlv_TEXCOORD0;
 void main() 
 {
     lowp vec4 tmpvar_3 = xlv_COLOR*_TintColor*texture2D(_MainTex, xlv_TEXCOORD0);
-    gl_FragData[0] = 2.0*tmpvar_3;
+    gl_FragData[0] = 4.0*tmpvar_3;
 }
