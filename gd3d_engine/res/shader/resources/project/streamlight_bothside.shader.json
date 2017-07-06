@@ -32,7 +32,7 @@
                 "fs": "streamlight"
             }
         ],
-        "fog_skin": [
+        "skin_fog": [
             {
                 "showface": "all",
                 "vs": "fog_streamlightbone_eff",
