@@ -50,6 +50,10 @@ namespace gd3d.framework
         public dataForVbo: Float32Array; //自己维护一个顶点数据的数组
         public dataForEbo: Uint16Array;
 
+        //在emission是在simulate in world space 时候,将发射器的这个矩阵保存起来,为静态的
+        //在emission是在simulate in local space 时候，为动态的
+        private emissionMatToWorld:gd3d.math.matrix;
+        private emissionWorldRotation:gd3d.math.quaternion;
         //根据发射器定义 初始化
         constructor(batcher: EmissionBatcher)//, _data: EmissionNew, startIndex: number, format: number
         {
@@ -69,6 +73,7 @@ namespace gd3d.framework
             this.sourceVbo = this.data.getVboData(this.format);
 
             this.initByData();
+
 
             //计算得出初始vbo ebo
         }
@@ -142,15 +147,19 @@ namespace gd3d.framework
                     gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
                     gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
                     gd3d.math.quatClone(this.rotationByShape,this.localRotation);
-                    //gd3d.math.quatMultiply(initRot, this.rotationByShape, this.rotationByShape);
                     
                     gd3d.math.pool.delete_quaternion(initRot);
                 }
             }
-            // if (this.data.uvType == UVTypeEnum.UVSprite)
-            // {
-            //     this.uvSpriteFrameInternal = 1.0 / this.data.uvSprite.totalCount;
-            // }
+            if(!this.emisson.simulateInLocalSpace)
+            {
+                this.emissionMatToWorld=new gd3d.math.matrix();
+                var mat=this.emisson.getmatrixToWorld();
+                gd3d.math.matrixClone(mat,this.emissionMatToWorld);
+                this.emissionWorldRotation=new gd3d.math.quaternion();
+                var quat=this.emisson.getWorldRotation();
+                gd3d.math.quatClone(quat,this.emissionWorldRotation);
+            }
         }
         actived:boolean=true;
         update(delta: number)
@@ -160,7 +169,7 @@ namespace gd3d.framework
             if (this.curLife >= this.totalLife)
             {
                 //矩阵置零
-                gd3d.math.matrixZero(this.matToBatcher);
+                gd3d.math.matrixZero(this.transformVertex);
                 this._updateVBO();
                 this.emisson.deadParticles.push(this);
                 this.curLife=0;
@@ -177,41 +186,60 @@ namespace gd3d.framework
             this._updateUV(delta);
             this._updateVBO();
         }
-        private matToBatcher:gd3d.math.matrix=new gd3d.math.matrix();
+        /**
+         * 在emission是在simulate in local space 时候，为matTobathcer
+         * 在emission是在simulate in world space 时候，为matToWorld
+         */
+        private transformVertex:gd3d.math.matrix=new gd3d.math.matrix();
         private _updateLocalMatrix(delta: number)
         {
             gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-            gd3d.math.matrixMultiply(this.emisson.matToBatcher,this.localMatrix,this.matToBatcher);
+            if(this.emisson.simulateInLocalSpace)
+            {
+                gd3d.math.matrixMultiply(this.emisson.matToBatcher,this.localMatrix,this.transformVertex);
+            }
+            else
+            {
+                gd3d.math.matrixMultiply(this.emissionMatToWorld,this.localMatrix,this.transformVertex);
+            }
+            
+        }
+
+        private matToworld:gd3d.math.matrix=new gd3d.math.matrix();
+        private refreshEmissionData()
+        {
+            if(this.emisson.simulateInLocalSpace)
+            {
+                this.emissionMatToWorld=this.emisson.getmatrixToWorld();
+                this.emissionWorldRotation=this.emisson.getWorldRotation();
+            }
         }
 
         private _updateRotation(delta: number)
         {
-            
             this._updateElementRotation();
         }
         
-        private matToworld:gd3d.math.matrix=new gd3d.math.matrix();
+
         private _updateElementRotation()
         {
-
-            var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
-            let cameraTransform = cam.gameObject.transform;
-            let translation = gd3d.math.pool.new_vector3();
-            let worldRotation = gd3d.math.pool.new_quaternion();
-            let worldTranslation = gd3d.math.pool.new_vector3();
-            let invTransformRotation = gd3d.math.pool.new_quaternion();
-
-            gd3d.math.vec3Clone(this.localTranslate, translation);
-            //this.matToworld=this.emisson.getmatrixToWorld();
-
-            gd3d.math.matrixTransformVector3(translation, this.emisson.getmatrixToWorld(), worldTranslation);
-
             if (this.renderModel != RenderModel.Mesh)
             {
+                this.refreshEmissionData();
 
+                let translation = gd3d.math.pool.new_vector3();
+                let worldTranslation = gd3d.math.pool.new_vector3();
+                let worldRotation = gd3d.math.pool.new_quaternion();
+                let invTransformRotation = gd3d.math.pool.new_quaternion();
+
+                gd3d.math.vec3Clone(this.localTranslate, translation);
+                var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                var camPosInWorld=cam.gameObject.transform.getWorldTranslate();
+
+                gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
                 if (this.renderModel == RenderModel.BillBoard)
                 {
-                    gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    gd3d.math.quatLookat(worldTranslation, camPosInWorld, worldRotation);
                 }
                 else if (this.renderModel == RenderModel.HorizontalBillBoard)
                 {
@@ -223,7 +251,7 @@ namespace gd3d.framework
                 else if (this.renderModel == RenderModel.VerticalBillBoard)
                 {
                     let forwardTarget = gd3d.math.pool.new_vector3();
-                    gd3d.math.vec3Clone(cameraTransform.getWorldTranslate(), forwardTarget);
+                    gd3d.math.vec3Clone(camPosInWorld, forwardTarget);
                     forwardTarget.y = worldTranslation.y;
                     gd3d.math.quatLookat(worldTranslation, forwardTarget, worldRotation);
                     gd3d.math.pool.delete_vector3(forwardTarget);
@@ -232,10 +260,10 @@ namespace gd3d.framework
                 else if (this.renderModel == RenderModel.StretchedBillBoard)
                 {
                     gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-                    gd3d.math.matrixMultiply(this.emisson.getmatrixToWorld(),this.localMatrix,this.matToworld);
+                    gd3d.math.matrixMultiply(this.emissionMatToWorld,this.localMatrix,this.matToworld);
                     //-------------------------------------------------------------------------------
                     // gd3d.math.quatClone(this.rotationByShape, this.localRotation);
-                    // gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    // gd3d.math.quatLookat(worldTranslation, camPosInWorld, worldRotation);
                     // let lookRot = new gd3d.math.quaternion();
                     // gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
                     // gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
@@ -260,7 +288,7 @@ namespace gd3d.framework
                     gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward,this.matToworld,zaxis);
                     gd3d.math.vec3Normalize(zaxis,zaxis);
                     
-                    EffectUtil.lookatbyXAxis(worldTranslation,xaxis,yaxis,zaxis,cameraTransform.getWorldTranslate(),worldRotation);
+                    EffectUtil.lookatbyXAxis(worldTranslation,xaxis,yaxis,zaxis,camPosInWorld,worldRotation);
                     gd3d.math.quatMultiply(this.localRotation,worldRotation,this.localRotation);
                     
 
@@ -275,19 +303,21 @@ namespace gd3d.framework
                 }
                 
                 //消除transform组件对粒子本身的影响
-                gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
+                gd3d.math.quatClone(this.emissionWorldRotation, invTransformRotation);
                 gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                 gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
                 
                 gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);//eulerrot有的不是必要的，todo
+
+                gd3d.math.pool.delete_vector3(translation);
+                gd3d.math.pool.delete_vector3(worldTranslation);
+                gd3d.math.pool.delete_quaternion(worldRotation);
+                gd3d.math.pool.delete_quaternion(invTransformRotation);
             } else
             {
                 gd3d.math.quatClone(this.rotationByEuler,this.localRotation);
             }
-            gd3d.math.pool.delete_vector3(translation);
-            gd3d.math.pool.delete_quaternion(worldRotation);
-            gd3d.math.pool.delete_vector3(worldTranslation);
-            gd3d.math.pool.delete_quaternion(invTransformRotation);
+
 
         }
         private _updatePos(delta: number)
@@ -511,7 +541,7 @@ namespace gd3d.framework
                     vertex.y = this.sourceVbo[i * vertexSize + 1];
                     vertex.z = this.sourceVbo[i * vertexSize + 2];
 
-                    gd3d.math.matrixTransformVector3(vertex, this.matToBatcher, vertex); 
+                    gd3d.math.matrixTransformVector3(vertex, this.transformVertex, vertex); 
 
                     this.dataForVbo[i * vertexSize + 0] = vertex.x;
                     this.dataForVbo[i * vertexSize + 1] = vertex.y;

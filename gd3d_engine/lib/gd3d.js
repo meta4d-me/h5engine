@@ -14858,9 +14858,7 @@ var gd3d;
     (function (framework) {
         var Emission = (function () {
             function Emission() {
-                this.beLoop = false;
-                this.paricleLoop = false;
-                this.singleMeshLoop = false;
+                this.simulateInLocalSpace = true;
                 this.renderModel = framework.RenderModel.None;
                 this.particleStartData = new gd3d.framework.ParticleStartData();
             }
@@ -14874,6 +14872,7 @@ var gd3d;
                 var emission = new Emission();
                 if (this.emissionType != undefined)
                     emission.emissionType = this.emissionType;
+                emission.simulateInLocalSpace = this.simulateInLocalSpace;
                 if (this.rootpos != undefined) {
                     emission.rootpos = gd3d.math.pool.clone_vector3(this.rootpos);
                 }
@@ -14891,7 +14890,6 @@ var gd3d;
                     emission.time = this.time;
                 if (this.pos != undefined)
                     emission.pos = this.pos.clone();
-                emission.beLoop = this.beLoop;
                 if (this.simulationSpeed != undefined) {
                     emission.simulationSpeed = this.simulationSpeed.clone();
                 }
@@ -16136,6 +16134,9 @@ var gd3d;
                                     data.emissionType = framework.ParticleEmissionType.continue;
                                     break;
                             }
+                            if (_data["simulateinlocal"] != undefined) {
+                                data.simulateInLocalSpace = _data["simulateinlocal"];
+                            }
                             if (_data["maxcount"] != undefined)
                                 data.maxEmissionCount = _data["maxcount"];
                             if (_data["emissioncount"] != undefined)
@@ -16834,7 +16835,7 @@ var gd3d;
                 this.tilling = new gd3d.math.vector2(1, 1);
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
                 this.actived = true;
-                this.matToBatcher = new gd3d.math.matrix();
+                this.transformVertex = new gd3d.math.matrix();
                 this.matToworld = new gd3d.math.matrix();
                 this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
                 this.gameObject = batcher.effectSys.gameObject;
@@ -16907,13 +16908,21 @@ var gd3d;
                         gd3d.math.pool.delete_quaternion(initRot);
                     }
                 }
+                if (!this.emisson.simulateInLocalSpace) {
+                    this.emissionMatToWorld = new gd3d.math.matrix();
+                    var mat = this.emisson.getmatrixToWorld();
+                    gd3d.math.matrixClone(mat, this.emissionMatToWorld);
+                    this.emissionWorldRotation = new gd3d.math.quaternion();
+                    var quat = this.emisson.getWorldRotation();
+                    gd3d.math.quatClone(quat, this.emissionWorldRotation);
+                }
             };
             Particle.prototype.update = function (delta) {
                 if (!this.actived)
                     return;
                 this.curLife += delta;
                 if (this.curLife >= this.totalLife) {
-                    gd3d.math.matrixZero(this.matToBatcher);
+                    gd3d.math.matrixZero(this.transformVertex);
                     this._updateVBO();
                     this.emisson.deadParticles.push(this);
                     this.curLife = 0;
@@ -16932,23 +16941,35 @@ var gd3d;
             };
             Particle.prototype._updateLocalMatrix = function (delta) {
                 gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-                gd3d.math.matrixMultiply(this.emisson.matToBatcher, this.localMatrix, this.matToBatcher);
+                if (this.emisson.simulateInLocalSpace) {
+                    gd3d.math.matrixMultiply(this.emisson.matToBatcher, this.localMatrix, this.transformVertex);
+                }
+                else {
+                    gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
+                }
+            };
+            Particle.prototype.refreshEmissionData = function () {
+                if (this.emisson.simulateInLocalSpace) {
+                    this.emissionMatToWorld = this.emisson.getmatrixToWorld();
+                    this.emissionWorldRotation = this.emisson.getWorldRotation();
+                }
             };
             Particle.prototype._updateRotation = function (delta) {
                 this._updateElementRotation();
             };
             Particle.prototype._updateElementRotation = function () {
-                var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
-                var cameraTransform = cam.gameObject.transform;
-                var translation = gd3d.math.pool.new_vector3();
-                var worldRotation = gd3d.math.pool.new_quaternion();
-                var worldTranslation = gd3d.math.pool.new_vector3();
-                var invTransformRotation = gd3d.math.pool.new_quaternion();
-                gd3d.math.vec3Clone(this.localTranslate, translation);
-                gd3d.math.matrixTransformVector3(translation, this.emisson.getmatrixToWorld(), worldTranslation);
                 if (this.renderModel != framework.RenderModel.Mesh) {
+                    this.refreshEmissionData();
+                    var translation = gd3d.math.pool.new_vector3();
+                    var worldTranslation = gd3d.math.pool.new_vector3();
+                    var worldRotation = gd3d.math.pool.new_quaternion();
+                    var invTransformRotation = gd3d.math.pool.new_quaternion();
+                    gd3d.math.vec3Clone(this.localTranslate, translation);
+                    var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                    var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
+                    gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
                     if (this.renderModel == framework.RenderModel.BillBoard) {
-                        gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                        gd3d.math.quatLookat(worldTranslation, camPosInWorld, worldRotation);
                     }
                     else if (this.renderModel == framework.RenderModel.HorizontalBillBoard) {
                         worldRotation.x = -0.5;
@@ -16958,14 +16979,14 @@ var gd3d;
                     }
                     else if (this.renderModel == framework.RenderModel.VerticalBillBoard) {
                         var forwardTarget = gd3d.math.pool.new_vector3();
-                        gd3d.math.vec3Clone(cameraTransform.getWorldTranslate(), forwardTarget);
+                        gd3d.math.vec3Clone(camPosInWorld, forwardTarget);
                         forwardTarget.y = worldTranslation.y;
                         gd3d.math.quatLookat(worldTranslation, forwardTarget, worldRotation);
                         gd3d.math.pool.delete_vector3(forwardTarget);
                     }
                     else if (this.renderModel == framework.RenderModel.StretchedBillBoard) {
                         gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-                        gd3d.math.matrixMultiply(this.emisson.getmatrixToWorld(), this.localMatrix, this.matToworld);
+                        gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.matToworld);
                         var xaxis = gd3d.math.pool.new_vector3();
                         var yaxis = gd3d.math.pool.new_vector3();
                         var zaxis = gd3d.math.pool.new_vector3();
@@ -16975,7 +16996,7 @@ var gd3d;
                         gd3d.math.vec3Normalize(yaxis, yaxis);
                         gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
                         gd3d.math.vec3Normalize(zaxis, zaxis);
-                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, cameraTransform.getWorldTranslate(), worldRotation);
+                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, camPosInWorld, worldRotation);
                         gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
                         gd3d.math.pool.delete_quaternion(worldRotation);
                         gd3d.math.pool.delete_vector3(translation);
@@ -16985,18 +17006,18 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(zaxis);
                         return;
                     }
-                    gd3d.math.quatClone(this.emisson.getWorldRotation(), invTransformRotation);
+                    gd3d.math.quatClone(this.emissionWorldRotation, invTransformRotation);
                     gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
                     gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
                     gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
+                    gd3d.math.pool.delete_vector3(translation);
+                    gd3d.math.pool.delete_vector3(worldTranslation);
+                    gd3d.math.pool.delete_quaternion(worldRotation);
+                    gd3d.math.pool.delete_quaternion(invTransformRotation);
                 }
                 else {
                     gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
                 }
-                gd3d.math.pool.delete_vector3(translation);
-                gd3d.math.pool.delete_quaternion(worldRotation);
-                gd3d.math.pool.delete_vector3(worldTranslation);
-                gd3d.math.pool.delete_quaternion(invTransformRotation);
             };
             Particle.prototype._updatePos = function (delta) {
                 if (this.data.moveSpeed != undefined) {
@@ -17161,7 +17182,7 @@ var gd3d;
                         vertex.x = this.sourceVbo[i * vertexSize + 0];
                         vertex.y = this.sourceVbo[i * vertexSize + 1];
                         vertex.z = this.sourceVbo[i * vertexSize + 2];
-                        gd3d.math.matrixTransformVector3(vertex, this.matToBatcher, vertex);
+                        gd3d.math.matrixTransformVector3(vertex, this.transformVertex, vertex);
                         this.dataForVbo[i * vertexSize + 0] = vertex.x;
                         this.dataForVbo[i * vertexSize + 1] = vertex.y;
                         this.dataForVbo[i * vertexSize + 2] = vertex.z;
@@ -17264,6 +17285,7 @@ var gd3d;
         var EmissionElement = (function () {
             function EmissionElement(_emission, sys) {
                 this.beloop = false;
+                this.simulateInLocalSpace = true;
                 this.active = true;
                 this.isover = false;
                 this.maxVertexCount = 2048;
@@ -17286,6 +17308,7 @@ var gd3d;
                         this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
                         break;
                 }
+                this.simulateInLocalSpace = this.emission.simulateInLocalSpace;
                 this.curTime = 0;
                 this.numcount = 0;
                 this.beloop = _emission.beloop;
@@ -17385,6 +17408,12 @@ var gd3d;
                 this.curbatcher = batcher;
             };
             EmissionElement.prototype.render = function (context, assetmgr, camera) {
+                if (this.simulateInLocalSpace) {
+                    context.updateModel(this.gameObject.transform);
+                }
+                else {
+                    context.updateModeTrail();
+                }
                 for (var key in this.emissionBatchers) {
                     this.emissionBatchers[key].render(context, assetmgr, camera);
                 }

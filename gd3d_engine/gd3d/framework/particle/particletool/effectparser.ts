@@ -257,6 +257,10 @@ namespace gd3d.framework
                         //         data.beLoop=true;
                         //     }
                         // }
+                        if(_data["simulateinlocal"]!=undefined)
+                        {
+                            data.simulateInLocalSpace=_data["simulateinlocal"];
+                        }
 
                         if (_data["maxcount"] != undefined)
                             data.maxEmissionCount = <number>_data["maxcount"];

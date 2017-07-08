@@ -2212,10 +2212,8 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Emission {
-        beLoop: boolean;
-        paricleLoop: boolean;
-        singleMeshLoop: boolean;
         emissionType: ParticleEmissionType;
+        simulateInLocalSpace: boolean;
         rootpos: gd3d.math.vector3;
         rootRotAngle: gd3d.math.vector3;
         rootScale: gd3d.math.vector3;
@@ -2606,15 +2604,18 @@ declare namespace gd3d.framework {
         vertexStartIndex: number;
         dataForVbo: Float32Array;
         dataForEbo: Uint16Array;
+        private emissionMatToWorld;
+        private emissionWorldRotation;
         constructor(batcher: EmissionBatcher);
         uploadData(array: Float32Array): void;
         initByData(): void;
         actived: boolean;
         update(delta: number): void;
-        private matToBatcher;
+        private transformVertex;
         private _updateLocalMatrix(delta);
-        private _updateRotation(delta);
         private matToworld;
+        private refreshEmissionData();
+        private _updateRotation(delta);
         private _updateElementRotation();
         private _updatePos(delta);
         private _updateEuler(delta);
@@ -2663,6 +2664,7 @@ declare namespace gd3d.framework {
         private curbatcher;
         deadParticles: Particle[];
         private beloop;
+        simulateInLocalSpace: boolean;
         active: boolean;
         emission: Emission;
         private vf;

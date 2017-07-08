@@ -5,14 +5,12 @@ namespace gd3d.framework
      */
     export class Emission
     {
-        beLoop: boolean = false;
-
-        paricleLoop:boolean=false;
-        singleMeshLoop:boolean=false;
         /**
          * 发射器类型
          */
         emissionType: ParticleEmissionType;
+
+        simulateInLocalSpace:boolean=true;
 
         rootpos:gd3d.math.vector3;
         rootRotAngle:gd3d.math.vector3;
@@ -149,7 +147,7 @@ namespace gd3d.framework
             let emission = new Emission();
             if (this.emissionType != undefined)
                 emission.emissionType = this.emissionType;
-
+            emission.simulateInLocalSpace=this.simulateInLocalSpace;
             if(this.rootpos!=undefined)
             {
                 emission.rootpos=gd3d.math.pool.clone_vector3(this.rootpos);
@@ -170,9 +168,7 @@ namespace gd3d.framework
                 emission.time = this.time;
             if (this.pos != undefined)
                 emission.pos = this.pos.clone();
-            emission.beLoop = this.beLoop;
-            // if (this.shape != undefined)
-            //     emission.shape = this.shape;
+
             if (this.simulationSpeed != undefined)
             {
                 emission.simulationSpeed = this.simulationSpeed.clone();

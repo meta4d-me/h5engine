@@ -58,6 +58,7 @@ namespace gd3d.framework
         public deadParticles:Particle[];
 
         private beloop:boolean=false;
+        public simulateInLocalSpace:boolean=true;//粒子运动运动空间（世界还是本地）
         public active: boolean = true;//激活状态
 
         public emission: Emission;//原始数据，不能被改变
@@ -93,6 +94,7 @@ namespace gd3d.framework
                     this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
                     break;
             }
+            this.simulateInLocalSpace=this.emission.simulateInLocalSpace;
             this.curTime = 0;
             this.numcount = 0;
             this.beloop=_emission.beloop;
@@ -128,6 +130,23 @@ namespace gd3d.framework
             gd3d.math.matrixMultiply(mat,this.matToBatcher,this.matToWorld);
             return this.matToWorld;
         }
+
+        // /**
+        //  * 粒子得到变换顶点的matrix
+        //  * @param particle 
+        //  * @param out 
+        //  */
+        // public getTransformVertexMatrix(particle:Particle,out:gd3d.math.matrix)
+        // {
+        //     if(this.simulateInLocalSpace)
+        //     {
+        //         gd3d.math.matrixMultiply(this.matToBatcher,particle.localMatrix,out);
+        //     }
+        //     else
+        //     {
+        //         gd3d.math.matrixMultiply(this);
+        //     }
+        // }
 
         public update(delta: number)
         {
@@ -229,6 +248,14 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
+            if(this.simulateInLocalSpace)
+            {
+               context.updateModel(this.gameObject.transform); 
+            }
+            else
+            {
+                context.updateModeTrail();
+            }
             for (let key in this.emissionBatchers)
             {
                 this.emissionBatchers[key].render(context, assetmgr, camera);
