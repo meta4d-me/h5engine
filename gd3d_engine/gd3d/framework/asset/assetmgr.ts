@@ -1650,7 +1650,8 @@ namespace gd3d.framework
         {
             if (this.curloadinfo != null)
             {
-                if (!this.curloadinfo.state.isfinish)
+                //没完成且没有出错再返回 出错直接过掉
+                if (!this.curloadinfo.state.isfinish && !this.curloadinfo.state.iserror)
                     return;
                 else
                 {
