@@ -175,10 +175,10 @@ namespace gd3d.framework
                     for (var i = 0; i < vcount; i++)
                     {
                         var _color = new gd3d.math.color();
-                        _color.a = read.readUInt8();
-                        _color.r = read.readUInt8();
-                        _color.g = read.readUInt8();
-                        _color.b = read.readUInt8();
+                        _color.a =math.floatClamp(read.readUInt8()/255,0,1.0);
+                        _color.r = math.floatClamp(read.readUInt8()/255,0,1.0);
+                        _color.g = math.floatClamp(read.readUInt8()/255,0,1.0);
+                        _color.b = math.floatClamp(read.readUInt8()/255,0,1.0);
                         data.color.push(_color);
                     }
                 }

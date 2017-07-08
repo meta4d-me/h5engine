@@ -6349,10 +6349,10 @@ var gd3d;
                         }
                         for (var i = 0; i < vcount; i++) {
                             var _color = new gd3d.math.color();
-                            _color.a = read.readUInt8();
-                            _color.r = read.readUInt8();
-                            _color.g = read.readUInt8();
-                            _color.b = read.readUInt8();
+                            _color.a = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                            _color.r = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                            _color.g = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                            _color.b = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
                             data.color.push(_color);
                         }
                     }
@@ -8745,7 +8745,7 @@ var gd3d;
                             b = curAttrsData.color.z;
                         }
                         if (curAttrsData.alpha != undefined)
-                            a = curAttrsData.alpha;
+                            a = a * curAttrsData.alpha;
                         if (curAttrsData.colorRate != undefined) {
                             r *= curAttrsData.colorRate;
                             g *= curAttrsData.colorRate;

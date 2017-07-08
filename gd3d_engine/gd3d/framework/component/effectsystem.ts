@@ -339,7 +339,7 @@ namespace gd3d.framework
                         b = curAttrsData.color.z;
                     }
                     if (curAttrsData.alpha != undefined)
-                        a = curAttrsData.alpha;//配置的alpha作为整体的百分比使用 源alpha依然是具体顶点的
+                        a =a*curAttrsData.alpha;//配置的alpha作为整体的百分比使用 源alpha依然是具体顶点的
                     if (curAttrsData.colorRate != undefined)
                     {
                         r *= curAttrsData.colorRate;
