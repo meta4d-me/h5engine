@@ -4455,7 +4455,7 @@ var gd3d;
             assetMgr.prototype.loadByQueue = function () {
                 var _this = this;
                 if (this.curloadinfo != null) {
-                    if (!this.curloadinfo.state.isfinish)
+                    if (!this.curloadinfo.state.isfinish && !this.curloadinfo.state.iserror)
                         return;
                     else {
                         this.curloadinfo = null;
