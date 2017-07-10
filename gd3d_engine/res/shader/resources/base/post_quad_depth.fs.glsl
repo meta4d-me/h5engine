@@ -1,4 +1,8 @@
-precision mediump float;
+#ifdef GL_FRAGMENT_PRECISION_HIGH  
+precision highp float;  
+#else  
+precision mediump float;  
+#endif 
 varying highp vec2 xlv_TEXCOORD0;       
 uniform sampler2D _DepthTex;   
 uniform sampler2D _MainTex;  

@@ -242,11 +242,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
+    main = __decorate([
+        gd3d.reflect.userCode
+    ], main);
     return main;
 }());
-main = __decorate([
-    gd3d.reflect.userCode
-], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -723,11 +723,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
+    CameraShock = __decorate([
+        gd3d.reflect.nodeComponent
+    ], CameraShock);
     return CameraShock;
 }());
-CameraShock = __decorate([
-    gd3d.reflect.nodeComponent
-], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -2230,9 +2230,8 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_ss_female@attack_04", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        var names = ["fx_ss_female@attack_04-", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         var name = names[0];
-        name = "1fx_zs_male@attack_01";
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
@@ -5779,11 +5778,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
+    testUserCodeUpdate = __decorate([
+        gd3d.reflect.userCode
+    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
-testUserCodeUpdate = __decorate([
-    gd3d.reflect.userCode
-], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {

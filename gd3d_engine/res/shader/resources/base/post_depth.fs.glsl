@@ -1,4 +1,8 @@
-precision highp float;
+#ifdef GL_FRAGMENT_PRECISION_HIGH  
+precision highp float;  
+#else  
+precision mediump float;  
+#endif 
 //varying highp vec3 xlv_Normal;   
 
 const float PackUpscale = 256. / 255.; 
