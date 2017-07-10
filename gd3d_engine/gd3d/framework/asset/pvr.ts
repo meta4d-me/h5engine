@@ -6,8 +6,8 @@ class PvrParse
     private pixelFormatL = 0;
     private colourSpace = 0;
     private channelType = 0;
-    private height = 1;
-    private width = 1;
+    public height = 1;
+    public width = 1;
     private depth = 1;
     private numSurfaces = 1;
     private numFaces = 1;
@@ -139,18 +139,20 @@ class PvrParse
             }
         }
         var offset = 0;
+        let _width:number = this.width;
+        let _height:number = this.height;
         for (var i = 0; i < this.mipMapCount; ++i)
         {
-            var levelSize = textureLevelSize(textureFormat, this.width, this.height);
+            var levelSize = textureLevelSize(textureFormat, _width, _height);
             let data = tool.readBytes(levelSize);
-            this.gl.compressedTexImage2D(this.gl.TEXTURE_2D, i, textureFormat, this.width, this.height, 0, data);
+            this.gl.compressedTexImage2D(this.gl.TEXTURE_2D, i, textureFormat, _width, _height, 0, data);
 
-            this.width = this.width >> 1;
-            if (this.width < 1)
-                this.width = 1;
-            this.height = this.height >> 1;
-            if (this.height < 1)
-                this.height = 1;
+            _width = _width >> 1;
+            if (_width < 1)
+                _width = 1;
+            _height = _height >> 1;
+            if (_height < 1)
+                _height = 1;
             offset += levelSize;
         }
         if (this.mipMapCount > 1)

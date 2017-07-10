@@ -716,8 +716,8 @@ declare class PvrParse {
     private pixelFormatL;
     private colourSpace;
     private channelType;
-    private height;
-    private width;
+    height: number;
+    width: number;
     private depth;
     private numSurfaces;
     private numFaces;
