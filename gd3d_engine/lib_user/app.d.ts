@@ -281,6 +281,7 @@ declare namespace t {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         renderer: gd3d.framework.meshRenderer;
+        skinrender: gd3d.framework.skinnedMeshRenderer;
         objCam: gd3d.framework.transform;
         start(app: gd3d.framework.application): void;
         private changeShader();

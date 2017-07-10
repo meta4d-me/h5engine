@@ -242,11 +242,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
-    main = __decorate([
-        gd3d.reflect.userCode
-    ], main);
     return main;
 }());
+main = __decorate([
+    gd3d.reflect.userCode
+], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -723,11 +723,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
-    CameraShock = __decorate([
-        gd3d.reflect.nodeComponent
-    ], CameraShock);
     return CameraShock;
 }());
+CameraShock = __decorate([
+    gd3d.reflect.nodeComponent
+], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -1970,48 +1970,16 @@ var t;
             this.changeShader();
             this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
                 if (state.isfinish) {
-                    _this.app.getAssetMgr().load("res/prefabs/baihu/resources/res_baihu_baihu.FBX_baihu.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    var prefabname = "0123_limingshibing";
+                    _this.app.getAssetMgr().load("res/prefabs/0123_limingshibing/0123_limingshibing.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                         if (s.isfinish) {
-                            var smesh1 = _this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin");
-                            var mesh1 = baihu.gameObject.addComponent("meshFilter");
-                            mesh1.mesh = (smesh1);
-                            _this.renderer = baihu.gameObject.addComponent("meshRenderer");
-                            var collider = baihu.gameObject.addComponent("boxcollider");
-                            baihu.markDirty();
-                            var sh = _this.app.getAssetMgr().getShader("diffuse.shader.json");
-                            _this.renderer.materials = [];
-                            _this.renderer.materials.push(new gd3d.framework.material());
-                            _this.renderer.materials.push(new gd3d.framework.material());
-                            _this.renderer.materials.push(new gd3d.framework.material());
-                            _this.renderer.materials.push(new gd3d.framework.material());
-                            _this.renderer.materials[0].setShader(sh);
-                            _this.renderer.materials[1].setShader(sh);
-                            _this.renderer.materials[2].setShader(sh);
-                            _this.renderer.materials[3].setShader(sh);
-                            _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihu.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
-                                if (s2.isfinish) {
-                                    var texture = _this.app.getAssetMgr().getAssetByName("baihu.imgdesc.json");
-                                    _this.renderer.materials[0].setTexture("_MainTex", texture);
-                                }
-                            });
-                            _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihuan.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
-                                if (s2.isfinish) {
-                                    var texture = _this.app.getAssetMgr().getAssetByName("baihuan.imgdesc.json");
-                                    _this.renderer.materials[1].setTexture("_MainTex", texture);
-                                }
-                            });
-                            _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihuya.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
-                                if (s2.isfinish) {
-                                    var texture = _this.app.getAssetMgr().getAssetByName("baihuya.imgdesc.json");
-                                    _this.renderer.materials[2].setTexture("_MainTex", texture);
-                                }
-                            });
-                            _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihumao.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
-                                if (s2.isfinish) {
-                                    var texture = _this.app.getAssetMgr().getAssetByName("baihumao.imgdesc.json");
-                                    _this.renderer.materials[3].setTexture("_MainTex", texture);
-                                }
-                            });
+                            var shizi = _this.app.getAssetMgr().getAssetByName("0123_limingshibing.prefab.json");
+                            var shizi01 = shizi.getCloneTrans();
+                            shizi01.localTranslate = new gd3d.math.vector3();
+                            _this.scene.addChild(shizi01);
+                            shizi01.markDirty();
+                            var renderer = shizi01.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER);
+                            _this.skinrender = renderer[0];
                         }
                     });
                 }
@@ -2023,8 +1991,8 @@ var t;
             this.camera = this.objCam.gameObject.addComponent("camera");
             this.camera.near = 0.01;
             this.camera.far = 100;
-            this.objCam.localTranslate = new gd3d.math.vector3(0, 2, -2);
-            this.objCam.lookat(baihu);
+            this.objCam.localTranslate = new gd3d.math.vector3(0, 12, 12);
+            this.objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             this.objCam.markDirty();
         };
         test_changeshader.prototype.changeShader = function () {
@@ -2041,7 +2009,9 @@ var t;
             var btn2 = document.createElement("button");
             btn2.textContent = "切换Shader到：transparent-diffuse.shader.json";
             btn2.onclick = function () {
-                var sh = _this.app.getAssetMgr().getShader("transparent-diffuse.shader.json");
+                var shader = "transparent-diffuse.shader.json";
+                var addshader = "transparent_additive.shader.json";
+                var sh = _this.app.getAssetMgr().getShader(addshader);
                 _this.change(sh);
             };
             btn2.style.top = "124px";
@@ -2049,8 +2019,10 @@ var t;
             this.app.container.appendChild(btn2);
         };
         test_changeshader.prototype.change = function (sha) {
-            for (var i = 0; i < 4; i++) {
-                this.renderer.materials[i].changeShader(sha);
+            var materials = this.skinrender.materials;
+            for (var i = 0; i < materials.length; i++) {
+                materials[i] = materials[i].clone();
+                materials[i].changeShader(sha);
             }
         };
         test_changeshader.prototype.update = function (delta) {
@@ -5778,11 +5750,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
-    testUserCodeUpdate = __decorate([
-        gd3d.reflect.userCode
-    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
+testUserCodeUpdate = __decorate([
+    gd3d.reflect.userCode
+], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {
