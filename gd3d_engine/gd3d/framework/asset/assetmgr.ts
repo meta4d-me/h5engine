@@ -239,6 +239,7 @@ namespace gd3d.framework
             {
                 result += this.resstate[key].loadedLength;
             }
+            result += this.compressTextLoaded + this.compressBinLoaded;
             return result;
         }
 
@@ -270,6 +271,10 @@ namespace gd3d.framework
         }
 
         progressCall:boolean = false;
+
+        compressTextLoaded:number = 0;
+
+        compressBinLoaded:number = 0;
 
         /**
          * @public
@@ -1296,7 +1301,8 @@ namespace gd3d.framework
                 },
                 (loadedLength, totalLength) =>
                 {
-                    state.resstate[filename].loadedLength = loadedLength;
+                    state.compressBinLoaded = loadedLength;
+                    // state.resstate[filename].loadedLength = loadedLength;
                     // state.resstate[filename].totalLength = totalLength;
                     state.progressCall = true;
                     onstate(state);
@@ -1952,9 +1958,10 @@ namespace gd3d.framework
                 },
                 (loadedLength, totalLength) =>
                 {
-                    state.resstate[filename].loadedLength = loadedLength;
+                    state.compressTextLoaded = loadedLength;
+                    // state.resstate[filename].loadedLength = loadedLength;
                     // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
+                    // state.progressCall = true;
                     onstate(state);
                 });
             }
