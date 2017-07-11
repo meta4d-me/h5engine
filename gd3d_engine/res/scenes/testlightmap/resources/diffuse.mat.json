@@ -1,9 +1,0 @@
-{
-    "shader":"diffuse.shader.json",
-    "mapUniform":{
-        "_MainTex":{
-            "type":0,
-            "value":"baihu.imgdesc.json"
-            }
-        }
-    }

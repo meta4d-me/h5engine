@@ -27,23 +27,29 @@ mat4 buildMat4(int index)
 	translation.x, translation.y, translation.z, 1);
 	return matrix;
 }
+
+highp vec4 calcVertex(highp vec4 srcVertex,highp vec4 blendIndex,highp vec4 blendWeight)
+{
+	int i = int(blendIndex.x);  
+    int i2 =int(blendIndex.y);
+	int i3 =int(blendIndex.z);
+	int i4 =int(blendIndex.w);
+	
+    mat4 mat = buildMat4(i)*blendWeight.x 
+			 + buildMat4(i2)*blendWeight.y 
+			 + buildMat4(i3)*blendWeight.z 
+			 + buildMat4(i4)*blendWeight.w;
+	return mat* srcVertex;
+}
+
+
 void main()
 {                                               
     highp vec4 tmpvar_1;                        
     tmpvar_1.w = 1.0;                           
-    tmpvar_1.xyz = _glesVertex.xyz;  
-	
-    int i = int(_glesBlendIndex4.x);  
-    int i2 =int(_glesBlendIndex4.y);
-	int i3 =int(_glesBlendIndex4.z);
-	int i4 =int(_glesBlendIndex4.w);
-	
-    mat4 mat = buildMat4(i)*_glesBlendWeight4.x 
-			 + buildMat4(i2)*_glesBlendWeight4.y 
-			 + buildMat4(i3)*_glesBlendWeight4.z 
-			 + buildMat4(i4)*_glesBlendWeight4.w;
+    tmpvar_1.xyz = calcVertex(_glesVertex,_glesBlendIndex4,_glesBlendWeight4).xyz;  
 			 
-    gl_Position = glstate_matrix_mvp * (mat* tmpvar_1);
+    gl_Position = glstate_matrix_mvp *  tmpvar_1;
 
 	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;  
 }
