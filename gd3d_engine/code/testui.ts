@@ -244,16 +244,19 @@ namespace t
                     {
                         this.app.getAssetMgr().load("res/resources/1.atlas.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
                         {
-                            var atlas = this.app.getAssetMgr().getAssetByName("1.atlas.json") as gd3d.framework.atlas;
-                            img_1.setTexture(atlas.texture);
-                            img_2.sprite = atlas.sprites["card_role_1_face"];
-                            img_2.sprite.border = new gd3d.math.border(10, 10, 10, 10);
-                            this.img_3.sprite = atlas.sprites["card_role_1_face"];
-                            this.img_4.sprite = atlas.sprites["card_role_1_face"];
-                            this.img_5.sprite = atlas.sprites["card_role_1_face"];
-                            img_6.sprite = atlas.sprites["card_role_1_face"];
-                            this.img_7.sprite = atlas.sprites["card_role_1_face"];
-                            this.img_8.sprite = atlas.sprites["card_role_1_face"];
+                            if(state.isfinish)
+                            {
+                                var atlas = this.app.getAssetMgr().getAssetByName("1.atlas.json") as gd3d.framework.atlas;
+                                img_1.setTexture(atlas.texture);
+                                img_2.sprite = atlas.sprites["card_role_1_face"];
+                                img_2.sprite.border = new gd3d.math.border(10, 10, 10, 10);
+                                this.img_3.sprite = atlas.sprites["card_role_1_face"];
+                                this.img_4.sprite = atlas.sprites["card_role_1_face"];
+                                this.img_5.sprite = atlas.sprites["card_role_1_face"];
+                                img_6.sprite = atlas.sprites["card_role_1_face"];
+                                this.img_7.sprite = atlas.sprites["card_role_1_face"];
+                                this.img_8.sprite = atlas.sprites["card_role_1_face"];
+                            }
                             //img9.sprite = atlas.sprites["card_role_1_face"];
                         });
                     }
@@ -282,7 +285,8 @@ namespace t
                     {
                         this.app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
                         {
-                            label.font = this.app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;//;
+                            if(s1.isfinish)
+                                label.font = this.app.getAssetMgr().getAssetByName("STXINGKA.font.json") as gd3d.framework.font;//;
                         });
                     }
                 });
