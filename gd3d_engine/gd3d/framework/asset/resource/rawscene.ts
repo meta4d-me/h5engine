@@ -131,7 +131,8 @@ namespace gd3d.framework
                 {
                     let lightmapName = lightmapData[i].name;
                     let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
-                    lightmap.use();
+                    if(lightmap)
+                        lightmap.use();
                     this.lightmaps.push(lightmap);
                 }
             }

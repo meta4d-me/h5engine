@@ -2671,28 +2671,19 @@ var test_loadScene = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
-        var name = "Wing_11";
+        var names = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        var name = "Wing_11";
-                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                        _this.baihu = _prefab.getCloneTrans();
-                        _this.baihu.name = "chibang";
-                        _this.baihu.localTranslate.y = 50;
-                        _this.baihu.markDirty();
-                        _this.scene.addChild(_this.baihu);
-                        _this.camera.gameObject.transform.lookat(_this.baihu);
-                        _this.camera.gameObject.transform.markDirty();
-                        var name = "MainCity";
-                        _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/scenes/citycompress/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
+                        var totalLength = index[name + ".assetbundle.json"];
+                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json", function (s) {
                             console.log(s.curtask + "/" + s.totaltask);
-                            console.log(s.progress);
                             if (s.isfinish) {
                                 var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
                                 var _root = _scene.getSceneRoot();
-                                _root.name = "changjing";
                                 _this.scene.addChild(_root);
                                 _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
                                 _root.markDirty();
@@ -4280,7 +4271,7 @@ var test_loadprefab = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        var names = ["193_meirenyu", "0060_duyanshou", "Cube", "0001_fashion", "baihu"];
+        var names = ["baihu", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -4289,7 +4280,7 @@ var test_loadprefab = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
                         _this.baihu = _prefab.getCloneTrans();
                         _this.scene.addChild(_this.baihu);
-                        _this.baihu.localScale = new gd3d.math.vector3(1, 1, 1);
+                        _this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
                         _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                         _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
                         _this.baihu = _prefab.getCloneTrans();
@@ -4477,7 +4468,8 @@ var testReload = (function () {
         this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
             if (s.isfinish) {
                 _this.app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                    label.font = _this.app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                    if (s1.isfinish)
+                        label.font = _this.app.getAssetMgr().getAssetByName("STXINGKA.font.json");
                 });
             }
         });
@@ -5641,16 +5633,18 @@ var t;
                 this.app.getAssetMgr().load("res/1.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         _this.app.getAssetMgr().load("res/resources/1.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                            var atlas = _this.app.getAssetMgr().getAssetByName("1.atlas.json");
-                            img_1_1.setTexture(atlas.texture);
-                            img_2_1.sprite = atlas.sprites["card_role_1_face"];
-                            img_2_1.sprite.border = new gd3d.math.border(10, 10, 10, 10);
-                            _this.img_3.sprite = atlas.sprites["card_role_1_face"];
-                            _this.img_4.sprite = atlas.sprites["card_role_1_face"];
-                            _this.img_5.sprite = atlas.sprites["card_role_1_face"];
-                            img_6_1.sprite = atlas.sprites["card_role_1_face"];
-                            _this.img_7.sprite = atlas.sprites["card_role_1_face"];
-                            _this.img_8.sprite = atlas.sprites["card_role_1_face"];
+                            if (state.isfinish) {
+                                var atlas = _this.app.getAssetMgr().getAssetByName("1.atlas.json");
+                                img_1_1.setTexture(atlas.texture);
+                                img_2_1.sprite = atlas.sprites["card_role_1_face"];
+                                img_2_1.sprite.border = new gd3d.math.border(10, 10, 10, 10);
+                                _this.img_3.sprite = atlas.sprites["card_role_1_face"];
+                                _this.img_4.sprite = atlas.sprites["card_role_1_face"];
+                                _this.img_5.sprite = atlas.sprites["card_role_1_face"];
+                                img_6_1.sprite = atlas.sprites["card_role_1_face"];
+                                _this.img_7.sprite = atlas.sprites["card_role_1_face"];
+                                _this.img_8.sprite = atlas.sprites["card_role_1_face"];
+                            }
                         });
                     }
                 });
@@ -5663,7 +5657,8 @@ var t;
                 this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         _this.app.getAssetMgr().load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                            label.font = _this.app.getAssetMgr().getAssetByName("STXINGKA.font.json");
+                            if (s1.isfinish)
+                                label.font = _this.app.getAssetMgr().getAssetByName("STXINGKA.font.json");
                         });
                     }
                 });

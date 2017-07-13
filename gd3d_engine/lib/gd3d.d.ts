@@ -25,6 +25,17 @@ declare namespace gd3d.framework {
         private _tar;
         private _standDeltaTime;
         targetFrame: number;
+        private _fixHeight;
+        private _fixWidth;
+        private beWidthSetted;
+        private beHeightSetted;
+        private _canvasClientWidth;
+        private _canvasClientHeight;
+        canvasFixHeight: number;
+        canvasFixWidth: number;
+        readonly canvasClientWidth: number;
+        readonly canvasClientHeight: number;
+        scale: number;
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
@@ -602,18 +613,27 @@ declare namespace gd3d.framework {
         pathAsset = 19,
         PVR = 20,
     }
+    class ResourceState {
+        res: IAsset;
+        state: number;
+        loadedLength: number;
+        totalLength: number;
+    }
     class stateLoad {
         iserror: boolean;
         isfinish: boolean;
         resstate: {
-            [id: string]: {
-                res: IAsset;
-                state: number;
-            };
+            [id: string]: ResourceState;
         };
         curtask: number;
         totaltask: number;
+        readonly fileProgress: number;
+        readonly curByteLength: number;
+        readonly totalByteLength: number;
         readonly progress: number;
+        progressCall: boolean;
+        compressTextLoaded: number;
+        compressBinLoaded: number;
         logs: string[];
         errs: Error[];
         url: string;
@@ -707,6 +727,21 @@ declare namespace gd3d.framework {
         files: {
             [key: string]: string;
         };
+    }
+}
+declare namespace gd3d.framework {
+    class assetBundlen {
+    }
+    class assetMgrn {
+        name: string;
+        private id;
+        assetmgr: assetMgr;
+        private files;
+        private packages;
+        url: string;
+        path: string;
+        constructor(url: string);
+        parse(json: any): void;
     }
 }
 declare class PvrParse {
@@ -3077,10 +3112,10 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.io {
-    function loadText(url: string, fun: (_txt: string, _err: Error) => void): void;
-    function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void): void;
-    function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void): void;
-    function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, progress: (progre: number) => void): void;
+    function loadText(url: string, fun: (_txt: string, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
 declare namespace gd3d.math {
     class pool {
