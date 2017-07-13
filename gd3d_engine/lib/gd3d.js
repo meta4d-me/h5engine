@@ -10761,7 +10761,6 @@ var gd3d;
                     _this.point.touch = false;
                 });
                 app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    console.error("engine:client" + ev.clientX + "," + ev.clientY + "    offset:" + ev.offsetX + "," + ev.offsetY + "  scale:" + app.scale);
                     _this.point.x = ev.clientX / app.scale;
                     _this.point.y = ev.clientY / app.scale;
                     _this.point.touch = true;
