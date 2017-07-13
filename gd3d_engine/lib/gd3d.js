@@ -38,6 +38,7 @@ var gd3d;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
                 this.beHeightSetted = false;
+                this.scale = 0;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
                 this.isFrustumCulling = true;
@@ -106,16 +107,6 @@ var gd3d;
             });
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
-                var metas = document.getElementsByName("viewport");
-                var meta;
-                if (!metas || metas.length < 1) {
-                    meta = document.createElement("meta");
-                    meta.name = "viewport";
-                    document.head.appendChild(meta);
-                }
-                else
-                    meta = metas[0];
-                meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
                 framework.sceneMgr.app = this;
                 this._timeScale = 1;
                 this.container = div;
@@ -129,7 +120,7 @@ var gd3d;
                 div.appendChild(canvas);
                 this.webgl = canvas.getContext('webgl') ||
                     canvas.getContext("experimental-webgl");
-                this.canvasFixHeight = 1100;
+                this.canvasFixHeight = 1200;
                 if (this.beWidthSetted) {
                     this.webgl.canvas.width = this._fixWidth;
                     this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
@@ -137,6 +128,7 @@ var gd3d;
                 else if (this.beHeightSetted) {
                     this.webgl.canvas.height = this._fixHeight;
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
                 this._canvasClientHeight = this.webgl.canvas.clientHeight;
@@ -209,6 +201,7 @@ var gd3d;
                     else if (this.beHeightSetted) {
                         this.webgl.canvas.height = this._fixHeight;
                         this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                        this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
                     console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
                 }
@@ -10710,10 +10703,30 @@ var gd3d;
                         _this.touches[id].y = touch.clientY;
                     }
                 });
-                app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.point.x = ev.offsetX;
-                    _this.point.y = ev.offsetY;
-                    _this.point.touch = true;
+                app.webgl.canvas.addEventListener("touchmove", function (ev) {
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this.touches[id] == null) {
+                            _this.touches[id] = new pointinfo();
+                            _this.touches[id].id = id;
+                        }
+                        _this.touches[id].touch = true;
+                        _this.touches[id].x = touch.clientX;
+                        _this.touches[id].y = touch.clientY;
+                    }
+                    var count = 0;
+                    var x = 0;
+                    var y = 0;
+                    for (var key in _this.touches) {
+                        if (_this.touches[key].touch == true) {
+                            x += _this.touches[key].x;
+                            y += _this.touches[key].y;
+                            count++;
+                        }
+                    }
+                    _this.point.x = x / count;
+                    _this.point.y = y / count;
                 });
                 app.webgl.canvas.addEventListener("touchend", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -10747,37 +10760,18 @@ var gd3d;
                     }
                     _this.point.touch = false;
                 });
+                app.webgl.canvas.addEventListener("mousedown", function (ev) {
+                    console.error("engine:client" + ev.clientX + "," + ev.clientY + "    offset:" + ev.offsetX + "," + ev.offsetY + "  scale:" + app.scale);
+                    _this.point.x = ev.clientX / app.scale;
+                    _this.point.y = ev.clientY / app.scale;
+                    _this.point.touch = true;
+                });
                 app.webgl.canvas.addEventListener("mouseup", function (ev) {
                     _this.point.touch = false;
                 });
-                app.webgl.canvas.addEventListener("touchmove", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = true;
-                        _this.touches[id].x = touch.clientX;
-                        _this.touches[id].y = touch.clientY;
-                    }
-                    var count = 0;
-                    var x = 0;
-                    var y = 0;
-                    for (var key in _this.touches) {
-                        if (_this.touches[key].touch == true) {
-                            x += _this.touches[key].x;
-                            y += _this.touches[key].y;
-                            count++;
-                        }
-                    }
-                    _this.point.x = x / count;
-                    _this.point.y = y / count;
-                });
                 app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.point.x = ev.offsetX;
-                    _this.point.y = ev.offsetY;
+                    _this.point.x = ev.clientX / app.scale;
+                    _this.point.y = ev.clientY / app.scale;
                 });
                 app.webgl.canvas.addEventListener("keydown", function (ev) {
                     _this.keyboardMap[ev.keyCode] = true;

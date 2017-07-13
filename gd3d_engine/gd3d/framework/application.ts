@@ -133,6 +133,7 @@ namespace gd3d.framework
         {
             return this._canvasClientHeight;
         }
+        public scale: number = 0;
         /**
          * @public
          * @language zh_CN
@@ -144,17 +145,17 @@ namespace gd3d.framework
         start(div: HTMLDivElement)
         {
             console.log("version: " + this.version + "  build: " + this.build);
-            var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
-            var meta: HTMLMetaElement;
-            if (!metas || metas.length < 1)
-            {
-                meta = document.createElement("meta") as HTMLMetaElement;
-                meta.name = "viewport";
-                document.head.appendChild(meta);
-            }
-            else
-                meta = metas[0];
-            meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5";
+            // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
+            // var meta: HTMLMetaElement;
+            // if (!metas || metas.length < 1)
+            // {
+            //     meta = document.createElement("meta") as HTMLMetaElement;
+            //     meta.name = "viewport";
+            //     document.head.appendChild(meta);
+            // }
+            // else
+            //     meta = metas[0];
+            // meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=1, minimum-scale=0.5, maximum-scale=0.5";
 
             sceneMgr.app = this;
             this._timeScale = 1;
@@ -171,7 +172,7 @@ namespace gd3d.framework
             //init webgl;
             this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
                 <WebGLRenderingContext>canvas.getContext("experimental-webgl");
-            this.canvasFixHeight = 1100;
+            this.canvasFixHeight = 1200;
             if (this.beWidthSetted)
             {
                 this.webgl.canvas.width = this._fixWidth;
@@ -180,6 +181,7 @@ namespace gd3d.framework
             {
                 this.webgl.canvas.height = this._fixHeight;
                 this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
             }
             this._canvasClientWidth = this.webgl.canvas.clientWidth;
             this._canvasClientHeight = this.webgl.canvas.clientHeight;
@@ -298,6 +300,7 @@ namespace gd3d.framework
                 {
                     this.webgl.canvas.height = this._fixHeight;
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
             }

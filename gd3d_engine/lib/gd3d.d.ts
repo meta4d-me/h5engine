@@ -35,6 +35,7 @@ declare namespace gd3d.framework {
         canvasFixWidth: number;
         readonly canvasClientWidth: number;
         readonly canvasClientHeight: number;
+        scale: number;
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);

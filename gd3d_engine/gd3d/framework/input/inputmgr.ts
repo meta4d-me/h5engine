@@ -1,6 +1,6 @@
 namespace gd3d.framework
 {
-    
+
     /**
      * @public
      * @language zh_CN
@@ -64,11 +64,37 @@ namespace gd3d.framework
                 }
             }
             );
-            app.webgl.canvas.addEventListener("mousedown", (ev) =>
+            app.webgl.canvas.addEventListener("touchmove", (ev) =>
             {
-                this.point.x = ev.offsetX;
-                this.point.y = ev.offsetY;
-                this.point.touch = true;
+                for (var i = 0; i < ev.changedTouches.length; i++)
+                {
+                    var touch = ev.changedTouches[i];
+                    var id = touch.identifier;
+
+                    if (this.touches[id] == null)
+                    {
+                        this.touches[id] = new pointinfo();
+                        this.touches[id].id = id;
+                    }
+                    this.touches[id].touch = true;
+                    this.touches[id].x = touch.clientX;
+                    this.touches[id].y = touch.clientY;
+                }
+
+                var count = 0;
+                var x = 0;
+                var y = 0;
+                for (var key in this.touches)
+                {
+                    if (this.touches[key].touch == true)
+                    {
+                        x += this.touches[key].x;
+                        y += this.touches[key].y;
+                        count++;
+                    }
+                }
+                this.point.x = x / count;
+                this.point.y = y / count;
             }
             );
             app.webgl.canvas.addEventListener("touchend", (ev) =>
@@ -117,48 +143,23 @@ namespace gd3d.framework
                 this.point.touch = false;
             }
             );
+            app.webgl.canvas.addEventListener("mousedown", (ev) =>
+            {
+                this.point.x = ev.clientX / app.scale;
+                this.point.y = ev.clientY / app.scale;
+                this.point.touch = true;
+            }
+            );
             app.webgl.canvas.addEventListener("mouseup", (ev) =>
             {
                 this.point.touch = false;
             }
             );
-            app.webgl.canvas.addEventListener("touchmove", (ev) =>
-            {
-                for (var i = 0; i < ev.changedTouches.length; i++)
-                {
-                    var touch = ev.changedTouches[i];
-                    var id = touch.identifier;
 
-                    if (this.touches[id] == null)
-                    {
-                        this.touches[id] = new pointinfo();
-                        this.touches[id].id = id;
-                    }
-                    this.touches[id].touch = true;
-                    this.touches[id].x = touch.clientX;
-                    this.touches[id].y = touch.clientY;
-                }
-
-                var count = 0;
-                var x = 0;
-                var y = 0;
-                for (var key in this.touches)
-                {
-                    if (this.touches[key].touch == true)
-                    {
-                        x += this.touches[key].x;
-                        y += this.touches[key].y;
-                        count++;
-                    }
-                }
-                this.point.x = x / count;
-                this.point.y = y / count;
-            }
-            );
             app.webgl.canvas.addEventListener("mousemove", (ev) =>
             {
-                this.point.x = ev.offsetX;
-                this.point.y = ev.offsetY;
+                this.point.x = ev.clientX / app.scale;
+                this.point.y = ev.clientY / app.scale;
             }
             );
 
