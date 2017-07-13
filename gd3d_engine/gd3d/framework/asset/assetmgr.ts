@@ -1245,6 +1245,18 @@ namespace gd3d.framework
                 state.resstate[filename].res = _textasset;
                 onstate(state);
             }
+            else if (type == AssetTypeEnum.pathAsset)
+            {
+                state.resstate[filename] = new ResourceState();
+                let txt = this.bundlePackJson[filename];
+                var _path = new pathasset(filename);
+                this.assetUrlDic[_textasset.getGUID()] = url;
+                _path.Parse(JSON.parse(txt));
+                this.use(_path);
+                state.resstate[filename].state = 1;
+                state.resstate[filename].res = _path;
+                onstate(state);
+            }
             else
             {
                 throw new Error("cant use the type:" + type);

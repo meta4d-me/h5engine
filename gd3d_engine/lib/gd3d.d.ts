@@ -729,6 +729,21 @@ declare namespace gd3d.framework {
         };
     }
 }
+declare namespace gd3d.framework {
+    class assetBundlen {
+    }
+    class assetMgrn {
+        name: string;
+        private id;
+        assetmgr: assetMgr;
+        private files;
+        private packages;
+        url: string;
+        path: string;
+        constructor(url: string);
+        parse(json: any): void;
+    }
+}
 declare class PvrParse {
     private version;
     private flags;
