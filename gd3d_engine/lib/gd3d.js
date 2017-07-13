@@ -3562,6 +3562,16 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["pathAsset"] = 19] = "pathAsset";
             AssetTypeEnum[AssetTypeEnum["PVR"] = 20] = "PVR";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
+        var ResourceState = (function () {
+            function ResourceState() {
+                this.res = null;
+                this.state = 0;
+                this.loadedLength = 0;
+                this.totalLength = 0;
+            }
+            return ResourceState;
+        }());
+        framework.ResourceState = ResourceState;
         var stateLoad = (function () {
             function stateLoad() {
                 this.iserror = false;
@@ -3569,12 +3579,45 @@ var gd3d;
                 this.resstate = {};
                 this.curtask = 0;
                 this.totaltask = 0;
+                this.progressCall = false;
+                this.compressTextLoaded = 0;
+                this.compressBinLoaded = 0;
                 this.logs = [];
                 this.errs = [];
             }
-            Object.defineProperty(stateLoad.prototype, "progress", {
+            Object.defineProperty(stateLoad.prototype, "fileProgress", {
                 get: function () {
                     return this.curtask / this.totaltask;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(stateLoad.prototype, "curByteLength", {
+                get: function () {
+                    var result = 0;
+                    for (var key in this.resstate) {
+                        result += this.resstate[key].loadedLength;
+                    }
+                    result += this.compressTextLoaded + this.compressBinLoaded;
+                    return result;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(stateLoad.prototype, "totalByteLength", {
+                get: function () {
+                    var result = 0;
+                    for (var key in this.resstate) {
+                        result += this.resstate[key].totalLength;
+                    }
+                    return result;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(stateLoad.prototype, "progress", {
+                get: function () {
+                    return this.curByteLength / this.totalByteLength;
                 },
                 enumerable: true,
                 configurable: true
@@ -3725,6 +3768,11 @@ var gd3d;
                     var type = list[state.curtask - 1].type;
                     if (mapPackes[surl] != undefined) {
                         assetmgr.loadResByPack(mapPackes[surl], surl, type, function (s) {
+                            if (s.progressCall) {
+                                s.progressCall = false;
+                                onstate(state);
+                                return;
+                            }
                             realTotal--;
                             state.curtask++;
                             var _fileName = assetmgr.getFileName(surl);
@@ -3749,6 +3797,11 @@ var gd3d;
                     }
                     else {
                         assetmgr.loadSingleRes(surl, type, function (s) {
+                            if (s.progressCall) {
+                                s.progressCall = false;
+                                onstate(state);
+                                return;
+                            }
                             realTotal--;
                             state.curtask++;
                             var _fileName = assetmgr.getFileName(surl);
@@ -3938,7 +3991,7 @@ var gd3d;
                     respack = this.bundlePackBin;
                 }
                 if (type == AssetTypeEnum.GLVertexShader) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
@@ -3947,7 +4000,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.GLFragmentShader) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
@@ -3956,7 +4009,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.Shader) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     state.resstate[filename].state = 1;
                     var _shader = new framework.shader(filename);
@@ -3989,7 +4042,7 @@ var gd3d;
                         _repeat = true;
                     }
                     var _textureSrc = url.replace(filename, _name);
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                         gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
                             if (err != null) {
@@ -4007,35 +4060,39 @@ var gd3d;
                             state.resstate[filename].state = 1;
                             state.resstate[filename].res = _texture;
                             onstate(state);
+                        }, function (loadedLength, totalLength) {
+                            state.resstate[filename].loadedLength = loadedLength;
+                            state.progressCall = true;
+                            onstate(state);
                         });
                     }
                     else {
-                        var img = new Image();
-                        img.src = _textureSrc;
-                        img.crossOrigin = "anonymous";
-                        img.onerror = function (error) {
-                            if (error != null) {
-                                state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
+                        gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
+                            if (_err != null) {
+                                state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
                                 state.iserror = true;
                                 onstate(state);
+                                return;
                             }
-                        };
-                        img.onload = function () {
                             var _texture = new framework.texture(filename);
                             _texture.realName = _name;
                             _this.assetUrlDic[_texture.getGUID()] = url;
                             var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                            t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                            t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
                             _texture.glTexture = t2d;
                             _this.use(_texture);
                             state.resstate[filename].state = 1;
                             state.resstate[filename].res = _texture;
                             onstate(state);
-                        };
+                        }, function (loadedLength, totalLength) {
+                            state.resstate[filename].loadedLength = loadedLength;
+                            state.progressCall = true;
+                            onstate(state);
+                        });
                     }
                 }
                 else if (type == AssetTypeEnum.Material) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     state.resstate[filename].state = 1;
                     var _material = new framework.material(filename);
@@ -4047,7 +4104,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.Mesh) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var _buffer = this.bundlePackBin[filename];
                     var _mesh = new framework.mesh(filename);
                     this.assetUrlDic[_mesh.getGUID()] = url;
@@ -4058,7 +4115,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.Aniclip) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var _buffer = this.bundlePackBin[filename];
                     var _clip = new framework.animationClip(filename);
                     this.assetUrlDic[_clip.getGUID()] = url;
@@ -4069,7 +4126,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.Atlas) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     var _atlas = new framework.atlas(filename);
                     this.assetUrlDic[_atlas.getGUID()] = url;
@@ -4080,7 +4137,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.Prefab) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     var _prefab = new framework.prefab(filename);
                     _prefab.assetbundle = bundlename;
@@ -4092,7 +4149,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.Scene) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     var _scene = new framework.rawscene(filename);
                     _scene.assetbundle = bundlename;
@@ -4104,7 +4161,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.Font) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     var _font = new framework.font(filename);
                     this.assetUrlDic[_font.getGUID()] = url;
@@ -4115,7 +4172,7 @@ var gd3d;
                     onstate(state);
                 }
                 else if (type == AssetTypeEnum.TextAsset) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     var txt = this.bundlePackJson[filename];
                     var _textasset = new framework.textasset(filename);
                     this.assetUrlDic[_textasset.getGUID()] = url;
@@ -4157,6 +4214,10 @@ var gd3d;
                             _this.bundlePackBin[strs[0]] = bufs;
                         }
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.compressBinLoaded = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.PackTxt) {
@@ -4173,10 +4234,14 @@ var gd3d;
                         var txt = gd3d.io.binReader.utf8ArrayToString(arr);
                         _this.bundlePackJson = JSON.parse(txt);
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.GLVertexShader) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4188,10 +4253,14 @@ var gd3d;
                         state.logs.push("load a glshader:" + filename);
                         _this.shaderPool.compileVS(_this.webgl, name, txt);
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.GLFragmentShader) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4203,10 +4272,14 @@ var gd3d;
                         state.logs.push("load a glshader:" + filename);
                         _this.shaderPool.compileFS(_this.webgl, name, txt);
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Shader) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4220,10 +4293,14 @@ var gd3d;
                         _this.assetUrlDic[_shader.getGUID()] = url;
                         _this.mapShader[filename] = _shader;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.PVR) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4239,34 +4316,39 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _texture;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Texture) {
-                    state.resstate[filename] = { state: 0, res: null };
-                    var img = new Image();
-                    img.src = url;
-                    img.crossOrigin = "anonymous";
-                    img.onerror = function (error) {
-                        if (error != null) {
-                            state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
+                    state.resstate[filename] = new ResourceState();
+                    gd3d.io.loadImg(url, function (_tex, _err) {
+                        if (_err != null) {
+                            state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
                             state.iserror = true;
                             onstate(state);
+                            return;
                         }
-                    };
-                    img.onload = function () {
                         var _texture = new framework.texture(filename);
                         _this.assetUrlDic[_texture.getGUID()] = url;
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(img, true, true, true, true);
+                        t2d.uploadImage(_tex, true, true, true, true);
                         _texture.glTexture = t2d;
                         _this.use(_texture);
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _texture;
                         onstate(state);
-                    };
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
+                    });
                 }
                 else if (type == AssetTypeEnum.TextureDesc) {
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4280,26 +4362,18 @@ var gd3d;
                         var _format = _texturedesc["format"];
                         var _mipmap = _texturedesc["mipmap"];
                         var _wrap = _texturedesc["wrap"];
-                        if (_name.indexOf("LightmapFar") >= 0) {
-                            console.log("");
-                        }
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                        if (_format == "RGB") {
+                        if (_format == "RGB")
                             _textureFormat = gd3d.render.TextureFormatEnum.RGB;
-                        }
-                        else if (_format == "Gray") {
+                        else if (_format == "Gray")
                             _textureFormat = gd3d.render.TextureFormatEnum.Gray;
-                        }
                         var _linear = true;
-                        if (_filterMode.indexOf("linear") < 0) {
+                        if (_filterMode.indexOf("linear") < 0)
                             _linear = false;
-                        }
                         var _repeat = false;
-                        if (_wrap.indexOf("Repeat") >= 0) {
+                        if (_wrap.indexOf("Repeat") >= 0)
                             _repeat = true;
-                        }
                         var _textureSrc = url.replace(filename, _name);
-                        state.resstate[filename] = { state: 0, res: null };
                         if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                             gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
                                 if (err != null) {
@@ -4317,36 +4391,40 @@ var gd3d;
                                 state.resstate[filename].state = 1;
                                 state.resstate[filename].res = _texture;
                                 onstate(state);
+                            }, function (loadedLength, totalLength) {
+                                state.resstate[filename].loadedLength = loadedLength;
+                                state.progressCall = true;
+                                onstate(state);
                             });
                         }
                         else {
-                            var img = new Image();
-                            img.src = _textureSrc;
-                            img.crossOrigin = "anonymous";
-                            img.onerror = function (error) {
-                                if (error != null) {
-                                    state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
+                            gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
+                                if (_err != null) {
+                                    state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
                                     state.iserror = true;
                                     onstate(state);
+                                    return;
                                 }
-                            };
-                            img.onload = function () {
                                 var _texture = new framework.texture(filename);
                                 _texture.realName = _name;
                                 _this.assetUrlDic[_texture.getGUID()] = url;
                                 var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                                t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
+                                t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
                                 _texture.glTexture = t2d;
                                 _this.use(_texture);
                                 state.resstate[filename].state = 1;
                                 state.resstate[filename].res = _texture;
                                 onstate(state);
-                            };
+                            }, function (loadedLength, totalLength) {
+                                state.resstate[filename].loadedLength = loadedLength;
+                                state.progressCall = true;
+                                onstate(state);
+                            });
                         }
                     });
                 }
                 else if (type == AssetTypeEnum.Material) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4362,10 +4440,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _material;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Mesh) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4380,10 +4462,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _mesh;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Aniclip) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4398,10 +4484,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _clip;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Atlas) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4416,10 +4506,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _atlas;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Prefab) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4435,10 +4529,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _prefab;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Scene) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4454,10 +4552,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _scene;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.Font) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4472,10 +4574,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _font;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.TextAsset) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4490,10 +4596,14 @@ var gd3d;
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _textasset;
                         onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
+                        onstate(state);
                     });
                 }
                 else if (type == AssetTypeEnum.pathAsset) {
-                    state.resstate[filename] = { state: 0, res: null };
+                    state.resstate[filename] = new ResourceState();
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4507,6 +4617,10 @@ var gd3d;
                         _this.use(_path);
                         state.resstate[filename].state = 1;
                         state.resstate[filename].res = _path;
+                        onstate(state);
+                    }, function (loadedLength, totalLength) {
+                        state.resstate[filename].loadedLength = loadedLength;
+                        state.progressCall = true;
                         onstate(state);
                     });
                 }
@@ -4560,6 +4674,7 @@ var gd3d;
                 }
                 else if (type == AssetTypeEnum.CompressBundle) {
                     var loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                    var filename_1 = this.getFileName(url);
                     gd3d.io.loadText(loadurl, function (txt, err) {
                         if (err != null) {
                             state.iserror = true;
@@ -4567,19 +4682,26 @@ var gd3d;
                             onstate(state);
                             return;
                         }
-                        var filename = _this.getFileName(url);
                         var ab = new assetBundle(url);
-                        ab.name = filename;
+                        ab.name = filename_1;
                         var json = JSON.parse(txt);
                         _this.bundlePackJson = json;
                         ab.parse(json["bundleinfo"]);
                         ab.load(_this, _this.curloadinfo);
-                        _this.mapBundle[filename] = ab;
+                        _this.mapBundle[filename_1] = ab;
+                    }, function (loadedLength, totalLength) {
+                        state.compressTextLoaded = loadedLength;
+                        onstate(state);
                     });
                 }
                 else {
                     state.totaltask = 1;
                     this.loadSingleRes(url, type, function (s) {
+                        if (s.progressCall) {
+                            s.progressCall = false;
+                            onstate(state);
+                            return;
+                        }
                         state.curtask = 1;
                         s.isfinish = true;
                         onstate(s);
@@ -7030,7 +7152,8 @@ var gd3d;
                     else {
                         var lightmapName = lightmapData[i].name;
                         var lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle);
-                        lightmap.use();
+                        if (lightmap)
+                            lightmap.use();
                         this.lightmaps.push(lightmap);
                     }
                 }
@@ -19481,7 +19604,8 @@ var gd3d;
 (function (gd3d) {
     var io;
     (function (io) {
-        function loadText(url, fun) {
+        function loadText(url, fun, onprocess) {
+            if (onprocess === void 0) { onprocess = null; }
             var req = new XMLHttpRequest();
             req.open("GET", url);
             req.responseType = "text";
@@ -19494,13 +19618,19 @@ var gd3d;
                     fun(req.responseText, null);
                 }
             };
+            req.onprogress = function (ev) {
+                if (onprocess) {
+                    onprocess(ev.loaded, ev.total);
+                }
+            };
             req.onerror = function () {
                 fun(null, new Error("onerr in req:"));
             };
             req.send();
         }
         io.loadText = loadText;
-        function loadArrayBuffer(url, fun) {
+        function loadArrayBuffer(url, fun, onprocess) {
+            if (onprocess === void 0) { onprocess = null; }
             var req = new XMLHttpRequest();
             req.open("GET", url);
             req.responseType = "arraybuffer";
@@ -19513,13 +19643,19 @@ var gd3d;
                     fun(req.response, null);
                 }
             };
+            req.onprogress = function (ev) {
+                if (onprocess) {
+                    onprocess(ev.loaded, ev.total);
+                }
+            };
             req.onerror = function () {
                 fun(null, new Error("onerr in req:"));
             };
             req.send();
         }
         io.loadArrayBuffer = loadArrayBuffer;
-        function loadBlob(url, fun) {
+        function loadBlob(url, fun, onprocess) {
+            if (onprocess === void 0) { onprocess = null; }
             var req = new XMLHttpRequest();
             req.open("GET", url);
             req.responseType = "blob";
@@ -19532,29 +19668,49 @@ var gd3d;
                     fun(req.response, null);
                 }
             };
+            req.onprogress = function (ev) {
+                if (onprocess) {
+                    onprocess(ev.loaded, ev.total);
+                }
+            };
             req.onerror = function () {
                 fun(null, new Error("onerr in req:"));
             };
             req.send();
         }
         io.loadBlob = loadBlob;
-        function loadImg(url, fun, progress) {
-            var img = new Image();
-            img.src = url;
-            img.onerror = function (error) {
-                if (error != null) {
-                    fun(null, new Error(error.message));
+        function loadImg(url, fun, onprocess) {
+            if (onprocess === void 0) { onprocess = null; }
+            var req = new XMLHttpRequest();
+            req.open("GET", url);
+            req.responseType = "blob";
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    if (req.status == 404) {
+                        fun(null, new Error("got a 404:" + url));
+                        return;
+                    }
+                    var blob = req.response;
+                    var img = document.createElement("img");
+                    img.onload = function (e) {
+                        window.URL.revokeObjectURL(img.src);
+                        fun(img, null);
+                    };
+                    img.onerror = function (e) {
+                        fun(null, new Error("error when blob to img:" + url));
+                    };
+                    img.src = window.URL.createObjectURL(blob);
                 }
             };
-            img.onprogress = function (e) {
-                if (progress) {
-                    var val = e.loaded / e.total * 100;
-                    progress(val);
+            req.onprogress = function (ev) {
+                if (onprocess) {
+                    onprocess(ev.loaded, ev.total);
                 }
             };
-            img.onload = function () {
-                fun(img, null);
+            req.onerror = function () {
+                fun(null, new Error("onerr in req:"));
             };
+            req.send();
         }
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));

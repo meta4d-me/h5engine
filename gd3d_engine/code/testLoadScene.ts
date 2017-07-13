@@ -25,7 +25,7 @@ class test_loadScene implements IState
                         (s) =>
                         {
                             console.log(s.curtask + "/" + s.totaltask);
-                            console.log(s.curByteLength+"/"+totalLength);
+                            // console.log(s.curByteLength+"/"+totalLength);
                             // console.log(s.progress);
                             if (s.isfinish)
                             {
