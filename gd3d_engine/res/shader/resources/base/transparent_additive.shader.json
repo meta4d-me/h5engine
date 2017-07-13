@@ -33,6 +33,7 @@
         "skin_fog": [
             {
                 "showface": "ccw",
+                "blendmode": "add",
                 "vs": "fog_bone_eff",
                 "fs": "fog_transparent_add"
             }

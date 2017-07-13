@@ -10,7 +10,7 @@ class test_loadprefab implements IState
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        let names: string[] = ["193_meirenyu", "0060_duyanshou", "Cube", "0001_fashion", "baihu"];
+        let names: string[] = ["baihu", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
         let name = names[0];
         // name="Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
@@ -25,7 +25,7 @@ class test_loadprefab implements IState
                             var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
                             this.baihu = _prefab.getCloneTrans();
                             this.scene.addChild(this.baihu);
-                            this.baihu.localScale = new gd3d.math.vector3(1, 1, 1);
+                            this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
                             this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                             this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
 
