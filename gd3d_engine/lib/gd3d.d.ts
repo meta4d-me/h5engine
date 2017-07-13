@@ -25,6 +25,16 @@ declare namespace gd3d.framework {
         private _tar;
         private _standDeltaTime;
         targetFrame: number;
+        private _fixHeight;
+        private _fixWidth;
+        private beWidthSetted;
+        private beHeightSetted;
+        private _canvasClientWidth;
+        private _canvasClientHeight;
+        canvasFixHeight: number;
+        canvasFixWidth: number;
+        readonly canvasClientWidth: number;
+        readonly canvasClientHeight: number;
         start(div: HTMLDivElement): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);

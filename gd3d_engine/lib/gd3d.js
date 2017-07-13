@@ -36,6 +36,8 @@ var gd3d;
                 this.build = "b000010";
                 this._tar = -1;
                 this._standDeltaTime = -1;
+                this.beWidthSetted = false;
+                this.beHeightSetted = false;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
                 this.isFrustumCulling = true;
@@ -72,6 +74,36 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(application.prototype, "canvasFixHeight", {
+                set: function (val) {
+                    this.beHeightSetted = true;
+                    this._fixHeight = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "canvasFixWidth", {
+                set: function (val) {
+                    this.beWidthSetted = true;
+                    this._fixWidth = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "canvasClientWidth", {
+                get: function () {
+                    return this._canvasClientWidth;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "canvasClientHeight", {
+                get: function () {
+                    return this._canvasClientHeight;
+                },
+                enumerable: true,
+                configurable: true
+            });
             application.prototype.start = function (div) {
                 console.log("version: " + this.version + "  build: " + this.build);
                 var metas = document.getElementsByName("viewport");
@@ -97,6 +129,17 @@ var gd3d;
                 div.appendChild(canvas);
                 this.webgl = canvas.getContext('webgl') ||
                     canvas.getContext("experimental-webgl");
+                this.canvasFixHeight = 1100;
+                if (this.beWidthSetted) {
+                    this.webgl.canvas.width = this._fixWidth;
+                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                }
+                else if (this.beHeightSetted) {
+                    this.webgl.canvas.height = this._fixHeight;
+                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                }
+                this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                this._canvasClientHeight = this.webgl.canvas.clientHeight;
                 gd3d.render.webglkit.initConst(this.webgl);
                 this.initAssetMgr();
                 this.initInputMgr();
@@ -156,9 +199,17 @@ var gd3d;
                 }
             };
             application.prototype.update = function (delta) {
-                if (this.webgl.canvas.clientWidth != this.webgl.canvas.width || this.webgl.canvas.clientHeight != this.webgl.canvas.height) {
-                    this.webgl.canvas.width = this.webgl.canvas.clientWidth;
-                    this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
+                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                    if (this.beWidthSetted) {
+                        this.webgl.canvas.width = this._fixWidth;
+                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    }
+                    else if (this.beHeightSetted) {
+                        this.webgl.canvas.height = this._fixHeight;
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                    }
                     console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
                 }
                 this.width = this.webgl.canvas.width;

@@ -64,7 +64,7 @@ namespace gd3d.framework
          * 设置timescale
          * @version egret-gd3d 1.0
          */
-        set timeScale(val:number)
+        set timeScale(val: number)
         {
             this._timeScale = val;
         }
@@ -75,7 +75,7 @@ namespace gd3d.framework
          * 获取timescale
          * @version egret-gd3d 1.0
          */
-        get timeScale():number
+        get timeScale(): number
         {
             return this._timeScale;
         }
@@ -92,12 +92,12 @@ namespace gd3d.framework
          */
         set targetFrame(val: number)
         {
-            if(val == 0)
+            if (val == 0)
                 val = -1;
             this._tar = val;
             this._standDeltaTime = 1 / this._tar;
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -109,7 +109,30 @@ namespace gd3d.framework
         {
             return this._tar;
         }
-        
+        private _fixHeight: number;
+        private _fixWidth: number;
+        private beWidthSetted: boolean = false;
+        private beHeightSetted: boolean = false;
+        private _canvasClientWidth: number;
+        private _canvasClientHeight: number;
+        set canvasFixHeight(val: number)
+        {
+            this.beHeightSetted = true;
+            this._fixHeight = val;
+        }
+        set canvasFixWidth(val: number)
+        {
+            this.beWidthSetted = true;
+            this._fixWidth = val;
+        }
+        get canvasClientWidth(): number
+        {
+            return this._canvasClientWidth;
+        }
+        get canvasClientHeight(): number
+        {
+            return this._canvasClientHeight;
+        }
         /**
          * @public
          * @language zh_CN
@@ -148,7 +171,18 @@ namespace gd3d.framework
             //init webgl;
             this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
                 <WebGLRenderingContext>canvas.getContext("experimental-webgl");
-
+            this.canvasFixHeight = 1100;
+            if (this.beWidthSetted)
+            {
+                this.webgl.canvas.width = this._fixWidth;
+                this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+            } else if (this.beHeightSetted)
+            {
+                this.webgl.canvas.height = this._fixHeight;
+                this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+            }
+            this._canvasClientWidth = this.webgl.canvas.clientWidth;
+            this._canvasClientHeight = this.webgl.canvas.clientHeight;
             gd3d.render.webglkit.initConst(this.webgl);
             this.initAssetMgr();
             this.initInputMgr();
@@ -209,7 +243,7 @@ namespace gd3d.framework
             return true;
         }
 
-        
+
         /**
          * @public
          * @language zh_CN
@@ -252,10 +286,19 @@ namespace gd3d.framework
         //delta 单位秒
         private update(delta: number)
         {
-            if (this.webgl.canvas.clientWidth != this.webgl.canvas.width || this.webgl.canvas.clientHeight != this.webgl.canvas.height)
+            if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight)
             {
-                this.webgl.canvas.width = this.webgl.canvas.clientWidth;
-                this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                if (this.beWidthSetted)
+                {
+                    this.webgl.canvas.width = this._fixWidth;
+                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                } else if (this.beHeightSetted)
+                {
+                    this.webgl.canvas.height = this._fixHeight;
+                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                }
                 console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
             }
             this.width = this.webgl.canvas.width;
@@ -556,7 +599,7 @@ namespace gd3d.framework
                 }
             }
         }
-        
+
         /**
          * @public
          * @language zh_CN
