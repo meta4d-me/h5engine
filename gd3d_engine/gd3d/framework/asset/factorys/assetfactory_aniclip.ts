@@ -2,12 +2,12 @@ namespace gd3d.framework
 {
     export class AssetFactory_Aniclip implements IAssetFactory
     {
-        newAsset(): IAsset
+        newAsset(): animationClip
         {
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: animationClip)
         {
             let filename = getFileName(url);
 
@@ -27,6 +27,18 @@ namespace gd3d.framework
                 {
                     AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 })
+        }
+
+        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr,asset?: animationClip)
+        {
+            let filename = getFileName(url);
+
+                state.resstate[filename] = new ResourceState();
+                let _buffer = assetMgr.bundlePackBin[filename];
+                var _clip = new animationClip(filename);
+                _clip.Parse(_buffer);
+
+                AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
         }
     }
 }

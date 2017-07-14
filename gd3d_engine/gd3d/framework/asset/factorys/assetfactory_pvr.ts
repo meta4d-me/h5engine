@@ -2,17 +2,18 @@ namespace gd3d.framework
 {
     export class AssetFactory_PVR implements IAssetFactory
     {
-        newAsset(): IAsset
+        newAsset(): texture
         {
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-                gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
+            gd3d.io.loadArrayBuffer(url,
+                (_buffer, err) =>
                 {
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
@@ -27,6 +28,11 @@ namespace gd3d.framework
                 {
                     AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
+        }
+
+        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
+        {
+
         }
     }
 }

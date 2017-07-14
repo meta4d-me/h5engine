@@ -7,7 +7,7 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
         {
             let filename = getFileName(url);
 
@@ -44,6 +44,11 @@ namespace gd3d.framework
                     state.progressCall = true;
                     onstate(state);
                 });
+        }
+
+        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        {
+            
         }
     }
 }

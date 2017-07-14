@@ -30,5 +30,20 @@ namespace gd3d.framework
                     AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
         }
+
+        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        {
+            let filename = getFileName(url);
+            let name = filename.substring(0, filename.indexOf("."));
+
+            state.resstate[filename] = new ResourceState();
+            let txt = assetMgr.bundlePackJson[filename];
+            txt = decodeURI(txt);
+            state.resstate[filename].state = 1;//完成
+
+            state.logs.push("load a glshader:" + filename);
+            assetMgr.shaderPool.compileVS(assetMgr.webgl, name, txt);
+            onstate(state);
+        }
     }
 }
