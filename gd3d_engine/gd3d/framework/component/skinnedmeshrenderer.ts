@@ -425,6 +425,7 @@ namespace gd3d.framework
 
             for (let i = 0; i < this.materials.length; i++)
             {
+                if(this.materials[i]==null) continue;
                 if (this.cacheData != null)
                 {
                     if (this._efficient)
