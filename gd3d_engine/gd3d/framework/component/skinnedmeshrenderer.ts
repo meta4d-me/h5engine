@@ -2,13 +2,13 @@
 
 namespace gd3d.framework
 {
-     /**
-     * @public
-     * @language zh_CN
-     * @classdesc
-     * 蒙皮网格渲染组件
-     * @version egret-gd3d 1.0
-     */
+    /**
+    * @public
+    * @language zh_CN
+    * @classdesc
+    * 蒙皮网格渲染组件
+    * @version egret-gd3d 1.0
+    */
     @reflect.nodeRender
     @reflect.nodeComponent
     export class skinnedMeshRenderer implements IRenderer
@@ -157,6 +157,9 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         maxBoneCount: number = 0;
+
+        //骨骼数据提交形态
+        private _skintype: number = 0;
 
         //这个数据是扣掉tpose之后的
         private _skeletonMatrixData: Float32Array;
@@ -361,14 +364,14 @@ namespace gd3d.framework
             if (this._skeletonMatrixData == null)
             {
                 //根据shader决定传什么数据
-                var skintype = this.useBoneShader(this.materials[0]);
-                if (skintype == 1)
+                this._skintype = this.useBoneShader(this.materials[0]);
+                if (this._skintype == 1)
                 {
                     this.maxBoneCount = 24;
                     this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
                     this._efficient = false;
                 }
-                else if (skintype == 2)
+                else if (this._skintype == 2)
                 {
                     this.maxBoneCount = 40;
                     this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
@@ -386,7 +389,7 @@ namespace gd3d.framework
                         this._queue = _mat.getQueue();
                 }
             }
-            
+
             if (this.player != null)
             {
                 if (!this.player.mix)
@@ -425,8 +428,8 @@ namespace gd3d.framework
 
             for (let i = 0; i < this.materials.length; i++)
             {
-                if(this.materials[i]==null) continue;
-                if (this.cacheData != null)
+                if (this.materials[i] == null) continue;
+                if (this.cacheData != null && this._skintype > 0)
                 {
                     if (this._efficient)
                     {
@@ -438,7 +441,7 @@ namespace gd3d.framework
                     }
                     continue;
                 }
-                if (this._skeletonMatrixData != null)
+                if (this._skeletonMatrixData != null && this._skintype > 0)
                 {
                     if (this._efficient)
                     {
