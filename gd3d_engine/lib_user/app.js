@@ -242,11 +242,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
-    main = __decorate([
-        gd3d.reflect.userCode
-    ], main);
     return main;
 }());
+main = __decorate([
+    gd3d.reflect.userCode
+], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -723,11 +723,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
-    CameraShock = __decorate([
-        gd3d.reflect.nodeComponent
-    ], CameraShock);
     return CameraShock;
 }());
+CameraShock = __decorate([
+    gd3d.reflect.nodeComponent
+], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -2678,9 +2678,10 @@ var test_loadScene = (function () {
                 _this.app.getAssetMgr().load("res/scenes/citycompress/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
                     if (s1.isfinish) {
                         var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
-                        var totalLength = index[name + ".assetbundle.json"];
+                        var totalLength_1 = index[name + ".assetbundle.json"];
                         _this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json", function (s) {
                             console.log(s.curtask + "/" + s.totaltask);
+                            console.log(s.curByteLength + "/" + totalLength_1);
                             if (s.isfinish) {
                                 var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
                                 var _root = _scene.getSceneRoot();
@@ -2706,6 +2707,14 @@ var test_loadScene = (function () {
     };
     test_loadScene.prototype.update = function (delta) {
         this.timer += delta;
+        CameraController.instance().update(delta);
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.5);
+        var z2 = Math.cos(this.timer * 0.5);
+        var objCam = this.camera.gameObject.transform;
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
+        objCam.markDirty();
     };
     return test_loadScene;
 }());
@@ -5745,11 +5754,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
-    testUserCodeUpdate = __decorate([
-        gd3d.reflect.userCode
-    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
+testUserCodeUpdate = __decorate([
+    gd3d.reflect.userCode
+], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {

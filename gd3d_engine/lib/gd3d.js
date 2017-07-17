@@ -923,24 +923,24 @@ var gd3d;
                 }
                 return this.rootNode;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], canvas.prototype, "pixelWidth", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], canvas.prototype, "pixelHeight", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform2D"),
-                __metadata("design:type", framework.transform2D)
-            ], canvas.prototype, "rootNode", void 0);
-            canvas = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
-            ], canvas);
             return canvas;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], canvas.prototype, "pixelWidth", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], canvas.prototype, "pixelHeight", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform2D"),
+            __metadata("design:type", framework.transform2D)
+        ], canvas.prototype, "rootNode", void 0);
+        canvas = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [])
+        ], canvas);
         framework.canvas = canvas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -1132,18 +1132,18 @@ var gd3d;
             };
             canvasRenderer.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("canvas"),
-                __metadata("design:type", framework.canvas)
-            ], canvasRenderer.prototype, "canvas", void 0);
-            canvasRenderer = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeCanvasRendererCollider,
-                __metadata("design:paramtypes", [])
-            ], canvasRenderer);
             return canvasRenderer;
         }());
+        __decorate([
+            gd3d.reflect.Field("canvas"),
+            __metadata("design:type", framework.canvas)
+        ], canvasRenderer.prototype, "canvas", void 0);
+        canvasRenderer = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeCanvasRendererCollider,
+            __metadata("design:paramtypes", [])
+        ], canvasRenderer);
         framework.canvasRenderer = canvasRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -1285,20 +1285,20 @@ var gd3d;
                 gd3d.math.matrix3x2TransformVector2(mat, temt, canvasPos);
                 gd3d.math.pool.delete_vector2(temt);
             };
-            __decorate([
-                gd3d.reflect.Field("canvas"),
-                __metadata("design:type", framework.canvas)
-            ], overlay2D.prototype, "canvas", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], overlay2D.prototype, "autoAsp", void 0);
-            overlay2D = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
-            ], overlay2D);
             return overlay2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("canvas"),
+            __metadata("design:type", framework.canvas)
+        ], overlay2D.prototype, "canvas", void 0);
+        __decorate([
+            gd3d.reflect.Field("boolean"),
+            __metadata("design:type", Boolean)
+        ], overlay2D.prototype, "autoAsp", void 0);
+        overlay2D = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [])
+        ], overlay2D);
         framework.overlay2D = overlay2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -1316,20 +1316,20 @@ var gd3d;
             vector2.prototype.toString = function () {
                 return this.x + "," + this.y;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector2.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector2.prototype, "y", void 0);
-            vector2 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number])
-            ], vector2);
             return vector2;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector2.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector2.prototype, "y", void 0);
+        vector2 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number])
+        ], vector2);
         math.vector2 = vector2;
         var rect = (function () {
             function rect(x, y, w, h) {
@@ -1345,28 +1345,28 @@ var gd3d;
             rect.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.w + "," + this.h;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "w", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "h", void 0);
-            rect = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], rect);
             return rect;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "w", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "h", void 0);
+        rect = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], rect);
         math.rect = rect;
         var border = (function () {
             function border(l, t, r, b) {
@@ -1379,28 +1379,28 @@ var gd3d;
                 this.r = r;
                 this.b = b;
             }
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "l", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "t", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "r", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "b", void 0);
-            border = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], border);
             return border;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "l", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "t", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "r", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "b", void 0);
+        border = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], border);
         math.border = border;
         var color = (function () {
             function color(r, g, b, a) {
@@ -1416,28 +1416,28 @@ var gd3d;
             color.prototype.toString = function () {
                 return this.r + "," + this.g + "," + this.b + "," + this.a;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "r", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "g", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "b", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "a", void 0);
-            color = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], color);
             return color;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "r", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "g", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "b", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "a", void 0);
+        color = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], color);
         math.color = color;
         var vector3 = (function () {
             function vector3(x, y, z) {
@@ -1451,24 +1451,24 @@ var gd3d;
             vector3.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.z;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "z", void 0);
-            vector3 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number])
-            ], vector3);
             return vector3;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector3.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector3.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector3.prototype, "z", void 0);
+        vector3 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number])
+        ], vector3);
         math.vector3 = vector3;
         var vector4 = (function () {
             function vector4(x, y, z, w) {
@@ -1484,28 +1484,28 @@ var gd3d;
             vector4.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.z + "," + this.w;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "z", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "w", void 0);
-            vector4 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], vector4);
             return vector4;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "z", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "w", void 0);
+        vector4 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], vector4);
         math.vector4 = vector4;
         var quaternion = (function () {
             function quaternion(x, y, z, w) {
@@ -1521,28 +1521,28 @@ var gd3d;
             quaternion.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.z + "," + this.w;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "z", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "w", void 0);
-            quaternion = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], quaternion);
             return quaternion;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "z", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "w", void 0);
+        quaternion = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], quaternion);
         math.quaternion = quaternion;
         var matrix = (function () {
             function matrix(datas) {
@@ -1590,16 +1590,16 @@ var gd3d;
                 this.comp = comp;
                 this.init = init;
             }
-            __decorate([
-                gd3d.reflect.Field("I2DComponent"),
-                __metadata("design:type", Object)
-            ], C2DComponent.prototype, "comp", void 0);
-            C2DComponent = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Object, Boolean])
-            ], C2DComponent);
             return C2DComponent;
         }());
+        __decorate([
+            gd3d.reflect.Field("I2DComponent"),
+            __metadata("design:type", Object)
+        ], C2DComponent.prototype, "comp", void 0);
+        C2DComponent = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Object, Boolean])
+        ], C2DComponent);
         framework.C2DComponent = C2DComponent;
         var transform2D = (function () {
             function transform2D() {
@@ -1975,47 +1975,47 @@ var gd3d;
                     }
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], transform2D.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform2D[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "children", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "width", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "height", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "pivot", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "localTranslate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "localScale", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "localRotate", void 0);
-            __decorate([
-                gd3d.reflect.Field("C2DComponent[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "components", void 0);
-            transform2D = __decorate([
-                gd3d.reflect.SerializeType
-            ], transform2D);
             return transform2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String)
+        ], transform2D.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform2D[]"),
+            __metadata("design:type", Array)
+        ], transform2D.prototype, "children", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], transform2D.prototype, "width", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], transform2D.prototype, "height", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector2"),
+            __metadata("design:type", gd3d.math.vector2)
+        ], transform2D.prototype, "pivot", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector2"),
+            __metadata("design:type", gd3d.math.vector2)
+        ], transform2D.prototype, "localTranslate", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector2"),
+            __metadata("design:type", gd3d.math.vector2)
+        ], transform2D.prototype, "localScale", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], transform2D.prototype, "localRotate", void 0);
+        __decorate([
+            gd3d.reflect.Field("C2DComponent[]"),
+            __metadata("design:type", Array)
+        ], transform2D.prototype, "components", void 0);
+        transform2D = __decorate([
+            gd3d.reflect.SerializeType
+        ], transform2D);
         framework.transform2D = transform2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -2200,26 +2200,26 @@ var gd3d;
                     this._targetImage.transform.markDirty();
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], button.prototype, "transition", null);
-            __decorate([
-                gd3d.reflect.Field("color"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [gd3d.math.color])
-            ], button.prototype, "normalColor", null);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], button.prototype, "fadeDuration", null);
-            button = __decorate([
-                gd3d.reflect.node2DComponent
-            ], button);
             return button;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], button.prototype, "transition", null);
+        __decorate([
+            gd3d.reflect.Field("color"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [gd3d.math.color])
+        ], button.prototype, "normalColor", null);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], button.prototype, "fadeDuration", null);
+        button = __decorate([
+            gd3d.reflect.node2DComponent
+        ], button);
         framework.button = button;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -3100,30 +3100,30 @@ var gd3d;
                     dindex++;
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
-                __metadata("design:type", gd3d.math.color)
-            ], image2D.prototype, "color", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("ImageType"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], image2D.prototype, "imageType", null);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("FillMethod"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], image2D.prototype, "fillMethod", null);
-            image2D = __decorate([
-                gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender,
-                __metadata("design:paramtypes", [])
-            ], image2D);
             return image2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("color"),
+            gd3d.reflect.UIStyle("vector4"),
+            __metadata("design:type", gd3d.math.color)
+        ], image2D.prototype, "color", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("ImageType"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], image2D.prototype, "imageType", null);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("FillMethod"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], image2D.prototype, "fillMethod", null);
+        image2D = __decorate([
+            gd3d.reflect.node2DComponent,
+            gd3d.reflect.nodeRender,
+            __metadata("design:paramtypes", [])
+        ], image2D);
         framework.image2D = image2D;
         var ImageType;
         (function (ImageType) {
@@ -3363,27 +3363,27 @@ var gd3d;
             };
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String),
-                __metadata("design:paramtypes", [String])
-            ], label.prototype, "text", null);
-            __decorate([
-                gd3d.reflect.Field("font"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.font])
-            ], label.prototype, "font", null);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], label.prototype, "fontsize", null);
-            label = __decorate([
-                gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender
-            ], label);
             return label;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String),
+            __metadata("design:paramtypes", [String])
+        ], label.prototype, "text", null);
+        __decorate([
+            gd3d.reflect.Field("font"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [framework.font])
+        ], label.prototype, "font", null);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], label.prototype, "fontsize", null);
+        label = __decorate([
+            gd3d.reflect.node2DComponent,
+            gd3d.reflect.nodeRender
+        ], label);
         framework.label = label;
         var HorizontalType;
         (function (HorizontalType) {
@@ -3482,26 +3482,26 @@ var gd3d;
             };
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
-            __decorate([
-                gd3d.reflect.Field("texture"),
-                __metadata("design:type", framework.texture)
-            ], rawImage2D.prototype, "_image", void 0);
-            __decorate([
-                gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
-                __metadata("design:type", gd3d.math.color)
-            ], rawImage2D.prototype, "color", void 0);
-            __decorate([
-                gd3d.reflect.Field("material"),
-                gd3d.reflect.UIStyle("material"),
-                __metadata("design:type", framework.material)
-            ], rawImage2D.prototype, "mat", void 0);
-            rawImage2D = __decorate([
-                gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender
-            ], rawImage2D);
             return rawImage2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("texture"),
+            __metadata("design:type", framework.texture)
+        ], rawImage2D.prototype, "_image", void 0);
+        __decorate([
+            gd3d.reflect.Field("color"),
+            gd3d.reflect.UIStyle("vector4"),
+            __metadata("design:type", gd3d.math.color)
+        ], rawImage2D.prototype, "color", void 0);
+        __decorate([
+            gd3d.reflect.Field("material"),
+            gd3d.reflect.UIStyle("material"),
+            __metadata("design:type", framework.material)
+        ], rawImage2D.prototype, "mat", void 0);
+        rawImage2D = __decorate([
+            gd3d.reflect.node2DComponent,
+            gd3d.reflect.nodeRender
+        ], rawImage2D);
         framework.rawImage2D = rawImage2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -3521,9 +3521,9 @@ var gd3d;
             resID.prototype.getID = function () {
                 return this.id;
             };
-            resID.idAll = 1;
             return resID;
         }());
+        resID.idAll = 1;
         framework.resID = resID;
         var constText = (function () {
             function constText(text) {
@@ -3532,12 +3532,12 @@ var gd3d;
             constText.prototype.getText = function () {
                 return this.name;
             };
-            constText = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], constText);
             return constText;
         }());
+        constText = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], constText);
         framework.constText = constText;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -3566,7 +3566,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["TextAsset"] = 16] = "TextAsset";
             AssetTypeEnum[AssetTypeEnum["PackBin"] = 17] = "PackBin";
             AssetTypeEnum[AssetTypeEnum["PackTxt"] = 18] = "PackTxt";
-            AssetTypeEnum[AssetTypeEnum["pathAsset"] = 19] = "pathAsset";
+            AssetTypeEnum[AssetTypeEnum["PathAsset"] = 19] = "PathAsset";
             AssetTypeEnum[AssetTypeEnum["PVR"] = 20] = "PVR";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var ResourceState = (function () {
@@ -3849,11 +3849,13 @@ var gd3d;
                 this.mapInLoad = {};
                 this.assetUrlDic = {};
                 this.bundlePackBin = {};
+                this.assetFactorys = {};
                 this.waitStateDic = {};
                 this.queueState = [];
                 this.app = app;
                 this.webgl = app.webgl;
                 this.shaderPool = new gd3d.render.shaderPool();
+                this.initAssetFactorys();
             }
             assetMgr.prototype.initDefAsset = function () {
                 framework.defShader.initDefaultShader(this);
@@ -3982,654 +3984,50 @@ var gd3d;
                 if (this.mapInLoad[name] != null)
                     delete this.mapInLoad[name];
             };
+            assetMgr.prototype.setAssetUrl = function (asset, url) {
+                this.assetUrlDic[asset.getGUID()] = url;
+            };
             assetMgr.prototype.getAssetUrl = function (asset) {
                 return this.assetUrlDic[asset.getGUID()];
             };
             assetMgr.prototype.loadResByPack = function (packnum, url, type, onstate, state) {
-                var _this = this;
-                var bundlename = this.getFileName(state.url);
-                var filename = this.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                var respack;
-                if (packnum == 0) {
-                    respack = this.bundlePackJson;
-                }
-                else {
-                    respack = this.bundlePackBin;
-                }
-                if (type == AssetTypeEnum.GLVertexShader) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    txt = decodeURI(txt);
-                    state.resstate[filename].state = 1;
-                    state.logs.push("load a glshader:" + filename);
-                    this.shaderPool.compileVS(this.webgl, name, txt);
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.GLFragmentShader) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    txt = decodeURI(txt);
-                    state.resstate[filename].state = 1;
-                    state.logs.push("load a glshader:" + filename);
-                    this.shaderPool.compileFS(this.webgl, name, txt);
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.Shader) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    state.resstate[filename].state = 1;
-                    var _shader = new framework.shader(filename);
-                    _shader.parse(this, JSON.parse(txt));
-                    this.assetUrlDic[_shader.getGUID()] = url;
-                    this.mapShader[filename] = _shader;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.TextureDesc) {
-                    var txt = this.bundlePackJson[filename];
-                    var _texturedesc = JSON.parse(txt);
-                    var _name = _texturedesc["name"];
-                    var _filterMode = _texturedesc["filterMode"];
-                    var _format = _texturedesc["format"];
-                    var _mipmap = _texturedesc["mipmap"];
-                    var _wrap = _texturedesc["wrap"];
-                    var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                    if (_format == "RGB") {
-                        _textureFormat = gd3d.render.TextureFormatEnum.RGB;
-                    }
-                    else if (_format == "Gray") {
-                        _textureFormat = gd3d.render.TextureFormatEnum.Gray;
-                    }
-                    var _linear = true;
-                    if (_filterMode.indexOf("linear") < 0) {
-                        _linear = false;
-                    }
-                    var _repeat = false;
-                    if (_wrap.indexOf("Repeat") >= 0) {
-                        _repeat = true;
-                    }
-                    var _textureSrc = url.replace(filename, _name);
-                    state.resstate[filename] = new ResourceState();
-                    if (_textureSrc.indexOf(".pvr.bin") >= 0) {
-                        gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                            if (err != null) {
-                                state.iserror = true;
-                                state.errs.push(new Error(err.message));
-                                onstate(state);
-                                return;
-                            }
-                            var _texture = new framework.texture(filename);
-                            _this.assetUrlDic[_texture.getGUID()] = url;
-                            var pvr = new PvrParse(_this.webgl);
-                            console.log(_textureSrc);
-                            _texture.glTexture = pvr.parse(_buffer);
-                            _this.use(_texture);
-                            state.resstate[filename].state = 1;
-                            state.resstate[filename].res = _texture;
-                            onstate(state);
-                        }, function (loadedLength, totalLength) {
-                            state.resstate[filename].loadedLength = loadedLength;
-                            state.progressCall = true;
-                            onstate(state);
-                        });
-                    }
-                    else {
-                        gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
-                            if (_err != null) {
-                                state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
-                                state.iserror = true;
-                                onstate(state);
-                                return;
-                            }
-                            var _texture = new framework.texture(filename);
-                            _texture.realName = _name;
-                            _this.assetUrlDic[_texture.getGUID()] = url;
-                            var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                            t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
-                            _texture.glTexture = t2d;
-                            _this.use(_texture);
-                            state.resstate[filename].state = 1;
-                            state.resstate[filename].res = _texture;
-                            onstate(state);
-                        }, function (loadedLength, totalLength) {
-                            state.resstate[filename].loadedLength = loadedLength;
-                            state.progressCall = true;
-                            onstate(state);
-                        });
-                    }
-                }
-                else if (type == AssetTypeEnum.Material) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    state.resstate[filename].state = 1;
-                    var _material = new framework.material(filename);
-                    _material.Parse(this, JSON.parse(txt));
-                    this.assetUrlDic[_material.getGUID()] = url;
-                    this.use(_material);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _material;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.Mesh) {
-                    state.resstate[filename] = new ResourceState();
-                    var _buffer = this.bundlePackBin[filename];
-                    var _mesh = new framework.mesh(filename);
-                    this.assetUrlDic[_mesh.getGUID()] = url;
-                    _mesh.Parse(_buffer, this.webgl);
-                    this.use(_mesh);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _mesh;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.Aniclip) {
-                    state.resstate[filename] = new ResourceState();
-                    var _buffer = this.bundlePackBin[filename];
-                    var _clip = new framework.animationClip(filename);
-                    this.assetUrlDic[_clip.getGUID()] = url;
-                    _clip.Parse(_buffer);
-                    this.use(_clip);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _clip;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.Atlas) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    var _atlas = new framework.atlas(filename);
-                    this.assetUrlDic[_atlas.getGUID()] = url;
-                    _atlas.Parse(txt, this);
-                    this.use(_atlas);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _atlas;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.Prefab) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    var _prefab = new framework.prefab(filename);
-                    _prefab.assetbundle = bundlename;
-                    this.assetUrlDic[_prefab.getGUID()] = url;
-                    _prefab.Parse(txt, this);
-                    this.use(_prefab);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _prefab;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.Scene) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    var _scene = new framework.rawscene(filename);
-                    _scene.assetbundle = bundlename;
-                    this.assetUrlDic[_scene.getGUID()] = url;
-                    _scene.Parse(txt, this);
-                    this.use(_scene);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _scene;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.Font) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    var _font = new framework.font(filename);
-                    this.assetUrlDic[_font.getGUID()] = url;
-                    _font.Parse(txt, this);
-                    this.use(_font);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _font;
-                    onstate(state);
-                }
-                else if (type == AssetTypeEnum.TextAsset) {
-                    state.resstate[filename] = new ResourceState();
-                    var txt = this.bundlePackJson[filename];
-                    var _textasset = new framework.textasset(filename);
-                    this.assetUrlDic[_textasset.getGUID()] = url;
-                    _textasset.content = txt;
-                    this.use(_textasset);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _textasset;
-                    onstate(state);
+                var assetFactory = this.getAssetFactory(type);
+                if (assetFactory != null) {
+                    assetFactory.loadByPack(packnum, url, onstate, state, this);
                 }
                 else {
                     throw new Error("cant use the type:" + type);
                 }
             };
+            assetMgr.prototype.regAssetFactory = function (type, factory) {
+                this.assetFactorys[type.toString()] = factory;
+            };
+            assetMgr.prototype.getAssetFactory = function (type) {
+                return this.assetFactorys[type];
+            };
+            assetMgr.prototype.initAssetFactorys = function () {
+                this.regAssetFactory(AssetTypeEnum.GLVertexShader, new framework.AssetFactory_GLVertexShader());
+                this.regAssetFactory(AssetTypeEnum.GLFragmentShader, new framework.AssetFactory_GLFragmentShader());
+                this.regAssetFactory(AssetTypeEnum.Shader, new framework.AssetFactory_Shader());
+                this.regAssetFactory(AssetTypeEnum.Texture, new framework.AssetFactory_Texture());
+                this.regAssetFactory(AssetTypeEnum.TextureDesc, new framework.AssetFactory_TextureDesc());
+                this.regAssetFactory(AssetTypeEnum.Mesh, new framework.AssetFactory_Mesh());
+                this.regAssetFactory(AssetTypeEnum.Prefab, new framework.AssetFactory_Prefab());
+                this.regAssetFactory(AssetTypeEnum.Material, new framework.AssetFactory_Material());
+                this.regAssetFactory(AssetTypeEnum.Aniclip, new framework.AssetFactory_Aniclip());
+                this.regAssetFactory(AssetTypeEnum.Scene, new framework.AssetFactory_Scene());
+                this.regAssetFactory(AssetTypeEnum.Atlas, new framework.AssetFactory_Atlas());
+                this.regAssetFactory(AssetTypeEnum.Font, new framework.AssetFactory_Font());
+                this.regAssetFactory(AssetTypeEnum.TextAsset, new framework.AssetFactory_TextAsset());
+                this.regAssetFactory(AssetTypeEnum.PackBin, new framework.AssetFactory_PackBin());
+                this.regAssetFactory(AssetTypeEnum.PackTxt, new framework.AssetFactory_PackTxt());
+                this.regAssetFactory(AssetTypeEnum.PathAsset, new framework.AssetFactory_PathAsset());
+                this.regAssetFactory(AssetTypeEnum.PVR, new framework.AssetFactory_PVR());
+            };
             assetMgr.prototype.loadSingleRes = function (url, type, onstate, state) {
-                var _this = this;
-                var bundlename = this.getFileName(state.url);
-                var filename = this.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                if (type == AssetTypeEnum.PackBin) {
-                    gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var read = new gd3d.io.binReader(_buffer);
-                        var index = read.readInt32();
-                        read.position = index;
-                        while (read.canread()) {
-                            var indindex = read.readInt32();
-                            if (index == 0)
-                                break;
-                            var key = read.readStringUtf8FixLength(indindex);
-                            var strs = key.split('|');
-                            var start = parseInt(strs[1]);
-                            var len = parseInt(strs[2]);
-                            var bufs = _buffer.slice(start, start + len);
-                            _this.bundlePackBin[strs[0]] = bufs;
-                        }
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.compressBinLoaded = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.PackTxt) {
-                    gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var read = new gd3d.io.binReader(_buffer);
-                        var arr = new Uint8Array(_buffer.byteLength);
-                        read.readUint8Array(arr);
-                        var txt = gd3d.io.binReader.utf8ArrayToString(arr);
-                        _this.bundlePackJson = JSON.parse(txt);
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.GLVertexShader) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        state.resstate[filename].state = 1;
-                        state.logs.push("load a glshader:" + filename);
-                        _this.shaderPool.compileVS(_this.webgl, name, txt);
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.GLFragmentShader) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        state.resstate[filename].state = 1;
-                        state.logs.push("load a glshader:" + filename);
-                        _this.shaderPool.compileFS(_this.webgl, name, txt);
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Shader) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        state.resstate[filename].state = 1;
-                        var _shader = new framework.shader(filename);
-                        _shader.parse(_this, JSON.parse(txt));
-                        _this.assetUrlDic[_shader.getGUID()] = url;
-                        _this.mapShader[filename] = _shader;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.PVR) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _texture = new framework.texture(filename);
-                        _this.assetUrlDic[_texture.getGUID()] = url;
-                        var pvr = new PvrParse(_this.webgl);
-                        _texture.glTexture = pvr.parse(_buffer);
-                        _this.use(_texture);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _texture;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Texture) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadImg(url, function (_tex, _err) {
-                        if (_err != null) {
-                            state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
-                            state.iserror = true;
-                            onstate(state);
-                            return;
-                        }
-                        var _texture = new framework.texture(filename);
-                        _this.assetUrlDic[_texture.getGUID()] = url;
-                        var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                        var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        t2d.uploadImage(_tex, true, true, true, true);
-                        _texture.glTexture = t2d;
-                        _this.use(_texture);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _texture;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.TextureDesc) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _texturedesc = JSON.parse(txt);
-                        var _name = _texturedesc["name"];
-                        var _filterMode = _texturedesc["filterMode"];
-                        var _format = _texturedesc["format"];
-                        var _mipmap = _texturedesc["mipmap"];
-                        var _wrap = _texturedesc["wrap"];
-                        var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                        if (_format == "RGB")
-                            _textureFormat = gd3d.render.TextureFormatEnum.RGB;
-                        else if (_format == "Gray")
-                            _textureFormat = gd3d.render.TextureFormatEnum.Gray;
-                        var _linear = true;
-                        if (_filterMode.indexOf("linear") < 0)
-                            _linear = false;
-                        var _repeat = false;
-                        if (_wrap.indexOf("Repeat") >= 0)
-                            _repeat = true;
-                        var _textureSrc = url.replace(filename, _name);
-                        if (_textureSrc.indexOf(".pvr.bin") >= 0) {
-                            gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                                if (err != null) {
-                                    state.iserror = true;
-                                    state.errs.push(new Error(err.message));
-                                    onstate(state);
-                                    return;
-                                }
-                                var _texture = new framework.texture(filename);
-                                _this.assetUrlDic[_texture.getGUID()] = url;
-                                var pvr = new PvrParse(_this.webgl);
-                                console.log(_textureSrc);
-                                _texture.glTexture = pvr.parse(_buffer);
-                                _this.use(_texture);
-                                state.resstate[filename].state = 1;
-                                state.resstate[filename].res = _texture;
-                                onstate(state);
-                            }, function (loadedLength, totalLength) {
-                                state.resstate[filename].loadedLength = loadedLength;
-                                state.progressCall = true;
-                                onstate(state);
-                            });
-                        }
-                        else {
-                            gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
-                                if (_err != null) {
-                                    state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
-                                    state.iserror = true;
-                                    onstate(state);
-                                    return;
-                                }
-                                var _texture = new framework.texture(filename);
-                                _texture.realName = _name;
-                                _this.assetUrlDic[_texture.getGUID()] = url;
-                                var t2d = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                                t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
-                                _texture.glTexture = t2d;
-                                _this.use(_texture);
-                                state.resstate[filename].state = 1;
-                                state.resstate[filename].res = _texture;
-                                onstate(state);
-                            }, function (loadedLength, totalLength) {
-                                state.resstate[filename].loadedLength = loadedLength;
-                                state.progressCall = true;
-                                onstate(state);
-                            });
-                        }
-                    });
-                }
-                else if (type == AssetTypeEnum.Material) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        state.resstate[filename].state = 1;
-                        var _material = new framework.material(filename);
-                        _material.Parse(_this, JSON.parse(txt));
-                        _this.assetUrlDic[_material.getGUID()] = url;
-                        _this.use(_material);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _material;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Mesh) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _mesh = new framework.mesh(filename);
-                        _this.assetUrlDic[_mesh.getGUID()] = url;
-                        _mesh.Parse(_buffer, _this.webgl);
-                        _this.use(_mesh);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _mesh;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Aniclip) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _clip = new framework.animationClip(filename);
-                        _this.assetUrlDic[_clip.getGUID()] = url;
-                        _clip.Parse(_buffer);
-                        _this.use(_clip);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _clip;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Atlas) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _atlas = new framework.atlas(filename);
-                        _this.assetUrlDic[_atlas.getGUID()] = url;
-                        _atlas.Parse(txt, _this);
-                        _this.use(_atlas);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _atlas;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Prefab) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _prefab = new framework.prefab(filename);
-                        _prefab.assetbundle = bundlename;
-                        _this.assetUrlDic[_prefab.getGUID()] = url;
-                        _prefab.Parse(txt, _this);
-                        _this.use(_prefab);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _prefab;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Scene) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _scene = new framework.rawscene(filename);
-                        _scene.assetbundle = bundlename;
-                        _this.assetUrlDic[_scene.getGUID()] = url;
-                        _scene.Parse(txt, _this);
-                        _this.use(_scene);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _scene;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.Font) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _font = new framework.font(filename);
-                        _this.assetUrlDic[_font.getGUID()] = url;
-                        _font.Parse(txt, _this);
-                        _this.use(_font);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _font;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.TextAsset) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _textasset = new framework.textasset(filename);
-                        _this.assetUrlDic[_textasset.getGUID()] = url;
-                        _textasset.content = txt;
-                        _this.use(_textasset);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _textasset;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-                else if (type == AssetTypeEnum.pathAsset) {
-                    state.resstate[filename] = new ResourceState();
-                    gd3d.io.loadText(url, function (txt, err) {
-                        if (err != null) {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-                        var _path = new framework.pathasset(filename);
-                        _this.assetUrlDic[_path.getGUID()] = url;
-                        _path.Parse(JSON.parse(txt));
-                        _this.use(_path);
-                        state.resstate[filename].state = 1;
-                        state.resstate[filename].res = _path;
-                        onstate(state);
-                    }, function (loadedLength, totalLength) {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
+                var assetFactory = this.getAssetFactory(type);
+                if (assetFactory != null) {
+                    assetFactory.load(url, onstate, state, this);
                 }
                 else {
                     throw new Error("cant use the type:" + type);
@@ -4991,7 +4389,7 @@ var gd3d;
                         return AssetTypeEnum.PackTxt;
                     }
                     else if (extname == ".path.json") {
-                        return AssetTypeEnum.pathAsset;
+                        return AssetTypeEnum.PathAsset;
                     }
                     i = file.indexOf(".", i + 1);
                 }
@@ -5346,7 +4744,9 @@ var gd3d;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
-            defShader.vscode = "\
+            return defShader;
+        }());
+        defShader.vscode = "\
     attribute vec4 _glesVertex;   \
     attribute vec4 _glesColor;                  \
     attribute vec4 _glesMultiTexCoord0;         \
@@ -5362,7 +4762,7 @@ var gd3d;
         xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
         gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
     }";
-            defShader.fscode = "         \
+        defShader.fscode = "         \
     uniform sampler2D _MainTex;                                                 \
     varying lowp vec4 xlv_COLOR;                                                 \
     varying highp vec2 xlv_TEXCOORD0;   \
@@ -5381,13 +4781,13 @@ var gd3d;
         gl_FragData[0] = col_1;\
     }\
     ";
-            defShader.fscode2 = "         \
+        defShader.fscode2 = "         \
     void main() \
     {\
         gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\
     }\
     ";
-            defShader.fscodeui = "         \
+        defShader.fscodeui = "         \
     uniform sampler2D _MainTex;                                                 \
     varying lowp vec4 xlv_COLOR;                                                 \
     varying highp vec2 xlv_TEXCOORD0;   \
@@ -5398,7 +4798,7 @@ var gd3d;
         gl_FragData[0] = tmpvar_3;\
     }\
     ";
-            defShader.vscodeuifont = "\
+        defShader.vscodeuifont = "\
     attribute vec4 _glesVertex;   \
     attribute vec4 _glesColor;                  \
     attribute vec4 _glesColorEx;                  \
@@ -5417,7 +4817,7 @@ var gd3d;
         xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
         gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
     }";
-            defShader.fscodeuifont = "\
+        defShader.fscodeuifont = "\
 precision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \n\
 uniform sampler2D _MainTex; \n\
 varying lowp vec4 xlv_COLOR;\n\
@@ -5437,7 +4837,7 @@ bc =min(1.0-c,bc);\n\
 \n\
 gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
 }";
-            defShader.vsdiffuse = "\
+        defShader.vsdiffuse = "\
     attribute vec4 _glesVertex;\
     attribute vec4 _glesMultiTexCoord0;\
     uniform highp mat4 glstate_matrix_mvp;\
@@ -5450,7 +4850,7 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\
         gl_Position = (glstate_matrix_mvp * tmpvar_1);\
     }";
-            defShader.fsdiffuse = "\
+        defShader.fsdiffuse = "\
     uniform sampler2D _MainTex;\
     uniform lowp float _AlphaCut;\
     varying highp vec2 xlv_TEXCOORD0;\
@@ -5461,7 +4861,7 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
             discard;\
         gl_FragData[0] = tmpvar_3;\
     }";
-            defShader.vsline = "\
+        defShader.vsline = "\
     attribute vec4 _glesVertex;\
     attribute vec4 _glesColor;\
     uniform highp mat4 glstate_matrix_mvp;\
@@ -5474,13 +4874,13 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         xlv_COLOR = _glesColor;\
         gl_Position = (glstate_matrix_mvp * tmpvar_1);\
     }";
-            defShader.fsline = "\
+        defShader.fsline = "\
     varying lowp vec4 xlv_COLOR;\
     void main()\
     {\
         gl_FragData[0] = xlv_COLOR;\
     }";
-            defShader.vsmaterialcolor = "\
+        defShader.vsmaterialcolor = "\
     attribute vec4 _glesVertex;\
     uniform vec4 _Color;\
     uniform highp mat4 glstate_matrix_mvp;\
@@ -5493,8 +4893,6 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         xlv_COLOR = _Color;\
         gl_Position = (glstate_matrix_mvp * tmpvar_1);\
     }";
-            return defShader;
-        }());
         framework.defShader = defShader;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -5522,6 +4920,765 @@ var gd3d;
             return defTexture;
         }());
         framework.defTexture = defTexture;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Aniclip = (function () {
+            function AssetFactory_Aniclip() {
+            }
+            AssetFactory_Aniclip.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_Aniclip.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _clip = new framework.animationClip(filename);
+                    _clip.Parse(_buffer);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Aniclip.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var _buffer = assetMgr.bundlePackBin[filename];
+                var _clip = new framework.animationClip(filename);
+                _clip.Parse(_buffer);
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+            };
+            return AssetFactory_Aniclip;
+        }());
+        framework.AssetFactory_Aniclip = AssetFactory_Aniclip;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Atlas = (function () {
+            function AssetFactory_Atlas() {
+            }
+            AssetFactory_Atlas.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_Atlas.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _atlas = new framework.atlas(filename);
+                    _atlas.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Atlas.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                var _atlas = new framework.atlas(filename);
+                _atlas.Parse(txt, assetMgr);
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+            };
+            return AssetFactory_Atlas;
+        }());
+        framework.AssetFactory_Atlas = AssetFactory_Atlas;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Font = (function () {
+            function AssetFactory_Font() {
+            }
+            AssetFactory_Font.prototype.newAsset = function (filename) {
+                return null;
+            };
+            AssetFactory_Font.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _font = new framework.font(filename);
+                    _font.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Font.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                var _font = new framework.font(filename);
+                _font.Parse(txt, assetMgr);
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+            };
+            return AssetFactory_Font;
+        }());
+        framework.AssetFactory_Font = AssetFactory_Font;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_GLFragmentShader = (function () {
+            function AssetFactory_GLFragmentShader() {
+            }
+            AssetFactory_GLFragmentShader.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_GLFragmentShader.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                var name = filename.substring(0, filename.indexOf("."));
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    state.resstate[filename].state = 1;
+                    state.logs.push("load a glshader:" + filename);
+                    assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
+                    onstate(state);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_GLFragmentShader.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                var name = filename.substring(0, filename.indexOf("."));
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                txt = decodeURI(txt);
+                state.resstate[filename].state = 1;
+                state.logs.push("load a glshader:" + filename);
+                assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
+                onstate(state);
+            };
+            return AssetFactory_GLFragmentShader;
+        }());
+        framework.AssetFactory_GLFragmentShader = AssetFactory_GLFragmentShader;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_GLVertexShader = (function () {
+            function AssetFactory_GLVertexShader() {
+            }
+            AssetFactory_GLVertexShader.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_GLVertexShader.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                var name = filename.substring(0, filename.indexOf("."));
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    state.resstate[filename].state = 1;
+                    state.logs.push("load a glshader:" + filename);
+                    assetMgr.shaderPool.compileVS(assetMgr.webgl, name, txt);
+                    onstate(state);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_GLVertexShader.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                var name = filename.substring(0, filename.indexOf("."));
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                txt = decodeURI(txt);
+                state.resstate[filename].state = 1;
+                state.logs.push("load a glshader:" + filename);
+                assetMgr.shaderPool.compileVS(assetMgr.webgl, name, txt);
+                onstate(state);
+            };
+            return AssetFactory_GLVertexShader;
+        }());
+        framework.AssetFactory_GLVertexShader = AssetFactory_GLVertexShader;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactoryTools = (function () {
+            function AssetFactoryTools() {
+            }
+            AssetFactoryTools.catchError = function (err, onstate, state) {
+                if (err != null) {
+                    state.iserror = true;
+                    state.errs.push(new Error(err.message));
+                    onstate(state);
+                    return true;
+                }
+                return false;
+            };
+            AssetFactoryTools.useAsset = function (assetMgr, onstate, state, asset, url) {
+                var fileName = getFileName(url);
+                assetMgr.setAssetUrl(asset, url);
+                assetMgr.use(asset);
+                state.resstate[fileName].state = 1;
+                state.resstate[fileName].res = asset;
+                onstate(state);
+            };
+            AssetFactoryTools.onProgress = function (loadedLength, totalLength, onstate, state, filename) {
+                state.resstate[filename].loadedLength = loadedLength;
+                state.progressCall = true;
+                onstate(state);
+            };
+            return AssetFactoryTools;
+        }());
+        framework.AssetFactoryTools = AssetFactoryTools;
+        function getFileName(url) {
+            var filei = url.lastIndexOf("/");
+            var file = url.substr(filei + 1);
+            return file;
+        }
+        framework.getFileName = getFileName;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Material = (function () {
+            function AssetFactory_Material() {
+            }
+            AssetFactory_Material.prototype.newAsset = function (filename) {
+                return null;
+            };
+            AssetFactory_Material.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _material = new framework.material(filename);
+                    _material.Parse(assetMgr, JSON.parse(txt));
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Material.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                var _material = new framework.material(filename);
+                _material.Parse(assetMgr, JSON.parse(txt));
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+            };
+            return AssetFactory_Material;
+        }());
+        framework.AssetFactory_Material = AssetFactory_Material;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Mesh = (function () {
+            function AssetFactory_Mesh() {
+            }
+            AssetFactory_Mesh.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_Mesh.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _mesh = new framework.mesh(filename);
+                    _mesh.Parse(_buffer, assetMgr.webgl);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Mesh.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var _buffer = assetMgr.bundlePackBin[filename];
+                var _mesh = new framework.mesh(filename);
+                _mesh.Parse(_buffer, assetMgr.webgl);
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+            };
+            return AssetFactory_Mesh;
+        }());
+        framework.AssetFactory_Mesh = AssetFactory_Mesh;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_PackBin = (function () {
+            function AssetFactory_PackBin() {
+            }
+            AssetFactory_PackBin.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_PackBin.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var read = new gd3d.io.binReader(_buffer);
+                    var index = read.readInt32();
+                    read.position = index;
+                    while (read.canread()) {
+                        var indindex = read.readInt32();
+                        if (index == 0)
+                            break;
+                        var key = read.readStringUtf8FixLength(indindex);
+                        var strs = key.split('|');
+                        var start = parseInt(strs[1]);
+                        var len = parseInt(strs[2]);
+                        var bufs = _buffer.slice(start, start + len);
+                        assetMgr.bundlePackBin[strs[0]] = bufs;
+                    }
+                    onstate(state);
+                }, function (loadedLength, totalLength) {
+                    state.compressBinLoaded = loadedLength;
+                    state.progressCall = true;
+                    onstate(state);
+                });
+            };
+            AssetFactory_PackBin.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+            };
+            return AssetFactory_PackBin;
+        }());
+        framework.AssetFactory_PackBin = AssetFactory_PackBin;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_PackTxt = (function () {
+            function AssetFactory_PackTxt() {
+            }
+            AssetFactory_PackTxt.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_PackTxt.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var read = new gd3d.io.binReader(_buffer);
+                    var arr = new Uint8Array(_buffer.byteLength);
+                    read.readUint8Array(arr);
+                    var txt = gd3d.io.binReader.utf8ArrayToString(arr);
+                    assetMgr.bundlePackJson = JSON.parse(txt);
+                    onstate(state);
+                }, function (loadedLength, totalLength) {
+                    state.compressTextLoaded = loadedLength;
+                    state.progressCall = true;
+                    onstate(state);
+                });
+            };
+            AssetFactory_PackTxt.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+            };
+            return AssetFactory_PackTxt;
+        }());
+        framework.AssetFactory_PackTxt = AssetFactory_PackTxt;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_PathAsset = (function () {
+            function AssetFactory_PathAsset() {
+            }
+            AssetFactory_PathAsset.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_PathAsset.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _path = new framework.pathasset(filename);
+                    _path.Parse(JSON.parse(txt));
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_PathAsset.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                var _path = new framework.pathasset(filename);
+                _path.Parse(JSON.parse(txt));
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+            };
+            return AssetFactory_PathAsset;
+        }());
+        framework.AssetFactory_PathAsset = AssetFactory_PathAsset;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Prefab = (function () {
+            function AssetFactory_Prefab() {
+            }
+            AssetFactory_Prefab.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_Prefab.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var bundlename = framework.getFileName(state.url);
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _prefab = new framework.prefab(filename);
+                    _prefab.assetbundle = bundlename;
+                    _prefab.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Prefab.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var bundlename = framework.getFileName(state.url);
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                var _prefab = new framework.prefab(filename);
+                _prefab.assetbundle = bundlename;
+                _prefab.Parse(txt, assetMgr);
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+            };
+            return AssetFactory_Prefab;
+        }());
+        framework.AssetFactory_Prefab = AssetFactory_Prefab;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_PVR = (function () {
+            function AssetFactory_PVR() {
+            }
+            AssetFactory_PVR.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_PVR.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _texture = new framework.texture(filename);
+                    var pvr = new PvrParse(assetMgr.webgl);
+                    _texture.glTexture = pvr.parse(_buffer);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_PVR.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+            };
+            return AssetFactory_PVR;
+        }());
+        framework.AssetFactory_PVR = AssetFactory_PVR;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Scene = (function () {
+            function AssetFactory_Scene() {
+            }
+            AssetFactory_Scene.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_Scene.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var bundlename = framework.getFileName(state.url);
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _scene = new framework.rawscene(filename);
+                    _scene.assetbundle = bundlename;
+                    _scene.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Scene.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var bundlename = framework.getFileName(state.url);
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                var _scene = new framework.rawscene(filename);
+                _scene.assetbundle = bundlename;
+                _scene.Parse(txt, assetMgr);
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+            };
+            return AssetFactory_Scene;
+        }());
+        framework.AssetFactory_Scene = AssetFactory_Scene;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Shader = (function () {
+            function AssetFactory_Shader() {
+            }
+            AssetFactory_Shader.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_Shader.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _shader = new framework.shader(filename);
+                    _shader.parse(assetMgr, JSON.parse(txt));
+                    assetMgr.setAssetUrl(_shader, url);
+                    assetMgr.mapShader[filename] = _shader;
+                    state.resstate[filename].state = 1;
+                    onstate(state);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Shader.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                var name = filename.substring(0, filename.indexOf("."));
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                state.resstate[filename].state = 1;
+                var _shader = new framework.shader(filename);
+                _shader.parse(assetMgr, JSON.parse(txt));
+                assetMgr.setAssetUrl(_shader, url);
+                assetMgr.mapShader[filename] = _shader;
+                onstate(state);
+            };
+            return AssetFactory_Shader;
+        }());
+        framework.AssetFactory_Shader = AssetFactory_Shader;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_TextAsset = (function () {
+            function AssetFactory_TextAsset() {
+            }
+            AssetFactory_TextAsset.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_TextAsset.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _textasset = new framework.textasset(filename);
+                    _textasset.content = txt;
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_TextAsset.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = assetMgr.bundlePackJson[filename];
+                var _textasset = new framework.textasset(filename);
+                _textasset.content = txt;
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+            };
+            return AssetFactory_TextAsset;
+        }());
+        framework.AssetFactory_TextAsset = AssetFactory_TextAsset;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_Texture = (function () {
+            function AssetFactory_Texture() {
+            }
+            AssetFactory_Texture.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_Texture.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadImg(url, function (_tex, _err) {
+                    if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                        return;
+                    var _texture = new framework.texture(filename);
+                    var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+                    var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                    t2d.uploadImage(_tex, true, true, true, true);
+                    _texture.glTexture = t2d;
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Texture.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+            };
+            return AssetFactory_Texture;
+        }());
+        framework.AssetFactory_Texture = AssetFactory_Texture;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_TextureDesc = (function () {
+            function AssetFactory_TextureDesc() {
+            }
+            AssetFactory_TextureDesc.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_TextureDesc.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _texturedesc = JSON.parse(txt);
+                    var _name = _texturedesc["name"];
+                    var _filterMode = _texturedesc["filterMode"];
+                    var _format = _texturedesc["format"];
+                    var _mipmap = _texturedesc["mipmap"];
+                    var _wrap = _texturedesc["wrap"];
+                    var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+                    if (_format == "RGB")
+                        _textureFormat = gd3d.render.TextureFormatEnum.RGB;
+                    else if (_format == "Gray")
+                        _textureFormat = gd3d.render.TextureFormatEnum.Gray;
+                    var _linear = true;
+                    if (_filterMode.indexOf("linear") < 0)
+                        _linear = false;
+                    var _repeat = false;
+                    if (_wrap.indexOf("Repeat") >= 0)
+                        _repeat = true;
+                    var _textureSrc = url.replace(filename, _name);
+                    if (_textureSrc.indexOf(".pvr.bin") >= 0) {
+                        gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
+                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                return;
+                            var _texture = new framework.texture(filename);
+                            var pvr = new PvrParse(assetMgr.webgl);
+                            _texture.glTexture = pvr.parse(_buffer);
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        }, function (loadedLength, totalLength) {
+                            framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                        });
+                    }
+                    else {
+                        gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
+                            if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                                return;
+                            var _texture = new framework.texture(filename);
+                            _texture.realName = _name;
+                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                            t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
+                            _texture.glTexture = t2d;
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        }, function (loadedLength, totalLength) {
+                            framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                        });
+                    }
+                });
+            };
+            AssetFactory_TextureDesc.prototype.loadByPack = function (packnum, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                var txt = assetMgr.bundlePackJson[filename];
+                var _texturedesc = JSON.parse(txt);
+                var _name = _texturedesc["name"];
+                var _filterMode = _texturedesc["filterMode"];
+                var _format = _texturedesc["format"];
+                var _mipmap = _texturedesc["mipmap"];
+                var _wrap = _texturedesc["wrap"];
+                var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+                if (_format == "RGB") {
+                    _textureFormat = gd3d.render.TextureFormatEnum.RGB;
+                }
+                else if (_format == "Gray") {
+                    _textureFormat = gd3d.render.TextureFormatEnum.Gray;
+                }
+                var _linear = true;
+                if (_filterMode.indexOf("linear") < 0) {
+                    _linear = false;
+                }
+                var _repeat = false;
+                if (_wrap.indexOf("Repeat") >= 0) {
+                    _repeat = true;
+                }
+                var _textureSrc = url.replace(filename, _name);
+                state.resstate[filename] = new framework.ResourceState();
+                if (_textureSrc.indexOf(".pvr.bin") >= 0) {
+                    gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _texture = new framework.texture(filename);
+                        var pvr = new PvrParse(assetMgr.webgl);
+                        console.log(_textureSrc);
+                        _texture.glTexture = pvr.parse(_buffer);
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    }, function (loadedLength, totalLength) {
+                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                    });
+                }
+                else {
+                    gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
+                        if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                            return;
+                        var _texture = new framework.texture(filename);
+                        _texture.realName = _name;
+                        var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                        t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
+                        _texture.glTexture = t2d;
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    }, function (loadedLength, totalLength) {
+                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                    });
+                }
+            };
+            return AssetFactory_TextureDesc;
+        }());
+        framework.AssetFactory_TextureDesc = AssetFactory_TextureDesc;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -5608,21 +5765,20 @@ var gd3d;
                 }
                 buf = null;
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], animationClip.prototype, "name", void 0);
-            animationClip = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], animationClip);
             return animationClip;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], animationClip.prototype, "name", void 0);
+        animationClip = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], animationClip);
         framework.animationClip = animationClip;
-        var PoseBoneMatrix = (function () {
+        var PoseBoneMatrix = PoseBoneMatrix_1 = (function () {
             function PoseBoneMatrix() {
             }
-            PoseBoneMatrix_1 = PoseBoneMatrix;
             PoseBoneMatrix.caclByteLength = function () {
                 var total = 12 + 16;
                 return total;
@@ -5739,20 +5895,19 @@ var gd3d;
                 gd3d.math.quatLerp(left.r, right.r, target.r, v);
                 return target;
             };
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], PoseBoneMatrix.prototype, "t", void 0);
-            __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
-            ], PoseBoneMatrix.prototype, "r", void 0);
-            PoseBoneMatrix = PoseBoneMatrix_1 = __decorate([
-                gd3d.reflect.SerializeType
-            ], PoseBoneMatrix);
             return PoseBoneMatrix;
-            var PoseBoneMatrix_1;
         }());
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], PoseBoneMatrix.prototype, "t", void 0);
+        __decorate([
+            gd3d.reflect.Field("quaternion"),
+            __metadata("design:type", gd3d.math.quaternion)
+        ], PoseBoneMatrix.prototype, "r", void 0);
+        PoseBoneMatrix = PoseBoneMatrix_1 = __decorate([
+            gd3d.reflect.SerializeType
+        ], PoseBoneMatrix);
         framework.PoseBoneMatrix = PoseBoneMatrix;
         var subClip = (function () {
             function subClip() {
@@ -5767,6 +5922,7 @@ var gd3d;
             return subClip;
         }());
         framework.subClip = subClip;
+        var PoseBoneMatrix_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -5849,12 +6005,12 @@ var gd3d;
                     this.sprites[spriteName] = r;
                 }
             };
-            atlas = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], atlas);
             return atlas;
         }());
+        atlas = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], atlas);
         framework.atlas = atlas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -5945,12 +6101,12 @@ var gd3d;
                 var d2 = new Date().valueOf();
                 var n = d2 - d1;
             };
-            font = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], font);
             return font;
         }());
+        font = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], font);
         framework.font = font;
         var charinfo = (function () {
             function charinfo() {
@@ -5974,23 +6130,23 @@ var gd3d;
                 this.value = value;
                 this.defaultValue = defaultValue;
             }
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("UniformTypeEnum"),
-                __metadata("design:type", Number)
-            ], UniformData.prototype, "type", void 0);
-            __decorate([
-                gd3d.reflect.Field("any"),
-                __metadata("design:type", Object)
-            ], UniformData.prototype, "value", void 0);
-            UniformData = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Object, Object])
-            ], UniformData);
             return UniformData;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("UniformTypeEnum"),
+            __metadata("design:type", Number)
+        ], UniformData.prototype, "type", void 0);
+        __decorate([
+            gd3d.reflect.Field("any"),
+            __metadata("design:type", Object)
+        ], UniformData.prototype, "value", void 0);
+        UniformData = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Object, Object])
+        ], UniformData);
         framework.UniformData = UniformData;
-        var material = (function () {
+        var material = material_1 = (function () {
             function material(assetName) {
                 if (assetName === void 0) { assetName = null; }
                 this.name = null;
@@ -6005,7 +6161,6 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
                 this.mapUniformTemp = {};
             }
-            material_1 = material;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -6459,33 +6614,33 @@ var gd3d;
                 }
                 return mat;
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], material.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("shader"),
-                __metadata("design:type", framework.shader)
-            ], material.prototype, "shader", void 0);
-            __decorate([
-                gd3d.reflect.Field("UniformDataDic"),
-                __metadata("design:type", Object)
-            ], material.prototype, "mapUniform", void 0);
-            material = material_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], material);
             return material;
-            var material_1;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], material.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("shader"),
+            __metadata("design:type", framework.shader)
+        ], material.prototype, "shader", void 0);
+        __decorate([
+            gd3d.reflect.Field("UniformDataDic"),
+            __metadata("design:type", Object)
+        ], material.prototype, "mapUniform", void 0);
+        material = material_1 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], material);
         framework.material = material;
+        var material_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var mesh = (function () {
+        var mesh = mesh_1 = (function () {
             function mesh(assetName) {
                 if (assetName === void 0) { assetName = null; }
                 this.id = new framework.resID();
@@ -6496,7 +6651,6 @@ var gd3d;
                 }
                 this.name = new framework.constText(assetName);
             }
-            mesh_1 = mesh;
             mesh.prototype.getName = function () {
                 if (!this.name) {
                     return null;
@@ -6846,13 +7000,12 @@ var gd3d;
                 _result.glMesh.uploadIndexSubData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
                 return _result;
             };
-            mesh = mesh_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], mesh);
             return mesh;
-            var mesh_1;
         }());
+        mesh = mesh_1 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], mesh);
         framework.mesh = mesh;
         var subMeshInfo = (function () {
             function subMeshInfo() {
@@ -6862,6 +7015,7 @@ var gd3d;
             return subMeshInfo;
         }());
         framework.subMeshInfo = subMeshInfo;
+        var mesh_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -7029,16 +7183,16 @@ var gd3d;
                 gd3d.math.vec3ScaleByNum(out, lerp, out);
                 gd3d.math.vec3Add(start, out, out);
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], pathasset.prototype, "name", void 0);
-            pathasset = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], pathasset);
             return pathasset;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], pathasset.prototype, "name", void 0);
+        pathasset = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], pathasset);
         framework.pathasset = pathasset;
         var pathtype;
         (function (pathtype) {
@@ -7106,12 +7260,12 @@ var gd3d;
                 this.trans = new framework.transform();
                 gd3d.io.deSerialize(JSON.parse(jsonStr), this.trans, assetmgr, this.assetbundle);
             };
-            prefab = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], prefab);
             return prefab;
         }());
+        prefab = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], prefab);
         framework.prefab = prefab;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -7198,12 +7352,12 @@ var gd3d;
                     this.lightmaps[key].unuse(true);
                 }
             };
-            rawscene = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], rawscene);
             return rawscene;
         }());
+        rawscene = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], rawscene);
         framework.rawscene = rawscene;
         var Fog = (function () {
             function Fog() {
@@ -7405,16 +7559,16 @@ var gd3d;
                 }
                 return pass;
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], shader.prototype, "name", void 0);
-            shader = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], shader);
             return shader;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], shader.prototype, "name", void 0);
+        shader = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], shader);
         framework.shader = shader;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -7494,12 +7648,12 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            sprite = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], sprite);
             return sprite;
         }());
+        sprite = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], sprite);
         framework.sprite = sprite;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -7537,16 +7691,16 @@ var gd3d;
                     return gd3d.math.caclStringByteLength(this.content);
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], textasset.prototype, "name", void 0);
-            textasset = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], textasset);
             return textasset;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], textasset.prototype, "name", void 0);
+        textasset = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], textasset);
         framework.textasset = textasset;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -7595,16 +7749,16 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], texture.prototype, "name", void 0);
-            texture = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], texture);
             return texture;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], texture.prototype, "name", void 0);
+        texture = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], texture);
         framework.texture = texture;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -8139,48 +8293,48 @@ var gd3d;
                     pnode = pnode.parent;
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("animationClip[]"),
-                __metadata("design:type", Array)
-            ], aniplayer.prototype, "clips", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], aniplayer.prototype, "autoplay", void 0);
-            __decorate([
-                gd3d.reflect.Field("tPoseInfo[]"),
-                __metadata("design:type", Array)
-            ], aniplayer.prototype, "bones", void 0);
-            __decorate([
-                gd3d.reflect.Field("PoseBoneMatrix[]"),
-                __metadata("design:type", Array)
-            ], aniplayer.prototype, "startPos", void 0);
-            aniplayer = __decorate([
-                gd3d.reflect.nodeComponent
-            ], aniplayer);
             return aniplayer;
         }());
+        __decorate([
+            gd3d.reflect.Field("animationClip[]"),
+            __metadata("design:type", Array)
+        ], aniplayer.prototype, "clips", void 0);
+        __decorate([
+            gd3d.reflect.Field("boolean"),
+            __metadata("design:type", Boolean)
+        ], aniplayer.prototype, "autoplay", void 0);
+        __decorate([
+            gd3d.reflect.Field("tPoseInfo[]"),
+            __metadata("design:type", Array)
+        ], aniplayer.prototype, "bones", void 0);
+        __decorate([
+            gd3d.reflect.Field("PoseBoneMatrix[]"),
+            __metadata("design:type", Array)
+        ], aniplayer.prototype, "startPos", void 0);
+        aniplayer = __decorate([
+            gd3d.reflect.nodeComponent
+        ], aniplayer);
         framework.aniplayer = aniplayer;
         var tPoseInfo = (function () {
             function tPoseInfo() {
             }
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], tPoseInfo.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], tPoseInfo.prototype, "tposep", void 0);
-            __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
-            ], tPoseInfo.prototype, "tposeq", void 0);
-            tPoseInfo = __decorate([
-                gd3d.reflect.SerializeType
-            ], tPoseInfo);
             return tPoseInfo;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String)
+        ], tPoseInfo.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], tPoseInfo.prototype, "tposep", void 0);
+        __decorate([
+            gd3d.reflect.Field("quaternion"),
+            __metadata("design:type", gd3d.math.quaternion)
+        ], tPoseInfo.prototype, "tposeq", void 0);
+        tPoseInfo = __decorate([
+            gd3d.reflect.SerializeType
+        ], tPoseInfo);
         framework.tPoseInfo = tPoseInfo;
         var PlayStyle;
         (function (PlayStyle) {
@@ -8205,12 +8359,12 @@ var gd3d;
             };
             asbone.prototype.clone = function () {
             };
-            asbone = __decorate([
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], asbone);
             return asbone;
         }());
+        asbone = __decorate([
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], asbone);
         framework.asbone = asbone;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -8341,20 +8495,20 @@ var gd3d;
             };
             boxcollider.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], boxcollider.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], boxcollider.prototype, "size", void 0);
-            boxcollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeBoxCollider
-            ], boxcollider);
             return boxcollider;
         }());
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], boxcollider.prototype, "center", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], boxcollider.prototype, "size", void 0);
+        boxcollider = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeBoxCollider
+        ], boxcollider);
         framework.boxcollider = boxcollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -8754,34 +8908,34 @@ var gd3d;
             };
             camera.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], camera.prototype, "near", null);
-            __decorate([
-                gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 999),
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], camera.prototype, "far", null);
-            __decorate([
-                gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }),
-                __metadata("design:type", Function),
-                __metadata("design:paramtypes", []),
-                __metadata("design:returntype", void 0)
-            ], camera.prototype, "markDirty", null);
-            __decorate([
-                gd3d.reflect.Field("IOverLay[]"),
-                __metadata("design:type", Array)
-            ], camera.prototype, "overlays", void 0);
-            camera = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeCamera
-            ], camera);
             return camera;
         }());
+        __decorate([
+            gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number),
+            __metadata("design:paramtypes", [Number])
+        ], camera.prototype, "near", null);
+        __decorate([
+            gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 999),
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number),
+            __metadata("design:paramtypes", [Number])
+        ], camera.prototype, "far", null);
+        __decorate([
+            gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }),
+            __metadata("design:type", Function),
+            __metadata("design:paramtypes", []),
+            __metadata("design:returntype", void 0)
+        ], camera.prototype, "markDirty", null);
+        __decorate([
+            gd3d.reflect.Field("IOverLay[]"),
+            __metadata("design:type", Array)
+        ], camera.prototype, "overlays", void 0);
+        camera = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeCamera
+        ], camera);
         framework.camera = camera;
         var CullingMask;
         (function (CullingMask) {
@@ -8799,7 +8953,7 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var effectSystem = (function () {
+        var effectSystem = effectSystem_1 = (function () {
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
                 this.renderLayer = framework.CullingMask.default;
@@ -8816,7 +8970,6 @@ var gd3d;
                 this.effectBatchers = [];
                 this.matDataGroups = [];
             }
-            effectSystem_1 = effectSystem;
             effectSystem.prototype.setEffect = function (effectConfig) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.data = this.parser.Parse(effectConfig, gd3d.framework.sceneMgr.app.getAssetMgr());
@@ -9221,20 +9374,20 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            effectSystem.fps = 30;
-            __decorate([
-                gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
-            ], effectSystem.prototype, "jsonData", void 0);
-            effectSystem = effectSystem_1 = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.selfClone
-            ], effectSystem);
             return effectSystem;
-            var effectSystem_1;
         }());
+        effectSystem.fps = 30;
+        __decorate([
+            gd3d.reflect.Field("textasset"),
+            __metadata("design:type", framework.textasset)
+        ], effectSystem.prototype, "jsonData", void 0);
+        effectSystem = effectSystem_1 = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.selfClone
+        ], effectSystem);
         framework.effectSystem = effectSystem;
+        var effectSystem_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9252,12 +9405,12 @@ var gd3d;
             };
             frustumculling.prototype.clone = function () {
             };
-            frustumculling = __decorate([
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], frustumculling);
             return frustumculling;
         }());
+        frustumculling = __decorate([
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], frustumculling);
         framework.frustumculling = frustumculling;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9386,11 +9539,11 @@ var gd3d;
             };
             guidpath.prototype.clone = function () {
             };
-            guidpath = __decorate([
-                gd3d.reflect.nodeComponent
-            ], guidpath);
             return guidpath;
         }());
+        guidpath = __decorate([
+            gd3d.reflect.nodeComponent
+        ], guidpath);
         framework.guidpath = guidpath;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9417,20 +9570,20 @@ var gd3d;
             };
             light.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], light.prototype, "isOpen", void 0);
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], light.prototype, "lightName", void 0);
-            light = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeLight
-            ], light);
             return light;
         }());
+        __decorate([
+            gd3d.reflect.Field("boolean"),
+            __metadata("design:type", Boolean)
+        ], light.prototype, "isOpen", void 0);
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String)
+        ], light.prototype, "lightName", void 0);
+        light = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeLight
+        ], light);
         framework.light = light;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9514,12 +9667,12 @@ var gd3d;
             };
             meshcollider.prototype.clone = function () {
             };
-            meshcollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeMeshCollider
-            ], meshcollider);
             return meshcollider;
         }());
+        meshcollider = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeMeshCollider
+        ], meshcollider);
         framework.meshcollider = meshcollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9559,17 +9712,17 @@ var gd3d;
             };
             meshFilter.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("mesh"),
-                gd3d.reflect.UIStyle("WidgetDragSelect"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
-            ], meshFilter.prototype, "mesh", null);
-            meshFilter = __decorate([
-                gd3d.reflect.nodeComponent
-            ], meshFilter);
             return meshFilter;
         }());
+        __decorate([
+            gd3d.reflect.Field("mesh"),
+            gd3d.reflect.UIStyle("WidgetDragSelect"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [framework.mesh])
+        ], meshFilter.prototype, "mesh", null);
+        meshFilter = __decorate([
+            gd3d.reflect.nodeComponent
+        ], meshFilter);
         framework.meshFilter = meshFilter;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9658,25 +9811,25 @@ var gd3d;
             };
             meshRenderer.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
-            ], meshRenderer.prototype, "materials", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], meshRenderer.prototype, "lightmapIndex", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector4"),
-                __metadata("design:type", gd3d.math.vector4)
-            ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
-            meshRenderer = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], meshRenderer);
             return meshRenderer;
         }());
+        __decorate([
+            gd3d.reflect.Field("material[]"),
+            __metadata("design:type", Array)
+        ], meshRenderer.prototype, "materials", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], meshRenderer.prototype, "lightmapIndex", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector4"),
+            __metadata("design:type", gd3d.math.vector4)
+        ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
+        meshRenderer = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], meshRenderer);
         framework.meshRenderer = meshRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9684,16 +9837,16 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var skinnedMeshRenderer = (function () {
+        var skinnedMeshRenderer = skinnedMeshRenderer_1 = (function () {
             function skinnedMeshRenderer() {
                 this.layer = framework.RenderLayerEnum.Common;
                 this.renderLayer = framework.CullingMask.default;
                 this.issetq = false;
                 this._queue = 0;
                 this.maxBoneCount = 0;
+                this._skintype = 0;
                 this._efficient = true;
             }
-            skinnedMeshRenderer_1 = skinnedMeshRenderer;
             Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
                 get: function () {
                     return this._queue;
@@ -9879,13 +10032,13 @@ var gd3d;
             };
             skinnedMeshRenderer.prototype.update = function (delta) {
                 if (this._skeletonMatrixData == null) {
-                    var skintype = this.useBoneShader(this.materials[0]);
-                    if (skintype == 1) {
+                    this._skintype = this.useBoneShader(this.materials[0]);
+                    if (this._skintype == 1) {
                         this.maxBoneCount = 24;
                         this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
                         this._efficient = false;
                     }
-                    else if (skintype == 2) {
+                    else if (this._skintype == 2) {
                         this.maxBoneCount = 40;
                         this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                         this._efficient = true;
@@ -9922,7 +10075,9 @@ var gd3d;
                     context.updateModel(this.player.gameObject.transform);
                 }
                 for (var i_5 = 0; i_5 < this.materials.length; i_5++) {
-                    if (this.cacheData != null) {
+                    if (this.materials[i_5] == null)
+                        continue;
+                    if (this.cacheData != null && this._skintype > 0) {
                         if (this._efficient) {
                             this.materials[i_5].setVector4v("glstate_vec4_bones", this.cacheData);
                         }
@@ -9931,7 +10086,7 @@ var gd3d;
                         }
                         continue;
                     }
-                    if (this._skeletonMatrixData != null) {
+                    if (this._skeletonMatrixData != null && this._skintype > 0) {
                         if (this._efficient) {
                             this.materials[i_5].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
                         }
@@ -9978,41 +10133,41 @@ var gd3d;
                     return 1;
                 return 0;
             };
-            skinnedMeshRenderer.dataCaches = [];
-            __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
-            ], skinnedMeshRenderer.prototype, "materials", void 0);
-            __decorate([
-                gd3d.reflect.Field("mesh"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
-            ], skinnedMeshRenderer.prototype, "mesh", null);
-            __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
-            ], skinnedMeshRenderer.prototype, "bones", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform"),
-                __metadata("design:type", framework.transform)
-            ], skinnedMeshRenderer.prototype, "rootBone", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "size", void 0);
-            skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], skinnedMeshRenderer);
             return skinnedMeshRenderer;
-            var skinnedMeshRenderer_1;
         }());
+        skinnedMeshRenderer.dataCaches = [];
+        __decorate([
+            gd3d.reflect.Field("material[]"),
+            __metadata("design:type", Array)
+        ], skinnedMeshRenderer.prototype, "materials", void 0);
+        __decorate([
+            gd3d.reflect.Field("mesh"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [framework.mesh])
+        ], skinnedMeshRenderer.prototype, "mesh", null);
+        __decorate([
+            gd3d.reflect.Field("transform[]"),
+            __metadata("design:type", Array)
+        ], skinnedMeshRenderer.prototype, "bones", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform"),
+            __metadata("design:type", framework.transform)
+        ], skinnedMeshRenderer.prototype, "rootBone", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], skinnedMeshRenderer.prototype, "center", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], skinnedMeshRenderer.prototype, "size", void 0);
+        skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], skinnedMeshRenderer);
         framework.skinnedMeshRenderer = skinnedMeshRenderer;
+        var skinnedMeshRenderer_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -10155,20 +10310,20 @@ var gd3d;
             };
             spherecollider.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], spherecollider.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], spherecollider.prototype, "radius", void 0);
-            spherecollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeSphereCollider
-            ], spherecollider);
             return spherecollider;
         }());
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], spherecollider.prototype, "center", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], spherecollider.prototype, "radius", void 0);
+        spherecollider = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeSphereCollider
+        ], spherecollider);
         framework.spherecollider = spherecollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -10422,12 +10577,12 @@ var gd3d;
             };
             trailRender_recorde.prototype.clone = function () {
             };
-            trailRender_recorde = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
-            ], trailRender_recorde);
             return trailRender_recorde;
         }());
+        trailRender_recorde = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent
+        ], trailRender_recorde);
         framework.trailRender_recorde = trailRender_recorde;
         var trailNode = (function () {
             function trailNode(p, updir, t) {
@@ -10674,12 +10829,12 @@ var gd3d;
             };
             trailRender.prototype.remove = function () {
             };
-            trailRender = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
-            ], trailRender);
             return trailRender;
         }());
+        trailRender = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent
+        ], trailRender);
         framework.trailRender = trailRender;
         var trailStick = (function () {
             function trailStick() {
@@ -11204,9 +11359,9 @@ var gd3d;
                 }
                 return ret.join('');
             };
-            converter.dataView = new DataView(new ArrayBuffer(8), 0, 8);
             return converter;
         }());
+        converter.dataView = new DataView(new ArrayBuffer(8), 0, 8);
         io.converter = converter;
         var binTool = (function (_super) {
             __extends(binTool, _super);
@@ -11773,9 +11928,9 @@ var gd3d;
                     }
                 }
             };
-            SerializeDependent.resoursePaths = [];
             return SerializeDependent;
         }());
+        SerializeDependent.resoursePaths = [];
         io.SerializeDependent = SerializeDependent;
         function SerializeForInspector(obj) {
             var str = JSON.stringify(serializeObjForInspector(obj, false));
@@ -12493,17 +12648,17 @@ var gd3d;
             referenceInfo.isRegType = function (type) {
                 return this.regtypelist.indexOf(type) >= 0;
             };
-            referenceInfo.oldmap = {};
-            referenceInfo.regtypelist = [];
             return referenceInfo;
         }());
+        referenceInfo.oldmap = {};
+        referenceInfo.regtypelist = [];
         io.referenceInfo = referenceInfo;
         var enumMgr = (function () {
             function enumMgr() {
             }
-            enumMgr.enumMap = {};
             return enumMgr;
         }());
+        enumMgr.enumMap = {};
         io.enumMgr = enumMgr;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
@@ -13708,11 +13863,11 @@ var gd3d;
         var commonStatic = (function () {
             function commonStatic() {
             }
-            commonStatic.x_axis = new gd3d.math.vector3(1, 0, 0);
-            commonStatic.y_axis = new gd3d.math.vector3(0, 1, 0);
-            commonStatic.z_axis = new gd3d.math.vector3(0, 0, 1);
             return commonStatic;
         }());
+        commonStatic.x_axis = new gd3d.math.vector3(1, 0, 0);
+        commonStatic.y_axis = new gd3d.math.vector3(0, 1, 0);
+        commonStatic.z_axis = new gd3d.math.vector3(0, 0, 1);
         math.commonStatic = commonStatic;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
@@ -17673,16 +17828,16 @@ var gd3d;
                 this.comp = comp;
                 this.init = init;
             }
-            __decorate([
-                gd3d.reflect.Field("INodeComponent"),
-                __metadata("design:type", Object)
-            ], nodeComponent.prototype, "comp", void 0);
-            nodeComponent = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Object, Boolean])
-            ], nodeComponent);
             return nodeComponent;
         }());
+        __decorate([
+            gd3d.reflect.Field("INodeComponent"),
+            __metadata("design:type", Object)
+        ], nodeComponent.prototype, "comp", void 0);
+        nodeComponent = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Object, Boolean])
+        ], nodeComponent);
         framework.nodeComponent = nodeComponent;
         var gameObject = (function () {
             function gameObject() {
@@ -17896,20 +18051,20 @@ var gd3d;
             gameObject.prototype.dispose = function () {
                 this.removeAllComponents();
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("enum"),
-                __metadata("design:type", Number)
-            ], gameObject.prototype, "layer", void 0);
-            __decorate([
-                gd3d.reflect.Field("nodeComponent[]"),
-                __metadata("design:type", Array)
-            ], gameObject.prototype, "components", void 0);
-            gameObject = __decorate([
-                gd3d.reflect.SerializeType
-            ], gameObject);
             return gameObject;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("enum"),
+            __metadata("design:type", Number)
+        ], gameObject.prototype, "layer", void 0);
+        __decorate([
+            gd3d.reflect.Field("nodeComponent[]"),
+            __metadata("design:type", Array)
+        ], gameObject.prototype, "components", void 0);
+        gameObject = __decorate([
+            gd3d.reflect.SerializeType
+        ], gameObject);
         framework.gameObject = gameObject;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19328,36 +19483,36 @@ var gd3d;
                 this._gameObject.dispose();
                 this._beDispose = true;
             };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], transform.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
-            ], transform.prototype, "children", void 0);
-            __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
-            ], transform.prototype, "localRotate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
-                __metadata("design:type", gd3d.math.vector3)
-            ], transform.prototype, "localTranslate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
-                __metadata("design:type", gd3d.math.vector3)
-            ], transform.prototype, "localScale", void 0);
-            __decorate([
-                gd3d.reflect.Field("gameObject"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [])
-            ], transform.prototype, "gameObject", null);
-            transform = __decorate([
-                gd3d.reflect.SerializeType
-            ], transform);
             return transform;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String)
+        ], transform.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform[]"),
+            __metadata("design:type", Array)
+        ], transform.prototype, "children", void 0);
+        __decorate([
+            gd3d.reflect.Field("quaternion"),
+            __metadata("design:type", gd3d.math.quaternion)
+        ], transform.prototype, "localRotate", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
+            __metadata("design:type", gd3d.math.vector3)
+        ], transform.prototype, "localTranslate", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
+            __metadata("design:type", gd3d.math.vector3)
+        ], transform.prototype, "localScale", void 0);
+        __decorate([
+            gd3d.reflect.Field("gameObject"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [])
+        ], transform.prototype, "gameObject", null);
+        transform = __decorate([
+            gd3d.reflect.SerializeType
+        ], transform);
         framework.transform = transform;
         var insID = (function () {
             function insID() {
@@ -19371,9 +19526,9 @@ var gd3d;
             insID.prototype.getInsID = function () {
                 return this.id;
             };
-            insID.idAll = 1;
             return insID;
         }());
+        insID.idAll = 1;
         framework.insID = insID;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19402,22 +19557,22 @@ var gd3d;
         var NumberUtil = (function () {
             function NumberUtil() {
             }
-            NumberUtil.KEY_A = 65;
-            NumberUtil.KEY_D = 68;
-            NumberUtil.KEY_E = 69;
-            NumberUtil.KEY_Q = 81;
-            NumberUtil.KEY_R = 82;
-            NumberUtil.KEY_S = 83;
-            NumberUtil.KEY_W = 87;
-            NumberUtil.KEY_a = 97;
-            NumberUtil.KEY_d = 100;
-            NumberUtil.KEY_e = 101;
-            NumberUtil.KEY_q = 113;
-            NumberUtil.KEY_r = 114;
-            NumberUtil.KEY_s = 115;
-            NumberUtil.KEY_w = 119;
             return NumberUtil;
         }());
+        NumberUtil.KEY_A = 65;
+        NumberUtil.KEY_D = 68;
+        NumberUtil.KEY_E = 69;
+        NumberUtil.KEY_Q = 81;
+        NumberUtil.KEY_R = 82;
+        NumberUtil.KEY_S = 83;
+        NumberUtil.KEY_W = 87;
+        NumberUtil.KEY_a = 97;
+        NumberUtil.KEY_d = 100;
+        NumberUtil.KEY_e = 101;
+        NumberUtil.KEY_q = 113;
+        NumberUtil.KEY_r = 114;
+        NumberUtil.KEY_s = 115;
+        NumberUtil.KEY_w = 119;
         framework.NumberUtil = NumberUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19428,14 +19583,14 @@ var gd3d;
         var RegexpUtil = (function () {
             function RegexpUtil() {
             }
-            RegexpUtil.textureRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*'(.+)'[ ]*\{[ ]*([a-zA-Z]*)[ ]*([a-zA-Z]*)[ ]*\}/;
-            RegexpUtil.vectorRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
-            RegexpUtil.floatRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
-            RegexpUtil.rangeRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
-            RegexpUtil.vector4Regexp = /\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
-            RegexpUtil.vector3FloatOrRangeRegexp = /([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\])/;
             return RegexpUtil;
         }());
+        RegexpUtil.textureRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*'(.+)'[ ]*\{[ ]*([a-zA-Z]*)[ ]*([a-zA-Z]*)[ ]*\}/;
+        RegexpUtil.vectorRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
+        RegexpUtil.floatRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
+        RegexpUtil.rangeRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
+        RegexpUtil.vector4Regexp = /\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
+        RegexpUtil.vector3FloatOrRangeRegexp = /([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\])/;
         framework.RegexpUtil = RegexpUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19460,24 +19615,24 @@ var gd3d;
                 var other = str.substr(1);
                 return firstChar + other;
             };
-            StringUtil.COMPONENT_CAMERA = "camera";
-            StringUtil.COMPONENT_BOXCOLLIDER = "boxcollider";
-            StringUtil.COMPONENT_LIGHT = "light";
-            StringUtil.COMPONENT_MESHFILTER = "meshFilter";
-            StringUtil.COMPONENT_MESHRENDER = "meshRenderer";
-            StringUtil.COMPONENT_EFFECTSYSTEM = "effectSystem";
-            StringUtil.COMPONENT_LABEL = "label";
-            StringUtil.COMPONENT_IMAGE = "image2D";
-            StringUtil.COMPONENT_RAWIMAGE = "rawImage2D";
-            StringUtil.COMPONENT_BUTTON = "button";
-            StringUtil.COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
-            StringUtil.COMPONENT_CAMERACONTROLLER = "cameraController";
-            StringUtil.COMPONENT_CANVASRENDER = "canvasRenderer";
-            StringUtil.UIStyle_RangeFloat = "rangeFloat";
-            StringUtil.UIStyle_Enum = "enum";
-            StringUtil.RESOURCES_MESH_CUBE = "cube";
             return StringUtil;
         }());
+        StringUtil.COMPONENT_CAMERA = "camera";
+        StringUtil.COMPONENT_BOXCOLLIDER = "boxcollider";
+        StringUtil.COMPONENT_LIGHT = "light";
+        StringUtil.COMPONENT_MESHFILTER = "meshFilter";
+        StringUtil.COMPONENT_MESHRENDER = "meshRenderer";
+        StringUtil.COMPONENT_EFFECTSYSTEM = "effectSystem";
+        StringUtil.COMPONENT_LABEL = "label";
+        StringUtil.COMPONENT_IMAGE = "image2D";
+        StringUtil.COMPONENT_RAWIMAGE = "rawImage2D";
+        StringUtil.COMPONENT_BUTTON = "button";
+        StringUtil.COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
+        StringUtil.COMPONENT_CAMERACONTROLLER = "cameraController";
+        StringUtil.COMPONENT_CANVASRENDER = "canvasRenderer";
+        StringUtil.UIStyle_RangeFloat = "rangeFloat";
+        StringUtil.UIStyle_Enum = "enum";
+        StringUtil.RESOURCES_MESH_CUBE = "cube";
         framework.StringUtil = StringUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -20062,15 +20217,15 @@ var gd3d;
             pool.collect_quaternion = function () {
                 pool.unused_quaternion.length = 0;
             };
-            pool.unused_vector4 = [];
-            pool.unused_color = [];
-            pool.unused_vector3 = [];
-            pool.unused_vector2 = [];
-            pool.unused_matrix3x2 = [];
-            pool.unused_matrix = [];
-            pool.unused_quaternion = [];
             return pool;
         }());
+        pool.unused_vector4 = [];
+        pool.unused_color = [];
+        pool.unused_vector3 = [];
+        pool.unused_vector2 = [];
+        pool.unused_matrix3x2 = [];
+        pool.unused_matrix = [];
+        pool.unused_quaternion = [];
         math.pool = pool;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
@@ -20133,11 +20288,11 @@ var gd3d;
                     webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
                 }
             };
-            webglkit._maxVertexAttribArray = 0;
-            webglkit._texNumber = null;
-            webglkit.caps = new caps();
             return webglkit;
         }());
+        webglkit._maxVertexAttribArray = 0;
+        webglkit._texNumber = null;
+        webglkit.caps = new caps();
         render.webglkit = webglkit;
     })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
@@ -20451,9 +20606,9 @@ var gd3d;
                     mesh.drawElementLines(webgl, drawbegin, drawcount);
                 }
             };
-            glDrawPass.textureID = null;
             return glDrawPass;
         }());
+        glDrawPass.textureID = null;
         render.glDrawPass = glDrawPass;
     })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
@@ -22272,9 +22427,9 @@ var gd3d;
                 glTexture2D.mapTexture[name] = t;
                 return t;
             };
-            glTexture2D.mapTexture = {};
             return glTexture2D;
         }());
+        glTexture2D.mapTexture = {};
         render.glTexture2D = glTexture2D;
         var WriteableTexture2D = (function () {
             function WriteableTexture2D(webgl, format, width, height, linear, premultiply, repeat, mirroredU, mirroredV) {

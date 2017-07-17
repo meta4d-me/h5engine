@@ -25,7 +25,7 @@ class test_loadScene implements IState
                         (s) =>
                         {
                             console.log(s.curtask + "/" + s.totaltask);
-                            // console.log(s.curByteLength+"/"+totalLength);
+                            console.log(s.curByteLength+"/"+totalLength);
                             // console.log(s.progress);
                             if (s.isfinish)
                             {
@@ -122,14 +122,14 @@ class test_loadScene implements IState
     update(delta: number)
     {
         this.timer += delta;
-        // CameraController.instance().update(delta);
-        // var x = Math.sin(this.timer);
-        // var z = Math.cos(this.timer);
-        // var x2 = Math.sin(this.timer * 0.5);
-        // var z2 = Math.cos(this.timer * 0.5);
-        // var objCam = this.camera.gameObject.transform;
-        // objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
-        // objCam.markDirty();//标记为需要刷新
+        CameraController.instance().update(delta);
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.5);
+        var z2 = Math.cos(this.timer * 0.5);
+        var objCam = this.camera.gameObject.transform;
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
+        objCam.markDirty();//标记为需要刷新
 
 
 

@@ -142,7 +142,7 @@ namespace gd3d.framework
          * 可编辑路径
          * @version egret-gd3d 1.0
          */
-        pathAsset,
+        PathAsset,
         /**
          * @public
          * @language zh_CN
@@ -670,6 +670,7 @@ namespace gd3d.framework
             this.app = app;
             this.webgl = app.webgl;
             this.shaderPool = new gd3d.render.shaderPool();
+            this.initAssetFactorys();
         }
         /**
          * @public
@@ -973,6 +974,20 @@ namespace gd3d.framework
         }
 
         private assetUrlDic: { [id: number]: string } = {};
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置资源的url
+         * @version egret-gd3d 1.0
+         * @param asset 资源
+         * @param url url
+         */
+        setAssetUrl(asset: IAsset,url:string){
+            this.assetUrlDic[asset.getGUID()] = url;
+        }
+
         /**
          * @public
          * @language zh_CN
@@ -986,8 +1001,9 @@ namespace gd3d.framework
             return this.assetUrlDic[asset.getGUID()];
         }
 
-        private bundlePackBin: { [name: string]: ArrayBuffer } = {};
-        private bundlePackJson: JSON;
+
+        public bundlePackBin: { [name: string]: ArrayBuffer } = {};
+        public bundlePackJson: JSON;
         //packnum 0 txt 1 bin
         /**
          * @private
@@ -999,257 +1015,49 @@ namespace gd3d.framework
          */
         loadResByPack(packnum: number, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad)
         {
-            let bundlename = this.getFileName(state.url);
-            let filename = this.getFileName(url);
-            let name = filename.substring(0, filename.indexOf("."));
-            let respack: any;
-            if (packnum == 0)
+            let assetFactory:IAssetFactory = this.getAssetFactory(type);
+            if(assetFactory!=null)
             {
-                respack = this.bundlePackJson;
-            }
-            else 
-            {
-                respack = this.bundlePackBin;
-            }
-            if (type == AssetTypeEnum.GLVertexShader)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                txt = decodeURI(txt);
-                state.resstate[filename].state = 1;//完成
-
-                state.logs.push("load a glshader:" + filename);
-                this.shaderPool.compileVS(this.webgl, name, txt);
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.GLFragmentShader)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                txt = decodeURI(txt);
-                state.resstate[filename].state = 1;//完成
-
-                state.logs.push("load a glshader:" + filename);
-                this.shaderPool.compileFS(this.webgl, name, txt);
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.Shader)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                state.resstate[filename].state = 1;//完成
-                var _shader = new shader(filename);
-                _shader.parse(this, JSON.parse(txt));
-                this.assetUrlDic[_shader.getGUID()] = url;
-                // this.use(_shader); //shader 地位特殊，不作为named resource,不卸载
-                this.mapShader[filename] = _shader;
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.TextureDesc)
-            {
-                let txt = this.bundlePackJson[filename];
-
-                var _texturedesc = JSON.parse(txt);
-                var _name: string = _texturedesc["name"];
-                var _filterMode: string = _texturedesc["filterMode"];
-                var _format: string = _texturedesc["format"];
-                var _mipmap: boolean = _texturedesc["mipmap"];
-                var _wrap: string = _texturedesc["wrap"];
-
-                var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
-                if (_format == "RGB")
-                {
-                    _textureFormat = render.TextureFormatEnum.RGB;
-                }
-                else if (_format == "Gray")
-                {
-                    _textureFormat = render.TextureFormatEnum.Gray;
-                }
-
-                var _linear: boolean = true;
-                if (_filterMode.indexOf("linear") < 0)
-                {
-                    _linear = false;
-                }
-
-                var _repeat: boolean = false;
-                if (_wrap.indexOf("Repeat") >= 0)
-                {
-                    _repeat = true;
-                }
-
-
-                var _textureSrc: string = url.replace(filename, _name);
-
-                state.resstate[filename] = new ResourceState();
-                if (_textureSrc.indexOf(".pvr.bin") >= 0)
-                {
-                    gd3d.io.loadArrayBuffer(_textureSrc, (_buffer, err) =>
-                    {
-                        if (err != null)
-                        {
-                            state.iserror = true;
-                            state.errs.push(new Error(err.message));
-                            onstate(state);
-                            return;
-                        }
-
-                        var _texture = new texture(filename);
-                        this.assetUrlDic[_texture.getGUID()] = url;
-                        let pvr: PvrParse = new PvrParse(this.webgl);
-                        console.log(_textureSrc);
-                        _texture.glTexture = pvr.parse(_buffer);
-                        this.use(_texture);
-                        state.resstate[filename].state = 1;//完成
-                        state.resstate[filename].res = _texture;
-                        onstate(state);
-                    },
-                    (loadedLength, totalLength) =>
-                    {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        // state.resstate[filename].totalLength = totalLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                } 
-                else
-                {
-                    gd3d.io.loadImg(_textureSrc,(_tex,_err)=>
-                    {
-                        if (_err != null)
-                        {
-                            state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
-                            state.iserror = true;
-                            onstate(state);
-                            return;
-                        }
-                        var _texture = new texture(filename);
-                        _texture.realName = _name;
-                        this.assetUrlDic[_texture.getGUID()] = url;
-
-                        var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                        t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
-                        _texture.glTexture = t2d;
-
-                        this.use(_texture);
-                        state.resstate[filename].state = 1;//完成
-                        state.resstate[filename].res = _texture;
-                        onstate(state);
-                    },
-                    (loadedLength, totalLength) =>
-                    {
-                        state.resstate[filename].loadedLength = loadedLength;
-                        // state.resstate[filename].totalLength = totalLength;
-                        state.progressCall = true;
-                        onstate(state);
-                    });
-                }
-            }
-            else if (type == AssetTypeEnum.Material)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                state.resstate[filename].state = 1;
-                var _material = new material(filename);//?what the fuck,解析出材质
-                _material.Parse(this, JSON.parse(txt));
-                this.assetUrlDic[_material.getGUID()] = url;
-                this.use(_material);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _material;
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.Mesh)
-            {
-                state.resstate[filename] = new ResourceState();
-                let _buffer = this.bundlePackBin[filename];
-                var _mesh = new mesh(filename);
-                this.assetUrlDic[_mesh.getGUID()] = url;
-                _mesh.Parse(_buffer, this.webgl);//在此方法中命名mesh的name（name存在bin文件中）
-                this.use(_mesh);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _mesh;
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.Aniclip)
-            {
-                state.resstate[filename] = new ResourceState();
-                let _buffer = this.bundlePackBin[filename];
-                var _clip = new animationClip(filename);
-                this.assetUrlDic[_clip.getGUID()] = url;
-                _clip.Parse(_buffer);
-                this.use(_clip);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _clip;
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.Atlas)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                var _atlas = new atlas(filename);
-                this.assetUrlDic[_atlas.getGUID()] = url;
-                _atlas.Parse(txt, this);
-                this.use(_atlas);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _atlas;
-                onstate(state);
-
-            }
-            else if (type == AssetTypeEnum.Prefab)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                var _prefab = new prefab(filename);
-                _prefab.assetbundle = bundlename;
-                this.assetUrlDic[_prefab.getGUID()] = url;
-                _prefab.Parse(txt, this);
-                this.use(_prefab);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _prefab;
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.Scene)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                var _scene = new rawscene(filename);
-                _scene.assetbundle = bundlename;
-                this.assetUrlDic[_scene.getGUID()] = url;
-                _scene.Parse(txt, this);
-                this.use(_scene);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _scene;
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.Font)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                var _font = new font(filename);
-                this.assetUrlDic[_font.getGUID()] = url;
-                _font.Parse(txt, this);
-                this.use(_font);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _font;
-                onstate(state);
-            }
-            else if (type == AssetTypeEnum.TextAsset)
-            {
-                state.resstate[filename] = new ResourceState();
-                let txt = this.bundlePackJson[filename];
-                var _textasset = new textasset(filename);
-                this.assetUrlDic[_textasset.getGUID()] = url;
-                _textasset.content = txt;
-                this.use(_textasset);
-                state.resstate[filename].state = 1;
-                state.resstate[filename].res = _textasset;
-                onstate(state);
+                assetFactory.loadByPack(packnum,url,onstate,state,this);
             }
             else
             {
                 throw new Error("cant use the type:" + type);
             }
         }
+
+
+        private assetFactorys:{[key:string]:IAssetFactory} = {};
+        private regAssetFactory(type: AssetTypeEnum,factory:IAssetFactory)
+        {
+            this.assetFactorys[type.toString()] = factory;
+        }
+        private getAssetFactory(type:AssetTypeEnum)
+        {
+            return this.assetFactorys[type];
+        }
+        private initAssetFactorys()
+        {
+            this.regAssetFactory(AssetTypeEnum.GLVertexShader,new AssetFactory_GLVertexShader());
+            this.regAssetFactory(AssetTypeEnum.GLFragmentShader,new AssetFactory_GLFragmentShader());
+            this.regAssetFactory(AssetTypeEnum.Shader,new AssetFactory_Shader());
+            this.regAssetFactory(AssetTypeEnum.Texture,new AssetFactory_Texture());
+            this.regAssetFactory(AssetTypeEnum.TextureDesc,new AssetFactory_TextureDesc());
+            this.regAssetFactory(AssetTypeEnum.Mesh,new AssetFactory_Mesh());
+            this.regAssetFactory(AssetTypeEnum.Prefab,new AssetFactory_Prefab());
+            this.regAssetFactory(AssetTypeEnum.Material,new AssetFactory_Material());
+            this.regAssetFactory(AssetTypeEnum.Aniclip,new AssetFactory_Aniclip());
+            this.regAssetFactory(AssetTypeEnum.Scene,new AssetFactory_Scene());
+            this.regAssetFactory(AssetTypeEnum.Atlas,new AssetFactory_Atlas());
+            this.regAssetFactory(AssetTypeEnum.Font,new AssetFactory_Font());
+            this.regAssetFactory(AssetTypeEnum.TextAsset,new AssetFactory_TextAsset());
+            this.regAssetFactory(AssetTypeEnum.PackBin,new AssetFactory_PackBin());
+            this.regAssetFactory(AssetTypeEnum.PackTxt,new AssetFactory_PackTxt());
+            this.regAssetFactory(AssetTypeEnum.PathAsset,new AssetFactory_PathAsset());
+            this.regAssetFactory(AssetTypeEnum.PVR,new AssetFactory_PVR());
+        }
+
+
         /**
          * @public
          * @language zh_CN
@@ -1265,597 +1073,10 @@ namespace gd3d.framework
          */
         loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad)
         {
-            let bundlename = this.getFileName(state.url);
-            let filename = this.getFileName(url);
-            let name = filename.substring(0, filename.indexOf("."));
-            if (type == AssetTypeEnum.PackBin)
+            let assetFactory:IAssetFactory = this.getAssetFactory(type);
+            if(assetFactory!=null)
             {
-                gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
-                    let index = read.readInt32();
-                    read.position = index;
-                    while (read.canread())
-                    {
-                        let indindex = read.readInt32();
-                        if (index == 0) break;
-
-                        let key = read.readStringUtf8FixLength(indindex);
-                        let strs: string[] = key.split('|');
-
-                        let start = parseInt(strs[1]);
-                        let len = parseInt(strs[2]);
-
-                        let bufs: ArrayBuffer = _buffer.slice(start, start + len);
-                        this.bundlePackBin[strs[0]] = bufs;
-                    }
-
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.compressBinLoaded = loadedLength;
-                    // state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                });
-            }
-            else if (type == AssetTypeEnum.PackTxt)
-            {
-                gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
-
-                    var arr = new Uint8Array(_buffer.byteLength);
-                    read.readUint8Array(arr);
-                    let txt = gd3d.io.binReader.utf8ArrayToString(arr);
-
-                    this.bundlePackJson = JSON.parse(txt);
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                });
-            }
-            else if (type == AssetTypeEnum.GLVertexShader)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    state.resstate[filename].state = 1;//完成
-
-                    state.logs.push("load a glshader:" + filename);
-                    this.shaderPool.compileVS(this.webgl, name, txt);
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                });
-            }
-            else if (type == AssetTypeEnum.GLFragmentShader)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    state.resstate[filename].state = 1;//完成
-
-                    state.logs.push("load a glshader:" + filename);
-                    this.shaderPool.compileFS(this.webgl, name, txt);
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                });
-            }
-            else if (type == AssetTypeEnum.Shader)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    state.resstate[filename].state = 1;//完成
-                    var _shader = new shader(filename);
-                    _shader.parse(this, JSON.parse(txt));
-                    this.assetUrlDic[_shader.getGUID()] = url;
-                    this.mapShader[filename] = _shader;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                });
-            }
-            else if (type == AssetTypeEnum.PVR)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-
-                    var _texture = new texture(filename);
-                    this.assetUrlDic[_texture.getGUID()] = url;
-                    let pvr: PvrParse = new PvrParse(this.webgl);
-                    _texture.glTexture = pvr.parse(_buffer);
-                    this.use(_texture);
-                    state.resstate[filename].state = 1;//完成
-                    state.resstate[filename].res = _texture;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                });
-            }
-            else if (type == AssetTypeEnum.Texture)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadImg(url,(_tex,_err)=>
-                {
-                    if (_err != null)
-                    {
-                        state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
-                        state.iserror = true;
-                        onstate(state);
-                        return;
-                    }
-                    var _texture = new texture(filename);
-                    this.assetUrlDic[_texture.getGUID()] = url;
-                    var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
-                    var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                    t2d.uploadImage(_tex, true, true, true, true);
-                    _texture.glTexture = t2d;
-                    this.use(_texture);
-                    state.resstate[filename].state = 1;//完成
-                    state.resstate[filename].res = _texture;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                });
-            }
-            else if (type == AssetTypeEnum.TextureDesc)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _texturedesc = JSON.parse(txt);
-                    var _name: string = _texturedesc["name"];
-                    var _filterMode: string = _texturedesc["filterMode"];
-                    var _format: string = _texturedesc["format"];
-                    var _mipmap: boolean = _texturedesc["mipmap"];
-                    var _wrap: string = _texturedesc["wrap"];
-
-                    var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
-                    if (_format == "RGB")
-                        _textureFormat = render.TextureFormatEnum.RGB;
-                    else if (_format == "Gray")
-                        _textureFormat = render.TextureFormatEnum.Gray;
-
-                    var _linear: boolean = true;
-                    if (_filterMode.indexOf("linear") < 0)
-                        _linear = false;
-
-                    var _repeat: boolean = false;
-                    if (_wrap.indexOf("Repeat") >= 0)
-                        _repeat = true;
-
-                    var _textureSrc: string = url.replace(filename, _name);
-                    
-                    if (_textureSrc.indexOf(".pvr.bin") >= 0)
-                    {
-                        gd3d.io.loadArrayBuffer(_textureSrc, (_buffer, err) =>
-                        {
-                            if (err != null)
-                            {
-                                state.iserror = true;
-                                state.errs.push(new Error(err.message));
-                                onstate(state);
-                                return;
-                            }
-
-                            var _texture = new texture(filename);
-                            this.assetUrlDic[_texture.getGUID()] = url;
-                            let pvr: PvrParse = new PvrParse(this.webgl);
-                            console.log(_textureSrc);
-                            _texture.glTexture = pvr.parse(_buffer);
-                            this.use(_texture);
-                            state.resstate[filename].state = 1;//完成
-                            state.resstate[filename].res = _texture;
-                            onstate(state);
-                        },
-                        (loadedLength, totalLength) =>
-                        {
-                            state.resstate[filename].loadedLength = loadedLength;
-                            // state.resstate[filename].totalLength = totalLength;
-                            state.progressCall = true;
-                            onstate(state);
-                        });
-                    } 
-                    else
-                    {
-                        gd3d.io.loadImg(_textureSrc,(_tex,_err)=>
-                        {
-                            if (_err != null)
-                            {
-                                state.errs.push(new Error("img load failed:" + filename + ". message:" + _err.message));
-                                state.iserror = true;
-                                onstate(state);
-                                return;
-                            }
-                            var _texture = new texture(filename);
-                            _texture.realName = _name;
-                            this.assetUrlDic[_texture.getGUID()] = url;
-
-                            var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                            t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
-                            _texture.glTexture = t2d;
-
-                            this.use(_texture);
-                            state.resstate[filename].state = 1;//完成
-                            state.resstate[filename].res = _texture;
-                            onstate(state);
-                        },
-                        (loadedLength, totalLength) =>
-                        {
-                            state.resstate[filename].loadedLength = loadedLength;
-                            // state.resstate[filename].totalLength = totalLength;
-                            state.progressCall = true;
-                            onstate(state);
-                        });
-                        // var img = new Image();
-                        // img.src = _textureSrc;
-                        // img.crossOrigin = "anonymous";
-                        // img.onerror = (error) =>
-                        // {
-                        //     if (error != null)
-                        //     {
-                        //         state.errs.push(new Error("img load failed:" + filename + ". message:" + error.message));
-                        //         state.iserror = true;
-                        //         onstate(state);
-                        //     }
-                        // }
-                        // img.onload = () =>
-                        // {
-                        //     var _texture = new texture(filename);
-                        //     _texture.realName = _name;
-                        //     this.assetUrlDic[_texture.getGUID()] = url;
-
-                        //     var t2d = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                        //     t2d.uploadImage(img, _mipmap, _linear, true, _repeat);
-                        //     _texture.glTexture = t2d;
-
-                        //     this.use(_texture);
-                        //     state.resstate[filename].state = 1;//完成
-                        //     state.resstate[filename].res = _texture;
-                        //     onstate(state);
-                        // }
-                    }
-                })
-            }
-            else if (type == AssetTypeEnum.Material)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    state.resstate[filename].state = 1;
-                    var _material = new material(filename);//?what the fuck,解析出材质
-                    _material.Parse(this, JSON.parse(txt));
-                    this.assetUrlDic[_material.getGUID()] = url;
-                    this.use(_material);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _material;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.Mesh)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _mesh = new mesh(filename);
-                    this.assetUrlDic[_mesh.getGUID()] = url;
-                    _mesh.Parse(_buffer, this.webgl);//在此方法中命名mesh的name（name存在bin文件中）
-                    this.use(_mesh);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _mesh;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.Aniclip)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadArrayBuffer(url, (_buffer, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _clip = new animationClip(filename);
-                    this.assetUrlDic[_clip.getGUID()] = url;
-                    _clip.Parse(_buffer);
-                    this.use(_clip);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _clip;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.Atlas)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _atlas = new atlas(filename);
-                    this.assetUrlDic[_atlas.getGUID()] = url;
-                    _atlas.Parse(txt, this);
-                    this.use(_atlas);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _atlas;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.Prefab)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _prefab = new prefab(filename);
-                    _prefab.assetbundle = bundlename;
-                    this.assetUrlDic[_prefab.getGUID()] = url;
-                    _prefab.Parse(txt, this);
-                    this.use(_prefab);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _prefab;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.Scene)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _scene = new rawscene(filename);
-                    _scene.assetbundle = bundlename;
-                    this.assetUrlDic[_scene.getGUID()] = url;
-                    _scene.Parse(txt, this);
-                    this.use(_scene);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _scene;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.Font)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _font = new font(filename);
-                    this.assetUrlDic[_font.getGUID()] = url;
-                    _font.Parse(txt, this);
-                    this.use(_font);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _font;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.TextAsset)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _textasset = new textasset(filename);
-                    this.assetUrlDic[_textasset.getGUID()] = url;
-                    _textasset.content = txt;
-                    this.use(_textasset);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _textasset;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
-            }
-            else if (type == AssetTypeEnum.pathAsset)
-            {
-                state.resstate[filename] = new ResourceState();
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var _path = new pathasset(filename);
-                    this.assetUrlDic[_path.getGUID()] = url;
-                    _path.Parse(JSON.parse(txt));
-                    this.use(_path);
-                    state.resstate[filename].state = 1;
-                    state.resstate[filename].res = _path;
-                    onstate(state);
-                },
-                (loadedLength, totalLength) =>
-                {
-                    state.resstate[filename].loadedLength = loadedLength;
-                    // state.resstate[filename].totalLength = totalLength;
-                    state.progressCall = true;
-                    onstate(state);
-                })
+                assetFactory.load(url,onstate,state,this);
             }
             else
             {
@@ -2459,7 +1680,7 @@ namespace gd3d.framework
                 }
                 else if (extname == ".path.json")
                 {
-                    return AssetTypeEnum.pathAsset;
+                    return AssetTypeEnum.PathAsset;
                 }
                 i = file.indexOf(".", i + 1);
             }
