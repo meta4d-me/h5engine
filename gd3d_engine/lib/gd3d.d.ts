@@ -10,6 +10,10 @@ declare namespace gd3d.framework {
         AddCamera = 3,
         AddCanvasRender = 4,
     }
+    enum CanvasFixedType {
+        FixedWidthType = 0,
+        FixedHeightType = 1,
+    }
     class application {
         webgl: WebGLRenderingContext;
         stats: Stats.Stats;
@@ -36,7 +40,7 @@ declare namespace gd3d.framework {
         readonly canvasClientWidth: number;
         readonly canvasClientHeight: number;
         scale: number;
-        start(div: HTMLDivElement): void;
+        start(div: HTMLDivElement, type?: CanvasFixedType, val?: number): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
         checkFilter(trans: any): boolean;
@@ -2171,6 +2175,7 @@ declare namespace gd3d.framework {
     class EffectMatData {
         shader: shader;
         diffuseTexture: texture;
+        alphaTexture: texture;
         alphaCut: number;
         static beEqual(data0: EffectMatData, data1: EffectMatData): boolean;
         clone(): EffectMatData;

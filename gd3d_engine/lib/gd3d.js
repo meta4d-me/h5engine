@@ -29,6 +29,11 @@ var gd3d;
             NotifyType[NotifyType["AddCamera"] = 3] = "AddCamera";
             NotifyType[NotifyType["AddCanvasRender"] = 4] = "AddCanvasRender";
         })(NotifyType = framework.NotifyType || (framework.NotifyType = {}));
+        var CanvasFixedType;
+        (function (CanvasFixedType) {
+            CanvasFixedType[CanvasFixedType["FixedWidthType"] = 0] = "FixedWidthType";
+            CanvasFixedType[CanvasFixedType["FixedHeightType"] = 1] = "FixedHeightType";
+        })(CanvasFixedType = framework.CanvasFixedType || (framework.CanvasFixedType = {}));
         var application = (function () {
             function application() {
                 this.limitFrame = true;
@@ -105,7 +110,9 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            application.prototype.start = function (div) {
+            application.prototype.start = function (div, type, val) {
+                if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
+                if (val === void 0) { val = 1200; }
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
                 this._timeScale = 1;
@@ -120,7 +127,14 @@ var gd3d;
                 div.appendChild(canvas);
                 this.webgl = canvas.getContext('webgl') ||
                     canvas.getContext("experimental-webgl");
-                this.canvasFixHeight = 1200;
+                switch (type) {
+                    case CanvasFixedType.FixedWidthType:
+                        this.canvasFixWidth = val;
+                        break;
+                    case CanvasFixedType.FixedHeightType:
+                        this.canvasFixHeight = val;
+                        break;
+                }
                 if (this.beWidthSetted) {
                     this.webgl.canvas.width = this._fixWidth;
                     this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
@@ -5025,7 +5039,6 @@ var PvrParse = (function () {
         this.version = tool.readUInt32();
         if (this.version === 0x03525650) {
             this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
-            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
             this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
             return this.parseV3(tool);
         }
@@ -5039,6 +5052,10 @@ var PvrParse = (function () {
     };
     PvrParse.prototype.parseV3 = function (tool) {
         this.flags = tool.readUInt32();
+        if (this.flags == 0)
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
+        else
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
         this.pixelFormatH = tool.readUInt32();
         this.pixelFormatL = tool.readUInt32();
         this.colourSpace = tool.readUInt32();
@@ -9114,6 +9131,8 @@ var gd3d;
                         subEffectBatcher.mat.setFloat("_AlphaCut", _initFrameData.attrsData.mat.alphaCut);
                     if (_initFrameData.attrsData.mat.diffuseTexture != null)
                         subEffectBatcher.mat.setTexture("_MainTex", _initFrameData.attrsData.mat.diffuseTexture);
+                    if (_initFrameData.attrsData.mat.alphaTexture != null)
+                        subEffectBatcher.mat.setTexture("_AlphaTex", _initFrameData.attrsData.mat.alphaTexture);
                     this.effectBatchers.push(subEffectBatcher);
                     this.matDataGroups.push(_initFrameData.attrsData.mat);
                 }
@@ -14923,12 +14942,13 @@ var gd3d;
             function EffectMatData() {
             }
             EffectMatData.beEqual = function (data0, data1) {
-                return data0.alphaCut == data1.alphaCut && data0.diffuseTexture == data1.diffuseTexture && data0.shader == data1.shader;
+                return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
             };
             EffectMatData.prototype.clone = function () {
                 var data = new EffectMatData();
                 data.shader = this.shader;
                 data.diffuseTexture = this.diffuseTexture;
+                data.alphaTexture = this.alphaTexture;
                 data.alphaCut = this.alphaCut;
                 return data;
             };
@@ -16565,6 +16585,8 @@ var gd3d;
                                 mat.diffuseTexture = this.asMgr.getAssetByName(content["diffuseTexture"]);
                             if (content["alphaCut"] != undefined)
                                 mat.alphaCut = content["alphaCut"];
+                            if (content["_AlphaTex"] != undefined)
+                                mat.alphaTexture = this.asMgr.getAssetByName(content["_AlphaTex"]);
                         }
                         return mat;
                     case "emmision":
@@ -16932,6 +16954,8 @@ var gd3d;
                     this.mat.setFloat("_AlphaCut", this.data.mat.alphaCut);
                 if (this.data.mat.diffuseTexture != null)
                     this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
+                if (this.data.mat.alphaTexture != null)
+                    this.mat.setTexture("_AlphaTex", this.data.mat.alphaTexture);
             }
             EmissionBatcher.prototype.initMesh = function () {
                 this.mesh = new framework.mesh();

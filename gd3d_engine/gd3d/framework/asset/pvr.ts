@@ -36,7 +36,6 @@ class PvrParse
         {
             //v3
             this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
-            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);//开启预乘
             this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转
             return this.parseV3(tool);
         }
@@ -55,6 +54,10 @@ class PvrParse
     private parseV3(tool: gd3d.io.binTool)
     {
         this.flags = tool.readUInt32();//0:没有设置  0x02 ：alpha预乘
+        if(this.flags == 0)
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);//开启预乘
+        else
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);//开启预乘
         this.pixelFormatH = tool.readUInt32();//高4位 rgba
         this.pixelFormatL = tool.readUInt32();//低4位 8888/4444/5551/565    高四位和低四位共同决定了其格式RGBA（32位）、RGBA4（16位）、    RGB、RGB5_A1、RGB565、  LUMINANCE_ALPHA、LUMINANCE、ALPHA
         this.colourSpace = tool.readUInt32();//0:linear rgb   1:srgb
@@ -139,8 +142,8 @@ class PvrParse
             }
         }
         var offset = 0;
-        let _width:number = this.width;
-        let _height:number = this.height;
+        let _width: number = this.width;
+        let _height: number = this.height;
         for (var i = 0; i < this.mipMapCount; ++i)
         {
             var levelSize = textureLevelSize(textureFormat, _width, _height);
