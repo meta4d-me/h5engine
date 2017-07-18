@@ -138,6 +138,7 @@ var gd3d;
                 if (this.beWidthSetted) {
                     this.webgl.canvas.width = this._fixWidth;
                     this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 else if (this.beHeightSetted) {
                     this.webgl.canvas.height = this._fixHeight;
@@ -10867,8 +10868,8 @@ var gd3d;
                 this.touches = {};
                 this.keyboardMap = {};
                 app.webgl.canvas.addEventListener("touchstart", function (ev) {
-                    _this.point.x = ev.touches[0].clientX;
-                    _this.point.y = ev.touches[0].clientY;
+                    _this.point.x = ev.touches[0].clientX / app.scale;
+                    _this.point.y = ev.touches[0].clientY / app.scale;
                     _this.point.touch = true;
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
@@ -10904,8 +10905,8 @@ var gd3d;
                             count++;
                         }
                     }
-                    _this.point.x = x / count;
-                    _this.point.y = y / count;
+                    _this.point.x = x / (count * app.scale);
+                    _this.point.y = y / (count * app.scale);
                 });
                 app.webgl.canvas.addEventListener("touchend", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
