@@ -45,8 +45,8 @@ namespace gd3d.framework
                 //     ev.preventDefault();
                 //     // return;
                 // }
-                this.point.x = ev.touches[0].clientX;
-                this.point.y = ev.touches[0].clientY;
+                this.point.x = ev.touches[0].clientX / app.scale;
+                this.point.y = ev.touches[0].clientY / app.scale;
                 this.point.touch = true;
 
                 for (var i = 0; i < ev.changedTouches.length; i++)
@@ -93,8 +93,8 @@ namespace gd3d.framework
                         count++;
                     }
                 }
-                this.point.x = x / count;
-                this.point.y = y / count;
+                this.point.x = x / count / app.scale;
+                this.point.y = y / count / app.scale;
             }
             );
             app.webgl.canvas.addEventListener("touchend", (ev) =>
