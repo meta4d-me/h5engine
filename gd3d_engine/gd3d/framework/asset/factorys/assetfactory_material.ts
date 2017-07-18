@@ -18,7 +18,7 @@ namespace gd3d.framework
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
-                    var _material = new material(filename);
+                    let _material = asset ? asset : new material(filename);
                     _material.Parse(assetMgr, JSON.parse(txt));
 
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
@@ -29,13 +29,13 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: material)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: material)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            let txt = assetMgr.bundlePackJson[filename];
-            var _material = new material(filename);
+            let txt = respack[filename];
+            let _material = asset ? asset : new material(filename);
             _material.Parse(assetMgr, JSON.parse(txt));
 
             AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);

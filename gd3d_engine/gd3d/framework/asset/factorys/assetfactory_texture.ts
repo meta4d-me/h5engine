@@ -18,7 +18,7 @@ namespace gd3d.framework
                     if (AssetFactoryTools.catchError(_err, onstate, state))
                         return;
 
-                    var _texture = new texture(filename);
+                    let _texture = asset ? asset : new texture(filename);
                     var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
                     var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
                     t2d.uploadImage(_tex, true, true, true, true);
@@ -32,7 +32,7 @@ namespace gd3d.framework
                 });
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
         {
 
         }

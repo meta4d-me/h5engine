@@ -4,7 +4,7 @@ namespace gd3d.framework
     {
         newAsset(assetName?: string): IAsset;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr, asset?: IAsset):void;
+        loadByPack(respack:any, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr, asset?: IAsset):void;
     }
 
     export class AssetFactoryTools

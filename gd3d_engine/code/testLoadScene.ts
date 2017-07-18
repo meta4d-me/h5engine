@@ -22,6 +22,7 @@ class test_loadScene implements IState
                         let totalLength = index[name + ".assetbundle.json"];
 
                         this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json",
+                        // this.app.getAssetMgr().load("res/scenes/city/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                         (s) =>
                         {
                             console.log(s.curtask + "/" + s.totaltask);
@@ -109,7 +110,7 @@ class test_loadScene implements IState
 
         objCam.markDirty();//标记为需要刷新
 
-        // CameraController.instance().init(this.app, this.camera);
+        CameraController.instance().init(this.app, this.camera);
     }
 
     baihu:gd3d.framework.transform;
