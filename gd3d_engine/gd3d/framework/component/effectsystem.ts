@@ -610,7 +610,8 @@ namespace gd3d.framework
                     subEffectBatcher.mat.setFloat("_AlphaCut", _initFrameData.attrsData.mat.alphaCut);
                 if (_initFrameData.attrsData.mat.diffuseTexture != null)
                     subEffectBatcher.mat.setTexture("_MainTex", _initFrameData.attrsData.mat.diffuseTexture);
-
+                if (_initFrameData.attrsData.mat.alphaTexture != null)
+                    subEffectBatcher.mat.setTexture("_AlphaTex", _initFrameData.attrsData.mat.alphaTexture);
                 this.effectBatchers.push(subEffectBatcher);
                 this.matDataGroups.push(_initFrameData.attrsData.mat);
 

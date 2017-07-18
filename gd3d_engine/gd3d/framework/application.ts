@@ -23,6 +23,18 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * @classdesc
+     * 设定画布的渲染大小，选择长或者宽作为标准锁定画布大小进行渲染。横屏选择FixedWidthType，竖屏选择FixedHeightType。目的是锁定屏幕大小，防止分辨率过高导致渲染压力过大
+     * @version egret-gd3d 1.0
+     */
+    export enum CanvasFixedType
+    {
+        FixedWidthType,
+        FixedHeightType,
+    }
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
      * 引擎的主入口
      * @version egret-gd3d 1.0
      */
@@ -142,7 +154,7 @@ namespace gd3d.framework
          * @param div 绘制区域的dom
          * @version egret-gd3d 1.0
          */
-        start(div: HTMLDivElement)
+        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.FixedHeightType, val: number = 1200)
         {
             console.log("version: " + this.version + "  build: " + this.build);
             // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
@@ -172,7 +184,15 @@ namespace gd3d.framework
             //init webgl;
             this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
                 <WebGLRenderingContext>canvas.getContext("experimental-webgl");
-            this.canvasFixHeight = 1200;
+            switch (type)
+            {
+                case CanvasFixedType.FixedWidthType:
+                    this.canvasFixWidth = val;
+                    break;
+                case CanvasFixedType.FixedHeightType:
+                    this.canvasFixHeight = val;
+                    break;
+            }
             if (this.beWidthSetted)
             {
                 this.webgl.canvas.width = this._fixWidth;

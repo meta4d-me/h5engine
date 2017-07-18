@@ -557,6 +557,8 @@ namespace gd3d.framework
                             mat.diffuseTexture = this.asMgr.getAssetByName(content["diffuseTexture"]) as texture;
                         if (content["alphaCut"] != undefined)
                             mat.alphaCut = <number>content["alphaCut"];
+                        if (content["_AlphaTex"] != undefined)
+                            mat.alphaTexture = this.asMgr.getAssetByName(content["_AlphaTex"]) as texture;
                     }
                     return mat;
                 case "emmision":

@@ -366,7 +366,7 @@ namespace gd3d.framework
         public timelineFrame: { [frameIndex: number]: EffectFrameData };
         public initFrameData: EffectFrameData;
         public ref: string;//数据整体引用
-        public beloop:boolean;
+        public beloop: boolean;
         public actionData: EffectActionData[];
         public emissionData: Emission;
         clone()
@@ -375,7 +375,7 @@ namespace gd3d.framework
             elementdata.name = this.name;
             elementdata.type = this.type;
             elementdata.ref = this.ref;
-            elementdata.beloop=this.beloop;
+            elementdata.beloop = this.beloop;
             elementdata.actionData = [];
             elementdata.timelineFrame = [];
             if (this.initFrameData)
@@ -749,11 +749,12 @@ namespace gd3d.framework
     {
         public shader: shader;
         public diffuseTexture: texture;
+        public alphaTexture: texture;
         public alphaCut: number;
 
         static beEqual(data0: EffectMatData, data1: EffectMatData)
         {
-            return data0.alphaCut == data1.alphaCut && data0.diffuseTexture == data1.diffuseTexture && data0.shader == data1.shader;
+            return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture=== data1.alphaTexture;
         }
 
         clone(): EffectMatData
@@ -761,6 +762,7 @@ namespace gd3d.framework
             let data = new EffectMatData();
             data.shader = this.shader;
             data.diffuseTexture = this.diffuseTexture;
+            data.alphaTexture = this.alphaTexture;
             data.alphaCut = this.alphaCut;
             return data;
         }

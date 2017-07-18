@@ -5,7 +5,7 @@ namespace gd3d.framework
      */
     export class EmissionBatcher
     {
-        private webgl:WebGLRenderingContext;
+        private webgl: WebGLRenderingContext;
         public gameObject: gameObject;
         public data: Emission;
         public mesh: mesh;
@@ -13,7 +13,7 @@ namespace gd3d.framework
 
         public dataForVbo: Float32Array;
         public dataForEbo: Uint16Array;
-        
+
         public particles: Particle[] = [];
         // public curLiveIndex: number = 0;
         /**
@@ -25,13 +25,13 @@ namespace gd3d.framework
         private vertexSize: number = 0;
         public formate: number = 0;
         public effectSys: effectSystem;
-        public emissionElement:EmissionElement;
-        constructor(_data: Emission, effectSys: effectSystem,emissionElement:EmissionElement)
+        public emissionElement: EmissionElement;
+        constructor(_data: Emission, effectSys: effectSystem, emissionElement: EmissionElement)
         {
-            this.webgl=emissionElement.webgl;
-            this.gameObject=effectSys.gameObject;
+            this.webgl = emissionElement.webgl;
+            this.gameObject = effectSys.gameObject;
             this.effectSys = effectSys;
-            this.emissionElement=emissionElement;
+            this.emissionElement = emissionElement;
             this.data = _data;
             this.formate = effectSys.particleVF;
             this.vertexSize = gd3d.render.meshData.calcByteSize(this.formate) / 4;
@@ -52,6 +52,8 @@ namespace gd3d.framework
                 this.mat.setFloat("_AlphaCut", this.data.mat.alphaCut);
             if (this.data.mat.diffuseTexture != null)
                 this.mat.setTexture("_MainTex", this.data.mat.diffuseTexture);
+            if (this.data.mat.alphaTexture != null)
+                this.mat.setTexture("_AlphaTex", this.data.mat.alphaTexture);
         }
 
         initMesh()
@@ -99,23 +101,23 @@ namespace gd3d.framework
 
         private refreshBuffer()
         {
-            var needvercount=this.curVerCount+this.emissionElement.perVertexCount;
-            var needIndexCount=this.curIndexCount+this.emissionElement.perIndexxCount;
+            var needvercount = this.curVerCount + this.emissionElement.perVertexCount;
+            var needIndexCount = this.curIndexCount + this.emissionElement.perIndexxCount;
 
-            if (needvercount*this.vertexSize> this.dataForVbo.length)
+            if (needvercount * this.vertexSize > this.dataForVbo.length)
             {
                 var length = this.dataForVbo.length;
                 this.mesh.glMesh.resetVboSize(this.webgl, length * 2);
                 let vbo = new Float32Array(length * 2);
                 vbo.set(this.dataForVbo, 0);
-                this.dataForVbo =vbo;
+                this.dataForVbo = vbo;
             }
             if (needIndexCount > this.dataForEbo.length)
             {
                 var length = this.dataForEbo.length;
                 this.mesh.glMesh.resetEboSize(this.webgl, 0, length * 2);
-                let ebo=new Uint16Array(length * 2);
-                ebo.set(this.dataForEbo,0);
+                let ebo = new Uint16Array(length * 2);
+                ebo.set(this.dataForEbo, 0);
                 this.dataForEbo = ebo;
             }
         }
@@ -132,13 +134,13 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
             let mesh = this.mesh;
-            
+
             mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
             if (assetmgr.app.getScene().fog)
             {
                 context.fog = assetmgr.app.getScene().fog;
                 this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
-            }else
+            } else
             {
                 this.mat.draw(context, mesh, mesh.submesh[0], "base");
             }
