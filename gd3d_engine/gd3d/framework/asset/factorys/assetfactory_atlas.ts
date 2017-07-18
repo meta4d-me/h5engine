@@ -17,7 +17,7 @@ namespace gd3d.framework
                 if (AssetFactoryTools.catchError(err, onstate, state))
                     return;
 
-                var _atlas = new atlas(filename);
+                let _atlas = asset ? asset : new atlas(filename);
                 _atlas.Parse(txt, assetMgr);
 
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
@@ -28,12 +28,12 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: atlas)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: atlas)
         {
             let filename = getFileName(url);
             state.resstate[filename] = new ResourceState();
-            let txt = assetMgr.bundlePackJson[filename];
-            var _atlas = new atlas(filename);
+            let txt = respack[filename];
+            let _atlas = asset ? asset : new atlas(filename);
             _atlas.Parse(txt, assetMgr);
 
             AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);

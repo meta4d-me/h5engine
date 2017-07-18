@@ -18,7 +18,7 @@ namespace gd3d.framework
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
-                    var _mesh = new mesh(filename);
+                    let _mesh = asset ? asset : new mesh(filename);
                     _mesh.Parse(_buffer, assetMgr.webgl);//在此方法中命名mesh的name（name存在bin文件中）
 
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
@@ -29,13 +29,13 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            let _buffer = assetMgr.bundlePackBin[filename];
-            var _mesh = new mesh(filename);
+            let _buffer = respack[filename];
+            let _mesh = asset ? asset : new mesh(filename);
             _mesh.Parse(_buffer, assetMgr.webgl);
 
             AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);

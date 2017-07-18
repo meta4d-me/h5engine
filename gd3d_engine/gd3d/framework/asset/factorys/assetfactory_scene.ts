@@ -19,7 +19,7 @@ namespace gd3d.framework
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
-                    var _scene = new rawscene(filename);
+                    let _scene = asset ? asset : new rawscene(filename);
                     _scene.assetbundle = bundlename;
                     _scene.Parse(txt, assetMgr);
 
@@ -31,14 +31,14 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene)
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            let txt = assetMgr.bundlePackJson[filename];
-            var _scene = new rawscene(filename);
+            let txt = respack[filename];
+            let _scene = asset ? asset : new rawscene(filename);
             _scene.assetbundle = bundlename;
             _scene.Parse(txt, assetMgr);
 

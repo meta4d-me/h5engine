@@ -2704,6 +2704,7 @@ var test_loadScene = (function () {
         objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
     };
     test_loadScene.prototype.update = function (delta) {
         this.timer += delta;
