@@ -184,9 +184,21 @@ namespace gd3d.framework
         res: IAsset = null;
         state: number = 0;
         loadedLength: number = 0;
-        totalLength: number = 0;
+        // totalLength: number = 0;
     }
-    
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 带引用的资源加载状态
+     * @version egret-gd3d 1.0
+     */
+    export class RefResourceState extends ResourceState
+    {
+        refLoadedLength: number = 0;
+    }
+
     /**
      * @public
      * @language zh_CN
@@ -264,7 +276,12 @@ namespace gd3d.framework
             let result = 0;
             for (let key in this.resstate)
             {
-                result += this.resstate[key].loadedLength;
+                let _resState = this.resstate[key];
+                result += _resState.loadedLength;
+                if (_resState instanceof RefResourceState)
+                {
+                    result += _resState.refLoadedLength;
+                }
             }
             result += this.compressTextLoaded + this.compressBinLoaded;
             return result;
@@ -276,15 +293,7 @@ namespace gd3d.framework
          * 总字节长度
          * @version egret-gd3d 1.0
          */
-        get totalByteLength(): number
-        {
-            let result = 0;
-            for (let key in this.resstate)
-            {
-                result += this.resstate[key].totalLength;
-            }
-            return result;
-        }
+        totalByteLength: number = 0;
 
         /**
          * @public
@@ -372,6 +381,16 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         path: string;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 资源的总字节数
+         * @version egret-gd3d 1.0
+         */
+        totalLength: number = 0;
+
         constructor(url: string)
         {
             this.url = url;
@@ -431,6 +450,10 @@ namespace gd3d.framework
                     this.packages.push(packes[i]);
                 }
             }
+            if (json["totalLength"] != undefined)
+            {
+                this.totalLength = json["totalLength"];
+            }
         }
         /**
          * @public
@@ -463,6 +486,8 @@ namespace gd3d.framework
          */
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad)
         {
+            state.totalByteLength = this.totalLength;
+
             let totoal = this.files.length;
             this.assetmgr = assetmgr;
             this.curLoadState = AssetBundleLoadState.None;
@@ -712,7 +737,8 @@ namespace gd3d.framework
                                 return;
                             }
 
-                            if(s.progressCall){
+                            if (s.progressCall)
+                            {
                                 s.progressCall = false;
                                 onstate(state);
                                 return;
@@ -735,7 +761,7 @@ namespace gd3d.framework
                                 loadcall();
                             }
                             assetmgr.doWaitState(this.url, state);
-                        }, state);
+                        }, state,asset);
                     }
                     
                 }
@@ -1099,7 +1125,8 @@ namespace gd3d.framework
          * @param asset 资源
          * @param url url
          */
-        setAssetUrl(asset: IAsset,url:string){
+        setAssetUrl(asset: IAsset, url: string)
+        {
             this.assetUrlDic[asset.getGUID()] = url;
         }
 
@@ -1183,12 +1210,12 @@ namespace gd3d.framework
          * @param onstate 状态返回的回调
          * @param state 资源加载的总状态
          */
-        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad)
+        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad,asset?: IAsset)
         {
             let assetFactory:IAssetFactory = this.getAssetFactory(type);
             if(assetFactory!=null)
             {
-                assetFactory.load(url,onstate,state,this);
+                assetFactory.load(url, onstate, state, this,asset);
             }
             else
             {
@@ -1296,7 +1323,8 @@ namespace gd3d.framework
                         return;
                     }
 
-                    if(s.progressCall){
+                    if (s.progressCall)
+                    {
                         s.progressCall = false;
                         onstate(state);
                         return;
