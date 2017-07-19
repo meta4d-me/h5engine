@@ -4156,12 +4156,17 @@ var gd3d;
             assetMgr.prototype.checkFreeChannel = function () {
                 var freechannel = -1;
                 for (var k = 0; k < this.loadingQueueState.length; k++) {
-                    if (!this.loadingQueueState[k].state.isfinish && !this.loadingQueueState[k].state.iserror) {
+                    if (this.loadingQueueState[k] == undefined) {
+                        freechannel = k;
+                        break;
+                    }
+                    else if (!this.loadingQueueState[k].state.isfinish && !this.loadingQueueState[k].state.iserror) {
                         continue;
                     }
                     else {
                         delete this.loadingQueueState[k];
                         freechannel = k;
+                        break;
                     }
                 }
                 if (freechannel == -1 && this.loadingQueueState.length < this.loadingCountLimit) {
