@@ -633,7 +633,9 @@ declare namespace gd3d.framework {
         res: IAsset;
         state: number;
         loadedLength: number;
-        totalLength: number;
+    }
+    class RefResourceState extends ResourceState {
+        refLoadedLength: number;
     }
     class stateLoad {
         iserror: boolean;
@@ -646,7 +648,7 @@ declare namespace gd3d.framework {
         totaltask: number;
         readonly fileProgress: number;
         readonly curByteLength: number;
-        readonly totalByteLength: number;
+        totalByteLength: number;
         readonly progress: number;
         progressCall: boolean;
         compressTextLoaded: number;
@@ -665,6 +667,7 @@ declare namespace gd3d.framework {
         private bundlePackJson;
         url: string;
         path: string;
+        totalLength: number;
         constructor(url: string);
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any): void;
@@ -721,7 +724,7 @@ declare namespace gd3d.framework {
         private regAssetFactory(type, factory);
         private getAssetFactory(type);
         private initAssetFactorys();
-        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad): void;
+        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset?: IAsset): void;
         private waitStateDic;
         doWaitState(name: string, state: stateLoad): void;
         private waitQueueState;
@@ -859,6 +862,7 @@ declare namespace gd3d.framework {
         static catchError(err: Error, onstate: (state: stateLoad) => void, state: stateLoad): boolean;
         static useAsset(assetMgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, url: string): void;
         static onProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad, filename: string): void;
+        static onRefProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad, filename: string): void;
     }
     function getFileName(url: string): string;
 }

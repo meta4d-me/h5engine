@@ -20,12 +20,14 @@ class test_loadprefab implements IState
                 this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                     (s) =>
                     {
+                        console.log(s.curtask + "/" + s.totaltask);
+                        console.log(s.curByteLength+"/"+s.totalByteLength);
                         if (s.isfinish)
                         {
                             var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
                             this.baihu = _prefab.getCloneTrans();
                             this.scene.addChild(this.baihu);
-                            this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
+                            // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
                             this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                             this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
 

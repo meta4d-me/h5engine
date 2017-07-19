@@ -39,6 +39,15 @@ namespace gd3d.framework
             state.progressCall = true;
             onstate(state);
         }
+
+        static onRefProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad,filename:string)
+        {
+            let _restate = state.resstate[filename] as RefResourceState;
+            _restate.refLoadedLength = loadedLength;
+            // state.resstate[filename].totalLength = totalLength;
+            state.progressCall = true;
+            onstate(state);
+        }
     }
 
     export function getFileName(url: string)

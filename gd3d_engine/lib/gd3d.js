@@ -138,6 +138,7 @@ var gd3d;
                 if (this.beWidthSetted) {
                     this.webgl.canvas.width = this._fixWidth;
                     this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 else if (this.beHeightSetted) {
                     this.webgl.canvas.height = this._fixHeight;
@@ -3587,11 +3588,20 @@ var gd3d;
                 this.res = null;
                 this.state = 0;
                 this.loadedLength = 0;
-                this.totalLength = 0;
             }
             return ResourceState;
         }());
         framework.ResourceState = ResourceState;
+        var RefResourceState = (function (_super) {
+            __extends(RefResourceState, _super);
+            function RefResourceState() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.refLoadedLength = 0;
+                return _this;
+            }
+            return RefResourceState;
+        }(ResourceState));
+        framework.RefResourceState = RefResourceState;
         var stateLoad = (function () {
             function stateLoad() {
                 this.iserror = false;
@@ -3600,6 +3610,7 @@ var gd3d;
                 this.curtask = 0;
                 this.bundleLoadState = 0;
                 this.totaltask = 0;
+                this.totalByteLength = 0;
                 this.progressCall = false;
                 this.compressTextLoaded = 0;
                 this.compressBinLoaded = 0;
@@ -3617,20 +3628,13 @@ var gd3d;
                 get: function () {
                     var result = 0;
                     for (var key in this.resstate) {
-                        result += this.resstate[key].loadedLength;
+                        var _resState = this.resstate[key];
+                        result += _resState.loadedLength;
+                        if (_resState instanceof RefResourceState) {
+                            result += _resState.refLoadedLength;
+                        }
                     }
                     result += this.compressTextLoaded + this.compressBinLoaded;
-                    return result;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(stateLoad.prototype, "totalByteLength", {
-                get: function () {
-                    var result = 0;
-                    for (var key in this.resstate) {
-                        result += this.resstate[key].totalLength;
-                    }
                     return result;
                 },
                 enumerable: true,
@@ -3651,6 +3655,7 @@ var gd3d;
                 this.files = [];
                 this.packages = [];
                 this.bundlePackBin = {};
+                this.totalLength = 0;
                 this.mapNamed = {};
                 this.url = url;
                 var i = url.lastIndexOf("/");
@@ -3690,6 +3695,9 @@ var gd3d;
                         this.packages.push(packes[i]);
                     }
                 }
+                if (json["totalLength"] != undefined) {
+                    this.totalLength = json["totalLength"];
+                }
             };
             assetBundle.prototype.unload = function () {
                 for (var key in this.mapNamed) {
@@ -3702,6 +3710,7 @@ var gd3d;
             };
             assetBundle.prototype.load = function (assetmgr, onstate, state) {
                 var _this = this;
+                state.totalByteLength = this.totalLength;
                 var totoal = this.files.length;
                 this.assetmgr = assetmgr;
                 this.curLoadState = AssetBundleLoadState.None;
@@ -3919,7 +3928,7 @@ var gd3d;
                                     loadcall();
                                 }
                                 assetmgr.doWaitState(_this.url, state);
-                            }, state);
+                            }, state, asset);
                         }
                     }
                 };
@@ -4113,10 +4122,10 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.PathAsset, new framework.AssetFactory_PathAsset());
                 this.regAssetFactory(AssetTypeEnum.PVR, new framework.AssetFactory_PVR());
             };
-            assetMgr.prototype.loadSingleRes = function (url, type, onstate, state) {
+            assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
                 var assetFactory = this.getAssetFactory(type);
                 if (assetFactory != null) {
-                    assetFactory.load(url, onstate, state, this);
+                    assetFactory.load(url, onstate, state, this, asset);
                 }
                 else {
                     throw new Error("cant use the type:" + type);
@@ -5231,6 +5240,12 @@ var gd3d;
                 state.progressCall = true;
                 onstate(state);
             };
+            AssetFactoryTools.onRefProgress = function (loadedLength, totalLength, onstate, state, filename) {
+                var _restate = state.resstate[filename];
+                _restate.refLoadedLength = loadedLength;
+                state.progressCall = true;
+                onstate(state);
+            };
             return AssetFactoryTools;
         }());
         framework.AssetFactoryTools = AssetFactoryTools;
@@ -5585,7 +5600,7 @@ var gd3d;
             };
             AssetFactory_TextureDesc.prototype.load = function (url, onstate, state, assetMgr, asset) {
                 var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
+                state.resstate[filename] = new framework.RefResourceState();
                 gd3d.io.loadText(url, function (txt, err) {
                     if (framework.AssetFactoryTools.catchError(err, onstate, state))
                         return;
@@ -5616,7 +5631,7 @@ var gd3d;
                             _texture.glTexture = pvr.parse(_buffer);
                             framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                         }, function (loadedLength, totalLength) {
-                            framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                            framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                         });
                     }
                     else {
@@ -5630,9 +5645,11 @@ var gd3d;
                             _texture.glTexture = t2d;
                             framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                         }, function (loadedLength, totalLength) {
-                            framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                            framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                         });
                     }
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
             AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
@@ -10875,8 +10892,8 @@ var gd3d;
                 this.touches = {};
                 this.keyboardMap = {};
                 app.webgl.canvas.addEventListener("touchstart", function (ev) {
-                    _this.point.x = ev.touches[0].clientX;
-                    _this.point.y = ev.touches[0].clientY;
+                    _this.point.x = ev.touches[0].clientX / app.scale;
+                    _this.point.y = ev.touches[0].clientY / app.scale;
                     _this.point.touch = true;
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
@@ -10912,8 +10929,8 @@ var gd3d;
                             count++;
                         }
                     }
-                    _this.point.x = x / count;
-                    _this.point.y = y / count;
+                    _this.point.x = x / (count * app.scale);
+                    _this.point.y = y / (count * app.scale);
                 });
                 app.webgl.canvas.addEventListener("touchend", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {

@@ -11,7 +11,7 @@ namespace gd3d.framework
         {
             let filename = getFileName(url);
 
-            state.resstate[filename] = new ResourceState();
+            state.resstate[filename] = new RefResourceState();
             gd3d.io.loadText(url,
                 (txt, err) =>
                 {
@@ -57,7 +57,7 @@ namespace gd3d.framework
                             },
                             (loadedLength, totalLength) =>
                             {
-                                AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                                AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                             });
                     }
                     else
@@ -80,10 +80,15 @@ namespace gd3d.framework
                             },
                             (loadedLength, totalLength) =>
                             {
-                                AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                                AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                             });
                     }
-                })
+                },
+                (loadedLength, totalLength) =>
+                {
+                    AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                }
+            );
         }
 
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)

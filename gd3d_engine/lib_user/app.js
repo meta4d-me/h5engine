@@ -2603,7 +2603,6 @@ var testloadImmediate = (function () {
         this.scene = this.app.getScene();
         var baihu = new gd3d.framework.transform();
         baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 20;
         gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
         this.scene.addChild(baihu);
         this.cube = baihu;
@@ -2732,7 +2731,6 @@ var test_load = (function () {
         this.scene = this.app.getScene();
         var baihu = new gd3d.framework.transform();
         baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 20;
         gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
         this.scene.addChild(baihu);
         var lighttran = new gd3d.framework.transform();
@@ -4288,11 +4286,12 @@ var test_loadprefab = (function () {
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    console.log(s.curtask + "/" + s.totaltask);
+                    console.log(s.curByteLength + "/" + s.totalByteLength);
                     if (s.isfinish) {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
                         _this.baihu = _prefab.getCloneTrans();
                         _this.scene.addChild(_this.baihu);
-                        _this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
                         _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                         _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
                         _this.baihu = _prefab.getCloneTrans();
