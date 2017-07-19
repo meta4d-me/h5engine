@@ -4405,7 +4405,7 @@ var gd3d;
                     img.onload = function () {
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         result.glTexture = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        result.glTexture.uploadImage(img, false, false);
+                        result.glTexture.uploadImage(img, true, true, true, true);
                         _this.use(result);
                     };
                 }
@@ -6426,7 +6426,7 @@ var gd3d;
                         _texture.use();
                         var _texelsizeName = _id + "_TexelSize";
                         var _gltexture = _texture.glTexture;
-                        if (this.mapUniform[_texelsizeName] != undefined) {
+                        if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined) {
                             this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                         }
                     }

@@ -1670,7 +1670,7 @@ namespace gd3d.framework
                 {
                     var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
                     result.glTexture = new gd3d.render.glTexture2D(this.webgl, _textureFormat);
-                    result.glTexture.uploadImage(img, false, false);
+                    result.glTexture.uploadImage(img, true, true, true, true);
                     this.use(result);
                 }
             }
