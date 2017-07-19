@@ -733,7 +733,7 @@ namespace gd3d.framework
                                 loadcall();
                             }
                             assetmgr.doWaitState(this.url, state);
-                        }, state);
+                        }, state,asset);
                     }
 
                 }
@@ -1182,12 +1182,12 @@ namespace gd3d.framework
          * @param onstate 状态返回的回调
          * @param state 资源加载的总状态
          */
-        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad)
+        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad,asset?: IAsset)
         {
             let assetFactory: IAssetFactory = this.getAssetFactory(type);
             if (assetFactory != null)
             {
-                assetFactory.load(url, onstate, state, this);
+                assetFactory.load(url, onstate, state, this,asset);
             }
             else
             {
