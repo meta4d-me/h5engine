@@ -2603,7 +2603,6 @@ var testloadImmediate = (function () {
         this.scene = this.app.getScene();
         var baihu = new gd3d.framework.transform();
         baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 20;
         gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
         this.scene.addChild(baihu);
         this.cube = baihu;
@@ -2730,7 +2729,6 @@ var test_load = (function () {
         this.scene = this.app.getScene();
         var baihu = new gd3d.framework.transform();
         baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 20;
         gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
         this.scene.addChild(baihu);
         var lighttran = new gd3d.framework.transform();
