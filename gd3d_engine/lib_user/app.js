@@ -2682,7 +2682,9 @@ var test_loadScene = (function () {
                         _this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json", function (s) {
                             console.log(s.curtask + "/" + s.totaltask);
                             console.log(s.curByteLength + "/" + totalLength_1);
-                            if (s.isfinish) {
+                            console.log(s.bundleLoadState);
+                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene) {
+                                console.log(s.isfinish);
                                 var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
                                 var _root = _scene.getSceneRoot();
                                 _this.scene.addChild(_root);

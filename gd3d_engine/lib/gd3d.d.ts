@@ -642,6 +642,7 @@ declare namespace gd3d.framework {
             [id: string]: ResourceState;
         };
         curtask: number;
+        bundleLoadState: number;
         totaltask: number;
         readonly fileProgress: number;
         readonly curByteLength: number;

@@ -3598,6 +3598,7 @@ var gd3d;
                 this.isfinish = false;
                 this.resstate = {};
                 this.curtask = 0;
+                this.bundleLoadState = 0;
                 this.totaltask = 0;
                 this.progressCall = false;
                 this.compressTextLoaded = 0;
@@ -3718,7 +3719,9 @@ var gd3d;
                 var pvrs = [];
                 var packs = [];
                 var asslist = [];
-                asslist.push(packs, glvshaders, glfshaders, shaders, meshs, textures, texturedescs, materials, anclips, prefabs, scenes, textassets, pvrs);
+                var assstatelist = [];
+                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs);
+                assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Mesh, AssetBundleLoadState.Prefab, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr);
                 var realTotal = 0;
                 var mapPackes = {};
                 for (var i = 0; i < this.packages.length; i++) {
@@ -3792,9 +3795,15 @@ var gd3d;
                     }
                 }
                 var list = [];
-                for (var k in asslist) {
-                    for (var i_1 in asslist[k]) {
-                        list.push(asslist[k][i_1]);
+                for (var i_1 = 0; i_1 < asslist.length; i_1++) {
+                    for (var j = 0; j < asslist[i_1].length; j++) {
+                        var url = asslist[i_1][j].url;
+                        var type_2 = asslist[i_1][j].type;
+                        var asset = asslist[i_1][j].asset;
+                        var state_1 = null;
+                        if (j == asslist[i_1].length - 1)
+                            state_1 = assstatelist[i_1];
+                        list.push({ url: url, type: type_2, asset: asset, state: state_1 });
                     }
                 }
                 realTotal = list.length;
@@ -3805,11 +3814,13 @@ var gd3d;
                 state.curtask = 1;
                 onstate(state);
                 assetmgr.doWaitState(this.url, state);
+                state.bundleLoadState = AssetBundleLoadState.None;
                 var loadcall = function () {
                     var surl = list[state.curtask - 1].url;
                     var type = list[state.curtask - 1].type;
                     var asset = list[state.curtask - 1].asset;
                     var _fileName = assetmgr.getFileName(surl);
+                    var loadstate = list[state.curtask - 1].state;
                     if (mapPackes[surl] != undefined) {
                         var respack = void 0;
                         if (mapPackes[surl] == 0)
@@ -3824,6 +3835,8 @@ var gd3d;
                                 onstate(state);
                                 return;
                             }
+                            if (state != undefined)
+                                state.bundleLoadState |= loadstate;
                             realTotal--;
                             state.curtask++;
                             if (realTotal === 0) {
@@ -3862,6 +3875,8 @@ var gd3d;
                                     var bufs = _buffer.slice(start, start + len);
                                     _this.bundlePackBin[strs[0]] = bufs;
                                 }
+                                if (state != undefined)
+                                    state.bundleLoadState |= loadstate;
                                 realTotal--;
                                 state.curtask++;
                                 if (realTotal === 0) {
@@ -3890,6 +3905,8 @@ var gd3d;
                                     onstate(state);
                                     return;
                                 }
+                                if (state != undefined)
+                                    state.bundleLoadState |= loadstate;
                                 realTotal--;
                                 state.curtask++;
                                 if (realTotal === 0) {
@@ -3925,7 +3942,7 @@ var gd3d;
                 this.waitStateDic = {};
                 this.waitQueueState = [];
                 this.loadingQueueState = [];
-                this.loadingCountLimit = 5;
+                this.loadingCountLimit = 2;
                 this.app = app;
                 this.webgl = app.webgl;
                 this.shaderPool = new gd3d.render.shaderPool();

@@ -230,6 +230,13 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * 加载状态
+         * @version egret-gd3d 1.0
+         */
+        bundleLoadState:number = 0;
+        /**
+         * @public
+         * @language zh_CN
          * 文件数的总进度
          * @version egret-gd3d 1.0
          */
@@ -475,10 +482,18 @@ namespace gd3d.framework
             let packs: {url: string, type: AssetTypeEnum, asset:any}[] = [];
             
             let asslist:any[] = [];
-            //这里定义了加载顺序
-            asslist.push(packs, glvshaders, glfshaders, shaders, meshs, textures, texturedescs, materials, anclips, prefabs, scenes, textassets, pvrs);
+            let assstatelist:any[] = [];
             
-
+            //这里定义了加载顺序
+            asslist.push(packs, glvshaders, glfshaders, 
+                        shaders, prefabs, meshs, 
+                        materials, scenes, textures, 
+                        texturedescs, anclips, textassets, pvrs);
+            
+            assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, 
+                            AssetBundleLoadState.Shader, AssetBundleLoadState.Mesh, AssetBundleLoadState.Prefab, 
+                            AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, 
+                            AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr);
             let realTotal = 0;
             var mapPackes: { [id: string]: number } = {};
 
@@ -562,12 +577,18 @@ namespace gd3d.framework
                     }
                 }
             }
-            let list:{ url: string, type: AssetTypeEnum, asset:any}[] = [];
-            for(let k in asslist)
+            let list:{ url: string, type: AssetTypeEnum, asset:any, state:AssetBundleLoadState}[] = [];
+            for(let i=0; i<asslist.length; i++)
             {
-                for(let i in asslist[k])
+                for(let j=0; j< asslist[i].length; j++)
                 {
-                    list.push(asslist[k][i]);
+                    let url = asslist[i][j].url;
+                    let type = asslist[i][j].type;
+                    let asset = asslist[i][j].asset;
+                    let state = null;
+                    if(j == asslist[i].length - 1)
+                        state = assstatelist[i];
+                    list.push({url, type, asset, state});
                 }
             }
             realTotal = list.length;
@@ -581,6 +602,7 @@ namespace gd3d.framework
             onstate(state);
             assetmgr.doWaitState(this.url, state);
 
+            state.bundleLoadState = AssetBundleLoadState.None;
             //排序完毕，开始加载
             var loadcall = () =>
             {
@@ -588,6 +610,7 @@ namespace gd3d.framework
                 let type = list[state.curtask - 1].type;
                 let asset = list[state.curtask - 1].asset;
                 let _fileName = assetmgr.getFileName(surl);
+                let loadstate = list[state.curtask - 1].state;
                 if (mapPackes[surl] != undefined)
                 {
                     //在pack里
@@ -603,6 +626,8 @@ namespace gd3d.framework
                             return;
                         }
 
+                        if(state != undefined)
+                            state.bundleLoadState |= loadstate;
                         realTotal--;
                         state.curtask++;
 
@@ -653,6 +678,8 @@ namespace gd3d.framework
                                 this.bundlePackBin[strs[0]] = bufs;
                             }
 
+                            if(state != undefined)
+                                state.bundleLoadState |= loadstate;
                             realTotal--;
                             state.curtask++;
                             
@@ -691,6 +718,8 @@ namespace gd3d.framework
                                 return;
                             }
 
+                            if(state != undefined)
+                                state.bundleLoadState |= loadstate;
                             realTotal--;
                             state.curtask++;
 
@@ -1189,7 +1218,7 @@ namespace gd3d.framework
 
         private waitQueueState: { state: stateLoad, type: AssetTypeEnum, onstate: (state: stateLoad) => void }[] = [];
         private loadingQueueState: { state: stateLoad, type: AssetTypeEnum, onstate: (state: stateLoad) => void }[] = [];
-        private loadingCountLimit:number = 5;
+        private loadingCountLimit:number = 2;
         private checkFreeChannel():number
         {
             let freechannel = -1;
