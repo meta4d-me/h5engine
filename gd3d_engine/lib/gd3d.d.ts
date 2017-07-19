@@ -759,12 +759,10 @@ declare class PvrParse {
     private flags;
     private pixelFormatH;
     private pixelFormatL;
-    private colourSpace;
     private channelType;
     height: number;
     width: number;
     private depth;
-    private numSurfaces;
     private numFaces;
     private mipMapCount;
     private metaDataSize;
