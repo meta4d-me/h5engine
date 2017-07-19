@@ -29,6 +29,7 @@ class test_loadScene implements IState
                             console.log(s.curByteLength+"/"+totalLength);
                             console.log(s.bundleLoadState);
                             // console.log(s.progress);
+                            // if(s.isfinish)
                             if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene)
                             {
                                 console.log(s.isfinish);

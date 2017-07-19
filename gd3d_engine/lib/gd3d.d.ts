@@ -710,6 +710,7 @@ declare namespace gd3d.framework {
         getAssetBundle(bundlename: string): assetBundle;
         unuse(res: IAsset, disposeNow?: boolean): void;
         use(res: IAsset): void;
+        regRes(name: string, asset: IAsset): void;
         releaseUnuseAsset(): void;
         getAssetsRefcount(): {
             [id: string]: number;

@@ -516,7 +516,7 @@ namespace gd3d.framework
                         texturedescs, anclips, textassets, pvrs);
             
             assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, 
-                            AssetBundleLoadState.Shader, AssetBundleLoadState.Mesh, AssetBundleLoadState.Prefab, 
+                            AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh,
                             AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, 
                             AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr);
             let realTotal = 0;
@@ -599,6 +599,7 @@ namespace gd3d.framework
                                 && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
                     {
                         this.mapNamed[fileName] = asset.getGUID();
+                        assetmgr.regRes(fileName, asset);
                     }
                 }
             }
@@ -938,9 +939,9 @@ namespace gd3d.framework
          */
         getAssetByName(name: string, bundlename: string = null): IAsset
         {
-            if (this.mapNamed[name] == null)
-                return null;
-            var id = this.mapNamed[name][0];
+            let id = null;
+            if (this.mapNamed[name] != null)
+                id = this.mapNamed[name][0];
             if (bundlename != null)
             {
                 let assetbundle = this.mapBundle[bundlename] as assetBundle;
@@ -1040,7 +1041,20 @@ namespace gd3d.framework
             }
             this.mapRes[id].refcount++;
         }
-
+        regRes(name:string, asset:IAsset)
+        {
+            let id = asset.getGUID();
+            if (this.mapRes[id] == null)
+            {
+                this.mapRes[id] = { asset: asset, refcount: 0 };
+                if (name != null)
+                {
+                    if (this.mapNamed[name] == null)
+                        this.mapNamed[name] = [];
+                    this.mapNamed[name].push(id);
+                }
+            }
+        }
         /**
          * @public
          * @language zh_CN
@@ -1667,6 +1681,7 @@ namespace gd3d.framework
             {
                 throw new Error("cant use the type:" + type);
             }
+            this.regRes(filename, result);
             return result;
         }
 
