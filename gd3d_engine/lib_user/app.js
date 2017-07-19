@@ -171,41 +171,7 @@ var main = (function () {
     main.prototype.onStart = function (app) {
         console.log("i am here.");
         this.app = app;
-        this.addBtn("test_ui", function () { return new t.test_ui(); });
-        this.addBtn("test_load", function () { return new test_load(); });
-        this.addBtn("test_loadimmediate", function () { return new testloadImmediate(); });
-        this.addBtn("test_loadprefab", function () { return new test_loadprefab(); });
-        this.addBtn("test_loadScene", function () { return new test_loadScene(); });
-        this.addBtn("test_pick", function () { return new test_pick(); });
-        this.addBtn("test_anim", function () { return new test_anim(); });
-        this.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
-        this.addBtn("test_reload", function () { return new testReload(); });
-        this.addBtn("test_uvroll", function () { return new t.test_uvroll(); });
-        this.addBtn("test_light1", function () { return new t.test_light1(); });
-        this.addBtn("test_light_d1", function () { return new t.light_d1(); });
-        this.addBtn("test_changeshader", function () { return new t.test_changeshader(); });
-        this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
-        this.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
-        this.addBtn("test_posteffect", function () { return new t.test_posteffect(); });
-        this.addBtn("test_streamlight", function () { return new test_streamlight(); });
-        this.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
-        this.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
-        this.addBtn("test_sound", function () { return new t.test_sound(); });
-        this.addBtn("test_cleardepth", function () { return new t.test_clearDepth0(); });
-        this.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
-        this.addBtn("test_metalModel", function () { return new t.test_metal(); });
-        this.addBtn("test_tank", function () { return new demo.TankGame(); });
-        this.addBtn("test_long", function () { return new demo.DragonTest(); });
-        this.addBtn("test_lookAt", function () { return new t.TestRotate(); });
-        this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
-        this.addBtn("test_integratedrender", function () { return new t.test_integratedrender(); });
-        this.addBtn("test_blend", function () { return new t.test_blend(); });
-        this.addBtn("TestRotate", function () { return new t.TestRotate(); });
-        this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
         this.addBtn("effect", function () { return new test_effect(); });
-        this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
-        this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
-        this.addBtn("test_tex_uv", function () { return new test_texuv(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -242,11 +208,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
+    main = __decorate([
+        gd3d.reflect.userCode
+    ], main);
     return main;
 }());
-main = __decorate([
-    gd3d.reflect.userCode
-], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -723,11 +689,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
+    CameraShock = __decorate([
+        gd3d.reflect.nodeComponent
+    ], CameraShock);
     return CameraShock;
 }());
-CameraShock = __decorate([
-    gd3d.reflect.nodeComponent
-], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -2202,7 +2168,7 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_ss_female@attack_04-", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        var names = ["fx_ss_female@attack_04", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
@@ -5756,11 +5722,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
+    testUserCodeUpdate = __decorate([
+        gd3d.reflect.userCode
+    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
-testUserCodeUpdate = __decorate([
-    gd3d.reflect.userCode
-], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {
