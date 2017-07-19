@@ -3730,7 +3730,7 @@ var gd3d;
                 var asslist = [];
                 var assstatelist = [];
                 asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs);
-                assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Mesh, AssetBundleLoadState.Prefab, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr);
+                assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr);
                 var realTotal = 0;
                 var mapPackes = {};
                 for (var i = 0; i < this.packages.length; i++) {
@@ -3800,6 +3800,7 @@ var gd3d;
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                             && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
                             this.mapNamed[fileName] = asset.getGUID();
+                            assetmgr.regRes(fileName, asset);
                         }
                     }
                 }
@@ -3979,9 +3980,9 @@ var gd3d;
             };
             assetMgr.prototype.getAssetByName = function (name, bundlename) {
                 if (bundlename === void 0) { bundlename = null; }
-                if (this.mapNamed[name] == null)
-                    return null;
-                var id = this.mapNamed[name][0];
+                var id = null;
+                if (this.mapNamed[name] != null)
+                    id = this.mapNamed[name][0];
                 if (bundlename != null) {
                     var assetbundle = this.mapBundle[bundlename];
                     if (assetbundle != null)
@@ -4042,6 +4043,17 @@ var gd3d;
                     }
                 }
                 this.mapRes[id].refcount++;
+            };
+            assetMgr.prototype.regRes = function (name, asset) {
+                var id = asset.getGUID();
+                if (this.mapRes[id] == null) {
+                    this.mapRes[id] = { asset: asset, refcount: 0 };
+                    if (name != null) {
+                        if (this.mapNamed[name] == null)
+                            this.mapNamed[name] = [];
+                        this.mapNamed[name].push(id);
+                    }
+                }
             };
             assetMgr.prototype.releaseUnuseAsset = function () {
                 for (var k in this.mapRes) {
@@ -4402,6 +4414,7 @@ var gd3d;
                 else {
                     throw new Error("cant use the type:" + type);
                 }
+                this.regRes(filename, result);
                 return result;
             };
             assetMgr.prototype.loadImmediate = function (url, type) {
