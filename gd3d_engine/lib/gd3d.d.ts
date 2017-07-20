@@ -1078,7 +1078,7 @@ declare namespace gd3d.framework {
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture): void;
         uploadUniform(pass: render.glDrawPass): void;
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any): void;
         clone(): material;
     }
@@ -1644,6 +1644,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         materials: material[];
+        useGlobalLightMap: boolean;
         lightmapIndex: number;
         lightmapScaleOffset: math.vector4;
         layer: RenderLayerEnum;

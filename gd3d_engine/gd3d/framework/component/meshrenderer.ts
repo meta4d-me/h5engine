@@ -35,6 +35,12 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("material[]")
         materials: material[]=[];
+
+        /**
+         * @private
+         * 使用全局的lightMap
+         */
+        useGlobalLightMap:boolean=true;
         /**
          * @private
          */
@@ -98,6 +104,11 @@ namespace gd3d.framework
             this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
 
             this.refreshLayerAndQue();
+
+            if(this.lightmapIndex==-2)
+            {
+                this.useGlobalLightMap=false;
+            }
         }
 
         private refreshLayerAndQue()
@@ -155,17 +166,23 @@ namespace gd3d.framework
                                     context.lightmapOffset = this.lightmapScaleOffset;
                                     context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                                 }
+
                             }
                             else
                             {
-                                //usemat.shaderStatus = shaderStatus.Base;
+                                if(!this.useGlobalLightMap)
+                                {
+                                    drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
+                                    context.lightmapOffset = this.lightmapScaleOffset;
+                                    context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                                }
                             }
                             if (this.gameObject.transform.scene.fog)
                             {
                                 context.fog = this.gameObject.transform.scene.fog;
                             }
                             if (usemat != null)
-                                usemat.draw(context, mesh, sm, drawtype);
+                                usemat.draw(context, mesh, sm, drawtype,this.useGlobalLightMap);
                         }
                     }
                 }
