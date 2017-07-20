@@ -11,7 +11,7 @@ namespace gd3d.framework
         {
             let filename = getFileName(url);
 
-            state.resstate[filename] = new ResourceState();
+            state.resstate[filename] = new RefResourceState();
             gd3d.io.loadText(url,
                 (txt, err) =>
                 {
@@ -49,7 +49,7 @@ namespace gd3d.framework
                                 if (AssetFactoryTools.catchError(err, onstate, state))
                                     return;
 
-                                var _texture = new texture(filename);
+                                let _texture = asset ? asset : new texture(filename);
                                 let pvr: PvrParse = new PvrParse(assetMgr.webgl);
                                 _texture.glTexture = pvr.parse(_buffer);
 
@@ -57,7 +57,7 @@ namespace gd3d.framework
                             },
                             (loadedLength, totalLength) =>
                             {
-                                AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                                AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                             });
                     }
                     else
@@ -68,7 +68,7 @@ namespace gd3d.framework
                                 if (AssetFactoryTools.catchError(_err, onstate, state))
                                     return;
 
-                                var _texture = new texture(filename);
+                                let _texture = asset ? asset : new texture(filename);
                                 _texture.realName = _name;
 
                                 var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
@@ -80,17 +80,22 @@ namespace gd3d.framework
                             },
                             (loadedLength, totalLength) =>
                             {
-                                AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                                AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                             });
                     }
-                })
+                },
+                (loadedLength, totalLength) =>
+                {
+                    AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                }
+            );
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
         {
             let filename = getFileName(url);
 
-            let txt = assetMgr.bundlePackJson[filename];
+            let txt = respack[filename];
 
             var _texturedesc = JSON.parse(txt);
             var _name: string = _texturedesc["name"];
@@ -133,7 +138,7 @@ namespace gd3d.framework
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;
 
-                        var _texture = new texture(filename);
+                        let _texture = asset ? asset : new texture(filename);
                         let pvr: PvrParse = new PvrParse(assetMgr.webgl);
                         console.log(_textureSrc);
                         _texture.glTexture = pvr.parse(_buffer);
@@ -152,7 +157,7 @@ namespace gd3d.framework
                     {
                         if (AssetFactoryTools.catchError(_err, onstate, state))
                             return;
-                        var _texture = new texture(filename);
+                        let _texture = asset ? asset : new texture(filename);
                         _texture.realName = _name;
 
                         var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);

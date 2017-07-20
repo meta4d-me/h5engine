@@ -2202,7 +2202,7 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_ss_female@attack_04-", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        var names = ["fx_ss_female@attack_04", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
@@ -2603,7 +2603,6 @@ var testloadImmediate = (function () {
         this.scene = this.app.getScene();
         var baihu = new gd3d.framework.transform();
         baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 20;
         gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
         this.scene.addChild(baihu);
         this.cube = baihu;
@@ -2682,7 +2681,9 @@ var test_loadScene = (function () {
                         _this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json", function (s) {
                             console.log(s.curtask + "/" + s.totaltask);
                             console.log(s.curByteLength + "/" + totalLength_1);
-                            if (s.isfinish) {
+                            console.log(s.bundleLoadState);
+                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene) {
+                                console.log(s.isfinish);
                                 var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
                                 var _root = _scene.getSceneRoot();
                                 _this.scene.addChild(_root);
@@ -2704,6 +2705,7 @@ var test_loadScene = (function () {
         objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
     };
     test_loadScene.prototype.update = function (delta) {
         this.timer += delta;
@@ -2729,7 +2731,6 @@ var test_load = (function () {
         this.scene = this.app.getScene();
         var baihu = new gd3d.framework.transform();
         baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 20;
         gd3d.math.quatFromEulerAngles(-90, 0, 0, baihu.localRotate);
         this.scene.addChild(baihu);
         var lighttran = new gd3d.framework.transform();
@@ -4285,11 +4286,12 @@ var test_loadprefab = (function () {
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    console.log(s.curtask + "/" + s.totaltask);
+                    console.log(s.curByteLength + "/" + s.totalByteLength);
                     if (s.isfinish) {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
                         _this.baihu = _prefab.getCloneTrans();
                         _this.scene.addChild(_this.baihu);
-                        _this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
                         _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                         _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
                         _this.baihu = _prefab.getCloneTrans();

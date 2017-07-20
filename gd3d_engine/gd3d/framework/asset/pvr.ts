@@ -4,12 +4,12 @@ class PvrParse
     private flags = 0;
     private pixelFormatH = 0;
     private pixelFormatL = 0;
-    private colourSpace = 0;
+    // private colourSpace = 0;
     private channelType = 0;
     public height = 1;
     public width = 1;
     private depth = 1;
-    private numSurfaces = 1;
+    // private numSurfaces = 1;
     private numFaces = 1;
     private mipMapCount = 1;
     private metaDataSize = 0;
@@ -29,6 +29,7 @@ class PvrParse
     public parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D
     {
         let ar: Uint8Array = new Uint8Array(_buffer);
+        _buffer = null;
         var tool: gd3d.io.binTool = new gd3d.io.binTool();
         tool.writeUint8Array(ar);
         this.version = tool.readUInt32();
@@ -36,9 +37,10 @@ class PvrParse
         {
             //v3
             this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
-            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);//开启预乘
             this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转
-            return this.parseV3(tool);
+            let tex = this.parseV3(tool);
+            tool.dispose();
+            return tex;
         }
 
         else if (this.version === 0x50565203)
@@ -55,14 +57,20 @@ class PvrParse
     private parseV3(tool: gd3d.io.binTool)
     {
         this.flags = tool.readUInt32();//0:没有设置  0x02 ：alpha预乘
+        if (this.flags == 0)
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);//开启预乘
+        else
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);//开启预乘
         this.pixelFormatH = tool.readUInt32();//高4位 rgba
         this.pixelFormatL = tool.readUInt32();//低4位 8888/4444/5551/565    高四位和低四位共同决定了其格式RGBA（32位）、RGBA4（16位）、    RGB、RGB5_A1、RGB565、  LUMINANCE_ALPHA、LUMINANCE、ALPHA
-        this.colourSpace = tool.readUInt32();//0:linear rgb   1:srgb
+        // this.colourSpace = tool.readUInt32();//0:linear rgb   1:srgb
+        tool.readBytes(4);
         this.channelType = tool.readUInt32();//格式
         this.height = tool.readUInt32();
         this.width = tool.readUInt32();
         this.depth = tool.readUInt32();
-        this.numSurfaces = tool.readUInt32();
+        // this.numSurfaces = tool.readUInt32();
+        tool.readBytes(4);
         this.numFaces = tool.readUInt32();
         this.mipMapCount = tool.readUInt32();
         this.metaDataSize = tool.readUInt32();
@@ -139,8 +147,8 @@ class PvrParse
             }
         }
         var offset = 0;
-        let _width:number = this.width;
-        let _height:number = this.height;
+        let _width: number = this.width;
+        let _height: number = this.height;
         for (var i = 0; i < this.mipMapCount; ++i)
         {
             var levelSize = textureLevelSize(textureFormat, _width, _height);
@@ -167,8 +175,6 @@ class PvrParse
         return t2d;
     }
 }
-
-
 
 enum ChannelTypes
 {

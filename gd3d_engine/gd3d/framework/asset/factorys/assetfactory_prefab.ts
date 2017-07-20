@@ -18,7 +18,7 @@ namespace gd3d.framework
                 if (AssetFactoryTools.catchError(err, onstate, state))
                     return;
 
-                var _prefab = new prefab(filename);
+                let _prefab = asset ? asset : new prefab(filename);
                 _prefab.assetbundle = bundlename;
                 _prefab.Parse(txt, assetMgr);
 
@@ -30,14 +30,14 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab)
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
             
             state.resstate[filename] = new ResourceState();
-            let txt = assetMgr.bundlePackJson[filename];
-            var _prefab = new prefab(filename);
+            let txt = respack[filename];
+            let _prefab = asset ? asset : new prefab(filename);
             _prefab.assetbundle = bundlename;
             _prefab.Parse(txt, assetMgr);
 

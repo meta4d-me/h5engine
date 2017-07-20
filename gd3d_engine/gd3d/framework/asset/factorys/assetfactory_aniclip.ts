@@ -17,8 +17,7 @@ namespace gd3d.framework
                 {
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
-
-                    var _clip = new animationClip(filename);
+                    let _clip = asset ? asset : new animationClip(filename);
                     _clip.Parse(_buffer);
 
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
@@ -29,13 +28,13 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr,asset?: animationClip)
+        loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr,asset?: animationClip)
         {
             let filename = getFileName(url);
 
                 state.resstate[filename] = new ResourceState();
-                let _buffer = assetMgr.bundlePackBin[filename];
-                var _clip = new animationClip(filename);
+                let _buffer = respack[filename];
+                let _clip = asset ? asset : new animationClip(filename);
                 _clip.Parse(_buffer);
 
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
