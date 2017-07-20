@@ -40,7 +40,7 @@ namespace gd3d.framework
          * @private
          * 使用全局的lightMap
          */
-        useGlobalLightMap:boolean=true;
+        useGlobalLightMap:boolean=false;
         /**
          * @private
          */
@@ -105,9 +105,9 @@ namespace gd3d.framework
 
             this.refreshLayerAndQue();
 
-            if(this.lightmapIndex==-2)
+            if(this.lightmapIndex!=-2)
             {
-                this.useGlobalLightMap=false;
+                this.useGlobalLightMap=true;
             }
         }
 

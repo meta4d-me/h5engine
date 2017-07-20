@@ -708,7 +708,7 @@ namespace gd3d.framework
          * @param json json数据
          * @version egret-gd3d 1.0
          */
-        Parse(assetmgr: assetMgr, json: any)
+        Parse(assetmgr: assetMgr, json: any,bundleName:string=null)
         {
             var shaderName = json["shader"];
             this.setShader(assetmgr.getShader(shaderName) as gd3d.framework.shader);
@@ -721,7 +721,7 @@ namespace gd3d.framework
                 {
                     case render.UniformTypeEnum.Texture:
                         var _value: string = jsonChild["value"];
-                        var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value) as gd3d.framework.texture;
+                        var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value,bundleName) as gd3d.framework.texture;
                         if (_texture == undefined)
                         {
                             _texture = assetmgr.getDefaultTexture("grid");

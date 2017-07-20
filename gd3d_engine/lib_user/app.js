@@ -206,6 +206,7 @@ var main = (function () {
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
         this.addBtn("test_tex_uv", function () { return new test_texuv(); });
+        this.addBtn("db_test_viewport", function () { return new db_test_cameraViewport(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -6125,6 +6126,7 @@ var db_test_cameraViewport = (function () {
                 _this.app.getScene().lightmaps = [];
                 _scene.useLightMap(_this.app.getScene());
                 _scene.useFog(_this.app.getScene());
+                state.finish = true;
             }
         });
     };
@@ -6132,7 +6134,7 @@ var db_test_cameraViewport = (function () {
         var _this = this;
         var name = "Scene";
         name = "prefab_jinji";
-        name = "Plane";
+        name = "Scene_1";
         this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
             if (s.isfinish) {
                 var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
@@ -6140,6 +6142,7 @@ var db_test_cameraViewport = (function () {
                 _this.scene.addChild(pre);
                 pre.localTranslate.y = 1000;
                 pre.markDirty();
+                state.finish = true;
             }
         });
     };

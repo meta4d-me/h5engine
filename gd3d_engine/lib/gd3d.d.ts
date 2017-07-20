@@ -1083,7 +1083,7 @@ declare namespace gd3d.framework {
         setTexture(_id: string, _texture: gd3d.framework.texture): void;
         uploadUniform(pass: render.glDrawPass): void;
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
-        Parse(assetmgr: assetMgr, json: any): void;
+        Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
     }
 }

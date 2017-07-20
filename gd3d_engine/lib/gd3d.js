@@ -5288,12 +5288,13 @@ var gd3d;
             };
             AssetFactory_Material.prototype.load = function (url, onstate, state, assetMgr, asset) {
                 var filename = framework.getFileName(url);
+                var assetbundleName = framework.getFileName(state.url);
                 state.resstate[filename] = new framework.ResourceState();
                 gd3d.io.loadText(url, function (txt, err) {
                     if (framework.AssetFactoryTools.catchError(err, onstate, state))
                         return;
                     var _material = asset ? asset : new framework.material(filename);
-                    _material.Parse(assetMgr, JSON.parse(txt));
+                    _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
@@ -5301,10 +5302,11 @@ var gd3d;
             };
             AssetFactory_Material.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
                 var filename = framework.getFileName(url);
+                var assetbundleName = framework.getFileName(state.url);
                 state.resstate[filename] = new framework.ResourceState();
                 var txt = respack[filename];
                 var _material = asset ? asset : new framework.material(filename);
-                _material.Parse(assetMgr, JSON.parse(txt));
+                _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
                 framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
             };
             return AssetFactory_Material;
@@ -6635,7 +6637,8 @@ var gd3d;
                     }
                 }
             };
-            material.prototype.Parse = function (assetmgr, json) {
+            material.prototype.Parse = function (assetmgr, json, bundleName) {
+                if (bundleName === void 0) { bundleName = null; }
                 var shaderName = json["shader"];
                 this.setShader(assetmgr.getShader(shaderName));
                 var mapUniform = json["mapUniform"];
@@ -6645,7 +6648,7 @@ var gd3d;
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
                             var _value = jsonChild["value"];
-                            var _texture = assetmgr.getAssetByName(_value);
+                            var _texture = assetmgr.getAssetByName(_value, bundleName);
                             if (_texture == undefined) {
                                 _texture = assetmgr.getDefaultTexture("grid");
                             }
@@ -9815,7 +9818,7 @@ var gd3d;
         var meshRenderer = (function () {
             function meshRenderer() {
                 this.materials = [];
-                this.useGlobalLightMap = true;
+                this.useGlobalLightMap = false;
                 this.lightmapIndex = -1;
                 this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.layer = framework.RenderLayerEnum.Common;
@@ -9837,8 +9840,8 @@ var gd3d;
             meshRenderer.prototype.start = function () {
                 this.filter = this.gameObject.getComponent("meshFilter");
                 this.refreshLayerAndQue();
-                if (this.lightmapIndex == -2) {
-                    this.useGlobalLightMap = false;
+                if (this.lightmapIndex != -2) {
+                    this.useGlobalLightMap = true;
                 }
             };
             meshRenderer.prototype.refreshLayerAndQue = function () {
