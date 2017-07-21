@@ -8970,7 +8970,7 @@ var gd3d;
                                     var bz = gd3d.math.pool.new_vector3();
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                    return az.z - bz.z;
+                                    return bz.z - az.z;
                                 }
                             });
                         }
@@ -9818,7 +9818,7 @@ var gd3d;
         var meshRenderer = (function () {
             function meshRenderer() {
                 this.materials = [];
-                this.useGlobalLightMap = false;
+                this.useGlobalLightMap = true;
                 this.lightmapIndex = -1;
                 this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.layer = framework.RenderLayerEnum.Common;
@@ -9840,8 +9840,8 @@ var gd3d;
             meshRenderer.prototype.start = function () {
                 this.filter = this.gameObject.getComponent("meshFilter");
                 this.refreshLayerAndQue();
-                if (this.lightmapIndex != -2) {
-                    this.useGlobalLightMap = true;
+                if (this.lightmapIndex == -2) {
+                    this.useGlobalLightMap = false;
                 }
             };
             meshRenderer.prototype.refreshLayerAndQue = function () {

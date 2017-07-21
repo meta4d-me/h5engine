@@ -921,3 +921,21 @@ declare class db_test_effect implements IState {
     bereplay: boolean;
     update(delta: number): void;
 }
+declare class db_test_transQueue implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    taskmgr: gd3d.framework.taskMgr;
+    start(app: gd3d.framework.application): void;
+    private loadShader(laststate, state);
+    private loadprefab(laststate, state);
+    private loadprefab2(laststate, state);
+    private addCam(laststate, state);
+    baihu: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    timer: number;
+    bere: boolean;
+    update(delta: number): void;
+}
