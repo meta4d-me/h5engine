@@ -18,7 +18,7 @@ namespace gd3d.framework
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
-                    var _font = new font(filename);
+                    let _font = asset ? asset : new font(filename);
                     _font.Parse(txt, assetMgr);
 
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
@@ -29,13 +29,13 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: font)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: font)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            let txt = assetMgr.bundlePackJson[filename];
-            var _font = new font(filename);
+            let txt = respack[filename];
+            let _font = asset ? asset : new font(filename);
             _font.Parse(txt, assetMgr);
 
             AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);

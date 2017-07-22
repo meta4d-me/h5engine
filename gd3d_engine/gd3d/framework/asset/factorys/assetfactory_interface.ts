@@ -4,7 +4,7 @@ namespace gd3d.framework
     {
         newAsset(assetName?: string): IAsset;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr, asset?: IAsset):void;
+        loadByPack(respack:any, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr, asset?: IAsset):void;
     }
 
     export class AssetFactoryTools
@@ -35,6 +35,15 @@ namespace gd3d.framework
         static onProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad,filename:string)
         {
             state.resstate[filename].loadedLength = loadedLength;
+            // state.resstate[filename].totalLength = totalLength;
+            state.progressCall = true;
+            onstate(state);
+        }
+
+        static onRefProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad,filename:string)
+        {
+            let _restate = state.resstate[filename] as RefResourceState;
+            _restate.refLoadedLength = loadedLength;
             // state.resstate[filename].totalLength = totalLength;
             state.progressCall = true;
             onstate(state);

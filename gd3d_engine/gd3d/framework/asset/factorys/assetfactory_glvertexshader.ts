@@ -31,13 +31,13 @@ namespace gd3d.framework
                 });
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
         {
             let filename = getFileName(url);
             let name = filename.substring(0, filename.indexOf("."));
 
             state.resstate[filename] = new ResourceState();
-            let txt = assetMgr.bundlePackJson[filename];
+            let txt = respack[filename];
             txt = decodeURI(txt);
             state.resstate[filename].state = 1;//完成
 

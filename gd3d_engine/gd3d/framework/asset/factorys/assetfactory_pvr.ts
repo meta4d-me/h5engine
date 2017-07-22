@@ -18,7 +18,7 @@ namespace gd3d.framework
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
-                    var _texture = new texture(filename);
+                    let _texture = asset ? asset : new texture(filename);
                     let pvr: PvrParse = new PvrParse(assetMgr.webgl);
                     _texture.glTexture = pvr.parse(_buffer);
 
@@ -30,7 +30,7 @@ namespace gd3d.framework
                 });
         }
 
-        loadByPack(packnum: number, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
         {
 
         }

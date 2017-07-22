@@ -367,8 +367,15 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _number;
+            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float)
+            {
+                this.mapUniformTemp[_id].value=_number;
+            }
             else
+            {
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float, _number);
+            }
+                
         }
         /**
          * @private
@@ -377,8 +384,14 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _numbers;
+            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Floatv)
+            {
+                this.mapUniformTemp[_id].value=_numbers;
+            }
             else
+            {
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Floatv, _numbers);
+            }
         }
         /**
          * @private
@@ -387,8 +400,14 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _vector4;
+            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4)
+            {
+                this.mapUniformTemp[_id].value=_vector4;
+            }
             else
+            {
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
+            }
         }
         /**
          * @private
@@ -397,8 +416,14 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _vector4v;
+            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4v)
+            {
+                this.mapUniformTemp[_id].value=_vector4v;
+            }
             else
+            {
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4v, _vector4v);
+            }
         }
         /**
          * @private
@@ -407,8 +432,14 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _matrix;
+            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4x4)
+            {
+                this.mapUniformTemp[_id].value=_matrix;
+            }
             else
+            {
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4x4, _matrix);
+            }
 
         }
         /**
@@ -418,8 +449,14 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _matrixv;
+            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4x4v)
+            {
+                this.mapUniformTemp[_id].value=_matrixv;
+            }
             else
+            {
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4x4v, _matrixv);
+            }
         }
         /**
          * @private
@@ -440,11 +477,15 @@ namespace gd3d.framework
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (this.mapUniform[_texelsizeName] != undefined)
+                    if (this.mapUniform[_texelsizeName] != undefined && _gltexture!=undefined)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
+            }
+            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Texture)
+            {
+                this.mapUniformTemp[_id].value=_texture;
             }
             else
             {
@@ -545,7 +586,7 @@ namespace gd3d.framework
          * @param sm 渲染的submesh信息
          * @version egret-gd3d 1.0
          */
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base")
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base",useGLobalLightMap:boolean=true)
         {
 
             let drawPasses = this.shader.passes[basetype + context.drawtype];
@@ -608,6 +649,7 @@ namespace gd3d.framework
                             this.setVector4(key, context.eyePos);
                             break;
                         case "_LightmapTex":
+                            if(!useGLobalLightMap) break;
                             this.setTexture(key, context.lightmap);
                             break;
                         case "glstate_lightmapOffset":
@@ -654,7 +696,7 @@ namespace gd3d.framework
                     }
                 }
             }
-            this.mapUniformTemp = {};
+            //this.mapUniformTemp = {};
         }
 
         /**
@@ -666,7 +708,7 @@ namespace gd3d.framework
          * @param json json数据
          * @version egret-gd3d 1.0
          */
-        Parse(assetmgr: assetMgr, json: any)
+        Parse(assetmgr: assetMgr, json: any,bundleName:string=null)
         {
             var shaderName = json["shader"];
             this.setShader(assetmgr.getShader(shaderName) as gd3d.framework.shader);
@@ -679,7 +721,7 @@ namespace gd3d.framework
                 {
                     case render.UniformTypeEnum.Texture:
                         var _value: string = jsonChild["value"];
-                        var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value) as gd3d.framework.texture;
+                        var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value,bundleName) as gd3d.framework.texture;
                         if (_texture == undefined)
                         {
                             _texture = assetmgr.getDefaultTexture("grid");

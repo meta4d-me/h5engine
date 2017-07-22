@@ -197,6 +197,7 @@ namespace gd3d.framework
             {
                 this.webgl.canvas.width = this._fixWidth;
                 this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
             } else if (this.beHeightSetted)
             {
                 this.webgl.canvas.height = this._fixHeight;

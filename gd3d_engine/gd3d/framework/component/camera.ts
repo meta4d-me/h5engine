@@ -740,7 +740,7 @@ namespace gd3d.framework
                                 var bz = math.pool.new_vector3();
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                return az.z - bz.z;
+                                return bz.z - az.z;
                             }
                         })
                     }
