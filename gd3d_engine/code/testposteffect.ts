@@ -266,27 +266,30 @@
                         textcolor.glTexture = color.renderTarget;
                         
                         post.material.setTexture("_MainTex", textcolor);
-                        post.material.setFloat("_BlurOffset", 0.002);
+                        post.material.setFloat("_BlurGap",1);
                         this.camera.postQueues.push(post);
                         console.log("模糊");
                     }
-                    // else if (this.postEffectType == PostEffectType.GaussianBlur)
-                    // {
+                    else if (this.postEffectType == PostEffectType.GaussianBlur)
+                    {
 
-                    //     var color = new gd3d.framework.cameraPostQueue_Color();
-                    //     color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
-                    //     this.camera.postQueues.push(color);
+                        var color = new gd3d.framework.cameraPostQueue_Color();
+                        color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                        this.camera.postQueues.push(color);
 
-                    //     var post = new gd3d.framework.cameraPostQueue_Quad();
-                    //     post.material.setShader(this.scene.app.getAssetMgr().getShader("GaussianBlur.shader.json"));
+                        var post = new gd3d.framework.cameraPostQueue_Quad();
+                        post.material.setShader(this.scene.app.getAssetMgr().getShader("GaussianBlur.shader.json"));
                         
-                    //     var textcolor = new gd3d.framework.texture("_color");
-                    //     textcolor.glTexture = color.renderTarget;
+                        var textcolor = new gd3d.framework.texture("_color");
+                        textcolor.glTexture = color.renderTarget;
                         
-                    //     post.material.setTexture("_MainTex", textcolor);
-                    //     this.camera.postQueues.push(post);
-                    //     console.log("高斯模糊");
-                    // }
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_BlurGap", 2);
+                        post.material.setFloat("_BlurSigma", 6);
+                        post.material.setFloat("_BlurLayer", 10);
+                        this.camera.postQueues.push(post);
+                        console.log("高斯模糊");
+                    }
                 }
             }
 
