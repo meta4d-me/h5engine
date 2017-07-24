@@ -8979,7 +8979,6 @@ var gd3d;
                 if (this.postQueues.length == 0) {
                     this._targetAndViewport(this.renderTarget, scene, context, false);
                     this._renderOnce(scene, context, "");
-                    context.webgl.flush();
                 }
                 else {
                     for (var i = 0; i < this.postQueues.length; i++) {
@@ -18338,6 +18337,7 @@ var gd3d;
                     this.webgl.clearDepth(1.0);
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
                 }
+                this.webgl.flush();
             };
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];
@@ -19982,6 +19982,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;

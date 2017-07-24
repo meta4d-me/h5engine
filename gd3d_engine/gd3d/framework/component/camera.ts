@@ -750,7 +750,7 @@ namespace gd3d.framework
             {
                 this._targetAndViewport(this.renderTarget, scene, context, false);
                 this._renderOnce(scene, context, "");
-                context.webgl.flush();
+                //context.webgl.flush();
             }
             else
             {

@@ -206,7 +206,6 @@ var main = (function () {
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
         this.addBtn("test_tex_uv", function () { return new test_texuv(); });
-        this.addBtn("db_test_transQueue", function () { return new db_test_transQueue(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
