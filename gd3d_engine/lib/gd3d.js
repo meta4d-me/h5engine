@@ -8024,7 +8024,7 @@ var gd3d;
                 return cc;
             };
             AudioEx.prototype.playLooped = function (name, buf) {
-                if (buf == null) {
+                if (!(buf instanceof AudioBuffer)) {
                     console.log("error: audioex playloop failed! " + "resources of audio(" + name + ") is empty!");
                     return;
                 }

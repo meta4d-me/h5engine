@@ -328,7 +328,7 @@
          */
         playLooped(name: string, buf: AudioBuffer): void
         {
-            if(buf==null)
+            if(!(buf instanceof AudioBuffer))
             {
                 console.log("error: audioex playloop failed! "+"resources of audio("+name+") is empty!");
                 return;
