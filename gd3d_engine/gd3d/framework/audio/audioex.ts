@@ -328,6 +328,11 @@
          */
         playLooped(name: string, buf: AudioBuffer): void
         {
+            if(buf==null)
+            {
+                console.log("error: audioex playloop failed! "+"resources of audio("+name+") is empty!");
+                return;
+            }
             if (this.channelLoop[name] != undefined)
             {
                 if (this.channelLoop[name].isplay)

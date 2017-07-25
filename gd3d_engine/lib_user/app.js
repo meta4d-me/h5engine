@@ -4198,10 +4198,21 @@ var t;
             btn = document.createElement("button");
             btn.textContent = "切换PostEffect";
             btn.onclick = function () {
-                _this.camera.postQueues = [];
+                var selectionQueue = [
+                    PostEffectType.GrayAndOutline,
+                    PostEffectType.Mask,
+                    PostEffectType.blur,
+                    PostEffectType.GaussianBlur
+                ];
+                var index = selectionQueue.indexOf(_this.postEffectType + 1);
+                if (index == -1) {
+                    _this.postEffectType = PostEffectType.GrayAndOutline;
+                }
+                else {
+                    _this.postEffectType = selectionQueue[index];
+                }
                 {
-                    if (_this.postEffectType == PostEffectType.Mask) {
-                        _this.postEffectType = PostEffectType.GrayAndOutline;
+                    if (_this.postEffectType == PostEffectType.GrayAndOutline) {
                         var color = new gd3d.framework.cameraPostQueue_Color();
                         color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
                         _this.camera.postQueues.push(color);
@@ -4219,8 +4230,7 @@ var t;
                         _this.camera.postQueues.push(post);
                         console.log("灰度+描边");
                     }
-                    else if (_this.postEffectType == PostEffectType.GrayAndOutline) {
-                        _this.postEffectType = PostEffectType.Mask;
+                    else if (_this.postEffectType == PostEffectType.Mask) {
                         var color = new gd3d.framework.cameraPostQueue_Color();
                         color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
                         _this.camera.postQueues.push(color);
@@ -4231,6 +4241,34 @@ var t;
                         post.material.setTexture("_MainTex", textcolor);
                         _this.camera.postQueues.push(post);
                         console.log("马赛克");
+                    }
+                    else if (_this.postEffectType == PostEffectType.blur) {
+                        var color = new gd3d.framework.cameraPostQueue_Color();
+                        color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                        _this.camera.postQueues.push(color);
+                        var post = new gd3d.framework.cameraPostQueue_Quad();
+                        post.material.setShader(_this.scene.app.getAssetMgr().getShader("blur.shader.json"));
+                        var textcolor = new gd3d.framework.texture("_color");
+                        textcolor.glTexture = color.renderTarget;
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_BlurGap", 1);
+                        _this.camera.postQueues.push(post);
+                        console.log("模糊");
+                    }
+                    else if (_this.postEffectType == PostEffectType.GaussianBlur) {
+                        var color = new gd3d.framework.cameraPostQueue_Color();
+                        color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                        _this.camera.postQueues.push(color);
+                        var post = new gd3d.framework.cameraPostQueue_Quad();
+                        post.material.setShader(_this.scene.app.getAssetMgr().getShader("GaussianBlur.shader.json"));
+                        var textcolor = new gd3d.framework.texture("_color");
+                        textcolor.glTexture = color.renderTarget;
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_BlurGap", 2);
+                        post.material.setFloat("_BlurSigma", 6);
+                        post.material.setFloat("_BlurLayer", 10);
+                        _this.camera.postQueues.push(post);
+                        console.log("高斯模糊");
                     }
                 }
             };
@@ -4270,6 +4308,8 @@ var PostEffectType;
 (function (PostEffectType) {
     PostEffectType[PostEffectType["GrayAndOutline"] = 0] = "GrayAndOutline";
     PostEffectType[PostEffectType["Mask"] = 1] = "Mask";
+    PostEffectType[PostEffectType["blur"] = 2] = "blur";
+    PostEffectType[PostEffectType["GaussianBlur"] = 3] = "GaussianBlur";
 })(PostEffectType || (PostEffectType = {}));
 var test_loadprefab = (function () {
     function test_loadprefab() {
