@@ -1082,8 +1082,8 @@ declare namespace gd3d.framework {
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture): void;
         uploadUniform(pass: render.glDrawPass): void;
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
-        Parse(assetmgr: assetMgr, json: any): void;
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
+        Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
     }
 }
@@ -1654,6 +1654,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         materials: material[];
+        useGlobalLightMap: boolean;
         lightmapIndex: number;
         lightmapScaleOffset: math.vector4;
         layer: RenderLayerEnum;
@@ -3252,6 +3253,8 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+}
+declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {

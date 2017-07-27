@@ -740,7 +740,7 @@ namespace gd3d.framework
                                 var bz = math.pool.new_vector3();
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                return az.z - bz.z;
+                                return bz.z - az.z;
                             }
                         })
                     }
@@ -750,7 +750,7 @@ namespace gd3d.framework
             {
                 this._targetAndViewport(this.renderTarget, scene, context, false);
                 this._renderOnce(scene, context, "");
-                context.webgl.flush();
+                //context.webgl.flush();
             }
             else
             {

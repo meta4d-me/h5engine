@@ -155,12 +155,14 @@ namespace gd3d.framework
             {
                 this._renderCamera(i);
             }
+            
             if (this.RealCameraNumber == 0)
             {
                 this.webgl.clearColor(0, 0, 0, 1);
                 this.webgl.clearDepth(1.0);
                 this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
             }
+            this.webgl.flush();
         }
 
         private RealCameraNumber: number = 0;
