@@ -4,6 +4,16 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var t;
 (function (t) {
     var light_d1 = (function () {
@@ -162,6 +172,143 @@ var t;
     }());
     t.light_d1 = light_d1;
 })(t || (t = {}));
+var localSave = (function () {
+    function localSave() {
+    }
+    Object.defineProperty(localSave, "Instance", {
+        get: function () {
+            if (!this._instance) {
+                this._instance = new localSave();
+            }
+            return this._instance;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    localSave.prototype.stringToUtf8Array = function (str) {
+        var bstr = [];
+        for (var i = 0; i < str.length; i++) {
+            var c = str.charAt(i);
+            var cc = c.charCodeAt(0);
+            if (cc > 0xFFFF) {
+                throw new Error("InvalidCharacterError");
+            }
+            if (cc > 0x80) {
+                if (cc < 0x07FF) {
+                    var c1 = (cc >>> 6) | 0xC0;
+                    var c2 = (cc & 0x3F) | 0x80;
+                    bstr.push(c1, c2);
+                }
+                else {
+                    var c1 = (cc >>> 12) | 0xE0;
+                    var c2 = ((cc >>> 6) & 0x3F) | 0x80;
+                    var c3 = (cc & 0x3F) | 0x80;
+                    bstr.push(c1, c2, c3);
+                }
+            }
+            else {
+                bstr.push(cc);
+            }
+        }
+        return bstr;
+    };
+    localSave.prototype.file_str2blob = function (string) {
+        var u8 = new Uint8Array(this.stringToUtf8Array(string));
+        var blob = new Blob([u8]);
+        return blob;
+    };
+    localSave.prototype.file_u8array2blob = function (array) {
+        var blob = new Blob([array]);
+        return blob;
+    };
+    localSave.prototype.save = function (path, file) {
+        var req = new XMLHttpRequest();
+        req.open("POST", this.localServerPath + "/hybirdapi/upload" + "?r=" + Math.random(), false);
+        var fdata = new FormData();
+        fdata.append("path", path);
+        fdata.append("file", file);
+        req.send(fdata);
+        var json = JSON.parse(req.responseText);
+        if (json["code"] != 0)
+            throw new Error(json["error"]);
+        return json["code"];
+    };
+    localSave.prototype.startDirect = function (exec, path, argc) {
+        var req = new XMLHttpRequest();
+        req.open("GET", this.localServerPath + "/hybirdapi/startdirect" +
+            "?exec=" + exec +
+            "&path=" + path +
+            "&argc=" + argc +
+            "&r=" + Math.random(), false);
+        req.send(null);
+        var json = req.responseText;
+        return json;
+    };
+    localSave.prototype.start = function (path) {
+        var req = new XMLHttpRequest();
+        req.open("GET", this.localServerPath + "/hybirdapi/start?path=" + path + "&r=" + Math.random(), false);
+        req.send(null);
+        var json = req.responseText;
+        return json;
+    };
+    localSave.prototype.startnowait = function (path, fun) {
+        if (fun === void 0) { fun = null; }
+        var req = new XMLHttpRequest();
+        req.open("GET", this.localServerPath + "/hybirdapi/start?path=" + path + "&r=" + Math.random(), true);
+        req.onreadystatechange = function (ev) {
+            if (req.readyState == 4) {
+                if (req.status == 404) {
+                    if (fun != null)
+                        fun(null, new Error("got a 404:" + path));
+                    return;
+                }
+                if (fun != null)
+                    fun(req.responseText, null);
+            }
+        };
+        req.onerror = function () {
+            if (fun != null)
+                fun(null, new Error("onerr in req:"));
+        };
+        req.send(null);
+    };
+    localSave.prototype.loadTextImmediate = function (url, fun) {
+        var req = new XMLHttpRequest();
+        req.open("GET", url);
+        req.onreadystatechange = function () {
+            if (req.readyState == 4) {
+                if (req.status == 404) {
+                    fun(null, new Error("got a 404:" + url));
+                    return;
+                }
+                fun(req.responseText, null);
+            }
+        };
+        req.onerror = function () {
+            fun(null, new Error("onerr in req:"));
+        };
+        req.send();
+    };
+    localSave.prototype.loadBlobImmediate = function (url, fun) {
+        var req = new XMLHttpRequest();
+        req.open("GET", url);
+        req.responseType = "blob";
+        req.onreadystatechange = function () {
+            if (req.readyState == 4) {
+                if (req.status == 404) {
+                    fun(null, new Error("got a 404:" + url));
+                    return;
+                }
+                fun(req.response, null);
+            }
+        };
+        req.onerror = function () {
+            fun(null, new Error("onerr in req:"));
+        };
+        req.send();
+    };
+    return localSave;
+}());
 var main = (function () {
     function main() {
         this.x = 0;
@@ -171,7 +318,42 @@ var main = (function () {
     main.prototype.onStart = function (app) {
         console.log("i am here.");
         this.app = app;
+        this.addBtn("test_ui", function () { return new t.test_ui(); });
+        this.addBtn("test_load", function () { return new test_load(); });
+        this.addBtn("test_loadimmediate", function () { return new testloadImmediate(); });
+        this.addBtn("test_loadprefab", function () { return new test_loadprefab(); });
+        this.addBtn("test_loadScene", function () { return new test_loadScene(); });
+        this.addBtn("test_pick", function () { return new test_pick(); });
+        this.addBtn("test_anim", function () { return new test_anim(); });
+        this.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
+        this.addBtn("test_reload", function () { return new testReload(); });
+        this.addBtn("test_uvroll", function () { return new t.test_uvroll(); });
+        this.addBtn("test_light1", function () { return new t.test_light1(); });
+        this.addBtn("test_light_d1", function () { return new t.light_d1(); });
+        this.addBtn("test_changeshader", function () { return new t.test_changeshader(); });
+        this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
+        this.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
+        this.addBtn("test_posteffect", function () { return new t.test_posteffect(); });
+        this.addBtn("test_streamlight", function () { return new test_streamlight(); });
+        this.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
+        this.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
+        this.addBtn("test_sound", function () { return new t.test_sound(); });
+        this.addBtn("test_cleardepth", function () { return new t.test_clearDepth0(); });
+        this.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
+        this.addBtn("test_metalModel", function () { return new t.test_metal(); });
+        this.addBtn("test_tank", function () { return new demo.TankGame(); });
+        this.addBtn("test_long", function () { return new demo.DragonTest(); });
+        this.addBtn("test_lookAt", function () { return new t.TestRotate(); });
+        this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
+        this.addBtn("test_integratedrender", function () { return new t.test_integratedrender(); });
+        this.addBtn("test_blend", function () { return new t.test_blend(); });
+        this.addBtn("TestRotate", function () { return new t.TestRotate(); });
+        this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
         this.addBtn("effect", function () { return new test_effect(); });
+        this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
+        this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
+        this.addBtn("test_tex_uv", function () { return new test_texuv(); });
+        this.addBtn("test_uimove", function () { return new test_uimove(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1641,6 +1823,131 @@ var t;
     }());
     t.test_three_leaved_rose_curve = test_three_leaved_rose_curve;
 })(t || (t = {}));
+var test_uimove = (function () {
+    function test_uimove() {
+        this.timer = 0;
+    }
+    test_uimove.prototype.start = function (app) {
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.markDirty();
+        this.test();
+    };
+    test_uimove.prototype.update = function (delta) {
+        this.timer += delta;
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.1);
+        var z2 = Math.cos(this.timer * 0.1);
+    };
+    test_uimove.prototype.test = function () {
+        var parentRect = new Rect();
+        parentRect.width = 600;
+        parentRect.height = 400;
+        parentRect.children = [];
+        var childRect = new Rect();
+        childRect.width = 300;
+        childRect.height = 200;
+        parentRect.children.push(childRect);
+        childRect.parent = parentRect;
+        childRect.alignType = AlignType.CENTER;
+        parentRect.layout();
+        childRect.localEulerAngles = new gd3d.math.vector3(0, 90, 0);
+        var matrix = gd3d.math.pool.new_matrix();
+        var qua = gd3d.math.pool.new_quaternion();
+        var vec = gd3d.math.pool.new_vector3();
+        gd3d.math.quatFromEulerAngles(childRect.localEulerAngles.x, childRect.localEulerAngles.y, childRect.localEulerAngles.z, qua);
+        gd3d.math.vec3Add(childRect.localTranslate, childRect.alignPos, vec);
+        gd3d.math.matrixMakeTransformRTS(vec, childRect.localScale, qua, matrix);
+        gd3d.math.pool.delete_vector3(vec);
+        gd3d.math.pool.delete_quaternion(qua);
+        console.log(matrix.toString());
+        for (var i = 0; i < childRect.points.length; i++) {
+            console.log(i + " before: " + childRect.points[i]);
+            gd3d.math.matrixTransformVector3(childRect.points[i], matrix, childRect.points[i]);
+            console.log(i + " after: " + childRect.points[i]);
+        }
+        gd3d.math.pool.delete_matrix(matrix);
+        console.log(matrix.toString());
+    };
+    return test_uimove;
+}());
+var Rect = (function (_super) {
+    __extends(Rect, _super);
+    function Rect() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.offset = new gd3d.math.vector3();
+        _this.children = [];
+        _this.alignType = AlignType.NONE;
+        _this.points = [];
+        _this.alignPos = new gd3d.math.vector3();
+        return _this;
+    }
+    Rect.prototype.layout = function () {
+        if (this.parent != null && this.alignType != null) {
+            switch (this.alignType) {
+                case AlignType.CENTER:
+                    this.alignPos = new gd3d.math.vector3(0, 0, 0);
+                    break;
+                case AlignType.LEFT:
+                    this.alignPos = new gd3d.math.vector3(0, (this.parent.height - this.height) / 2);
+                    break;
+                case AlignType.RIGHT:
+                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, (this.parent.height - this.height) / 2);
+                    break;
+                case AlignType.TOP:
+                    this.alignPos = new gd3d.math.vector3((this.parent.width - this.width) / 2, 0);
+                    break;
+                case AlignType.BOTTOM:
+                    this.alignPos = new gd3d.math.vector3((this.parent.width - this.width) / 2, this.parent.height - this.height);
+                    break;
+                case AlignType.TOP_LEFT:
+                    this.alignPos = new gd3d.math.vector3(0, 0);
+                    break;
+                case AlignType.BOTTOM_LEFT:
+                    this.alignPos = new gd3d.math.vector3(0, this.parent.height - this.height);
+                    break;
+                case AlignType.TOP_RIGHT:
+                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, 0);
+                    break;
+                case AlignType.BOTTOM_RIGHT:
+                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, this.parent.height - this.height);
+                    break;
+            }
+        }
+        var pos = gd3d.math.pool.new_vector3();
+        gd3d.math.vec3Add(this.alignPos, this.localTranslate, pos);
+        this.points[0] = new gd3d.math.vector3(pos.x - this.width / 2, pos.y + this.height / 2, pos.z);
+        this.points[1] = new gd3d.math.vector3(pos.x - this.width / 2, pos.y - this.height / 2, pos.z);
+        this.points[2] = new gd3d.math.vector3(pos.x + this.width / 2, pos.y - this.height / 2, pos.z);
+        this.points[3] = new gd3d.math.vector3(pos.x + this.width / 2, pos.y - this.height / 2, pos.z);
+        for (var i = 0; i < this.children.length; i++) {
+            this.children[i].layout();
+        }
+    };
+    return Rect;
+}(gd3d.framework.transform));
+var AlignType;
+(function (AlignType) {
+    AlignType[AlignType["NONE"] = 0] = "NONE";
+    AlignType[AlignType["CENTER"] = 1] = "CENTER";
+    AlignType[AlignType["LEFT"] = 2] = "LEFT";
+    AlignType[AlignType["RIGHT"] = 3] = "RIGHT";
+    AlignType[AlignType["TOP"] = 4] = "TOP";
+    AlignType[AlignType["BOTTOM"] = 5] = "BOTTOM";
+    AlignType[AlignType["TOP_LEFT"] = 6] = "TOP_LEFT";
+    AlignType[AlignType["BOTTOM_LEFT"] = 7] = "BOTTOM_LEFT";
+    AlignType[AlignType["TOP_RIGHT"] = 8] = "TOP_RIGHT";
+    AlignType[AlignType["BOTTOM_RIGHT"] = 9] = "BOTTOM_RIGHT";
+})(AlignType || (AlignType = {}));
 var test_01 = (function () {
     function test_01() {
         this.timer = 0;
@@ -2092,6 +2399,197 @@ var t;
     }());
     t.test_clearDepth0 = test_clearDepth0;
 })(t || (t = {}));
+var test_effecteditor = (function () {
+    function test_effecteditor() {
+        this.timer = 0;
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.beclone = false;
+        this.effectloaded = false;
+        this.bestop = false;
+        this.bereplay = false;
+    }
+    test_effecteditor.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_effecteditor.prototype.loadText = function (laststate, state) {
+        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_effecteditor.prototype.addcube = function (laststate, state) {
+        {
+            {
+                var cube = new gd3d.framework.transform();
+                cube.name = "cube";
+                cube.localTranslate.x = 0;
+                this.scene.addChild(cube);
+                var mesh = cube.gameObject.addComponent("meshFilter");
+                var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                mesh.mesh = (smesh);
+                var renderer = cube.gameObject.addComponent("meshRenderer");
+                var cuber = renderer;
+                var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+                if (sh != null) {
+                    cuber.materials = [];
+                    cuber.materials.push(new gd3d.framework.material());
+                    cuber.materials[0].setShader(sh);
+                    var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
+                    cuber.materials[0].setTexture("_MainTex", texture);
+                }
+            }
+        }
+        state.finish = true;
+    };
+    test_effecteditor.prototype.loadModel = function (laststate, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.app.getAssetMgr().load("res/prefabs/fx_shuijing_cj/fx_shuijing_cj.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_s) {
+                    if (_s.isfinish) {
+                        var _prefab = _this.app.getAssetMgr().getAssetByName("fx_shuijing_cj.prefab.json");
+                        _this.dragon = _prefab.getCloneTrans();
+                        _this.scene.addChild(_this.dragon);
+                        state.finish = true;
+                    }
+                });
+            }
+        });
+    };
+    test_effecteditor.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.gui = new lighttool.htmlui.gui(this.app.container);
+        lighttool.htmlui.panelMgr.instance().init(this.app.container);
+        this.gui.onchange = function () {
+            if (_this.gui.add_Button("new particle")) {
+            }
+        };
+        setInterval(function () {
+            _this.gui.update();
+        }, 300);
+        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.taskmgr.addTaskCall(this.loadText.bind(this));
+        this.taskmgr.addTaskCall(this.addcam.bind(this));
+        this.taskmgr.addTaskCall(this.loadEffect.bind(this));
+    };
+    test_effecteditor.prototype.loadEffect = function (laststate, state) {
+        var _this = this;
+        var names = ["fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        var name = names[0];
+        this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                _this.tr = new gd3d.framework.transform();
+                _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+                var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
+                _this.effect.setJsonData(text);
+                _this.scene.addChild(_this.tr);
+                _this.tr.markDirty();
+                state.finish = true;
+                _this.effectloaded = true;
+                _this.addButton();
+            }
+        });
+    };
+    test_effecteditor.prototype.addButton = function () {
+        var _this = this;
+        var btn = document.createElement("button");
+        btn.textContent = "Load Prefab";
+        btn.onclick = function () {
+            _this.app.getAssetMgr().savePrefab(_this.tr, "prefabName", function (data, resourses) {
+                console.log(data.files);
+                console.log(resourses.length);
+            });
+        };
+        btn.style.top = "160px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+        var btn1 = document.createElement("button");
+        btn1.textContent = "Save To Prefab";
+        btn1.onclick = function () {
+            var name = _this.tr.name;
+            var _prefab = new gd3d.framework.prefab(name);
+            _this.app.getAssetMgr().use(_prefab);
+            _prefab.assetbundle = name;
+            var path = "";
+            _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
+                console.log(data.files);
+                console.log(resourses.length);
+                var _loop_1 = function (key) {
+                    var val = data.files[key];
+                    var blob = localSave.Instance.file_str2blob(val);
+                    var files = [];
+                    var resPath = path + "/resources/";
+                    var _loop_2 = function (i) {
+                        var resourceUrl = resourses[i];
+                        var resourceName = _this.getNameFromURL(resourceUrl);
+                        var resourceLength = 0;
+                        if (resourceName.indexOf(".txt") != -1 || resourceName.indexOf(".json")) {
+                            localSave.Instance.loadTextImmediate(resourceUrl, function (_txt, _err) {
+                                var blob = localSave.Instance.file_str2blob(_txt);
+                                localSave.Instance.save(resPath + resourceName, blob);
+                            });
+                        }
+                        else {
+                            localSave.Instance.loadBlobImmediate(resourceUrl, function (_blob, _err) {
+                                localSave.Instance.save(resPath + resourceName, _blob);
+                            });
+                        }
+                        var fileInfo_1 = { "name": "resources/" + resourceName, "length": 100 };
+                        files.push(fileInfo_1);
+                    };
+                    for (var i = 0; i < resourses.length; i++) {
+                        _loop_2(i);
+                    }
+                    localSave.Instance.save(resPath + name + ".prefab.json", blob);
+                    var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
+                    files.push(fileInfo);
+                    var assetBundleStr = JSON.stringify({ "files": files });
+                    var assetBundleBlob = localSave.Instance.file_str2blob(assetBundleStr);
+                    localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
+                };
+                for (var key in data.files) {
+                    _loop_1(key);
+                }
+            });
+        };
+        btn1.style.top = "320px";
+        btn1.style.position = "absolute";
+        this.app.container.appendChild(btn1);
+    };
+    test_effecteditor.prototype.getNameFromURL = function (path) {
+        var index = path.lastIndexOf("/");
+        return path.substring(index + 1);
+    };
+    test_effecteditor.prototype.addcam = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 200;
+        this.camera.fov = Math.PI * 0.3;
+        this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 20, 20);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    test_effecteditor.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return test_effecteditor;
+}());
 var test_effect = (function () {
     function test_effect() {
         this.timer = 0;
@@ -2168,7 +2666,7 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_ss_female@attack_04", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        var names = ["fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
@@ -2180,8 +2678,79 @@ var test_effect = (function () {
                 _this.tr.markDirty();
                 state.finish = true;
                 _this.effectloaded = true;
+                _this.addButton();
             }
         });
+    };
+    test_effect.prototype.addButton = function () {
+        var _this = this;
+        var btn = document.createElement("button");
+        btn.textContent = "Load Prefab";
+        btn.onclick = function () {
+            _this.app.getAssetMgr().savePrefab(_this.tr, "prefabName", function (data, resourses) {
+                console.log(data.files);
+                console.log(resourses.length);
+            });
+        };
+        btn.style.top = "160px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+        var btn1 = document.createElement("button");
+        btn1.textContent = "Save To Prefab";
+        btn1.onclick = function () {
+            var name = _this.tr.name;
+            var _prefab = new gd3d.framework.prefab(name);
+            _this.app.getAssetMgr().use(_prefab);
+            _prefab.assetbundle = name;
+            var path = "";
+            _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
+                console.log(data.files);
+                console.log(resourses.length);
+                var _loop_3 = function (key) {
+                    var val = data.files[key];
+                    var blob = localSave.Instance.file_str2blob(val);
+                    var files = [];
+                    var resPath = path + "/resources/";
+                    var _loop_4 = function (i) {
+                        var resourceUrl = resourses[i];
+                        var resourceName = _this.getNameFromURL(resourceUrl);
+                        var resourceLength = 0;
+                        if (resourceName.indexOf(".txt") != -1 || resourceName.indexOf(".json")) {
+                            localSave.Instance.loadTextImmediate(resourceUrl, function (_txt, _err) {
+                                var blob = localSave.Instance.file_str2blob(_txt);
+                                localSave.Instance.save(resPath + resourceName, blob);
+                            });
+                        }
+                        else {
+                            localSave.Instance.loadBlobImmediate(resourceUrl, function (_blob, _err) {
+                                localSave.Instance.save(resPath + resourceName, _blob);
+                            });
+                        }
+                        var fileInfo_2 = { "name": "resources/" + resourceName, "length": 100 };
+                        files.push(fileInfo_2);
+                    };
+                    for (var i = 0; i < resourses.length; i++) {
+                        _loop_4(i);
+                    }
+                    localSave.Instance.save(resPath + name + ".prefab.json", blob);
+                    var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
+                    files.push(fileInfo);
+                    var assetBundleStr = JSON.stringify({ "files": files });
+                    var assetBundleBlob = localSave.Instance.file_str2blob(assetBundleStr);
+                    localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
+                };
+                for (var key in data.files) {
+                    _loop_3(key);
+                }
+            });
+        };
+        btn1.style.top = "320px";
+        btn1.style.position = "absolute";
+        this.app.container.appendChild(btn1);
+    };
+    test_effect.prototype.getNameFromURL = function (path) {
+        var index = path.lastIndexOf("/");
+        return path.substring(index + 1);
     };
     test_effect.prototype.addcam = function (laststate, state) {
         var objCam = new gd3d.framework.transform();
@@ -4751,7 +5320,7 @@ var t;
                                 var tr = new gd3d.framework.transform();
                                 _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
                                 var text = _this.app.getAssetMgr().getAssetByName(effectName + ".effect.json");
-                                _this.effect.setEffect(text.content);
+                                _this.effect.setJsonData(text);
                                 _this.role.addChild(tr);
                                 var rotateVelocity = gd3d.math.pool.new_quaternion();
                                 gd3d.math.quatFromEulerAngles(180, 0, 0, rotateVelocity);
@@ -4774,7 +5343,7 @@ var t;
                     var tr = new gd3d.framework.transform();
                     _this.effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
                     var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
-                    _this.effect.setEffect(text.content);
+                    _this.effect.setJsonData(text);
                     _this.role.addChild(tr);
                     var rotateVelocity = gd3d.math.pool.new_quaternion();
                     gd3d.math.quatFromEulerAngles(180, 0, 0, rotateVelocity);
@@ -4887,20 +5456,17 @@ var t;
             {
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", function (buf, err) {
                     _this.looped = buf;
-                    gd3d.framework.AudioEx.instance().playLooped("abc", _this.looped);
                 });
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", function (buf, err) {
                     _this.once1 = buf;
                 });
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", function (buf, err) {
                     _this.once2 = buf;
-                    gd3d.framework.AudioEx.instance().playOnce("once2", _this.once2);
                 });
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
                     button.onclick = function () {
-                        gd3d.framework.AudioEx.instance().playOnce("once1", _this.once1);
                     };
                     button.style.top = "130px";
                     button.style.position = "absolute";
@@ -4910,7 +5476,6 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play once2";
                     button.onclick = function () {
-                        gd3d.framework.AudioEx.instance().playOnce("once2", _this.once2);
                     };
                     button.style.top = "130px";
                     button.style.left = "90px";
@@ -4921,7 +5486,6 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play loop";
                     button.onclick = function () {
-                        gd3d.framework.AudioEx.instance().playLooped("abc", _this.looped);
                     };
                     button.style.top = "160px";
                     button.style.position = "absolute";
@@ -4931,7 +5495,6 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "stop loop";
                     button.onclick = function () {
-                        gd3d.framework.AudioEx.instance().stopLooped("abc");
                     };
                     button.style.top = "160px";
                     button.style.left = "90px";
@@ -4943,12 +5506,8 @@ var t;
                     var input = document.createElement("input");
                     input.type = "range";
                     input.valueAsNumber = 10;
-                    gd3d.framework.AudioEx.instance().setSoundVolume(-0.2);
-                    gd3d.framework.AudioEx.instance().setMusicVolume(-0.2);
                     input.oninput = function (e) {
                         var value = (input.valueAsNumber - 50) / 50;
-                        gd3d.framework.AudioEx.instance().setSoundVolume(value);
-                        gd3d.framework.AudioEx.instance().setMusicVolume(value);
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";

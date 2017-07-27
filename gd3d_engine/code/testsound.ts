@@ -91,20 +91,20 @@ namespace t {
 
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", (buf, err) => {
                     this.looped = buf;
-                    gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
+                    // gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
                 });
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", (buf, err) => {
                     this.once1 = buf;
                 });
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", (buf, err) => {
                     this.once2 = buf;
-                    gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
+                    // gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
                 });
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
                     button.onclick = () => {
-                        gd3d.framework.AudioEx.instance().playOnce("once1", this.once1);
+                        // gd3d.framework.AudioEx.instance().playOnce("once1", this.once1);
                     };
                     button.style.top = "130px";
                     button.style.position = "absolute";
@@ -114,7 +114,7 @@ namespace t {
                     var button = document.createElement("button");
                     button.textContent = "play once2";
                     button.onclick = () => {
-                        gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
+                        // gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
                     };
                     button.style.top = "130px";
                     button.style.left = "90px"
@@ -125,7 +125,7 @@ namespace t {
                     var button = document.createElement("button");
                     button.textContent = "play loop";
                     button.onclick = () => {
-                        gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
+                        // gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
                     };
 
                     button.style.top = "160px";
@@ -136,7 +136,7 @@ namespace t {
                     var button = document.createElement("button");
                     button.textContent = "stop loop";
                     button.onclick = () => {
-                        gd3d.framework.AudioEx.instance().stopLooped("abc");
+                        // gd3d.framework.AudioEx.instance().stopLooped("abc");
                     };
                     button.style.top = "160px";
                     button.style.left = "90px"
@@ -148,12 +148,12 @@ namespace t {
                     var input = document.createElement("input");
                     input.type = "range";
                     input.valueAsNumber = 10;
-                    gd3d.framework.AudioEx.instance().setSoundVolume(-0.2);
-                    gd3d.framework.AudioEx.instance().setMusicVolume(-0.2);
+                    // gd3d.framework.AudioEx.instance().setSoundVolume(-0.2);
+                    // gd3d.framework.AudioEx.instance().setMusicVolume(-0.2);
                     input.oninput = (e) => {
                         var value = (input.valueAsNumber - 50) / 50;
-                        gd3d.framework.AudioEx.instance().setSoundVolume(value);
-                        gd3d.framework.AudioEx.instance().setMusicVolume(value);
+                        // gd3d.framework.AudioEx.instance().setSoundVolume(value);
+                        // gd3d.framework.AudioEx.instance().setMusicVolume(value);
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";

@@ -1285,14 +1285,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class AudioChannel {
-        source: AudioBufferSourceNode;
-        gainNode: GainNode;
-        pannerNode: PannerNode;
-        volume: number;
-        isplay: boolean;
-        stop(): void;
-    }
     class AudioEx {
         private constructor();
         clickInit(): void;
@@ -1306,16 +1298,6 @@ declare namespace gd3d.framework {
         private getNewChannel();
         private getFreeChannelOnce();
         private channelOnce;
-        playOnce(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel;
-        playOnceInterrupt(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel;
-        playOnceBlocking(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel;
-        private channelLoop;
-        playLooped(name: string, buf: AudioBuffer): void;
-        stopLooped(name: string): void;
-        private _soundVolume;
-        setSoundVolume(val: number): void;
-        private _musicVolume;
-        setMusicVolume(val: number): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1393,6 +1375,31 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         remove(): void;
         clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AudioPlayer implements INodeComponent {
+        _volume: number;
+        audioChannel: AudioChannel;
+        buffer: AudioBuffer;
+        beLoop: boolean;
+        init(buffer: AudioBuffer, audioChannel: AudioChannel, beLoop?: boolean): void;
+        start(): void;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+        play(x?: number, y?: number, z?: number): AudioChannel;
+        stop(): void;
+        volume: number;
+    }
+    class AudioChannel {
+        source: AudioBufferSourceNode;
+        gainNode: GainNode;
+        pannerNode: PannerNode;
+        volume: number;
+        isplay: boolean;
+        stop(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1530,7 +1537,6 @@ declare namespace gd3d.framework {
         private effectBatchers;
         private particles;
         private matDataGroups;
-        setEffect(effectConfig: string): void;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;

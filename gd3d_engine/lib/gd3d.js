@@ -7813,37 +7813,9 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var AudioChannel = (function () {
-            function AudioChannel() {
-            }
-            Object.defineProperty(AudioChannel.prototype, "volume", {
-                get: function () {
-                    return this.gainNode.gain.value;
-                },
-                set: function (val) {
-                    val = val > 1 ? 1 : val;
-                    val = val <= -1 ? -0.999 : val;
-                    this.gainNode.gain.value = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            AudioChannel.prototype.stop = function () {
-                if (this.source != null) {
-                    this.source.stop();
-                    this.source = null;
-                }
-                this.isplay = false;
-            };
-            return AudioChannel;
-        }());
-        framework.AudioChannel = AudioChannel;
         var AudioEx = (function () {
             function AudioEx() {
                 this.channelOnce = {};
-                this.channelLoop = {};
-                this._soundVolume = 0;
-                this._musicVolume = 0;
                 try {
                     var _AudioContext = window["AudioContext"] || window["webkitAudioContext"] || window["mozAudioContext"] || window["msAudioContext"];
                     this.audioContext = new _AudioContext();
@@ -7907,7 +7879,7 @@ var gd3d;
                 });
             };
             AudioEx.prototype.getNewChannel = function () {
-                var cc = new AudioChannel();
+                var cc = new framework.AudioChannel();
                 cc.source = this.audioContext.createBufferSource();
                 cc.pannerNode = this.audioContext.createPanner();
                 cc.source.connect(this.audioContext.destination);
@@ -7927,102 +7899,6 @@ var gd3d;
                 }
                 var cc = this.getNewChannel();
                 return cc;
-            };
-            AudioEx.prototype.playOnce = function (name, buf, x, y, z) {
-                var c = this.getFreeChannelOnce();
-                c.source.loop = false;
-                c.source.buffer = buf;
-                c.volume = this._soundVolume;
-                c.source.start();
-                if (x && y && z)
-                    c.pannerNode.setPosition(x, y, z);
-                c.isplay = true;
-                c.source.onended = function () {
-                    c.isplay = false;
-                    c.source = null;
-                };
-                this.channelOnce[name] = c;
-                return c;
-            };
-            AudioEx.prototype.playOnceInterrupt = function (name, buf, x, y, z) {
-                for (var key in this.channelOnce) {
-                    if (key == name && this.channelOnce[key].isplay) {
-                        this.channelOnce[key].stop();
-                    }
-                }
-                var cc = this.getFreeChannelOnce();
-                cc.source.loop = false;
-                cc.source.buffer = buf;
-                cc.volume = this._soundVolume;
-                if (x && y && z)
-                    cc.pannerNode.setPosition(x, y, z);
-                cc.source.start();
-                cc.isplay = true;
-                cc.source.onended = function () {
-                    cc.isplay = false;
-                    cc.source = null;
-                };
-                this.channelOnce[name] = cc;
-                return cc;
-            };
-            AudioEx.prototype.playOnceBlocking = function (name, buf, x, y, z) {
-                for (var key in this.channelOnce) {
-                    if (key == name && this.channelOnce[key].isplay) {
-                        return;
-                    }
-                }
-                var cc = this.getFreeChannelOnce();
-                cc.source.loop = false;
-                cc.source.buffer = buf;
-                cc.volume = this._soundVolume;
-                if (x && y && z)
-                    cc.pannerNode.setPosition(x, y, z);
-                cc.source.start();
-                cc.isplay = true;
-                cc.source.onended = function () {
-                    cc.isplay = false;
-                    cc.source = null;
-                };
-                this.channelOnce[name] = cc;
-                return cc;
-            };
-            AudioEx.prototype.playLooped = function (name, buf) {
-                if (this.channelLoop[name] != undefined) {
-                    if (this.channelLoop[name].isplay) {
-                        this.channelLoop[name].source.stop();
-                        this.channelLoop[name].isplay = false;
-                    }
-                }
-                var cc = this.getNewChannel();
-                cc.source.loop = true;
-                cc.volume = this._musicVolume;
-                this.channelLoop[name] = cc;
-                this.channelLoop[name].source.buffer = buf;
-                this.channelLoop[name].source.start();
-                this.channelLoop[name].isplay = true;
-            };
-            AudioEx.prototype.stopLooped = function (name) {
-                if (this.channelLoop[name] == undefined || this.channelLoop[name] == null || this.channelLoop[name].source == null)
-                    return;
-                this.channelLoop[name].source.stop();
-                this.channelLoop[name].source = null;
-                this.channelLoop[name].isplay = false;
-            };
-            AudioEx.prototype.setSoundVolume = function (val) {
-                this._soundVolume = val;
-                for (var key in this.channelOnce) {
-                    if (this.channelOnce[key]) {
-                        this.channelOnce[key].volume = this._soundVolume;
-                    }
-                }
-            };
-            AudioEx.prototype.setMusicVolume = function (val) {
-                this._musicVolume = val;
-                for (var key in this.channelLoop) {
-                    if (this.channelLoop[key]) {
-                        this.channelLoop[key].volume = this._musicVolume;
-                    }
-                }
             };
             return AudioEx;
         }());
@@ -8413,6 +8289,94 @@ var gd3d;
             return asbone;
         }());
         framework.asbone = asbone;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AudioPlayer = (function () {
+            function AudioPlayer() {
+            }
+            AudioPlayer.prototype.init = function (buffer, audioChannel, beLoop) {
+                if (beLoop === void 0) { beLoop = false; }
+                this.buffer = buffer;
+                this.audioChannel = audioChannel;
+                this.beLoop = beLoop;
+            };
+            AudioPlayer.prototype.start = function () {
+            };
+            AudioPlayer.prototype.update = function (delta) {
+            };
+            AudioPlayer.prototype.remove = function () {
+            };
+            AudioPlayer.prototype.clone = function () {
+            };
+            AudioPlayer.prototype.play = function (x, y, z) {
+                if (this.audioChannel == null)
+                    return null;
+                var c = this.audioChannel;
+                c.source.loop = this.beLoop;
+                c.source.buffer = this.buffer;
+                c.volume = this.volume;
+                c.source.start();
+                if (x && y && z)
+                    c.pannerNode.setPosition(x, y, z);
+                c.isplay = true;
+                if (!this.beLoop) {
+                    c.source.onended = function () {
+                        c.isplay = false;
+                        c.source = null;
+                    };
+                }
+                return c;
+            };
+            AudioPlayer.prototype.stop = function () {
+                if (this.audioChannel != null) {
+                    this.audioChannel.stop();
+                }
+            };
+            Object.defineProperty(AudioPlayer.prototype, "volume", {
+                get: function () {
+                    return this.audioChannel == null ? -1 : this.audioChannel.volume;
+                },
+                set: function (val) {
+                    this.audioChannel == null ? 0 : this.audioChannel.volume = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AudioPlayer = __decorate([
+                gd3d.reflect.nodeComponent
+            ], AudioPlayer);
+            return AudioPlayer;
+        }());
+        framework.AudioPlayer = AudioPlayer;
+        var AudioChannel = (function () {
+            function AudioChannel() {
+            }
+            Object.defineProperty(AudioChannel.prototype, "volume", {
+                get: function () {
+                    return this.gainNode.gain.value;
+                },
+                set: function (val) {
+                    val = val > 1 ? 1 : val;
+                    val = val <= -1 ? -0.999 : val;
+                    this.gainNode.gain.value = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AudioChannel.prototype.stop = function () {
+                if (this.source != null) {
+                    this.source.stop();
+                    this.source = null;
+                }
+                this.isplay = false;
+            };
+            return AudioChannel;
+        }());
+        framework.AudioChannel = AudioChannel;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9018,10 +8982,6 @@ var gd3d;
                 this.matDataGroups = [];
             }
             effectSystem_1 = effectSystem;
-            effectSystem.prototype.setEffect = function (effectConfig) {
-                this.webgl = gd3d.framework.sceneMgr.app.webgl;
-                this.data = this.parser.Parse(effectConfig, gd3d.framework.sceneMgr.app.getAssetMgr());
-            };
             effectSystem.prototype.setJsonData = function (_jsonData) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.jsonData = _jsonData;

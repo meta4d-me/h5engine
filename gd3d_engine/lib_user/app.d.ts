@@ -1,4 +1,5 @@
 /// <reference path="../lib/gd3d.d.ts" />
+/// <reference path="../lib/htmlui.d.ts" />
 declare namespace t {
     class light_d1 implements IState {
         app: gd3d.framework.application;
@@ -14,6 +15,20 @@ declare namespace t {
         taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
     }
+}
+declare class localSave {
+    private static _instance;
+    static readonly Instance: localSave;
+    localServerPath: string;
+    stringToUtf8Array(str: string): number[];
+    file_str2blob(string: string): Blob;
+    file_u8array2blob(array: Uint8Array): Blob;
+    save(path: string, file: Blob | File): number;
+    startDirect(exec: string, path: string, argc: string): any;
+    start(path: string): any;
+    startnowait(path: string, fun?: (_txt: string, _err: Error) => void): any;
+    loadTextImmediate(url: string, fun: (_txt: string, _err: Error) => void): void;
+    loadBlobImmediate(url: string, fun: (_blob: Blob, _err: Error) => void): void;
 }
 interface IState {
     start(app: gd3d.framework.application): any;
@@ -227,6 +242,41 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_uimove implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    timer: number;
+    update(delta: number): void;
+    private test();
+}
+declare class Rect extends gd3d.framework.transform {
+    width: number;
+    height: number;
+    offset: gd3d.math.vector3;
+    parent: Rect;
+    children: Rect[];
+    alignType: AlignType;
+    points: gd3d.math.vector3[];
+    alignPos: gd3d.math.vector3;
+    layout(): void;
+}
+declare enum AlignType {
+    NONE = 0,
+    CENTER = 1,
+    LEFT = 2,
+    RIGHT = 3,
+    TOP = 4,
+    BOTTOM = 5,
+    TOP_LEFT = 6,
+    BOTTOM_LEFT = 7,
+    TOP_RIGHT = 8,
+    BOTTOM_RIGHT = 9,
+}
 declare class test_01 implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -312,6 +362,34 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_effecteditor implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    effect: gd3d.framework.effectSystem;
+    label: HTMLLabelElement;
+    gui: lighttool.htmlui.gui;
+    private loadShader(laststate, state);
+    private loadText(laststate, state);
+    private addcube(laststate, state);
+    private dragon;
+    private loadModel(laststate, state);
+    start(app: gd3d.framework.application): void;
+    private loadEffect(laststate, state);
+    private addButton();
+    private getNameFromURL(path);
+    private addcam(laststate, state);
+    tr: gd3d.framework.transform;
+    ttr: gd3d.framework.transform;
+    eff: gd3d.framework.effectSystem;
+    beclone: boolean;
+    effectloaded: boolean;
+    bestop: boolean;
+    bereplay: boolean;
+    update(delta: number): void;
+}
 declare class test_effect implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -327,6 +405,8 @@ declare class test_effect implements IState {
     private loadModel(laststate, state);
     start(app: gd3d.framework.application): void;
     private loadEffect(laststate, state);
+    private addButton();
+    private getNameFromURL(path);
     private addcam(laststate, state);
     tr: gd3d.framework.transform;
     ttr: gd3d.framework.transform;
