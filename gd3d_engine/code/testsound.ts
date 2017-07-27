@@ -1,6 +1,8 @@
-namespace t {
+namespace t
+{
 
-    export class test_sound implements IState {
+    export class test_sound implements IState
+    {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         camera: gd3d.framework.camera;
@@ -17,26 +19,33 @@ namespace t {
         once2: AudioBuffer = null;
 
 
-        private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) => {
+        private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
+            {
                 state.finish = true;
             }
             );
         }
 
-        private loadText(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-                if (s.isfinish) {
+        private loadText(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        {
+            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            {
+                if (s.isfinish)
+                {
                     state.finish = true;
                 }
-                else {
+                else
+                {
                     state.error = true;
                 }
             }
             );
         }
 
-        private addcam(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        private addcam(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        {
 
             //添加一个摄像机
             var objCam = new gd3d.framework.transform();
@@ -52,7 +61,8 @@ namespace t {
 
         }
 
-        private addcube(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        private addcube(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        {
             //添加一个盒子
             {
                 //添加一个盒子
@@ -70,7 +80,8 @@ namespace t {
                     let cuber = renderer;
 
                     var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
-                    if (sh != null) {
+                    if (sh != null)
+                    {
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);//----------------使用shader
@@ -86,25 +97,38 @@ namespace t {
             state.finish = true;
         }
 
-        private loadSoundInfe(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        private loadSoundInfe(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        {
             {
-
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", (buf, err) => {
+                let tr = new gd3d.framework.transform();
+                let player: gd3d.framework.AudioPlayer = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER) as gd3d.framework.AudioPlayer;
+                this.app.getScene().addChild(tr);
+                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", (buf, err) =>
+                {
                     this.looped = buf;
+                    player.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                    player.play(buf, 0);
                     // gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
                 });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", (buf, err) => {
+                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", (buf, err) =>
+                {
                     this.once1 = buf;
                 });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", (buf, err) => {
+                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", (buf, err) =>
+                {
                     this.once2 = buf;
+                    player.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                    player.play(buf, 0);
                     // gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
                 });
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
-                    button.onclick = () => {
+                    button.onclick = () =>
+                    {
                         // gd3d.framework.AudioEx.instance().playOnce("once1", this.once1);
+                        player.init("once1", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                        player.play(this.once1, 0);
                     };
                     button.style.top = "130px";
                     button.style.position = "absolute";
@@ -113,8 +137,11 @@ namespace t {
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once2";
-                    button.onclick = () => {
+                    button.onclick = () =>
+                    {
                         // gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
+                        player.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                        player.play(this.once2, 0);
                     };
                     button.style.top = "130px";
                     button.style.left = "90px"
@@ -124,8 +151,11 @@ namespace t {
                 {
                     var button = document.createElement("button");
                     button.textContent = "play loop";
-                    button.onclick = () => {
+                    button.onclick = () =>
+                    {
                         // gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
+                        player.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), true);
+                        player.play(this.looped, 0);
                     };
 
                     button.style.top = "160px";
@@ -135,8 +165,10 @@ namespace t {
                 {
                     var button = document.createElement("button");
                     button.textContent = "stop loop";
-                    button.onclick = () => {
+                    button.onclick = () =>
+                    {
                         // gd3d.framework.AudioEx.instance().stopLooped("abc");
+                        player.stop();
                     };
                     button.style.top = "160px";
                     button.style.left = "90px"
@@ -148,10 +180,13 @@ namespace t {
                     var input = document.createElement("input");
                     input.type = "range";
                     input.valueAsNumber = 10;
+                    player.volume = -0.2;
                     // gd3d.framework.AudioEx.instance().setSoundVolume(-0.2);
                     // gd3d.framework.AudioEx.instance().setMusicVolume(-0.2);
-                    input.oninput = (e) => {
+                    input.oninput = (e) =>
+                    {
                         var value = (input.valueAsNumber - 50) / 50;
+                        player.volume = value;
                         // gd3d.framework.AudioEx.instance().setSoundVolume(value);
                         // gd3d.framework.AudioEx.instance().setMusicVolume(value);
                     };
@@ -165,7 +200,8 @@ namespace t {
         }
 
 
-        start(app: gd3d.framework.application) {
+        start(app: gd3d.framework.application)
+        {
             console.log("i am here.");
             this.app = app;
             this.scene = this.app.getScene();
@@ -176,18 +212,17 @@ namespace t {
             this.taskmgr.addTaskCall(this.addcube.bind(this))
             this.taskmgr.addTaskCall(this.addcam.bind(this));
             this.taskmgr.addTaskCall(this.loadSoundInfe.bind(this));
-
+            gd3d.framework.AudioEx.instance().clickInit();
         }
 
-
-
-
-        update(delta: number) {
+        update(delta: number)
+        {
             this.taskmgr.move(delta);
 
             this.timer += delta;
 
-            if (this.cube != null) {
+            if (this.cube != null)
+            {
 
                 let cubeTransform = this.cube.gameObject.transform;
 

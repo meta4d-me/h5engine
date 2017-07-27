@@ -5,7 +5,7 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class AudioPlayer implements INodeComponent
     {
-        public _volume: number;
+        private _volume: number;
         public audioChannel: AudioChannel;
         public buffer: AudioBuffer;
         public beLoop: boolean;
@@ -16,11 +16,10 @@ namespace gd3d.framework
          * @param volume 音量大小
          * @param beLoop 
          */
-        public init(name: string, buffer: AudioBuffer, volume: number, beLoop: boolean = false)
+        public init(name: string, audioChannel: AudioChannel, beLoop: boolean = false)
         {
             this.name = name;
-            this.buffer = buffer;
-            this.volume = volume;
+            this.audioChannel = audioChannel;
             this.beLoop = beLoop;
         }
         start()
@@ -50,10 +49,12 @@ namespace gd3d.framework
          * @param y 音源在3D空间中的播放位置
          * @param z 音源在3D空间中的播放位置
          */
-        play(onended: Function, x?: number, y?: number, z?: number)
+        play(buffer: AudioBuffer, volume: number = 0, onended?: Function, x?: number, y?: number, z?: number)
         {
             if (this.audioChannel == null)
                 return null;
+            this.buffer = buffer;
+            this.volume = volume;
             var c = this.audioChannel;
             c.source.loop = this.beLoop;
             c.source.buffer = this.buffer;

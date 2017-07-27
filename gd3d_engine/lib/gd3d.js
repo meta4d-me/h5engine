@@ -4156,12 +4156,17 @@ var gd3d;
             assetMgr.prototype.checkFreeChannel = function () {
                 var freechannel = -1;
                 for (var k = 0; k < this.loadingQueueState.length; k++) {
-                    if (!this.loadingQueueState[k].state.isfinish && !this.loadingQueueState[k].state.iserror) {
+                    if (this.loadingQueueState[k] == undefined) {
+                        freechannel = k;
+                        break;
+                    }
+                    else if (!this.loadingQueueState[k].state.isfinish && !this.loadingQueueState[k].state.iserror) {
                         continue;
                     }
                     else {
                         delete this.loadingQueueState[k];
                         freechannel = k;
+                        break;
                     }
                 }
                 if (freechannel == -1 && this.loadingQueueState.length < this.loadingCountLimit) {
@@ -4400,7 +4405,7 @@ var gd3d;
                     img.onload = function () {
                         var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                         result.glTexture = new gd3d.render.glTexture2D(_this.webgl, _textureFormat);
-                        result.glTexture.uploadImage(img, false, false);
+                        result.glTexture.uploadImage(img, true, true, true, true);
                         _this.use(result);
                     };
                 }
@@ -5283,12 +5288,13 @@ var gd3d;
             };
             AssetFactory_Material.prototype.load = function (url, onstate, state, assetMgr, asset) {
                 var filename = framework.getFileName(url);
+                var assetbundleName = framework.getFileName(state.url);
                 state.resstate[filename] = new framework.ResourceState();
                 gd3d.io.loadText(url, function (txt, err) {
                     if (framework.AssetFactoryTools.catchError(err, onstate, state))
                         return;
                     var _material = asset ? asset : new framework.material(filename);
-                    _material.Parse(assetMgr, JSON.parse(txt));
+                    _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
@@ -5296,10 +5302,11 @@ var gd3d;
             };
             AssetFactory_Material.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
                 var filename = framework.getFileName(url);
+                var assetbundleName = framework.getFileName(state.url);
                 state.resstate[filename] = new framework.ResourceState();
                 var txt = respack[filename];
                 var _material = asset ? asset : new framework.material(filename);
-                _material.Parse(assetMgr, JSON.parse(txt));
+                _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
                 framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
             };
             return AssetFactory_Material;
@@ -6380,38 +6387,62 @@ var gd3d;
             material.prototype.setFloat = function (_id, _number) {
                 if (this.mapUniform[_id] != undefined)
                     this.mapUniform[_id].value = _number;
-                else
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.Float) {
+                    this.mapUniformTemp[_id].value = _number;
+                }
+                else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Float, _number);
+                }
             };
             material.prototype.setFloatv = function (_id, _numbers) {
                 if (this.mapUniform[_id] != undefined)
                     this.mapUniform[_id].value = _numbers;
-                else
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.Floatv) {
+                    this.mapUniformTemp[_id].value = _numbers;
+                }
+                else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Floatv, _numbers);
+                }
             };
             material.prototype.setVector4 = function (_id, _vector4) {
                 if (this.mapUniform[_id] != undefined)
                     this.mapUniform[_id].value = _vector4;
-                else
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.Float4) {
+                    this.mapUniformTemp[_id].value = _vector4;
+                }
+                else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Float4, _vector4);
+                }
             };
             material.prototype.setVector4v = function (_id, _vector4v) {
                 if (this.mapUniform[_id] != undefined)
                     this.mapUniform[_id].value = _vector4v;
-                else
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.Float4v) {
+                    this.mapUniformTemp[_id].value = _vector4v;
+                }
+                else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Float4v, _vector4v);
+                }
             };
             material.prototype.setMatrix = function (_id, _matrix) {
                 if (this.mapUniform[_id] != undefined)
                     this.mapUniform[_id].value = _matrix;
-                else
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.Float4x4) {
+                    this.mapUniformTemp[_id].value = _matrix;
+                }
+                else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Float4x4, _matrix);
+                }
             };
             material.prototype.setMatrixv = function (_id, _matrixv) {
                 if (this.mapUniform[_id] != undefined)
                     this.mapUniform[_id].value = _matrixv;
-                else
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.Float4x4v) {
+                    this.mapUniformTemp[_id].value = _matrixv;
+                }
+                else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Float4x4v, _matrixv);
+                }
             };
             material.prototype.setTexture = function (_id, _texture) {
                 if (this.mapUniform[_id] != undefined) {
@@ -6423,10 +6454,13 @@ var gd3d;
                         _texture.use();
                         var _texelsizeName = _id + "_TexelSize";
                         var _gltexture = _texture.glTexture;
-                        if (this.mapUniform[_texelsizeName] != undefined) {
+                        if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined) {
                             this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                         }
                     }
+                }
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.Texture) {
+                    this.mapUniformTemp[_id].value = _texture;
                 }
                 else {
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Texture, _texture);
@@ -6506,8 +6540,9 @@ var gd3d;
                     }
                 }
             };
-            material.prototype.draw = function (context, mesh, sm, basetype) {
+            material.prototype.draw = function (context, mesh, sm, basetype, useGLobalLightMap) {
                 if (basetype === void 0) { basetype = "base"; }
+                if (useGLobalLightMap === void 0) { useGLobalLightMap = true; }
                 var drawPasses = this.shader.passes[basetype + context.drawtype];
                 if (drawPasses == undefined)
                     drawPasses = this.shader.passes["base" + context.drawtype];
@@ -6560,6 +6595,8 @@ var gd3d;
                                 this.setVector4(key, context.eyePos);
                                 break;
                             case "_LightmapTex":
+                                if (!useGLobalLightMap)
+                                    break;
                                 this.setTexture(key, context.lightmap);
                                 break;
                             case "glstate_lightmapOffset":
@@ -6599,9 +6636,9 @@ var gd3d;
                         }
                     }
                 }
-                this.mapUniformTemp = {};
             };
-            material.prototype.Parse = function (assetmgr, json) {
+            material.prototype.Parse = function (assetmgr, json, bundleName) {
+                if (bundleName === void 0) { bundleName = null; }
                 var shaderName = json["shader"];
                 this.setShader(assetmgr.getShader(shaderName));
                 var mapUniform = json["mapUniform"];
@@ -6611,7 +6648,7 @@ var gd3d;
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
                             var _value = jsonChild["value"];
-                            var _texture = assetmgr.getAssetByName(_value);
+                            var _texture = assetmgr.getAssetByName(_value, bundleName);
                             if (_texture == undefined) {
                                 _texture = assetmgr.getDefaultTexture("grid");
                             }
@@ -7815,7 +7852,6 @@ var gd3d;
     (function (framework) {
         var AudioEx = (function () {
             function AudioEx() {
-                this.channelOnce = {};
                 try {
                     var _AudioContext = window["AudioContext"] || window["webkitAudioContext"] || window["mozAudioContext"] || window["msAudioContext"];
                     this.audioContext = new _AudioContext();
@@ -7878,7 +7914,7 @@ var gd3d;
                     }
                 });
             };
-            AudioEx.prototype.getNewChannel = function () {
+            AudioEx.prototype.createAudioChannel = function () {
                 var cc = new framework.AudioChannel();
                 cc.source = this.audioContext.createBufferSource();
                 cc.pannerNode = this.audioContext.createPanner();
@@ -7887,17 +7923,6 @@ var gd3d;
                 cc.source.connect(cc.gainNode);
                 cc.gainNode.connect(AudioEx.instance().audioContext.destination);
                 cc.gainNode.gain.value = 1;
-                return cc;
-            };
-            AudioEx.prototype.getFreeChannelOnce = function () {
-                for (var key in this.channelOnce) {
-                    if (this.channelOnce[key].isplay == false) {
-                        var cc_1 = this.getNewChannel();
-                        this.channelOnce[key] = cc_1;
-                        return this.channelOnce[key];
-                    }
-                }
-                var cc = this.getNewChannel();
                 return cc;
             };
             return AudioEx;
@@ -8298,9 +8323,9 @@ var gd3d;
         var AudioPlayer = (function () {
             function AudioPlayer() {
             }
-            AudioPlayer.prototype.init = function (buffer, audioChannel, beLoop) {
+            AudioPlayer.prototype.init = function (name, audioChannel, beLoop) {
                 if (beLoop === void 0) { beLoop = false; }
-                this.buffer = buffer;
+                this.name = name;
                 this.audioChannel = audioChannel;
                 this.beLoop = beLoop;
             };
@@ -8312,9 +8337,12 @@ var gd3d;
             };
             AudioPlayer.prototype.clone = function () {
             };
-            AudioPlayer.prototype.play = function (x, y, z) {
+            AudioPlayer.prototype.play = function (buffer, volume, onended, x, y, z) {
+                if (volume === void 0) { volume = 0; }
                 if (this.audioChannel == null)
                     return null;
+                this.buffer = buffer;
+                this.volume = volume;
                 var c = this.audioChannel;
                 c.source.loop = this.beLoop;
                 c.source.buffer = this.buffer;
@@ -8327,9 +8355,10 @@ var gd3d;
                     c.source.onended = function () {
                         c.isplay = false;
                         c.source = null;
+                        if (onended != undefined)
+                            onended();
                     };
                 }
-                return c;
             };
             AudioPlayer.prototype.stop = function () {
                 if (this.audioChannel != null) {
@@ -8346,6 +8375,9 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            AudioPlayer.prototype.isPlaying = function () {
+                return this.audioChannel == undefined ? false : this.audioChannel.isplay;
+            };
             AudioPlayer = __decorate([
                 gd3d.reflect.nodeComponent
             ], AudioPlayer);
@@ -8897,7 +8929,7 @@ var gd3d;
                                     var bz = gd3d.math.pool.new_vector3();
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                    return az.z - bz.z;
+                                    return bz.z - az.z;
                                 }
                             });
                         }
@@ -8906,7 +8938,6 @@ var gd3d;
                 if (this.postQueues.length == 0) {
                     this._targetAndViewport(this.renderTarget, scene, context, false);
                     this._renderOnce(scene, context, "");
-                    context.webgl.flush();
                 }
                 else {
                     for (var i = 0; i < this.postQueues.length; i++) {
@@ -9741,6 +9772,7 @@ var gd3d;
         var meshRenderer = (function () {
             function meshRenderer() {
                 this.materials = [];
+                this.useGlobalLightMap = true;
                 this.lightmapIndex = -1;
                 this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.layer = framework.RenderLayerEnum.Common;
@@ -9762,6 +9794,9 @@ var gd3d;
             meshRenderer.prototype.start = function () {
                 this.filter = this.gameObject.getComponent("meshFilter");
                 this.refreshLayerAndQue();
+                if (this.lightmapIndex == -2) {
+                    this.useGlobalLightMap = false;
+                }
             };
             meshRenderer.prototype.refreshLayerAndQue = function () {
                 if (this.materials == null || this.materials.length == 0) {
@@ -9803,12 +9838,17 @@ var gd3d;
                                     }
                                 }
                                 else {
+                                    if (!this.useGlobalLightMap) {
+                                        drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
+                                        context.lightmapOffset = this.lightmapScaleOffset;
+                                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                                    }
                                 }
                                 if (this.gameObject.transform.scene.fog) {
                                     context.fog = this.gameObject.transform.scene.fog;
                                 }
                                 if (usemat != null)
-                                    usemat.draw(context, mesh, sm, drawtype);
+                                    usemat.draw(context, mesh, sm, drawtype, this.useGlobalLightMap);
                             }
                         }
                     }
@@ -18252,6 +18292,7 @@ var gd3d;
                     this.webgl.clearDepth(1.0);
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
                 }
+                this.webgl.flush();
             };
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];
@@ -19635,6 +19676,7 @@ var gd3d;
             StringUtil.COMPONENT_RAWIMAGE = "rawImage2D";
             StringUtil.COMPONENT_BUTTON = "button";
             StringUtil.COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
+            StringUtil.COMPONENT_AUDIOPLAYER = "AudioPlayer";
             StringUtil.COMPONENT_CAMERACONTROLLER = "cameraController";
             StringUtil.COMPONENT_CANVASRENDER = "canvasRenderer";
             StringUtil.UIStyle_RangeFloat = "rangeFloat";

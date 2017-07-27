@@ -4733,10 +4733,21 @@ var t;
             btn = document.createElement("button");
             btn.textContent = "切换PostEffect";
             btn.onclick = function () {
-                _this.camera.postQueues = [];
+                var selectionQueue = [
+                    PostEffectType.GrayAndOutline,
+                    PostEffectType.Mask,
+                    PostEffectType.blur,
+                    PostEffectType.GaussianBlur
+                ];
+                var index = selectionQueue.indexOf(_this.postEffectType + 1);
+                if (index == -1) {
+                    _this.postEffectType = PostEffectType.GrayAndOutline;
+                }
+                else {
+                    _this.postEffectType = selectionQueue[index];
+                }
                 {
-                    if (_this.postEffectType == PostEffectType.Mask) {
-                        _this.postEffectType = PostEffectType.GrayAndOutline;
+                    if (_this.postEffectType == PostEffectType.GrayAndOutline) {
                         var color = new gd3d.framework.cameraPostQueue_Color();
                         color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
                         _this.camera.postQueues.push(color);
@@ -4754,8 +4765,7 @@ var t;
                         _this.camera.postQueues.push(post);
                         console.log("灰度+描边");
                     }
-                    else if (_this.postEffectType == PostEffectType.GrayAndOutline) {
-                        _this.postEffectType = PostEffectType.Mask;
+                    else if (_this.postEffectType == PostEffectType.Mask) {
                         var color = new gd3d.framework.cameraPostQueue_Color();
                         color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
                         _this.camera.postQueues.push(color);
@@ -4766,6 +4776,34 @@ var t;
                         post.material.setTexture("_MainTex", textcolor);
                         _this.camera.postQueues.push(post);
                         console.log("马赛克");
+                    }
+                    else if (_this.postEffectType == PostEffectType.blur) {
+                        var color = new gd3d.framework.cameraPostQueue_Color();
+                        color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                        _this.camera.postQueues.push(color);
+                        var post = new gd3d.framework.cameraPostQueue_Quad();
+                        post.material.setShader(_this.scene.app.getAssetMgr().getShader("blur.shader.json"));
+                        var textcolor = new gd3d.framework.texture("_color");
+                        textcolor.glTexture = color.renderTarget;
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_BlurGap", 1);
+                        _this.camera.postQueues.push(post);
+                        console.log("模糊");
+                    }
+                    else if (_this.postEffectType == PostEffectType.GaussianBlur) {
+                        var color = new gd3d.framework.cameraPostQueue_Color();
+                        color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                        _this.camera.postQueues.push(color);
+                        var post = new gd3d.framework.cameraPostQueue_Quad();
+                        post.material.setShader(_this.scene.app.getAssetMgr().getShader("GaussianBlur.shader.json"));
+                        var textcolor = new gd3d.framework.texture("_color");
+                        textcolor.glTexture = color.renderTarget;
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_BlurGap", 2);
+                        post.material.setFloat("_BlurSigma", 6);
+                        post.material.setFloat("_BlurLayer", 10);
+                        _this.camera.postQueues.push(post);
+                        console.log("高斯模糊");
                     }
                 }
             };
@@ -4805,6 +4843,8 @@ var PostEffectType;
 (function (PostEffectType) {
     PostEffectType[PostEffectType["GrayAndOutline"] = 0] = "GrayAndOutline";
     PostEffectType[PostEffectType["Mask"] = 1] = "Mask";
+    PostEffectType[PostEffectType["blur"] = 2] = "blur";
+    PostEffectType[PostEffectType["GaussianBlur"] = 3] = "GaussianBlur";
 })(PostEffectType || (PostEffectType = {}));
 var test_loadprefab = (function () {
     function test_loadprefab() {
@@ -5454,19 +5494,28 @@ var t;
         test_sound.prototype.loadSoundInfe = function (laststate, state) {
             var _this = this;
             {
+                var tr = new gd3d.framework.transform();
+                var player_1 = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER);
+                this.app.getScene().addChild(tr);
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", function (buf, err) {
                     _this.looped = buf;
+                    player_1.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                    player_1.play(buf, 0);
                 });
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", function (buf, err) {
                     _this.once1 = buf;
                 });
                 gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", function (buf, err) {
                     _this.once2 = buf;
+                    player_1.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                    player_1.play(buf, 0);
                 });
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
                     button.onclick = function () {
+                        player_1.init("once1", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                        player_1.play(_this.once1, 0);
                     };
                     button.style.top = "130px";
                     button.style.position = "absolute";
@@ -5476,6 +5525,8 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play once2";
                     button.onclick = function () {
+                        player_1.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
+                        player_1.play(_this.once2, 0);
                     };
                     button.style.top = "130px";
                     button.style.left = "90px";
@@ -5486,6 +5537,8 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play loop";
                     button.onclick = function () {
+                        player_1.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), true);
+                        player_1.play(_this.looped, 0);
                     };
                     button.style.top = "160px";
                     button.style.position = "absolute";
@@ -5495,6 +5548,7 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "stop loop";
                     button.onclick = function () {
+                        player_1.stop();
                     };
                     button.style.top = "160px";
                     button.style.left = "90px";
@@ -5506,8 +5560,10 @@ var t;
                     var input = document.createElement("input");
                     input.type = "range";
                     input.valueAsNumber = 10;
+                    player_1.volume = -0.2;
                     input.oninput = function (e) {
                         var value = (input.valueAsNumber - 50) / 50;
+                        player_1.volume = value;
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";
@@ -5525,6 +5581,7 @@ var t;
             this.taskmgr.addTaskCall(this.addcube.bind(this));
             this.taskmgr.addTaskCall(this.addcam.bind(this));
             this.taskmgr.addTaskCall(this.loadSoundInfe.bind(this));
+            gd3d.framework.AudioEx.instance().clickInit();
         };
         test_sound.prototype.update = function (delta) {
             this.taskmgr.move(delta);

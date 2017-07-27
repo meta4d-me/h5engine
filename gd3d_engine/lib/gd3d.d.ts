@@ -1295,9 +1295,7 @@ declare namespace gd3d.framework {
         isAvailable(): boolean;
         loadAudioBufferFromArrayBuffer(ab: ArrayBuffer, fun: (buf: AudioBuffer, _err: Error) => void): void;
         loadAudioBuffer(url: string, fun: (buf: AudioBuffer, _err: Error) => void): void;
-        private getNewChannel();
-        private getFreeChannelOnce();
-        private channelOnce;
+        createAudioChannel(): AudioChannel;
     }
 }
 declare namespace gd3d.framework {
@@ -1379,19 +1377,21 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AudioPlayer implements INodeComponent {
-        _volume: number;
+        private _volume;
         audioChannel: AudioChannel;
         buffer: AudioBuffer;
         beLoop: boolean;
-        init(buffer: AudioBuffer, audioChannel: AudioChannel, beLoop?: boolean): void;
+        name: String;
+        init(name: string, audioChannel: AudioChannel, beLoop?: boolean): void;
         start(): void;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
         clone(): void;
-        play(x?: number, y?: number, z?: number): AudioChannel;
+        play(buffer: AudioBuffer, volume?: number, onended?: Function, x?: number, y?: number, z?: number): any;
         stop(): void;
         volume: number;
+        isPlaying(): boolean;
     }
     class AudioChannel {
         source: AudioBufferSourceNode;
@@ -3213,6 +3213,7 @@ declare namespace gd3d.framework {
         static COMPONENT_RAWIMAGE: string;
         static COMPONENT_BUTTON: string;
         static COMPONENT_SKINMESHRENDER: string;
+        static COMPONENT_AUDIOPLAYER: string;
         static COMPONENT_CAMERACONTROLLER: string;
         static COMPONENT_CANVASRENDER: string;
         static UIStyle_RangeFloat: string;
@@ -3253,8 +3254,6 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-}
-declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {
