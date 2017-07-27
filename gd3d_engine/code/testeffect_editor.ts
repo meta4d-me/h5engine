@@ -1,5 +1,5 @@
-﻿/// <reference path="localSave.ts" />
-class test_effect implements IState
+﻿/// <reference path="../lib/htmlui.d.ts" />
+class test_effecteditor implements IState
 {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -8,7 +8,7 @@ class test_effect implements IState
     taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
     effect: gd3d.framework.effectSystem;
     label: HTMLLabelElement;
-
+    gui: lighttool.htmlui.gui;
     private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
     {
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
@@ -94,6 +94,18 @@ class test_effect implements IState
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
+        this.gui = new lighttool.htmlui.gui(this.app.container);
+        lighttool.htmlui.panelMgr.instance().init(this.app.container);
+        this.gui.onchange = () =>
+        {
+            if(this.gui.add_Button("new particle")){
+                
+            }
+        };
+        setInterval(() =>
+        {
+            this.gui.update();
+        }, 300);
         //任务排队执行系统
         this.taskmgr.addTaskCall(this.loadShader.bind(this));
         this.taskmgr.addTaskCall(this.loadText.bind(this));
