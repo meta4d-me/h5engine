@@ -61,6 +61,8 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_Asi_prefab",()=>new test_loadAsiprefab());
 
         this.addBtn("test_tex_uv",()=>new test_texuv());
+
+        this.addBtn("test_blur",()=>new t.test_posteffect_cc());
     }
     private x: number = 0;
     private y: number = 100;

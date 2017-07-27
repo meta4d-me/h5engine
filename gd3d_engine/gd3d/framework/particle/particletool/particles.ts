@@ -61,7 +61,7 @@ namespace gd3d.framework
         public simulateInLocalSpace:boolean=true;//粒子运动运动空间（世界还是本地）
         public active: boolean = true;//激活状态
 
-        public emission: Emission;//原始数据，不能被改变
+        public emissionData: Emission;//原始数据，不能被改变
         private vf: number;
         private curTime: number;
         private numcount: number;
@@ -85,16 +85,16 @@ namespace gd3d.framework
             this.effectSys = sys;
             this.vf=sys.particleVF;
             this.gameObject = sys.gameObject;
-            this.emission = _emission.emissionData;
-            switch (this.emission.emissionType)
+            this.emissionData = _emission.emissionData;
+            switch (this.emissionData.emissionType)
             {
                 case ParticleEmissionType.burst:
                     break;
                 case ParticleEmissionType.continue:
-                    this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
+                    this._continueSpaceTime = this.emissionData.time / (this.emissionData.emissionCount);
                     break;
             }
-            this.simulateInLocalSpace=this.emission.simulateInLocalSpace;
+            this.simulateInLocalSpace=this.emissionData.simulateInLocalSpace;
             this.curTime = 0;
             this.numcount = 0;
             this.beloop=_emission.beloop;
@@ -103,12 +103,12 @@ namespace gd3d.framework
             this.deadParticles=[];
             this.addBatcher();
 
-            this.perVertexCount=this.emission.mesh.data.pos.length;
-            this.perIndexxCount=this.emission.mesh.data.trisindex.length;
+            this.perVertexCount=this.emissionData.mesh.data.pos.length;
+            this.perIndexxCount=this.emissionData.mesh.data.trisindex.length;
 
-            gd3d.math.vec3Clone(this.emission.rootpos,this.localtranslate);
-            gd3d.math.vec3Clone(this.emission.rootRotAngle,this.eluerAngle);
-            gd3d.math.vec3Clone(this.emission.rootScale,this.localScale);
+            gd3d.math.vec3Clone(this.emissionData.rootpos,this.localtranslate);
+            gd3d.math.vec3Clone(this.emissionData.rootRotAngle,this.eluerAngle);
+            gd3d.math.vec3Clone(this.emissionData.rootScale,this.localScale);
 
             gd3d.math.quatFromEulerAngles(this.eluerAngle.x,this.eluerAngle.y,this.eluerAngle.z,this.localrotate);
             gd3d.math.matrixMakeTransformRTS(this.localtranslate,this.localScale,this.localrotate,this.matToBatcher);
@@ -124,29 +124,13 @@ namespace gd3d.framework
 
         matToBatcher:gd3d.math.matrix=new gd3d.math.matrix();
         private matToWorld:gd3d.math.matrix=new gd3d.math.matrix();
+        
         public getmatrixToWorld():gd3d.math.matrix
         {
             var mat=this.gameObject.transform.getWorldMatrix();
             gd3d.math.matrixMultiply(mat,this.matToBatcher,this.matToWorld);
             return this.matToWorld;
         }
-
-        // /**
-        //  * 粒子得到变换顶点的matrix
-        //  * @param particle 
-        //  * @param out 
-        //  */
-        // public getTransformVertexMatrix(particle:Particle,out:gd3d.math.matrix)
-        // {
-        //     if(this.simulateInLocalSpace)
-        //     {
-        //         gd3d.math.matrixMultiply(this.matToBatcher,particle.localMatrix,out);
-        //     }
-        //     else
-        //     {
-        //         gd3d.math.matrixMultiply(this);
-        //     }
-        // }
 
         public update(delta: number)
         {
@@ -166,7 +150,7 @@ namespace gd3d.framework
         updateEmission(delta: number)
         {
             if (this.isover) return;
-            if (this.emission.emissionType == ParticleEmissionType.continue)
+            if (this.emissionData.emissionType == ParticleEmissionType.continue)
             {
                 if (this.numcount == 0) 
                 {
@@ -176,7 +160,7 @@ namespace gd3d.framework
 
                 if (this.curTime > this._continueSpaceTime)
                 {
-                    if (this.numcount < this.emission.emissionCount)
+                    if (this.numcount < this.emissionData.emissionCount)
                     {
                         this.addParticle();
                         this.curTime = 0;
@@ -196,11 +180,11 @@ namespace gd3d.framework
                     }
                 }
             }
-            else if (this.emission.emissionType == ParticleEmissionType.burst)
+            else if (this.emissionData.emissionType == ParticleEmissionType.burst)
             {
-                if (this.curTime > this.emission.time)
+                if (this.curTime > this.emissionData.time)
                 {
-                    this.addParticle(this.emission.emissionCount);
+                    this.addParticle(this.emissionData.emissionCount);
                     if (this.beloop)
                     {
                         this.curTime = 0;
@@ -241,7 +225,7 @@ namespace gd3d.framework
         
         private addBatcher()
         {
-            var batcher=new EmissionBatcher(this.emission, this.effectSys,this);
+            var batcher=new EmissionBatcher(this.emissionData, this.effectSys,this);
             this.emissionBatchers.push(batcher);
             this.curbatcher=batcher;
         }

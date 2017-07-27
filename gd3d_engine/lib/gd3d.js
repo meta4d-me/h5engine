@@ -17772,26 +17772,26 @@ var gd3d;
                 this.effectSys = sys;
                 this.vf = sys.particleVF;
                 this.gameObject = sys.gameObject;
-                this.emission = _emission.emissionData;
-                switch (this.emission.emissionType) {
+                this.emissionData = _emission.emissionData;
+                switch (this.emissionData.emissionType) {
                     case framework.ParticleEmissionType.burst:
                         break;
                     case framework.ParticleEmissionType.continue:
-                        this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
+                        this._continueSpaceTime = this.emissionData.time / (this.emissionData.emissionCount);
                         break;
                 }
-                this.simulateInLocalSpace = this.emission.simulateInLocalSpace;
+                this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
                 this.curTime = 0;
                 this.numcount = 0;
                 this.beloop = _emission.beloop;
                 this.emissionBatchers = [];
                 this.deadParticles = [];
                 this.addBatcher();
-                this.perVertexCount = this.emission.mesh.data.pos.length;
-                this.perIndexxCount = this.emission.mesh.data.trisindex.length;
-                gd3d.math.vec3Clone(this.emission.rootpos, this.localtranslate);
-                gd3d.math.vec3Clone(this.emission.rootRotAngle, this.eluerAngle);
-                gd3d.math.vec3Clone(this.emission.rootScale, this.localScale);
+                this.perVertexCount = this.emissionData.mesh.data.pos.length;
+                this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
+                gd3d.math.vec3Clone(this.emissionData.rootpos, this.localtranslate);
+                gd3d.math.vec3Clone(this.emissionData.rootRotAngle, this.eluerAngle);
+                gd3d.math.vec3Clone(this.emissionData.rootScale, this.localScale);
                 gd3d.math.quatFromEulerAngles(this.eluerAngle.x, this.eluerAngle.y, this.eluerAngle.z, this.localrotate);
                 gd3d.math.matrixMakeTransformRTS(this.localtranslate, this.localScale, this.localrotate, this.matToBatcher);
             }
@@ -17818,13 +17818,13 @@ var gd3d;
             EmissionElement.prototype.updateEmission = function (delta) {
                 if (this.isover)
                     return;
-                if (this.emission.emissionType == framework.ParticleEmissionType.continue) {
+                if (this.emissionData.emissionType == framework.ParticleEmissionType.continue) {
                     if (this.numcount == 0) {
                         this.addParticle();
                         this.numcount++;
                     }
                     if (this.curTime > this._continueSpaceTime) {
-                        if (this.numcount < this.emission.emissionCount) {
+                        if (this.numcount < this.emissionData.emissionCount) {
                             this.addParticle();
                             this.curTime = 0;
                             this.numcount++;
@@ -17841,9 +17841,9 @@ var gd3d;
                         }
                     }
                 }
-                else if (this.emission.emissionType == framework.ParticleEmissionType.burst) {
-                    if (this.curTime > this.emission.time) {
-                        this.addParticle(this.emission.emissionCount);
+                else if (this.emissionData.emissionType == framework.ParticleEmissionType.burst) {
+                    if (this.curTime > this.emissionData.time) {
+                        this.addParticle(this.emissionData.emissionCount);
                         if (this.beloop) {
                             this.curTime = 0;
                             this.isover = false;
@@ -17875,7 +17875,7 @@ var gd3d;
                 }
             };
             EmissionElement.prototype.addBatcher = function () {
-                var batcher = new framework.EmissionBatcher(this.emission, this.effectSys, this);
+                var batcher = new framework.EmissionBatcher(this.emissionData, this.effectSys, this);
                 this.emissionBatchers.push(batcher);
                 this.curbatcher = batcher;
             };

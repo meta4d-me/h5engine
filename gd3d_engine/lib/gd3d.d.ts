@@ -2832,7 +2832,7 @@ declare namespace gd3d.framework {
         private beloop;
         simulateInLocalSpace: boolean;
         active: boolean;
-        emission: Emission;
+        emissionData: Emission;
         private vf;
         private curTime;
         private numcount;
