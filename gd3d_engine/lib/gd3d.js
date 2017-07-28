@@ -9008,7 +9008,6 @@ var gd3d;
                 this.speed = 1;
                 this.parser = new gd3d.framework.EffectParser();
                 this.vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
-                this.particleVF = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
                 this.effectBatchers = [];
                 this.matDataGroups = [];
             }
@@ -9823,6 +9822,7 @@ var gd3d;
                 if (this.filter != null) {
                     var mesh = this.filter.getMeshOutput();
                     if (mesh != null) {
+                        mesh.glMesh.bindVboBuffer(context.webgl);
                         if (mesh.submesh != null) {
                             for (var i = 0; i < mesh.submesh.length; i++) {
                                 var sm = mesh.submesh[i];
@@ -10146,6 +10146,7 @@ var gd3d;
                 }
                 if (this._mesh != null) {
                     if (this._mesh != null) {
+                        this._mesh.glMesh.bindVboBuffer(context.webgl);
                         if (this._mesh.submesh != null) {
                             for (var i = 0; i < this._mesh.submesh.length; i++) {
                                 var sm = this._mesh.submesh[i];
@@ -17133,19 +17134,18 @@ var gd3d;
     var framework;
     (function (framework) {
         var EmissionBatcher = (function () {
-            function EmissionBatcher(_data, effectSys, emissionElement) {
+            function EmissionBatcher(emissionElement) {
                 this.particles = [];
                 this.vertexSize = 0;
-                this.formate = 0;
+                this.vf = 0;
                 this.curVerCount = 0;
                 this.curIndexCount = 0;
-                this.webgl = emissionElement.webgl;
-                this.gameObject = effectSys.gameObject;
-                this.effectSys = effectSys;
                 this.emissionElement = emissionElement;
-                this.data = _data;
-                this.formate = effectSys.particleVF;
-                this.vertexSize = gd3d.render.meshData.calcByteSize(this.formate) / 4;
+                this.webgl = emissionElement.webgl;
+                this.gameObject = emissionElement.gameObject;
+                this.vf = emissionElement.vf;
+                this.data = emissionElement.emissionData;
+                this.vertexSize = gd3d.render.meshData.calcByteSize(this.vf) / 4;
                 this.initMesh();
                 this.mat = new framework.material();
                 if (this.data.mat.shader == null) {
@@ -17177,7 +17177,7 @@ var gd3d;
                 }
                 this.dataForVbo = new Float32Array(128);
                 this.dataForEbo = new Uint16Array(128);
-                this.mesh.glMesh.initBuffer(this.webgl, this.effectSys.particleVF, 128, gd3d.render.MeshTypeEnum.Dynamic);
+                this.mesh.glMesh.initBuffer(this.webgl, this.vf, 128, gd3d.render.MeshTypeEnum.Dynamic);
                 this.mesh.glMesh.addIndex(this.webgl, this.dataForEbo.length);
             };
             EmissionBatcher.prototype.addParticle = function () {
@@ -17249,11 +17249,11 @@ var gd3d;
         var Particle = (function () {
             function Particle(batcher) {
                 this.renderModel = framework.RenderModel.Mesh;
-                this.localMatrix = new gd3d.math.matrix();
                 this.startScale = new gd3d.math.vector3();
                 this.startRotation = new gd3d.math.quaternion();
                 this.rotationByShape = new gd3d.math.quaternion();
                 this.rotationByEuler = new gd3d.math.quaternion();
+                this.localMatrix = new gd3d.math.matrix();
                 this.localRotation = new gd3d.math.quaternion();
                 this.tilling = new gd3d.math.vector2(1, 1);
                 this.speedDir = new gd3d.math.vector3(0, 0, 0);
@@ -17261,18 +17261,18 @@ var gd3d;
                 this.transformVertex = new gd3d.math.matrix();
                 this.matToworld = new gd3d.math.matrix();
                 this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
-                this.gameObject = batcher.effectSys.gameObject;
-                this.emisson = batcher.emissionElement;
                 this.batcher = batcher;
-                this.format = batcher.formate;
+                this.gameObject = batcher.gameObject;
+                this.emisson = batcher.emissionElement;
+                this.vf = batcher.vf;
                 this.data = batcher.data.clone();
-                this.vertexSize = gd3d.render.meshData.calcByteSize(this.format) / 4;
+                this.vertexSize = gd3d.render.meshData.calcByteSize(this.vf) / 4;
                 this.vertexStartIndex = batcher.curVerCount;
                 this.vertexCount = this.emisson.perVertexCount;
                 this.dataForVbo = new Float32Array(this.vertexCount * this.vertexSize);
                 this.dataForEbo = this.data.mesh.data.genIndexDataArray();
-                this.dataForVbo.set(this.data.mesh.data.genVertexDataArray(this.format), 0);
-                this.sourceVbo = this.data.getVboData(this.format);
+                this.dataForVbo.set(this.data.mesh.data.genVertexDataArray(this.vf), 0);
+                this.sourceVbo = this.data.getVboData(this.vf);
                 this.initByData();
             }
             Particle.prototype.uploadData = function (array) {
@@ -17282,7 +17282,7 @@ var gd3d;
                 this.totalLife = this.data.life.getValueRandom();
                 this.renderModel = this.data.renderModel;
                 this.curLife = 0;
-                this.startFrameId = this.batcher.effectSys.frameId;
+                this.startFrameId = this.batcher.emissionElement.effectSys.frameId;
                 var localRandomDirection = this.data.particleStartData.randomDirection;
                 this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
                 var localRandomTranslate = this.data.particleStartData.position;
@@ -17678,12 +17678,12 @@ var gd3d;
         var Particles = (function () {
             function Particles(sys) {
                 this.emissionElements = [];
+                this.vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
                 this.loopFrame = Number.MAX_VALUE;
                 this.effectSys = sys;
-                this.vf = sys.particleVF;
             }
             Particles.prototype.addEmission = function (_emissionNew) {
-                var _emissionElement = new EmissionElement(_emissionNew, this.effectSys);
+                var _emissionElement = new EmissionElement(_emissionNew, this.effectSys, this);
                 this.emissionElements.push(_emissionElement);
             };
             Particles.prototype.update = function (delta) {
@@ -17706,45 +17706,46 @@ var gd3d;
         }());
         framework.Particles = Particles;
         var EmissionElement = (function () {
-            function EmissionElement(_emission, sys) {
-                this.beloop = false;
-                this.simulateInLocalSpace = true;
-                this.active = true;
-                this.isover = false;
+            function EmissionElement(_emission, sys, mgr) {
                 this.maxVertexCount = 2048;
                 this.localtranslate = new gd3d.math.vector3();
                 this.localScale = new gd3d.math.vector3(1, 1, 1);
                 this.localrotate = new gd3d.math.quaternion();
                 this.eluerAngle = new gd3d.math.quaternion();
+                this.beloop = false;
+                this.simulateInLocalSpace = true;
+                this.active = true;
+                this.isover = false;
                 this.worldRotation = new gd3d.math.quaternion();
                 this.matToBatcher = new gd3d.math.matrix();
                 this.matToWorld = new gd3d.math.matrix();
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.effectSys = sys;
-                this.vf = sys.particleVF;
-                this.gameObject = sys.gameObject;
-                this.emission = _emission.emissionData;
-                switch (this.emission.emissionType) {
+                this.ParticleMgr = mgr;
+                this.vf = mgr.vf;
+                this.gameObject = mgr.effectSys.gameObject;
+                this.beloop = _emission.beloop;
+                this.emissionData = _emission.emissionData;
+                this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
+                this.perVertexCount = this.emissionData.mesh.data.pos.length;
+                this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
+                switch (this.emissionData.emissionType) {
                     case framework.ParticleEmissionType.burst:
                         break;
                     case framework.ParticleEmissionType.continue:
-                        this._continueSpaceTime = this.emission.time / (this.emission.emissionCount);
+                        this._continueSpaceTime = this.emissionData.time / (this.emissionData.emissionCount);
                         break;
                 }
-                this.simulateInLocalSpace = this.emission.simulateInLocalSpace;
-                this.curTime = 0;
-                this.numcount = 0;
-                this.beloop = _emission.beloop;
-                this.emissionBatchers = [];
-                this.deadParticles = [];
-                this.addBatcher();
-                this.perVertexCount = this.emission.mesh.data.pos.length;
-                this.perIndexxCount = this.emission.mesh.data.trisindex.length;
-                gd3d.math.vec3Clone(this.emission.rootpos, this.localtranslate);
-                gd3d.math.vec3Clone(this.emission.rootRotAngle, this.eluerAngle);
-                gd3d.math.vec3Clone(this.emission.rootScale, this.localScale);
+                gd3d.math.vec3Clone(this.emissionData.rootpos, this.localtranslate);
+                gd3d.math.vec3Clone(this.emissionData.rootRotAngle, this.eluerAngle);
+                gd3d.math.vec3Clone(this.emissionData.rootScale, this.localScale);
                 gd3d.math.quatFromEulerAngles(this.eluerAngle.x, this.eluerAngle.y, this.eluerAngle.z, this.localrotate);
                 gd3d.math.matrixMakeTransformRTS(this.localtranslate, this.localScale, this.localrotate, this.matToBatcher);
+                this.emissionBatchers = [];
+                this.deadParticles = [];
+                this.curTime = 0;
+                this.numcount = 0;
+                this.addBatcher();
             }
             EmissionElement.prototype.getWorldRotation = function () {
                 var parRot = this.gameObject.transform.getWorldRotate();
@@ -17769,13 +17770,13 @@ var gd3d;
             EmissionElement.prototype.updateEmission = function (delta) {
                 if (this.isover)
                     return;
-                if (this.emission.emissionType == framework.ParticleEmissionType.continue) {
+                if (this.emissionData.emissionType == framework.ParticleEmissionType.continue) {
                     if (this.numcount == 0) {
                         this.addParticle();
                         this.numcount++;
                     }
                     if (this.curTime > this._continueSpaceTime) {
-                        if (this.numcount < this.emission.emissionCount) {
+                        if (this.numcount < this.emissionData.emissionCount) {
                             this.addParticle();
                             this.curTime = 0;
                             this.numcount++;
@@ -17792,9 +17793,9 @@ var gd3d;
                         }
                     }
                 }
-                else if (this.emission.emissionType == framework.ParticleEmissionType.burst) {
-                    if (this.curTime > this.emission.time) {
-                        this.addParticle(this.emission.emissionCount);
+                else if (this.emissionData.emissionType == framework.ParticleEmissionType.burst) {
+                    if (this.curTime > this.emissionData.time) {
+                        this.addParticle(this.emissionData.emissionCount);
                         if (this.beloop) {
                             this.curTime = 0;
                             this.isover = false;
@@ -17826,7 +17827,7 @@ var gd3d;
                 }
             };
             EmissionElement.prototype.addBatcher = function () {
-                var batcher = new framework.EmissionBatcher(this.emission, this.effectSys, this);
+                var batcher = new framework.EmissionBatcher(this);
                 this.emissionBatchers.push(batcher);
                 this.curbatcher = batcher;
             };
@@ -20796,10 +20797,12 @@ var gd3d;
                 }
                 return total;
             };
+            glMesh.prototype.bindVboBuffer = function (webgl) {
+                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
+            };
             glMesh.prototype.bind = function (webgl, shadercode, bindEbo) {
                 if (bindEbo === void 0) { bindEbo = 0; }
                 this.bindIndex = bindEbo;
-                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 if (bindEbo >= 0) {
                     webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[bindEbo]);
                 }
