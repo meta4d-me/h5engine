@@ -33,12 +33,22 @@ class test_loadprefab implements IState
 
                             // this.baihu.localEulerAngles = new gd3d.math.vector3();
                             this.baihu = _prefab.getCloneTrans();
-                            objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
-                            objCam.lookatPoint(new gd3d.math.vector3(0.1, 0.1, 0.1));
+                            objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
                             objCam.markDirty();
                             this.renderer = this.baihu.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
                             this.skinRenders = this.baihu.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER) as gd3d.framework.skinnedMeshRenderer[];
-                            this.changeShader();
+                            // this.changeShader();
+                            for(let i=0; i<22; i++)
+                            {
+                                for(let j=0; j<22; j++)
+                                {
+                                    let bp = _prefab.getCloneTrans();
+                                    bp.localTranslate = new gd3d.math.vector3(i - 11, 0, j - 11);
+                                    bp.markDirty();
+                                    this.scene.addChild(bp);
+                                }
+                            }
                         }
                     });
             }
