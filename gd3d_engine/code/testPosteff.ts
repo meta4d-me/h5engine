@@ -51,7 +51,7 @@ namespace t
                     var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
                     let cuber = renderer;
 
-                    var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+                    var sh = this.app.getAssetMgr().getShader("light1.shader.json");
                     if (sh != null)
                     {
                         cuber.materials = [];
@@ -126,6 +126,35 @@ namespace t
             console.log("i am here.");
             this.app = app;
             this.scene = this.app.getScene();
+
+            var btn = document.createElement("button");
+            btn.textContent = "切换光源类型";
+            btn.style.left = "50px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+            btn.onclick = () =>
+            {
+                
+                if (this.light != null)
+                {
+                    if (this.light.type == gd3d.framework.LightTypeEnum.Direction)
+                    {
+                        this.light.type = gd3d.framework.LightTypeEnum.Point;
+                        console.log("点光源");
+                    }
+                    else if (this.light.type == gd3d.framework.LightTypeEnum.Point)
+                    {
+                        this.light.type = gd3d.framework.LightTypeEnum.Spot;
+                        this.light.spotAngelCos = Math.cos(0.2 * Math.PI);
+                        console.log("聚光灯");
+                    }
+                    else
+                    {
+                        this.light.type = gd3d.framework.LightTypeEnum.Direction;
+                        console.log("方向光");
+                    }
+                }
+            }
 
             this.addbtn("50px","normal",()=>{
                 this.camera.postQueues=[];
@@ -211,6 +240,52 @@ namespace t
                 var focalDistance=0.96;
 
                 post2.material.setFloat("_focalDistance",focalDistance);
+
+                this.camera.postQueues.push(post2);
+
+            });
+            this.addbtn("450px","bloom",()=>{
+                this.camera.postQueues=[];
+                var color = new gd3d.framework.cameraPostQueue_Color();
+                color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                this.camera.postQueues.push(color);
+                var textcolor = new gd3d.framework.texture("_color");
+                textcolor.glTexture = color.renderTarget;
+
+                var post0 = new gd3d.framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl,1024, 1024, true, false);
+                post0.material.setShader(this.scene.app.getAssetMgr().getShader("threshold.shader.json"));
+                post0.material.setTexture("_MainTex", textcolor);
+                this.camera.postQueues.push(post0);
+                var specucolor = new gd3d.framework.texture("_specucolor");
+                specucolor.glTexture = post0.renderTarget;
+
+                var texsize:number=512;
+                var post = new gd3d.framework.cameraPostQueue_Quad();
+                post.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl,texsize, texsize, true, false);
+                post.material.setShader(this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post.material.setTexture("_MainTex", specucolor);
+                post.material.setVector4("sample_offsets", new gd3d.math.vector4(0,1.0,0,0.0));
+                post.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0/texsize,1.0/texsize,texsize,texsize));
+                this.camera.postQueues.push(post);
+
+                var texBlur0= new gd3d.framework.texture("_blur0");
+                texBlur0.glTexture = post.renderTarget;
+
+                var post1 = new gd3d.framework.cameraPostQueue_Quad();
+                post1.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl,texsize, texsize, true, false);
+                post1.material.setShader(this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post1.material.setTexture("_MainTex", texBlur0);
+                post1.material.setVector4("sample_offsets", new gd3d.math.vector4(1.0,0,0.0,0));
+                post1.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0/texsize,1.0/texsize,texsize,texsize));
+                this.camera.postQueues.push(post1);
+                var texBlur= new gd3d.framework.texture("_blur");
+                texBlur.glTexture = post1.renderTarget;
+
+                var post2 = new gd3d.framework.cameraPostQueue_Quad();
+                post2.material.setShader(this.scene.app.getAssetMgr().getShader("bloom.shader.json"));
+                post2.material.setTexture("_MainTex",textcolor);
+                post2.material.setTexture("_BlurTex",specucolor);
 
                 this.camera.postQueues.push(post2);
 

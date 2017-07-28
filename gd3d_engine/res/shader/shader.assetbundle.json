@@ -591,6 +591,22 @@
         {
             "name": "resources/posteffect/dof.fs.glsl",
             "length": 0
+        },
+        {
+            "name": "resources/posteffect/threshold.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/threshold.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/bloom.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/bloom.fs.glsl",
+            "length": 0
         }
     ]
 }

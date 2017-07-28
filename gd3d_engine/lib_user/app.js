@@ -4599,6 +4599,142 @@ var test_pick = (function () {
 }());
 var t;
 (function (t) {
+    var test_post_bloom = (function () {
+        function test_post_bloom() {
+            this.postEffectType = PostEffectType.GrayAndOutline;
+            this.timer = 0;
+            this.taskmgr = new gd3d.framework.taskMgr();
+        }
+        test_post_bloom.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+                if (_state.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        test_post_bloom.prototype.loadText = function (laststate, state) {
+            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+                else {
+                    state.error = true;
+                }
+            });
+        };
+        test_post_bloom.prototype.addcamandlight = function (laststate, state) {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera");
+            this.camera.near = 1;
+            this.camera.far = 15;
+            this.camera.fov = Math.PI * 0.3;
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            objCam.markDirty();
+            state.finish = true;
+        };
+        test_post_bloom.prototype.start = function (app) {
+            var _this = this;
+            console.log("i am here.");
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.addbtn("50px", "normal", function () {
+                _this.camera.postQueues = [];
+            });
+            this.addbtn("150px", "模糊", function () {
+                _this.camera.postQueues = [];
+                var color = new gd3d.framework.cameraPostQueue_Color();
+                color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                _this.camera.postQueues.push(color);
+                var textcolor = new gd3d.framework.texture("_color");
+                textcolor.glTexture = color.renderTarget;
+                var texsize = 512;
+                var post = new gd3d.framework.cameraPostQueue_Quad();
+                post.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
+                post.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post.material.setTexture("_MainTex", textcolor);
+                post.material.setVector4("sample_offsets", new gd3d.math.vector4(0, 1.0, 0, -1.0));
+                post.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
+                _this.camera.postQueues.push(post);
+                var texBlur0 = new gd3d.framework.texture("_blur0");
+                texBlur0.glTexture = post.renderTarget;
+                var post1 = new gd3d.framework.cameraPostQueue_Quad();
+                post1.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post1.material.setTexture("_MainTex", texBlur0);
+                post1.material.setVector4("sample_offsets", new gd3d.math.vector4(1.0, 0, -1.0, 0));
+                post1.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
+                _this.camera.postQueues.push(post1);
+            });
+            this.addbtn("350px", "景深", function () {
+                _this.camera.postQueues = [];
+                var color = new gd3d.framework.cameraPostQueue_Color();
+                color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                _this.camera.postQueues.push(color);
+                var textcolor = new gd3d.framework.texture("_color");
+                textcolor.glTexture = color.renderTarget;
+                var depth = new gd3d.framework.cameraPostQueue_Depth();
+                depth.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                _this.camera.postQueues.push(depth);
+                var depthcolor = new gd3d.framework.texture("_depthcolor");
+                depthcolor.glTexture = depth.renderTarget;
+                var texsize = 512;
+                var post = new gd3d.framework.cameraPostQueue_Quad();
+                post.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
+                post.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post.material.setTexture("_MainTex", textcolor);
+                post.material.setVector4("sample_offsets", new gd3d.math.vector4(0, 1.0, 0, -1.0));
+                post.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
+                _this.camera.postQueues.push(post);
+                var texBlur0 = new gd3d.framework.texture("_blur0");
+                texBlur0.glTexture = post.renderTarget;
+                var post1 = new gd3d.framework.cameraPostQueue_Quad();
+                post1.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
+                post1.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post1.material.setTexture("_MainTex", texBlur0);
+                post1.material.setVector4("sample_offsets", new gd3d.math.vector4(1.0, 0, -1.0, 0));
+                post1.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
+                _this.camera.postQueues.push(post1);
+                var texBlur = new gd3d.framework.texture("_blur");
+                texBlur.glTexture = post1.renderTarget;
+                var post2 = new gd3d.framework.cameraPostQueue_Quad();
+                post2.material.setShader(_this.scene.app.getAssetMgr().getShader("dof.shader.json"));
+                post2.material.setTexture("_MainTex", textcolor);
+                post2.material.setTexture("_BlurTex", texBlur);
+                post2.material.setTexture("_DepthTex", depthcolor);
+                var focalDistance = 0.96;
+                post2.material.setFloat("_focalDistance", focalDistance);
+                _this.camera.postQueues.push(post2);
+            });
+            this.addbtn("350px", "bloom", function () {
+                _this.camera.postQueues = [];
+            });
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadText.bind(this));
+            this.taskmgr.addTaskCall(this.addcamandlight.bind(this));
+        };
+        test_post_bloom.prototype.addbtn = function (topOffset, textContent, func) {
+            var _this = this;
+            var btn = document.createElement("button");
+            btn.style.top = topOffset;
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+            btn.textContent = textContent;
+            btn.onclick = function () {
+                _this.camera.postQueues = [];
+                func();
+            };
+        };
+        test_post_bloom.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+        };
+        return test_post_bloom;
+    }());
+    t.test_post_bloom = test_post_bloom;
+})(t || (t = {}));
+var t;
+(function (t) {
     var test_posteffect_cc = (function () {
         function test_posteffect_cc() {
             this.postEffectType = PostEffectType.GrayAndOutline;
@@ -4636,7 +4772,7 @@ var t;
                     mesh.mesh = (smesh);
                     var renderer = cube.gameObject.addComponent("meshRenderer");
                     var cuber = renderer;
-                    var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+                    var sh = this.app.getAssetMgr().getShader("light1.shader.json");
                     if (sh != null) {
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
@@ -4692,6 +4828,28 @@ var t;
             console.log("i am here.");
             this.app = app;
             this.scene = this.app.getScene();
+            var btn = document.createElement("button");
+            btn.textContent = "切换光源类型";
+            btn.style.left = "50px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+            btn.onclick = function () {
+                if (_this.light != null) {
+                    if (_this.light.type == gd3d.framework.LightTypeEnum.Direction) {
+                        _this.light.type = gd3d.framework.LightTypeEnum.Point;
+                        console.log("点光源");
+                    }
+                    else if (_this.light.type == gd3d.framework.LightTypeEnum.Point) {
+                        _this.light.type = gd3d.framework.LightTypeEnum.Spot;
+                        _this.light.spotAngelCos = Math.cos(0.2 * Math.PI);
+                        console.log("聚光灯");
+                    }
+                    else {
+                        _this.light.type = gd3d.framework.LightTypeEnum.Direction;
+                        console.log("方向光");
+                    }
+                }
+            };
             this.addbtn("50px", "normal", function () {
                 _this.camera.postQueues = [];
             });
@@ -4762,6 +4920,45 @@ var t;
                 post2.material.setTexture("_DepthTex", depthcolor);
                 var focalDistance = 0.96;
                 post2.material.setFloat("_focalDistance", focalDistance);
+                _this.camera.postQueues.push(post2);
+            });
+            this.addbtn("450px", "bloom", function () {
+                _this.camera.postQueues = [];
+                var color = new gd3d.framework.cameraPostQueue_Color();
+                color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                _this.camera.postQueues.push(color);
+                var textcolor = new gd3d.framework.texture("_color");
+                textcolor.glTexture = color.renderTarget;
+                var post0 = new gd3d.framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                post0.material.setShader(_this.scene.app.getAssetMgr().getShader("threshold.shader.json"));
+                post0.material.setTexture("_MainTex", textcolor);
+                _this.camera.postQueues.push(post0);
+                var specucolor = new gd3d.framework.texture("_specucolor");
+                specucolor.glTexture = post0.renderTarget;
+                var texsize = 512;
+                var post = new gd3d.framework.cameraPostQueue_Quad();
+                post.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
+                post.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post.material.setTexture("_MainTex", specucolor);
+                post.material.setVector4("sample_offsets", new gd3d.math.vector4(0, 1.0, 0, 0.0));
+                post.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
+                _this.camera.postQueues.push(post);
+                var texBlur0 = new gd3d.framework.texture("_blur0");
+                texBlur0.glTexture = post.renderTarget;
+                var post1 = new gd3d.framework.cameraPostQueue_Quad();
+                post1.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
+                post1.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
+                post1.material.setTexture("_MainTex", texBlur0);
+                post1.material.setVector4("sample_offsets", new gd3d.math.vector4(1.0, 0, 0.0, 0));
+                post1.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
+                _this.camera.postQueues.push(post1);
+                var texBlur = new gd3d.framework.texture("_blur");
+                texBlur.glTexture = post1.renderTarget;
+                var post2 = new gd3d.framework.cameraPostQueue_Quad();
+                post2.material.setShader(_this.scene.app.getAssetMgr().getShader("bloom.shader.json"));
+                post2.material.setTexture("_MainTex", textcolor);
+                post2.material.setTexture("_BlurTex", specucolor);
                 _this.camera.postQueues.push(post2);
             });
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
