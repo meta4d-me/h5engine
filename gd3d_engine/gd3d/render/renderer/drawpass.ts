@@ -36,6 +36,8 @@
      */
     export class glDrawPass
     {
+        static lastState: string = "";
+        curState: string;
         program: glProgram;
         state_showface: ShowFaceStateEnum = ShowFaceStateEnum.CCW;
         state_zwrite: boolean = false;
@@ -133,6 +135,41 @@
                 this.state_blend = false;
             }
         }
+
+        private getCurDrawState(): string
+        {
+            let res: string = "";
+            res = this.formate(this.state_showface.toString(), res);
+
+            res = this.formate(this.state_zwrite.toString(), res);
+
+            res = this.formate(this.state_ztest.toString(), res);
+            if (this.state_ztest)
+            {
+                res = this.formate(this.state_ztest_method.toString(), res);
+            } else
+            {
+                res = this.formate("ztestnone", res);
+            }
+
+            res = this.formate(this.state_blend.toString(), res);
+            if (this.state_blend)
+            {
+                res = this.formate(this.state_blendEquation.toString(), res);
+            } else
+            {
+                res = this.formate("blendnone", res);
+            }
+            // console.log(res);
+            return res;
+        }
+
+        private formate(str: string, out: string)
+        {
+            return out += str + "_";
+        }
+
+
         //设置uniform save起来
         uniformFloat(name: string, number: number)
         {
@@ -205,53 +242,57 @@
         //使用材质
         use(webgl: WebGLRenderingContext, applyUniForm: boolean = true)
         {
-            //set state
-            if (this.state_showface == ShowFaceStateEnum.ALL)
+            this.curState = this.getCurDrawState();
+            if (this.curState != glDrawPass.lastState)
             {
-                webgl.disable(webgl.CULL_FACE);
-            }
-            else
-            {
-                if (this.state_showface == ShowFaceStateEnum.CCW)
+                glDrawPass.lastState = this.curState;
+                //set state
+                if (this.state_showface == ShowFaceStateEnum.ALL)
                 {
-                    webgl.frontFace(webgl.CCW);
+                    webgl.disable(webgl.CULL_FACE);
                 }
                 else
                 {
-                    webgl.frontFace(webgl.CW);
+                    if (this.state_showface == ShowFaceStateEnum.CCW)
+                    {
+                        webgl.frontFace(webgl.CCW);
+                    }
+                    else
+                    {
+                        webgl.frontFace(webgl.CW);
+                    }
+                    webgl.cullFace(webgl.BACK);
+                    webgl.enable(webgl.CULL_FACE);
                 }
-                webgl.cullFace(webgl.BACK);
-                webgl.enable(webgl.CULL_FACE);
-
-            }
-            if (this.state_zwrite)
-            {
-                webgl.depthMask(true);
-            }
-            else
-            {
-                webgl.depthMask(false);
-            }
-            if (this.state_ztest)
-            {
-                webgl.enable(webgl.DEPTH_TEST);
-                webgl.depthFunc(this.state_ztest_method);
-            }
-            else
-            {
-                webgl.disable(webgl.DEPTH_TEST);
-            }
-            if (this.state_blend)
-            {
-                webgl.enable(webgl.BLEND);
-                webgl.blendEquation(this.state_blendEquation);
-                //this.webgl.blendFunc(this.webgl.ONE, this.webgl.ONE_MINUS_SRC_ALPHA);
-                webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB,
-                    this.state_blendSrcAlpha, this.state_blendDestALpha);
-            }
-            else
-            {
-                webgl.disable(webgl.BLEND);
+                if (this.state_zwrite)
+                {
+                    webgl.depthMask(true);
+                }
+                else
+                {
+                    webgl.depthMask(false);
+                }
+                if (this.state_ztest)
+                {
+                    webgl.enable(webgl.DEPTH_TEST);
+                    webgl.depthFunc(this.state_ztest_method);
+                }
+                else
+                {
+                    webgl.disable(webgl.DEPTH_TEST);
+                }
+                if (this.state_blend)
+                {
+                    webgl.enable(webgl.BLEND);
+                    webgl.blendEquation(this.state_blendEquation);
+                    //this.webgl.blendFunc(this.webgl.ONE, this.webgl.ONE_MINUS_SRC_ALPHA);
+                    webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB,
+                        this.state_blendSrcAlpha, this.state_blendDestALpha);
+                }
+                else
+                {
+                    webgl.disable(webgl.BLEND);
+                }
             }
 
 
@@ -299,7 +340,7 @@
                         } catch (e)
                         {
                             console.error(key + "  " + u.value);
-                            for(let k in this.uniforms)
+                            for (let k in this.uniforms)
                             {
                                 console.error(k);
                             }

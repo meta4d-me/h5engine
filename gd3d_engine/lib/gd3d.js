@@ -20455,6 +20455,29 @@ var gd3d;
                     this.state_blend = false;
                 }
             };
+            glDrawPass.prototype.getCurDrawState = function () {
+                var res = "";
+                res = this.formate(this.state_showface.toString(), res);
+                res = this.formate(this.state_zwrite.toString(), res);
+                res = this.formate(this.state_ztest.toString(), res);
+                if (this.state_ztest) {
+                    res = this.formate(this.state_ztest_method.toString(), res);
+                }
+                else {
+                    res = this.formate("ztestnone", res);
+                }
+                res = this.formate(this.state_blend.toString(), res);
+                if (this.state_blend) {
+                    res = this.formate(this.state_blendEquation.toString(), res);
+                }
+                else {
+                    res = this.formate("blendnone", res);
+                }
+                return res;
+            };
+            glDrawPass.prototype.formate = function (str, out) {
+                return out += str + "_";
+            };
             glDrawPass.prototype.uniformFloat = function (name, number) {
                 var v = this.uniforms[name];
                 if (v == null)
@@ -20528,39 +20551,43 @@ var gd3d;
             };
             glDrawPass.prototype.use = function (webgl, applyUniForm) {
                 if (applyUniForm === void 0) { applyUniForm = true; }
-                if (this.state_showface == ShowFaceStateEnum.ALL) {
-                    webgl.disable(webgl.CULL_FACE);
-                }
-                else {
-                    if (this.state_showface == ShowFaceStateEnum.CCW) {
-                        webgl.frontFace(webgl.CCW);
+                this.curState = this.getCurDrawState();
+                if (this.curState != glDrawPass.lastState) {
+                    glDrawPass.lastState = this.curState;
+                    if (this.state_showface == ShowFaceStateEnum.ALL) {
+                        webgl.disable(webgl.CULL_FACE);
                     }
                     else {
-                        webgl.frontFace(webgl.CW);
+                        if (this.state_showface == ShowFaceStateEnum.CCW) {
+                            webgl.frontFace(webgl.CCW);
+                        }
+                        else {
+                            webgl.frontFace(webgl.CW);
+                        }
+                        webgl.cullFace(webgl.BACK);
+                        webgl.enable(webgl.CULL_FACE);
                     }
-                    webgl.cullFace(webgl.BACK);
-                    webgl.enable(webgl.CULL_FACE);
-                }
-                if (this.state_zwrite) {
-                    webgl.depthMask(true);
-                }
-                else {
-                    webgl.depthMask(false);
-                }
-                if (this.state_ztest) {
-                    webgl.enable(webgl.DEPTH_TEST);
-                    webgl.depthFunc(this.state_ztest_method);
-                }
-                else {
-                    webgl.disable(webgl.DEPTH_TEST);
-                }
-                if (this.state_blend) {
-                    webgl.enable(webgl.BLEND);
-                    webgl.blendEquation(this.state_blendEquation);
-                    webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
-                }
-                else {
-                    webgl.disable(webgl.BLEND);
+                    if (this.state_zwrite) {
+                        webgl.depthMask(true);
+                    }
+                    else {
+                        webgl.depthMask(false);
+                    }
+                    if (this.state_ztest) {
+                        webgl.enable(webgl.DEPTH_TEST);
+                        webgl.depthFunc(this.state_ztest_method);
+                    }
+                    else {
+                        webgl.disable(webgl.DEPTH_TEST);
+                    }
+                    if (this.state_blend) {
+                        webgl.enable(webgl.BLEND);
+                        webgl.blendEquation(this.state_blendEquation);
+                        webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
+                    }
+                    else {
+                        webgl.disable(webgl.BLEND);
+                    }
                 }
                 this.program.use(webgl);
                 if (applyUniForm) {
@@ -20657,6 +20684,7 @@ var gd3d;
                     mesh.drawElementLines(webgl, drawbegin, drawcount);
                 }
             };
+            glDrawPass.lastState = "";
             glDrawPass.textureID = null;
             return glDrawPass;
         }());

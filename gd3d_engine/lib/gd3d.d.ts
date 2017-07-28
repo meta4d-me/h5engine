@@ -2316,7 +2316,7 @@ declare namespace gd3d.framework {
         actionType: string;
         startFrame: number;
         endFrame: number;
-        params: any[];
+        params: any;
         clone(): EffectActionData;
     }
     class EffectMatData {
@@ -3381,6 +3381,8 @@ declare namespace gd3d.render {
         Add_PreMultiply = 4,
     }
     class glDrawPass {
+        static lastState: string;
+        curState: string;
         program: glProgram;
         state_showface: ShowFaceStateEnum;
         state_zwrite: boolean;
@@ -3403,6 +3405,8 @@ declare namespace gd3d.render {
         uniformallchange: boolean;
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
+        private getCurDrawState();
+        private formate(str, out);
         uniformFloat(name: string, number: number): void;
         uniformFloatv(name: string, numbers: Float32Array): void;
         uniformVec4(name: string, vec: math.vector4): void;

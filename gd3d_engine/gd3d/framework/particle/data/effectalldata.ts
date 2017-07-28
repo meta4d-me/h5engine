@@ -727,7 +727,7 @@ namespace gd3d.framework
         public actionType: string;
         public startFrame: number;
         public endFrame: number;
-        public params: any[];
+        public params: any;
         clone()
         {
             let actiondata = new EffectActionData();

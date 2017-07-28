@@ -1,5 +1,5 @@
 {
-    "life": 1000,
+    "life": 5,
     "elements": [
         {
             "name": "glow",
@@ -46,7 +46,7 @@
                     "frame": 61,
                     "actions": [
                         {
-                            "action": "loop",
+                            "action": "destroy",
                             "param": {}
                         }
                     ]

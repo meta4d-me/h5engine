@@ -362,34 +362,6 @@ declare namespace t {
         update(delta: number): void;
     }
 }
-declare class test_effecteditor implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    camera: gd3d.framework.camera;
-    timer: number;
-    taskmgr: gd3d.framework.taskMgr;
-    effect: gd3d.framework.effectSystem;
-    label: HTMLLabelElement;
-    gui: lighttool.htmlui.gui;
-    private loadShader(laststate, state);
-    private loadText(laststate, state);
-    private addcube(laststate, state);
-    private dragon;
-    private loadModel(laststate, state);
-    start(app: gd3d.framework.application): void;
-    private loadEffect(laststate, state);
-    private addButton();
-    private getNameFromURL(path);
-    private addcam(laststate, state);
-    tr: gd3d.framework.transform;
-    ttr: gd3d.framework.transform;
-    eff: gd3d.framework.effectSystem;
-    beclone: boolean;
-    effectloaded: boolean;
-    bestop: boolean;
-    bereplay: boolean;
-    update(delta: number): void;
-}
 declare class test_effect implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -958,4 +930,43 @@ declare class CameraController {
     checkOnRightClick(mouseEvent: MouseEvent): boolean;
     private doMouseWheel(ev, isFirefox);
     remove(): void;
+}
+declare class EffectElement extends gd3d.framework.transform {
+    type: gd3d.framework.EffectElementTypeEnum;
+    beLoop: boolean;
+    name: string;
+}
+declare class test_effecteditor implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    effect: gd3d.framework.effectSystem;
+    label: HTMLLabelElement;
+    gui: lighttool.htmlui.gui;
+    transformRoot: gd3d.framework.transform;
+    effectSystem: gd3d.framework.effectSystem;
+    effectSysData: gd3d.framework.EffectSystemData;
+    setVal(val: string, property: string, data: any): void;
+    start(app: gd3d.framework.application): void;
+    private scaleChecked;
+    private positionChecked;
+    private eulerChecked;
+    private addElement();
+    private play();
+    private loadShader(laststate, state);
+    private loadText(laststate, state);
+    private loadEffect(laststate, state);
+    private addButton();
+    private getNameFromURL(path);
+    private addcam(laststate, state);
+    tr: gd3d.framework.transform;
+    ttr: gd3d.framework.transform;
+    eff: gd3d.framework.effectSystem;
+    beclone: boolean;
+    effectloaded: boolean;
+    bestop: boolean;
+    bereplay: boolean;
+    update(delta: number): void;
 }
