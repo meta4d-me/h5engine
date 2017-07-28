@@ -642,6 +642,40 @@ declare class test_pick implements IState {
     update(delta: number): void;
 }
 declare namespace t {
+    class test_post_bloom implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        private addcamandlight(laststate, state);
+        start(app: gd3d.framework.application): void;
+        private addbtn(topOffset, textContent, func);
+        camera: gd3d.framework.camera;
+        postEffectType: PostEffectType;
+        timer: number;
+        taskmgr: gd3d.framework.taskMgr;
+        update(delta: number): void;
+    }
+}
+declare namespace t {
+    class test_posteffect_cc implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        private loadShader(laststate, state);
+        private loadText(laststate, state);
+        private addcube(laststate, state);
+        private addcamandlight(laststate, state);
+        start(app: gd3d.framework.application): void;
+        private addbtn(topOffset, textContent, func);
+        camera: gd3d.framework.camera;
+        postEffectType: PostEffectType;
+        light: gd3d.framework.light;
+        timer: number;
+        taskmgr: gd3d.framework.taskMgr;
+        update(delta: number): void;
+    }
+}
+declare namespace t {
     class test_posteffect implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;

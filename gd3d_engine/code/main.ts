@@ -63,8 +63,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_tex_uv",()=>new test_texuv());
         this.addBtn("test_uimove",()=>new test_uimove());
         
-        this.addBtn("test_effecteditor",()=>new test_effecteditor());
-
+        this.addBtn("post_景深",()=>new t.test_posteffect_cc());
         
     }
     private x: number = 0;

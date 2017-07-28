@@ -11,6 +11,7 @@ class test_loadScene implements IState
         let names: string[] = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         let name = names[0];
         // name="MainCity";
+        let isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
@@ -30,8 +31,9 @@ class test_loadScene implements IState
                             console.log(s.bundleLoadState);
                             // console.log(s.progress);
                             // if(s.isfinish)
-                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene)
+                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded)
                             {
+                                isloaded = true;
                                 console.log(s.isfinish);
                                 var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
                                 var _root = _scene.getSceneRoot();

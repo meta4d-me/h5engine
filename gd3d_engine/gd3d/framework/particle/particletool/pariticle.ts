@@ -8,10 +8,12 @@ namespace gd3d.framework
      */
     export class Particle
     {
+        private batcher: EmissionBatcher;
         public gameObject: gameObject;
+        private emisson:EmissionElement;
+        private vf: number;
+
         public renderModel: RenderModel = RenderModel.Mesh;
-        //public mat: EffectMatData;
-        public localMatrix: math.matrix = new math.matrix();
 
         private startScale: math.vector3 = new gd3d.math.vector3();
         public startRotation: gd3d.math.quaternion = new gd3d.math.quaternion();
@@ -19,7 +21,8 @@ namespace gd3d.framework
         public euler: math.vector3;
         public rotationByEuler: math.quaternion = new math.quaternion();
 
-        //private startPitchYawRoll: gd3d.math.vector3 = new gd3d.math.vector3();
+        public localMatrix: math.matrix = new math.matrix();
+
 
         public localTranslate: math.vector3;
         public localRotation: math.quaternion = new math.quaternion();
@@ -33,7 +36,6 @@ namespace gd3d.framework
 
         private totalLife:number;//总生命
         private curLife: number;//当前经过的生命周期
-        private format: number;
         private speedDir: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
         private movespeed:gd3d.math.vector3;
         private simulationSpeed: number;
@@ -41,8 +43,6 @@ namespace gd3d.framework
         public startFrameId: number;
 
         public data: Emission;
-        private batcher: EmissionBatcher;
-        private emisson:EmissionElement;
         private vertexSize: number;//单个顶点大小
         private vertexCount: number;//顶点数量
         public sourceVbo: Float32Array;
@@ -57,24 +57,22 @@ namespace gd3d.framework
         //根据发射器定义 初始化
         constructor(batcher: EmissionBatcher)//, _data: EmissionNew, startIndex: number, format: number
         {
-            this.gameObject = batcher.effectSys.gameObject;
-            this.emisson=batcher.emissionElement;
             this.batcher = batcher;
-            this.format = batcher.formate;
-            this.data = batcher.data.clone();
+            this.gameObject = batcher.gameObject;
+            this.emisson=batcher.emissionElement;
+            this.vf = batcher.vf;
+            this.data = batcher.data.clone();//--------------------todo
             
-            this.vertexSize = gd3d.render.meshData.calcByteSize(this.format) / 4;
+            this.vertexSize = gd3d.render.meshData.calcByteSize(this.vf) / 4;
             this.vertexStartIndex = batcher.curVerCount;
             this.vertexCount = this.emisson.perVertexCount;
 
             this.dataForVbo = new Float32Array(this.vertexCount * this.vertexSize);
             this.dataForEbo = this.data.mesh.data.genIndexDataArray();
-            this.dataForVbo.set(this.data.mesh.data.genVertexDataArray(this.format), 0);
-            this.sourceVbo = this.data.getVboData(this.format);
+            this.dataForVbo.set(this.data.mesh.data.genVertexDataArray(this.vf), 0);
+            this.sourceVbo = this.data.getVboData(this.vf);
 
             this.initByData();
-
-
             //计算得出初始vbo ebo
         }
 
@@ -87,7 +85,7 @@ namespace gd3d.framework
             this.totalLife=this.data.life.getValueRandom();
             this.renderModel=this.data.renderModel;
             this.curLife = 0;
-            this.startFrameId = this.batcher.effectSys.frameId;
+            this.startFrameId = this.batcher.emissionElement.effectSys.frameId;
 
             //box方向随着中心轴朝向
             let localRandomDirection = this.data.particleStartData.randomDirection;

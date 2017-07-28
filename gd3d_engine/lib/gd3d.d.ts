@@ -1533,7 +1533,6 @@ declare namespace gd3d.framework {
         webgl: WebGLRenderingContext;
         private parser;
         vf: number;
-        particleVF: number;
         private effectBatchers;
         private particles;
         private matDataGroups;
@@ -2719,6 +2718,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class EmissionBatcher {
+        emissionElement: EmissionElement;
         private webgl;
         gameObject: gameObject;
         data: Emission;
@@ -2728,10 +2728,8 @@ declare namespace gd3d.framework {
         dataForEbo: Uint16Array;
         particles: Particle[];
         private vertexSize;
-        formate: number;
-        effectSys: effectSystem;
-        emissionElement: EmissionElement;
-        constructor(_data: Emission, effectSys: effectSystem, emissionElement: EmissionElement);
+        vf: number;
+        constructor(emissionElement: EmissionElement);
         initMesh(): void;
         curVerCount: number;
         curIndexCount: number;
@@ -2744,14 +2742,17 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Particle {
+        private batcher;
         gameObject: gameObject;
+        private emisson;
+        private vf;
         renderModel: RenderModel;
-        localMatrix: math.matrix;
         private startScale;
         startRotation: gd3d.math.quaternion;
         rotationByShape: math.quaternion;
         euler: math.vector3;
         rotationByEuler: math.quaternion;
+        localMatrix: math.matrix;
         localTranslate: math.vector3;
         localRotation: math.quaternion;
         localScale: math.vector3;
@@ -2762,14 +2763,11 @@ declare namespace gd3d.framework {
         tilling: math.vector2;
         private totalLife;
         private curLife;
-        private format;
         private speedDir;
         private movespeed;
         private simulationSpeed;
         startFrameId: number;
         data: Emission;
-        private batcher;
-        private emisson;
         private vertexSize;
         private vertexCount;
         sourceVbo: Float32Array;
@@ -2820,7 +2818,7 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         name: string;
         emissionElements: EmissionElement[];
-        private vf;
+        vf: number;
         effectSys: effectSystem;
         loopFrame: number;
         constructor(sys: effectSystem);
@@ -2832,27 +2830,28 @@ declare namespace gd3d.framework {
     class EmissionElement {
         webgl: WebGLRenderingContext;
         gameObject: gameObject;
-        emissionBatchers: EmissionBatcher[];
-        private curbatcher;
-        deadParticles: Particle[];
-        private beloop;
-        simulateInLocalSpace: boolean;
-        active: boolean;
-        emission: Emission;
-        private vf;
-        private curTime;
-        private numcount;
-        private isover;
-        private _continueSpaceTime;
         effectSys: effectSystem;
-        perVertexCount: number;
-        perIndexxCount: number;
+        ParticleMgr: Particles;
+        vf: number;
+        emissionData: Emission;
         private maxVertexCount;
         private localtranslate;
         private localScale;
         private localrotate;
         private eluerAngle;
-        constructor(_emission: EffectElementData, sys: effectSystem);
+        private beloop;
+        simulateInLocalSpace: boolean;
+        active: boolean;
+        private _continueSpaceTime;
+        perVertexCount: number;
+        perIndexxCount: number;
+        emissionBatchers: EmissionBatcher[];
+        private curbatcher;
+        deadParticles: Particle[];
+        private curTime;
+        private numcount;
+        private isover;
+        constructor(_emission: EffectElementData, sys: effectSystem, mgr: Particles);
         private worldRotation;
         getWorldRotation(): gd3d.math.quaternion;
         matToBatcher: gd3d.math.matrix;
@@ -3470,6 +3469,7 @@ declare namespace gd3d.render {
         vertexByteSize: number;
         ebos: WebGLBuffer[];
         indexCounts: number[];
+        bindVboBuffer(webgl: WebGLRenderingContext): void;
         bindIndex: number;
         vertexFormat: VertexFormatMask;
         bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo?: number): void;

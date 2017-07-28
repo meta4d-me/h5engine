@@ -147,6 +147,7 @@ namespace gd3d.framework
                 var mesh = this.filter.getMeshOutput();
                 if (mesh != null)
                 {
+                    mesh.glMesh.bindVboBuffer(context.webgl);
                     if (mesh.submesh != null)
                     {
                         for (var i = 0; i < mesh.submesh.length; i++)
