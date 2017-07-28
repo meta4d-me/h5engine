@@ -59,8 +59,12 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("effect",()=>new test_effect());
         this.addBtn("pathasset",()=>new t.test_pathAsset());
         this.addBtn("test_Asi_prefab",()=>new test_loadAsiprefab());
-
+        
         this.addBtn("test_tex_uv",()=>new test_texuv());
+        this.addBtn("test_uimove",()=>new test_uimove());
+        
+        this.addBtn("post_景深",()=>new t.test_posteffect_cc());
+        
     }
     private x: number = 0;
     private y: number = 100;

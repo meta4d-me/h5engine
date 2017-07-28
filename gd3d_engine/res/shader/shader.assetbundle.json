@@ -555,6 +555,58 @@
         {
             "name": "resources/project/fog_additive_alpha.fs.glsl",
             "length": 0
+        },
+        {
+            "name": "resources/posteffect/separate_blur.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/separate_blur.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/separate_blur.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/post_quad.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/post_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/post_quad.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/dof.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/dof.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/dof.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/threshold.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/threshold.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/bloom.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/bloom.fs.glsl",
+            "length": 0
         }
     ]
 }

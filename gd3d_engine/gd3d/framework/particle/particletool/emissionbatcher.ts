@@ -5,6 +5,7 @@ namespace gd3d.framework
      */
     export class EmissionBatcher
     {
+        public emissionElement: EmissionElement;
         private webgl: WebGLRenderingContext;
         public gameObject: gameObject;
         public data: Emission;
@@ -15,27 +16,18 @@ namespace gd3d.framework
         public dataForEbo: Uint16Array;
 
         public particles: Particle[] = [];
-        // public curLiveIndex: number = 0;
-        /**
-         * 顶点大小
-         * @public
-         * @type {number}
-         * @memberof effect
-         */
         private vertexSize: number = 0;
-        public formate: number = 0;
-        public effectSys: effectSystem;
-        public emissionElement: EmissionElement;
-        constructor(_data: Emission, effectSys: effectSystem, emissionElement: EmissionElement)
-        {
-            this.webgl = emissionElement.webgl;
-            this.gameObject = effectSys.gameObject;
-            this.effectSys = effectSys;
-            this.emissionElement = emissionElement;
-            this.data = _data;
-            this.formate = effectSys.particleVF;
-            this.vertexSize = gd3d.render.meshData.calcByteSize(this.formate) / 4;
+        public vf: number = 0;
 
+        constructor(emissionElement: EmissionElement)
+        {
+            this.emissionElement = emissionElement;
+            this.webgl = emissionElement.webgl;
+            this.gameObject=emissionElement.gameObject;
+            this.vf=emissionElement.vf;
+            this.data = emissionElement.emissionData;
+
+            this.vertexSize = gd3d.render.meshData.calcByteSize(this.vf) / 4;
             this.initMesh();
 
             //初始化材质信息
@@ -74,7 +66,7 @@ namespace gd3d.framework
 
             this.dataForVbo = new Float32Array(128);
             this.dataForEbo = new Uint16Array(128);
-            this.mesh.glMesh.initBuffer(this.webgl, this.effectSys.particleVF, 128, render.MeshTypeEnum.Dynamic);
+            this.mesh.glMesh.initBuffer(this.webgl, this.vf, 128, render.MeshTypeEnum.Dynamic);
             this.mesh.glMesh.addIndex(this.webgl, this.dataForEbo.length);
         }
         public curVerCount: number = 0;

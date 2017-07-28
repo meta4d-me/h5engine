@@ -86,23 +86,11 @@ namespace gd3d.framework
          /**
          * @private
          */
-        public particleVF=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
+        //public particleVF=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
 
         private effectBatchers: EffectBatcher[] = [];
         private particles: Particles;//粒子系统 发射器统一管理
         private matDataGroups: EffectMatData[] = [];
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置特效数据 string
-         * @version egret-gd3d 1.0
-         */
-        setEffect(effectConfig: string)
-        {
-            this.webgl=gd3d.framework.sceneMgr.app.webgl;
-            this.data = this.parser.Parse(effectConfig, gd3d.framework.sceneMgr.app.getAssetMgr());
-        }
          /**
          * @private
          */

@@ -1285,14 +1285,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class AudioChannel {
-        source: AudioBufferSourceNode;
-        gainNode: GainNode;
-        pannerNode: PannerNode;
-        volume: number;
-        isplay: boolean;
-        stop(): void;
-    }
     class AudioEx {
         private constructor();
         clickInit(): void;
@@ -1303,19 +1295,7 @@ declare namespace gd3d.framework {
         isAvailable(): boolean;
         loadAudioBufferFromArrayBuffer(ab: ArrayBuffer, fun: (buf: AudioBuffer, _err: Error) => void): void;
         loadAudioBuffer(url: string, fun: (buf: AudioBuffer, _err: Error) => void): void;
-        private getNewChannel();
-        private getFreeChannelOnce();
-        private channelOnce;
-        playOnce(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel;
-        playOnceInterrupt(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel;
-        playOnceBlocking(name: string, buf: AudioBuffer, x?: number, y?: number, z?: number): AudioChannel;
-        private channelLoop;
-        playLooped(name: string, buf: AudioBuffer): void;
-        stopLooped(name: string): void;
-        private _soundVolume;
-        setSoundVolume(val: number): void;
-        private _musicVolume;
-        setMusicVolume(val: number): void;
+        createAudioChannel(): AudioChannel;
     }
 }
 declare namespace gd3d.framework {
@@ -1393,6 +1373,33 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         remove(): void;
         clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AudioPlayer implements INodeComponent {
+        private _volume;
+        audioChannel: AudioChannel;
+        buffer: AudioBuffer;
+        beLoop: boolean;
+        name: String;
+        init(name: string, audioChannel: AudioChannel, beLoop?: boolean): void;
+        start(): void;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+        play(buffer: AudioBuffer, volume?: number, onended?: Function, x?: number, y?: number, z?: number): any;
+        stop(): void;
+        volume: number;
+        isPlaying(): boolean;
+    }
+    class AudioChannel {
+        source: AudioBufferSourceNode;
+        gainNode: GainNode;
+        pannerNode: PannerNode;
+        volume: number;
+        isplay: boolean;
+        stop(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1526,11 +1533,9 @@ declare namespace gd3d.framework {
         webgl: WebGLRenderingContext;
         private parser;
         vf: number;
-        particleVF: number;
         private effectBatchers;
         private particles;
         private matDataGroups;
-        setEffect(effectConfig: string): void;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
@@ -2713,6 +2718,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class EmissionBatcher {
+        emissionElement: EmissionElement;
         private webgl;
         gameObject: gameObject;
         data: Emission;
@@ -2722,10 +2728,8 @@ declare namespace gd3d.framework {
         dataForEbo: Uint16Array;
         particles: Particle[];
         private vertexSize;
-        formate: number;
-        effectSys: effectSystem;
-        emissionElement: EmissionElement;
-        constructor(_data: Emission, effectSys: effectSystem, emissionElement: EmissionElement);
+        vf: number;
+        constructor(emissionElement: EmissionElement);
         initMesh(): void;
         curVerCount: number;
         curIndexCount: number;
@@ -2738,14 +2742,17 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Particle {
+        private batcher;
         gameObject: gameObject;
+        private emisson;
+        private vf;
         renderModel: RenderModel;
-        localMatrix: math.matrix;
         private startScale;
         startRotation: gd3d.math.quaternion;
         rotationByShape: math.quaternion;
         euler: math.vector3;
         rotationByEuler: math.quaternion;
+        localMatrix: math.matrix;
         localTranslate: math.vector3;
         localRotation: math.quaternion;
         localScale: math.vector3;
@@ -2756,14 +2763,11 @@ declare namespace gd3d.framework {
         tilling: math.vector2;
         private totalLife;
         private curLife;
-        private format;
         private speedDir;
         private movespeed;
         private simulationSpeed;
         startFrameId: number;
         data: Emission;
-        private batcher;
-        private emisson;
         private vertexSize;
         private vertexCount;
         sourceVbo: Float32Array;
@@ -2814,7 +2818,7 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         name: string;
         emissionElements: EmissionElement[];
-        private vf;
+        vf: number;
         effectSys: effectSystem;
         loopFrame: number;
         constructor(sys: effectSystem);
@@ -2826,27 +2830,28 @@ declare namespace gd3d.framework {
     class EmissionElement {
         webgl: WebGLRenderingContext;
         gameObject: gameObject;
-        emissionBatchers: EmissionBatcher[];
-        private curbatcher;
-        deadParticles: Particle[];
-        private beloop;
-        simulateInLocalSpace: boolean;
-        active: boolean;
-        emission: Emission;
-        private vf;
-        private curTime;
-        private numcount;
-        private isover;
-        private _continueSpaceTime;
         effectSys: effectSystem;
-        perVertexCount: number;
-        perIndexxCount: number;
+        ParticleMgr: Particles;
+        vf: number;
+        emissionData: Emission;
         private maxVertexCount;
         private localtranslate;
         private localScale;
         private localrotate;
         private eluerAngle;
-        constructor(_emission: EffectElementData, sys: effectSystem);
+        private beloop;
+        simulateInLocalSpace: boolean;
+        active: boolean;
+        private _continueSpaceTime;
+        perVertexCount: number;
+        perIndexxCount: number;
+        emissionBatchers: EmissionBatcher[];
+        private curbatcher;
+        deadParticles: Particle[];
+        private curTime;
+        private numcount;
+        private isover;
+        constructor(_emission: EffectElementData, sys: effectSystem, mgr: Particles);
         private worldRotation;
         getWorldRotation(): gd3d.math.quaternion;
         matToBatcher: gd3d.math.matrix;
@@ -3207,6 +3212,7 @@ declare namespace gd3d.framework {
         static COMPONENT_RAWIMAGE: string;
         static COMPONENT_BUTTON: string;
         static COMPONENT_SKINMESHRENDER: string;
+        static COMPONENT_AUDIOPLAYER: string;
         static COMPONENT_CAMERACONTROLLER: string;
         static COMPONENT_CANVASRENDER: string;
         static UIStyle_RangeFloat: string;

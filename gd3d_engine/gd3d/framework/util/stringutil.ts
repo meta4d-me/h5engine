@@ -112,6 +112,15 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 获取AudioPlayer组件的名字
+         * @version egret-gd3d 1.0
+         */
+        public static COMPONENT_AUDIOPLAYER = "AudioPlayer";
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 获取cameraController组件的名字
          * @version egret-gd3d 1.0
          */
