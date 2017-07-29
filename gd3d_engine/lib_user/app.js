@@ -323,39 +323,27 @@ var main = (function () {
         this.addBtn("test_loadimmediate", function () { return new testloadImmediate(); });
         this.addBtn("test_loadprefab", function () { return new test_loadprefab(); });
         this.addBtn("test_loadScene", function () { return new test_loadScene(); });
-        this.addBtn("test_pick", function () { return new test_pick(); });
         this.addBtn("test_anim", function () { return new test_anim(); });
         this.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
         this.addBtn("test_reload", function () { return new testReload(); });
         this.addBtn("test_uvroll", function () { return new t.test_uvroll(); });
         this.addBtn("test_light1", function () { return new t.test_light1(); });
         this.addBtn("test_light_d1", function () { return new t.light_d1(); });
-        this.addBtn("test_changeshader", function () { return new t.test_changeshader(); });
         this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
-        this.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
-        this.addBtn("test_posteffect", function () { return new t.test_posteffect(); });
         this.addBtn("test_streamlight", function () { return new test_streamlight(); });
         this.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
         this.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
         this.addBtn("test_sound", function () { return new t.test_sound(); });
-        this.addBtn("test_cleardepth", function () { return new t.test_clearDepth0(); });
         this.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
-        this.addBtn("test_metalModel", function () { return new t.test_metal(); });
         this.addBtn("test_tank", function () { return new demo.TankGame(); });
         this.addBtn("test_long", function () { return new demo.DragonTest(); });
-        this.addBtn("test_lookAt", function () { return new t.TestRotate(); });
         this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
         this.addBtn("test_integratedrender", function () { return new t.test_integratedrender(); });
         this.addBtn("test_blend", function () { return new t.test_blend(); });
-        this.addBtn("TestRotate", function () { return new t.TestRotate(); });
-        this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
         this.addBtn("effect", function () { return new test_effect(); });
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
         this.addBtn("test_tex_uv", function () { return new test_texuv(); });
-        this.addBtn("test_uimove", function () { return new test_uimove(); });
-        this.addBtn("post_景深", function () { return new t.test_posteffect_cc(); });
-        this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -7006,7 +6994,7 @@ var test_effecteditor = (function () {
                     _this.gui.add_A("TimeLine:");
                     _this.gui.beginLayout_V();
                     _this.gui.add_A("frameIndex:");
-                    var val = _this.gui.add_Textbox("");
+                    var val = _this.gui.add_Textbox("30");
                     if (_this.gui.add_Button("Add Breath Action")) {
                         if (val != "") {
                             try {
@@ -7049,25 +7037,25 @@ var test_effecteditor = (function () {
                             _this.gui.beginLayout_H();
                             _this.gui.add_A("startvalue:");
                             _this.gui.add_A(" x");
-                            _this.setVal(_this.gui.add_Textbox("1"), "x", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+                            _this.setVal(_this.gui.add_Textbox("2"), "x", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
                             _this.gui.add_A(" y");
-                            _this.setVal(_this.gui.add_Textbox("1"), "y", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+                            _this.setVal(_this.gui.add_Textbox("2"), "y", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
                             _this.gui.add_A(" z");
-                            _this.setVal(_this.gui.add_Textbox("1"), "z", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+                            _this.setVal(_this.gui.add_Textbox("2"), "z", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
                             _this.gui.endLayout();
                             _this.gui.beginLayout_H();
                             _this.gui.add_A("targetvalue:");
                             _this.gui.add_A(" x");
-                            _this.setVal(_this.gui.add_Textbox("1"), "x", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+                            _this.setVal(_this.gui.add_Textbox("2"), "x", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
                             _this.gui.add_A(" y");
-                            _this.setVal(_this.gui.add_Textbox("1"), "y", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+                            _this.setVal(_this.gui.add_Textbox("2"), "y", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
                             _this.gui.add_A(" z");
-                            _this.setVal(_this.gui.add_Textbox("1"), "z", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+                            _this.setVal(_this.gui.add_Textbox("4"), "z", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
                             _this.gui.endLayout();
                         }
                         _this.gui.beginLayout_H();
                         _this.gui.add_A("loopframe:");
-                        _this.setVal(_this.gui.add_Textbox(""), "loopframe", _this.effectSysData.elements[0].actionData[0].params);
+                        _this.setVal(_this.gui.add_Textbox("60"), "loopframe", _this.effectSysData.elements[0].actionData[0].params);
                         _this.gui.endLayout();
                     }
                     _this.gui.endLayout();
@@ -7101,6 +7089,8 @@ var test_effecteditor = (function () {
         this.effectSystem.data = this.effectSysData;
         this.app.getScene().addChild(this.transformRoot);
         this.transformRoot.markDirty();
+        this.effectSystem.reset();
+        this.effectSystem.play();
     };
     test_effecteditor.prototype.loadShader = function (laststate, state) {
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {

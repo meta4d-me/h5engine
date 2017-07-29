@@ -149,7 +149,7 @@ class test_effecteditor implements IState
                     this.gui.add_A("TimeLine:");
                     this.gui.beginLayout_V();
                     this.gui.add_A("frameIndex:");
-                    let val = this.gui.add_Textbox("");
+                    let val = this.gui.add_Textbox("30");
                     if (this.gui.add_Button("Add Breath Action"))
                     {
                         if (val != "")
@@ -202,26 +202,26 @@ class test_effecteditor implements IState
                             this.gui.beginLayout_H();
                             this.gui.add_A("startvalue:");
                             this.gui.add_A(" x");
-                            this.setVal(this.gui.add_Textbox("1"), "x", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+                            this.setVal(this.gui.add_Textbox("2"), "x", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
                             this.gui.add_A(" y");
-                            this.setVal(this.gui.add_Textbox("1"), "y", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+                            this.setVal(this.gui.add_Textbox("2"), "y", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
                             this.gui.add_A(" z");
-                            this.setVal(this.gui.add_Textbox("1"), "z", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+                            this.setVal(this.gui.add_Textbox("2"), "z", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
                             this.gui.endLayout();
 
                             this.gui.beginLayout_H();
                             this.gui.add_A("targetvalue:");
                             this.gui.add_A(" x");
-                            this.setVal(this.gui.add_Textbox("1"), "x", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+                            this.setVal(this.gui.add_Textbox("2"), "x", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
                             this.gui.add_A(" y");
-                            this.setVal(this.gui.add_Textbox("1"), "y", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+                            this.setVal(this.gui.add_Textbox("2"), "y", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
                             this.gui.add_A(" z");
-                            this.setVal(this.gui.add_Textbox("1"), "z", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+                            this.setVal(this.gui.add_Textbox("4"), "z", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
                             this.gui.endLayout();
                         }
                         this.gui.beginLayout_H();
                         this.gui.add_A("loopframe:");
-                        this.setVal(this.gui.add_Textbox(""), "loopframe", this.effectSysData.elements[0].actionData[0].params);
+                        this.setVal(this.gui.add_Textbox("60"), "loopframe", this.effectSysData.elements[0].actionData[0].params);
                         this.gui.endLayout();
                     }
                     this.gui.endLayout();
@@ -266,6 +266,8 @@ class test_effecteditor implements IState
         this.effectSystem.data = this.effectSysData;
         this.app.getScene().addChild(this.transformRoot);
         this.transformRoot.markDirty();
+        this.effectSystem.reset();
+        this.effectSystem.play();
     }
 
 

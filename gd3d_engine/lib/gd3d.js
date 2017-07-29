@@ -9028,6 +9028,7 @@ var gd3d;
                 configurable: true
             });
             effectSystem.prototype.init = function () {
+                console.log("init");
                 if (this._data) {
                     this.addElements();
                 }
