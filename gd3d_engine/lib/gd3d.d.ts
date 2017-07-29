@@ -3380,6 +3380,12 @@ declare namespace gd3d.render {
         Add_PreMultiply = 4,
     }
     class glDrawPass {
+        static lastShowFace: number;
+        static lastZWrite: boolean;
+        static lastZTest: boolean;
+        static lastZTestMethod: number;
+        static lastBlend: boolean;
+        static lastBlendEquation: number;
         static lastState: string;
         curState: string;
         program: glProgram;
