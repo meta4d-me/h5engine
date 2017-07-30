@@ -132,13 +132,17 @@
         vertexByteSize: number;
         ebos: WebGLBuffer[];
         indexCounts: number[];
+        
+        bindVboBuffer(webgl: WebGLRenderingContext)
+        {
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
+        }
 
         bindIndex: number = -1;
         vertexFormat: VertexFormatMask = VertexFormatMask.Position;
         bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo: number = 0)
         {
             this.bindIndex = bindEbo;
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             if (bindEbo >= 0)
             {
                 webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[bindEbo]);

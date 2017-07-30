@@ -2316,7 +2316,7 @@ declare namespace gd3d.framework {
         actionType: string;
         startFrame: number;
         endFrame: number;
-        params: any[];
+        params: any;
         clone(): EffectActionData;
     }
     class EffectMatData {
@@ -3260,8 +3260,6 @@ declare namespace gd3d.io {
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
-declare namespace web3d.io {
-}
 declare namespace gd3d.math {
     class pool {
         static collect_all(): void;
@@ -3388,6 +3386,14 @@ declare namespace gd3d.render {
         Add_PreMultiply = 4,
     }
     class glDrawPass {
+        static lastShowFace: number;
+        static lastZWrite: boolean;
+        static lastZTest: boolean;
+        static lastZTestMethod: number;
+        static lastBlend: boolean;
+        static lastBlendEquation: number;
+        static lastState: string;
+        curState: string;
         program: glProgram;
         state_showface: ShowFaceStateEnum;
         state_zwrite: boolean;
@@ -3410,6 +3416,8 @@ declare namespace gd3d.render {
         uniformallchange: boolean;
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
+        private getCurDrawState();
+        private formate(str, out);
         uniformFloat(name: string, number: number): void;
         uniformFloatv(name: string, numbers: Float32Array): void;
         uniformVec4(name: string, vec: math.vector4): void;
@@ -3473,6 +3481,7 @@ declare namespace gd3d.render {
         vertexByteSize: number;
         ebos: WebGLBuffer[];
         indexCounts: number[];
+        bindVboBuffer(webgl: WebGLRenderingContext): void;
         bindIndex: number;
         vertexFormat: VertexFormatMask;
         bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo?: number): void;

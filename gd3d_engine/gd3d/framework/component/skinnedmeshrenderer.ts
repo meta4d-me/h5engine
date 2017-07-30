@@ -458,6 +458,7 @@ namespace gd3d.framework
             {
                 if (this._mesh != null)
                 {
+                    this._mesh.glMesh.bindVboBuffer(context.webgl);
                     if (this._mesh.submesh != null)
                     {
                         for (var i = 0; i < this._mesh.submesh.length; i++)

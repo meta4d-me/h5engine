@@ -362,34 +362,6 @@ declare namespace t {
         update(delta: number): void;
     }
 }
-declare class test_effecteditor implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    camera: gd3d.framework.camera;
-    timer: number;
-    taskmgr: gd3d.framework.taskMgr;
-    effect: gd3d.framework.effectSystem;
-    label: HTMLLabelElement;
-    gui: lighttool.htmlui.gui;
-    private loadShader(laststate, state);
-    private loadText(laststate, state);
-    private addcube(laststate, state);
-    private dragon;
-    private loadModel(laststate, state);
-    start(app: gd3d.framework.application): void;
-    private loadEffect(laststate, state);
-    private addButton();
-    private getNameFromURL(path);
-    private addcam(laststate, state);
-    tr: gd3d.framework.transform;
-    ttr: gd3d.framework.transform;
-    eff: gd3d.framework.effectSystem;
-    beclone: boolean;
-    effectloaded: boolean;
-    bestop: boolean;
-    bereplay: boolean;
-    update(delta: number): void;
-}
 declare class test_effect implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -993,26 +965,12 @@ declare class CameraController {
     private doMouseWheel(ev, isFirefox);
     remove(): void;
 }
-declare class db_test_cameraViewport implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    taskmgr: gd3d.framework.taskMgr;
-    start(app: gd3d.framework.application): void;
-    private loadShader(laststate, state);
-    private loadCompressedScene(laststate, state);
-    private loadScene(laststate, state);
-    private loadprefab(laststate, state);
-    private addCam(laststate, state);
-    baihu: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
-    timer: number;
-    bere: boolean;
-    update(delta: number): void;
+declare class EffectElement extends gd3d.framework.transform {
+    type: gd3d.framework.EffectElementTypeEnum;
+    beLoop: boolean;
+    name: string;
 }
-declare class db_test_effect implements IState {
+declare class test_effecteditor implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
@@ -1020,14 +978,23 @@ declare class db_test_effect implements IState {
     taskmgr: gd3d.framework.taskMgr;
     effect: gd3d.framework.effectSystem;
     label: HTMLLabelElement;
-    private loadShader(laststate, state);
-    private dragon;
-    private loadModel(laststate, state);
+    gui: lighttool.htmlui.gui;
+    transformRoot: gd3d.framework.transform;
+    effectSystem: gd3d.framework.effectSystem;
+    effectSysData: gd3d.framework.EffectSystemData;
+    setVal(val: string, property: string, data: any): void;
     start(app: gd3d.framework.application): void;
+    private scaleChecked;
+    private positionChecked;
+    private eulerChecked;
+    private addElement();
+    private play();
+    private loadShader(laststate, state);
+    private loadText(laststate, state);
     private loadEffect(laststate, state);
-    private loadScene(laststate, state);
+    private addButton();
+    private getNameFromURL(path);
     private addcam(laststate, state);
-    private addbtn(laststate, state);
     tr: gd3d.framework.transform;
     ttr: gd3d.framework.transform;
     eff: gd3d.framework.effectSystem;
@@ -1035,23 +1002,5 @@ declare class db_test_effect implements IState {
     effectloaded: boolean;
     bestop: boolean;
     bereplay: boolean;
-    update(delta: number): void;
-}
-declare class db_test_transQueue implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    taskmgr: gd3d.framework.taskMgr;
-    start(app: gd3d.framework.application): void;
-    private loadShader(laststate, state);
-    private loadprefab(laststate, state);
-    private loadprefab2(laststate, state);
-    private addCam(laststate, state);
-    baihu: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
-    timer: number;
-    bere: boolean;
     update(delta: number): void;
 }

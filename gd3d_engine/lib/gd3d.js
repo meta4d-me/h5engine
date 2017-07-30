@@ -9822,6 +9822,7 @@ var gd3d;
                 if (this.filter != null) {
                     var mesh = this.filter.getMeshOutput();
                     if (mesh != null) {
+                        mesh.glMesh.bindVboBuffer(context.webgl);
                         if (mesh.submesh != null) {
                             for (var i = 0; i < mesh.submesh.length; i++) {
                                 var sm = mesh.submesh[i];
@@ -10145,6 +10146,7 @@ var gd3d;
                 }
                 if (this._mesh != null) {
                     if (this._mesh != null) {
+                        this._mesh.glMesh.bindVboBuffer(context.webgl);
                         if (this._mesh.submesh != null) {
                             for (var i = 0; i < this._mesh.submesh.length; i++) {
                                 var sm = this._mesh.submesh[i];
@@ -19950,20 +19952,6 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
-var web3d;
-(function (web3d) {
-    var io;
-    (function (io) {
-        onmessage = function (msg) {
-            switch (msg.data.type) {
-                case "load":
-                    break;
-                case "loadShaders":
-                    break;
-            }
-        };
-    })(io = web3d.io || (web3d.io = {}));
-})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
@@ -20481,6 +20469,29 @@ var gd3d;
                     this.state_blend = false;
                 }
             };
+            glDrawPass.prototype.getCurDrawState = function () {
+                var res = "";
+                res = this.formate(this.state_showface.toString(), res);
+                res = this.formate(this.state_zwrite.toString(), res);
+                res = this.formate(this.state_ztest.toString(), res);
+                if (this.state_ztest) {
+                    res = this.formate(this.state_ztest_method.toString(), res);
+                }
+                else {
+                    res = this.formate("ztestnone", res);
+                }
+                res = this.formate(this.state_blend.toString(), res);
+                if (this.state_blend) {
+                    res = this.formate(this.state_blendEquation.toString(), res);
+                }
+                else {
+                    res = this.formate("blendnone", res);
+                }
+                return res;
+            };
+            glDrawPass.prototype.formate = function (str, out) {
+                return out += str + "_";
+            };
             glDrawPass.prototype.uniformFloat = function (name, number) {
                 var v = this.uniforms[name];
                 if (v == null)
@@ -20554,39 +20565,57 @@ var gd3d;
             };
             glDrawPass.prototype.use = function (webgl, applyUniForm) {
                 if (applyUniForm === void 0) { applyUniForm = true; }
-                if (this.state_showface == ShowFaceStateEnum.ALL) {
-                    webgl.disable(webgl.CULL_FACE);
-                }
-                else {
-                    if (this.state_showface == ShowFaceStateEnum.CCW) {
-                        webgl.frontFace(webgl.CCW);
+                if (glDrawPass.lastShowFace == undefined || glDrawPass.lastShowFace != this.state_showface) {
+                    if (this.state_showface == ShowFaceStateEnum.ALL) {
+                        webgl.disable(webgl.CULL_FACE);
                     }
                     else {
-                        webgl.frontFace(webgl.CW);
+                        if (this.state_showface == ShowFaceStateEnum.CCW) {
+                            webgl.frontFace(webgl.CCW);
+                        }
+                        else {
+                            webgl.frontFace(webgl.CW);
+                        }
+                        webgl.cullFace(webgl.BACK);
+                        webgl.enable(webgl.CULL_FACE);
                     }
-                    webgl.cullFace(webgl.BACK);
-                    webgl.enable(webgl.CULL_FACE);
+                    glDrawPass.lastShowFace = this.state_showface;
                 }
-                if (this.state_zwrite) {
-                    webgl.depthMask(true);
+                if (glDrawPass.lastZWrite == undefined || glDrawPass.lastZWrite != this.state_zwrite) {
+                    if (this.state_zwrite) {
+                        webgl.depthMask(true);
+                    }
+                    else {
+                        webgl.depthMask(false);
+                    }
+                    glDrawPass.lastZWrite = this.state_zwrite;
                 }
-                else {
-                    webgl.depthMask(false);
+                if (glDrawPass.lastZTest == undefined || glDrawPass.lastZTest != this.state_ztest) {
+                    if (this.state_ztest) {
+                        webgl.enable(webgl.DEPTH_TEST);
+                        if (glDrawPass.lastZTestMethod == undefined || glDrawPass.lastZTestMethod != this.state_ztest_method) {
+                            webgl.depthFunc(this.state_ztest_method);
+                            glDrawPass.lastZTestMethod = this.state_ztest_method;
+                        }
+                    }
+                    else {
+                        webgl.disable(webgl.DEPTH_TEST);
+                    }
+                    glDrawPass.lastZTest = this.state_ztest;
                 }
-                if (this.state_ztest) {
-                    webgl.enable(webgl.DEPTH_TEST);
-                    webgl.depthFunc(this.state_ztest_method);
-                }
-                else {
-                    webgl.disable(webgl.DEPTH_TEST);
-                }
-                if (this.state_blend) {
-                    webgl.enable(webgl.BLEND);
-                    webgl.blendEquation(this.state_blendEquation);
-                    webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
-                }
-                else {
-                    webgl.disable(webgl.BLEND);
+                if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
+                    if (this.state_blend) {
+                        webgl.enable(webgl.BLEND);
+                        if (glDrawPass.lastBlendEquation == undefined || glDrawPass.lastBlendEquation != this.state_blendEquation) {
+                            webgl.blendEquation(this.state_blendEquation);
+                            webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
+                            glDrawPass.lastBlendEquation = this.state_blendEquation;
+                        }
+                    }
+                    else {
+                        webgl.disable(webgl.BLEND);
+                    }
+                    glDrawPass.lastBlend = this.state_blend;
                 }
                 this.program.use(webgl);
                 if (applyUniForm) {
@@ -20683,6 +20712,7 @@ var gd3d;
                     mesh.drawElementLines(webgl, drawbegin, drawcount);
                 }
             };
+            glDrawPass.lastState = "";
             glDrawPass.textureID = null;
             return glDrawPass;
         }());
@@ -20794,10 +20824,12 @@ var gd3d;
                 }
                 return total;
             };
+            glMesh.prototype.bindVboBuffer = function (webgl) {
+                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
+            };
             glMesh.prototype.bind = function (webgl, shadercode, bindEbo) {
                 if (bindEbo === void 0) { bindEbo = 0; }
                 this.bindIndex = bindEbo;
-                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 if (bindEbo >= 0) {
                     webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[bindEbo]);
                 }

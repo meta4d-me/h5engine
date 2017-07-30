@@ -53,18 +53,18 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_skillsystem", () => new t.test_skillsystem());
         this.addBtn("test_integratedrender", () => new t.test_integratedrender());
         this.addBtn("test_blend", () => new t.test_blend());
-        
-        this.addBtn("TestRotate",()=>new t.TestRotate());
-        this.addBtn("testtrailrenderRecorde",()=>new t.test_trailrenderrecorde());
-        this.addBtn("effect",()=>new test_effect());
-        this.addBtn("pathasset",()=>new t.test_pathAsset());
-        this.addBtn("test_Asi_prefab",()=>new test_loadAsiprefab());
-        
-        this.addBtn("test_tex_uv",()=>new test_texuv());
-        this.addBtn("test_uimove",()=>new test_uimove());
-        
-        this.addBtn("post_景深",()=>new t.test_posteffect_cc());
-        
+
+        this.addBtn("TestRotate", () => new t.TestRotate());
+        this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde());
+        this.addBtn("effect", () => new test_effect());
+        this.addBtn("pathasset", () => new t.test_pathAsset());
+        this.addBtn("test_Asi_prefab", () => new test_loadAsiprefab());
+
+        this.addBtn("test_tex_uv", () => new test_texuv());
+        this.addBtn("test_uimove", () => new test_uimove());
+
+        this.addBtn("post_景深", () => new t.test_posteffect_cc());
+        this.addBtn("test_effecteditor", () => new test_effecteditor());
     }
     private x: number = 0;
     private y: number = 100;
