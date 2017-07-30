@@ -2268,6 +2268,7 @@ declare namespace gd3d.framework {
         initFrameData: EffectFrameData;
         ref: string;
         beloop: boolean;
+        delayTime: number;
         actionData: EffectActionData[];
         emissionData: Emission;
         clone(): EffectElementData;
@@ -2391,6 +2392,7 @@ declare namespace gd3d.framework {
         maxEmissionCount: number;
         emissionCount: number;
         time: number;
+        delayTime: number;
         pos: ParticleNode;
         moveSpeed: ParticleNode;
         gravity: number;
@@ -2615,8 +2617,10 @@ declare namespace gd3d.framework {
         fps: number;
         row: number;
         colum: number;
+        totalCount: number;
         private frameInternal;
         private spriteIndex;
+        private tex_ST;
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement): void;
         update(frameIndex: number): void;
     }
@@ -2842,6 +2846,8 @@ declare namespace gd3d.framework {
         private beloop;
         simulateInLocalSpace: boolean;
         active: boolean;
+        private delayTime;
+        private delayFlag;
         private _continueSpaceTime;
         perVertexCount: number;
         perIndexxCount: number;

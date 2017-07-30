@@ -297,7 +297,6 @@
         dot = gd3d.math.floatClamp(dot, -1, 1);
         var rotangle = Math.acos(dot)*180/Math.PI;
         
-
         if (rotangle< 0.01)
         {
             out.x=0;

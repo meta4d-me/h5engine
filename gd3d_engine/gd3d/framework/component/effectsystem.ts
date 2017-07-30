@@ -154,20 +154,6 @@ namespace gd3d.framework
             {
                 if (this.state == EffectPlayStateEnum.Play)
                     this.playTimer += delta * this.speed;
-                // console.log(this.playTimer);
-                
-                // if (this.playTimer >= this.data.life)
-                // {
-                //     if (this.beLoop)
-                //     {
-                //         //this.playTimer=0;
-                //         //this.reset();//
-                //     }
-                //     else
-                //     {
-                //         this.stop();
-                //     }
-                // }
                 if(!this.beLoop)
                 {
                    if (this.playTimer >= this.data.life)
@@ -350,7 +336,6 @@ namespace gd3d.framework
                     //uv
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * curAttrsData.tilling.x + curAttrsData.uv.x;
                     effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * curAttrsData.tilling.y + curAttrsData.uv.y;
-                    // console.log(effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] + "   " + effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14]);
                 }
             }
         }

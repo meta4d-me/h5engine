@@ -29,6 +29,8 @@ namespace gd3d.framework
          */
         time: number;
 
+
+        delayTime:number;
         /**
          * 位置相关
          * 

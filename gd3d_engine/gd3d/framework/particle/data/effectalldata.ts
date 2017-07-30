@@ -367,6 +367,7 @@ namespace gd3d.framework
         public initFrameData: EffectFrameData;
         public ref: string;//数据整体引用
         public beloop: boolean;
+        public delayTime:number;
         public actionData: EffectActionData[];
         public emissionData: Emission;
         clone()

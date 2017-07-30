@@ -68,7 +68,9 @@ namespace gd3d.framework
         private beloop:boolean=false;
         public simulateInLocalSpace:boolean=true;//粒子运动运动空间（世界还是本地）
         public active: boolean = true;//激活状态
+        private delayTime:number;
         //---------衍生属性---------------------------
+        private delayFlag:boolean=false;
         private _continueSpaceTime: number;
         public perVertexCount:number;//单个粒子的顶点数
         public perIndexxCount:number;
@@ -93,6 +95,11 @@ namespace gd3d.framework
 
             this.beloop=_emission.beloop;
             this.emissionData = _emission.emissionData;
+            this.delayTime=_emission.emissionData.delayTime;
+            if(this.delayTime>0)
+            {
+                this.delayFlag=true;
+            } 
             this.simulateInLocalSpace=this.emissionData.simulateInLocalSpace;
             this.perVertexCount=this.emissionData.mesh.data.pos.length;
             this.perIndexxCount=this.emissionData.mesh.data.trisindex.length;
@@ -138,6 +145,17 @@ namespace gd3d.framework
         public update(delta: number)
         {
             this.curTime += delta;
+            if(this.delayFlag)
+            {
+                if(this.curTime<this.delayTime)
+                {
+                    return;
+                }else
+                {
+                    this.curTime=this.curTime-this.delayTime;
+                    this.delayFlag=false;
+                }
+            }
             this.updateEmission(delta);
             this.updateBatcher(delta);
         }

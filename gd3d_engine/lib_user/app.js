@@ -7198,14 +7198,13 @@ var db_test_effect = (function () {
         this.scene = this.app.getScene();
         this.taskmgr.addTaskCall(this.loadShader.bind(this));
         this.taskmgr.addTaskCall(this.addcam.bind(this));
-        this.taskmgr.addTaskCall(this.loadScene.bind(this));
         this.taskmgr.addTaskCall(this.loadEffect.bind(this));
         this.taskmgr.addTaskCall(this.addbtn.bind(this));
     };
     db_test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["0fx_fs_female@attack_02", "fx_0_zs_male@attack_02"];
-        var name = names[1];
+        var names = ["0fx_fs_female@attack_02", "fx_0_zs_male@attack_02", "0fx_boss_02"];
+        var name = names[2];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();

@@ -228,19 +228,22 @@ namespace gd3d.framework
          * @memberof UISpriteAnimation
          */
         colum: number = 1;
+        totalCount:number=1;
         private frameInternal: number = 1;
         private spriteIndex: number = 0;
+
+        private tex_ST:gd3d.math.vector4=new gd3d.math.vector4(1,1,0,0);
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement)
         {
             this.startFrame = _startFrame;
             this.endFrame = _endFrame;
             this.params = _params;
             this.elements = _elements;
-            if (this.params["fps"] != undefined)
-            {
-                this.fps = <number>this.params["fps"];
-                this.frameInternal = effectSystem.fps / this.fps;
-            }
+            // if (this.params["fps"] != undefined)
+            // {
+            //     this.fps = <number>this.params["fps"];
+            //     this.frameInternal = effectSystem.fps / this.fps;
+            // }
             if (this.params["row"] != undefined)
             {
                 this.row = <number>this.params["row"];
@@ -249,19 +252,22 @@ namespace gd3d.framework
             {
                 this.colum = <number>this.params["colum"];
             }
+            if (this.params["count"] != undefined)
+            {
+                this.totalCount = <number>this.params["count"];
+            }
         }
         update(frameIndex: number)
         {
             if (this.startFrame > frameIndex || this.endFrame < frameIndex) return;
-            if ((frameIndex - this.startFrame) % this.frameInternal == 0)
-            {
-                this.spriteIndex = (frameIndex - this.startFrame) / this.frameInternal;
-                this.spriteIndex %= (this.colum * this.row);
-                this.elements.curAttrData.uv.x = (this.spriteIndex % this.colum) / this.colum;
-                this.elements.curAttrData.uv.y = Math.floor((this.spriteIndex / this.colum)) / this.row;
-                this.elements.curAttrData.tilling.x = 1 / this.colum;
-                this.elements.curAttrData.tilling.y = 1 / this.row;
-            }
+
+            var spriteindex=Math.floor((frameIndex-this.startFrame)/(this.endFrame-this.startFrame)*this.totalCount);
+
+            gd3d.math.spriteAnimation(this.row,this.colum,spriteindex,this.tex_ST);
+            this.elements.curAttrData.uv.x =this.tex_ST.z;
+            this.elements.curAttrData.uv.y = this.tex_ST.w;
+            this.elements.curAttrData.tilling.x =this.tex_ST.x;
+            this.elements.curAttrData.tilling.y =this.tex_ST.y;
         }
     }
     /**

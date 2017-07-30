@@ -16067,36 +16067,35 @@ var gd3d;
                 this.fps = 30;
                 this.row = 1;
                 this.colum = 1;
+                this.totalCount = 1;
                 this.frameInternal = 1;
                 this.spriteIndex = 0;
+                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
             }
             UVSpriteAnimationAction.prototype.init = function (_startFrame, _endFrame, _params, _elements) {
                 this.startFrame = _startFrame;
                 this.endFrame = _endFrame;
                 this.params = _params;
                 this.elements = _elements;
-                if (this.params["fps"] != undefined) {
-                    this.fps = this.params["fps"];
-                    this.frameInternal = framework.effectSystem.fps / this.fps;
-                }
                 if (this.params["row"] != undefined) {
                     this.row = this.params["row"];
                 }
                 if (this.params["colum"] != undefined) {
                     this.colum = this.params["colum"];
                 }
+                if (this.params["count"] != undefined) {
+                    this.totalCount = this.params["count"];
+                }
             };
             UVSpriteAnimationAction.prototype.update = function (frameIndex) {
                 if (this.startFrame > frameIndex || this.endFrame < frameIndex)
                     return;
-                if ((frameIndex - this.startFrame) % this.frameInternal == 0) {
-                    this.spriteIndex = (frameIndex - this.startFrame) / this.frameInternal;
-                    this.spriteIndex %= (this.colum * this.row);
-                    this.elements.curAttrData.uv.x = (this.spriteIndex % this.colum) / this.colum;
-                    this.elements.curAttrData.uv.y = Math.floor((this.spriteIndex / this.colum)) / this.row;
-                    this.elements.curAttrData.tilling.x = 1 / this.colum;
-                    this.elements.curAttrData.tilling.y = 1 / this.row;
-                }
+                var spriteindex = Math.floor((frameIndex - this.startFrame) / (this.endFrame - this.startFrame) * this.totalCount);
+                gd3d.math.spriteAnimation(this.row, this.colum, spriteindex, this.tex_ST);
+                this.elements.curAttrData.uv.x = this.tex_ST.z;
+                this.elements.curAttrData.uv.y = this.tex_ST.w;
+                this.elements.curAttrData.tilling.x = this.tex_ST.x;
+                this.elements.curAttrData.tilling.y = this.tex_ST.y;
             };
             return UVSpriteAnimationAction;
         }());
@@ -17713,6 +17712,7 @@ var gd3d;
                 this.beloop = false;
                 this.simulateInLocalSpace = true;
                 this.active = true;
+                this.delayFlag = false;
                 this.isover = false;
                 this.worldRotation = new gd3d.math.quaternion();
                 this.matToBatcher = new gd3d.math.matrix();
@@ -17724,6 +17724,10 @@ var gd3d;
                 this.gameObject = mgr.effectSys.gameObject;
                 this.beloop = _emission.beloop;
                 this.emissionData = _emission.emissionData;
+                this.delayTime = _emission.emissionData.delayTime;
+                if (this.delayTime > 0) {
+                    this.delayFlag = true;
+                }
                 this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
                 this.perVertexCount = this.emissionData.mesh.data.pos.length;
                 this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
@@ -17757,6 +17761,15 @@ var gd3d;
             };
             EmissionElement.prototype.update = function (delta) {
                 this.curTime += delta;
+                if (this.delayFlag) {
+                    if (this.curTime < this.delayTime) {
+                        return;
+                    }
+                    else {
+                        this.curTime = this.curTime - this.delayTime;
+                        this.delayFlag = false;
+                    }
+                }
                 this.updateEmission(delta);
                 this.updateBatcher(delta);
             };
