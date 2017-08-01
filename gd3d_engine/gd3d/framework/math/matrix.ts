@@ -550,9 +550,9 @@
     export function matrixProject_OrthoLH(width: number, height: number, znear: number, zfar: number, out: matrix)
     {
         var hw = 2.0 / width;
-        var hh = 2.0 / height;
-        var id = 1.0 / (zfar - znear);
-        var nid = znear / (znear - zfar);
+        var hh = -2.0 / height;
+        var id = -2.0 / (zfar - znear);
+        var nid = (zfar + znear) / (znear - zfar);
 
 
         out.rawData[0] = hw;
