@@ -198,6 +198,7 @@
                     PostEffectType.blur,
                     PostEffectType.GaussianBlur
                 ];
+                this.camera.postQueues = [];
                 
                 let index = selectionQueue.indexOf(this.postEffectType+1);
                 if(index == -1){
