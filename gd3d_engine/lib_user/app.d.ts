@@ -697,6 +697,7 @@ declare enum PostEffectType {
     Mask = 1,
     blur = 2,
     GaussianBlur = 3,
+    RadialBlur = 4,
 }
 declare class test_loadprefab implements IState {
     app: gd3d.framework.application;

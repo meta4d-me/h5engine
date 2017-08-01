@@ -196,7 +196,8 @@
                     PostEffectType.GrayAndOutline,
                     PostEffectType.Mask,
                     PostEffectType.blur,
-                    PostEffectType.GaussianBlur
+                    PostEffectType.GaussianBlur,
+                    PostEffectType.RadialBlur
                 ];
                 this.camera.postQueues = [];
                 
@@ -291,6 +292,24 @@
                         this.camera.postQueues.push(post);
                         console.log("高斯模糊");
                     }
+                    else if (this.postEffectType == PostEffectType.RadialBlur)
+                    {
+
+                        var color = new gd3d.framework.cameraPostQueue_Color();
+                        color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                        this.camera.postQueues.push(color);
+
+                        var post = new gd3d.framework.cameraPostQueue_Quad();
+                        post.material.setShader(this.scene.app.getAssetMgr().getShader("radial_blur.shader.json"));
+                        
+                        var textcolor = new gd3d.framework.texture("_color");
+                        textcolor.glTexture = color.renderTarget;
+                        
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_Level", 50);
+                        this.camera.postQueues.push(post);
+                        console.log("径向模糊");
+                    }
                 }
             }
 
@@ -351,5 +370,6 @@ enum PostEffectType
     GrayAndOutline,
     Mask,
     blur,
-    GaussianBlur
+    GaussianBlur,
+    RadialBlur
 }

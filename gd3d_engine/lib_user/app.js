@@ -4955,8 +4955,10 @@ var t;
                     PostEffectType.GrayAndOutline,
                     PostEffectType.Mask,
                     PostEffectType.blur,
-                    PostEffectType.GaussianBlur
+                    PostEffectType.GaussianBlur,
+                    PostEffectType.RadialBlur
                 ];
+                _this.camera.postQueues = [];
                 var index = selectionQueue.indexOf(_this.postEffectType + 1);
                 if (index == -1) {
                     _this.postEffectType = PostEffectType.GrayAndOutline;
@@ -5023,6 +5025,19 @@ var t;
                         _this.camera.postQueues.push(post);
                         console.log("高斯模糊");
                     }
+                    else if (_this.postEffectType == PostEffectType.RadialBlur) {
+                        var color = new gd3d.framework.cameraPostQueue_Color();
+                        color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                        _this.camera.postQueues.push(color);
+                        var post = new gd3d.framework.cameraPostQueue_Quad();
+                        post.material.setShader(_this.scene.app.getAssetMgr().getShader("radial_blur.shader.json"));
+                        var textcolor = new gd3d.framework.texture("_color");
+                        textcolor.glTexture = color.renderTarget;
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_Level", 50);
+                        _this.camera.postQueues.push(post);
+                        console.log("径向模糊");
+                    }
                 }
             };
             btn.style.top = "250px";
@@ -5063,6 +5078,7 @@ var PostEffectType;
     PostEffectType[PostEffectType["Mask"] = 1] = "Mask";
     PostEffectType[PostEffectType["blur"] = 2] = "blur";
     PostEffectType[PostEffectType["GaussianBlur"] = 3] = "GaussianBlur";
+    PostEffectType[PostEffectType["RadialBlur"] = 4] = "RadialBlur";
 })(PostEffectType || (PostEffectType = {}));
 var test_loadprefab = (function () {
     function test_loadprefab() {
