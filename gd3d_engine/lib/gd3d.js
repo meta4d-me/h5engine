@@ -9058,6 +9058,7 @@ var gd3d;
                 else if (this.state == framework.EffectPlayStateEnum.BeReady) {
                     if (this.autoplay) {
                         this.play();
+                        this._update(delta);
                     }
                     else {
                         this.gameObject.visible = false;
@@ -19952,6 +19953,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;

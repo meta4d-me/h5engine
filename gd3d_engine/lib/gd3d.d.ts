@@ -3260,6 +3260,8 @@ declare namespace gd3d.io {
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
+declare namespace web3d.io {
+}
 declare namespace gd3d.math {
     class pool {
         static collect_all(): void;

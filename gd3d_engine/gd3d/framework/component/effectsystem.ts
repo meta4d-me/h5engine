@@ -168,6 +168,8 @@ namespace gd3d.framework
                 if (this.autoplay)
                 {
                     this.play();
+                    //this.playTimer += delta * this.speed;
+                    this._update(delta);
                 }
                 else
                 {
@@ -351,9 +353,10 @@ namespace gd3d.framework
          */
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
+                   
             //if (!(camera.CullingMask & this.renderLayer)) return;
             if (this.state == EffectPlayStateEnum.Play)
-            {
+            {  
                 context.updateModel(this.gameObject.transform);
                 for (let i in this.effectBatchers)
                 {
