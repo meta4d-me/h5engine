@@ -607,6 +607,26 @@
         {
             "name": "resources/posteffect/bloom.fs.glsl",
             "length": 0
+        },
+        {
+            "name": "resources/posteffect/radial_blur.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/radial_blur.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/radial_blur_quad.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/radial_blur_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/radial_blur.shader.json",
+            "length": 0
         }
     ]
 }
