@@ -20840,10 +20840,10 @@ var gd3d;
                 return total;
             };
             glMesh.prototype.bindVboBuffer = function (webgl) {
+                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             };
             glMesh.prototype.bind = function (webgl, shadercode, bindEbo) {
                 if (bindEbo === void 0) { bindEbo = 0; }
-                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 this.bindIndex = bindEbo;
                 if (bindEbo >= 0) {
                     webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[bindEbo]);
