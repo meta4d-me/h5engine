@@ -1,3 +1,9 @@
+#ifdef GL_FRAGMENT_PRECISION_HIGH  
+precision highp float;  
+#else  
+precision mediump float;  
+#endif 
+
 uniform sampler2D _MainTex;//清晰图
 uniform sampler2D _BlurTex;//模糊的图
 uniform sampler2D _DepthTex;//深度图
