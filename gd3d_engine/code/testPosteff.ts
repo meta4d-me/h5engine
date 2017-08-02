@@ -315,7 +315,6 @@ namespace t
 
 
         camera: gd3d.framework.camera;
-        postEffectType:PostEffectType = PostEffectType.GrayAndOutline;
         light: gd3d.framework.light;
         timer: number = 0;
         taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();

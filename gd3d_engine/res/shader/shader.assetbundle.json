@@ -627,6 +627,22 @@
         {
             "name": "resources/posteffect/radial_blur.shader.json",
             "length": 0
+        },
+        {
+            "name": "resources/posteffect/contort.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/contort.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/contort_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/contort.shader.json",
+            "length": 0
         }
     ]
 }
