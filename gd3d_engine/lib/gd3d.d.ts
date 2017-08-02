@@ -1494,6 +1494,7 @@ declare namespace gd3d.framework {
         private frameVecs;
         fov: number;
         size: number;
+        private _opvalue;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;

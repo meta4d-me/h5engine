@@ -8625,7 +8625,7 @@ var gd3d;
                 this.frameVecs = [];
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
-                this.opvalue = 1;
+                this._opvalue = 1;
                 this.postQueues = [];
             }
             Object.defineProperty(camera.prototype, "near", {
@@ -8633,10 +8633,12 @@ var gd3d;
                     return this._near;
                 },
                 set: function (val) {
+                    if (this.opvalue > 0) {
+                        if (val < 0.01)
+                            val = 0.01;
+                    }
                     if (val >= this.far)
-                        val = this.far - 1;
-                    if (val < 0.01)
-                        val = 0.01;
+                        val = this.far - 0.01;
                     this._near = val;
                 },
                 enumerable: true,
@@ -8648,9 +8650,7 @@ var gd3d;
                 },
                 set: function (val) {
                     if (val <= this.near)
-                        val = this.near + 1;
-                    if (val >= 1000)
-                        val = 1000;
+                        val = this.near + 0.01;
                     this._far = val;
                 },
                 enumerable: true,
@@ -8810,6 +8810,21 @@ var gd3d;
                 this.frameVecs.push(farRT);
                 this.frameVecs.push(nearRT);
             };
+            Object.defineProperty(camera.prototype, "opvalue", {
+                get: function () {
+                    return this._opvalue;
+                },
+                set: function (val) {
+                    if (val > 0 && this._near < 0.01) {
+                        this._near = 0.01;
+                        if (this._far <= this._near)
+                            this._far = this._near + 0.01;
+                    }
+                    this._opvalue = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
             camera.prototype.getPosAtXPanelInViewCoordinateByScreenPos = function (screenPos, app, z, out) {
                 var vpp = new gd3d.math.rect();
                 this.calcViewPortPixel(app, vpp);
@@ -13659,8 +13674,8 @@ var gd3d;
         function matrixProject_OrthoLH(width, height, znear, zfar, out) {
             var hw = 2.0 / width;
             var hh = 2.0 / height;
-            var id = 1.0 / (zfar - znear);
-            var nid = znear / (znear - zfar);
+            var id = -2.0 / (zfar - znear);
+            var nid = (zfar + znear) / (znear - zfar);
             out.rawData[0] = hw;
             out.rawData[1] = 0;
             out.rawData[2] = 0;
