@@ -654,21 +654,31 @@ namespace demo
 
             {//post effect test
                 var color = new gd3d.framework.cameraPostQueue_Color();
-                color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 2048, 2048, true, false);
                 this.camera.postQueues.push(color);
 
-                this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
-                this.postQuad.material.setShader(this.scene.app.getAssetMgr().getShader("contort.shader.json"));
+                // this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                // this.postQuad.material.setShader(this.scene.app.getAssetMgr().getShader("contort.shader.json"));
+                
+                // var textcolor = new gd3d.framework.texture("_color");
+                // textcolor.glTexture = color.renderTarget;
+                
+                // this.uD = 0;
+                // this.uR = 0;
+                // this.postQuad.material.setTexture("_MainTex", textcolor);
+                // this.postQuad.material.setFloat("_UD", this.uD);
+                // this.postQuad.material.setFloat("_UR", this.uR);
+                // this.camera.postQueues.push(this.postQuad);
+
+                var post = new gd3d.framework.cameraPostQueue_Quad();
+                post.material.setShader(this.scene.app.getAssetMgr().getShader("barrel_blur.shader.json"));
                 
                 var textcolor = new gd3d.framework.texture("_color");
                 textcolor.glTexture = color.renderTarget;
                 
-                this.uD = 0;
-                this.uR = 0;
-                this.postQuad.material.setTexture("_MainTex", textcolor);
-                this.postQuad.material.setFloat("_UD", this.uD);
-                this.postQuad.material.setFloat("_UR", this.uR);
-                this.camera.postQueues.push(this.postQuad);
+                post.material.setTexture("_MainTex", textcolor);
+                post.material.setFloat("_Power", 0.3);
+                this.camera.postQueues.push(post);
             }
 
             var tranLight = new gd3d.framework.transform();
@@ -1002,13 +1012,13 @@ namespace demo
                     this.heroGun.markDirty();
                 }
 
-                // if (this.camera != null)
-                // {
-                //     this.camera.gameObject.transform.localTranslate.x = this.heroTank.localTranslate.x;
-                //     this.camera.gameObject.transform.localTranslate.y = this.heroTank.localTranslate.y + 20;
-                //     this.camera.gameObject.transform.localTranslate.z = this.heroTank.localTranslate.z - 16;
-                //     this.camera.gameObject.transform.markDirty();
-                // }
+                if (this.camera != null)
+                {
+                    this.camera.gameObject.transform.localTranslate.x = this.heroTank.localTranslate.x;
+                    this.camera.gameObject.transform.localTranslate.y = this.heroTank.localTranslate.y + 20;
+                    this.camera.gameObject.transform.localTranslate.z = this.heroTank.localTranslate.z - 16;
+                    this.camera.gameObject.transform.markDirty();
+                }
             }
             
         }
@@ -1053,7 +1063,7 @@ namespace demo
             };
             this.bulletList.push(bullet);
             
-            this.cameraShock.play(1, 0.5, true);
+            // this.cameraShock.play(1, 0.5, true);
         }
 
         private updateBullet(delta: number)

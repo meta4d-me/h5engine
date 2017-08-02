@@ -190,6 +190,7 @@
             list.push("高斯模糊");
             list.push("径向模糊");
             list.push("扭曲虚空");
+            list.push("桶模糊");
 
             var select = document.createElement("select");
             select.style.top = "240px";
@@ -229,7 +230,6 @@
                     post.material.setTexture("_MainTex", textcolor);
                     post.material.setTexture("_DepthTex", text);
                     this.camera.postQueues.push(post);
-
                     console.log("灰度+描边");
                 }
                 else if (select.value == "1")
@@ -316,6 +316,22 @@
                     post.material.setTexture("_MainTex", textcolor);
                     this.camera.postQueues.push(post);
                     console.log("扭曲虚空");
+                }
+                else if (select.value == "6")
+                {
+                    var color = new gd3d.framework.cameraPostQueue_Color();
+                    color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                    this.camera.postQueues.push(color);
+
+                    var post = new gd3d.framework.cameraPostQueue_Quad();
+                    post.material.setShader(this.scene.app.getAssetMgr().getShader("barrel_blur.shader.json"));
+                    
+                    var textcolor = new gd3d.framework.texture("_color");
+                    textcolor.glTexture = color.renderTarget;
+                    
+                    post.material.setTexture("_MainTex", textcolor);
+                    this.camera.postQueues.push(post);
+                    console.log("桶模糊");
                 }
             }
 

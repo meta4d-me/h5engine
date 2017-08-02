@@ -643,6 +643,22 @@
         {
             "name": "resources/posteffect/contort.shader.json",
             "length": 0
+        },
+        {
+            "name": "resources/posteffect/barrel_blur.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/barrel_blur.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/barrel_blur_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/barrel_blur.shader.json",
+            "length": 0
         }
     ]
 }
