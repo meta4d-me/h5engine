@@ -551,7 +551,7 @@
     {
         var hw = 2.0 / width;
         var hh = 2.0 / height;
-        var id = -2.0 / (zfar - znear);
+        var id = 2.0 / (zfar - znear);
         var nid = (zfar + znear) / (znear - zfar);
 
 
