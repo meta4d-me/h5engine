@@ -172,6 +172,7 @@ declare namespace demo {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         camera: gd3d.framework.camera;
+        postQuad: gd3d.framework.cameraPostQueue_Quad;
         light: gd3d.framework.light;
         heroTank: gd3d.framework.transform;
         heroGun: gd3d.framework.transform;
@@ -203,6 +204,9 @@ declare namespace demo {
         private keyMap;
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
+        uD: number;
+        uR: number;
+        updatePostEffect(delta: number): void;
         testTankCol(tran: gd3d.framework.transform): boolean;
         tempTran: gd3d.framework.transform;
         tankControl(delta: number): void;
@@ -664,7 +668,6 @@ declare namespace t {
         start(app: gd3d.framework.application): void;
         private addbtn(topOffset, textContent, func);
         camera: gd3d.framework.camera;
-        postEffectType: PostEffectType;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
@@ -681,7 +684,6 @@ declare namespace t {
         start(app: gd3d.framework.application): void;
         private addbtn(topOffset, textContent, func);
         camera: gd3d.framework.camera;
-        postEffectType: PostEffectType;
         light: gd3d.framework.light;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
@@ -698,19 +700,11 @@ declare namespace t {
         private addcamandlight(laststate, state);
         start(app: gd3d.framework.application): void;
         camera: gd3d.framework.camera;
-        postEffectType: PostEffectType;
         light: gd3d.framework.light;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
     }
-}
-declare enum PostEffectType {
-    GrayAndOutline = 0,
-    Mask = 1,
-    blur = 2,
-    GaussianBlur = 3,
-    RadialBlur = 4,
 }
 declare class test_loadprefab implements IState {
     app: gd3d.framework.application;
