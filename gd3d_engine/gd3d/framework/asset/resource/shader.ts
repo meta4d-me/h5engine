@@ -324,6 +324,43 @@ namespace gd3d.framework
         }
 
 
-    }
+        private static mapUniformGlobal: {
+            [id: string]: UniformData
+        };
 
+        private static setGlobal(key:string,value:any,type:render.UniformTypeEnum)
+        {
+            if (shader.mapUniformGlobal == undefined)
+                shader.mapUniformGlobal = {};
+            if (shader.mapUniformGlobal[key] != undefined)
+                shader.mapUniformGlobal[key].value = value;
+            else
+                shader.mapUniformGlobal[key] = new UniformData(type, value);
+        }
+
+        static setGlobalFloat(key: string, value: number)
+        {
+            shader.setGlobal(key,value,render.UniformTypeEnum.Float);
+        }
+
+        static setGlobalVector4(key: string, value: math.vector4)
+        {
+            shader.setGlobal(key,value,render.UniformTypeEnum.Float4);
+        }
+
+        static setGlobalMatrix(key: string, value: math.matrix)
+        {
+            shader.setGlobal(key,value,render.UniformTypeEnum.Float4x4);
+        }
+
+        static setGlobalTexture(key: string, value: texture)
+        {
+            shader.setGlobal(key,value,render.UniformTypeEnum.Texture);
+        }
+
+        static getGlobalMapUniform():{[id: string]: UniformData}
+        {
+            return shader.mapUniformGlobal;
+        }
+    }
 }
