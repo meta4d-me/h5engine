@@ -659,6 +659,18 @@
         {
             "name": "resources/posteffect/barrel_blur.shader.json",
             "length": 0
+        },
+        {
+            "name": "resources/shadowmap/shadowmap.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/shadowmap/shadowmap.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/shadowmap/shadowmap.shader.json",
+            "length": 0
         }
     ]
 }
