@@ -5749,6 +5749,7 @@ var test_ShadowMap = (function () {
                         var _aabb = _this.app.getScene().getRoot().aabbchild;
                         console.log(_aabb.maximum + " : " + _aabb.minimum);
                         _this.FitToScene(_this.lightcamera, _aabb);
+                        _this.ShowCameraInfo(_this.lightcamera);
                         var depth = new gd3d.framework.cameraPostQueue_Depth();
                         depth.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
                         _this.lightcamera.postQueues.push(depth);
@@ -5870,6 +5871,14 @@ var test_ShadowMap = (function () {
         this.inputFar.style.top = "250px";
         this.inputFar.style.position = "absolute";
         this.app.container.appendChild(this.inputFar);
+    };
+    test_ShadowMap.prototype.ShowCameraInfo = function (camera) {
+        var near = camera.near.toString();
+        var far = camera.far.toString();
+        this.inputNear.value = near;
+        this.inputFar.value = far;
+        this.labelNear.textContent = "near :" + near;
+        this.labelFar.textContent = "far :" + far;
     };
     return test_ShadowMap;
 }());

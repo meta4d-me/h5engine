@@ -775,6 +775,7 @@ declare class test_ShadowMap implements IState {
     inputNear: HTMLInputElement;
     inputFar: HTMLInputElement;
     ShowUI(): void;
+    ShowCameraInfo(camera: gd3d.framework.camera): void;
 }
 declare namespace t {
     class test_skillsystem implements IState {

@@ -28,6 +28,7 @@ class test_ShadowMap implements IState
                             let _aabb = this.app.getScene().getRoot().aabbchild;
                             console.log(_aabb.maximum + " : " + _aabb.minimum);
                             this.FitToScene(this.lightcamera,_aabb);
+                            this.ShowCameraInfo(this.lightcamera);
 
                             var depth = new gd3d.framework.cameraPostQueue_Depth();
                             depth.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
@@ -196,5 +197,15 @@ class test_ShadowMap implements IState
         this.inputFar.style.top = "250px";
         this.inputFar.style.position = "absolute";
         this.app.container.appendChild(this.inputFar);
+    }
+
+    ShowCameraInfo(camera:gd3d.framework.camera)
+    {
+        let near = camera.near.toString();
+        let far = camera.far.toString();
+        this.inputNear.value = near;
+        this.inputFar.value = far;
+        this.labelNear.textContent = "near :" + near;
+        this.labelFar.textContent = "far :" +far;
     }
 }
