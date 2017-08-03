@@ -393,11 +393,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
+    main = __decorate([
+        gd3d.reflect.userCode
+    ], main);
     return main;
 }());
-main = __decorate([
-    gd3d.reflect.userCode
-], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -874,11 +874,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
+    CameraShock = __decorate([
+        gd3d.reflect.nodeComponent
+    ], CameraShock);
     return CameraShock;
 }());
-CameraShock = __decorate([
-    gd3d.reflect.nodeComponent
-], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -896,9 +896,9 @@ var Joystick = (function () {
         this.overlay2d = overlay2d;
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.addJoystick.bind(this));
-        document.addEventListener("mousedown", function (e) { _this.onMouseDown(e); e.preventDefault(); });
-        document.addEventListener("mouseup", function (e) { _this.onMouseUp(e); e.preventDefault(); });
-        document.addEventListener("mousemove", function (e) { _this.onMouseMove(e); e.preventDefault(); });
+        document.addEventListener("mousedown", function (e) { _this.onMouseDown(e); });
+        document.addEventListener("mouseup", function (e) { _this.onMouseUp(e); });
+        document.addEventListener("mousemove", function (e) { _this.onMouseMove(e); });
         document.addEventListener("touchstart", function (e) { _this.onTouchStart(e); e.preventDefault(); });
         document.addEventListener("touchend", function (e) { _this.onTouchEnd(e); e.preventDefault(); });
         document.addEventListener("touchmove", function (e) { _this.onTouchMove(e); e.preventDefault(); });
@@ -1244,8 +1244,6 @@ var demo;
             this.angleLimit = 5;
             this.colVisible = false;
             this.keyMap = {};
-            this.uD = 0;
-            this.uR = 0;
             this.bulletId = 0;
             this.bulletList = [];
             this.bulletSpeed = 30;
@@ -1325,6 +1323,7 @@ var demo;
             });
         };
         TankGame.prototype.addCameraAndLight = function (laststate, state) {
+            var _this = this;
             var tranCam = new gd3d.framework.transform();
             tranCam.name = "Cam";
             this.scene.addChild(tranCam);
@@ -1336,18 +1335,132 @@ var demo;
             tranCam.localTranslate = new gd3d.math.vector3(0, 20, -16);
             tranCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             tranCam.markDirty();
-            {
+            var list = [
+                "标准",
+                "马赛克",
+                "径向模糊",
+                "旋转扭曲",
+                "桶模糊",
+                "灰度图",
+                "棕褐色调",
+                "反色",
+                "高斯滤波",
+                "均值滤波",
+                "锐化",
+                "膨胀",
+                "腐蚀"
+            ];
+            var select = document.createElement("select");
+            select.style.top = "240px";
+            select.style.right = "0px";
+            select.style.position = "absolute";
+            this.app.container.appendChild(select);
+            for (var i = 0; i < list.length; i++) {
+                var op = document.createElement("option");
+                op.value = i.toString();
+                op.innerText = list[i];
+                select.appendChild(op);
+            }
+            select.onchange = function () {
+                _this.camera.postQueues = [];
                 var color = new gd3d.framework.cameraPostQueue_Color();
-                color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 2048, 2048, true, false);
-                this.camera.postQueues.push(color);
-                var post = new gd3d.framework.cameraPostQueue_Quad();
-                post.material.setShader(this.scene.app.getAssetMgr().getShader("barrel_blur.shader.json"));
+                color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 2048, 2048, true, false);
+                _this.camera.postQueues.push(color);
                 var textcolor = new gd3d.framework.texture("_color");
                 textcolor.glTexture = color.renderTarget;
-                post.material.setTexture("_MainTex", textcolor);
-                post.material.setFloat("_Power", 0.3);
-                this.camera.postQueues.push(post);
-            }
+                if (select.value == "0") {
+                    _this.camera.postQueues = [];
+                }
+                else if (select.value == "1") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("mask.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "2") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("radial_blur.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_Level", 25);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "3") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("contort.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_UD", 120);
+                    _this.postQuad.material.setFloat("_UR", 0.3);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "4") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("barrel_blur.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_Power", 0.3);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "5") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 1);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "6") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 2);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "7") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 3);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "8") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 4);
+                    _this.postQuad.material.setFloat("_Step", 2);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "9") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 5);
+                    _this.postQuad.material.setFloat("_Step", 2);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "10") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 6);
+                    _this.postQuad.material.setFloat("_Step", 0.1);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "11") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 7);
+                    _this.postQuad.material.setFloat("_Step", 0.3);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "12") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("filter_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_FilterType", 8);
+                    _this.postQuad.material.setFloat("_Step", 0.3);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+            };
             var tranLight = new gd3d.framework.transform();
             tranLight.name = "light";
             this.scene.addChild(tranLight);
@@ -1441,15 +1554,6 @@ var demo;
                 }
             }
             this.fireTick += delta;
-            this.updatePostEffect(delta);
-        };
-        TankGame.prototype.updatePostEffect = function (delta) {
-            if (this.postQuad != null && this.uR < 1) {
-                this.uD += delta * (70 + this.uR * 70);
-                this.uR += delta * 0.3;
-                this.postQuad.material.setFloat("_UD", this.uD);
-                this.postQuad.material.setFloat("_UR", this.uR);
-            }
         };
         TankGame.prototype.testTankCol = function (tran) {
             var col = tran.gameObject.getComponent("boxcollider");
@@ -5064,14 +5168,15 @@ var t;
                     }
                 }
             };
-            var list = [];
-            list.push("灰度+描边");
-            list.push("马赛克");
-            list.push("均值模糊");
-            list.push("高斯模糊");
-            list.push("径向模糊");
-            list.push("扭曲虚空");
-            list.push("桶模糊");
+            var list = [
+                "灰度+描边",
+                "马赛克",
+                "均值模糊",
+                "高斯模糊",
+                "径向模糊",
+                "旋转扭曲",
+                "桶模糊"
+            ];
             var select = document.createElement("select");
             select.style.top = "240px";
             select.style.position = "absolute";
@@ -5165,7 +5270,7 @@ var t;
                     textcolor.glTexture = color.renderTarget;
                     post.material.setTexture("_MainTex", textcolor);
                     _this.camera.postQueues.push(post);
-                    console.log("扭曲虚空");
+                    console.log("旋转扭曲");
                 }
                 else if (select.value == "6") {
                     var color = new gd3d.framework.cameraPostQueue_Color();
@@ -6735,11 +6840,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
+    testUserCodeUpdate = __decorate([
+        gd3d.reflect.userCode
+    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
-testUserCodeUpdate = __decorate([
-    gd3d.reflect.userCode
-], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {

@@ -183,14 +183,15 @@
                 }
             }
 
-            let list: string[] = [];
-            list.push("灰度+描边");
-            list.push("马赛克");
-            list.push("均值模糊");
-            list.push("高斯模糊");
-            list.push("径向模糊");
-            list.push("扭曲虚空");
-            list.push("桶模糊");
+            let list: string[] = [
+                "灰度+描边",
+                "马赛克",
+                "均值模糊",
+                "高斯模糊",
+                "径向模糊",
+                "旋转扭曲",
+                "桶模糊"
+            ];
 
             var select = document.createElement("select");
             select.style.top = "240px";
@@ -315,7 +316,7 @@
                     
                     post.material.setTexture("_MainTex", textcolor);
                     this.camera.postQueues.push(post);
-                    console.log("扭曲虚空");
+                    console.log("旋转扭曲");
                 }
                 else if (select.value == "6")
                 {

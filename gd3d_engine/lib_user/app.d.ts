@@ -204,9 +204,6 @@ declare namespace demo {
         private keyMap;
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
-        uD: number;
-        uR: number;
-        updatePostEffect(delta: number): void;
         testTankCol(tran: gd3d.framework.transform): boolean;
         tempTran: gd3d.framework.transform;
         tankControl(delta: number): void;
