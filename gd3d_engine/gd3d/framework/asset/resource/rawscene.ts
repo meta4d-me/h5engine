@@ -101,6 +101,27 @@ namespace gd3d.framework
             let total = 0;
             return total;
         }
+        resetLightMap(assetmgr: assetMgr)
+        {
+            this.lightmaps.length = 0;
+            let lightmapCount = this.lightmapData.length;
+            for (let i = 0; i < lightmapCount; i++)
+            {
+                if (this.lightmapData[i] == null)
+                {
+                    this.lightmaps.push(null);
+                }
+                else
+                {
+                    let lightmapName = this.lightmapData[i].name;
+                    let lightmap = assetmgr.getAssetByName(lightmapName) as texture;
+                    if(lightmap)
+                        lightmap.use();
+                    this.lightmaps.push(lightmap);
+                }
+            }
+        }
+        private lightmapData;
         /**
          * @public
          * @language zh_CN
@@ -119,17 +140,17 @@ namespace gd3d.framework
             io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
 
             this.lightmaps = [];
-            let lightmapData = _json["lightmap"];
-            let lightmapCount = lightmapData.length;
+            this.lightmapData = _json["lightmap"];
+            let lightmapCount = this.lightmapData.length;
             for (let i = 0; i < lightmapCount; i++)
             {
-                if (lightmapData[i] == null)
+                if (this.lightmapData[i] == null)
                 {
                     this.lightmaps.push(null);
                 }
                 else
                 {
-                    let lightmapName = lightmapData[i].name;
+                    let lightmapName = this.lightmapData[i].name;
                     let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
                     if(lightmap)
                         lightmap.use();

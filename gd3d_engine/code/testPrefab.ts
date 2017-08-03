@@ -10,49 +10,133 @@ class test_loadprefab implements IState
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        let names: string[] = ["baihu", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
+        let names: string[] = ["elong", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
         let name = names[0];
-        // name="Wing_11";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
-            if (state.isfinish)
+            if(state.isfinish)
             {
-                this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                    (s) =>
+                this.app.getAssetMgr().load("res/prefabs/" + name + "/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, 
+                (s) => 
+                {
+                    if(s.isfinish)
                     {
-                        console.log(s.curtask + "/" + s.totaltask);
-                        console.log(s.curByteLength+"/"+s.totalByteLength);
-                        if (s.isfinish)
-                        {
-                            var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
-                            this.baihu = _prefab.getCloneTrans();
-                            this.scene.addChild(this.baihu);
-                            // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
-                            this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                            this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
+                        var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
+                        this.baihu = _prefab.getCloneTrans();
+                        this.scene.addChild(this.baihu);
+                        // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
+                        this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
 
-                            // this.baihu.localEulerAngles = new gd3d.math.vector3();
-                            this.baihu = _prefab.getCloneTrans();
-                            objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
-                            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-                            objCam.markDirty();
-                            this.renderer = this.baihu.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
-                            this.skinRenders = this.baihu.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER) as gd3d.framework.skinnedMeshRenderer[];
-                            // this.changeShader();
-                            for(let i=0; i<22; i++)
+                        objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                        objCam.markDirty();
+
+                        this.app.getAssetMgr().load("res/prefabs/" + name + "/textures/" + name + "texture.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                        (s) => 
+                        {
+                            if(s.isfinish)
                             {
-                                for(let j=0; j<22; j++)
+                                let meshrenderer = this.baihu.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
+                                let skinnmeshrenderer = this.baihu.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
+                                for(let i=0; i<meshrenderer.length; i++)
                                 {
-                                    let bp = _prefab.getCloneTrans();
-                                    bp.localTranslate = new gd3d.math.vector3(i - 11, 0, j - 11);
-                                    bp.markDirty();
-                                    this.scene.addChild(bp);
+                                    let v = meshrenderer[i];
+                                    for(let j=0; j<v.materials.length; j++)
+                                    {
+                                        for(let k in v.materials[j].mapUniform)
+                                        {
+                                            if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                                            {
+                                                let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                                                v.materials[j].setTexture(k, textur);
+                                            }
+                                        }
+                                        
+                                    }
+                                }
+                                for(let i=0; i<skinnmeshrenderer.length; i++)
+                                {
+                                    let v = skinnmeshrenderer[i];
+                                    for(let j=0; j<v.materials.length; j++)
+                                    {
+                                        for(let k in v.materials[j].mapUniform)
+                                        {
+                                            if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                                            {
+                                                let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                                                v.materials[j].setTexture(k, textur);
+                                            }
+                                        }
+                                        
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                        this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/" + name + "aniclip.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                        (s) => 
+                        {
+                            if(s.isfinish)
+                            {
+                                
+                                let anipalyer = this.baihu.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
+                                for(let i=0; i<anipalyer.length; i++)
+                                {
+                                    for(let j=0; j<anipalyer[i].clips.length; j++)
+                                    {
+                                        let v = anipalyer[i].clips[j];
+                                        anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+                                    }
+                                    
+                                    anipalyer[i].playByIndex(0);
+                                }
+                            }
+                        });
+                    }
+                });
             }
         });
+        // name="Wing_11";
+        // this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        // {
+        //     if (state.isfinish)
+        //     {
+        //         this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+        //             (s) =>
+        //             {
+        //                 console.log(s.curtask + "/" + s.totaltask);
+        //                 console.log(s.curByteLength+"/"+s.totalByteLength);
+        //                 if (s.isfinish)
+        //                 {
+        //                     var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
+        //                     this.baihu = _prefab.getCloneTrans();
+        //                     this.scene.addChild(this.baihu);
+        //                     // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
+        //                     this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+        //                     this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
+
+        //                     // this.baihu.localEulerAngles = new gd3d.math.vector3();
+        //                     this.baihu = _prefab.getCloneTrans();
+        //                     objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+        //                     objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        //                     objCam.markDirty();
+        //                     this.renderer = this.baihu.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
+        //                     this.skinRenders = this.baihu.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER) as gd3d.framework.skinnedMeshRenderer[];
+        //                     // this.changeShader();
+        //                     // for(let i=0; i<22; i++)
+        //                     // {
+        //                     //     for(let j=0; j<22; j++)
+        //                     //     {
+        //                     //         let bp = _prefab.getCloneTrans();
+        //                     //         bp.localTranslate = new gd3d.math.vector3(i - 11, 0, j - 11);
+        //                     //         bp.markDirty();
+        //                     //         this.scene.addChild(bp);
+        //                     //     }
+        //                     // }
+        //                 }
+        //             });
+        //     }
+        // });
 
 
         //添加一个摄像机
@@ -81,7 +165,7 @@ class test_loadprefab implements IState
         btn.style.position = "absolute";
         this.app.container.appendChild(btn);
 
-        var btn2 = document.createElement("button");
+        var btn2 = document.createElement("button"); 
         btn2.textContent = "切换Shader到：additive_alpha.shader.json";
         btn2.onclick = () =>
         {

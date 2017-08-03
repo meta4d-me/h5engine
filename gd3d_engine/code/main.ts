@@ -23,6 +23,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_loadimmediate", () => new testloadImmediate());
         this.addBtn("test_loadprefab", () => new test_loadprefab());
         this.addBtn("test_loadScene", () => new test_loadScene());
+        this.addBtn("test_loadMulBundle", () => new test_loadMulBundle());
         this.addBtn("test_pick", () => new test_pick());
 
         this.addBtn("test_anim", () => new test_anim());

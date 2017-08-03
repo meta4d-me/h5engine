@@ -204,9 +204,6 @@ declare namespace demo {
         private keyMap;
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
-        uD: number;
-        uR: number;
-        updatePostEffect(delta: number): void;
         testTankCol(tran: gd3d.framework.transform): boolean;
         tempTran: gd3d.framework.transform;
         tankControl(delta: number): void;
@@ -450,6 +447,19 @@ declare class testloadImmediate implements IState {
     cube2: gd3d.framework.transform;
     cube3: gd3d.framework.transform;
     timer: number;
+    update(delta: number): void;
+}
+declare class test_loadMulBundle implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    baihu: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    timer: number;
+    bere: boolean;
     update(delta: number): void;
 }
 declare class test_loadScene implements IState {
@@ -745,6 +755,26 @@ declare namespace t {
         private targetdir;
         update(delta: number): void;
     }
+}
+declare class test_ShadowMap implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    renderer: gd3d.framework.meshRenderer[];
+    skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    start(app: gd3d.framework.application): void;
+    lightcamera: gd3d.framework.camera;
+    depthTexture: gd3d.framework.texture;
+    viewcamera: gd3d.framework.camera;
+    timer: number;
+    posToUV: gd3d.math.matrix;
+    lightProjection: gd3d.math.matrix;
+    update(delta: number): void;
+    FitToScene(lightCamera: gd3d.framework.camera, aabb: gd3d.framework.aabb): void;
+    labelNear: HTMLLabelElement;
+    labelFar: HTMLLabelElement;
+    inputNear: HTMLInputElement;
+    inputFar: HTMLInputElement;
+    ShowUI(): void;
 }
 declare namespace t {
     class test_skillsystem implements IState {

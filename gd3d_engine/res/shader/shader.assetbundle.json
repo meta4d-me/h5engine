@@ -661,6 +661,18 @@
             "length": 0
         },
         {
+            "name": "resources/posteffect/filter_quad.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/filter_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/filter_quad.shader.json",
+            "length": 0
+        },
+        {
             "name": "resources/shadowmap/shadowmap.vs.glsl",
             "length": 0
         },

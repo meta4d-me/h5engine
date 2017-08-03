@@ -15,6 +15,8 @@ namespace gd3d.framework
         value: any;
         defaultValue: any;
 
+        resname:string;
+
         constructor(type: render.UniformTypeEnum, value: any, defaultValue: any = null)
         {
             this.type = type;
@@ -461,7 +463,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        setTexture(_id: string, _texture: gd3d.framework.texture)
+        setTexture(_id: string, _texture: gd3d.framework.texture, resname:string = "")
         {
             if (this.mapUniform[_id] != undefined)
             {
@@ -470,6 +472,10 @@ namespace gd3d.framework
                     this.mapUniform[_id].value.unuse();
                 }
                 this.mapUniform[_id].value = _texture;
+                if(resname != "")
+                {
+                    this.mapUniform[_id].resname = resname;
+                }
                 if (_texture != null)
                 {
                     _texture.use();
@@ -699,7 +705,7 @@ namespace gd3d.framework
                         {
                             _texture = assetmgr.getDefaultTexture("grid");
                         }
-                        this.setTexture(i, _texture);
+                        this.setTexture(i, _texture, _value);
                         break;
                     case render.UniformTypeEnum.Float:
                         var _value: string = jsonChild["value"];
