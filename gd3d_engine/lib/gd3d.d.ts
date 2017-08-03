@@ -1049,6 +1049,7 @@ declare namespace gd3d.framework {
         type: render.UniformTypeEnum;
         value: any;
         defaultValue: any;
+        resname: string;
         constructor(type: render.UniformTypeEnum, value: any, defaultValue?: any);
     }
     class material implements IAsset {
@@ -1080,7 +1081,7 @@ declare namespace gd3d.framework {
         setVector4v(_id: string, _vector4v: Float32Array): void;
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
-        setTexture(_id: string, _texture: gd3d.framework.texture): void;
+        setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
         uploadUniform(pass: render.glDrawPass): void;
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
@@ -1183,6 +1184,8 @@ declare namespace gd3d.framework {
         use(): void;
         unuse(disposeNow?: boolean): void;
         caclByteLength(): number;
+        resetLightMap(assetmgr: assetMgr): void;
+        private lightmapData;
         Parse(txt: string, assetmgr: assetMgr): void;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
@@ -1494,6 +1497,7 @@ declare namespace gd3d.framework {
         private frameVecs;
         fov: number;
         size: number;
+        private _opvalue;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
