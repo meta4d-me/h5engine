@@ -93,7 +93,7 @@ namespace gd3d.framework
         {
             //注意，这tm是个引用
             gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
-            gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this.matrixModelView);
+            //gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this.matrixModelView);
             // gd3d.math.matrixInverse(this.matrixModelView, this.matrixNormal);
             // gd3d.math.matrixTranspose(this.matrixNormal, this.matrixNormal);
             gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
