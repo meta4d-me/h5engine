@@ -155,10 +155,10 @@ namespace gd3d.framework
         endFrame: number;
         elements: EffectElement;
 
-        speedu:number = 0;
-        speedv:number = 0;
-        startu:number = 0;
-        startv:number = 0;
+        speedu: number = 0;
+        speedv: number = 0;
+        startu: number = 0;
+        startv: number = 0;
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement)
         {
             this.startFrame = _startFrame;
@@ -182,11 +182,11 @@ namespace gd3d.framework
                 this.startv = <number>this.params["startv"];
             }
         }
-        
+
         update(frameIndex: number)
         {
             if (this.startFrame > frameIndex || this.endFrame < frameIndex) return;
-            if(this.startFrame == frameIndex)
+            if (this.startFrame == frameIndex)
             {
                 //init
                 this.elements.curAttrData.uv.x = this.startu;
@@ -228,11 +228,11 @@ namespace gd3d.framework
          * @memberof UISpriteAnimation
          */
         colum: number = 1;
-        totalCount:number=1;
+        totalCount: number = 1;
         private frameInternal: number = 1;
         private spriteIndex: number = 0;
 
-        private tex_ST:gd3d.math.vector4=new gd3d.math.vector4(1,1,0,0);
+        private tex_ST: gd3d.math.vector4 = new gd3d.math.vector4(1, 1, 0, 0);
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement)
         {
             this.startFrame = _startFrame;
@@ -261,13 +261,12 @@ namespace gd3d.framework
         {
             if (this.startFrame > frameIndex || this.endFrame < frameIndex) return;
 
-            var spriteindex=Math.floor((frameIndex-this.startFrame)/(this.endFrame-this.startFrame)*this.totalCount);
-
-            gd3d.math.spriteAnimation(this.row,this.colum,spriteindex,this.tex_ST);
-            this.elements.curAttrData.uv.x =this.tex_ST.z;
+            var spriteindex = Math.floor((frameIndex - this.startFrame) / (this.endFrame - this.startFrame) * this.totalCount);
+            gd3d.math.spriteAnimation(this.row, this.colum, spriteindex, this.tex_ST);
+            this.elements.curAttrData.uv.x = this.tex_ST.z;
             this.elements.curAttrData.uv.y = this.tex_ST.w;
-            this.elements.curAttrData.tilling.x =this.tex_ST.x;
-            this.elements.curAttrData.tilling.y =this.tex_ST.y;
+            this.elements.curAttrData.tilling.x = this.tex_ST.x;
+            this.elements.curAttrData.tilling.y = this.tex_ST.y;
         }
     }
     /**
@@ -333,10 +332,10 @@ namespace gd3d.framework
         public endFrame: number;
         public elements: EffectElement;
         public radius: number;
-        public polar:any;
-        public level:number;
+        public polar: any;
+        public level: number;
         public frameInternal: number;
-        public speed:number;
+        public speed: number;
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement)
         {
             this.startFrame = _startFrame;
@@ -356,9 +355,9 @@ namespace gd3d.framework
             {
                 this.speed = <number>this.params["speed"];
             }
-            if(this.params["polar"]!=undefined)
+            if (this.params["polar"] != undefined)
             {
-               this.polar = EffectUtil.parseEffectVec3(this.params["polar"]);
+                this.polar = EffectUtil.parseEffectVec3(this.params["polar"]);
             }
 
             this.frameInternal = 1 / effectSystem.fps;
@@ -367,28 +366,28 @@ namespace gd3d.framework
         update(frameIndex: number)
         {
             let initFrameDataPos = gd3d.math.pool.new_vector3();
-            gd3d.math.vec3Clone(this.elements.data.initFrameData.attrsData.pos,initFrameDataPos);
+            gd3d.math.vec3Clone(this.elements.data.initFrameData.attrsData.pos, initFrameDataPos);
             let radius = this.radius;
-            let curFrame = frameIndex%360;
+            let curFrame = frameIndex % 360;
 
             let x = this.polar.x.getValue();
             let y = this.polar.y.getValue();
             let z = this.polar.z.getValue();
             {
                 let theta = frameIndex * this.speed;
-                this.elements.curAttrData.pos.x = initFrameDataPos.x + radius * Math.cos(3 * theta+ x) * Math.cos(theta);
-                this.elements.curAttrData.pos.z = initFrameDataPos.z +  radius * Math.cos(3 * theta+ x) * Math.sin(theta);
-                this.elements.curAttrData.pos.y = initFrameDataPos.y + y*Math.cos(frameIndex * this.speed); 
+                this.elements.curAttrData.pos.x = initFrameDataPos.x + radius * Math.cos(3 * theta + x) * Math.cos(theta);
+                this.elements.curAttrData.pos.z = initFrameDataPos.z + radius * Math.cos(3 * theta + x) * Math.sin(theta);
+                this.elements.curAttrData.pos.y = initFrameDataPos.y + y * Math.cos(frameIndex * this.speed);
             }
             {
                 let deltaTheta = frameIndex * this.speed + 0.001;
                 let targetPoint = gd3d.math.pool.new_vector3();
-                targetPoint.x =initFrameDataPos.x + radius * Math.cos(3 * deltaTheta + x) * Math.cos(deltaTheta);
-                targetPoint.z =initFrameDataPos.z + radius * Math.cos(3 * deltaTheta + x) * Math.sin(deltaTheta);
-                targetPoint.y =initFrameDataPos.y +  y*Math.cos(frameIndex * this.speed); 
+                targetPoint.x = initFrameDataPos.x + radius * Math.cos(3 * deltaTheta + x) * Math.cos(deltaTheta);
+                targetPoint.z = initFrameDataPos.z + radius * Math.cos(3 * deltaTheta + x) * Math.sin(deltaTheta);
+                targetPoint.y = initFrameDataPos.y + y * Math.cos(frameIndex * this.speed);
                 let rotation = gd3d.math.pool.new_quaternion();
-                gd3d.math.quatLookat(this.elements.curAttrData.pos,targetPoint,rotation);
-                gd3d.math.quatToEulerAngles(rotation,this.elements.curAttrData.euler);
+                gd3d.math.quatLookat(this.elements.curAttrData.pos, targetPoint, rotation);
+                gd3d.math.quatToEulerAngles(rotation, this.elements.curAttrData.euler);
                 gd3d.math.pool.delete_vector3(targetPoint);
                 gd3d.math.pool.delete_quaternion(rotation);
             }
@@ -408,16 +407,16 @@ namespace gd3d.framework
         public endFrame: number;
         public elements: EffectElement;
         public radius: number;
-        public position:any;
-        public eular:any;
-        public width:number;
+        public position: any;
+        public eular: any;
+        public width: number;
         public frameInternal: number;
-        public speed:number;
-        public transform:gd3d.framework.transform;
-        public startRotation:gd3d.math.quaternion;
-        public color:any;
-        public alpha:number;
-        public offsetTransalte:gd3d.math.vector3= new gd3d.math.vector3();
+        public speed: number;
+        public transform: gd3d.framework.transform;
+        public startRotation: gd3d.math.quaternion;
+        public color: any;
+        public alpha: number;
+        public offsetTransalte: gd3d.math.vector3 = new gd3d.math.vector3();
         init(_startFrame: number, _endFrame: number, _params: any, _elements: EffectElement)
         {
             this.startFrame = _startFrame;
@@ -425,7 +424,7 @@ namespace gd3d.framework
             this.params = _params;
             this.elements = _elements;
 
-            if(this.params["pos"]!=undefined)
+            if (this.params["pos"] != undefined)
             {
                 this.position = EffectUtil.parseEffectVec3(this.params["pos"]);
             }
@@ -433,11 +432,11 @@ namespace gd3d.framework
             this.offsetTransalte.y = this.position.y.getValue();
             this.offsetTransalte.z = this.position.z.getValue();
 
-            if(this.params["eular"]!=undefined)
+            if (this.params["eular"] != undefined)
             {
-               this.eular = EffectUtil.parseEffectVec3(this.params["eular"]);
+                this.eular = EffectUtil.parseEffectVec3(this.params["eular"]);
             }
-            if(this.params["color"]!=undefined)
+            if (this.params["color"] != undefined)
             {
                 this.color = EffectUtil.parseEffectVec3(this.params["color"]);
             }
@@ -482,7 +481,7 @@ namespace gd3d.framework
             {
                 gd3d.math.matrixTransformVector3(worldTranslate, this.elements.transform.getWorldMatrix(), worldTranslate);
             }
-            gd3d.math.vec3Clone(worldTranslate,this.transform.localTranslate);
+            gd3d.math.vec3Clone(worldTranslate, this.transform.localTranslate);
             gd3d.math.pool.delete_vector3(worldTranslate);
 
             let trailTransform = new gd3d.framework.transform();
@@ -492,15 +491,15 @@ namespace gd3d.framework
             let y = this.eular.y.getValue();
             let z = this.eular.z.getValue();
             this.startRotation = new gd3d.math.quaternion();
-            gd3d.math.quatFromEulerAngles(x,y,z,this.startRotation);
+            gd3d.math.quatFromEulerAngles(x, y, z, this.startRotation);
 
-            gd3d.math.quatMultiply(this.startRotation,curAttrData.localRotation,this.transform.localRotate);
+            gd3d.math.quatMultiply(this.startRotation, curAttrData.localRotation, this.transform.localRotate);
 
             this.transform.markDirty();
             trailTransform.markDirty();
 
             let trailrender = trailTransform.gameObject.addComponent("trailRender") as gd3d.framework.trailRender;
-            trailrender.color=new gd3d.math.color(this.color.x.getValue(),this.color.y.getValue(),this.color.z.getValue(),this.alpha);
+            trailrender.color = new gd3d.math.color(this.color.x.getValue(), this.color.y.getValue(), this.color.z.getValue(), this.alpha);
             trailrender.setspeed(this.speed);
             trailrender.setWidth(this.width);
 
@@ -515,11 +514,11 @@ namespace gd3d.framework
             {
                 gd3d.math.matrixTransformVector3(worldTranslate, this.elements.transform.getWorldMatrix(), worldTranslate);
             }
-            gd3d.math.vec3Clone(worldTranslate,this.transform.localTranslate);
-            gd3d.math.vec3Add(this.transform.localTranslate,this.offsetTransalte,this.transform.localTranslate);
+            gd3d.math.vec3Clone(worldTranslate, this.transform.localTranslate);
+            gd3d.math.vec3Add(this.transform.localTranslate, this.offsetTransalte, this.transform.localTranslate);
             gd3d.math.pool.delete_vector3(worldTranslate);
             // gd3d.math.quatClone(this.elements.curAttrData.localRotation,this.transform.localRotate);
-            gd3d.math.quatMultiply(this.startRotation,this.elements.curAttrData.localRotation,this.transform.localRotate);
+            gd3d.math.quatMultiply(this.startRotation, this.elements.curAttrData.localRotation, this.transform.localRotate);
             this.transform.markDirty();
         }
     }

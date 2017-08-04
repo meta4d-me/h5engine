@@ -8,14 +8,6 @@ attribute vec3 _glesTangent;
 
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp mat4 glstate_matrix_model;
-uniform highp mat4 glstate_matrix_modelview;
-uniform highp vec4 glstate_eyepos;
-
-uniform highp vec4 glstate_vec4_lightposs[8];
-uniform highp vec4 glstate_vec4_lightdirs[8];
-uniform highp float glstate_float_spotangelcoss[8];
-uniform highp float glstate_lightcount;
-
 
 // out  varyings to our fragment shader
 varying highp vec4 xlv_COLOR;
@@ -42,13 +34,14 @@ void main()
 
    	TBNmat=calBTNMatrix(normalmat,_glesNormal,_glesTangent);
 
-    worldpos =(glstate_matrix_model * vec4(_glesVertex.xyz, 1.0)).xyz;
+	vec4 pos = glstate_matrix_model * vec4(_glesVertex.xyz, 1.0);
+    worldpos = pos.xyz;
 	//eyedir = glstate_eyepos - worldpos;
 
 	xlv_COLOR = _glesColor;
 	xlv_Position = _glesVertex.xyz;
 	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
-	gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
+	gl_Position = pos;
 }
 
 

@@ -40,7 +40,7 @@ namespace gd3d.framework
         private movespeed:gd3d.math.vector3;
         private simulationSpeed: number;
        // private uvSpriteFrameInternal: number;
-        public startFrameId: number;
+        // public startFrameId: number;
 
         public data: Emission;
         private vertexSize: number;//单个顶点大小
@@ -85,7 +85,7 @@ namespace gd3d.framework
             this.totalLife=this.data.life.getValueRandom();
             this.renderModel=this.data.renderModel;
             this.curLife = 0;
-            this.startFrameId = this.batcher.emissionElement.effectSys.frameId;
+            // this.startFrameId = this.batcher.emissionElement.effectSys.frameId;
 
             //box方向随着中心轴朝向
             let localRandomDirection = this.data.particleStartData.randomDirection;

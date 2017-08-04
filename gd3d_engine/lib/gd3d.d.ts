@@ -1494,6 +1494,7 @@ declare namespace gd3d.framework {
         private frameVecs;
         fov: number;
         size: number;
+        private _opvalue;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
@@ -1526,7 +1527,6 @@ declare namespace gd3d.framework {
         beLoop: boolean;
         state: EffectPlayStateEnum;
         private curFrameId;
-        frameId: number;
         static fps: number;
         private playTimer;
         private speed;
@@ -1555,9 +1555,11 @@ declare namespace gd3d.framework {
         reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
         private resetSingleMesh();
         private resetparticle();
+        private delayElements;
         private addElements();
+        private addElement(data);
         private addInitFrame(elementData);
-        setFrameId(id: number): void;
+        getDelayFrameCount(delayTime: number): number;
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
@@ -1609,8 +1611,6 @@ declare namespace gd3d.framework {
     }
     class light implements INodeComponent {
         gameObject: gameObject;
-        isOpen: boolean;
-        lightName: string;
         type: LightTypeEnum;
         spotAngelCos: number;
         start(): void;
@@ -2245,6 +2245,7 @@ declare namespace gd3d.framework {
         curAttrData: EffectAttrsData;
         effectBatcher: EffectBatcher;
         startIndex: number;
+        delayTime: number;
         actionActive: boolean;
         loopFrame: number;
         active: boolean;
@@ -2301,6 +2302,7 @@ declare namespace gd3d.framework {
         frameIndex: number;
         attrsData: EffectAttrsData;
         lerpDatas: EffectLerpData[];
+        delayTime: number;
         clone(): EffectFrameData;
         dispose(): void;
     }
@@ -2770,7 +2772,6 @@ declare namespace gd3d.framework {
         private speedDir;
         private movespeed;
         private simulationSpeed;
-        startFrameId: number;
         data: Emission;
         private vertexSize;
         private vertexCount;
@@ -2846,8 +2847,6 @@ declare namespace gd3d.framework {
         private beloop;
         simulateInLocalSpace: boolean;
         active: boolean;
-        private delayTime;
-        private delayFlag;
         private _continueSpaceTime;
         perVertexCount: number;
         perIndexxCount: number;

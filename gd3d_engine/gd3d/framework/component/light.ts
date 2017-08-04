@@ -27,17 +27,6 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         gameObject: gameObject;
-         /**
-         * @private
-         */
-        @gd3d.reflect.Field("boolean")
-        isOpen: boolean = false;//添加测试用
-         /**
-         * @private
-         */
-        @gd3d.reflect.Field("string")
-        lightName: string;//添加测试用
-
         /**
          * @public
          * @language zh_CN
