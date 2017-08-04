@@ -659,6 +659,46 @@
         {
             "name": "resources/posteffect/barrel_blur.shader.json",
             "length": 0
+        },
+        {
+            "name": "resources/posteffect/filter_quad.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/filter_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/filter_quad.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/shadowmap/shadowmap.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/shadowmap/shadowmap.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/shadowmap/shadowmap.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/hdr_quad_0.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/hdr_quad_1.fs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/hdr_quad.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/posteffect/hdr_quad.shader.json",
+            "length": 0
         }
     ]
 }
