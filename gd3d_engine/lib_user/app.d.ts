@@ -775,6 +775,7 @@ declare class test_ShadowMap implements IState {
     lightProjection: gd3d.math.matrix;
     update(delta: number): void;
     FitToScene(lightCamera: gd3d.framework.camera, aabb: gd3d.framework.aabb): void;
+    asp: number;
     labelNear: HTMLLabelElement;
     labelFar: HTMLLabelElement;
     inputNear: HTMLInputElement;

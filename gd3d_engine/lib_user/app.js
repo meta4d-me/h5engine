@@ -394,11 +394,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
-    main = __decorate([
-        gd3d.reflect.userCode
-    ], main);
     return main;
 }());
+main = __decorate([
+    gd3d.reflect.userCode
+], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -875,11 +875,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
-    CameraShock = __decorate([
-        gd3d.reflect.nodeComponent
-    ], CameraShock);
     return CameraShock;
 }());
+CameraShock = __decorate([
+    gd3d.reflect.nodeComponent
+], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -5768,17 +5768,23 @@ var test_ShadowMap = (function () {
                         var _scene = _this.app.getAssetMgr().getAssetByName("testshadowmap.scene.json");
                         var _root = _scene.getSceneRoot();
                         _this.scene.addChild(_root);
-                        _this.scene.getRoot().markDirty();
-                        var _aabb = _this.app.getScene().getRoot().aabbchild;
+                        _root.markDirty();
+                        _root.updateTran(false);
+                        _root.updateAABBChild();
+                        var _aabb = _root.aabbchild;
                         console.log(_aabb.maximum + " : " + _aabb.minimum);
                         _this.FitToScene(_this.lightcamera, _aabb);
                         _this.ShowCameraInfo(_this.lightcamera);
-                        var depth = new gd3d.framework.cameraPostQueue_Depth();
-                        depth.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
-                        _this.lightcamera.postQueues.push(depth);
-                        _this.depthTexture = new gd3d.framework.texture("_depth");
-                        _this.depthTexture.glTexture = depth.renderTarget;
-                        gd3d.framework.shader.setGlobalTexture("_Light_Depth", _this.depthTexture);
+                        {
+                            var depth = new gd3d.framework.cameraPostQueue_Depth();
+                            depth.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                            _this.lightcamera.postQueues.push(depth);
+                            _this.depthTexture = new gd3d.framework.texture("_depth");
+                            _this.depthTexture.glTexture = depth.renderTarget;
+                            gd3d.framework.shader.setGlobalTexture("_Light_Depth", _this.depthTexture);
+                        }
+                        {
+                        }
                     }
                 });
             }
@@ -5794,10 +5800,10 @@ var test_ShadowMap = (function () {
         var viewCamObj = new gd3d.framework.transform();
         viewCamObj.name = "ViewCamera";
         this.scene.addChild(viewCamObj);
-        viewCamObj.localTranslate = new gd3d.math.vector3(10, 10, 10);
+        viewCamObj.localTranslate = new gd3d.math.vector3(20, 20, 20);
         viewCamObj.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         this.viewcamera = viewCamObj.gameObject.addComponent("camera");
-        this.viewcamera.backgroundColor = new gd3d.math.color(199 / 255.0, 237 / 255.0, 204 / 255.0, 1.0);
+        this.viewcamera.backgroundColor = new gd3d.math.color(1, 0.11, 0.11, 1.0);
         viewCamObj.markDirty();
         this.ShowUI();
     };
@@ -5822,19 +5828,20 @@ var test_ShadowMap = (function () {
         this.lightcamera.calcViewMatrix(worldToView);
         var vpp = new gd3d.math.rect();
         this.lightcamera.calcViewPortPixel(this.app, vpp);
-        var asp = vpp.w / vpp.h;
+        this.asp = vpp.w / vpp.h;
         var projection = gd3d.math.pool.new_matrix();
-        this.lightcamera.calcProjectMatrix(asp, projection);
+        this.lightcamera.calcProjectMatrix(this.asp, projection);
         gd3d.math.matrixMultiply(projection, worldToView, this.lightProjection);
         gd3d.math.matrixMultiply(this.posToUV, this.lightProjection, this.lightProjection);
         gd3d.framework.shader.setGlobalMatrix("_LightProjection", this.lightProjection);
+        gd3d.framework.shader.setGlobalFloat("_bias", 0.001);
     };
     test_ShadowMap.prototype.FitToScene = function (lightCamera, aabb) {
         lightCamera.gameObject.transform.setWorldPosition(new gd3d.math.vector3(aabb.center.x, aabb.center.y, aabb.center.z));
         var _vec3 = gd3d.math.pool.new_vector3();
         gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, _vec3);
         var maxLength = gd3d.math.vec3Length(_vec3);
-        lightCamera.size = maxLength / 2;
+        lightCamera.size = maxLength;
         lightCamera.near = -maxLength / 2;
         lightCamera.far = maxLength / 2;
     };
@@ -5894,6 +5901,25 @@ var test_ShadowMap = (function () {
         this.inputFar.style.top = "250px";
         this.inputFar.style.position = "absolute";
         this.app.container.appendChild(this.inputFar);
+        var cameraRotateLabel = document.createElement("label");
+        cameraRotateLabel.style.top = "375px";
+        cameraRotateLabel.style.position = "absolute";
+        cameraRotateLabel.textContent = "改变灯光角度";
+        this.app.container.appendChild(cameraRotateLabel);
+        var inputCameraRotateY = document.createElement("input");
+        inputCameraRotateY.type = "range";
+        inputCameraRotateY.min = "-180";
+        inputCameraRotateY.max = "180";
+        inputCameraRotateY.step = "1";
+        inputCameraRotateY.oninput = function () {
+            var _value = parseFloat(inputCameraRotateY.value);
+            var _angle = _this.lightcamera.gameObject.transform.localEulerAngles;
+            _this.lightcamera.gameObject.transform.localEulerAngles = new gd3d.math.vector3(_angle.x, _value, _angle.z);
+            _this.lightcamera.gameObject.transform.markDirty();
+        };
+        inputCameraRotateY.style.top = "400px";
+        inputCameraRotateY.style.position = "absolute";
+        this.app.container.appendChild(inputCameraRotateY);
     };
     test_ShadowMap.prototype.ShowCameraInfo = function (camera) {
         var near = camera.near.toString();
@@ -7021,11 +7047,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
-    testUserCodeUpdate = __decorate([
-        gd3d.reflect.userCode
-    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
+testUserCodeUpdate = __decorate([
+    gd3d.reflect.userCode
+], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {

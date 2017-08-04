@@ -8,6 +8,7 @@ uniform sampler2D _MainTex;
 uniform sampler2D _Light_Depth;
 
 uniform float _AlphaCut;
+uniform float _bias;//这个是根据视角算的。这里先偷个懒，外部传个固定值进来
 
 varying highp vec2 xlv_TEXCOORD0;
 varying highp vec4 _WorldPos;
@@ -23,14 +24,15 @@ float unpackRGBAToDepth(const in vec4 v)
     return dot(v, UnpackFactors);
 }
 
-float GetShadowAtten() {
-	float shadowDepth = unpackRGBAToDepth(texture2D(_Light_Depth, _WorldPos.xy));
-	return _WorldPos.z <= shadowDepth ? 1.0 : 0.1;
-}
-
 void main() 
 {
     lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);
-	tmpvar_3 = tmpvar_3 * GetShadowAtten();
-    gl_FragData[0] = tmpvar_3;
+
+	float shadowDepth = unpackRGBAToDepth(texture2D(_Light_Depth, _WorldPos.xy));
+    float worldDepth = (_WorldPos.z +1.)/2.;
+
+    float _depth = step(shadowDepth + _bias,worldDepth);
+    lowp vec4 temvar_4 = vec4(0.5,0.5,0.5,0) * _depth;
+
+    gl_FragData[0] = tmpvar_3 - temvar_4;
 }
