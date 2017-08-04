@@ -15,6 +15,8 @@ namespace gd3d.framework
         value: any;
         defaultValue: any;
 
+        resname:string;
+
         constructor(type: render.UniformTypeEnum, value: any, defaultValue: any = null)
         {
             this.type = type;
@@ -461,7 +463,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        setTexture(_id: string, _texture: gd3d.framework.texture)
+        setTexture(_id: string, _texture: gd3d.framework.texture, resname:string = "")
         {
             if (this.mapUniform[_id] != undefined)
             {
@@ -470,6 +472,10 @@ namespace gd3d.framework
                     this.mapUniform[_id].value.unuse();
                 }
                 this.mapUniform[_id].value = _texture;
+                if(resname != "")
+                {
+                    this.mapUniform[_id].resname = resname;
+                }
                 if (_texture != null)
                 {
                     _texture.use();
@@ -497,11 +503,18 @@ namespace gd3d.framework
          */
         uploadUniform(pass: render.glDrawPass)
         {
-            for (let id in this.mapUniform)
+            this.uploadMapUniform(pass,this.mapUniform);
+            this.uploadMapUniform(pass,this.mapUniformTemp);
+            this.uploadMapUniform(pass,shader.getGlobalMapUniform());
+        }
+
+        private uploadMapUniform(pass: render.glDrawPass,mapUniform:{[id: string]: UniformData})
+        {
+            for (let id in mapUniform)
             {
-                let type = this.mapUniform[id].type;
-                let value = this.mapUniform[id].value;
-                let defaultValue = this.mapUniform[id].defaultValue;
+                let type = mapUniform[id].type;
+                let value = mapUniform[id].value;
+                let defaultValue = mapUniform[id].defaultValue;
                 var target = pass.uniforms[id];
                 if (target == null) continue;
                 switch (type)
@@ -537,40 +550,6 @@ namespace gd3d.framework
                         {
                             pass.uniformTexture(id, null);
                         }
-                        break;
-                }
-            }
-            for (let id in this.mapUniformTemp)
-            {
-                let type = this.mapUniformTemp[id].type;
-                let value = this.mapUniformTemp[id].value;
-                var target = pass.uniforms[id];
-                if (target == null) continue;
-                switch (type)
-                {
-                    case render.UniformTypeEnum.Float:
-                        pass.uniformFloat(id, value);
-                        break;
-                    case render.UniformTypeEnum.Floatv:
-                        pass.uniformFloatv(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4:
-                        pass.uniformVec4(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4v:
-                        pass.uniformVec4v(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4x4:
-                        pass.uniformMatrix(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4x4v:
-                        pass.uniformMatrixV(id, value);
-                        break;
-                    case render.UniformTypeEnum.Texture:
-                        if (value != null)
-                            pass.uniformTexture(id, value.glTexture);
-                        else
-                            pass.uniformTexture(id, null);
                         break;
                 }
             }
@@ -726,7 +705,7 @@ namespace gd3d.framework
                         {
                             _texture = assetmgr.getDefaultTexture("grid");
                         }
-                        this.setTexture(i, _texture);
+                        this.setTexture(i, _texture, _value);
                         break;
                     case render.UniformTypeEnum.Float:
                         var _value: string = jsonChild["value"];

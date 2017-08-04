@@ -164,7 +164,6 @@ namespace t
 
 
         camera: gd3d.framework.camera;
-        postEffectType:PostEffectType = PostEffectType.GrayAndOutline;
         timer: number = 0;
         taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
         update(delta: number)

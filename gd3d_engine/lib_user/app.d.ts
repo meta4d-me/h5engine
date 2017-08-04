@@ -172,6 +172,7 @@ declare namespace demo {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         camera: gd3d.framework.camera;
+        postQuad: gd3d.framework.cameraPostQueue_Quad;
         light: gd3d.framework.light;
         heroTank: gd3d.framework.transform;
         heroGun: gd3d.framework.transform;
@@ -448,6 +449,22 @@ declare class testloadImmediate implements IState {
     timer: number;
     update(delta: number): void;
 }
+declare class test_loadMulBundle implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    refreshTexture(tran: gd3d.framework.transform): void;
+    refreshAniclip(tran: gd3d.framework.transform): void;
+    refreshLightMap(scene: gd3d.framework.scene, rawscene: gd3d.framework.rawscene): void;
+    start(app: gd3d.framework.application): void;
+    baihu: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    timer: number;
+    bere: boolean;
+    update(delta: number): void;
+}
 declare class test_loadScene implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -651,7 +668,6 @@ declare namespace t {
         start(app: gd3d.framework.application): void;
         private addbtn(topOffset, textContent, func);
         camera: gd3d.framework.camera;
-        postEffectType: PostEffectType;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
@@ -668,7 +684,6 @@ declare namespace t {
         start(app: gd3d.framework.application): void;
         private addbtn(topOffset, textContent, func);
         camera: gd3d.framework.camera;
-        postEffectType: PostEffectType;
         light: gd3d.framework.light;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
@@ -685,25 +700,19 @@ declare namespace t {
         private addcamandlight(laststate, state);
         start(app: gd3d.framework.application): void;
         camera: gd3d.framework.camera;
-        postEffectType: PostEffectType;
         light: gd3d.framework.light;
         timer: number;
         taskmgr: gd3d.framework.taskMgr;
         update(delta: number): void;
     }
 }
-declare enum PostEffectType {
-    GrayAndOutline = 0,
-    Mask = 1,
-    blur = 2,
-    GaussianBlur = 3,
-    RadialBlur = 4,
-}
 declare class test_loadprefab implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     renderer: gd3d.framework.meshRenderer[];
     skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    refreshTexture(tran: gd3d.framework.transform): void;
+    refreshAniclip(tran: gd3d.framework.transform): void;
     start(app: gd3d.framework.application): void;
     private changeShader();
     change(sha: gd3d.framework.shader): void;
@@ -751,6 +760,28 @@ declare namespace t {
         private targetdir;
         update(delta: number): void;
     }
+}
+declare class test_ShadowMap implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    renderer: gd3d.framework.meshRenderer[];
+    skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    start(app: gd3d.framework.application): void;
+    lightcamera: gd3d.framework.camera;
+    depthTexture: gd3d.framework.texture;
+    viewcamera: gd3d.framework.camera;
+    timer: number;
+    posToUV: gd3d.math.matrix;
+    lightProjection: gd3d.math.matrix;
+    update(delta: number): void;
+    FitToScene(lightCamera: gd3d.framework.camera, aabb: gd3d.framework.aabb): void;
+    asp: number;
+    labelNear: HTMLLabelElement;
+    labelFar: HTMLLabelElement;
+    inputNear: HTMLInputElement;
+    inputFar: HTMLInputElement;
+    ShowUI(): void;
+    ShowCameraInfo(camera: gd3d.framework.camera): void;
 }
 declare namespace t {
     class test_skillsystem implements IState {

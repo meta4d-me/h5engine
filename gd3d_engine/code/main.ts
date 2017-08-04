@@ -23,6 +23,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_loadimmediate", () => new testloadImmediate());
         this.addBtn("test_loadprefab", () => new test_loadprefab());
         this.addBtn("test_loadScene", () => new test_loadScene());
+        this.addBtn("test_loadMulBundle", () => new test_loadMulBundle());
         this.addBtn("test_pick", () => new test_pick());
 
         this.addBtn("test_anim", () => new test_anim());
@@ -65,6 +66,7 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("post_景深", () => new t.test_posteffect_cc());
         this.addBtn("test_effecteditor", () => new test_effecteditor());
+        this.addBtn("test_shadowmap",()=>new test_ShadowMap());
     }
     private x: number = 0;
     private y: number = 100;

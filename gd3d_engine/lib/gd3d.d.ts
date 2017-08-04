@@ -1049,6 +1049,7 @@ declare namespace gd3d.framework {
         type: render.UniformTypeEnum;
         value: any;
         defaultValue: any;
+        resname: string;
         constructor(type: render.UniformTypeEnum, value: any, defaultValue?: any);
     }
     class material implements IAsset {
@@ -1080,8 +1081,9 @@ declare namespace gd3d.framework {
         setVector4v(_id: string, _vector4v: Float32Array): void;
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
-        setTexture(_id: string, _texture: gd3d.framework.texture): void;
+        setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
         uploadUniform(pass: render.glDrawPass): void;
+        private uploadMapUniform(pass, mapUniform);
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
@@ -1183,6 +1185,8 @@ declare namespace gd3d.framework {
         use(): void;
         unuse(disposeNow?: boolean): void;
         caclByteLength(): number;
+        resetLightMap(assetmgr: assetMgr): void;
+        private lightmapData;
         Parse(txt: string, assetmgr: assetMgr): void;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
@@ -1227,6 +1231,15 @@ declare namespace gd3d.framework {
         parse(assetmgr: assetMgr, json: any): void;
         private _parseProperties(assetmgr, properties);
         private _parsePass(assetmgr, json);
+        private static mapUniformGlobal;
+        private static setGlobal(key, value, type);
+        static setGlobalFloat(key: string, value: number): void;
+        static setGlobalVector4(key: string, value: math.vector4): void;
+        static setGlobalMatrix(key: string, value: math.matrix): void;
+        static setGlobalTexture(key: string, value: texture): void;
+        static getGlobalMapUniform(): {
+            [id: string]: UniformData;
+        };
     }
 }
 declare namespace gd3d.framework {

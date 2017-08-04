@@ -50,42 +50,6 @@ class test_loadScene implements IState
                     }
                 })
                 
-                // this.app.getAssetMgr().load("res/prefabs/baihu/baihu.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                //     (s) =>
-                //     {
-                //             console.log(s.curtask + "   /" + s.totaltask);
-                //         if (s.isfinish)
-                //         {
-
-                //         }
-                //     });
-                // this.app.getAssetMgr().load("res/prefabs/elong/elong.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                //     (s) => 
-                //     {
-                //             console.log(s.curtask + "   /" + s.totaltask);
-                //         if (s.isfinish)
-                //         {
-
-                //         }
-                //     });
-                // this.app.getAssetMgr().load("res/prefabs/tank01/tank01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                //     (s) =>
-                //     {
-                //             console.log(s.curtask + "   /" + s.totaltask);
-                //         if (s.isfinish)
-                //         {
-
-                //         }
-                //     });
-                // this.app.getAssetMgr().load("res/prefabs/dragon/dragon.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                //     (s) =>
-                //     {
-                //             console.log(s.curtask + "   /" + s.totaltask);
-                //         if (s.isfinish)
-                //         {
-
-                //         }
-                //     });
             }
         });
         // var name="Wing_11";
