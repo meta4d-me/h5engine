@@ -455,6 +455,9 @@ declare class testloadImmediate implements IState {
 declare class test_loadMulBundle implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    refreshTexture(tran: gd3d.framework.transform): void;
+    refreshAniclip(tran: gd3d.framework.transform): void;
+    refreshLightMap(scene: gd3d.framework.scene, rawscene: gd3d.framework.rawscene): void;
     start(app: gd3d.framework.application): void;
     baihu: gd3d.framework.transform;
     camera: gd3d.framework.camera;
@@ -711,6 +714,8 @@ declare class test_loadprefab implements IState {
     scene: gd3d.framework.scene;
     renderer: gd3d.framework.meshRenderer[];
     skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    refreshTexture(tran: gd3d.framework.transform): void;
+    refreshAniclip(tran: gd3d.framework.transform): void;
     start(app: gd3d.framework.application): void;
     private changeShader();
     change(sha: gd3d.framework.shader): void;

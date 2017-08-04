@@ -2,6 +2,66 @@ class test_loadMulBundle implements IState
 {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    refreshTexture(tran:gd3d.framework.transform)
+    {
+        let meshrenderer = tran.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
+        let skinnmeshrenderer = tran.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
+        for(let i=0; i<meshrenderer.length; i++)
+        {
+            let v = meshrenderer[i];
+            for(let j=0; j<v.materials.length; j++)
+            {
+                for(let k in v.materials[j].mapUniform)
+                {
+                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    {
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        v.materials[j].setTexture(k, textur);
+                    }
+                }
+                
+            }
+        }
+        for(let i=0; i<skinnmeshrenderer.length; i++)
+        {
+            let v = skinnmeshrenderer[i];
+            for(let j=0; j<v.materials.length; j++)
+            {
+                for(let k in v.materials[j].mapUniform)
+                {
+                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    {
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        v.materials[j].setTexture(k, textur);
+                    }
+                }
+                
+            }
+        }
+    }
+    
+    refreshAniclip(tran:gd3d.framework.transform)
+    {
+        let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
+        for(let i=0; i<anipalyer.length; i++)
+        {
+            for(let j=0; j<anipalyer[i].clips.length; j++)
+            {
+                let v = anipalyer[i].clips[j];
+                anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+            }
+            
+            anipalyer[i].playByIndex(0);
+        }
+    }
+
+    refreshLightMap(scene:gd3d.framework.scene, rawscene:gd3d.framework.rawscene)
+    {
+        scene.lightmaps = [];
+        rawscene.resetLightMap(this.app.getAssetMgr());
+        rawscene.useLightMap(this.app.getScene());
+        rawscene.useFog(this.app.getScene());
+    }
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
@@ -16,14 +76,12 @@ class test_loadMulBundle implements IState
         {
             if (state.isfinish)
             {
-                
                 this.app.getAssetMgr().load("res/scenes/"+name+"/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
                     if(s1.isfinish)
                     {
                         var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
                         var _root = _scene.getSceneRoot();
                         this.scene.addChild(_root);
-                        // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
                         _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
                         _root.markDirty();
                         
@@ -32,44 +90,8 @@ class test_loadMulBundle implements IState
                         {
                             if(s.isfinish)
                             {
-                                let meshrenderer = this.scene.getRoot().gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
-                                let skinnmeshrenderer = this.scene.getRoot().gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
-                                for(let i=0; i<meshrenderer.length; i++)
-                                {
-                                    let v = meshrenderer[i];
-                                    for(let j=0; j<v.materials.length; j++)
-                                    {
-                                        for(let k in v.materials[j].mapUniform)
-                                        {
-                                            if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
-                                            {
-                                                let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
-                                                v.materials[j].setTexture(k, textur);
-                                            }
-                                        }
-                                        
-                                    }
-                                }
-                                for(let i=0; i<skinnmeshrenderer.length; i++)
-                                {
-                                    let v = skinnmeshrenderer[i];
-                                    for(let j=0; j<v.materials.length; j++)
-                                    {
-                                        for(let k in v.materials[j].mapUniform)
-                                        {
-                                            if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
-                                            {
-                                                let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
-                                                v.materials[j].setTexture(k, textur);
-                                            }
-                                        }
-                                        
-                                    }
-                                }
-                                this.app.getScene().lightmaps = [];
-                                _scene.resetLightMap(this.app.getAssetMgr());
-                                _scene.useLightMap(this.app.getScene());
-                                _scene.useFog(this.app.getScene());
+                                this.refreshTexture(this.app.getScene().getRoot());
+                                this.refreshLightMap(this.app.getScene(), _scene);
                             }
                         });
                         
@@ -78,71 +100,11 @@ class test_loadMulBundle implements IState
                         {
                             if(s.isfinish)
                             {
-                                
-                                let anipalyer = this.app.getScene().getRoot().gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
-                                for(let i=0; i<anipalyer.length; i++)
-                                {
-                                    for(let j=0; j<anipalyer[i].clips.length; j++)
-                                    {
-                                        let v = anipalyer[i].clips[j];
-                                        anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
-                                    }
-                                    
-                                    anipalyer[i].playByIndex(0);
-                                }
+                                this.refreshAniclip(this.app.getScene().getRoot());
                             }
                         });
                     }
                 });
-                
-                // this.app.getAssetMgr().load("res/scenes/MainCity/MainCity.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
-                //     if(s1.isfinish)
-                //     {
-                //         var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
-                //         var _root = _scene.getSceneRoot();
-                //         this.scene.addChild(_root);
-                //         // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
-                //         _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
-                //         _root.markDirty();
-                //         this.app.getScene().lightmaps = [];
-                //         _scene.useLightMap(this.app.getScene());
-                //         _scene.useFog(this.app.getScene());
-                //     }
-                // });
-                // this.app.getAssetMgr().load("res/scenes/citycompress/index.json.txt",gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
-                //     if(s1.isfinish)
-                //     {   
-                //         let index = JSON.parse((this.app.getAssetMgr().getAssetByName("index.json.txt") as gd3d.framework.textasset).content);
-                //         let totalLength = index[name + ".assetbundle.json"];
-
-                //         this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json",
-                //         // this.app.getAssetMgr().load("res/scenes/city/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                //         (s) =>
-                //         {
-                //             console.log(s.curtask + "/" + s.totaltask);
-                //             console.log(s.curByteLength+"/"+totalLength);
-                //             console.log(s.bundleLoadState);
-                //             // console.log(s.progress);
-                //             // if(s.isfinish)
-                //             if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded)
-                //             {
-                //                 isloaded = true;
-                //                 console.log(s.isfinish);
-                //                 var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
-                //                 var _root = _scene.getSceneRoot();
-                //                 this.scene.addChild(_root);
-                //                 // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
-                //                 _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
-                //                 _root.markDirty();
-                //                 this.app.getScene().lightmaps = [];
-                //                 _scene.useLightMap(this.app.getScene());
-                //                 _scene.useFog(this.app.getScene());
-                //             }
-                //         });
-
-                //     }
-                // })
-                
             }
         });
         //添加一个摄像机

@@ -4,13 +4,64 @@ class test_loadprefab implements IState
     scene: gd3d.framework.scene;
     renderer: gd3d.framework.meshRenderer[];
     skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    refreshTexture(tran:gd3d.framework.transform)
+    {
+        let meshrenderer = tran.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
+        let skinnmeshrenderer = tran.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
+        for(let i=0; i<meshrenderer.length; i++)
+        {
+            let v = meshrenderer[i];
+            for(let j=0; j<v.materials.length; j++)
+            {
+                for(let k in v.materials[j].mapUniform)
+                {
+                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    {
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        v.materials[j].setTexture(k, textur);
+                    }
+                }
+                
+            }
+        }
+        for(let i=0; i<skinnmeshrenderer.length; i++)
+        {
+            let v = skinnmeshrenderer[i];
+            for(let j=0; j<v.materials.length; j++)
+            {
+                for(let k in v.materials[j].mapUniform)
+                {
+                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    {
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        v.materials[j].setTexture(k, textur);
+                    }
+                }
+                
+            }
+        }
+    }
+    refreshAniclip(tran:gd3d.framework.transform)
+    {
+        let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
+        for(let i=0; i<anipalyer.length; i++)
+        {
+            for(let j=0; j<anipalyer[i].clips.length; j++)
+            {
+                let v = anipalyer[i].clips[j];
+                anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+            }
+            
+            anipalyer[i].playByIndex(0);
+        }
+    }
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        let names: string[] = ["elong", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
+        let names: string[] = ["elongmul", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
         let name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
@@ -37,40 +88,7 @@ class test_loadprefab implements IState
                         {
                             if(s.isfinish)
                             {
-                                let meshrenderer = this.baihu.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
-                                let skinnmeshrenderer = this.baihu.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
-                                for(let i=0; i<meshrenderer.length; i++)
-                                {
-                                    let v = meshrenderer[i];
-                                    for(let j=0; j<v.materials.length; j++)
-                                    {
-                                        for(let k in v.materials[j].mapUniform)
-                                        {
-                                            if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
-                                            {
-                                                let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
-                                                v.materials[j].setTexture(k, textur);
-                                            }
-                                        }
-                                        
-                                    }
-                                }
-                                for(let i=0; i<skinnmeshrenderer.length; i++)
-                                {
-                                    let v = skinnmeshrenderer[i];
-                                    for(let j=0; j<v.materials.length; j++)
-                                    {
-                                        for(let k in v.materials[j].mapUniform)
-                                        {
-                                            if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
-                                            {
-                                                let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
-                                                v.materials[j].setTexture(k, textur);
-                                            }
-                                        }
-                                        
-                                    }
-                                }
+                                this.refreshTexture(this.baihu);
                             }
                         });
                         this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/" + name + "aniclip.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
@@ -78,36 +96,27 @@ class test_loadprefab implements IState
                         {
                             if(s.isfinish)
                             {
-                                
-                                let anipalyer = this.baihu.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
-                                for(let i=0; i<anipalyer.length; i++)
-                                {
-                                    for(let j=0; j<anipalyer[i].clips.length; j++)
-                                    {
-                                        let v = anipalyer[i].clips[j];
-                                        anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
-                                    }
-                                    
-                                    anipalyer[i].playByIndex(0);
-                                }
+                                this.refreshAniclip(this.baihu);
                             }
                         });
                     }
                 });
             }
         });
-        // name="Wing_11";
+        // name="elong";
+        // let isloaded= false;
         // this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         // {
         //     if (state.isfinish)
         //     {
-        //         this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+        //         this.app.getAssetMgr().loadCompressBundle("res/prefabs/" + name + "/" + name + ".assetbundle.json", 
         //             (s) =>
         //             {
         //                 console.log(s.curtask + "/" + s.totaltask);
         //                 console.log(s.curByteLength+"/"+s.totalByteLength);
-        //                 if (s.isfinish)
+        //                 if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Prefab && !isloaded)
         //                 {
+        //                     isloaded = true;
         //                     var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
         //                     this.baihu = _prefab.getCloneTrans();
         //                     this.scene.addChild(this.baihu);
