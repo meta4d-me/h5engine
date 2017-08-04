@@ -29,7 +29,7 @@ void main()
     lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);
 
 	float shadowDepth = unpackRGBAToDepth(texture2D(_Light_Depth, _WorldPos.xy));
-    float worldDepth = (_WorldPos.z +1.)/2.;
+    float worldDepth = (_WorldPos.z +1.)/2.;//不理解这里为啥要做变换。
 
     float _depth = step(shadowDepth + _bias,worldDepth);
     lowp vec4 temvar_4 = vec4(0.5,0.5,0.5,0) * _depth;
