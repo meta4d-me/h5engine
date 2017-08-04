@@ -394,11 +394,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
+    main = __decorate([
+        gd3d.reflect.userCode
+    ], main);
     return main;
 }());
-main = __decorate([
-    gd3d.reflect.userCode
-], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -875,11 +875,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
+    CameraShock = __decorate([
+        gd3d.reflect.nodeComponent
+    ], CameraShock);
     return CameraShock;
 }());
-CameraShock = __decorate([
-    gd3d.reflect.nodeComponent
-], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -1349,7 +1349,8 @@ var demo;
                 "均值滤波",
                 "锐化",
                 "膨胀",
-                "腐蚀"
+                "腐蚀",
+                "HDR"
             ];
             var select = document.createElement("select");
             select.style.top = "240px";
@@ -1459,6 +1460,13 @@ var demo;
                     _this.postQuad.material.setTexture("_MainTex", textcolor);
                     _this.postQuad.material.setFloat("_FilterType", 8);
                     _this.postQuad.material.setFloat("_Step", 0.3);
+                    _this.camera.postQueues.push(_this.postQuad);
+                }
+                else if (select.value == "13") {
+                    _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("hdr_quad.shader.json"));
+                    _this.postQuad.material.setTexture("_MainTex", textcolor);
+                    _this.postQuad.material.setFloat("_K", 1.5);
                     _this.camera.postQueues.push(_this.postQuad);
                 }
             };
@@ -5774,7 +5782,7 @@ var test_ShadowMap = (function () {
         viewCamObj.localTranslate = new gd3d.math.vector3(10, 10, 10);
         viewCamObj.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         this.viewcamera = viewCamObj.gameObject.addComponent("camera");
-        this.viewcamera.backgroundColor = new gd3d.math.color(1, 0.11, 0.11, 1.0);
+        this.viewcamera.backgroundColor = new gd3d.math.color(199 / 255.0, 237 / 255.0, 204 / 255.0, 1.0);
         viewCamObj.markDirty();
         this.ShowUI();
     };
@@ -6998,11 +7006,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
+    testUserCodeUpdate = __decorate([
+        gd3d.reflect.userCode
+    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
-testUserCodeUpdate = __decorate([
-    gd3d.reflect.userCode
-], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {

@@ -665,7 +665,8 @@ namespace demo
                 "均值滤波",
                 "锐化",
                 "膨胀",
-                "腐蚀"
+                "腐蚀",
+                "HDR"
             ];
 
             var select = document.createElement("select");
@@ -793,6 +794,14 @@ namespace demo
                     this.postQuad.material.setTexture("_MainTex", textcolor);
                     this.postQuad.material.setFloat("_FilterType", 8);
                     this.postQuad.material.setFloat("_Step", 0.3);
+                    this.camera.postQueues.push(this.postQuad);
+                }
+                else if (select.value == "13")
+                {
+                    this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
+                    this.postQuad.material.setShader(this.scene.app.getAssetMgr().getShader("hdr_quad.shader.json"));
+                    this.postQuad.material.setTexture("_MainTex", textcolor);
+                    this.postQuad.material.setFloat("_K", 1.5);
                     this.camera.postQueues.push(this.postQuad);
                 }
             };
