@@ -551,8 +551,8 @@
     {
         var hw = 2.0 / width;
         var hh = 2.0 / height;
-        var id = 1.0 / (zfar - znear);
-        var nid = znear / (znear - zfar);
+        var id = 2.0 / (zfar - znear);//-2.0 / (zfar - znear); 为毛是反的 ヽ(●-`Д´-)ノ
+        var nid = (zfar + znear) / (znear - zfar);
 
 
         out.rawData[0] = hw;

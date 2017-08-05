@@ -25,6 +25,7 @@ namespace gd3d.framework
             //最后一个参数true 表示不用camera的clear 配置
             camera._targetAndViewport(this.renderTarget, scene, context, true);
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
+            gd3d.render.glDrawPass.lastZWrite = true;
             context.webgl.clearColor(0, 0, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -51,6 +52,7 @@ namespace gd3d.framework
             camera._targetAndViewport(this.renderTarget, scene, context, true);
 
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
+            gd3d.render.glDrawPass.lastZWrite = true;
             context.webgl.clearColor(0, 0.3, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -88,13 +90,13 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: camera);
         update(delta: number);
     }
-     /**
-     * @public
-     * @language zh_CN
-     * @classdesc
-     * 视锥剔除组件，作为标记存在
-     * @version egret-gd3d 1.0
-     */
+    /**
+    * @public
+    * @language zh_CN
+    * @classdesc
+    * 视锥剔除组件，作为标记存在
+    * @version egret-gd3d 1.0
+    */
     @reflect.nodeComponent
     @reflect.nodeCamera
     export class camera implements INodeComponent
@@ -131,8 +133,11 @@ namespace gd3d.framework
          */
         set near(val: number)
         {
-            if (val >= this.far) val = this.far - 1;
-            if (val < 0.01) val = 0.01;
+            if (this.opvalue > 0)
+            {
+                if (val < 0.01) val = 0.01;
+            }
+            if (val >= this.far) val = this.far - 0.01;
             this._near = val;
         }
         private _far: number = 1000;
@@ -158,8 +163,7 @@ namespace gd3d.framework
          */
         set far(val: number)
         {
-            if (val <= this.near) val = this.near + 1;
-            if (val >= 1000) val = 1000;
+            if (val <= this.near) val = this.near + 0.01;
             this._far = val;
         }
         /**
@@ -169,7 +173,7 @@ namespace gd3d.framework
          * 是否为主相机
          * @version egret-gd3d 1.0
          */
-        public isMainCamera:boolean = false;
+        public isMainCamera: boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -540,7 +544,7 @@ namespace gd3d.framework
         private matProjO: math.matrix = new math.matrix;
         private matProj: math.matrix = new math.matrix;
 
-        private frameVecs:math.vector3[] = [];
+        private frameVecs: math.vector3[] = [];
         /**
          * @public
          * @language zh_CN
@@ -557,6 +561,8 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         size: number = 2;//正交投影的竖向size
+
+        private _opvalue = 1;
         /**
          * @public
          * @language zh_CN
@@ -564,7 +570,21 @@ namespace gd3d.framework
          * 0=正交， 1=透视 中间值可以在两种相机间过度
          * @version egret-gd3d 1.0
          */
-        opvalue: number = 1;//0=正交， 1=透视 中间值可以在两种相机间过度
+        set opvalue(val: number)
+        {
+            if (val > 0 && this._near < 0.01)
+            {
+                this._near = 0.01;
+                if (this._far <= this._near)
+                    this._far = this._near + 0.01;
+            }
+            this._opvalue = val;
+        }
+        get opvalue():number
+        {
+            return this._opvalue;
+        }
+
         /**
          * @private
          */
@@ -587,19 +607,19 @@ namespace gd3d.framework
             out.x = nearpos.x - (nearpos.x - farpos.x) * rate;
             out.y = nearpos.y - (nearpos.y - farpos.y) * rate;
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         fillRenderer(scene: scene)
         {
             scene.renderList.clear();
-            if(scene.app.isFrustumCulling)
+            if (scene.app.isFrustumCulling)
                 this.calcCameraFrame(scene.app);
             this._fillRenderer(scene, scene.getRoot());
         }
         private _fillRenderer(scene: scene, node: transform)
         {
-            if(scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))  return;//视锥测试不通过 直接return
+            if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node)) return;//视锥测试不通过 直接return
             if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
             {
                 scene.renderList.addRenderer(node.gameObject.renderer);
@@ -612,26 +632,26 @@ namespace gd3d.framework
                 }
             }
         }
-         /**
-         * @private
-         */
-        testFrustumCulling(scene: scene, node:transform)
+        /**
+        * @private
+        */
+        testFrustumCulling(scene: scene, node: transform)
         {
-            if(!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
+            if (!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
             let spherecol = node.gameObject.getComponent("spherecollider") as spherecollider;
             let worldPos = node.getWorldTranslate();
 
-            if(!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5])) return false;
-            if(!spherecol.caclPlaneInDir(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7])) return false;
-            if(!spherecol.caclPlaneInDir(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6])) return false;
-            if(!spherecol.caclPlaneInDir(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4])) return false;
-            if(!spherecol.caclPlaneInDir(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6])) return false;
-            if(!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3])) return false;
+            if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5])) return false;
+            if (!spherecol.caclPlaneInDir(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7])) return false;
+            if (!spherecol.caclPlaneInDir(this.frameVecs[3], this.frameVecs[2], this.frameVecs[6])) return false;
+            if (!spherecol.caclPlaneInDir(this.frameVecs[2], this.frameVecs[0], this.frameVecs[4])) return false;
+            if (!spherecol.caclPlaneInDir(this.frameVecs[5], this.frameVecs[7], this.frameVecs[6])) return false;
+            if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[2], this.frameVecs[3])) return false;
             return true;
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean)
         {
             {
@@ -660,6 +680,7 @@ namespace gd3d.framework
                     if (this.clearOption_Color && this.clearOption_Depth)
                     {
                         context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
+                        gd3d.render.glDrawPass.lastZWrite = true;
                         context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                         context.webgl.clearDepth(1.0);
                         context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -667,6 +688,7 @@ namespace gd3d.framework
                     else if (this.clearOption_Depth)
                     {
                         context.webgl.depthMask(true);
+                        gd3d.render.glDrawPass.lastZWrite = true;
                         context.webgl.clearDepth(1.0);
                         context.webgl.clear(context.webgl.DEPTH_BUFFER_BIT);
                     }
@@ -683,9 +705,9 @@ namespace gd3d.framework
 
             }
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         _renderOnce(scene: scene, context: renderContext, drawtype: string)
         {
             context.drawtype = drawtype;
@@ -707,13 +729,13 @@ namespace gd3d.framework
             }
 
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         postQueues: ICameraPostQueue[] = [];
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         renderScene(scene: scene, context: renderContext)
         {
             for (var i = 0; i < scene.renderList.renderLayers.length; i++)
@@ -734,7 +756,7 @@ namespace gd3d.framework
                             {
                                 // var matrixView = math.pool.new_matrix();
                                 // this.calcViewMatrix(matrixView);
-                                var matrixView=context.matrixView;
+                                var matrixView = context.matrixView;
 
                                 var az = math.pool.new_vector3();
                                 var bz = math.pool.new_vector3();
@@ -763,16 +785,16 @@ namespace gd3d.framework
 
 
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         remove()
         {
 
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         clone()
         {
 

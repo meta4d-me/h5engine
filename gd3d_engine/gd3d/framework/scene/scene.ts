@@ -287,7 +287,7 @@ namespace gd3d.framework
             //update 的时候只收集摄像机和灯光信息
             //收集摄像机
             var c = node.gameObject.camera;
-            if (c != null)
+            if (c != null && c.gameObject.visibleInScene)
             {
                 this.renderCameras.push(c);
             }

@@ -45,6 +45,7 @@ namespace gd3d.framework
         public effectBatcher: EffectBatcher;
         public startIndex: number = 0;
 
+        public delayTime: number = 0;
         public actionActive: boolean = false;//当前帧action状态
         public loopFrame: number = Number.MAX_VALUE;//循环帧数
         public active: boolean = true;//激活状态
@@ -53,6 +54,7 @@ namespace gd3d.framework
             this.data = _data;
             this.name = this.data.name;
             this.timelineFrame = {};
+            this.delayTime = _data.delayTime;
             this.initActions();
             this.recordElementLerpAttributes();
         }
@@ -367,7 +369,7 @@ namespace gd3d.framework
         public initFrameData: EffectFrameData;
         public ref: string;//数据整体引用
         public beloop: boolean;
-        public delayTime:number;
+        public delayTime: number = 0;
         public actionData: EffectActionData[];
         public emissionData: Emission;
         clone()
@@ -676,6 +678,7 @@ namespace gd3d.framework
         public frameIndex: number;
         public attrsData: EffectAttrsData;
         public lerpDatas: EffectLerpData[];
+        public delayTime: number;
         clone()
         {
             let framedata = new EffectFrameData();
@@ -755,7 +758,7 @@ namespace gd3d.framework
 
         static beEqual(data0: EffectMatData, data1: EffectMatData)
         {
-            return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture=== data1.alphaTexture;
+            return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
         }
 
         clone(): EffectMatData

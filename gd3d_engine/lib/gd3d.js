@@ -6444,12 +6444,16 @@ var gd3d;
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Float4x4v, _matrixv);
                 }
             };
-            material.prototype.setTexture = function (_id, _texture) {
+            material.prototype.setTexture = function (_id, _texture, resname) {
+                if (resname === void 0) { resname = ""; }
                 if (this.mapUniform[_id] != undefined) {
                     if (this.mapUniform[_id].value) {
                         this.mapUniform[_id].value.unuse();
                     }
                     this.mapUniform[_id].value = _texture;
+                    if (resname != "") {
+                        this.mapUniform[_id].resname = resname;
+                    }
                     if (_texture != null) {
                         _texture.use();
                         var _texelsizeName = _id + "_TexelSize";
@@ -6467,10 +6471,15 @@ var gd3d;
                 }
             };
             material.prototype.uploadUniform = function (pass) {
-                for (var id in this.mapUniform) {
-                    var type = this.mapUniform[id].type;
-                    var value = this.mapUniform[id].value;
-                    var defaultValue = this.mapUniform[id].defaultValue;
+                this.uploadMapUniform(pass, this.mapUniform);
+                this.uploadMapUniform(pass, this.mapUniformTemp);
+                this.uploadMapUniform(pass, framework.shader.getGlobalMapUniform());
+            };
+            material.prototype.uploadMapUniform = function (pass, mapUniform) {
+                for (var id in mapUniform) {
+                    var type = mapUniform[id].type;
+                    var value = mapUniform[id].value;
+                    var defaultValue = mapUniform[id].defaultValue;
                     var target = pass.uniforms[id];
                     if (target == null)
                         continue;
@@ -6503,39 +6512,6 @@ var gd3d;
                             else {
                                 pass.uniformTexture(id, null);
                             }
-                            break;
-                    }
-                }
-                for (var id in this.mapUniformTemp) {
-                    var type = this.mapUniformTemp[id].type;
-                    var value = this.mapUniformTemp[id].value;
-                    var target = pass.uniforms[id];
-                    if (target == null)
-                        continue;
-                    switch (type) {
-                        case gd3d.render.UniformTypeEnum.Float:
-                            pass.uniformFloat(id, value);
-                            break;
-                        case gd3d.render.UniformTypeEnum.Floatv:
-                            pass.uniformFloatv(id, value);
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4:
-                            pass.uniformVec4(id, value);
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4v:
-                            pass.uniformVec4v(id, value);
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4x4:
-                            pass.uniformMatrix(id, value);
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4x4v:
-                            pass.uniformMatrixV(id, value);
-                            break;
-                        case gd3d.render.UniformTypeEnum.Texture:
-                            if (value != null)
-                                pass.uniformTexture(id, value.glTexture);
-                            else
-                                pass.uniformTexture(id, null);
                             break;
                     }
                 }
@@ -6652,7 +6628,7 @@ var gd3d;
                             if (_texture == undefined) {
                                 _texture = assetmgr.getDefaultTexture("grid");
                             }
-                            this.setTexture(i, _texture);
+                            this.setTexture(i, _texture, _value);
                             break;
                         case gd3d.render.UniformTypeEnum.Float:
                             var _value = jsonChild["value"];
@@ -7385,20 +7361,36 @@ var gd3d;
                 var total = 0;
                 return total;
             };
+            rawscene.prototype.resetLightMap = function (assetmgr) {
+                this.lightmaps.length = 0;
+                var lightmapCount = this.lightmapData.length;
+                for (var i = 0; i < lightmapCount; i++) {
+                    if (this.lightmapData[i] == null) {
+                        this.lightmaps.push(null);
+                    }
+                    else {
+                        var lightmapName = this.lightmapData[i].name;
+                        var lightmap = assetmgr.getAssetByName(lightmapName);
+                        if (lightmap)
+                            lightmap.use();
+                        this.lightmaps.push(lightmap);
+                    }
+                }
+            };
             rawscene.prototype.Parse = function (txt, assetmgr) {
                 var _json = JSON.parse(txt);
                 this.rootNode = new framework.transform();
                 this.rootNode.name = this.getName();
                 gd3d.io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
                 this.lightmaps = [];
-                var lightmapData = _json["lightmap"];
-                var lightmapCount = lightmapData.length;
+                this.lightmapData = _json["lightmap"];
+                var lightmapCount = this.lightmapData.length;
                 for (var i = 0; i < lightmapCount; i++) {
-                    if (lightmapData[i] == null) {
+                    if (this.lightmapData[i] == null) {
                         this.lightmaps.push(null);
                     }
                     else {
-                        var lightmapName = lightmapData[i].name;
+                        var lightmapName = this.lightmapData[i].name;
                         var lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle);
                         if (lightmap)
                             lightmap.use();
@@ -7470,6 +7462,7 @@ var gd3d;
                 }
                 this.name = new framework.constText(assetName);
             }
+            shader_1 = shader;
             shader.prototype.getName = function () {
                 return this.name.getText();
             };
@@ -7643,15 +7636,39 @@ var gd3d;
                 }
                 return pass;
             };
+            shader.setGlobal = function (key, value, type) {
+                if (shader_1.mapUniformGlobal == undefined)
+                    shader_1.mapUniformGlobal = {};
+                if (shader_1.mapUniformGlobal[key] != undefined)
+                    shader_1.mapUniformGlobal[key].value = value;
+                else
+                    shader_1.mapUniformGlobal[key] = new framework.UniformData(type, value);
+            };
+            shader.setGlobalFloat = function (key, value) {
+                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float);
+            };
+            shader.setGlobalVector4 = function (key, value) {
+                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float4);
+            };
+            shader.setGlobalMatrix = function (key, value) {
+                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float4x4);
+            };
+            shader.setGlobalTexture = function (key, value) {
+                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Texture);
+            };
+            shader.getGlobalMapUniform = function () {
+                return shader_1.mapUniformGlobal;
+            };
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
             ], shader.prototype, "name", void 0);
-            shader = __decorate([
+            shader = shader_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
             ], shader);
             return shader;
+            var shader_1;
         }());
         framework.shader = shader;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -8566,6 +8583,7 @@ var gd3d;
             cameraPostQueue_Depth.prototype.render = function (scene, context, camera) {
                 camera._targetAndViewport(this.renderTarget, scene, context, true);
                 context.webgl.depthMask(true);
+                gd3d.render.glDrawPass.lastZWrite = true;
                 context.webgl.clearColor(0, 0, 0, 0);
                 context.webgl.clearDepth(1.0);
                 context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -8583,6 +8601,7 @@ var gd3d;
             cameraPostQueue_Quad.prototype.render = function (scene, context, camera) {
                 camera._targetAndViewport(this.renderTarget, scene, context, true);
                 context.webgl.depthMask(true);
+                gd3d.render.glDrawPass.lastZWrite = true;
                 context.webgl.clearColor(0, 0.3, 0, 0);
                 context.webgl.clearDepth(1.0);
                 context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -8625,7 +8644,7 @@ var gd3d;
                 this.frameVecs = [];
                 this.fov = Math.PI * 0.25;
                 this.size = 2;
-                this.opvalue = 1;
+                this._opvalue = 1;
                 this.postQueues = [];
             }
             Object.defineProperty(camera.prototype, "near", {
@@ -8633,10 +8652,12 @@ var gd3d;
                     return this._near;
                 },
                 set: function (val) {
+                    if (this.opvalue > 0) {
+                        if (val < 0.01)
+                            val = 0.01;
+                    }
                     if (val >= this.far)
-                        val = this.far - 1;
-                    if (val < 0.01)
-                        val = 0.01;
+                        val = this.far - 0.01;
                     this._near = val;
                 },
                 enumerable: true,
@@ -8648,9 +8669,7 @@ var gd3d;
                 },
                 set: function (val) {
                     if (val <= this.near)
-                        val = this.near + 1;
-                    if (val >= 1000)
-                        val = 1000;
+                        val = this.near + 0.01;
                     this._far = val;
                 },
                 enumerable: true,
@@ -8810,6 +8829,21 @@ var gd3d;
                 this.frameVecs.push(farRT);
                 this.frameVecs.push(nearRT);
             };
+            Object.defineProperty(camera.prototype, "opvalue", {
+                get: function () {
+                    return this._opvalue;
+                },
+                set: function (val) {
+                    if (val > 0 && this._near < 0.01) {
+                        this._near = 0.01;
+                        if (this._far <= this._near)
+                            this._far = this._near + 0.01;
+                    }
+                    this._opvalue = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
             camera.prototype.getPosAtXPanelInViewCoordinateByScreenPos = function (screenPos, app, z, out) {
                 var vpp = new gd3d.math.rect();
                 this.calcViewPortPixel(app, vpp);
@@ -8882,12 +8916,14 @@ var gd3d;
                     if (withoutClear == false) {
                         if (this.clearOption_Color && this.clearOption_Depth) {
                             context.webgl.depthMask(true);
+                            gd3d.render.glDrawPass.lastZWrite = true;
                             context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                             context.webgl.clearDepth(1.0);
                             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
                         }
                         else if (this.clearOption_Depth) {
                             context.webgl.depthMask(true);
+                            gd3d.render.glDrawPass.lastZWrite = true;
                             context.webgl.clearDepth(1.0);
                             context.webgl.clear(context.webgl.DEPTH_BUFFER_BIT);
                         }
@@ -9003,13 +9039,13 @@ var gd3d;
                 this.autoplay = true;
                 this.state = framework.EffectPlayStateEnum.None;
                 this.curFrameId = -1;
-                this.frameId = 0;
                 this.playTimer = 0;
                 this.speed = 1;
                 this.parser = new gd3d.framework.EffectParser();
                 this.vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
                 this.effectBatchers = [];
                 this.matDataGroups = [];
+                this.delayElements = [];
             }
             effectSystem_1 = effectSystem;
             effectSystem.prototype.setJsonData = function (_jsonData) {
@@ -9067,12 +9103,20 @@ var gd3d;
                 }
             };
             effectSystem.prototype._update = function (delta) {
+                if (this.delayElements.length > 0) {
+                    for (var i = this.delayElements.length - 1; i >= 0; i--) {
+                        if (this.delayElements[i].delayTime <= this.playTimer) {
+                            this.addElement(this.delayElements[i]);
+                            this.delayElements.splice(i, 1);
+                        }
+                    }
+                }
                 if (this.checkFrameId()) {
                     for (var i in this.effectBatchers) {
                         var subEffectBatcher = this.effectBatchers[i];
                         for (var key in subEffectBatcher.effectElements) {
                             var element = subEffectBatcher.effectElements[key];
-                            var frameId = this.curFrameId % element.loopFrame;
+                            var frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
                             if (element.active) {
                                 element.actionActive = false;
                                 this.mergeLerpAttribData(element.curAttrData, element.timelineFrame[frameId]);
@@ -9090,7 +9134,6 @@ var gd3d;
                         }
                     }
                     if (this.particles != undefined) {
-                        this.frameId = this.curFrameId % this.particles.loopFrame;
                         this.particles.update(1 / effectSystem_1.fps);
                     }
                 }
@@ -9257,18 +9300,26 @@ var gd3d;
             effectSystem.prototype.addElements = function () {
                 for (var index in this.data.elements) {
                     var data = this.data.elements[index];
-                    if (data.type == framework.EffectElementTypeEnum.EmissionType) {
-                        if (this.particles == undefined) {
-                            this.particles = new framework.Particles(this);
-                        }
-                        this.particles.addEmission(data);
+                    if (data.delayTime > 0) {
+                        this.delayElements.push(data);
                     }
-                    else if (data.type == framework.EffectElementTypeEnum.SingleMeshType) {
-                        this.addInitFrame(data);
+                    else {
+                        this.addElement(data);
                     }
                 }
                 this.state = framework.EffectPlayStateEnum.BeReady;
                 this.beLoop = this.data.beLoop;
+            };
+            effectSystem.prototype.addElement = function (data) {
+                if (data.type == framework.EffectElementTypeEnum.EmissionType) {
+                    if (this.particles == undefined) {
+                        this.particles = new framework.Particles(this);
+                    }
+                    this.particles.addEmission(data);
+                }
+                else if (data.type == framework.EffectElementTypeEnum.SingleMeshType) {
+                    this.addInitFrame(data);
+                }
             };
             effectSystem.prototype.addInitFrame = function (elementData) {
                 var element = new framework.EffectElement(elementData);
@@ -9378,11 +9429,13 @@ var gd3d;
                 for (var i = 0; i < indexArray.length; i++) {
                     subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
                 }
-                this.effectBatchers[index].beBufferInited = false;
             };
             effectSystem.prototype.setFrameId = function (id) {
                 if (this.state == framework.EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
                     this.curFrameId = id;
+            };
+            effectSystem.prototype.getDelayFrameCount = function (delayTime) {
+                return delayTime * effectSystem_1.fps;
             };
             effectSystem.prototype.checkFrameId = function () {
                 var curid = (effectSystem_1.fps * this.playTimer) | 0;
@@ -9598,7 +9651,6 @@ var gd3d;
         })(LightTypeEnum = framework.LightTypeEnum || (framework.LightTypeEnum = {}));
         var light = (function () {
             function light() {
-                this.isOpen = false;
                 this.spotAngelCos = 0.9;
             }
             light.prototype.start = function () {
@@ -9609,14 +9661,6 @@ var gd3d;
             };
             light.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], light.prototype, "isOpen", void 0);
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], light.prototype, "lightName", void 0);
             light = __decorate([
                 gd3d.reflect.nodeComponent,
                 gd3d.reflect.nodeLight
@@ -12586,6 +12630,9 @@ var gd3d;
                 else {
                     _asset = assetMgr.getAssetByName(assetName, bundlename);
                 }
+                if (_asset == null && type == "animationClip") {
+                    _asset = new gd3d.framework.animationClip(assetName);
+                }
                 {
                     if (instanceObj instanceof Array) {
                         instanceObj.push(_asset);
@@ -13660,8 +13707,8 @@ var gd3d;
         function matrixProject_OrthoLH(width, height, znear, zfar, out) {
             var hw = 2.0 / width;
             var hh = 2.0 / height;
-            var id = 1.0 / (zfar - znear);
-            var nid = znear / (znear - zfar);
+            var id = 2.0 / (zfar - znear);
+            var nid = (zfar + znear) / (znear - zfar);
             out.rawData[0] = hw;
             out.rawData[1] = 0;
             out.rawData[2] = 0;
@@ -14657,12 +14704,14 @@ var gd3d;
         var EffectElement = (function () {
             function EffectElement(_data) {
                 this.startIndex = 0;
+                this.delayTime = 0;
                 this.actionActive = false;
                 this.loopFrame = Number.MAX_VALUE;
                 this.active = true;
                 this.data = _data;
                 this.name = this.data.name;
                 this.timelineFrame = {};
+                this.delayTime = _data.delayTime;
                 this.initActions();
                 this.recordElementLerpAttributes();
             }
@@ -14878,6 +14927,7 @@ var gd3d;
         framework.EffectElement = EffectElement;
         var EffectElementData = (function () {
             function EffectElementData() {
+                this.delayTime = 0;
             }
             EffectElementData.prototype.clone = function () {
                 var elementdata = new EffectElementData();
@@ -16396,6 +16446,8 @@ var gd3d;
                             element.ref = elementData["ref"];
                         if (elementData["beloop"] != undefined)
                             element.beloop = elementData["beloop"];
+                        if (elementData["delaytime"] != undefined)
+                            element.delayTime = elementData["delaytime"];
                         if (elementData["type"] != undefined) {
                             switch (elementData["type"]) {
                                 case "singlemesh":
@@ -17282,7 +17334,6 @@ var gd3d;
                 this.totalLife = this.data.life.getValueRandom();
                 this.renderModel = this.data.renderModel;
                 this.curLife = 0;
-                this.startFrameId = this.batcher.emissionElement.effectSys.frameId;
                 var localRandomDirection = this.data.particleStartData.randomDirection;
                 this.speedDir = gd3d.math.pool.clone_vector3(localRandomDirection);
                 var localRandomTranslate = this.data.particleStartData.position;
@@ -17715,7 +17766,6 @@ var gd3d;
                 this.beloop = false;
                 this.simulateInLocalSpace = true;
                 this.active = true;
-                this.delayFlag = false;
                 this.isover = false;
                 this.worldRotation = new gd3d.math.quaternion();
                 this.matToBatcher = new gd3d.math.matrix();
@@ -17727,10 +17777,6 @@ var gd3d;
                 this.gameObject = mgr.effectSys.gameObject;
                 this.beloop = _emission.beloop;
                 this.emissionData = _emission.emissionData;
-                this.delayTime = _emission.emissionData.delayTime;
-                if (this.delayTime > 0) {
-                    this.delayFlag = true;
-                }
                 this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
                 this.perVertexCount = this.emissionData.mesh.data.pos.length;
                 this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
@@ -17764,15 +17810,6 @@ var gd3d;
             };
             EmissionElement.prototype.update = function (delta) {
                 this.curTime += delta;
-                if (this.delayFlag) {
-                    if (this.curTime < this.delayTime) {
-                        return;
-                    }
-                    else {
-                        this.curTime = this.curTime - this.delayTime;
-                        this.delayFlag = false;
-                    }
-                }
                 this.updateEmission(delta);
                 this.updateBatcher(delta);
             };
@@ -18193,7 +18230,6 @@ var gd3d;
             };
             renderContext.prototype.updateModel = function (model) {
                 gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
-                gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this.matrixModelView);
                 gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
             };
             renderContext.prototype.updateModeTrail = function () {
@@ -18389,7 +18425,7 @@ var gd3d;
             };
             scene.prototype.collectCameraAndLight = function (node) {
                 var c = node.gameObject.camera;
-                if (c != null) {
+                if (c != null && c.gameObject.visibleInScene) {
                     this.renderCameras.push(c);
                 }
                 while (this.renderContext.length < this.renderCameras.length) {
@@ -20504,6 +20540,14 @@ var gd3d;
                 }
                 return res;
             };
+            glDrawPass.prototype.getCurBlendVal = function () {
+                var res = "";
+                res = this.formate(this.state_blendSrcRGB.toString(), res);
+                res = this.formate(this.state_blendDestRGB.toString(), res);
+                res = this.formate(this.state_blendSrcAlpha.toString(), res);
+                res = this.formate(this.state_blendDestALpha.toString(), res);
+                return res;
+            };
             glDrawPass.prototype.formate = function (str, out) {
                 return out += str + "_";
             };
@@ -20618,19 +20662,26 @@ var gd3d;
                     }
                     glDrawPass.lastZTest = this.state_ztest;
                 }
-                if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
-                    if (this.state_blend) {
+                if (this.state_blend) {
+                    if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
                         webgl.enable(webgl.BLEND);
-                        if (glDrawPass.lastBlendEquation == undefined || glDrawPass.lastBlendEquation != this.state_blendEquation) {
-                            webgl.blendEquation(this.state_blendEquation);
-                            webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
-                            glDrawPass.lastBlendEquation = this.state_blendEquation;
-                        }
+                        glDrawPass.lastBlend = this.state_blend;
                     }
-                    else {
+                    if (glDrawPass.lastBlendEquation == undefined || glDrawPass.lastBlendEquation != this.state_blendEquation) {
+                        webgl.blendEquation(this.state_blendEquation);
+                    }
+                    var blendVal = this.getCurBlendVal();
+                    if (blendVal != glDrawPass.lastBlendVal) {
+                        webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
+                        glDrawPass.lastBlendVal = blendVal;
+                    }
+                    glDrawPass.lastBlendEquation = this.state_blendEquation;
+                }
+                else {
+                    if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
                         webgl.disable(webgl.BLEND);
+                        glDrawPass.lastBlend = this.state_blend;
                     }
-                    glDrawPass.lastBlend = this.state_blend;
                 }
                 this.program.use(webgl);
                 if (applyUniForm) {
@@ -20840,10 +20891,10 @@ var gd3d;
                 return total;
             };
             glMesh.prototype.bindVboBuffer = function (webgl) {
-                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             };
             glMesh.prototype.bind = function (webgl, shadercode, bindEbo) {
                 if (bindEbo === void 0) { bindEbo = 0; }
+                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 this.bindIndex = bindEbo;
                 if (bindEbo >= 0) {
                     webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[bindEbo]);

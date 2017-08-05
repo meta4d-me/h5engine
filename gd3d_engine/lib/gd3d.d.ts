@@ -1049,6 +1049,7 @@ declare namespace gd3d.framework {
         type: render.UniformTypeEnum;
         value: any;
         defaultValue: any;
+        resname: string;
         constructor(type: render.UniformTypeEnum, value: any, defaultValue?: any);
     }
     class material implements IAsset {
@@ -1080,8 +1081,9 @@ declare namespace gd3d.framework {
         setVector4v(_id: string, _vector4v: Float32Array): void;
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
-        setTexture(_id: string, _texture: gd3d.framework.texture): void;
+        setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
         uploadUniform(pass: render.glDrawPass): void;
+        private uploadMapUniform(pass, mapUniform);
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
@@ -1183,6 +1185,8 @@ declare namespace gd3d.framework {
         use(): void;
         unuse(disposeNow?: boolean): void;
         caclByteLength(): number;
+        resetLightMap(assetmgr: assetMgr): void;
+        private lightmapData;
         Parse(txt: string, assetmgr: assetMgr): void;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
@@ -1227,6 +1231,15 @@ declare namespace gd3d.framework {
         parse(assetmgr: assetMgr, json: any): void;
         private _parseProperties(assetmgr, properties);
         private _parsePass(assetmgr, json);
+        private static mapUniformGlobal;
+        private static setGlobal(key, value, type);
+        static setGlobalFloat(key: string, value: number): void;
+        static setGlobalVector4(key: string, value: math.vector4): void;
+        static setGlobalMatrix(key: string, value: math.matrix): void;
+        static setGlobalTexture(key: string, value: texture): void;
+        static getGlobalMapUniform(): {
+            [id: string]: UniformData;
+        };
     }
 }
 declare namespace gd3d.framework {
@@ -1494,6 +1507,7 @@ declare namespace gd3d.framework {
         private frameVecs;
         fov: number;
         size: number;
+        private _opvalue;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
@@ -1526,7 +1540,6 @@ declare namespace gd3d.framework {
         beLoop: boolean;
         state: EffectPlayStateEnum;
         private curFrameId;
-        frameId: number;
         static fps: number;
         private playTimer;
         private speed;
@@ -1555,9 +1568,12 @@ declare namespace gd3d.framework {
         reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
         private resetSingleMesh();
         private resetparticle();
+        private delayElements;
         private addElements();
+        private addElement(data);
         private addInitFrame(elementData);
         setFrameId(id: number): void;
+        getDelayFrameCount(delayTime: number): number;
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
@@ -1609,8 +1625,6 @@ declare namespace gd3d.framework {
     }
     class light implements INodeComponent {
         gameObject: gameObject;
-        isOpen: boolean;
-        lightName: string;
         type: LightTypeEnum;
         spotAngelCos: number;
         start(): void;
@@ -2245,6 +2259,7 @@ declare namespace gd3d.framework {
         curAttrData: EffectAttrsData;
         effectBatcher: EffectBatcher;
         startIndex: number;
+        delayTime: number;
         actionActive: boolean;
         loopFrame: number;
         active: boolean;
@@ -2301,6 +2316,7 @@ declare namespace gd3d.framework {
         frameIndex: number;
         attrsData: EffectAttrsData;
         lerpDatas: EffectLerpData[];
+        delayTime: number;
         clone(): EffectFrameData;
         dispose(): void;
     }
@@ -2770,7 +2786,6 @@ declare namespace gd3d.framework {
         private speedDir;
         private movespeed;
         private simulationSpeed;
-        startFrameId: number;
         data: Emission;
         private vertexSize;
         private vertexCount;
@@ -2846,8 +2861,6 @@ declare namespace gd3d.framework {
         private beloop;
         simulateInLocalSpace: boolean;
         active: boolean;
-        private delayTime;
-        private delayFlag;
         private _continueSpaceTime;
         perVertexCount: number;
         perIndexxCount: number;
@@ -3394,6 +3407,7 @@ declare namespace gd3d.render {
         static lastZTestMethod: number;
         static lastBlend: boolean;
         static lastBlendEquation: number;
+        static lastBlendVal: string;
         static lastState: string;
         curState: string;
         program: glProgram;
@@ -3419,6 +3433,7 @@ declare namespace gd3d.render {
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
         private getCurDrawState();
+        private getCurBlendVal();
         private formate(str, out);
         uniformFloat(name: string, number: number): void;
         uniformFloatv(name: string, numbers: Float32Array): void;
@@ -3429,6 +3444,7 @@ declare namespace gd3d.render {
         uniformTexture(name: string, tex: render.ITexture): void;
         static textureID: number[];
         use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
+        getLast: any;
         applyUniformSaved(webgl: WebGLRenderingContext): void;
         applyUniform_Float(webgl: WebGLRenderingContext, key: string, value: number): void;
         applyUniform_Floatv(webgl: WebGLRenderingContext, key: string, value: Float32Array): void;

@@ -58,10 +58,7 @@ namespace gd3d.framework
          */
         state: EffectPlayStateEnum = EffectPlayStateEnum.None;
         private curFrameId: number = -1;
-         /**
-         * @private
-         */
-        public frameId: number = 0;
+   
         /**
          * @public
          * @language zh_CN
@@ -188,6 +185,18 @@ namespace gd3d.framework
          */
         private _update(delta: number)
         {
+            if (this.delayElements.length > 0)
+            {
+                for (let i = this.delayElements.length - 1; i >= 0; i--)
+                {
+                    if (this.delayElements[i].delayTime <= this.playTimer)
+                    {
+                        //延时时间到了就添加到effectbatcher中，开始渲染
+                        this.addElement(this.delayElements[i]);
+                        this.delayElements.splice(i, 1);
+                    }
+                }
+            }
             if (this.checkFrameId())
             {
                 for (let i in this.effectBatchers)
@@ -196,7 +205,8 @@ namespace gd3d.framework
                     for (let key in subEffectBatcher.effectElements)
                     {
                         let element = subEffectBatcher.effectElements[key];
-                        let frameId = this.curFrameId % element.loopFrame;
+                        // let frameId = this.curFrameId % element.loopFrame;
+                        let frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
                         if (element.active)
                         {
                             element.actionActive = false;
@@ -219,7 +229,6 @@ namespace gd3d.framework
                 }
                 if (this.particles != undefined)
                 {
-                    this.frameId = this.curFrameId % this.particles.loopFrame;
                     this.particles.update(1 / effectSystem.fps);
                 }
             }
@@ -493,7 +502,7 @@ namespace gd3d.framework
             }
         }
 
-
+        private delayElements: EffectElementData[] = [];
         /**
          * 向特效中增加元素
          */
@@ -502,24 +511,34 @@ namespace gd3d.framework
             for (let index in this.data.elements)
             {
                 let data = this.data.elements[index];
-                if (data.type == EffectElementTypeEnum.EmissionType)
+                if (data.delayTime > 0)
                 {
-                    if (this.particles == undefined)
-                    {
-                        this.particles = new Particles(this);
-                    }
-                    this.particles.addEmission(data);
+                    this.delayElements.push(data);
                 }
-                else if (data.type == EffectElementTypeEnum.SingleMeshType)
+                else
                 {
-                    this.addInitFrame(data);
+                    this.addElement(data);
                 }
-
-                // this.recordElementLerpAttributes(data);
             }
 
             this.state = EffectPlayStateEnum.BeReady;
             this.beLoop = this.data.beLoop;
+        }
+
+        private addElement(data: EffectElementData)
+        {
+            if (data.type == EffectElementTypeEnum.EmissionType)
+            {
+                if (this.particles == undefined)
+                {
+                    this.particles = new Particles(this);
+                }
+                this.particles.addEmission(data);
+            }
+            else if (data.type == EffectElementTypeEnum.SingleMeshType)
+            {
+                this.addInitFrame(data);
+            }
         }
 
         /**
@@ -662,7 +681,7 @@ namespace gd3d.framework
             {
                 subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
             }
-            this.effectBatchers[index].beBufferInited = false;
+            // this.effectBatchers[index].beBufferInited = false;
 
         }
          /**
@@ -672,6 +691,14 @@ namespace gd3d.framework
         {
             if (this.state == EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
                 this.curFrameId = id;
+        }
+
+        /**
+        * @private
+        */
+        public getDelayFrameCount(delayTime: number)
+        {
+            return delayTime * effectSystem.fps;
         }
 
         /**

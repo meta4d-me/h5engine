@@ -885,6 +885,10 @@ namespace gd3d.io
             //     instanceObj.setMesh(_asset);
             // }
             // else
+            if(_asset == null && type == "animationClip")
+            {
+                _asset = new framework.animationClip(assetName);
+            }
             {
                 if (instanceObj instanceof Array)
                 {

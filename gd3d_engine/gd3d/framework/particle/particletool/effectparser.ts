@@ -43,6 +43,8 @@ namespace gd3d.framework
                         element.ref = elementData["ref"];
                     if(elementData["beloop"]!=undefined)
                         element.beloop=elementData["beloop"];
+                    if (elementData["delaytime"] != undefined)
+                        element.delayTime = <number>elementData["delaytime"];
                     if (elementData["type"] != undefined)
                     {
                         switch (elementData["type"])
