@@ -3405,6 +3405,7 @@ declare namespace gd3d.render {
         static lastZTestMethod: number;
         static lastBlend: boolean;
         static lastBlendEquation: number;
+        static lastBlendVal: string;
         static lastState: string;
         curState: string;
         program: glProgram;
@@ -3430,6 +3431,7 @@ declare namespace gd3d.render {
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
         private getCurDrawState();
+        private getCurBlendVal();
         private formate(str, out);
         uniformFloat(name: string, number: number): void;
         uniformFloatv(name: string, numbers: Float32Array): void;
@@ -3440,6 +3442,7 @@ declare namespace gd3d.render {
         uniformTexture(name: string, tex: render.ITexture): void;
         static textureID: number[];
         use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
+        getLast: any;
         applyUniformSaved(webgl: WebGLRenderingContext): void;
         applyUniform_Float(webgl: WebGLRenderingContext, key: string, value: number): void;
         applyUniform_Floatv(webgl: WebGLRenderingContext, key: string, value: Float32Array): void;
