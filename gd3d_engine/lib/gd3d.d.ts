@@ -1572,6 +1572,7 @@ declare namespace gd3d.framework {
         private addElements();
         private addElement(data);
         private addInitFrame(elementData);
+        setFrameId(id: number): void;
         getDelayFrameCount(delayTime: number): number;
         private checkFrameId();
         remove(): void;

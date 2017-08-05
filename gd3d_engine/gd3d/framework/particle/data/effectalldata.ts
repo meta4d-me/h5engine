@@ -202,6 +202,7 @@ namespace gd3d.framework
                         break;
                 }
                 action.init(actiondata.startFrame, actiondata.endFrame, actiondata.params, this);
+                this.actions.push(action);
             }
         }
 
@@ -368,9 +369,7 @@ namespace gd3d.framework
         public initFrameData: EffectFrameData;
         public ref: string;//数据整体引用
         public beloop: boolean;
-
         public delayTime: number = 0;
-
         public actionData: EffectActionData[];
         public emissionData: Emission;
         clone()

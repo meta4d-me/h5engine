@@ -9425,6 +9425,10 @@ var gd3d;
                     subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
                 }
             };
+            effectSystem.prototype.setFrameId = function (id) {
+                if (this.state == framework.EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
+                    this.curFrameId = id;
+            };
             effectSystem.prototype.getDelayFrameCount = function (delayTime) {
                 return delayTime * effectSystem_1.fps;
             };
@@ -14807,6 +14811,7 @@ var gd3d;
                             break;
                     }
                     action.init(actiondata.startFrame, actiondata.endFrame, actiondata.params, this);
+                    this.actions.push(action);
                 }
             };
             EffectElement.prototype.update = function () {
