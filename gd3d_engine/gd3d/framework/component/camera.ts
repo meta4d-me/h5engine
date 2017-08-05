@@ -25,6 +25,7 @@ namespace gd3d.framework
             //最后一个参数true 表示不用camera的clear 配置
             camera._targetAndViewport(this.renderTarget, scene, context, true);
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
+            gd3d.render.glDrawPass.lastZWrite = true;
             context.webgl.clearColor(0, 0, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -51,6 +52,7 @@ namespace gd3d.framework
             camera._targetAndViewport(this.renderTarget, scene, context, true);
 
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
+            gd3d.render.glDrawPass.lastZWrite = true;
             context.webgl.clearColor(0, 0.3, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -678,6 +680,7 @@ namespace gd3d.framework
                     if (this.clearOption_Color && this.clearOption_Depth)
                     {
                         context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
+                        gd3d.render.glDrawPass.lastZWrite = true;
                         context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                         context.webgl.clearDepth(1.0);
                         context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
@@ -685,6 +688,7 @@ namespace gd3d.framework
                     else if (this.clearOption_Depth)
                     {
                         context.webgl.depthMask(true);
+                        gd3d.render.glDrawPass.lastZWrite = true;
                         context.webgl.clearDepth(1.0);
                         context.webgl.clear(context.webgl.DEPTH_BUFFER_BIT);
                     }
