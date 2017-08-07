@@ -53,12 +53,12 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         beLoop: boolean;
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         state: EffectPlayStateEnum = EffectPlayStateEnum.None;
         private curFrameId: number = -1;
-   
+
         /**
          * @public
          * @language zh_CN
@@ -69,28 +69,28 @@ namespace gd3d.framework
         public static fps: number = 30;
         private playTimer: number = 0;
         private speed: number = 1;
-         /**
-         * @private
-         */
-        public webgl:WebGLRenderingContext;
+        /**
+        * @private
+        */
+        public webgl: WebGLRenderingContext;
         // private time: number = 0;
 
         private parser = new gd3d.framework.EffectParser();
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         public vf = gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Normal | render.VertexFormatMask.Tangent | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         //public particleVF=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
 
         private effectBatchers: EffectBatcher[] = [];
         private particles: Particles;//粒子系统 发射器统一管理
         private matDataGroups: EffectMatData[] = [];
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         @gd3d.reflect.Field("textasset")
         jsonData: textasset;
         /**
@@ -102,27 +102,27 @@ namespace gd3d.framework
          */
         setJsonData(_jsonData: textasset)
         {
-            this.webgl=gd3d.framework.sceneMgr.app.webgl;
+            this.webgl = gd3d.framework.sceneMgr.app.webgl;
             this.jsonData = _jsonData;
             this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         set data(value: EffectSystemData)
         {
             this._data = value;
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         get data(): EffectSystemData
         {
             return this._data;
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         init()
         {
             if (this._data)
@@ -131,9 +131,9 @@ namespace gd3d.framework
             }
         }
         private _data: EffectSystemData;
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         get totalFrameCount(): number
         {
             return this.data.life * effectSystem.fps;
@@ -151,12 +151,12 @@ namespace gd3d.framework
             {
                 if (this.state == EffectPlayStateEnum.Play)
                     this.playTimer += delta * this.speed;
-                if(!this.beLoop)
+                if (!this.beLoop)
                 {
-                   if (this.playTimer >= this.data.life)
-                   {
-                       this.stop();
-                   }
+                    if (this.playTimer >= this.data.life)
+                    {
+                        this.stop();
+                    }
                 }
                 this._update(delta);
             }
@@ -165,6 +165,7 @@ namespace gd3d.framework
                 if (this.autoplay)
                 {
                     this.play();
+                    this._update(delta);
                 }
                 else
                 {
@@ -173,6 +174,7 @@ namespace gd3d.framework
                 }
             }
         }
+
         /**
          * 更新特效数据
          * 
@@ -185,15 +187,27 @@ namespace gd3d.framework
         {
             if (this.delayElements.length > 0)
             {
+                if (this.refElements.length > 0)
+                    this.refElements = [];
                 for (let i = this.delayElements.length - 1; i >= 0; i--)
                 {
-                    if (this.delayElements[i].delayTime <= this.playTimer)
+                    let data = this.delayElements[i];
+                    if (data.delayTime <= this.playTimer)
                     {
-                        //延时时间到了就添加到effectbatcher中，开始渲染
-                        this.addElement(this.delayElements[i]);
+                        //延时时间到了就添加到effectbatcher中，开始渲染。先处理没有引用它人的，再处理带引用关系的
+                        if (data.refFrom != undefined)
+                        {
+                            this.refElements.push(data);
+                        } else
+                        {
+                            this.addElement(this.delayElements[i]);
+                        }
                         this.delayElements.splice(i, 1);
                     }
                 }
+                //这里处理的是有延时的refElements
+                if (this.refElements.length > 0)
+                    this.addRefElements();
             }
             if (this.checkFrameId())
             {
@@ -203,6 +217,11 @@ namespace gd3d.framework
                     for (let key in subEffectBatcher.effectElements)
                     {
                         let element = subEffectBatcher.effectElements[key];
+                        if (element.delayTime == undefined || element.delayTime <= this.playTimer)
+                        {
+                            //没有延时或者延时已经结束
+                            subEffectBatcher.mesh.submesh[0].size = element.endEboIndex;
+                        }
                         // let frameId = this.curFrameId % element.loopFrame;
                         let frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
                         if (element.active)
@@ -219,9 +238,9 @@ namespace gd3d.framework
                             }
                         }
                         element.update();
-                        if (element.isActiveFrame(frameId))
+                        if (element.isCurFrameNeedRefresh(frameId))
                         {
-                            this.updateEffectBatcher(element.effectBatcher, element.curAttrData, element.data.initFrameData, element.startIndex);
+                            this.updateEffectBatcher(element.effectBatcher, element.curAttrData, element.data.initFrameData, element.startVboIndex);
                         }
                     }
                 }
@@ -322,7 +341,7 @@ namespace gd3d.framework
                         b = curAttrsData.color.z;
                     }
                     if (curAttrsData.alpha != undefined)
-                        a =a*curAttrsData.alpha;//配置的alpha作为整体的百分比使用 源alpha依然是具体顶点的
+                        a = a * curAttrsData.alpha;//配置的alpha作为整体的百分比使用 源alpha依然是具体顶点的
                     if (curAttrsData.colorRate != undefined)
                     {
                         r *= curAttrsData.colorRate;
@@ -368,7 +387,7 @@ namespace gd3d.framework
                 {
                     let subEffectBatcher = this.effectBatchers[i];
                     let mesh = subEffectBatcher.mesh;
-                    if (!subEffectBatcher.beBufferInited)
+                    if (subEffectBatcher.state === EffectBatcherState.NotInitedStateType)
                     {
                         mesh.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
                         if (mesh.glMesh.ebos.length == 0)
@@ -381,8 +400,18 @@ namespace gd3d.framework
                         }
                         mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
                         mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
-                        subEffectBatcher.beBufferInited = true;
+                        subEffectBatcher.state = EffectBatcherState.InitedStateType;
                     }
+                    else if (subEffectBatcher.state === EffectBatcherState.ResizeCapacityStateType)
+                    {
+
+                        mesh.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);//动态修正掉mesh中的ebo大小
+                        mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
+                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                        mesh.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);//动态修正mesh中的vbo大小
+                        subEffectBatcher.state = EffectBatcherState.InitedStateType;
+                    }
+
                     mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
                     if (this.gameObject.getScene().fog)
                     {
@@ -457,7 +486,7 @@ namespace gd3d.framework
          * 重置到初始状态
          * @version egret-gd3d 1.0
          */
-        reset(restSinglemesh:boolean=true,resetParticle:boolean=true)
+        reset(restSinglemesh: boolean = true, resetParticle: boolean = true)
         {
             this.state = EffectPlayStateEnum.BeReady;
             this.gameObject.visible = false;
@@ -485,9 +514,9 @@ namespace gd3d.framework
             if (this.particles != undefined)
                 this.particles.dispose();
 
-            for (let index in this.data.elements)
+            for (let name in this.data.elementDic)
             {
-                let data = this.data.elements[index];
+                let data = this.data.elementDic[name];
                 if (data.type == EffectElementTypeEnum.EmissionType)
                 {
                     if (this.particles == undefined)
@@ -500,26 +529,54 @@ namespace gd3d.framework
         }
 
         private delayElements: EffectElementData[] = [];
+        private refElements: EffectElementData[] = [];
         /**
          * 向特效中增加元素
          */
         private addElements()
         {
-            for (let index in this.data.elements)
+            for (let name in this.data.elementDic)
             {
-                let data = this.data.elements[index];
+                let data = this.data.elementDic[name];
                 if (data.delayTime > 0)
                 {
                     this.delayElements.push(data);
+                    continue;
                 }
-                else
+                if (data.refFrom == undefined)
                 {
                     this.addElement(data);
+                } else
+                {
+                    this.refElements.push(data);
                 }
             }
-
+            //这里处理的是没有延时的refElements
+            this.addRefElements();
             this.state = EffectPlayStateEnum.BeReady;
             this.beLoop = this.data.beLoop;
+        }
+
+        private addRefElements()
+        {
+            while (this.refElements.length > 0)
+            {
+                for (let i = this.refElements.length - 1; i >= 0; i--)
+                {
+                    let data = this.refElements[i];
+                    let refFrom = data.refFrom;
+                    //有就直接处理，没有就跳过，下一轮循环处理
+                    if (this._data.elementDic[refFrom] != undefined)
+                    {
+                        let elementData: EffectElementData = this._data.elementDic[refFrom].clone();
+                        elementData.beloop = data.beloop;
+                        elementData.delayTime = data.delayTime;
+                        elementData.name = data.name;
+                        this.addElement(elementData);
+                        this.refElements.splice(i, 1);
+                    }
+                }
+            }
         }
 
         private addElement(data: EffectElementData)
@@ -562,12 +619,14 @@ namespace gd3d.framework
             }
             let vertexStartIndex = 0;
             let vertexCount = _initFrameData.attrsData.mesh.data.pos.length;//顶点数量
+            let indexCount = _initFrameData.attrsData.mesh.data.genIndexDataArray
             let subEffectBatcher: EffectBatcher = null;
             if (index >= 0)
             {
                 subEffectBatcher = this.effectBatchers[index];
                 vertexStartIndex = subEffectBatcher.curTotalVertexCount;
                 subEffectBatcher.curTotalVertexCount += vertexCount;
+                subEffectBatcher.state = EffectBatcherState.ResizeCapacityStateType;
             } else
             {
                 subEffectBatcher = new EffectBatcher(this.vf);
@@ -609,7 +668,8 @@ namespace gd3d.framework
 
             }
             element.effectBatcher = subEffectBatcher;
-            element.startIndex = vertexStartIndex;
+            element.startVboIndex = vertexStartIndex;
+            // element.endEboIndex = ;vertexStartIndex + vertexCount;
             element.curAttrData = elementData.initFrameData.attrsData.copyandinit();
             let vertexSize = subEffectBatcher.vertexSize;
             let vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
@@ -621,6 +681,7 @@ namespace gd3d.framework
             element.update();
 
             subEffectBatcher.effectElements.push(element);
+
             for (let i = 0; i < vertexCount; i++)
             {
                 {//postion
@@ -673,17 +734,15 @@ namespace gd3d.framework
             var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
             let _startIndex = subEffectBatcher.indexStartIndex;
             subEffectBatcher.indexStartIndex += indexArray.length;
-
+            element.endEboIndex = subEffectBatcher.indexStartIndex;
             for (var i = 0; i < indexArray.length; i++)
             {
                 subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
             }
-            // this.effectBatchers[index].beBufferInited = false;
-
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         public setFrameId(id: number)
         {
             if (this.state == EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
@@ -718,9 +777,9 @@ namespace gd3d.framework
             }
             return false;
         }
-         /**
-         * @private
-         */
+        /**
+        * @private
+        */
         remove()
         {
             this.state = EffectPlayStateEnum.Dispose;
@@ -732,13 +791,13 @@ namespace gd3d.framework
             if (this.particles)
                 this.particles.dispose();
         }
-         /**
-         * @private
-         * 临时测试时显示使用
-         * @readonly
-         * @type {number}
-         * @memberof effectSystem
-         */
+        /**
+        * @private
+        * 临时测试时显示使用
+        * @readonly
+        * @type {number}
+        * @memberof effectSystem
+        */
         public get leftLifeTime(): number
         {
             if (this.data != null)

@@ -30,21 +30,34 @@ namespace gd3d.framework
             }
             if (content["elements"] != undefined)
             {
-                effectData.elements = [];
+                effectData.elementDic = {};
                 let elements = <any[]>content["elements"];
                 for (let i in elements)
                 {
                     let element = new EffectElementData();
-                    effectData.elements.push(element);
                     let elementData = elements[i];
                     if (elementData["name"] != undefined)
+                    {
                         element.name = elementData["name"];
-                    if (elementData["ref"] != undefined)
-                        element.ref = elementData["ref"];
-                    if(elementData["beloop"]!=undefined)
-                        element.beloop=elementData["beloop"];
+                        if (effectData.elementDic[element.name] == undefined)
+                            effectData.elementDic[element.name] = element;
+                        else
+                            console.error("特效中元素的名字重复：" + element.name);
+                    }
+                    else
+                    {
+                        console.error("未设置特效中元素的名字！");
+                        continue;
+                    }
+                    if (elementData["beloop"] != undefined)
+                        element.beloop = elementData["beloop"];
                     if (elementData["delaytime"] != undefined)
                         element.delayTime = <number>elementData["delaytime"];
+                    if (elementData["ref"] != undefined)
+                    {
+                        element.refFrom = elementData["ref"];
+                        continue;
+                    }
                     if (elementData["type"] != undefined)
                     {
                         switch (elementData["type"])
@@ -259,9 +272,9 @@ namespace gd3d.framework
                         //         data.beLoop=true;
                         //     }
                         // }
-                        if(_data["simulateinlocal"]!=undefined)
+                        if (_data["simulateinlocal"] != undefined)
                         {
-                            data.simulateInLocalSpace=_data["simulateinlocal"];
+                            data.simulateInLocalSpace = _data["simulateinlocal"];
                         }
 
                         if (_data["maxcount"] != undefined)
@@ -278,29 +291,29 @@ namespace gd3d.framework
                         //     data.pos = this._parseToObjData("pos", _data["pos"]);
                         // if (_data["shape"] != undefined)
                         //     data.shape = _data["shape"];
-                        if(_data["rootpos"]!=undefined)
+                        if (_data["rootpos"] != undefined)
                         {
-                            data.rootpos=EffectUtil.parseVector3(_data["rootpos"]);
+                            data.rootpos = EffectUtil.parseVector3(_data["rootpos"]);
                         }
                         else
                         {
-                            data.rootpos=new gd3d.math.vector3();
+                            data.rootpos = new gd3d.math.vector3();
                         }
-                        if(_data["rootRotAngle"]!=undefined)
+                        if (_data["rootRotAngle"] != undefined)
                         {
-                            data.rootRotAngle=EffectUtil.parseVector3(_data["rootRotAngle"]);
-                        }
-                        else
-                        {
-                            data.rootRotAngle=new gd3d.math.vector3();
-                        }
-                        if(_data["rootscale"])
-                        {
-                            data.rootScale=EffectUtil.parseVector3(_data["rootscale"]);
+                            data.rootRotAngle = EffectUtil.parseVector3(_data["rootRotAngle"]);
                         }
                         else
                         {
-                            data.rootScale=new gd3d.math.vector3(1,1,1);
+                            data.rootRotAngle = new gd3d.math.vector3();
+                        }
+                        if (_data["rootscale"])
+                        {
+                            data.rootScale = EffectUtil.parseVector3(_data["rootscale"]);
+                        }
+                        else
+                        {
+                            data.rootScale = new gd3d.math.vector3(1, 1, 1);
                         }
                         if (_data["moveSpeed"] != undefined)
                             data.moveSpeed = this._parseToObjData("moveSpeed", _data["moveSpeed"]);

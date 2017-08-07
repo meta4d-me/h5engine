@@ -38,200 +38,200 @@ class test_effecteditor implements IState
         lighttool.htmlui.panelMgr.instance().init(div);
         this.gui.onchange = () =>
         {
-            if (this.gui.add_Button("new particle"))
-            {
-                this.transformRoot = new gd3d.framework.transform();
-                this.effectSystem = this.transformRoot.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
-                this.effectSysData = new gd3d.framework.EffectSystemData();
-                this.effectSysData.beLoop = false;
-                this.effectSysData.life = 0;
-                this.effectSysData.elements = [];
-            }
-            if (this.effectSystem != undefined)
-            {
-                if (this.gui.add_Button("add element"))
-                {
-                    this.addElement();
-                }
-                if (this.effectSysData.elements.length > 0)
-                {
-                    this.gui.beginLayout_H();
-                    this.gui.add_A("life:");
-                    this.setVal(this.gui.add_Textbox("5"), "life", this.effectSysData);
-                    this.gui.endLayout();
-                    this.gui.beginLayout_H();
-                    this.gui.add_A("Position:");
-                    this.gui.add_A(" x");
-                    this.setVal(this.gui.add_Textbox("0"), "x", this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    this.gui.add_A(" y");
-                    this.setVal(this.gui.add_Textbox("0"), "y", this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    this.gui.add_A(" z");
-                    this.setVal(this.gui.add_Textbox("0"), "z", this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    this.gui.endLayout();
+            // if (this.gui.add_Button("new particle"))
+            // {
+            //     this.transformRoot = new gd3d.framework.transform();
+            //     this.effectSystem = this.transformRoot.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
+            //     this.effectSysData = new gd3d.framework.EffectSystemData();
+            //     this.effectSysData.beLoop = false;
+            //     this.effectSysData.life = 0;
+            //     this.effectSysData.elements = [];
+            // }
+            // if (this.effectSystem != undefined)
+            // {
+            //     if (this.gui.add_Button("add element"))
+            //     {
+            //         this.addElement();
+            //     }
+            //     if (this.effectSysData.elements.length > 0)
+            //     {
+            //         this.gui.beginLayout_H();
+            //         this.gui.add_A("life:");
+            //         this.setVal(this.gui.add_Textbox("5"), "life", this.effectSysData);
+            //         this.gui.endLayout();
+            //         this.gui.beginLayout_H();
+            //         this.gui.add_A("Position:");
+            //         this.gui.add_A(" x");
+            //         this.setVal(this.gui.add_Textbox("0"), "x", this.effectSysData.elements[0].initFrameData.attrsData.pos);
+            //         this.gui.add_A(" y");
+            //         this.setVal(this.gui.add_Textbox("0"), "y", this.effectSysData.elements[0].initFrameData.attrsData.pos);
+            //         this.gui.add_A(" z");
+            //         this.setVal(this.gui.add_Textbox("0"), "z", this.effectSysData.elements[0].initFrameData.attrsData.pos);
+            //         this.gui.endLayout();
 
-                    this.gui.beginLayout_H();
-                    this.gui.add_A("Euler:");
-                    this.gui.add_A(" x");
-                    this.setVal(this.gui.add_Textbox("0"), "x", this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    this.gui.add_A(" y");
-                    this.setVal(this.gui.add_Textbox("0"), "y", this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    this.gui.add_A(" z");
-                    this.setVal(this.gui.add_Textbox("0"), "z", this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    this.gui.endLayout();
+            //         this.gui.beginLayout_H();
+            //         this.gui.add_A("Euler:");
+            //         this.gui.add_A(" x");
+            //         this.setVal(this.gui.add_Textbox("0"), "x", this.effectSysData.elements[0].initFrameData.attrsData.euler);
+            //         this.gui.add_A(" y");
+            //         this.setVal(this.gui.add_Textbox("0"), "y", this.effectSysData.elements[0].initFrameData.attrsData.euler);
+            //         this.gui.add_A(" z");
+            //         this.setVal(this.gui.add_Textbox("0"), "z", this.effectSysData.elements[0].initFrameData.attrsData.euler);
+            //         this.gui.endLayout();
 
-                    this.gui.beginLayout_H();
-                    this.gui.add_A("Scale:");
-                    this.gui.add_A(" x");
-                    this.setVal(this.gui.add_Textbox("1"), "x", this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    this.gui.add_A(" y");
-                    this.setVal(this.gui.add_Textbox("1"), "y", this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    this.gui.add_A(" z");
-                    this.setVal(this.gui.add_Textbox("1"), "z", this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    this.gui.endLayout();
+            //         this.gui.beginLayout_H();
+            //         this.gui.add_A("Scale:");
+            //         this.gui.add_A(" x");
+            //         this.setVal(this.gui.add_Textbox("1"), "x", this.effectSysData.elements[0].initFrameData.attrsData.scale);
+            //         this.gui.add_A(" y");
+            //         this.setVal(this.gui.add_Textbox("1"), "y", this.effectSysData.elements[0].initFrameData.attrsData.scale);
+            //         this.gui.add_A(" z");
+            //         this.setVal(this.gui.add_Textbox("1"), "z", this.effectSysData.elements[0].initFrameData.attrsData.scale);
+            //         this.gui.endLayout();
 
-                    this.gui.beginLayout_H();
-                    this.gui.add_A("Color:");
-                    this.gui.add_A(" x");
-                    this.setVal(this.gui.add_Textbox("1"), "x", this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    this.gui.add_A(" y");
-                    this.setVal(this.gui.add_Textbox("1"), "y", this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    this.gui.add_A(" z");
-                    this.setVal(this.gui.add_Textbox("1"), "z", this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    this.gui.endLayout();
+            //         this.gui.beginLayout_H();
+            //         this.gui.add_A("Color:");
+            //         this.gui.add_A(" x");
+            //         this.setVal(this.gui.add_Textbox("1"), "x", this.effectSysData.elements[0].initFrameData.attrsData.color);
+            //         this.gui.add_A(" y");
+            //         this.setVal(this.gui.add_Textbox("1"), "y", this.effectSysData.elements[0].initFrameData.attrsData.color);
+            //         this.gui.add_A(" z");
+            //         this.setVal(this.gui.add_Textbox("1"), "z", this.effectSysData.elements[0].initFrameData.attrsData.color);
+            //         this.gui.endLayout();
 
-                    this.gui.beginLayout_H();
-                    this.gui.add_A("拖拽选择mesh文件");
-                    let fileList = this.gui.add_DragFile();
-                    if (fileList != null && fileList.length > 0)
-                    {
-                        let file = fileList[0];
-                        this.effectSysData.elements[0].initFrameData.attrsData.mesh = this.app.getAssetMgr().getAssetByName(file.name) as gd3d.framework.mesh;
-                        console.log(file.name);
-                    }
-                    if (this.effectSysData.elements[0].initFrameData.attrsData.mesh != null)
-                        this.gui.add_A(this.effectSysData.elements[0].initFrameData.attrsData.mesh.getName());
-                    this.gui.endLayout();
-                    if (this.gui.add_Button("创建材质"))
-                    {
-                        let matData = new gd3d.framework.EffectMatData();
-                        this.effectSysData.elements[0].initFrameData.attrsData.mat = matData;
-                    }
-                    if (this.effectSysData.elements[0].initFrameData.attrsData.mat != undefined)
-                    {
-                        this.gui.beginLayout_H();
-                        this.gui.add_A("拖拽选择shader");
-                        let fileList = this.gui.add_DragFile();
-                        if (fileList != null && fileList.length > 0)
-                        {
-                            let file = fileList[0];
-                            this.effectSysData.elements[0].initFrameData.attrsData.mat.shader = this.app.getAssetMgr().getShader(file.name) as gd3d.framework.shader;
-                            console.log(file.name);
-                        }
-                        if (this.effectSysData.elements[0].initFrameData.attrsData.mat.shader != null)
-                            this.gui.add_A(this.effectSysData.elements[0].initFrameData.attrsData.mat.shader.getName());
-                        this.gui.endLayout();
+            //         this.gui.beginLayout_H();
+            //         this.gui.add_A("拖拽选择mesh文件");
+            //         let fileList = this.gui.add_DragFile();
+            //         if (fileList != null && fileList.length > 0)
+            //         {
+            //             let file = fileList[0];
+            //             this.effectSysData.elements[0].initFrameData.attrsData.mesh = this.app.getAssetMgr().getAssetByName(file.name) as gd3d.framework.mesh;
+            //             console.log(file.name);
+            //         }
+            //         if (this.effectSysData.elements[0].initFrameData.attrsData.mesh != null)
+            //             this.gui.add_A(this.effectSysData.elements[0].initFrameData.attrsData.mesh.getName());
+            //         this.gui.endLayout();
+            //         if (this.gui.add_Button("创建材质"))
+            //         {
+            //             let matData = new gd3d.framework.EffectMatData();
+            //             this.effectSysData.elements[0].initFrameData.attrsData.mat = matData;
+            //         }
+            //         if (this.effectSysData.elements[0].initFrameData.attrsData.mat != undefined)
+            //         {
+            //             this.gui.beginLayout_H();
+            //             this.gui.add_A("拖拽选择shader");
+            //             let fileList = this.gui.add_DragFile();
+            //             if (fileList != null && fileList.length > 0)
+            //             {
+            //                 let file = fileList[0];
+            //                 this.effectSysData.elements[0].initFrameData.attrsData.mat.shader = this.app.getAssetMgr().getShader(file.name) as gd3d.framework.shader;
+            //                 console.log(file.name);
+            //             }
+            //             if (this.effectSysData.elements[0].initFrameData.attrsData.mat.shader != null)
+            //                 this.gui.add_A(this.effectSysData.elements[0].initFrameData.attrsData.mat.shader.getName());
+            //             this.gui.endLayout();
 
-                        this.gui.beginLayout_H();
-                        this.gui.add_A("拖拽选择贴图");
-                        fileList = this.gui.add_DragFile();
-                        if (fileList != null && fileList.length > 0)
-                        {
-                            let file = fileList[0];
-                            this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture = this.app.getAssetMgr().getAssetByName(file.name) as gd3d.framework.texture;
-                            console.log(file.name);
-                        }
-                        if (this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture != null)
-                            this.gui.add_A(this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture.getName());
-                        this.gui.endLayout();
-                    }
+            //             this.gui.beginLayout_H();
+            //             this.gui.add_A("拖拽选择贴图");
+            //             fileList = this.gui.add_DragFile();
+            //             if (fileList != null && fileList.length > 0)
+            //             {
+            //                 let file = fileList[0];
+            //                 this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture = this.app.getAssetMgr().getAssetByName(file.name) as gd3d.framework.texture;
+            //                 console.log(file.name);
+            //             }
+            //             if (this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture != null)
+            //                 this.gui.add_A(this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture.getName());
+            //             this.gui.endLayout();
+            //         }
 
 
-                    this.gui.add_A("TimeLine:");
-                    this.gui.beginLayout_V();
-                    this.gui.add_A("frameIndex:");
-                    let val = this.gui.add_Textbox("30");
-                    if (this.gui.add_Button("Add Breath Action"))
-                    {
-                        if (val != "")
-                        {
-                            try
-                            {
-                                let v = parseFloat(val);
-                                if (this.effectSysData.elements[0].timelineFrame == undefined)
-                                    this.effectSysData.elements[0].timelineFrame = {};
-                                if (this.effectSysData.elements[0].timelineFrame[v] == undefined)
-                                    this.effectSysData.elements[0].timelineFrame[v] = new gd3d.framework.EffectFrameData();
-                                this.effectSysData.elements[0].timelineFrame[v].frameIndex = v;
-                                let action = new gd3d.framework.EffectActionData();
-                                action.actionType = "breath";
-                                action.startFrame = v;
-                                this.effectSysData.elements[0].actionData = [];
-                                this.effectSysData.elements[0].actionData.push(action);
-                            } catch (e)
-                            {
+            //         this.gui.add_A("TimeLine:");
+            //         this.gui.beginLayout_V();
+            //         this.gui.add_A("frameIndex:");
+            //         let val = this.gui.add_Textbox("30");
+            //         if (this.gui.add_Button("Add Breath Action"))
+            //         {
+            //             if (val != "")
+            //             {
+            //                 try
+            //                 {
+            //                     let v = parseFloat(val);
+            //                     if (this.effectSysData.elements[0].timelineFrame == undefined)
+            //                         this.effectSysData.elements[0].timelineFrame = {};
+            //                     if (this.effectSysData.elements[0].timelineFrame[v] == undefined)
+            //                         this.effectSysData.elements[0].timelineFrame[v] = new gd3d.framework.EffectFrameData();
+            //                     this.effectSysData.elements[0].timelineFrame[v].frameIndex = v;
+            //                     let action = new gd3d.framework.EffectActionData();
+            //                     action.actionType = "breath";
+            //                     action.startFrame = v;
+            //                     this.effectSysData.elements[0].actionData = [];
+            //                     this.effectSysData.elements[0].actionData.push(action);
+            //                 } catch (e)
+            //                 {
 
-                            }
-                        }
-                    }
-                    if (this.effectSysData.elements[0].actionData != undefined && this.effectSysData.elements[0].actionData.length > 0)
-                    {
-                        this.scaleChecked = this.gui.add_Checkbox("scale", this.scaleChecked);
-                        if (this.scaleChecked)
-                        {
-                            this.positionChecked = false;
-                            this.eulerChecked = false;
-                        }
-                        this.positionChecked = this.gui.add_Checkbox("position", this.positionChecked);
-                        if (this.positionChecked)
-                        {
-                            this.scaleChecked = false;
-                            this.eulerChecked = false;
-                        }
-                        this.eulerChecked = this.gui.add_Checkbox("euler", this.eulerChecked);
-                        if (this.eulerChecked)
-                        {
-                            this.positionChecked = false;
-                            this.scaleChecked = false;
-                        }
+            //                 }
+            //             }
+            //         }
+            //         if (this.effectSysData.elements[0].actionData != undefined && this.effectSysData.elements[0].actionData.length > 0)
+            //         {
+            //             this.scaleChecked = this.gui.add_Checkbox("scale", this.scaleChecked);
+            //             if (this.scaleChecked)
+            //             {
+            //                 this.positionChecked = false;
+            //                 this.eulerChecked = false;
+            //             }
+            //             this.positionChecked = this.gui.add_Checkbox("position", this.positionChecked);
+            //             if (this.positionChecked)
+            //             {
+            //                 this.scaleChecked = false;
+            //                 this.eulerChecked = false;
+            //             }
+            //             this.eulerChecked = this.gui.add_Checkbox("euler", this.eulerChecked);
+            //             if (this.eulerChecked)
+            //             {
+            //                 this.positionChecked = false;
+            //                 this.scaleChecked = false;
+            //             }
 
-                        if (this.scaleChecked)
-                        {
-                            if (this.effectSysData.elements[0].actionData[0].params == undefined)
-                                this.effectSysData.elements[0].actionData[0].params = {};
-                            this.effectSysData.elements[0].actionData[0].params["name"] = "scale";
-                            this.gui.beginLayout_H();
-                            this.gui.add_A("startvalue:");
-                            this.gui.add_A(" x");
-                            this.setVal(this.gui.add_Textbox("2"), "x", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            this.gui.add_A(" y");
-                            this.setVal(this.gui.add_Textbox("2"), "y", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            this.gui.add_A(" z");
-                            this.setVal(this.gui.add_Textbox("2"), "z", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            this.gui.endLayout();
+            //             if (this.scaleChecked)
+            //             {
+            //                 if (this.effectSysData.elements[0].actionData[0].params == undefined)
+            //                     this.effectSysData.elements[0].actionData[0].params = {};
+            //                 this.effectSysData.elements[0].actionData[0].params["name"] = "scale";
+            //                 this.gui.beginLayout_H();
+            //                 this.gui.add_A("startvalue:");
+            //                 this.gui.add_A(" x");
+            //                 this.setVal(this.gui.add_Textbox("2"), "x", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+            //                 this.gui.add_A(" y");
+            //                 this.setVal(this.gui.add_Textbox("2"), "y", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+            //                 this.gui.add_A(" z");
+            //                 this.setVal(this.gui.add_Textbox("2"), "z", this.effectSysData.elements[0].actionData[0].params["startvalue"]);
+            //                 this.gui.endLayout();
 
-                            this.gui.beginLayout_H();
-                            this.gui.add_A("targetvalue:");
-                            this.gui.add_A(" x");
-                            this.setVal(this.gui.add_Textbox("2"), "x", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            this.gui.add_A(" y");
-                            this.setVal(this.gui.add_Textbox("2"), "y", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            this.gui.add_A(" z");
-                            this.setVal(this.gui.add_Textbox("4"), "z", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            this.gui.endLayout();
-                        }
-                        this.gui.beginLayout_H();
-                        this.gui.add_A("loopframe:");
-                        this.setVal(this.gui.add_Textbox("60"), "loopframe", this.effectSysData.elements[0].actionData[0].params);
-                        this.gui.endLayout();
-                    }
-                    this.gui.endLayout();
-                }
-            }
+            //                 this.gui.beginLayout_H();
+            //                 this.gui.add_A("targetvalue:");
+            //                 this.gui.add_A(" x");
+            //                 this.setVal(this.gui.add_Textbox("2"), "x", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+            //                 this.gui.add_A(" y");
+            //                 this.setVal(this.gui.add_Textbox("2"), "y", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+            //                 this.gui.add_A(" z");
+            //                 this.setVal(this.gui.add_Textbox("4"), "z", this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
+            //                 this.gui.endLayout();
+            //             }
+            //             this.gui.beginLayout_H();
+            //             this.gui.add_A("loopframe:");
+            //             this.setVal(this.gui.add_Textbox("60"), "loopframe", this.effectSysData.elements[0].actionData[0].params);
+            //             this.gui.endLayout();
+            //         }
+            //         this.gui.endLayout();
+            //     }
+            // }
 
-            if (this.gui.add_Button("Play"))
-            {
-                this.play();
-            }
+            // if (this.gui.add_Button("Play"))
+            // {
+            //     this.play();
+            // }
         };
         setInterval(() =>
         {
@@ -246,12 +246,13 @@ class test_effecteditor implements IState
     private scaleChecked: boolean;
     private positionChecked: boolean;
     private eulerChecked: boolean;
-
+    private length: number = 0;
     private addElement()
     {
         let element: gd3d.framework.EffectElementData = new gd3d.framework.EffectElementData();
-        this.effectSysData.elements.push(element);
-        element.name = "element" + (this.effectSysData.elements.length - 1);
+        element.name = "element" +this.length;
+        this.effectSysData.elementDic[element.name] = (element);
+        this.length++;
         element.type = gd3d.framework.EffectElementTypeEnum.SingleMeshType;
         element.initFrameData = new gd3d.framework.EffectFrameData();
         element.initFrameData.frameIndex = -1;

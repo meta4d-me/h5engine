@@ -383,7 +383,6 @@ declare class test_effect implements IState {
     private addcam(laststate, state);
     tr: gd3d.framework.transform;
     ttr: gd3d.framework.transform;
-    eff: gd3d.framework.effectSystem;
     beclone: boolean;
     effectloaded: boolean;
     bestop: boolean;
@@ -1019,6 +1018,7 @@ declare class test_effecteditor implements IState {
     private scaleChecked;
     private positionChecked;
     private eulerChecked;
+    private length;
     private addElement();
     private play();
     private loadShader(laststate, state);

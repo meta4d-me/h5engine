@@ -1569,7 +1569,9 @@ declare namespace gd3d.framework {
         private resetSingleMesh();
         private resetparticle();
         private delayElements;
+        private refElements;
         private addElements();
+        private addRefElements();
         private addElement(data);
         private addInitFrame(elementData);
         setFrameId(id: number): void;
@@ -2243,7 +2245,9 @@ declare namespace gd3d.framework {
     class EffectSystemData {
         life: number;
         beLoop: boolean;
-        elements: EffectElementData[];
+        elementDic: {
+            [name: string]: EffectElementData;
+        };
         clone(): EffectSystemData;
         dispose(): void;
     }
@@ -2258,7 +2262,8 @@ declare namespace gd3d.framework {
         actions: IEffectAction[];
         curAttrData: EffectAttrsData;
         effectBatcher: EffectBatcher;
-        startIndex: number;
+        startVboIndex: number;
+        endEboIndex: number;
         delayTime: number;
         actionActive: boolean;
         loopFrame: number;
@@ -2270,7 +2275,7 @@ declare namespace gd3d.framework {
         initActions(): void;
         update(): void;
         private updateElementRotation();
-        isActiveFrame(frameIndex: number): boolean;
+        isCurFrameNeedRefresh(frameIndex: number): boolean;
         setActive(_active: boolean): void;
         dispose(): void;
     }
@@ -2281,7 +2286,7 @@ declare namespace gd3d.framework {
             [frameIndex: number]: EffectFrameData;
         };
         initFrameData: EffectFrameData;
-        ref: string;
+        refFrom: string;
         beloop: boolean;
         delayTime: number;
         actionData: EffectActionData[];
@@ -2343,10 +2348,15 @@ declare namespace gd3d.framework {
         static beEqual(data0: EffectMatData, data1: EffectMatData): boolean;
         clone(): EffectMatData;
     }
+    enum EffectBatcherState {
+        NotInitedStateType = 0,
+        InitedStateType = 1,
+        ResizeCapacityStateType = 2,
+    }
     class EffectBatcher {
         mesh: mesh;
         mat: material;
-        beBufferInited: boolean;
+        state: EffectBatcherState;
         dataForVbo: Float32Array;
         dataForEbo: Uint16Array;
         effectElements: EffectElement[];

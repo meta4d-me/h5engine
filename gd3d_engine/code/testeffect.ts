@@ -133,15 +133,17 @@ class test_effect implements IState
     private addButton()
     {
         var btn = document.createElement("button");
-        btn.textContent = "Load Prefab";
+        btn.textContent = "Play";
         btn.onclick = () =>
         {
-            this.app.getAssetMgr().savePrefab(this.tr, "prefabName", (data: gd3d.framework.SaveInfo, resourses: string[]) =>
-            {
-                console.log(data.files);
-                console.log(resourses.length);
+            // this.app.getAssetMgr().savePrefab(this.tr, "prefabName", (data: gd3d.framework.SaveInfo, resourses: string[]) =>
+            // {
+            //     console.log(data.files);
+            //     console.log(resourses.length);
 
-            });
+            // });
+            this.effect.stop();
+            this.effect.play();
         }
         btn.style.top = "160px";
         btn.style.position = "absolute";
@@ -239,7 +241,6 @@ class test_effect implements IState
 
     tr: gd3d.framework.transform;
     ttr: gd3d.framework.transform;
-    eff: gd3d.framework.effectSystem;
     beclone = false;
     effectloaded = false;
     bestop = false;
