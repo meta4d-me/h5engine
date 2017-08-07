@@ -59,6 +59,7 @@ namespace gd3d.framework
             var mesh = scene.app.getAssetMgr().getDefaultMesh("quad");
             //画四边形
             context.drawtype = "";
+            mesh.glMesh.bindVboBuffer(context.webgl);
             this.material.draw(context, mesh, mesh.submesh[0], "quad");
         }
         renderTarget: render.glRenderTarget;

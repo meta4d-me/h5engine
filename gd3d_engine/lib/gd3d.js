@@ -924,24 +924,24 @@ var gd3d;
                 }
                 return this.rootNode;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], canvas.prototype, "pixelWidth", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], canvas.prototype, "pixelHeight", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform2D"),
-                __metadata("design:type", framework.transform2D)
-            ], canvas.prototype, "rootNode", void 0);
-            canvas = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
-            ], canvas);
             return canvas;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], canvas.prototype, "pixelWidth", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], canvas.prototype, "pixelHeight", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform2D"),
+            __metadata("design:type", framework.transform2D)
+        ], canvas.prototype, "rootNode", void 0);
+        canvas = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [])
+        ], canvas);
         framework.canvas = canvas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -1133,18 +1133,18 @@ var gd3d;
             };
             canvasRenderer.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("canvas"),
-                __metadata("design:type", framework.canvas)
-            ], canvasRenderer.prototype, "canvas", void 0);
-            canvasRenderer = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeCanvasRendererCollider,
-                __metadata("design:paramtypes", [])
-            ], canvasRenderer);
             return canvasRenderer;
         }());
+        __decorate([
+            gd3d.reflect.Field("canvas"),
+            __metadata("design:type", framework.canvas)
+        ], canvasRenderer.prototype, "canvas", void 0);
+        canvasRenderer = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeCanvasRendererCollider,
+            __metadata("design:paramtypes", [])
+        ], canvasRenderer);
         framework.canvasRenderer = canvasRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -1286,20 +1286,20 @@ var gd3d;
                 gd3d.math.matrix3x2TransformVector2(mat, temt, canvasPos);
                 gd3d.math.pool.delete_vector2(temt);
             };
-            __decorate([
-                gd3d.reflect.Field("canvas"),
-                __metadata("design:type", framework.canvas)
-            ], overlay2D.prototype, "canvas", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], overlay2D.prototype, "autoAsp", void 0);
-            overlay2D = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
-            ], overlay2D);
             return overlay2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("canvas"),
+            __metadata("design:type", framework.canvas)
+        ], overlay2D.prototype, "canvas", void 0);
+        __decorate([
+            gd3d.reflect.Field("boolean"),
+            __metadata("design:type", Boolean)
+        ], overlay2D.prototype, "autoAsp", void 0);
+        overlay2D = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [])
+        ], overlay2D);
         framework.overlay2D = overlay2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -1317,20 +1317,20 @@ var gd3d;
             vector2.prototype.toString = function () {
                 return this.x + "," + this.y;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector2.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector2.prototype, "y", void 0);
-            vector2 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number])
-            ], vector2);
             return vector2;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector2.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector2.prototype, "y", void 0);
+        vector2 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number])
+        ], vector2);
         math.vector2 = vector2;
         var rect = (function () {
             function rect(x, y, w, h) {
@@ -1346,28 +1346,28 @@ var gd3d;
             rect.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.w + "," + this.h;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "w", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "h", void 0);
-            rect = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], rect);
             return rect;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "w", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], rect.prototype, "h", void 0);
+        rect = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], rect);
         math.rect = rect;
         var border = (function () {
             function border(l, t, r, b) {
@@ -1380,28 +1380,28 @@ var gd3d;
                 this.r = r;
                 this.b = b;
             }
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "l", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "t", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "r", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "b", void 0);
-            border = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], border);
             return border;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "l", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "t", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "r", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], border.prototype, "b", void 0);
+        border = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], border);
         math.border = border;
         var color = (function () {
             function color(r, g, b, a) {
@@ -1417,28 +1417,28 @@ var gd3d;
             color.prototype.toString = function () {
                 return this.r + "," + this.g + "," + this.b + "," + this.a;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "r", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "g", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "b", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "a", void 0);
-            color = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], color);
             return color;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "r", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "g", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "b", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], color.prototype, "a", void 0);
+        color = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], color);
         math.color = color;
         var vector3 = (function () {
             function vector3(x, y, z) {
@@ -1452,24 +1452,24 @@ var gd3d;
             vector3.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.z;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "z", void 0);
-            vector3 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number])
-            ], vector3);
             return vector3;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector3.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector3.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector3.prototype, "z", void 0);
+        vector3 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number])
+        ], vector3);
         math.vector3 = vector3;
         var vector4 = (function () {
             function vector4(x, y, z, w) {
@@ -1485,28 +1485,28 @@ var gd3d;
             vector4.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.z + "," + this.w;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "z", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "w", void 0);
-            vector4 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], vector4);
             return vector4;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "z", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], vector4.prototype, "w", void 0);
+        vector4 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], vector4);
         math.vector4 = vector4;
         var quaternion = (function () {
             function quaternion(x, y, z, w) {
@@ -1522,28 +1522,28 @@ var gd3d;
             quaternion.prototype.toString = function () {
                 return this.x + "," + this.y + "," + this.z + "," + this.w;
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "z", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "w", void 0);
-            quaternion = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], quaternion);
             return quaternion;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "x", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "y", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "z", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], quaternion.prototype, "w", void 0);
+        quaternion = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Number, Number, Number])
+        ], quaternion);
         math.quaternion = quaternion;
         var matrix = (function () {
             function matrix(datas) {
@@ -1591,16 +1591,16 @@ var gd3d;
                 this.comp = comp;
                 this.init = init;
             }
-            __decorate([
-                gd3d.reflect.Field("I2DComponent"),
-                __metadata("design:type", Object)
-            ], C2DComponent.prototype, "comp", void 0);
-            C2DComponent = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Object, Boolean])
-            ], C2DComponent);
             return C2DComponent;
         }());
+        __decorate([
+            gd3d.reflect.Field("I2DComponent"),
+            __metadata("design:type", Object)
+        ], C2DComponent.prototype, "comp", void 0);
+        C2DComponent = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Object, Boolean])
+        ], C2DComponent);
         framework.C2DComponent = C2DComponent;
         var transform2D = (function () {
             function transform2D() {
@@ -1976,47 +1976,47 @@ var gd3d;
                     }
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], transform2D.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform2D[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "children", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "width", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "height", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "pivot", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "localTranslate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "localScale", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "localRotate", void 0);
-            __decorate([
-                gd3d.reflect.Field("C2DComponent[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "components", void 0);
-            transform2D = __decorate([
-                gd3d.reflect.SerializeType
-            ], transform2D);
             return transform2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String)
+        ], transform2D.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform2D[]"),
+            __metadata("design:type", Array)
+        ], transform2D.prototype, "children", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], transform2D.prototype, "width", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], transform2D.prototype, "height", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector2"),
+            __metadata("design:type", gd3d.math.vector2)
+        ], transform2D.prototype, "pivot", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector2"),
+            __metadata("design:type", gd3d.math.vector2)
+        ], transform2D.prototype, "localTranslate", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector2"),
+            __metadata("design:type", gd3d.math.vector2)
+        ], transform2D.prototype, "localScale", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], transform2D.prototype, "localRotate", void 0);
+        __decorate([
+            gd3d.reflect.Field("C2DComponent[]"),
+            __metadata("design:type", Array)
+        ], transform2D.prototype, "components", void 0);
+        transform2D = __decorate([
+            gd3d.reflect.SerializeType
+        ], transform2D);
         framework.transform2D = transform2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -2201,26 +2201,26 @@ var gd3d;
                     this._targetImage.transform.markDirty();
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], button.prototype, "transition", null);
-            __decorate([
-                gd3d.reflect.Field("color"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [gd3d.math.color])
-            ], button.prototype, "normalColor", null);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], button.prototype, "fadeDuration", null);
-            button = __decorate([
-                gd3d.reflect.node2DComponent
-            ], button);
             return button;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], button.prototype, "transition", null);
+        __decorate([
+            gd3d.reflect.Field("color"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [gd3d.math.color])
+        ], button.prototype, "normalColor", null);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], button.prototype, "fadeDuration", null);
+        button = __decorate([
+            gd3d.reflect.node2DComponent
+        ], button);
         framework.button = button;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -3101,30 +3101,30 @@ var gd3d;
                     dindex++;
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
-                __metadata("design:type", gd3d.math.color)
-            ], image2D.prototype, "color", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("ImageType"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], image2D.prototype, "imageType", null);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("FillMethod"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], image2D.prototype, "fillMethod", null);
-            image2D = __decorate([
-                gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender,
-                __metadata("design:paramtypes", [])
-            ], image2D);
             return image2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("color"),
+            gd3d.reflect.UIStyle("vector4"),
+            __metadata("design:type", gd3d.math.color)
+        ], image2D.prototype, "color", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("ImageType"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], image2D.prototype, "imageType", null);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("FillMethod"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], image2D.prototype, "fillMethod", null);
+        image2D = __decorate([
+            gd3d.reflect.node2DComponent,
+            gd3d.reflect.nodeRender,
+            __metadata("design:paramtypes", [])
+        ], image2D);
         framework.image2D = image2D;
         var ImageType;
         (function (ImageType) {
@@ -3364,27 +3364,27 @@ var gd3d;
             };
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String),
-                __metadata("design:paramtypes", [String])
-            ], label.prototype, "text", null);
-            __decorate([
-                gd3d.reflect.Field("font"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.font])
-            ], label.prototype, "font", null);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
-            ], label.prototype, "fontsize", null);
-            label = __decorate([
-                gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender
-            ], label);
             return label;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String),
+            __metadata("design:paramtypes", [String])
+        ], label.prototype, "text", null);
+        __decorate([
+            gd3d.reflect.Field("font"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [framework.font])
+        ], label.prototype, "font", null);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [Number])
+        ], label.prototype, "fontsize", null);
+        label = __decorate([
+            gd3d.reflect.node2DComponent,
+            gd3d.reflect.nodeRender
+        ], label);
         framework.label = label;
         var HorizontalType;
         (function (HorizontalType) {
@@ -3483,26 +3483,26 @@ var gd3d;
             };
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
-            __decorate([
-                gd3d.reflect.Field("texture"),
-                __metadata("design:type", framework.texture)
-            ], rawImage2D.prototype, "_image", void 0);
-            __decorate([
-                gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
-                __metadata("design:type", gd3d.math.color)
-            ], rawImage2D.prototype, "color", void 0);
-            __decorate([
-                gd3d.reflect.Field("material"),
-                gd3d.reflect.UIStyle("material"),
-                __metadata("design:type", framework.material)
-            ], rawImage2D.prototype, "mat", void 0);
-            rawImage2D = __decorate([
-                gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender
-            ], rawImage2D);
             return rawImage2D;
         }());
+        __decorate([
+            gd3d.reflect.Field("texture"),
+            __metadata("design:type", framework.texture)
+        ], rawImage2D.prototype, "_image", void 0);
+        __decorate([
+            gd3d.reflect.Field("color"),
+            gd3d.reflect.UIStyle("vector4"),
+            __metadata("design:type", gd3d.math.color)
+        ], rawImage2D.prototype, "color", void 0);
+        __decorate([
+            gd3d.reflect.Field("material"),
+            gd3d.reflect.UIStyle("material"),
+            __metadata("design:type", framework.material)
+        ], rawImage2D.prototype, "mat", void 0);
+        rawImage2D = __decorate([
+            gd3d.reflect.node2DComponent,
+            gd3d.reflect.nodeRender
+        ], rawImage2D);
         framework.rawImage2D = rawImage2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -3522,9 +3522,9 @@ var gd3d;
             resID.prototype.getID = function () {
                 return this.id;
             };
-            resID.idAll = 1;
             return resID;
         }());
+        resID.idAll = 1;
         framework.resID = resID;
         var constText = (function () {
             function constText(text) {
@@ -3533,12 +3533,12 @@ var gd3d;
             constText.prototype.getText = function () {
                 return this.name;
             };
-            constText = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], constText);
             return constText;
         }());
+        constText = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], constText);
         framework.constText = constText;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -4862,7 +4862,9 @@ var gd3d;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
-            defShader.vscode = "\
+            return defShader;
+        }());
+        defShader.vscode = "\
     attribute vec4 _glesVertex;   \
     attribute vec4 _glesColor;                  \
     attribute vec4 _glesMultiTexCoord0;         \
@@ -4878,7 +4880,7 @@ var gd3d;
         xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
         gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
     }";
-            defShader.fscode = "         \
+        defShader.fscode = "         \
     uniform sampler2D _MainTex;                                                 \
     varying lowp vec4 xlv_COLOR;                                                 \
     varying highp vec2 xlv_TEXCOORD0;   \
@@ -4897,13 +4899,13 @@ var gd3d;
         gl_FragData[0] = col_1;\
     }\
     ";
-            defShader.fscode2 = "         \
+        defShader.fscode2 = "         \
     void main() \
     {\
         gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\
     }\
     ";
-            defShader.fscodeui = "         \
+        defShader.fscodeui = "         \
     uniform sampler2D _MainTex;                                                 \
     varying lowp vec4 xlv_COLOR;                                                 \
     varying highp vec2 xlv_TEXCOORD0;   \
@@ -4914,7 +4916,7 @@ var gd3d;
         gl_FragData[0] = tmpvar_3;\
     }\
     ";
-            defShader.vscodeuifont = "\
+        defShader.vscodeuifont = "\
     attribute vec4 _glesVertex;   \
     attribute vec4 _glesColor;                  \
     attribute vec4 _glesColorEx;                  \
@@ -4933,7 +4935,7 @@ var gd3d;
         xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
         gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
     }";
-            defShader.fscodeuifont = "\
+        defShader.fscodeuifont = "\
 precision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \n\
 uniform sampler2D _MainTex; \n\
 varying lowp vec4 xlv_COLOR;\n\
@@ -4953,7 +4955,7 @@ bc =min(1.0-c,bc);\n\
 \n\
 gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
 }";
-            defShader.vsdiffuse = "\
+        defShader.vsdiffuse = "\
     attribute vec4 _glesVertex;\
     attribute vec4 _glesMultiTexCoord0;\
     uniform highp mat4 glstate_matrix_mvp;\
@@ -4966,7 +4968,7 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\
         gl_Position = (glstate_matrix_mvp * tmpvar_1);\
     }";
-            defShader.fsdiffuse = "\
+        defShader.fsdiffuse = "\
     uniform sampler2D _MainTex;\
     uniform lowp float _AlphaCut;\
     varying highp vec2 xlv_TEXCOORD0;\
@@ -4977,7 +4979,7 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
             discard;\
         gl_FragData[0] = tmpvar_3;\
     }";
-            defShader.vsline = "\
+        defShader.vsline = "\
     attribute vec4 _glesVertex;\
     attribute vec4 _glesColor;\
     uniform highp mat4 glstate_matrix_mvp;\
@@ -4990,13 +4992,13 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         xlv_COLOR = _glesColor;\
         gl_Position = (glstate_matrix_mvp * tmpvar_1);\
     }";
-            defShader.fsline = "\
+        defShader.fsline = "\
     varying lowp vec4 xlv_COLOR;\
     void main()\
     {\
         gl_FragData[0] = xlv_COLOR;\
     }";
-            defShader.vsmaterialcolor = "\
+        defShader.vsmaterialcolor = "\
     attribute vec4 _glesVertex;\
     uniform vec4 _Color;\
     uniform highp mat4 glstate_matrix_mvp;\
@@ -5009,8 +5011,6 @@ gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         xlv_COLOR = _Color;\
         gl_Position = (glstate_matrix_mvp * tmpvar_1);\
     }";
-            return defShader;
-        }());
         framework.defShader = defShader;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -5816,21 +5816,20 @@ var gd3d;
                 }
                 buf = null;
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], animationClip.prototype, "name", void 0);
-            animationClip = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], animationClip);
             return animationClip;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], animationClip.prototype, "name", void 0);
+        animationClip = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], animationClip);
         framework.animationClip = animationClip;
-        var PoseBoneMatrix = (function () {
+        var PoseBoneMatrix = PoseBoneMatrix_1 = (function () {
             function PoseBoneMatrix() {
             }
-            PoseBoneMatrix_1 = PoseBoneMatrix;
             PoseBoneMatrix.caclByteLength = function () {
                 var total = 12 + 16;
                 return total;
@@ -5947,20 +5946,19 @@ var gd3d;
                 gd3d.math.quatLerp(left.r, right.r, target.r, v);
                 return target;
             };
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], PoseBoneMatrix.prototype, "t", void 0);
-            __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
-            ], PoseBoneMatrix.prototype, "r", void 0);
-            PoseBoneMatrix = PoseBoneMatrix_1 = __decorate([
-                gd3d.reflect.SerializeType
-            ], PoseBoneMatrix);
             return PoseBoneMatrix;
-            var PoseBoneMatrix_1;
         }());
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], PoseBoneMatrix.prototype, "t", void 0);
+        __decorate([
+            gd3d.reflect.Field("quaternion"),
+            __metadata("design:type", gd3d.math.quaternion)
+        ], PoseBoneMatrix.prototype, "r", void 0);
+        PoseBoneMatrix = PoseBoneMatrix_1 = __decorate([
+            gd3d.reflect.SerializeType
+        ], PoseBoneMatrix);
         framework.PoseBoneMatrix = PoseBoneMatrix;
         var subClip = (function () {
             function subClip() {
@@ -5975,6 +5973,7 @@ var gd3d;
             return subClip;
         }());
         framework.subClip = subClip;
+        var PoseBoneMatrix_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6057,12 +6056,12 @@ var gd3d;
                     this.sprites[spriteName] = r;
                 }
             };
-            atlas = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], atlas);
             return atlas;
         }());
+        atlas = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], atlas);
         framework.atlas = atlas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -6153,12 +6152,12 @@ var gd3d;
                 var d2 = new Date().valueOf();
                 var n = d2 - d1;
             };
-            font = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], font);
             return font;
         }());
+        font = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], font);
         framework.font = font;
         var charinfo = (function () {
             function charinfo() {
@@ -6182,23 +6181,23 @@ var gd3d;
                 this.value = value;
                 this.defaultValue = defaultValue;
             }
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("UniformTypeEnum"),
-                __metadata("design:type", Number)
-            ], UniformData.prototype, "type", void 0);
-            __decorate([
-                gd3d.reflect.Field("any"),
-                __metadata("design:type", Object)
-            ], UniformData.prototype, "value", void 0);
-            UniformData = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Object, Object])
-            ], UniformData);
             return UniformData;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("UniformTypeEnum"),
+            __metadata("design:type", Number)
+        ], UniformData.prototype, "type", void 0);
+        __decorate([
+            gd3d.reflect.Field("any"),
+            __metadata("design:type", Object)
+        ], UniformData.prototype, "value", void 0);
+        UniformData = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Number, Object, Object])
+        ], UniformData);
         framework.UniformData = UniformData;
-        var material = (function () {
+        var material = material_1 = (function () {
             function material(assetName) {
                 if (assetName === void 0) { assetName = null; }
                 this.name = null;
@@ -6213,7 +6212,6 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
                 this.mapUniformTemp = {};
             }
-            material_1 = material;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -6673,33 +6671,33 @@ var gd3d;
                 }
                 return mat;
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], material.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("shader"),
-                __metadata("design:type", framework.shader)
-            ], material.prototype, "shader", void 0);
-            __decorate([
-                gd3d.reflect.Field("UniformDataDic"),
-                __metadata("design:type", Object)
-            ], material.prototype, "mapUniform", void 0);
-            material = material_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], material);
             return material;
-            var material_1;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], material.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("shader"),
+            __metadata("design:type", framework.shader)
+        ], material.prototype, "shader", void 0);
+        __decorate([
+            gd3d.reflect.Field("UniformDataDic"),
+            __metadata("design:type", Object)
+        ], material.prototype, "mapUniform", void 0);
+        material = material_1 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], material);
         framework.material = material;
+        var material_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var mesh = (function () {
+        var mesh = mesh_1 = (function () {
             function mesh(assetName) {
                 if (assetName === void 0) { assetName = null; }
                 this.id = new framework.resID();
@@ -6710,7 +6708,6 @@ var gd3d;
                 }
                 this.name = new framework.constText(assetName);
             }
-            mesh_1 = mesh;
             mesh.prototype.getName = function () {
                 if (!this.name) {
                     return null;
@@ -7060,13 +7057,12 @@ var gd3d;
                 _result.glMesh.uploadIndexSubData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
                 return _result;
             };
-            mesh = mesh_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], mesh);
             return mesh;
-            var mesh_1;
         }());
+        mesh = mesh_1 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], mesh);
         framework.mesh = mesh;
         var subMeshInfo = (function () {
             function subMeshInfo() {
@@ -7076,6 +7072,7 @@ var gd3d;
             return subMeshInfo;
         }());
         framework.subMeshInfo = subMeshInfo;
+        var mesh_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -7243,16 +7240,16 @@ var gd3d;
                 gd3d.math.vec3ScaleByNum(out, lerp, out);
                 gd3d.math.vec3Add(start, out, out);
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], pathasset.prototype, "name", void 0);
-            pathasset = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], pathasset);
             return pathasset;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], pathasset.prototype, "name", void 0);
+        pathasset = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], pathasset);
         framework.pathasset = pathasset;
         var pathtype;
         (function (pathtype) {
@@ -7320,12 +7317,12 @@ var gd3d;
                 this.trans = new framework.transform();
                 gd3d.io.deSerialize(JSON.parse(jsonStr), this.trans, assetmgr, this.assetbundle);
             };
-            prefab = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], prefab);
             return prefab;
         }());
+        prefab = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], prefab);
         framework.prefab = prefab;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -7428,12 +7425,12 @@ var gd3d;
                     this.lightmaps[key].unuse(true);
                 }
             };
-            rawscene = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], rawscene);
             return rawscene;
         }());
+        rawscene = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], rawscene);
         framework.rawscene = rawscene;
         var Fog = (function () {
             function Fog() {
@@ -7447,7 +7444,7 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var shader = (function () {
+        var shader = shader_1 = (function () {
             function shader(assetName) {
                 if (assetName === void 0) { assetName = null; }
                 this.name = null;
@@ -7462,7 +7459,6 @@ var gd3d;
                 }
                 this.name = new framework.constText(assetName);
             }
-            shader_1 = shader;
             shader.prototype.getName = function () {
                 return this.name.getText();
             };
@@ -7659,18 +7655,18 @@ var gd3d;
             shader.getGlobalMapUniform = function () {
                 return shader_1.mapUniformGlobal;
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], shader.prototype, "name", void 0);
-            shader = shader_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], shader);
             return shader;
-            var shader_1;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], shader.prototype, "name", void 0);
+        shader = shader_1 = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], shader);
         framework.shader = shader;
+        var shader_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -7749,12 +7745,12 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            sprite = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], sprite);
             return sprite;
         }());
+        sprite = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], sprite);
         framework.sprite = sprite;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -7792,16 +7788,16 @@ var gd3d;
                     return gd3d.math.caclStringByteLength(this.content);
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], textasset.prototype, "name", void 0);
-            textasset = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], textasset);
             return textasset;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], textasset.prototype, "name", void 0);
+        textasset = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], textasset);
         framework.textasset = textasset;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -7850,16 +7846,16 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
-            ], texture.prototype, "name", void 0);
-            texture = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], texture);
             return texture;
         }());
+        __decorate([
+            gd3d.reflect.Field("constText"),
+            __metadata("design:type", framework.constText)
+        ], texture.prototype, "name", void 0);
+        texture = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [String])
+        ], texture);
         framework.texture = texture;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -8258,48 +8254,48 @@ var gd3d;
                     pnode = pnode.parent;
                 }
             };
-            __decorate([
-                gd3d.reflect.Field("animationClip[]"),
-                __metadata("design:type", Array)
-            ], aniplayer.prototype, "clips", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], aniplayer.prototype, "autoplay", void 0);
-            __decorate([
-                gd3d.reflect.Field("tPoseInfo[]"),
-                __metadata("design:type", Array)
-            ], aniplayer.prototype, "bones", void 0);
-            __decorate([
-                gd3d.reflect.Field("PoseBoneMatrix[]"),
-                __metadata("design:type", Array)
-            ], aniplayer.prototype, "startPos", void 0);
-            aniplayer = __decorate([
-                gd3d.reflect.nodeComponent
-            ], aniplayer);
             return aniplayer;
         }());
+        __decorate([
+            gd3d.reflect.Field("animationClip[]"),
+            __metadata("design:type", Array)
+        ], aniplayer.prototype, "clips", void 0);
+        __decorate([
+            gd3d.reflect.Field("boolean"),
+            __metadata("design:type", Boolean)
+        ], aniplayer.prototype, "autoplay", void 0);
+        __decorate([
+            gd3d.reflect.Field("tPoseInfo[]"),
+            __metadata("design:type", Array)
+        ], aniplayer.prototype, "bones", void 0);
+        __decorate([
+            gd3d.reflect.Field("PoseBoneMatrix[]"),
+            __metadata("design:type", Array)
+        ], aniplayer.prototype, "startPos", void 0);
+        aniplayer = __decorate([
+            gd3d.reflect.nodeComponent
+        ], aniplayer);
         framework.aniplayer = aniplayer;
         var tPoseInfo = (function () {
             function tPoseInfo() {
             }
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], tPoseInfo.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], tPoseInfo.prototype, "tposep", void 0);
-            __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
-            ], tPoseInfo.prototype, "tposeq", void 0);
-            tPoseInfo = __decorate([
-                gd3d.reflect.SerializeType
-            ], tPoseInfo);
             return tPoseInfo;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String)
+        ], tPoseInfo.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], tPoseInfo.prototype, "tposep", void 0);
+        __decorate([
+            gd3d.reflect.Field("quaternion"),
+            __metadata("design:type", gd3d.math.quaternion)
+        ], tPoseInfo.prototype, "tposeq", void 0);
+        tPoseInfo = __decorate([
+            gd3d.reflect.SerializeType
+        ], tPoseInfo);
         framework.tPoseInfo = tPoseInfo;
         var PlayStyle;
         (function (PlayStyle) {
@@ -8324,12 +8320,12 @@ var gd3d;
             };
             asbone.prototype.clone = function () {
             };
-            asbone = __decorate([
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], asbone);
             return asbone;
         }());
+        asbone = __decorate([
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], asbone);
         framework.asbone = asbone;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -8395,11 +8391,11 @@ var gd3d;
             AudioPlayer.prototype.isPlaying = function () {
                 return this.audioChannel == undefined ? false : this.audioChannel.isplay;
             };
-            AudioPlayer = __decorate([
-                gd3d.reflect.nodeComponent
-            ], AudioPlayer);
             return AudioPlayer;
         }());
+        AudioPlayer = __decorate([
+            gd3d.reflect.nodeComponent
+        ], AudioPlayer);
         framework.AudioPlayer = AudioPlayer;
         var AudioChannel = (function () {
             function AudioChannel() {
@@ -8555,20 +8551,20 @@ var gd3d;
             };
             boxcollider.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], boxcollider.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], boxcollider.prototype, "size", void 0);
-            boxcollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeBoxCollider
-            ], boxcollider);
             return boxcollider;
         }());
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], boxcollider.prototype, "center", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], boxcollider.prototype, "size", void 0);
+        boxcollider = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeBoxCollider
+        ], boxcollider);
         framework.boxcollider = boxcollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -8607,6 +8603,7 @@ var gd3d;
                 context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
                 var mesh = scene.app.getAssetMgr().getDefaultMesh("quad");
                 context.drawtype = "";
+                mesh.glMesh.bindVboBuffer(context.webgl);
                 this.material.draw(context, mesh, mesh.submesh[0], "quad");
             };
             return cameraPostQueue_Quad;
@@ -8986,34 +8983,34 @@ var gd3d;
             };
             camera.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], camera.prototype, "near", null);
-            __decorate([
-                gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 999),
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], camera.prototype, "far", null);
-            __decorate([
-                gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }),
-                __metadata("design:type", Function),
-                __metadata("design:paramtypes", []),
-                __metadata("design:returntype", void 0)
-            ], camera.prototype, "markDirty", null);
-            __decorate([
-                gd3d.reflect.Field("IOverLay[]"),
-                __metadata("design:type", Array)
-            ], camera.prototype, "overlays", void 0);
-            camera = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeCamera
-            ], camera);
             return camera;
         }());
+        __decorate([
+            gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number),
+            __metadata("design:paramtypes", [Number])
+        ], camera.prototype, "near", null);
+        __decorate([
+            gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 999),
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number),
+            __metadata("design:paramtypes", [Number])
+        ], camera.prototype, "far", null);
+        __decorate([
+            gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }),
+            __metadata("design:type", Function),
+            __metadata("design:paramtypes", []),
+            __metadata("design:returntype", void 0)
+        ], camera.prototype, "markDirty", null);
+        __decorate([
+            gd3d.reflect.Field("IOverLay[]"),
+            __metadata("design:type", Array)
+        ], camera.prototype, "overlays", void 0);
+        camera = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeCamera
+        ], camera);
         framework.camera = camera;
         var CullingMask;
         (function (CullingMask) {
@@ -9031,7 +9028,7 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var effectSystem = (function () {
+        var effectSystem = effectSystem_1 = (function () {
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
                 this.renderLayer = framework.CullingMask.default;
@@ -9047,7 +9044,6 @@ var gd3d;
                 this.matDataGroups = [];
                 this.delayElements = [];
             }
-            effectSystem_1 = effectSystem;
             effectSystem.prototype.setJsonData = function (_jsonData) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.jsonData = _jsonData;
@@ -9466,20 +9462,20 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            effectSystem.fps = 30;
-            __decorate([
-                gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
-            ], effectSystem.prototype, "jsonData", void 0);
-            effectSystem = effectSystem_1 = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.selfClone
-            ], effectSystem);
             return effectSystem;
-            var effectSystem_1;
         }());
+        effectSystem.fps = 30;
+        __decorate([
+            gd3d.reflect.Field("textasset"),
+            __metadata("design:type", framework.textasset)
+        ], effectSystem.prototype, "jsonData", void 0);
+        effectSystem = effectSystem_1 = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.selfClone
+        ], effectSystem);
         framework.effectSystem = effectSystem;
+        var effectSystem_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9497,12 +9493,12 @@ var gd3d;
             };
             frustumculling.prototype.clone = function () {
             };
-            frustumculling = __decorate([
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], frustumculling);
             return frustumculling;
         }());
+        frustumculling = __decorate([
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], frustumculling);
         framework.frustumculling = frustumculling;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9631,11 +9627,11 @@ var gd3d;
             };
             guidpath.prototype.clone = function () {
             };
-            guidpath = __decorate([
-                gd3d.reflect.nodeComponent
-            ], guidpath);
             return guidpath;
         }());
+        guidpath = __decorate([
+            gd3d.reflect.nodeComponent
+        ], guidpath);
         framework.guidpath = guidpath;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9661,12 +9657,12 @@ var gd3d;
             };
             light.prototype.clone = function () {
             };
-            light = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeLight
-            ], light);
             return light;
         }());
+        light = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeLight
+        ], light);
         framework.light = light;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9750,12 +9746,12 @@ var gd3d;
             };
             meshcollider.prototype.clone = function () {
             };
-            meshcollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeMeshCollider
-            ], meshcollider);
             return meshcollider;
         }());
+        meshcollider = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeMeshCollider
+        ], meshcollider);
         framework.meshcollider = meshcollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9795,17 +9791,17 @@ var gd3d;
             };
             meshFilter.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("mesh"),
-                gd3d.reflect.UIStyle("WidgetDragSelect"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
-            ], meshFilter.prototype, "mesh", null);
-            meshFilter = __decorate([
-                gd3d.reflect.nodeComponent
-            ], meshFilter);
             return meshFilter;
         }());
+        __decorate([
+            gd3d.reflect.Field("mesh"),
+            gd3d.reflect.UIStyle("WidgetDragSelect"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [framework.mesh])
+        ], meshFilter.prototype, "mesh", null);
+        meshFilter = __decorate([
+            gd3d.reflect.nodeComponent
+        ], meshFilter);
         framework.meshFilter = meshFilter;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9904,25 +9900,25 @@ var gd3d;
             };
             meshRenderer.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
-            ], meshRenderer.prototype, "materials", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], meshRenderer.prototype, "lightmapIndex", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector4"),
-                __metadata("design:type", gd3d.math.vector4)
-            ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
-            meshRenderer = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], meshRenderer);
             return meshRenderer;
         }());
+        __decorate([
+            gd3d.reflect.Field("material[]"),
+            __metadata("design:type", Array)
+        ], meshRenderer.prototype, "materials", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], meshRenderer.prototype, "lightmapIndex", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector4"),
+            __metadata("design:type", gd3d.math.vector4)
+        ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
+        meshRenderer = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], meshRenderer);
         framework.meshRenderer = meshRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -9930,7 +9926,7 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var skinnedMeshRenderer = (function () {
+        var skinnedMeshRenderer = skinnedMeshRenderer_1 = (function () {
             function skinnedMeshRenderer() {
                 this.layer = framework.RenderLayerEnum.Common;
                 this.renderLayer = framework.CullingMask.default;
@@ -9940,7 +9936,6 @@ var gd3d;
                 this._skintype = 0;
                 this._efficient = true;
             }
-            skinnedMeshRenderer_1 = skinnedMeshRenderer;
             Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
                 get: function () {
                     return this._queue;
@@ -10228,41 +10223,41 @@ var gd3d;
                     return 1;
                 return 0;
             };
-            skinnedMeshRenderer.dataCaches = [];
-            __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
-            ], skinnedMeshRenderer.prototype, "materials", void 0);
-            __decorate([
-                gd3d.reflect.Field("mesh"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
-            ], skinnedMeshRenderer.prototype, "mesh", null);
-            __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
-            ], skinnedMeshRenderer.prototype, "bones", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform"),
-                __metadata("design:type", framework.transform)
-            ], skinnedMeshRenderer.prototype, "rootBone", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "size", void 0);
-            skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], skinnedMeshRenderer);
             return skinnedMeshRenderer;
-            var skinnedMeshRenderer_1;
         }());
+        skinnedMeshRenderer.dataCaches = [];
+        __decorate([
+            gd3d.reflect.Field("material[]"),
+            __metadata("design:type", Array)
+        ], skinnedMeshRenderer.prototype, "materials", void 0);
+        __decorate([
+            gd3d.reflect.Field("mesh"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [framework.mesh])
+        ], skinnedMeshRenderer.prototype, "mesh", null);
+        __decorate([
+            gd3d.reflect.Field("transform[]"),
+            __metadata("design:type", Array)
+        ], skinnedMeshRenderer.prototype, "bones", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform"),
+            __metadata("design:type", framework.transform)
+        ], skinnedMeshRenderer.prototype, "rootBone", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], skinnedMeshRenderer.prototype, "center", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], skinnedMeshRenderer.prototype, "size", void 0);
+        skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent,
+            __metadata("design:paramtypes", [])
+        ], skinnedMeshRenderer);
         framework.skinnedMeshRenderer = skinnedMeshRenderer;
+        var skinnedMeshRenderer_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -10405,20 +10400,20 @@ var gd3d;
             };
             spherecollider.prototype.clone = function () {
             };
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], spherecollider.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], spherecollider.prototype, "radius", void 0);
-            spherecollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeSphereCollider
-            ], spherecollider);
             return spherecollider;
         }());
+        __decorate([
+            gd3d.reflect.Field("vector3"),
+            __metadata("design:type", gd3d.math.vector3)
+        ], spherecollider.prototype, "center", void 0);
+        __decorate([
+            gd3d.reflect.Field("number"),
+            __metadata("design:type", Number)
+        ], spherecollider.prototype, "radius", void 0);
+        spherecollider = __decorate([
+            gd3d.reflect.nodeComponent,
+            gd3d.reflect.nodeSphereCollider
+        ], spherecollider);
         framework.spherecollider = spherecollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -10672,12 +10667,12 @@ var gd3d;
             };
             trailRender_recorde.prototype.clone = function () {
             };
-            trailRender_recorde = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
-            ], trailRender_recorde);
             return trailRender_recorde;
         }());
+        trailRender_recorde = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent
+        ], trailRender_recorde);
         framework.trailRender_recorde = trailRender_recorde;
         var trailNode = (function () {
             function trailNode(p, updir, t) {
@@ -10924,12 +10919,12 @@ var gd3d;
             };
             trailRender.prototype.remove = function () {
             };
-            trailRender = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
-            ], trailRender);
             return trailRender;
         }());
+        trailRender = __decorate([
+            gd3d.reflect.nodeRender,
+            gd3d.reflect.nodeComponent
+        ], trailRender);
         framework.trailRender = trailRender;
         var trailStick = (function () {
             function trailStick() {
@@ -11454,9 +11449,9 @@ var gd3d;
                 }
                 return ret.join('');
             };
-            converter.dataView = new DataView(new ArrayBuffer(8), 0, 8);
             return converter;
         }());
+        converter.dataView = new DataView(new ArrayBuffer(8), 0, 8);
         io.converter = converter;
         var binTool = (function (_super) {
             __extends(binTool, _super);
@@ -12023,9 +12018,9 @@ var gd3d;
                     }
                 }
             };
-            SerializeDependent.resoursePaths = [];
             return SerializeDependent;
         }());
+        SerializeDependent.resoursePaths = [];
         io.SerializeDependent = SerializeDependent;
         function SerializeForInspector(obj) {
             var str = JSON.stringify(serializeObjForInspector(obj, false));
@@ -12746,17 +12741,17 @@ var gd3d;
             referenceInfo.isRegType = function (type) {
                 return this.regtypelist.indexOf(type) >= 0;
             };
-            referenceInfo.oldmap = {};
-            referenceInfo.regtypelist = [];
             return referenceInfo;
         }());
+        referenceInfo.oldmap = {};
+        referenceInfo.regtypelist = [];
         io.referenceInfo = referenceInfo;
         var enumMgr = (function () {
             function enumMgr() {
             }
-            enumMgr.enumMap = {};
             return enumMgr;
         }());
+        enumMgr.enumMap = {};
         io.enumMgr = enumMgr;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
@@ -13961,11 +13956,11 @@ var gd3d;
         var commonStatic = (function () {
             function commonStatic() {
             }
-            commonStatic.x_axis = new gd3d.math.vector3(1, 0, 0);
-            commonStatic.y_axis = new gd3d.math.vector3(0, 1, 0);
-            commonStatic.z_axis = new gd3d.math.vector3(0, 0, 1);
             return commonStatic;
         }());
+        commonStatic.x_axis = new gd3d.math.vector3(1, 0, 0);
+        commonStatic.y_axis = new gd3d.math.vector3(0, 1, 0);
+        commonStatic.z_axis = new gd3d.math.vector3(0, 0, 1);
         math.commonStatic = commonStatic;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
@@ -17929,16 +17924,16 @@ var gd3d;
                 this.comp = comp;
                 this.init = init;
             }
-            __decorate([
-                gd3d.reflect.Field("INodeComponent"),
-                __metadata("design:type", Object)
-            ], nodeComponent.prototype, "comp", void 0);
-            nodeComponent = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Object, Boolean])
-            ], nodeComponent);
             return nodeComponent;
         }());
+        __decorate([
+            gd3d.reflect.Field("INodeComponent"),
+            __metadata("design:type", Object)
+        ], nodeComponent.prototype, "comp", void 0);
+        nodeComponent = __decorate([
+            gd3d.reflect.SerializeType,
+            __metadata("design:paramtypes", [Object, Boolean])
+        ], nodeComponent);
         framework.nodeComponent = nodeComponent;
         var gameObject = (function () {
             function gameObject() {
@@ -18152,20 +18147,20 @@ var gd3d;
             gameObject.prototype.dispose = function () {
                 this.removeAllComponents();
             };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("enum"),
-                __metadata("design:type", Number)
-            ], gameObject.prototype, "layer", void 0);
-            __decorate([
-                gd3d.reflect.Field("nodeComponent[]"),
-                __metadata("design:type", Array)
-            ], gameObject.prototype, "components", void 0);
-            gameObject = __decorate([
-                gd3d.reflect.SerializeType
-            ], gameObject);
             return gameObject;
         }());
+        __decorate([
+            gd3d.reflect.Field("number"),
+            gd3d.reflect.UIStyle("enum"),
+            __metadata("design:type", Number)
+        ], gameObject.prototype, "layer", void 0);
+        __decorate([
+            gd3d.reflect.Field("nodeComponent[]"),
+            __metadata("design:type", Array)
+        ], gameObject.prototype, "components", void 0);
+        gameObject = __decorate([
+            gd3d.reflect.SerializeType
+        ], gameObject);
         framework.gameObject = gameObject;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19584,36 +19579,36 @@ var gd3d;
                 this._gameObject.dispose();
                 this._beDispose = true;
             };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], transform.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
-            ], transform.prototype, "children", void 0);
-            __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
-            ], transform.prototype, "localRotate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
-                __metadata("design:type", gd3d.math.vector3)
-            ], transform.prototype, "localTranslate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
-                __metadata("design:type", gd3d.math.vector3)
-            ], transform.prototype, "localScale", void 0);
-            __decorate([
-                gd3d.reflect.Field("gameObject"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [])
-            ], transform.prototype, "gameObject", null);
-            transform = __decorate([
-                gd3d.reflect.SerializeType
-            ], transform);
             return transform;
         }());
+        __decorate([
+            gd3d.reflect.Field("string"),
+            __metadata("design:type", String)
+        ], transform.prototype, "name", void 0);
+        __decorate([
+            gd3d.reflect.Field("transform[]"),
+            __metadata("design:type", Array)
+        ], transform.prototype, "children", void 0);
+        __decorate([
+            gd3d.reflect.Field("quaternion"),
+            __metadata("design:type", gd3d.math.quaternion)
+        ], transform.prototype, "localRotate", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
+            __metadata("design:type", gd3d.math.vector3)
+        ], transform.prototype, "localTranslate", void 0);
+        __decorate([
+            gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
+            __metadata("design:type", gd3d.math.vector3)
+        ], transform.prototype, "localScale", void 0);
+        __decorate([
+            gd3d.reflect.Field("gameObject"),
+            __metadata("design:type", Object),
+            __metadata("design:paramtypes", [])
+        ], transform.prototype, "gameObject", null);
+        transform = __decorate([
+            gd3d.reflect.SerializeType
+        ], transform);
         framework.transform = transform;
         var insID = (function () {
             function insID() {
@@ -19627,9 +19622,9 @@ var gd3d;
             insID.prototype.getInsID = function () {
                 return this.id;
             };
-            insID.idAll = 1;
             return insID;
         }());
+        insID.idAll = 1;
         framework.insID = insID;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19658,22 +19653,22 @@ var gd3d;
         var NumberUtil = (function () {
             function NumberUtil() {
             }
-            NumberUtil.KEY_A = 65;
-            NumberUtil.KEY_D = 68;
-            NumberUtil.KEY_E = 69;
-            NumberUtil.KEY_Q = 81;
-            NumberUtil.KEY_R = 82;
-            NumberUtil.KEY_S = 83;
-            NumberUtil.KEY_W = 87;
-            NumberUtil.KEY_a = 97;
-            NumberUtil.KEY_d = 100;
-            NumberUtil.KEY_e = 101;
-            NumberUtil.KEY_q = 113;
-            NumberUtil.KEY_r = 114;
-            NumberUtil.KEY_s = 115;
-            NumberUtil.KEY_w = 119;
             return NumberUtil;
         }());
+        NumberUtil.KEY_A = 65;
+        NumberUtil.KEY_D = 68;
+        NumberUtil.KEY_E = 69;
+        NumberUtil.KEY_Q = 81;
+        NumberUtil.KEY_R = 82;
+        NumberUtil.KEY_S = 83;
+        NumberUtil.KEY_W = 87;
+        NumberUtil.KEY_a = 97;
+        NumberUtil.KEY_d = 100;
+        NumberUtil.KEY_e = 101;
+        NumberUtil.KEY_q = 113;
+        NumberUtil.KEY_r = 114;
+        NumberUtil.KEY_s = 115;
+        NumberUtil.KEY_w = 119;
         framework.NumberUtil = NumberUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19684,14 +19679,14 @@ var gd3d;
         var RegexpUtil = (function () {
             function RegexpUtil() {
             }
-            RegexpUtil.textureRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*'(.+)'[ ]*\{[ ]*([a-zA-Z]*)[ ]*([a-zA-Z]*)[ ]*\}/;
-            RegexpUtil.vectorRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
-            RegexpUtil.floatRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
-            RegexpUtil.rangeRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
-            RegexpUtil.vector4Regexp = /\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
-            RegexpUtil.vector3FloatOrRangeRegexp = /([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\])/;
             return RegexpUtil;
         }());
+        RegexpUtil.textureRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*'(.+)'[ ]*\{[ ]*([a-zA-Z]*)[ ]*([a-zA-Z]*)[ ]*\}/;
+        RegexpUtil.vectorRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
+        RegexpUtil.floatRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
+        RegexpUtil.rangeRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
+        RegexpUtil.vector4Regexp = /\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
+        RegexpUtil.vector3FloatOrRangeRegexp = /([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\])/;
         framework.RegexpUtil = RegexpUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -19716,25 +19711,25 @@ var gd3d;
                 var other = str.substr(1);
                 return firstChar + other;
             };
-            StringUtil.COMPONENT_CAMERA = "camera";
-            StringUtil.COMPONENT_BOXCOLLIDER = "boxcollider";
-            StringUtil.COMPONENT_LIGHT = "light";
-            StringUtil.COMPONENT_MESHFILTER = "meshFilter";
-            StringUtil.COMPONENT_MESHRENDER = "meshRenderer";
-            StringUtil.COMPONENT_EFFECTSYSTEM = "effectSystem";
-            StringUtil.COMPONENT_LABEL = "label";
-            StringUtil.COMPONENT_IMAGE = "image2D";
-            StringUtil.COMPONENT_RAWIMAGE = "rawImage2D";
-            StringUtil.COMPONENT_BUTTON = "button";
-            StringUtil.COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
-            StringUtil.COMPONENT_AUDIOPLAYER = "AudioPlayer";
-            StringUtil.COMPONENT_CAMERACONTROLLER = "cameraController";
-            StringUtil.COMPONENT_CANVASRENDER = "canvasRenderer";
-            StringUtil.UIStyle_RangeFloat = "rangeFloat";
-            StringUtil.UIStyle_Enum = "enum";
-            StringUtil.RESOURCES_MESH_CUBE = "cube";
             return StringUtil;
         }());
+        StringUtil.COMPONENT_CAMERA = "camera";
+        StringUtil.COMPONENT_BOXCOLLIDER = "boxcollider";
+        StringUtil.COMPONENT_LIGHT = "light";
+        StringUtil.COMPONENT_MESHFILTER = "meshFilter";
+        StringUtil.COMPONENT_MESHRENDER = "meshRenderer";
+        StringUtil.COMPONENT_EFFECTSYSTEM = "effectSystem";
+        StringUtil.COMPONENT_LABEL = "label";
+        StringUtil.COMPONENT_IMAGE = "image2D";
+        StringUtil.COMPONENT_RAWIMAGE = "rawImage2D";
+        StringUtil.COMPONENT_BUTTON = "button";
+        StringUtil.COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
+        StringUtil.COMPONENT_AUDIOPLAYER = "AudioPlayer";
+        StringUtil.COMPONENT_CAMERACONTROLLER = "cameraController";
+        StringUtil.COMPONENT_CANVASRENDER = "canvasRenderer";
+        StringUtil.UIStyle_RangeFloat = "rangeFloat";
+        StringUtil.UIStyle_Enum = "enum";
+        StringUtil.RESOURCES_MESH_CUBE = "cube";
         framework.StringUtil = StringUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -20333,15 +20328,15 @@ var gd3d;
             pool.collect_quaternion = function () {
                 pool.unused_quaternion.length = 0;
             };
-            pool.unused_vector4 = [];
-            pool.unused_color = [];
-            pool.unused_vector3 = [];
-            pool.unused_vector2 = [];
-            pool.unused_matrix3x2 = [];
-            pool.unused_matrix = [];
-            pool.unused_quaternion = [];
             return pool;
         }());
+        pool.unused_vector4 = [];
+        pool.unused_color = [];
+        pool.unused_vector3 = [];
+        pool.unused_vector2 = [];
+        pool.unused_matrix3x2 = [];
+        pool.unused_matrix = [];
+        pool.unused_quaternion = [];
         math.pool = pool;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
@@ -20404,11 +20399,11 @@ var gd3d;
                     webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
                 }
             };
-            webglkit._maxVertexAttribArray = 0;
-            webglkit._texNumber = null;
-            webglkit.caps = new caps();
             return webglkit;
         }());
+        webglkit._maxVertexAttribArray = 0;
+        webglkit._texNumber = null;
+        webglkit.caps = new caps();
         render.webglkit = webglkit;
     })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
@@ -20778,10 +20773,10 @@ var gd3d;
                     mesh.drawElementLines(webgl, drawbegin, drawcount);
                 }
             };
-            glDrawPass.lastState = "";
-            glDrawPass.textureID = null;
             return glDrawPass;
         }());
+        glDrawPass.lastState = "";
+        glDrawPass.textureID = null;
         render.glDrawPass = glDrawPass;
     })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
@@ -20891,10 +20886,10 @@ var gd3d;
                 return total;
             };
             glMesh.prototype.bindVboBuffer = function (webgl) {
+                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             };
             glMesh.prototype.bind = function (webgl, shadercode, bindEbo) {
                 if (bindEbo === void 0) { bindEbo = 0; }
-                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 this.bindIndex = bindEbo;
                 if (bindEbo >= 0) {
                     webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[bindEbo]);
@@ -22602,9 +22597,9 @@ var gd3d;
                 glTexture2D.mapTexture[name] = t;
                 return t;
             };
-            glTexture2D.mapTexture = {};
             return glTexture2D;
         }());
+        glTexture2D.mapTexture = {};
         render.glTexture2D = glTexture2D;
         var WriteableTexture2D = (function () {
             function WriteableTexture2D(webgl, format, width, height, linear, premultiply, repeat, mirroredU, mirroredV) {
