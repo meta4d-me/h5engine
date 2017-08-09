@@ -28,9 +28,6 @@ namespace gd3d.framework
          * 发射时间（continue类型时表示持续发射时间，burst时表示延时发射时间）
          */
         time: number;
-
-
-        delayTime:number;
         /**
          * 位置相关
          * 

@@ -1571,7 +1571,6 @@ declare namespace gd3d.framework {
         private delayElements;
         private refElements;
         private addElements();
-        private addRefElements();
         private addElement(data);
         private addInitFrame(elementData);
         setFrameId(id: number): void;
@@ -2717,6 +2716,8 @@ declare namespace gd3d.framework {
     class EffectParser {
         asMgr: assetMgr;
         Parse(str: string, assetmgr: assetMgr): EffectSystemData;
+        private _parse(elementData);
+        private copyAndOverWrite(srcData, desData);
         _parseSingleMeshTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionShape(_startdata: any, element: EffectElementData): void;

@@ -9106,17 +9106,10 @@ var gd3d;
                     for (var i = this.delayElements.length - 1; i >= 0; i--) {
                         var data = this.delayElements[i];
                         if (data.delayTime <= this.playTimer) {
-                            if (data.refFrom != undefined) {
-                                this.refElements.push(data);
-                            }
-                            else {
-                                this.addElement(this.delayElements[i]);
-                            }
+                            this.addElement(this.delayElements[i]);
                             this.delayElements.splice(i, 1);
                         }
                     }
-                    if (this.refElements.length > 0)
-                        this.addRefElements();
                 }
                 if (this.checkFrameId()) {
                     for (var i in this.effectBatchers) {
@@ -9321,32 +9314,10 @@ var gd3d;
                         this.delayElements.push(data);
                         continue;
                     }
-                    if (data.refFrom == undefined) {
-                        this.addElement(data);
-                    }
-                    else {
-                        this.refElements.push(data);
-                    }
+                    this.addElement(data);
                 }
-                this.addRefElements();
                 this.state = framework.EffectPlayStateEnum.BeReady;
                 this.beLoop = this.data.beLoop;
-            };
-            effectSystem.prototype.addRefElements = function () {
-                while (this.refElements.length > 0) {
-                    for (var i = this.refElements.length - 1; i >= 0; i--) {
-                        var data = this.refElements[i];
-                        var refFrom = data.refFrom;
-                        if (this._data.elementDic[refFrom] != undefined) {
-                            var elementData = this._data.elementDic[refFrom].clone();
-                            elementData.beloop = data.beloop;
-                            elementData.delayTime = data.delayTime;
-                            elementData.name = data.name;
-                            this.addElement(elementData);
-                            this.refElements.splice(i, 1);
-                        }
-                    }
-                }
             };
             effectSystem.prototype.addElement = function (data) {
                 if (data.type == framework.EffectElementTypeEnum.EmissionType) {
@@ -16480,52 +16451,105 @@ var gd3d;
                 if (content["beloop"] != undefined) {
                     effectData.beLoop = content["beloop"];
                 }
+                var refOriDic = {};
+                var unRefOriDic = {};
+                var refCount = 0;
                 if (content["elements"] != undefined) {
                     effectData.elementDic = {};
                     var elements = content["elements"];
                     for (var i in elements) {
-                        var element = new framework.EffectElementData();
                         var elementData = elements[i];
+                        var name_5 = "";
                         if (elementData["name"] != undefined) {
-                            element.name = elementData["name"];
-                            if (effectData.elementDic[element.name] == undefined)
-                                effectData.elementDic[element.name] = element;
-                            else
-                                console.error("特效中元素的名字重复：" + element.name);
+                            name_5 = elementData["name"];
+                            if (effectData.elementDic[name_5] != undefined || refOriDic[name_5] != undefined) {
+                                console.error("特效中元素的名字重复：" + name_5);
+                                continue;
+                            }
                         }
                         else {
                             console.error("未设置特效中元素的名字！");
                             continue;
                         }
-                        if (elementData["beloop"] != undefined)
-                            element.beloop = elementData["beloop"];
-                        if (elementData["delaytime"] != undefined)
-                            element.delayTime = elementData["delaytime"];
                         if (elementData["ref"] != undefined) {
-                            element.refFrom = elementData["ref"];
+                            refOriDic[name_5] = elementData;
+                            refCount++;
                             continue;
                         }
-                        if (elementData["type"] != undefined) {
-                            switch (elementData["type"]) {
-                                case "singlemesh":
-                                    element.type = framework.EffectElementTypeEnum.SingleMeshType;
-                                    break;
-                                case "emission":
-                                    element.type = framework.EffectElementTypeEnum.EmissionType;
-                                    break;
-                            }
+                        else {
+                            effectData.elementDic[name_5] = this._parse(elementData);
+                            unRefOriDic[name_5] = elementData;
                         }
-                        switch (element.type) {
-                            case framework.EffectElementTypeEnum.SingleMeshType:
-                                this._parseSingleMeshTypeData(elementData, element);
-                                break;
-                            case framework.EffectElementTypeEnum.EmissionType:
-                                this._parseEmissionTypeData(elementData, element);
-                                break;
+                    }
+                    while (refCount > 0) {
+                        for (var key in refOriDic) {
+                            var desOriData = refOriDic[key];
+                            if (desOriData == null)
+                                continue;
+                            var refFrom = desOriData["ref"];
+                            if (unRefOriDic[refFrom] != undefined) {
+                                var srcOriData = unRefOriDic[refFrom];
+                                this.copyAndOverWrite(srcOriData, desOriData);
+                                var element = this._parse(desOriData);
+                                effectData.elementDic[desOriData["name"]] = element;
+                                delete refOriDic[key];
+                                refCount--;
+                            }
                         }
                     }
                 }
                 return effectData;
+            };
+            EffectParser.prototype._parse = function (elementData) {
+                var element = new framework.EffectElementData();
+                if (elementData["beloop"] != undefined)
+                    element.beloop = elementData["beloop"];
+                if (elementData["delaytime"] != undefined)
+                    element.delayTime = elementData["delaytime"];
+                element.name = elementData["name"];
+                if (elementData["type"] != undefined) {
+                    switch (elementData["type"]) {
+                        case "singlemesh":
+                            element.type = framework.EffectElementTypeEnum.SingleMeshType;
+                            break;
+                        case "emission":
+                            element.type = framework.EffectElementTypeEnum.EmissionType;
+                            break;
+                    }
+                }
+                switch (element.type) {
+                    case framework.EffectElementTypeEnum.SingleMeshType:
+                        this._parseSingleMeshTypeData(elementData, element);
+                        break;
+                    case framework.EffectElementTypeEnum.EmissionType:
+                        this._parseEmissionTypeData(elementData, element);
+                        break;
+                }
+                return element;
+            };
+            EffectParser.prototype.copyAndOverWrite = function (srcData, desData) {
+                for (var key in srcData) {
+                    var data = srcData[key];
+                    if (data != undefined) {
+                        var baseType = typeof (data);
+                        switch (baseType.toLowerCase()) {
+                            case "number":
+                            case "string":
+                            case "boolean":
+                                if (desData[key] == undefined)
+                                    desData[key] = data;
+                                break;
+                            default:
+                                if (desData[key] == undefined) {
+                                    desData[key] = srcData[key];
+                                }
+                                else {
+                                    this.copyAndOverWrite(srcData[key], desData[key]);
+                                }
+                                break;
+                        }
+                    }
+                }
             };
             EffectParser.prototype._parseSingleMeshTypeData = function (elementData, element) {
                 if (elementData["timeline"] != undefined) {
