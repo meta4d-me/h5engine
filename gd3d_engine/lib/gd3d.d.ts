@@ -1549,7 +1549,6 @@ declare namespace gd3d.framework {
         private effectBatchers;
         private particles;
         private matDataGroups;
-        private particleElementDic;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
@@ -1577,7 +1576,6 @@ declare namespace gd3d.framework {
         private addInitFrame(elementData);
         setFrameId(id: number): void;
         getDelayFrameCount(delayTime: number): number;
-        private beExecuteNextFrame;
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
@@ -2265,7 +2263,6 @@ declare namespace gd3d.framework {
         curAttrData: EffectAttrsData;
         effectBatcher: EffectBatcher;
         startVboIndex: number;
-        startEboIndex: number;
         endEboIndex: number;
         delayTime: number;
         actionActive: boolean;
@@ -2421,6 +2418,7 @@ declare namespace gd3d.framework {
         maxEmissionCount: number;
         emissionCount: number;
         time: number;
+        delayTime: number;
         pos: ParticleNode;
         moveSpeed: ParticleNode;
         gravity: number;
@@ -3120,7 +3118,7 @@ declare namespace gd3d.framework {
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3);
         intersectAABB(_aabb: aabb): boolean;
         intersectPlaneTransform(tran: transform): pickinfo;
-        private intersectPlane(planePoint, planeNormal);
+        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: any): gd3d.math.vector3;
         intersectCollider(tran: transform): pickinfo;
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
