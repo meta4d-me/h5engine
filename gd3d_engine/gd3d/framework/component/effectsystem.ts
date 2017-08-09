@@ -196,20 +196,10 @@ namespace gd3d.framework
                     let data = this.delayElements[i];
                     if (data.delayTime <= this.playTimer)
                     {
-                        //延时时间到了就添加到effectbatcher中，开始渲染。先处理没有引用它人的，再处理带引用关系的
-                        if (data.refFrom != undefined)
-                        {
-                            this.refElements.push(data);
-                        } else
-                        {
-                            this.addElement(this.delayElements[i]);
-                        }
+                        this.addElement(this.delayElements[i]);
                         this.delayElements.splice(i, 1);
                     }
                 }
-                //这里处理的是有延时的refElements
-                if (this.refElements.length > 0)
-                    this.addRefElements();
             }
             if (this.checkFrameId())
             {
@@ -539,8 +529,6 @@ namespace gd3d.framework
                     this.refElements.push(data);
                 }
             }
-            //这里处理的是没有延时的refElements
-            this.addRefElements();
         }
 
         private delayElements: EffectElementData[] = [];
@@ -558,76 +546,10 @@ namespace gd3d.framework
                     this.delayElements.push(data);
                     continue;
                 }
-                if (data.refFrom == undefined)
-                {
-                    this.addElement(data);
-                } else
-                {
-                    this.refElements.push(data);
-                }
+                this.addElement(data);
             }
-            //这里处理的是没有延时的refElements
-            this.addRefElements();
             this.state = EffectPlayStateEnum.BeReady;
             this.beLoop = this.data.beLoop;
-        }
-
-        private addRefElements()
-        {
-            while (this.refElements.length > 0)
-            {
-                for (let i = this.refElements.length - 1; i >= 0; i--)
-                {
-                    let data = this.refElements[i];
-                    let refFrom = data.refFrom;
-                    //有就直接处理，没有就跳过，下一轮循环处理
-                    if (this._data.elementDic[refFrom] != undefined)
-                    {
-                        let elementData: EffectElementData = this._data.elementDic[refFrom].clone();
-                        this.copyAndOverWrite(data, elementData);
-                        // elementData.beloop = data.beloop;
-                        // elementData.delayTime = data.delayTime;
-                        // elementData.name = data.name;
-                        this.addElement(elementData);
-                        this.refElements.splice(i, 1);
-                    }
-                }
-            }
-        }
-
-        private copyAndOverWrite(srcData: any, desData: any)
-        {
-            for (let key in srcData)
-            {
-                let data = srcData[key];
-                if (data != undefined)
-                {
-                    let baseType: string = typeof (data);
-                    switch (baseType.toLowerCase())
-                    {
-                        case "number":
-                        case "string":
-                        case "boolean":
-                            try
-                            {
-                                desData[key] = data;
-                            } catch (e)
-                            {
-                                console.warn("key:" + key);
-                            }
-                            break;
-                        default:
-                            if (desData[key] == undefined)
-                            {
-                                desData[key] = srcData[key];
-                            } else
-                            {
-                                this.copyAndOverWrite(srcData[key], desData[key]);
-                            }
-                            break;
-                    }
-                }
-            }
         }
 
         private addElement(data: EffectElementData)

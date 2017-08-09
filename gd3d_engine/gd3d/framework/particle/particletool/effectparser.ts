@@ -28,60 +28,139 @@ namespace gd3d.framework
             {
                 effectData.beLoop = <boolean>content["beloop"];
             }
+            // let list: any[] = [];
+            let refOriDic: { [name: string]: any } = {};
+            let unRefOriDic: { [name: string]: any } = {};
+            let refCount = 0;
             if (content["elements"] != undefined)
             {
                 effectData.elementDic = {};
                 let elements = <any[]>content["elements"];
                 for (let i in elements)
                 {
-                    let element = new EffectElementData();
                     let elementData = elements[i];
+                    let name: string = "";
                     if (elementData["name"] != undefined)
                     {
-                        element.name = elementData["name"];
-                        if (effectData.elementDic[element.name] == undefined)
-                            effectData.elementDic[element.name] = element;
-                        else
-                            console.error("特效中元素的名字重复：" + element.name);
-                    }
-                    else
+                        name = elementData["name"];
+                        if (effectData.elementDic[name] != undefined || refOriDic[name] != undefined)
+                        {
+                            console.error("特效中元素的名字重复：" + name);
+                            continue;
+                        }
+                    } else
                     {
                         console.error("未设置特效中元素的名字！");
                         continue;
                     }
-                    if (elementData["beloop"] != undefined)
-                        element.beloop = elementData["beloop"];
-                    if (elementData["delaytime"] != undefined)
-                        element.delayTime = <number>elementData["delaytime"];
+
                     if (elementData["ref"] != undefined)
                     {
-                        element.refFrom = elementData["ref"];
-                        // continue;
-                    }
-                    if (elementData["type"] != undefined)
+                        // element.refFrom = elementData["ref"];
+                        refOriDic[name] = elementData;
+                        refCount++;
+                        continue;
+                    } else
                     {
-                        switch (elementData["type"])
+                        effectData.elementDic[name] = this._parse(elementData);
+                        unRefOriDic[name] = elementData;
+                    }
+                }
+
+                while (refCount > 0)
+                {
+                    for (let key in refOriDic)
+                    {
+                        let desOriData = refOriDic[key];
+                        if (desOriData == null)
+                            continue;
+                        let refFrom = desOriData["ref"];
+                        if (unRefOriDic[refFrom] != undefined)
                         {
-                            case "singlemesh":
-                                element.type = EffectElementTypeEnum.SingleMeshType;
-                                break;
-                            case "emission":
-                                element.type = EffectElementTypeEnum.EmissionType;
-                                break;
+                            let srcOriData = unRefOriDic[refFrom];
+                            this.copyAndOverWrite(srcOriData, desOriData);
+                            let element: EffectElementData = this._parse(desOriData);
+                            effectData.elementDic[desOriData["name"]] = element;
+                            delete refOriDic[key];
+                            refCount--;
                         }
-                    }
-                    switch (element.type)
-                    {
-                        case EffectElementTypeEnum.SingleMeshType:
-                            this._parseSingleMeshTypeData(elementData, element);
-                            break;
-                        case EffectElementTypeEnum.EmissionType:
-                            this._parseEmissionTypeData(elementData, element);
-                            break;
                     }
                 }
             }
             return effectData;
+        }
+
+        /**
+         * 解析特效中单个元素数据
+         * @param elementData 
+         */
+        private _parse(elementData: any): EffectElementData
+        {
+            let element = new EffectElementData();
+            if (elementData["beloop"] != undefined)
+                element.beloop = elementData["beloop"];
+            if (elementData["delaytime"] != undefined)
+                element.delayTime = <number>elementData["delaytime"];
+            element.name = elementData["name"];
+            if (elementData["type"] != undefined)
+            {
+                switch (elementData["type"])
+                {
+                    case "singlemesh":
+                        element.type = EffectElementTypeEnum.SingleMeshType;
+                        break;
+                    case "emission":
+                        element.type = EffectElementTypeEnum.EmissionType;
+                        break;
+                }
+            }
+            switch (element.type)
+            {
+                case EffectElementTypeEnum.SingleMeshType:
+                    this._parseSingleMeshTypeData(elementData, element);
+                    break;
+                case EffectElementTypeEnum.EmissionType:
+                    this._parseEmissionTypeData(elementData, element);
+                    break;
+            }
+            return element;
+        }
+
+        /**
+         * 处理特效中元素之间的ref，同时保留ref出来的数据同样根据配置被随机出来的功能
+         * @param srcData 
+         * @param desData 
+         */
+        private copyAndOverWrite(srcData: any, desData: any)
+        {
+            for (let key in srcData)
+            {
+                let data = srcData[key];
+                if (data != undefined)
+                {
+                    let baseType: string = typeof (data);
+                    switch (baseType.toLowerCase())
+                    {
+                        case "number":
+                        case "string":
+                        case "boolean":
+                            //对于基础类型，目标data中没有这个字段才赋值，有的话就用目标data中的数据
+                            if (desData[key] == undefined)
+                                desData[key] = data;
+                            break;
+                        default:
+                            //对于对象，如果目标中没有这个字段，就直接赋值，有的话，往下继续递归找
+                            if (desData[key] == undefined)
+                            {
+                                desData[key] = srcData[key];
+                            } else
+                            {
+                                this.copyAndOverWrite(srcData[key], desData[key]);
+                            }
+                            break;
+                    }
+                }
+            }
         }
 
         /**
