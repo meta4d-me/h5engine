@@ -326,9 +326,10 @@ namespace gd3d.framework
         {
             if (elementData["timeline"] != undefined)
             {
-                if (elementData["timeline"]["attrs"] != undefined)
+                let timelines = <any[]>elementData["timeline"];
+                if (timelines.length > 0 && timelines[0] != undefined && timelines[0]["attrs"] != undefined)
                 {
-                    let _data = elementData["timeline"]["attrs"];
+                    let _data = timelines[0]["attrs"];
                     let data = new Emission();
                     element.emissionData = data;
                     if (_data["emissionType"] != undefined)

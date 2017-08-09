@@ -16698,8 +16698,9 @@ var gd3d;
             };
             EffectParser.prototype._parseEmissionTypeData = function (elementData, element) {
                 if (elementData["timeline"] != undefined) {
-                    if (elementData["timeline"]["attrs"] != undefined) {
-                        var _data = elementData["timeline"]["attrs"];
+                    var timelines = elementData["timeline"];
+                    if (timelines.length > 0 && timelines[0] != undefined && timelines[0]["attrs"] != undefined) {
+                        var _data = timelines[0]["attrs"];
                         var data = new framework.Emission();
                         element.emissionData = data;
                         if (_data["emissionType"] != undefined) {
