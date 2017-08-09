@@ -56,7 +56,7 @@ namespace gd3d.framework
                     if (elementData["ref"] != undefined)
                     {
                         element.refFrom = elementData["ref"];
-                        continue;
+                        // continue;
                     }
                     if (elementData["type"] != undefined)
                     {

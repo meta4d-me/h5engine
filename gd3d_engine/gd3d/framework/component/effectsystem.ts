@@ -88,6 +88,8 @@ namespace gd3d.framework
         private effectBatchers: EffectBatcher[] = [];
         private particles: Particles;//粒子系统 发射器统一管理
         private matDataGroups: EffectMatData[] = [];
+        private particleElementDic: { [name: string]: EffectElementData } = {};
+
         /**
         * @private
         */
@@ -221,6 +223,10 @@ namespace gd3d.framework
                         {
                             //没有延时或者延时已经结束
                             subEffectBatcher.mesh.submesh[0].size = element.endEboIndex;
+                        } else
+                        {
+                            if (subEffectBatcher.mesh.submesh[0].size > element.startEboIndex)
+                                subEffectBatcher.mesh.submesh[0].size = element.startEboIndex;
                         }
                         // let frameId = this.curFrameId % element.loopFrame;
                         let frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
@@ -436,7 +442,6 @@ namespace gd3d.framework
             let effect = new effectSystem();
             effect.data = this.data.clone();
             return effect;
-
         }
         /**
          * @public
@@ -514,18 +519,28 @@ namespace gd3d.framework
             if (this.particles != undefined)
                 this.particles.dispose();
 
-            for (let name in this.data.elementDic)
+            for (let name in this.particleElementDic)
             {
                 let data = this.data.elementDic[name];
-                if (data.type == EffectElementTypeEnum.EmissionType)
+                if (data.delayTime > 0)
+                {
+                    this.delayElements.push(data);
+                    continue;
+                }
+                if (data.refFrom == undefined)
                 {
                     if (this.particles == undefined)
                     {
                         this.particles = new Particles(this);
                     }
                     this.particles.addEmission(data);
+                } else
+                {
+                    this.refElements.push(data);
                 }
             }
+            //这里处理的是没有延时的refElements
+            this.addRefElements();
         }
 
         private delayElements: EffectElementData[] = [];
@@ -569,11 +584,47 @@ namespace gd3d.framework
                     if (this._data.elementDic[refFrom] != undefined)
                     {
                         let elementData: EffectElementData = this._data.elementDic[refFrom].clone();
-                        elementData.beloop = data.beloop;
-                        elementData.delayTime = data.delayTime;
-                        elementData.name = data.name;
+                        this.copyAndOverWrite(data, elementData);
+                        // elementData.beloop = data.beloop;
+                        // elementData.delayTime = data.delayTime;
+                        // elementData.name = data.name;
                         this.addElement(elementData);
                         this.refElements.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+        private copyAndOverWrite(srcData: any, desData: any)
+        {
+            for (let key in srcData)
+            {
+                let data = srcData[key];
+                if (data != undefined)
+                {
+                    let baseType: string = typeof (data);
+                    switch (baseType.toLowerCase())
+                    {
+                        case "number":
+                        case "string":
+                        case "boolean":
+                            try
+                            {
+                                desData[key] = data;
+                            } catch (e)
+                            {
+                                console.warn("key:" + key);
+                            }
+                            break;
+                        default:
+                            if (desData[key] == undefined)
+                            {
+                                desData[key] = srcData[key];
+                            } else
+                            {
+                                this.copyAndOverWrite(srcData[key], desData[key]);
+                            }
+                            break;
                     }
                 }
             }
@@ -588,6 +639,7 @@ namespace gd3d.framework
                     this.particles = new Particles(this);
                 }
                 this.particles.addEmission(data);
+                this.particleElementDic[data.name] = data;
             }
             else if (data.type == EffectElementTypeEnum.SingleMeshType)
             {
@@ -626,7 +678,8 @@ namespace gd3d.framework
                 subEffectBatcher = this.effectBatchers[index];
                 vertexStartIndex = subEffectBatcher.curTotalVertexCount;
                 subEffectBatcher.curTotalVertexCount += vertexCount;
-                subEffectBatcher.state = EffectBatcherState.ResizeCapacityStateType;
+                if (subEffectBatcher.state == EffectBatcherState.InitedStateType)
+                    subEffectBatcher.state = EffectBatcherState.ResizeCapacityStateType;
             } else
             {
                 subEffectBatcher = new EffectBatcher(this.vf);
@@ -645,7 +698,6 @@ namespace gd3d.framework
                     sm.line = false;
                     subEffectBatcher.mesh.submesh.push(sm);
                 }
-
                 vertexStartIndex = 0;
                 index = 0;
                 if (_initFrameData.attrsData.mat.shader == null)
@@ -733,6 +785,7 @@ namespace gd3d.framework
             //index
             var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
             let _startIndex = subEffectBatcher.indexStartIndex;
+            element.startEboIndex = _startIndex;
             subEffectBatcher.indexStartIndex += indexArray.length;
             element.endEboIndex = subEffectBatcher.indexStartIndex;
             for (var i = 0; i < indexArray.length; i++)
@@ -756,7 +809,7 @@ namespace gd3d.framework
         {
             return delayTime * effectSystem.fps;
         }
-
+        private beExecuteNextFrame: boolean = true;
         /**
          * 计算当前的frameid
          * 
@@ -773,6 +826,7 @@ namespace gd3d.framework
             {
                 if (this.state == EffectPlayStateEnum.Play)
                     this.curFrameId = curid;
+                this.beExecuteNextFrame = true;
                 return true;
             }
             return false;

@@ -1573,6 +1573,7 @@ declare namespace gd3d.framework {
         private refElements;
         private addElements();
         private addRefElements();
+        private copyAndOverWrite(srcData, desData);
         private addElement(data);
         private addInitFrame(elementData);
         setFrameId(id: number): void;

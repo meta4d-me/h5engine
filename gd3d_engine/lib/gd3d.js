@@ -9358,11 +9358,37 @@ var gd3d;
                         var refFrom = data.refFrom;
                         if (this._data.elementDic[refFrom] != undefined) {
                             var elementData = this._data.elementDic[refFrom].clone();
-                            elementData.beloop = data.beloop;
-                            elementData.delayTime = data.delayTime;
-                            elementData.name = data.name;
+                            this.copyAndOverWrite(data, elementData);
                             this.addElement(elementData);
                             this.refElements.splice(i, 1);
+                        }
+                    }
+                }
+            };
+            effectSystem.prototype.copyAndOverWrite = function (srcData, desData) {
+                for (var key in srcData) {
+                    var data = srcData[key];
+                    if (data != undefined) {
+                        var baseType = typeof (data);
+                        switch (baseType.toLowerCase()) {
+                            case "number":
+                            case "string":
+                            case "boolean":
+                                try {
+                                    desData[key] = data;
+                                }
+                                catch (e) {
+                                    console.warn("key:" + key);
+                                }
+                                break;
+                            default:
+                                if (desData[key] == undefined) {
+                                    desData[key] = srcData[key];
+                                }
+                                else {
+                                    this.copyAndOverWrite(srcData[key], desData[key]);
+                                }
+                                break;
                         }
                     }
                 }
@@ -16528,7 +16554,6 @@ var gd3d;
                             element.delayTime = elementData["delaytime"];
                         if (elementData["ref"] != undefined) {
                             element.refFrom = elementData["ref"];
-                            continue;
                         }
                         if (elementData["type"] != undefined) {
                             switch (elementData["type"]) {

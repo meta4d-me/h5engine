@@ -43,10 +43,12 @@ namespace gd3d.framework
         public actions: IEffectAction[];
         public curAttrData: EffectAttrsData;
         public effectBatcher: EffectBatcher;
-        //在effectbatcher中索引的开始位置
+        //在effectbatcher中顶点的开始位置
         public startVboIndex: number = 0;
-        //在effectbatcher中顶点的结束位置，用来动态计算当前要渲染到哪个顶点，主要针对delaytime类型的特效重播时的处理
-        public endEboIndex:number = 0;
+        //在effectbatcher中索引的开始位置，用来动态计算当前要渲染到哪个顶点，主要针对delaytime类型的特效重播时的处理
+        public startEboIndex: number = 0;
+        //在effectbatcher中索引的结束位置，用来动态计算当前要渲染到哪个顶点，主要针对delaytime类型的特效重播时的处理
+        public endEboIndex: number = 0;
         public delayTime: number = 0;
         public actionActive: boolean = false;//当前帧action状态
         public loopFrame: number = Number.MAX_VALUE;//循环帧数
