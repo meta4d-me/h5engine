@@ -9042,8 +9042,10 @@ var gd3d;
                 this.vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
                 this.effectBatchers = [];
                 this.matDataGroups = [];
+                this.particleElementDic = {};
                 this.delayElements = [];
                 this.refElements = [];
+                this.beExecuteNextFrame = true;
             }
             effectSystem.prototype.setJsonData = function (_jsonData) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
@@ -9118,6 +9120,10 @@ var gd3d;
                             var element = subEffectBatcher.effectElements[key];
                             if (element.delayTime == undefined || element.delayTime <= this.playTimer) {
                                 subEffectBatcher.mesh.submesh[0].size = element.endEboIndex;
+                            }
+                            else {
+                                if (subEffectBatcher.mesh.submesh[0].size > element.startEboIndex)
+                                    subEffectBatcher.mesh.submesh[0].size = element.startEboIndex;
                             }
                             var frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
                             if (element.active) {
@@ -9297,13 +9303,20 @@ var gd3d;
             effectSystem.prototype.resetparticle = function () {
                 if (this.particles != undefined)
                     this.particles.dispose();
-                for (var name_3 in this.data.elementDic) {
+                for (var name_3 in this.particleElementDic) {
                     var data = this.data.elementDic[name_3];
-                    if (data.type == framework.EffectElementTypeEnum.EmissionType) {
+                    if (data.delayTime > 0) {
+                        this.delayElements.push(data);
+                        continue;
+                    }
+                    if (data.refFrom == undefined) {
                         if (this.particles == undefined) {
                             this.particles = new framework.Particles(this);
                         }
                         this.particles.addEmission(data);
+                    }
+                    else {
+                        this.refElements.push(data);
                     }
                 }
             };
@@ -9325,6 +9338,7 @@ var gd3d;
                         this.particles = new framework.Particles(this);
                     }
                     this.particles.addEmission(data);
+                    this.particleElementDic[data.name] = data;
                 }
                 else if (data.type == framework.EffectElementTypeEnum.SingleMeshType) {
                     this.addInitFrame(data);
@@ -9353,7 +9367,8 @@ var gd3d;
                     subEffectBatcher = this.effectBatchers[index];
                     vertexStartIndex = subEffectBatcher.curTotalVertexCount;
                     subEffectBatcher.curTotalVertexCount += vertexCount;
-                    subEffectBatcher.state = framework.EffectBatcherState.ResizeCapacityStateType;
+                    if (subEffectBatcher.state == framework.EffectBatcherState.InitedStateType)
+                        subEffectBatcher.state = framework.EffectBatcherState.ResizeCapacityStateType;
                 }
                 else {
                     subEffectBatcher = new framework.EffectBatcher(this.vf);
@@ -9436,6 +9451,7 @@ var gd3d;
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
                 var _startIndex = subEffectBatcher.indexStartIndex;
+                element.startEboIndex = _startIndex;
                 subEffectBatcher.indexStartIndex += indexArray.length;
                 element.endEboIndex = subEffectBatcher.indexStartIndex;
                 for (var i = 0; i < indexArray.length; i++) {
@@ -9454,6 +9470,7 @@ var gd3d;
                 if (curid != this.curFrameId) {
                     if (this.state == framework.EffectPlayStateEnum.Play)
                         this.curFrameId = curid;
+                    this.beExecuteNextFrame = true;
                     return true;
                 }
                 return false;
@@ -14715,6 +14732,7 @@ var gd3d;
         var EffectElement = (function () {
             function EffectElement(_data) {
                 this.startVboIndex = 0;
+                this.startEboIndex = 0;
                 this.endEboIndex = 0;
                 this.delayTime = 0;
                 this.actionActive = false;
