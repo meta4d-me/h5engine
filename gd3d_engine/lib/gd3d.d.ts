@@ -571,6 +571,16 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class uirect implements I2DComponent {
+        canbeClick: boolean;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
     class resID {
         constructor();
         private static idAll;
@@ -3227,6 +3237,7 @@ declare namespace gd3d.framework {
         static COMPONENT_MESHRENDER: string;
         static COMPONENT_EFFECTSYSTEM: string;
         static COMPONENT_LABEL: string;
+        static COMPONENT_uirect: string;
         static COMPONENT_IMAGE: string;
         static COMPONENT_RAWIMAGE: string;
         static COMPONENT_BUTTON: string;
