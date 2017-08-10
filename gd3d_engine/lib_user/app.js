@@ -2619,7 +2619,7 @@ var test_effect = (function () {
     };
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
-        var names = ["fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        var names = ["0fx_boss_02", "fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         var name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
@@ -2638,12 +2638,10 @@ var test_effect = (function () {
     test_effect.prototype.addButton = function () {
         var _this = this;
         var btn = document.createElement("button");
-        btn.textContent = "Load Prefab";
+        btn.textContent = "Play";
         btn.onclick = function () {
-            _this.app.getAssetMgr().savePrefab(_this.tr, "prefabName", function (data, resourses) {
-                console.log(data.files);
-                console.log(resourses.length);
-            });
+            _this.effect.stop();
+            _this.effect.play();
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";
@@ -4243,7 +4241,7 @@ var t;
             this.camera.near = 0.01;
             this.camera.far = 30;
             this.camera.fov = Math.PI * 0.3;
-            objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
             var lighttran = new gd3d.framework.transform();
@@ -7369,6 +7367,7 @@ var test_effecteditor = (function () {
     function test_effecteditor() {
         this.timer = 0;
         this.taskmgr = new gd3d.framework.taskMgr();
+        this.length = 0;
         this.beclone = false;
         this.effectloaded = false;
         this.bestop = false;
@@ -7395,171 +7394,6 @@ var test_effecteditor = (function () {
         this.gui = new lighttool.htmlui.gui(div);
         lighttool.htmlui.panelMgr.instance().init(div);
         this.gui.onchange = function () {
-            if (_this.gui.add_Button("new particle")) {
-                _this.transformRoot = new gd3d.framework.transform();
-                _this.effectSystem = _this.transformRoot.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                _this.effectSysData = new gd3d.framework.EffectSystemData();
-                _this.effectSysData.beLoop = false;
-                _this.effectSysData.life = 0;
-                _this.effectSysData.elements = [];
-            }
-            if (_this.effectSystem != undefined) {
-                if (_this.gui.add_Button("add element")) {
-                    _this.addElement();
-                }
-                if (_this.effectSysData.elements.length > 0) {
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("life:");
-                    _this.setVal(_this.gui.add_Textbox("5"), "life", _this.effectSysData);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Position:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("0"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("0"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("0"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Euler:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("0"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("0"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("0"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Scale:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("1"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("1"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("1"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Color:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("1"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("1"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("1"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("拖拽选择mesh文件");
-                    var fileList = _this.gui.add_DragFile();
-                    if (fileList != null && fileList.length > 0) {
-                        var file = fileList[0];
-                        _this.effectSysData.elements[0].initFrameData.attrsData.mesh = _this.app.getAssetMgr().getAssetByName(file.name);
-                        console.log(file.name);
-                    }
-                    if (_this.effectSysData.elements[0].initFrameData.attrsData.mesh != null)
-                        _this.gui.add_A(_this.effectSysData.elements[0].initFrameData.attrsData.mesh.getName());
-                    _this.gui.endLayout();
-                    if (_this.gui.add_Button("创建材质")) {
-                        var matData = new gd3d.framework.EffectMatData();
-                        _this.effectSysData.elements[0].initFrameData.attrsData.mat = matData;
-                    }
-                    if (_this.effectSysData.elements[0].initFrameData.attrsData.mat != undefined) {
-                        _this.gui.beginLayout_H();
-                        _this.gui.add_A("拖拽选择shader");
-                        var fileList_1 = _this.gui.add_DragFile();
-                        if (fileList_1 != null && fileList_1.length > 0) {
-                            var file = fileList_1[0];
-                            _this.effectSysData.elements[0].initFrameData.attrsData.mat.shader = _this.app.getAssetMgr().getShader(file.name);
-                            console.log(file.name);
-                        }
-                        if (_this.effectSysData.elements[0].initFrameData.attrsData.mat.shader != null)
-                            _this.gui.add_A(_this.effectSysData.elements[0].initFrameData.attrsData.mat.shader.getName());
-                        _this.gui.endLayout();
-                        _this.gui.beginLayout_H();
-                        _this.gui.add_A("拖拽选择贴图");
-                        fileList_1 = _this.gui.add_DragFile();
-                        if (fileList_1 != null && fileList_1.length > 0) {
-                            var file = fileList_1[0];
-                            _this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture = _this.app.getAssetMgr().getAssetByName(file.name);
-                            console.log(file.name);
-                        }
-                        if (_this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture != null)
-                            _this.gui.add_A(_this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture.getName());
-                        _this.gui.endLayout();
-                    }
-                    _this.gui.add_A("TimeLine:");
-                    _this.gui.beginLayout_V();
-                    _this.gui.add_A("frameIndex:");
-                    var val = _this.gui.add_Textbox("30");
-                    if (_this.gui.add_Button("Add Breath Action")) {
-                        if (val != "") {
-                            try {
-                                var v = parseFloat(val);
-                                if (_this.effectSysData.elements[0].timelineFrame == undefined)
-                                    _this.effectSysData.elements[0].timelineFrame = {};
-                                if (_this.effectSysData.elements[0].timelineFrame[v] == undefined)
-                                    _this.effectSysData.elements[0].timelineFrame[v] = new gd3d.framework.EffectFrameData();
-                                _this.effectSysData.elements[0].timelineFrame[v].frameIndex = v;
-                                var action = new gd3d.framework.EffectActionData();
-                                action.actionType = "breath";
-                                action.startFrame = v;
-                                _this.effectSysData.elements[0].actionData = [];
-                                _this.effectSysData.elements[0].actionData.push(action);
-                            }
-                            catch (e) {
-                            }
-                        }
-                    }
-                    if (_this.effectSysData.elements[0].actionData != undefined && _this.effectSysData.elements[0].actionData.length > 0) {
-                        _this.scaleChecked = _this.gui.add_Checkbox("scale", _this.scaleChecked);
-                        if (_this.scaleChecked) {
-                            _this.positionChecked = false;
-                            _this.eulerChecked = false;
-                        }
-                        _this.positionChecked = _this.gui.add_Checkbox("position", _this.positionChecked);
-                        if (_this.positionChecked) {
-                            _this.scaleChecked = false;
-                            _this.eulerChecked = false;
-                        }
-                        _this.eulerChecked = _this.gui.add_Checkbox("euler", _this.eulerChecked);
-                        if (_this.eulerChecked) {
-                            _this.positionChecked = false;
-                            _this.scaleChecked = false;
-                        }
-                        if (_this.scaleChecked) {
-                            if (_this.effectSysData.elements[0].actionData[0].params == undefined)
-                                _this.effectSysData.elements[0].actionData[0].params = {};
-                            _this.effectSysData.elements[0].actionData[0].params["name"] = "scale";
-                            _this.gui.beginLayout_H();
-                            _this.gui.add_A("startvalue:");
-                            _this.gui.add_A(" x");
-                            _this.setVal(_this.gui.add_Textbox("2"), "x", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            _this.gui.add_A(" y");
-                            _this.setVal(_this.gui.add_Textbox("2"), "y", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            _this.gui.add_A(" z");
-                            _this.setVal(_this.gui.add_Textbox("2"), "z", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            _this.gui.endLayout();
-                            _this.gui.beginLayout_H();
-                            _this.gui.add_A("targetvalue:");
-                            _this.gui.add_A(" x");
-                            _this.setVal(_this.gui.add_Textbox("2"), "x", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            _this.gui.add_A(" y");
-                            _this.setVal(_this.gui.add_Textbox("2"), "y", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            _this.gui.add_A(" z");
-                            _this.setVal(_this.gui.add_Textbox("4"), "z", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            _this.gui.endLayout();
-                        }
-                        _this.gui.beginLayout_H();
-                        _this.gui.add_A("loopframe:");
-                        _this.setVal(_this.gui.add_Textbox("60"), "loopframe", _this.effectSysData.elements[0].actionData[0].params);
-                        _this.gui.endLayout();
-                    }
-                    _this.gui.endLayout();
-                }
-            }
-            if (_this.gui.add_Button("Play")) {
-                _this.play();
-            }
         };
         setInterval(function () {
             _this.gui.update();
@@ -7571,8 +7405,9 @@ var test_effecteditor = (function () {
     };
     test_effecteditor.prototype.addElement = function () {
         var element = new gd3d.framework.EffectElementData();
-        this.effectSysData.elements.push(element);
-        element.name = "element" + (this.effectSysData.elements.length - 1);
+        element.name = "element" + this.length;
+        this.effectSysData.elementDic[element.name] = (element);
+        this.length++;
         element.type = gd3d.framework.EffectElementTypeEnum.SingleMeshType;
         element.initFrameData = new gd3d.framework.EffectFrameData();
         element.initFrameData.frameIndex = -1;

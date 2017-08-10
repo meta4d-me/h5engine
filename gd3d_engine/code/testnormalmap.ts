@@ -129,7 +129,6 @@
                 cuber.materials = [];
                 cuber.materials.push(new gd3d.framework.material());
                 cuber.materials[0].setShader(sh);//----------------使用shader
-                //cuber.materials[0].setVector4("_Color", new gd3d.math.vector4(0.4, 0.4, 0.2, 1.0));
 
                 let texture = this.app.getAssetMgr().getAssetByName("map_diffuse.png") as gd3d.framework.texture;
                 cuber.materials[0].setTexture("_MainTex", texture);
@@ -149,7 +148,7 @@
             this.camera.near = 0.01;
             this.camera.far = 30;
             this.camera.fov = Math.PI * 0.3;
-            objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();//标记为需要刷新
 

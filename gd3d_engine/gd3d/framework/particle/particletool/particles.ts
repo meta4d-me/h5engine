@@ -9,16 +9,16 @@ namespace gd3d.framework
         public gameObject: gameObject;
         public name: string;
         public emissionElements: EmissionElement[] = [];//一个特效系统可以有多个发射器元素
-        public vf: number=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
+        public vf: number = gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
         public effectSys: effectSystem;
         public loopFrame: number = Number.MAX_VALUE;//循环帧数
         constructor(sys: effectSystem)
         {
             this.effectSys = sys;
         }
-        addEmission(_emissionNew:EffectElementData)
+        addEmission(_emissionNew: EffectElementData)
         {
-            let _emissionElement = new EmissionElement(_emissionNew, this.effectSys,this);
+            let _emissionElement = new EmissionElement(_emissionNew, this.effectSys, this);
             this.emissionElements.push(_emissionElement);
         }
         update(delta: number)
@@ -50,59 +50,59 @@ namespace gd3d.framework
      */
     export class EmissionElement
     {
-        public webgl:WebGLRenderingContext;
+        public webgl: WebGLRenderingContext;
         public gameObject: gameObject;
         public effectSys: effectSystem;
-        public ParticleMgr:Particles;
+        public ParticleMgr: Particles;
         public vf: number;
         public emissionData: Emission;//原始数据，不能被改变
 
         //-------静态属性----------------------------
-        private maxVertexCount:number=2048;//batcher 最大定点数
+        private maxVertexCount: number = 2048;//batcher 最大定点数
         //-------原属性
-        private localtranslate:gd3d.math.vector3=new gd3d.math.vector3();
-        private localScale:gd3d.math.vector3=new gd3d.math.vector3(1,1,1);
-        private localrotate:gd3d.math.quaternion=new gd3d.math.quaternion();
-        private eluerAngle:gd3d.math.vector3=new gd3d.math.quaternion();
+        private localtranslate: gd3d.math.vector3 = new gd3d.math.vector3();
+        private localScale: gd3d.math.vector3 = new gd3d.math.vector3(1, 1, 1);
+        private localrotate: gd3d.math.quaternion = new gd3d.math.quaternion();
+        private eluerAngle: gd3d.math.vector3 = new gd3d.math.quaternion();
 
-        private beloop:boolean=false;
-        public simulateInLocalSpace:boolean=true;//粒子运动运动空间（世界还是本地）
+        private beloop: boolean = false;
+        public simulateInLocalSpace: boolean = true;//粒子运动运动空间（世界还是本地）
         public active: boolean = true;//激活状态
-        // private delayTime:number;
+        // private delayTime: number = 0;
         //---------衍生属性---------------------------
-        // private delayFlag:boolean=false;
+        // private delayFlag: boolean = false;
         private _continueSpaceTime: number;
-        public perVertexCount:number;//单个粒子的顶点数
-        public perIndexxCount:number;
+        public perVertexCount: number;//单个粒子的顶点数
+        public perIndexxCount: number;
 
         //---------------运行逻辑---------------------------------------
         public emissionBatchers: EmissionBatcher[];//一个发射器可能有多个batcher 需要有一个管理机制
-        private curbatcher:EmissionBatcher;
-        public deadParticles:Particle[];
+        private curbatcher: EmissionBatcher;
+        public deadParticles: Particle[];
 
         private curTime: number;
         private numcount: number;
         private isover: boolean = false;
         //-----------------------------------------------------------------
 
-        constructor(_emission: EffectElementData, sys: effectSystem,mgr:Particles)
+        constructor(_emission: EffectElementData, sys: effectSystem, mgr: Particles)
         {
-            this.webgl=gd3d.framework.sceneMgr.app.webgl;
+            this.webgl = gd3d.framework.sceneMgr.app.webgl;
             this.effectSys = sys;
-            this.ParticleMgr=mgr;
-            this.vf=mgr.vf;
+            this.ParticleMgr = mgr;
+            this.vf = mgr.vf;
             this.gameObject = mgr.effectSys.gameObject;
 
-            this.beloop=_emission.beloop;
+            this.beloop = _emission.beloop;
             this.emissionData = _emission.emissionData;
-            // this.delayTime=_emission.emissionData.delayTime;
-            // if(this.delayTime>0)
+            // this.delayTime = _emission.delayTime;
+            // if (this.delayTime > 0)
             // {
-            //     this.delayFlag=true;
-            // } 
-            this.simulateInLocalSpace=this.emissionData.simulateInLocalSpace;
-            this.perVertexCount=this.emissionData.mesh.data.pos.length;
-            this.perIndexxCount=this.emissionData.mesh.data.trisindex.length;
+            //     this.delayFlag = true;
+            // }
+            this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
+            this.perVertexCount = this.emissionData.mesh.data.pos.length;
+            this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
             switch (this.emissionData.emissionType)
             {
                 case ParticleEmissionType.burst:
@@ -111,50 +111,46 @@ namespace gd3d.framework
                     this._continueSpaceTime = this.emissionData.time / (this.emissionData.emissionCount);
                     break;
             }
-            gd3d.math.vec3Clone(this.emissionData.rootpos,this.localtranslate);
-            gd3d.math.vec3Clone(this.emissionData.rootRotAngle,this.eluerAngle);
-            gd3d.math.vec3Clone(this.emissionData.rootScale,this.localScale);
-            gd3d.math.quatFromEulerAngles(this.eluerAngle.x,this.eluerAngle.y,this.eluerAngle.z,this.localrotate);
-            gd3d.math.matrixMakeTransformRTS(this.localtranslate,this.localScale,this.localrotate,this.matToBatcher);
+            gd3d.math.vec3Clone(this.emissionData.rootpos, this.localtranslate);
+            gd3d.math.vec3Clone(this.emissionData.rootRotAngle, this.eluerAngle);
+            gd3d.math.vec3Clone(this.emissionData.rootScale, this.localScale);
+            gd3d.math.quatFromEulerAngles(this.eluerAngle.x, this.eluerAngle.y, this.eluerAngle.z, this.localrotate);
+            gd3d.math.matrixMakeTransformRTS(this.localtranslate, this.localScale, this.localrotate, this.matToBatcher);
 
             this.emissionBatchers = [];
-            this.deadParticles=[];
+            this.deadParticles = [];
             this.curTime = 0;
             this.numcount = 0;
             this.addBatcher();
         }
 
-        private worldRotation:gd3d.math.quaternion=new gd3d.math.quaternion();
-        getWorldRotation():gd3d.math.quaternion
+        private worldRotation: gd3d.math.quaternion = new gd3d.math.quaternion();
+        getWorldRotation(): gd3d.math.quaternion
         {
-            var parRot=this.gameObject.transform.getWorldRotate();
-            gd3d.math.quatMultiply(parRot,this.localrotate,this.worldRotation);
+            var parRot = this.gameObject.transform.getWorldRotate();
+            gd3d.math.quatMultiply(parRot, this.localrotate, this.worldRotation);
             return this.worldRotation;
         }
 
-        matToBatcher:gd3d.math.matrix=new gd3d.math.matrix();
-        private matToWorld:gd3d.math.matrix=new gd3d.math.matrix();
-        
-        public getmatrixToWorld():gd3d.math.matrix
+        matToBatcher: gd3d.math.matrix = new gd3d.math.matrix();
+        private matToWorld: gd3d.math.matrix = new gd3d.math.matrix();
+
+        public getmatrixToWorld(): gd3d.math.matrix
         {
-            var mat=this.gameObject.transform.getWorldMatrix();
-            gd3d.math.matrixMultiply(mat,this.matToBatcher,this.matToWorld);
+            var mat = this.gameObject.transform.getWorldMatrix();
+            gd3d.math.matrixMultiply(mat, this.matToBatcher, this.matToWorld);
             return this.matToWorld;
         }
 
         public update(delta: number)
         {
             this.curTime += delta;
-            // if(this.delayFlag)
+            // if (this.delayTime != undefined && this.curTime < this.delayTime)
             // {
-            //     if(this.curTime<this.delayTime)
-            //     {
-            //         return;
-            //     }else
-            //     {
-            //         this.curTime=this.curTime-this.delayTime;
-            //         this.delayFlag=false;
-            //     }
+            //     return;
+            // } else
+            // {
+            //     this.curTime = this.curTime - this.delayTime;
             // }
             this.updateEmission(delta);
             this.updateBatcher(delta);
@@ -220,18 +216,18 @@ namespace gd3d.framework
 
         addParticle(count: number = 1)
         {
-            for(var i=0;i<count;i++)
+            for (var i = 0; i < count; i++)
             {
-                if(this.deadParticles.length>0)
+                if (this.deadParticles.length > 0)
                 {
-                    var particle=this.deadParticles.pop();
+                    var particle = this.deadParticles.pop();
                     particle.initByData();
-                    particle.actived=true;
+                    particle.actived = true;
                 }
                 else
                 {
-                    var total=this.curbatcher.curVerCount+this.perVertexCount;
-                    if(total<=this.maxVertexCount)
+                    var total = this.curbatcher.curVerCount + this.perVertexCount;
+                    if (total <= this.maxVertexCount)
                     {
                         this.curbatcher.addParticle();
                     }
@@ -243,19 +239,19 @@ namespace gd3d.framework
                 }
             }
         }
-        
+
         private addBatcher()
         {
-            var batcher=new EmissionBatcher(this);
+            var batcher = new EmissionBatcher(this);
             this.emissionBatchers.push(batcher);
-            this.curbatcher=batcher;
+            this.curbatcher = batcher;
         }
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            if(this.simulateInLocalSpace)
+            if (this.simulateInLocalSpace)
             {
-               context.updateModel(this.gameObject.transform); 
+                context.updateModel(this.gameObject.transform);
             }
             else
             {
@@ -279,5 +275,5 @@ namespace gd3d.framework
             return this.isover;
         }
     }
- 
+
 }

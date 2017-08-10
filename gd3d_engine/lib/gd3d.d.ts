@@ -1559,6 +1559,7 @@ declare namespace gd3d.framework {
         private effectBatchers;
         private particles;
         private matDataGroups;
+        private particleElementDic;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
@@ -1579,11 +1580,13 @@ declare namespace gd3d.framework {
         private resetSingleMesh();
         private resetparticle();
         private delayElements;
+        private refElements;
         private addElements();
         private addElement(data);
         private addInitFrame(elementData);
         setFrameId(id: number): void;
         getDelayFrameCount(delayTime: number): number;
+        private beExecuteNextFrame;
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
@@ -2253,7 +2256,9 @@ declare namespace gd3d.framework {
     class EffectSystemData {
         life: number;
         beLoop: boolean;
-        elements: EffectElementData[];
+        elementDic: {
+            [name: string]: EffectElementData;
+        };
         clone(): EffectSystemData;
         dispose(): void;
     }
@@ -2268,7 +2273,9 @@ declare namespace gd3d.framework {
         actions: IEffectAction[];
         curAttrData: EffectAttrsData;
         effectBatcher: EffectBatcher;
-        startIndex: number;
+        startVboIndex: number;
+        startEboIndex: number;
+        endEboIndex: number;
         delayTime: number;
         actionActive: boolean;
         loopFrame: number;
@@ -2280,7 +2287,7 @@ declare namespace gd3d.framework {
         initActions(): void;
         update(): void;
         private updateElementRotation();
-        isActiveFrame(frameIndex: number): boolean;
+        isCurFrameNeedRefresh(frameIndex: number): boolean;
         setActive(_active: boolean): void;
         dispose(): void;
     }
@@ -2291,7 +2298,7 @@ declare namespace gd3d.framework {
             [frameIndex: number]: EffectFrameData;
         };
         initFrameData: EffectFrameData;
-        ref: string;
+        refFrom: string;
         beloop: boolean;
         delayTime: number;
         actionData: EffectActionData[];
@@ -2353,10 +2360,15 @@ declare namespace gd3d.framework {
         static beEqual(data0: EffectMatData, data1: EffectMatData): boolean;
         clone(): EffectMatData;
     }
+    enum EffectBatcherState {
+        NotInitedStateType = 0,
+        InitedStateType = 1,
+        ResizeCapacityStateType = 2,
+    }
     class EffectBatcher {
         mesh: mesh;
         mat: material;
-        beBufferInited: boolean;
+        state: EffectBatcherState;
         dataForVbo: Float32Array;
         dataForEbo: Uint16Array;
         effectElements: EffectElement[];
@@ -2418,7 +2430,6 @@ declare namespace gd3d.framework {
         maxEmissionCount: number;
         emissionCount: number;
         time: number;
-        delayTime: number;
         pos: ParticleNode;
         moveSpeed: ParticleNode;
         gravity: number;
@@ -2717,6 +2728,8 @@ declare namespace gd3d.framework {
     class EffectParser {
         asMgr: assetMgr;
         Parse(str: string, assetmgr: assetMgr): EffectSystemData;
+        private _parse(elementData);
+        private copyAndOverWrite(srcData, desData);
         _parseSingleMeshTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionShape(_startdata: any, element: EffectElementData): void;
@@ -3118,7 +3131,7 @@ declare namespace gd3d.framework {
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3);
         intersectAABB(_aabb: aabb): boolean;
         intersectPlaneTransform(tran: transform): pickinfo;
-        private intersectPlane(planePoint, planeNormal);
+        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: any): gd3d.math.vector3;
         intersectCollider(tran: transform): pickinfo;
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
