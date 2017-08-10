@@ -3510,6 +3510,34 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var uirect = (function () {
+            function uirect() {
+                this.canbeClick = true;
+            }
+            uirect.prototype.start = function () {
+                throw new Error("Method not implemented.");
+            };
+            uirect.prototype.update = function (delta) {
+                throw new Error("Method not implemented.");
+            };
+            uirect.prototype.onPointEvent = function (canvas, ev, oncap) {
+                throw new Error("Method not implemented.");
+            };
+            uirect.prototype.remove = function () {
+                throw new Error("Method not implemented.");
+            };
+            uirect = __decorate([
+                gd3d.reflect.node2DComponent
+            ], uirect);
+            return uirect;
+        }());
+        framework.uirect = uirect;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var resID = (function () {
             function resID() {
                 this.id = resID.next();
@@ -19829,6 +19857,7 @@ var gd3d;
             StringUtil.COMPONENT_MESHRENDER = "meshRenderer";
             StringUtil.COMPONENT_EFFECTSYSTEM = "effectSystem";
             StringUtil.COMPONENT_LABEL = "label";
+            StringUtil.COMPONENT_uirect = "uirect";
             StringUtil.COMPONENT_IMAGE = "image2D";
             StringUtil.COMPONENT_RAWIMAGE = "rawImage2D";
             StringUtil.COMPONENT_BUTTON = "button";
@@ -20095,6 +20124,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
