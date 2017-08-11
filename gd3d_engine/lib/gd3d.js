@@ -15401,8 +15401,6 @@ var gd3d;
                     emission.emissionCount = this.emissionCount;
                 if (this.time != undefined)
                     emission.time = this.time;
-                if (this.pos != undefined)
-                    emission.pos = this.pos.clone();
                 if (this.simulationSpeed != undefined) {
                     emission.simulationSpeed = this.simulationSpeed.clone();
                 }

@@ -2420,7 +2420,6 @@ declare namespace gd3d.framework {
         maxEmissionCount: number;
         emissionCount: number;
         time: number;
-        pos: ParticleNode;
         moveSpeed: ParticleNode;
         gravity: number;
         euler: ParticleNode;

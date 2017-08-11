@@ -34,9 +34,6 @@ namespace gd3d.framework
          * @type {gd3d.math.vector3}
          * @memberof EmissionNew
          */
-        pos: ParticleNode;
-        // shape: ParticleSystemShape.NORMAL;
-
 
         /**
          * 沿着本地坐标轴不同方向的速度
@@ -165,8 +162,6 @@ namespace gd3d.framework
                 emission.emissionCount = this.emissionCount;
             if (this.time != undefined)
                 emission.time = this.time;
-            if (this.pos != undefined)
-                emission.pos = this.pos.clone();
 
             if (this.simulationSpeed != undefined)
             {

@@ -5,7 +5,7 @@ interface IState
     start(app: gd3d.framework.application);
     update(delta: number);
 }
-//需加上这个反射标记，场景才能通过名字找到这个类，并自动创建他
+//需加上这个反射标记，引擎才能通过名字找到这个类，并自动创建他
 @gd3d.reflect.userCode
 class main implements gd3d.framework.IUserCode
 {
