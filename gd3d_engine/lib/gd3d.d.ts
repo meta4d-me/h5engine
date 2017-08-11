@@ -294,6 +294,8 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         pick2d(mx: number, my: number): transform2D;
         dopick2d(outv: math.vector2, tran: transform2D): transform2D;
+        pick2d_new(mx: number, my: number): transform2D;
+        dopick2d_new(outv: math.vector2, tran: transform2D): transform2D;
         calScreenPosToCanvasPos(mousePos: gd3d.math.vector2, canvasPos: gd3d.math.vector2): void;
     }
 }

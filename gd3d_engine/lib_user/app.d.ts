@@ -1069,6 +1069,7 @@ declare class db_test_effect implements IState {
     start(app: gd3d.framework.application): void;
     private loadEffect(laststate, state);
     private loadScene(laststate, state);
+    private loadScene_nocompress(laststate, state);
     private addcam(laststate, state);
     private addbtn(laststate, state);
     tr: gd3d.framework.transform;
@@ -1097,67 +1098,4 @@ declare class db_test_transQueue implements IState {
     timer: number;
     bere: boolean;
     update(delta: number): void;
-}
-declare module "onlyForDBTest/uitest" {
-    export class UIMouseCTR {
-        app: gd3d.framework.application;
-        scene: gd3d.framework.scene;
-        editorCam: gd3d.framework.camera;
-        constructor(_app: gd3d.framework.application, _editorCam: gd3d.framework.camera);
-        overLay: gd3d.framework.overlay2D;
-        private eventMgr;
-        _LLine: gd3d.framework.transform2D;
-        _RLine: gd3d.framework.transform2D;
-        _TLine: gd3d.framework.transform2D;
-        _DLine: gd3d.framework.transform2D;
-        private lineArr;
-        _RTPoint: gd3d.framework.transform2D;
-        _RDPoint: gd3d.framework.transform2D;
-        _LTPoint: gd3d.framework.transform2D;
-        _LDPoint: gd3d.framework.transform2D;
-        private pointArr;
-        private TransGroup;
-        private LineWide;
-        private LineHeight;
-        private PointWide;
-        private initUIFrameData();
-        attachControll(): void;
-        SetOverLayVisiable(value: boolean): void;
-        refreshFrameData(center: gd3d.math.vector2, wide: number, height: number): void;
-        localTransLate: gd3d.math.vector2;
-        pivot: gd3d.math.vector2;
-        wide: number;
-        height: number;
-        center: gd3d.math.vector2;
-        private recordInitialValue(pivot, wide, height, center, _tranlate);
-        private mouseStartPoint;
-        private mouseEndPoint;
-        private PickedTransStartPoint;
-        private TransGroupStartPos;
-        PickedTrans: gd3d.framework.transform2D;
-        PickedEreal: gd3d.framework.transform2D;
-        pointDownEvent(e: any): void;
-        private pickedTransAndRefreshData(e);
-        private pick2dTransCam(ex, ey);
-        private isPick2dTrans(ex, ey, cam);
-        private isPickerCtrEreal(ex, ey);
-        private pointLeftDown;
-        private calRealMoveVector(mouseStart, mouseEnd, out);
-        pointHoldEvent(e: any): void;
-        private pickAndMoveUI();
-        pointUpEvent(e: any): void;
-        keyDownEvent(e: any): void;
-        update(delta: number): void;
-        mapFunc: {
-            [name: string]: Function;
-        };
-        private rLine();
-        private lLine();
-        private tLine();
-        private dLine();
-        private rtPoint();
-        private rdPoint();
-        private ltPoint();
-        private ldPoint();
-    }
 }
