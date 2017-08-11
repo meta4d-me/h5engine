@@ -1274,6 +1274,35 @@ var gd3d;
                 }
                 return null;
             };
+            overlay2D.prototype.pick2d_new = function (mx, my) {
+                if (this.camera == null)
+                    return null;
+                var vp = new gd3d.math.rect();
+                var app = this.camera.calcViewPortPixel(this.app, vp);
+                var sx = (mx / vp.w) * 2 - 1;
+                var sy = (my / vp.h) * -2 + 1;
+                var outv2 = gd3d.math.pool.new_vector2();
+                outv2.x = sx;
+                outv2.y = sy;
+                var root = this.canvas.getRoot();
+                return this.dopick2d_new(outv2, root);
+            };
+            overlay2D.prototype.dopick2d_new = function (outv, tran) {
+                if (tran.children != null) {
+                    for (var i = tran.children.length - 1; i >= 0; i--) {
+                        var tran2 = this.dopick2d_new(outv, tran.children[i]);
+                        if (tran2 != null)
+                            return tran2;
+                    }
+                }
+                var uirect = tran.getComponent("uirect");
+                if (uirect != null) {
+                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv)) {
+                        return uirect.transform;
+                    }
+                }
+                return null;
+            };
             overlay2D.prototype.calScreenPosToCanvasPos = function (mousePos, canvasPos) {
                 var vp = new gd3d.math.rect();
                 this.camera.calcViewPortPixel(this.app, vp);
@@ -3504,6 +3533,30 @@ var gd3d;
             return rawImage2D;
         }());
         framework.rawImage2D = rawImage2D;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var uirect = (function () {
+            function uirect() {
+                this.canbeClick = true;
+            }
+            uirect.prototype.start = function () {
+            };
+            uirect.prototype.update = function (delta) {
+            };
+            uirect.prototype.onPointEvent = function (canvas, ev, oncap) {
+            };
+            uirect.prototype.remove = function () {
+            };
+            uirect = __decorate([
+                gd3d.reflect.node2DComponent
+            ], uirect);
+            return uirect;
+        }());
+        framework.uirect = uirect;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -19827,6 +19880,7 @@ var gd3d;
             StringUtil.COMPONENT_MESHRENDER = "meshRenderer";
             StringUtil.COMPONENT_EFFECTSYSTEM = "effectSystem";
             StringUtil.COMPONENT_LABEL = "label";
+            StringUtil.COMPONENT_uirect = "uirect";
             StringUtil.COMPONENT_IMAGE = "image2D";
             StringUtil.COMPONENT_RAWIMAGE = "rawImage2D";
             StringUtil.COMPONENT_BUTTON = "button";
@@ -20093,6 +20147,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;

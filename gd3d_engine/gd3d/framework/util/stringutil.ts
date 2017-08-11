@@ -71,7 +71,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         public static COMPONENT_LABEL = "label";
-
+        public static COMPONENT_uirect = "uirect";
         /**
          * @public
          * @language zh_CN

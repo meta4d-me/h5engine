@@ -294,6 +294,8 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         pick2d(mx: number, my: number): transform2D;
         dopick2d(outv: math.vector2, tran: transform2D): transform2D;
+        pick2d_new(mx: number, my: number): transform2D;
+        dopick2d_new(outv: math.vector2, tran: transform2D): transform2D;
         calScreenPosToCanvasPos(mousePos: gd3d.math.vector2, canvasPos: gd3d.math.vector2): void;
     }
 }
@@ -568,6 +570,16 @@ declare namespace gd3d.framework {
         transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+}
+declare namespace gd3d.framework {
+    class uirect implements I2DComponent {
+        canbeClick: boolean;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -3239,6 +3251,7 @@ declare namespace gd3d.framework {
         static COMPONENT_MESHRENDER: string;
         static COMPONENT_EFFECTSYSTEM: string;
         static COMPONENT_LABEL: string;
+        static COMPONENT_uirect: string;
         static COMPONENT_IMAGE: string;
         static COMPONENT_RAWIMAGE: string;
         static COMPONENT_BUTTON: string;
@@ -3284,6 +3297,8 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+}
+declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {
