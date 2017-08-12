@@ -107,6 +107,7 @@ declare namespace gd3d.framework {
         static readonly ins: sceneMgr;
         static app: application;
         static scene: scene;
+        static camera: camera;
     }
 }
 declare namespace Stats {
