@@ -15454,8 +15454,6 @@ var gd3d;
                     emission.emissionCount = this.emissionCount;
                 if (this.time != undefined)
                     emission.time = this.time;
-                if (this.pos != undefined)
-                    emission.pos = this.pos.clone();
                 if (this.simulationSpeed != undefined) {
                     emission.simulationSpeed = this.simulationSpeed.clone();
                 }
@@ -20150,20 +20148,6 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
-var web3d;
-(function (web3d) {
-    var io;
-    (function (io) {
-        onmessage = function (msg) {
-            switch (msg.data.type) {
-                case "load":
-                    break;
-                case "loadShaders":
-                    break;
-            }
-        };
-    })(io = web3d.io || (web3d.io = {}));
-})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
