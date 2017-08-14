@@ -18617,29 +18617,29 @@ var gd3d;
             scene.prototype.getRoot = function () {
                 return this.rootNode;
             };
-            scene.prototype.pickAll = function (ray, isPickMesh) {
+            scene.prototype.pickAll = function (ray, isPickMesh, root) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
-                var picked = this.doPick(ray, true, isPickMesh);
+                if (root === void 0) { root = this.getRoot(); }
+                var picked = this.doPick(ray, true, isPickMesh, root);
                 if (picked == null)
                     return null;
                 return picked;
             };
-            scene.prototype.pick = function (ray, isPickMesh) {
+            scene.prototype.pick = function (ray, isPickMesh, root) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
-                var pickinfo = this.doPick(ray, false, isPickMesh);
+                if (root === void 0) { root = this.getRoot(); }
+                var pickinfo = this.doPick(ray, false, isPickMesh, root);
                 if (pickinfo == null)
                     return null;
                 return pickinfo;
             };
-            scene.prototype.doPick = function (ray, pickall, isPickMesh) {
-                if (pickall === void 0) { pickall = false; }
-                if (isPickMesh === void 0) { isPickMesh = false; }
+            scene.prototype.doPick = function (ray, pickall, isPickMesh, root) {
                 var pickedList = new Array();
                 if (isPickMesh) {
-                    this.pickMesh(ray, this.getRoot(), pickedList);
+                    this.pickMesh(ray, root, pickedList);
                 }
                 else {
-                    this.pickCollider(ray, this.getRoot(), pickedList);
+                    this.pickCollider(ray, root, pickedList);
                 }
                 if (pickedList.length == 0)
                     return null;
