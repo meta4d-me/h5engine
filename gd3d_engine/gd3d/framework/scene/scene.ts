@@ -173,7 +173,7 @@ namespace gd3d.framework
             //一个camera 不是一次单纯的绘制，camera 还有多个绘制遍
             var cam = this.renderCameras[camindex];
             var context = this.renderContext[camindex];
-
+            sceneMgr.camera=cam;
             if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0)
             {
                 context.updateCamera(this.app, cam);
@@ -194,7 +194,7 @@ namespace gd3d.framework
             }
             else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
             {
-                context.updateCamera(this.app, cam);
+                context.updateCamera(this.app, cam);           
                 context.updateLights(this.renderLights);
                 cam.fillRenderer(this);
                 cam.renderScene(this, context);

@@ -100,9 +100,9 @@ namespace gd3d.framework
             // {
             //     this.delayFlag = true;
             // }
-            this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
             this.perVertexCount = this.emissionData.mesh.data.pos.length;
             this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
+            this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
             switch (this.emissionData.emissionType)
             {
                 case ParticleEmissionType.burst:

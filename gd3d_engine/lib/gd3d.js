@@ -17596,7 +17596,7 @@ var gd3d;
                     var worldRotation = gd3d.math.pool.new_quaternion();
                     var invTransformRotation = gd3d.math.pool.new_quaternion();
                     gd3d.math.vec3Clone(this.localTranslate, translation);
-                    var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                    var cam = gd3d.framework.sceneMgr.camera;
                     var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
                     gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
                     if (this.renderModel == framework.RenderModel.BillBoard) {
@@ -17934,9 +17934,9 @@ var gd3d;
                 this.gameObject = mgr.effectSys.gameObject;
                 this.beloop = _emission.beloop;
                 this.emissionData = _emission.emissionData;
-                this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
                 this.perVertexCount = this.emissionData.mesh.data.pos.length;
                 this.perIndexxCount = this.emissionData.mesh.data.trisindex.length;
+                this.simulateInLocalSpace = this.emissionData.simulateInLocalSpace;
                 switch (this.emissionData.emissionType) {
                     case framework.ParticleEmissionType.burst:
                         break;
@@ -18505,6 +18505,7 @@ var gd3d;
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];
                 var context = this.renderContext[camindex];
+                framework.sceneMgr.camera = cam;
                 if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0) {
                     context.updateCamera(this.app, cam);
                     context.updateLights(this.renderLights);
@@ -20147,6 +20148,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
