@@ -20148,20 +20148,6 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
-var web3d;
-(function (web3d) {
-    var io;
-    (function (io) {
-        onmessage = function (msg) {
-            switch (msg.data.type) {
-                case "load":
-                    break;
-                case "loadShaders":
-                    break;
-            }
-        };
-    })(io = web3d.io || (web3d.io = {}));
-})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
@@ -20808,10 +20794,10 @@ var gd3d;
                     }
                     glDrawPass.lastZWrite = this.state_zwrite;
                 }
-                if (glDrawPass.lastZTest == undefined || glDrawPass.lastZTest != this.state_ztest) {
+                {
                     if (this.state_ztest) {
                         webgl.enable(webgl.DEPTH_TEST);
-                        if (glDrawPass.lastZTestMethod == undefined || glDrawPass.lastZTestMethod != this.state_ztest_method) {
+                        {
                             webgl.depthFunc(this.state_ztest_method);
                             glDrawPass.lastZTestMethod = this.state_ztest_method;
                         }

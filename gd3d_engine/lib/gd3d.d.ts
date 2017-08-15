@@ -3299,8 +3299,6 @@ declare namespace gd3d.io {
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
-declare namespace web3d.io {
-}
 declare namespace gd3d.math {
     class pool {
         static collect_all(): void;
@@ -3470,7 +3468,6 @@ declare namespace gd3d.render {
         uniformTexture(name: string, tex: render.ITexture): void;
         static textureID: number[];
         use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
-        getLast: any;
         applyUniformSaved(webgl: WebGLRenderingContext): void;
         applyUniform_Float(webgl: WebGLRenderingContext, key: string, value: number): void;
         applyUniform_Floatv(webgl: WebGLRenderingContext, key: string, value: Float32Array): void;
