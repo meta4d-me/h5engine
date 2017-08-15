@@ -9281,6 +9281,8 @@ var gd3d;
                 }
             };
             effectSystem.prototype.render = function (context, assetmgr, camera) {
+                if (!(camera.CullingMask & this.renderLayer))
+                    return;
                 if (this.state == framework.EffectPlayStateEnum.Play) {
                     context.updateModel(this.gameObject.transform);
                     for (var i in this.effectBatchers) {
@@ -18618,29 +18620,29 @@ var gd3d;
             scene.prototype.getRoot = function () {
                 return this.rootNode;
             };
-            scene.prototype.pickAll = function (ray, isPickMesh) {
+            scene.prototype.pickAll = function (ray, isPickMesh, root) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
-                var picked = this.doPick(ray, true, isPickMesh);
+                if (root === void 0) { root = this.getRoot(); }
+                var picked = this.doPick(ray, true, isPickMesh, root);
                 if (picked == null)
                     return null;
                 return picked;
             };
-            scene.prototype.pick = function (ray, isPickMesh) {
+            scene.prototype.pick = function (ray, isPickMesh, root) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
-                var pickinfo = this.doPick(ray, false, isPickMesh);
+                if (root === void 0) { root = this.getRoot(); }
+                var pickinfo = this.doPick(ray, false, isPickMesh, root);
                 if (pickinfo == null)
                     return null;
                 return pickinfo;
             };
-            scene.prototype.doPick = function (ray, pickall, isPickMesh) {
-                if (pickall === void 0) { pickall = false; }
-                if (isPickMesh === void 0) { isPickMesh = false; }
+            scene.prototype.doPick = function (ray, pickall, isPickMesh, root) {
                 var pickedList = new Array();
                 if (isPickMesh) {
-                    this.pickMesh(ray, this.getRoot(), pickedList);
+                    this.pickMesh(ray, root, pickedList);
                 }
                 else {
-                    this.pickCollider(ray, this.getRoot(), pickedList);
+                    this.pickCollider(ray, root, pickedList);
                 }
                 if (pickedList.length == 0)
                     return null;
@@ -20808,10 +20810,10 @@ var gd3d;
                     }
                     glDrawPass.lastZWrite = this.state_zwrite;
                 }
-                if (glDrawPass.lastZTest == undefined || glDrawPass.lastZTest != this.state_ztest) {
+                {
                     if (this.state_ztest) {
                         webgl.enable(webgl.DEPTH_TEST);
-                        if (glDrawPass.lastZTestMethod == undefined || glDrawPass.lastZTestMethod != this.state_ztest_method) {
+                        {
                             webgl.depthFunc(this.state_ztest_method);
                             glDrawPass.lastZTestMethod = this.state_ztest_method;
                         }

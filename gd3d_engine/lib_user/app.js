@@ -358,7 +358,6 @@ var main = (function () {
         this.addBtn("post_景深", function () { return new t.test_posteffect_cc(); });
         this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
-        this.addBtn("testeff", function () { return new db_test_effect(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;

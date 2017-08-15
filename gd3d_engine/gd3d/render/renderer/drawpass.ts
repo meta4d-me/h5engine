@@ -350,12 +350,12 @@
                 glDrawPass.lastZWrite = this.state_zwrite;
             }
 
-            if (glDrawPass.lastZTest == undefined || glDrawPass.lastZTest != this.state_ztest)
+            // if (glDrawPass.lastZTest == undefined || glDrawPass.lastZTest != this.state_ztest)
             {
                 if (this.state_ztest)
                 {
                     webgl.enable(webgl.DEPTH_TEST);
-                    if (glDrawPass.lastZTestMethod == undefined || glDrawPass.lastZTestMethod != this.state_ztest_method)
+                    // if (glDrawPass.lastZTestMethod == undefined || glDrawPass.lastZTestMethod != this.state_ztest_method)
                     {
                         webgl.depthFunc(this.state_ztest_method);
                         glDrawPass.lastZTestMethod = this.state_ztest_method;
@@ -405,8 +405,6 @@
                 this.applyUniformSaved(webgl);
             }
         }
-
-        getLast
 
         applyUniformSaved(webgl: WebGLRenderingContext)
         {

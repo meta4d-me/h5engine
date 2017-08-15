@@ -3047,9 +3047,9 @@ declare namespace gd3d.framework {
         getChild(index: number): transform;
         getChildByName(name: string): transform;
         getRoot(): transform;
-        pickAll(ray: ray, isPickMesh?: boolean): Array<pickinfo>;
-        pick(ray: ray, isPickMesh?: boolean): pickinfo;
-        private doPick(ray, pickall?, isPickMesh?);
+        pickAll(ray: ray, isPickMesh?: boolean, root?: transform): Array<pickinfo>;
+        pick(ray: ray, isPickMesh?: boolean, root?: transform): pickinfo;
+        private doPick(ray, pickall, isPickMesh, root);
         private pickMesh(ray, tran, pickedList);
         private pickCollider(ray, tran, pickedList);
     }
@@ -3470,7 +3470,6 @@ declare namespace gd3d.render {
         uniformTexture(name: string, tex: render.ITexture): void;
         static textureID: number[];
         use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
-        getLast: any;
         applyUniformSaved(webgl: WebGLRenderingContext): void;
         applyUniform_Float(webgl: WebGLRenderingContext, key: string, value: number): void;
         applyUniform_Floatv(webgl: WebGLRenderingContext, key: string, value: Float32Array): void;
