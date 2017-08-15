@@ -107,7 +107,6 @@ declare namespace gd3d.framework {
         static readonly ins: sceneMgr;
         static app: application;
         static scene: scene;
-        static camera: camera;
     }
 }
 declare namespace Stats {
@@ -2906,6 +2905,7 @@ declare namespace gd3d.framework {
         updateEmission(delta: number): void;
         addParticle(count?: number): void;
         private addBatcher();
+        renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
         isOver(): boolean;

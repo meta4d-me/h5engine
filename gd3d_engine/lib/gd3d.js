@@ -17598,7 +17598,10 @@ var gd3d;
                     var worldRotation = gd3d.math.pool.new_quaternion();
                     var invTransformRotation = gd3d.math.pool.new_quaternion();
                     gd3d.math.vec3Clone(this.localTranslate, translation);
-                    var cam = gd3d.framework.sceneMgr.camera;
+                    var cam = this.batcher.emissionElement.renderCamera;
+                    if (cam == null) {
+                        cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                    }
                     var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
                     gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
                     if (this.renderModel == framework.RenderModel.BillBoard) {
@@ -18042,6 +18045,7 @@ var gd3d;
                 this.curbatcher = batcher;
             };
             EmissionElement.prototype.render = function (context, assetmgr, camera) {
+                this.renderCamera = camera;
                 if (this.simulateInLocalSpace) {
                     context.updateModel(this.gameObject.transform);
                 }
@@ -18507,7 +18511,6 @@ var gd3d;
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];
                 var context = this.renderContext[camindex];
-                framework.sceneMgr.camera = cam;
                 if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0) {
                     context.updateCamera(this.app, cam);
                     context.updateLights(this.renderLights);
