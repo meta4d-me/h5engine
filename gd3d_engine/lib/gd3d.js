@@ -7947,7 +7947,7 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var aniplayer = (function () {
+        var aniplayer = aniplayer_1 = (function () {
             function aniplayer() {
                 this._clipnameCount = 0;
                 this._clipnames = null;
@@ -7967,6 +7967,7 @@ var gd3d;
                 this.playStyle = PlayStyle.NormalPlay;
                 this.percent = 0;
                 this.mix = false;
+                this.isCache = false;
             }
             Object.defineProperty(aniplayer.prototype, "clipnames", {
                 get: function () {
@@ -8024,6 +8025,8 @@ var gd3d;
                     this.crossdelta -= delta / this.speed * this.crossspeed;
                     this.mix = true;
                 }
+                if (this.isCache && !this.mix && !framework.StringUtil.isNullOrEmptyObject(this.carelist) && aniplayer_1.playerCaches[this.cacheKey] != null)
+                    return;
                 for (var i = 0; i < this._playClip.boneCount; i++) {
                     var bone = this._playClip.bones[i];
                     var frame = this._playClip.frames[this._playFrameid];
@@ -8056,6 +8059,9 @@ var gd3d;
                         gd3d.math.pool.delete_matrix(_matrix);
                         gd3d.math.pool.delete_matrix(_newmatrix);
                     }
+                }
+                if (this.isCache && !this.mix) {
+                    aniplayer_1.playerCaches[this.cacheKey] = this;
                 }
             };
             aniplayer.prototype.playByIndex = function (animIndex, speed, beRevert) {
@@ -8256,6 +8262,7 @@ var gd3d;
             };
             return aniplayer;
         }());
+        aniplayer.playerCaches = [];
         __decorate([
             gd3d.reflect.Field("animationClip[]"),
             __metadata("design:type", Array)
@@ -8272,7 +8279,7 @@ var gd3d;
             gd3d.reflect.Field("PoseBoneMatrix[]"),
             __metadata("design:type", Array)
         ], aniplayer.prototype, "startPos", void 0);
-        aniplayer = __decorate([
+        aniplayer = aniplayer_1 = __decorate([
             gd3d.reflect.nodeComponent
         ], aniplayer);
         framework.aniplayer = aniplayer;
@@ -8303,6 +8310,7 @@ var gd3d;
             PlayStyle[PlayStyle["FramePlay"] = 1] = "FramePlay";
             PlayStyle[PlayStyle["PingPang"] = 2] = "PingPang";
         })(PlayStyle = framework.PlayStyle || (framework.PlayStyle = {}));
+        var aniplayer_1;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -10128,16 +10136,23 @@ var gd3d;
                     }
                 }
                 if (this.player != null) {
-                    if (!this.player.mix) {
+                    if (this.player.isCache && !this.player.mix) {
                         var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
                         var data = skinnedMeshRenderer_1.dataCaches[cacheKey];
                         if (!data) {
-                            data = new Float32Array(8 * 40);
-                            this.player.fillPoseData(data, this.bones, true);
-                            skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                            var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
+                            if (_cachePlayer) {
+                                data = new Float32Array(8 * 40);
+                                _cachePlayer.fillPoseData(data, this.bones, true);
+                                skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                                this.cacheData = data;
+                                return;
+                            }
                         }
-                        this.cacheData = data;
-                        return;
+                        else {
+                            this.cacheData = data;
+                            return;
+                        }
                     }
                     this.cacheData = null;
                     if (this._skeletonMatrixData != null) {
@@ -18221,7 +18236,6 @@ var gd3d;
             };
             renderContext.prototype.updateModel = function (model) {
                 gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
-                gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this.matrixModelView);
                 gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
             };
             renderContext.prototype.updateModeTrail = function () {
@@ -18404,6 +18418,7 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
+                framework.aniplayer.playerCaches = [];
                 node.gameObject.init();
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
@@ -19707,6 +19722,19 @@ var gd3d;
                 var firstChar = str.substr(0, 1).toLowerCase();
                 var other = str.substr(1);
                 return firstChar + other;
+            };
+            StringUtil.isNullOrEmptyObject = function (obj) {
+                if (!obj)
+                    return true;
+                try {
+                    var _str = JSON.stringify(obj);
+                    if (_str == '{}')
+                        return true;
+                    return false;
+                }
+                catch (e) {
+                    return false;
+                }
             };
             return StringUtil;
         }());

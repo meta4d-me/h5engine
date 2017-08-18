@@ -3638,6 +3638,7 @@ var test_multipleplayer_anim = (function () {
         this.cubes = {};
         this.infos = {};
         this.timer = 0;
+        this.aniplayers = [];
     }
     test_multipleplayer_anim.prototype.init = function () {
         this.infos[53] = { abName: "prefabs/elong/elong.assetbundle.json", prefabName: "elong.prefab.json", materialCount: 1 };
@@ -3659,8 +3660,8 @@ var test_multipleplayer_anim = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
                         var a = 10;
                         var b = 10;
-                        for (var i = -14; i <= 14; i++) {
-                            for (var j = -14; j <= 14; j++) {
+                        for (var i = -5; i <= 5; i++) {
+                            for (var j = -5; j <= 5; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);
@@ -3669,8 +3670,7 @@ var test_multipleplayer_anim = (function () {
                                     objCam.lookat(trans);
                                 }
                                 var ap = trans.gameObject.getComponent("aniplayer");
-                                ap.autoplay = true;
-                                ap._playTimer = Math.random() * 1000;
+                                _this.aniplayers.push(ap);
                             }
                         }
                         objCam.markDirty();
@@ -3687,6 +3687,22 @@ var test_multipleplayer_anim = (function () {
         this.camera.far = 199;
         objCam.localTranslate = new gd3d.math.vector3(0, 86, 0);
         objCam.markDirty();
+        var tipsLabel = document.createElement("label");
+        tipsLabel.style.top = "300px";
+        tipsLabel.style.position = "absolute";
+        tipsLabel.textContent = "开启cache";
+        this.app.container.appendChild(tipsLabel);
+        var cacheOpenCheckBox = document.createElement("input");
+        cacheOpenCheckBox.type = "checkbox";
+        cacheOpenCheckBox.checked = false;
+        cacheOpenCheckBox.onchange = function () {
+            for (var key in _this.aniplayers) {
+                _this.aniplayers[key].isCache = cacheOpenCheckBox.checked;
+            }
+        };
+        cacheOpenCheckBox.style.top = "350px";
+        cacheOpenCheckBox.style.position = "absolute";
+        this.app.container.appendChild(cacheOpenCheckBox);
     };
     test_multipleplayer_anim.prototype.update = function (delta) {
     };
