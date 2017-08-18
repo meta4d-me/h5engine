@@ -15,6 +15,6 @@ namespace gd3d.framework
 
         public static app: application;
         public static scene: scene;
-
+        //public static camera:camera;
     }
 }

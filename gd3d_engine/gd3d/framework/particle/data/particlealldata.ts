@@ -28,18 +28,12 @@ namespace gd3d.framework
          * 发射时间（continue类型时表示持续发射时间，burst时表示延时发射时间）
          */
         time: number;
-
-
-        delayTime:number;
         /**
          * 位置相关
          * 
          * @type {gd3d.math.vector3}
          * @memberof EmissionNew
          */
-        pos: ParticleNode;
-        // shape: ParticleSystemShape.NORMAL;
-
 
         /**
          * 沿着本地坐标轴不同方向的速度
@@ -168,8 +162,6 @@ namespace gd3d.framework
                 emission.emissionCount = this.emissionCount;
             if (this.time != undefined)
                 emission.time = this.time;
-            if (this.pos != undefined)
-                emission.pos = this.pos.clone();
 
             if (this.simulationSpeed != undefined)
             {

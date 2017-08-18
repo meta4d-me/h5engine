@@ -109,7 +109,7 @@ class test_effect implements IState
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
-        let names: string[] = ["fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+        let names: string[] = ["0fx_boss_02", "fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
         let name = names[0];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
@@ -132,16 +132,25 @@ class test_effect implements IState
 
     private addButton()
     {
+
         var btn = document.createElement("button");
-        btn.textContent = "Load Prefab";
+        btn.textContent = "Play";
         btn.onclick = () =>
         {
-            this.app.getAssetMgr().savePrefab(this.tr, "prefabName", (data: gd3d.framework.SaveInfo, resourses: string[]) =>
-            {
-                console.log(data.files);
-                console.log(resourses.length);
+            // this.app.getAssetMgr().savePrefab(this.tr, "prefabName", (data: gd3d.framework.SaveInfo, resourses: string[]) =>
+            // {
+            //     console.log(data.files);
+            //     console.log(resourses.length);
 
-            });
+            // });
+            this.effect.stop();
+            this.effect.play();
+
+            // let tr = new gd3d.framework.transform();
+            // this.scene.addChild(tr);
+            // let effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
+            // let ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
+            // gd3d.io.serializeObj(effect);
         }
         btn.style.top = "160px";
         btn.style.position = "absolute";
@@ -239,7 +248,6 @@ class test_effect implements IState
 
     tr: gd3d.framework.transform;
     ttr: gd3d.framework.transform;
-    eff: gd3d.framework.effectSystem;
     beclone = false;
     effectloaded = false;
     bestop = false;

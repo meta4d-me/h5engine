@@ -135,14 +135,14 @@
         
         bindVboBuffer(webgl: WebGLRenderingContext)
         {
-            // webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
         }
 
         bindIndex: number = -1;
         vertexFormat: VertexFormatMask = VertexFormatMask.Position;
         bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo: number = 0)
         {
-            webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
+            // webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             this.bindIndex = bindEbo;
             if (bindEbo >= 0)
             {

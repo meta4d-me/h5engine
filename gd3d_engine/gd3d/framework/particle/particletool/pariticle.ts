@@ -40,7 +40,6 @@ namespace gd3d.framework
         private movespeed:gd3d.math.vector3;
         private simulationSpeed: number;
        // private uvSpriteFrameInternal: number;
-        public startFrameId: number;
 
         public data: Emission;
         private vertexSize: number;//单个顶点大小
@@ -85,7 +84,6 @@ namespace gd3d.framework
             this.totalLife=this.data.life.getValueRandom();
             this.renderModel=this.data.renderModel;
             this.curLife = 0;
-            this.startFrameId = this.batcher.emissionElement.effectSys.frameId;
 
             //box方向随着中心轴朝向
             let localRandomDirection = this.data.particleStartData.randomDirection;
@@ -231,7 +229,13 @@ namespace gd3d.framework
                 let invTransformRotation = gd3d.math.pool.new_quaternion();
 
                 gd3d.math.vec3Clone(this.localTranslate, translation);
-                var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                //var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                //var cam = gd3d.framework.sceneMgr.camera;
+                var cam=this.batcher.emissionElement.renderCamera;
+                if(cam==null)
+                {
+                    cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                }
                 var camPosInWorld=cam.gameObject.transform.getWorldTranslate();
 
                 gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);

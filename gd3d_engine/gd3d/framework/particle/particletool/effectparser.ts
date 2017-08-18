@@ -28,45 +28,139 @@ namespace gd3d.framework
             {
                 effectData.beLoop = <boolean>content["beloop"];
             }
+            // let list: any[] = [];
+            let refOriDic: { [name: string]: any } = {};
+            let unRefOriDic: { [name: string]: any } = {};
+            let refCount = 0;
             if (content["elements"] != undefined)
             {
-                effectData.elements = [];
+                effectData.elementDic = {};
                 let elements = <any[]>content["elements"];
                 for (let i in elements)
                 {
-                    let element = new EffectElementData();
-                    effectData.elements.push(element);
                     let elementData = elements[i];
+                    let name: string = "";
                     if (elementData["name"] != undefined)
-                        element.name = elementData["name"];
-                    if (elementData["ref"] != undefined)
-                        element.ref = elementData["ref"];
-                    if(elementData["beloop"]!=undefined)
-                        element.beloop=elementData["beloop"];
-                    if (elementData["type"] != undefined)
                     {
-                        switch (elementData["type"])
+                        name = elementData["name"];
+                        if (effectData.elementDic[name] != undefined || refOriDic[name] != undefined)
                         {
-                            case "singlemesh":
-                                element.type = EffectElementTypeEnum.SingleMeshType;
-                                break;
-                            case "emission":
-                                element.type = EffectElementTypeEnum.EmissionType;
-                                break;
+                            console.error("特效中元素的名字重复：" + name);
+                            continue;
                         }
-                    }
-                    switch (element.type)
+                    } else
                     {
-                        case EffectElementTypeEnum.SingleMeshType:
-                            this._parseSingleMeshTypeData(elementData, element);
-                            break;
-                        case EffectElementTypeEnum.EmissionType:
-                            this._parseEmissionTypeData(elementData, element);
-                            break;
+                        console.error("未设置特效中元素的名字！");
+                        continue;
+                    }
+
+                    if (elementData["ref"] != undefined)
+                    {
+                        // element.refFrom = elementData["ref"];
+                        refOriDic[name] = elementData;
+                        refCount++;
+                        continue;
+                    } else
+                    {
+                        effectData.elementDic[name] = this._parse(elementData);
+                        unRefOriDic[name] = elementData;
+                    }
+                }
+
+                while (refCount > 0)
+                {
+                    for (let key in refOriDic)
+                    {
+                        let desOriData = refOriDic[key];
+                        if (desOriData == null)
+                            continue;
+                        let refFrom = desOriData["ref"];
+                        if (unRefOriDic[refFrom] != undefined)
+                        {
+                            let srcOriData = unRefOriDic[refFrom];
+                            this.copyAndOverWrite(srcOriData, desOriData);
+                            let element: EffectElementData = this._parse(desOriData);
+                            effectData.elementDic[desOriData["name"]] = element;
+                            delete refOriDic[key];
+                            refCount--;
+                        }
                     }
                 }
             }
             return effectData;
+        }
+
+        /**
+         * 解析特效中单个元素数据
+         * @param elementData 
+         */
+        private _parse(elementData: any): EffectElementData
+        {
+            let element = new EffectElementData();
+            if (elementData["beloop"] != undefined)
+                element.beloop = elementData["beloop"];
+            if (elementData["delaytime"] != undefined)
+                element.delayTime = <number>elementData["delaytime"];
+            element.name = elementData["name"];
+            if (elementData["type"] != undefined)
+            {
+                switch (elementData["type"])
+                {
+                    case "singlemesh":
+                        element.type = EffectElementTypeEnum.SingleMeshType;
+                        break;
+                    case "emission":
+                        element.type = EffectElementTypeEnum.EmissionType;
+                        break;
+                }
+            }
+            switch (element.type)
+            {
+                case EffectElementTypeEnum.SingleMeshType:
+                    this._parseSingleMeshTypeData(elementData, element);
+                    break;
+                case EffectElementTypeEnum.EmissionType:
+                    this._parseEmissionTypeData(elementData, element);
+                    break;
+            }
+            return element;
+        }
+
+        /**
+         * 处理特效中元素之间的ref，同时保留ref出来的数据同样根据配置被随机出来的功能
+         * @param srcData 
+         * @param desData 
+         */
+        private copyAndOverWrite(srcData: any, desData: any)
+        {
+            for (let key in srcData)
+            {
+                let data = srcData[key];
+                if (data != undefined)
+                {
+                    let baseType: string = typeof (data);
+                    switch (baseType.toLowerCase())
+                    {
+                        case "number":
+                        case "string":
+                        case "boolean":
+                            //对于基础类型，目标data中没有这个字段才赋值，有的话就用目标data中的数据
+                            if (desData[key] == undefined)
+                                desData[key] = data;
+                            break;
+                        default:
+                            //对于对象，如果目标中没有这个字段，就直接赋值，有的话，往下继续递归找
+                            if (desData[key] == undefined)
+                            {
+                                desData[key] = srcData[key];
+                            } else
+                            {
+                                this.copyAndOverWrite(srcData[key], desData[key]);
+                            }
+                            break;
+                    }
+                }
+            }
         }
 
         /**
@@ -232,9 +326,10 @@ namespace gd3d.framework
         {
             if (elementData["timeline"] != undefined)
             {
-                if (elementData["timeline"]["attrs"] != undefined)
+                let timelines = <any[]>elementData["timeline"];
+                if (timelines.length > 0 && timelines[0] != undefined && timelines[0]["attrs"] != undefined)
                 {
-                    let _data = elementData["timeline"]["attrs"];
+                    let _data = timelines[0]["attrs"];
                     let data = new Emission();
                     element.emissionData = data;
                     if (_data["emissionType"] != undefined)
@@ -257,9 +352,9 @@ namespace gd3d.framework
                         //         data.beLoop=true;
                         //     }
                         // }
-                        if(_data["simulateinlocal"]!=undefined)
+                        if (_data["simulateinlocal"] != undefined)
                         {
-                            data.simulateInLocalSpace=_data["simulateinlocal"];
+                            data.simulateInLocalSpace = _data["simulateinlocal"];
                         }
 
                         if (_data["maxcount"] != undefined)
@@ -276,29 +371,29 @@ namespace gd3d.framework
                         //     data.pos = this._parseToObjData("pos", _data["pos"]);
                         // if (_data["shape"] != undefined)
                         //     data.shape = _data["shape"];
-                        if(_data["rootpos"]!=undefined)
+                        if (_data["rootpos"] != undefined)
                         {
-                            data.rootpos=EffectUtil.parseVector3(_data["rootpos"]);
+                            data.rootpos = EffectUtil.parseVector3(_data["rootpos"]);
                         }
                         else
                         {
-                            data.rootpos=new gd3d.math.vector3();
+                            data.rootpos = new gd3d.math.vector3();
                         }
-                        if(_data["rootRotAngle"]!=undefined)
+                        if (_data["rootRotAngle"] != undefined)
                         {
-                            data.rootRotAngle=EffectUtil.parseVector3(_data["rootRotAngle"]);
-                        }
-                        else
-                        {
-                            data.rootRotAngle=new gd3d.math.vector3();
-                        }
-                        if(_data["rootscale"])
-                        {
-                            data.rootScale=EffectUtil.parseVector3(_data["rootscale"]);
+                            data.rootRotAngle = EffectUtil.parseVector3(_data["rootRotAngle"]);
                         }
                         else
                         {
-                            data.rootScale=new gd3d.math.vector3(1,1,1);
+                            data.rootRotAngle = new gd3d.math.vector3();
+                        }
+                        if (_data["rootscale"])
+                        {
+                            data.rootScale = EffectUtil.parseVector3(_data["rootscale"]);
+                        }
+                        else
+                        {
+                            data.rootScale = new gd3d.math.vector3(1, 1, 1);
                         }
                         if (_data["moveSpeed"] != undefined)
                             data.moveSpeed = this._parseToObjData("moveSpeed", _data["moveSpeed"]);

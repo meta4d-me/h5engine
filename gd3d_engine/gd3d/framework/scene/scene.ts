@@ -175,7 +175,7 @@ namespace gd3d.framework
             //一个camera 不是一次单纯的绘制，camera 还有多个绘制遍
             var cam = this.renderCameras[camindex];
             var context = this.renderContext[camindex];
-
+            //sceneMgr.camera=cam;
             if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0)
             {
                 context.updateCamera(this.app, cam);
@@ -196,7 +196,7 @@ namespace gd3d.framework
             }
             else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
             {
-                context.updateCamera(this.app, cam);
+                context.updateCamera(this.app, cam);           
                 context.updateLights(this.renderLights);
                 cam.fillRenderer(this);
                 cam.renderScene(this, context);
@@ -405,9 +405,9 @@ namespace gd3d.framework
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
          * @version egret-gd3d 1.0
          */
-        public pickAll(ray: ray, isPickMesh: boolean = false): Array<pickinfo>
+        public pickAll(ray: ray, isPickMesh: boolean = false, root: transform = this.getRoot()): Array<pickinfo>
         {
-            var picked = this.doPick(ray, true, isPickMesh) as Array<pickinfo>;
+            var picked = this.doPick(ray, true, isPickMesh, root) as Array<pickinfo>;
             if (picked == null) return null;
             return picked;
         }
@@ -421,9 +421,9 @@ namespace gd3d.framework
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
          * @version egret-gd3d 1.0
          */
-        public pick(ray: ray, isPickMesh: boolean = false): pickinfo
+        public pick(ray: ray, isPickMesh: boolean = false, root: transform = this.getRoot()): pickinfo
         {
-            var pickinfo = this.doPick(ray, false, isPickMesh) as pickinfo;
+            var pickinfo = this.doPick(ray, false, isPickMesh, root) as pickinfo;
             if (pickinfo == null) return null;
 
             //pickinfo.pickedtran.gameObject.collider.subTran.gameObject.visible = !pickinfo.pickedtran.gameObject.collider.subTran.gameObject.visible;
@@ -431,16 +431,16 @@ namespace gd3d.framework
 
             return pickinfo;
         }
-        private doPick(ray: ray, pickall: boolean = false, isPickMesh: boolean = false): any
+        private doPick(ray: ray, pickall: boolean, isPickMesh: boolean, root: transform): any
         {
             var pickedList: Array<pickinfo> = new Array<pickinfo>();
             if (isPickMesh)
             {
-                this.pickMesh(ray, this.getRoot(), pickedList);
+                this.pickMesh(ray, root, pickedList);
             }
             else
             {
-                this.pickCollider(ray, this.getRoot(), pickedList);
+                this.pickCollider(ray, root, pickedList);
             }
 
             if (pickedList.length == 0) return null;

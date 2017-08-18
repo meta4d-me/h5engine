@@ -8,25 +8,25 @@ namespace gd3d.framework
     {
         public life: number;
         public beLoop: boolean = false;
-        public elements: EffectElementData[] = [];
+        public elementDic: { [name: string]: EffectElementData } = {};
         clone()
         {
             let data: EffectSystemData = new EffectSystemData();
             data.life = this.life;
             data.beLoop = this.beLoop;
-            for (let key in this.elements)
+            for (let key in this.elementDic)
             {
-                data.elements[key] = this.elements[key].clone();
+                data.elementDic[key] = this.elementDic[key].clone();
             }
             return data;
         }
         dispose()
         {
-            for (let key in this.elements)
+            for (let key in this.elementDic)
             {
-                this.elements[key].dispose();
+                this.elementDic[key].dispose();
+                delete this.elementDic[key];
             }
-            this.elements.length = 0;
         }
     }
     /**
@@ -43,8 +43,13 @@ namespace gd3d.framework
         public actions: IEffectAction[];
         public curAttrData: EffectAttrsData;
         public effectBatcher: EffectBatcher;
-        public startIndex: number = 0;
-
+        //在effectbatcher中顶点的开始位置
+        public startVboIndex: number = 0;
+        //在effectbatcher中索引的开始位置，用来动态计算当前要渲染到哪个顶点，主要针对delaytime类型的特效重播时的处理
+        public startEboIndex: number = 0;
+        //在effectbatcher中索引的结束位置，用来动态计算当前要渲染到哪个顶点，主要针对delaytime类型的特效重播时的处理
+        public endEboIndex: number = 0;
+        public delayTime: number = 0;
         public actionActive: boolean = false;//当前帧action状态
         public loopFrame: number = Number.MAX_VALUE;//循环帧数
         public active: boolean = true;//激活状态
@@ -53,6 +58,7 @@ namespace gd3d.framework
             this.data = _data;
             this.name = this.data.name;
             this.timelineFrame = {};
+            this.delayTime = _data.delayTime;
             this.initActions();
             this.recordElementLerpAttributes();
         }
@@ -320,7 +326,15 @@ namespace gd3d.framework
 
         }
 
-        isActiveFrame(frameIndex: number): boolean
+        /**
+         * 当前帧的数据是否有变化，有变化才需要去刷新batcher，否则直接用当前batcher中的数据去提交渲染即可。
+         * 在以下三种情况下，数据都是变化的，都需要刷新bacther：
+         * 1、timeline中有当前帧
+         * 2、renderModel不是none
+         * 3、有action在刷新
+         * @param frameIndex 
+         */
+        isCurFrameNeedRefresh(frameIndex: number): boolean
         {
             if (this.timelineFrame[frameIndex] != undefined)
             {
@@ -365,9 +379,9 @@ namespace gd3d.framework
         public type: EffectElementTypeEnum;//singlemesh,emission....
         public timelineFrame: { [frameIndex: number]: EffectFrameData };
         public initFrameData: EffectFrameData;
-        public ref: string;//数据整体引用
+        public refFrom: string;//数据整体引用
         public beloop: boolean;
-        public delayTime:number;
+        public delayTime: number = 0;
         public actionData: EffectActionData[];
         public emissionData: Emission;
         clone()
@@ -375,7 +389,7 @@ namespace gd3d.framework
             let elementdata = new EffectElementData();
             elementdata.name = this.name;
             elementdata.type = this.type;
-            elementdata.ref = this.ref;
+            elementdata.refFrom = this.refFrom;
             elementdata.beloop = this.beloop;
             elementdata.actionData = [];
             elementdata.timelineFrame = [];
@@ -676,6 +690,7 @@ namespace gd3d.framework
         public frameIndex: number;
         public attrsData: EffectAttrsData;
         public lerpDatas: EffectLerpData[];
+        public delayTime: number;
         clone()
         {
             let framedata = new EffectFrameData();
@@ -755,7 +770,7 @@ namespace gd3d.framework
 
         static beEqual(data0: EffectMatData, data1: EffectMatData)
         {
-            return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture=== data1.alphaTexture;
+            return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
         }
 
         clone(): EffectMatData
@@ -768,6 +783,14 @@ namespace gd3d.framework
             return data;
         }
     }
+
+    export enum EffectBatcherState
+    {
+        NotInitedStateType,
+        InitedStateType,
+        ResizeCapacityStateType
+    }
+
     /**
      * @private
      */
@@ -775,8 +798,7 @@ namespace gd3d.framework
     {
         public mesh: mesh;
         public mat: material;
-        public beBufferInited: boolean = false;
-
+        public state: EffectBatcherState = EffectBatcherState.NotInitedStateType;
         public dataForVbo: Float32Array;
         public dataForEbo: Uint16Array;
 

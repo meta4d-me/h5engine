@@ -3,7 +3,7 @@
 namespace gd3d.framework
 {
     /**
-     * @private
+     * @public
      */
     export enum HideFlags
     {
@@ -15,7 +15,7 @@ namespace gd3d.framework
         DontSaveInBuild = 0x00000010,
         DontUnloadUnusedAsset = 0x00000020,
         DontSave = 0x00000034,
-        HideAndDontSave = 0x0000003D,
+        HideAndDontSave = 0x0000003D
     }
     
     /**

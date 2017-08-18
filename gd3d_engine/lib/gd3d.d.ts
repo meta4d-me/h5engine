@@ -294,6 +294,8 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         pick2d(mx: number, my: number): transform2D;
         dopick2d(outv: math.vector2, tran: transform2D): transform2D;
+        pick2d_new(mx: number, my: number): transform2D;
+        dopick2d_new(outv: math.vector2, tran: transform2D): transform2D;
         calScreenPosToCanvasPos(mousePos: gd3d.math.vector2, canvasPos: gd3d.math.vector2): void;
     }
 }
@@ -568,6 +570,16 @@ declare namespace gd3d.framework {
         transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+}
+declare namespace gd3d.framework {
+    class uirect implements I2DComponent {
+        canbeClick: boolean;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1545,7 +1557,6 @@ declare namespace gd3d.framework {
         beLoop: boolean;
         state: EffectPlayStateEnum;
         private curFrameId;
-        frameId: number;
         static fps: number;
         private playTimer;
         private speed;
@@ -1555,6 +1566,7 @@ declare namespace gd3d.framework {
         private effectBatchers;
         private particles;
         private matDataGroups;
+        private particleElementDic;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
@@ -1574,12 +1586,19 @@ declare namespace gd3d.framework {
         reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
         private resetSingleMesh();
         private resetparticle();
+        private delayElements;
+        private refElements;
         private addElements();
+        private addElement(data);
         private addInitFrame(elementData);
         setFrameId(id: number): void;
+        getDelayFrameCount(delayTime: number): number;
+        private beExecuteNextFrame;
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
+        effectElements: IEffectElement[];
+        addEffectElement(type: gd3d.framework.EffectElementTypeEnum): IEffectElement;
     }
 }
 declare namespace gd3d.framework {
@@ -1628,8 +1647,6 @@ declare namespace gd3d.framework {
     }
     class light implements INodeComponent {
         gameObject: gameObject;
-        isOpen: boolean;
-        lightName: string;
         type: LightTypeEnum;
         spotAngelCos: number;
         start(): void;
@@ -2248,7 +2265,9 @@ declare namespace gd3d.framework {
     class EffectSystemData {
         life: number;
         beLoop: boolean;
-        elements: EffectElementData[];
+        elementDic: {
+            [name: string]: EffectElementData;
+        };
         clone(): EffectSystemData;
         dispose(): void;
     }
@@ -2263,7 +2282,10 @@ declare namespace gd3d.framework {
         actions: IEffectAction[];
         curAttrData: EffectAttrsData;
         effectBatcher: EffectBatcher;
-        startIndex: number;
+        startVboIndex: number;
+        startEboIndex: number;
+        endEboIndex: number;
+        delayTime: number;
         actionActive: boolean;
         loopFrame: number;
         active: boolean;
@@ -2274,7 +2296,7 @@ declare namespace gd3d.framework {
         initActions(): void;
         update(): void;
         private updateElementRotation();
-        isActiveFrame(frameIndex: number): boolean;
+        isCurFrameNeedRefresh(frameIndex: number): boolean;
         setActive(_active: boolean): void;
         dispose(): void;
     }
@@ -2285,7 +2307,7 @@ declare namespace gd3d.framework {
             [frameIndex: number]: EffectFrameData;
         };
         initFrameData: EffectFrameData;
-        ref: string;
+        refFrom: string;
         beloop: boolean;
         delayTime: number;
         actionData: EffectActionData[];
@@ -2320,6 +2342,7 @@ declare namespace gd3d.framework {
         frameIndex: number;
         attrsData: EffectAttrsData;
         lerpDatas: EffectLerpData[];
+        delayTime: number;
         clone(): EffectFrameData;
         dispose(): void;
     }
@@ -2346,10 +2369,15 @@ declare namespace gd3d.framework {
         static beEqual(data0: EffectMatData, data1: EffectMatData): boolean;
         clone(): EffectMatData;
     }
+    enum EffectBatcherState {
+        NotInitedStateType = 0,
+        InitedStateType = 1,
+        ResizeCapacityStateType = 2,
+    }
     class EffectBatcher {
         mesh: mesh;
         mat: material;
-        beBufferInited: boolean;
+        state: EffectBatcherState;
         dataForVbo: Float32Array;
         dataForEbo: Uint16Array;
         effectElements: EffectElement[];
@@ -2411,8 +2439,6 @@ declare namespace gd3d.framework {
         maxEmissionCount: number;
         emissionCount: number;
         time: number;
-        delayTime: number;
-        pos: ParticleNode;
         moveSpeed: ParticleNode;
         gravity: number;
         euler: ParticleNode;
@@ -2559,6 +2585,162 @@ declare namespace gd3d.framework {
         getValueRandom(): number;
         constructor();
         static RandomRange(min: number, max: number, isInteger?: boolean): number;
+    }
+}
+declare namespace gd3d.framework {
+    interface IAttributeData {
+        uiState: AttributeUIState;
+        data: any;
+        attributeType: AttributeType;
+        actions: {
+            [frameIndex: number]: IEffectAction;
+        };
+        init(): any;
+    }
+    class Vector3AttributeData implements IAttributeData, ILerpAttributeInterface {
+        uiState: AttributeUIState;
+        attributeType: AttributeType;
+        data: any;
+        actions: {
+            [frameIndex: number]: IEffectAction;
+        };
+        init(): void;
+        addFramePoint(frameId: number, data: gd3d.math.vector3): void;
+        removeKeyPoint(frameId: number, data: any): void;
+    }
+    class Vector2AttributeData implements IAttributeData, ILerpAttributeInterface {
+        uiState: AttributeUIState;
+        attributeType: AttributeType;
+        data: any;
+        timeLine: {
+            [frameIndex: number]: gd3d.math.vector2;
+        };
+        actions: {
+            [frameIndex: number]: IEffectAction;
+        };
+        init(): void;
+        addFramePoint(frameId: number, data: gd3d.math.vector2): void;
+        removeKeyPoint(frameId: number, data: gd3d.math.vector2): void;
+    }
+    class NumberAttributeData implements IAttributeData, ILerpAttributeInterface {
+        uiState: AttributeUIState;
+        attributeType: AttributeType;
+        data: any;
+        timeLine: {
+            [frameIndex: number]: number;
+        };
+        actions: {
+            [frameIndex: number]: IEffectAction;
+        };
+        init(): void;
+        addFramePoint(frameId: number, data: any): void;
+        removeKeyPoint(frameId: number, data: number): void;
+    }
+    interface ILerpAttributeInterface {
+        addFramePoint(frameId: number, data: any): any;
+        removeKeyPoint(frameId: number, data: any): any;
+    }
+    enum AttributeUIState {
+        None = 0,
+        Show = 1,
+        Hide = 2,
+    }
+    enum AttributeUIType {
+        Number = 0,
+        Vector2 = 1,
+        Vector3 = 2,
+        Vector4 = 3,
+    }
+    enum AttributeType {
+        FixedValType = 0,
+        LerpType = 1,
+    }
+}
+declare namespace gd3d.framework {
+    interface IEffectElement {
+        name: string;
+        elementType: gd3d.framework.EffectElementTypeEnum;
+        beloop: boolean;
+        delayTime: number;
+        mat: gd3d.framework.material;
+        WriteToJson(obj: any): any;
+    }
+    class EffectElementSingleMesh implements IEffectElement {
+        name: string;
+        elementType: gd3d.framework.EffectElementTypeEnum;
+        beloop: boolean;
+        delayTime: number;
+        mat: gd3d.framework.material;
+        texturePath: string;
+        shader: gd3d.framework.shader;
+        mesh: gd3d.framework.mesh;
+        position: Vector3AttributeData;
+        euler: Vector3AttributeData;
+        scale: Vector3AttributeData;
+        color: Vector3AttributeData;
+        alpha: NumberAttributeData;
+        tilling: Vector2AttributeData;
+        colorRate: number;
+        uv: gd3d.math.vector2;
+        renderModel: gd3d.framework.RenderModel;
+        timelineFrame: {
+            [frameIndex: number]: EffectFrameData;
+        };
+        ref: string;
+        actions: IEffectAction[];
+        curAttrData: EffectAttrsData;
+        effectBatcher: EffectBatcher;
+        startVboIndex: number;
+        startEboIndex: number;
+        endEboIndex: number;
+        actionActive: boolean;
+        loopFrame: number;
+        active: boolean;
+        transform: transform;
+        private mgr;
+        constructor(assetMgr: gd3d.framework.assetMgr);
+        initData(): void;
+        WriteToJson(obj: any): any;
+    }
+    class EffectElementEmission implements IEffectElement {
+        name: string;
+        elementType: gd3d.framework.EffectElementTypeEnum;
+        beloop: boolean;
+        delayTime: number;
+        emissionType: gd3d.framework.ParticleEmissionType;
+        simulateInLocalSpace: boolean;
+        rootpos: gd3d.math.vector3;
+        rootRotAngle: gd3d.math.vector3;
+        rootScale: gd3d.math.vector3;
+        maxEmissionCount: number;
+        emissionCount: number;
+        time: number;
+        moveSpeed: gd3d.framework.ParticleNode;
+        gravity: number;
+        euler: gd3d.framework.ParticleNode;
+        eulerNodes: Array<gd3d.framework.ParticleNode>;
+        eulerSpeed: gd3d.framework.ParticleNode;
+        scale: gd3d.framework.ParticleNode;
+        scaleNodes: Array<gd3d.framework.ParticleNodeNumber>;
+        scaleSpeed: gd3d.framework.ParticleNode;
+        color: gd3d.framework.ParticleNode;
+        colorRate: number;
+        colorNodes: Array<gd3d.framework.ParticleNode>;
+        colorSpeed: gd3d.framework.ParticleNode;
+        simulationSpeed: gd3d.framework.ParticleNodeNumber;
+        alpha: gd3d.framework.ParticleNodeNumber;
+        alphaNodes: Array<gd3d.framework.ParticleNodeNumber>;
+        alphaSpeed: gd3d.framework.ParticleNodeNumber;
+        uv: gd3d.framework.ParticleNodeVec2;
+        uvType: gd3d.framework.UVTypeEnum;
+        uvRoll: gd3d.framework.UVRoll;
+        uvSprite: gd3d.framework.UVSprite;
+        tilling: gd3d.math.vector2;
+        mat: gd3d.framework.material;
+        life: gd3d.framework.ValueData;
+        renderModel: gd3d.framework.RenderModel;
+        mesh: gd3d.framework.mesh;
+        WriteToJson(obj: any): any;
     }
 }
 declare namespace gd3d.framework {
@@ -2710,6 +2892,8 @@ declare namespace gd3d.framework {
     class EffectParser {
         asMgr: assetMgr;
         Parse(str: string, assetmgr: assetMgr): EffectSystemData;
+        private _parse(elementData);
+        private copyAndOverWrite(srcData, desData);
         _parseSingleMeshTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionShape(_startdata: any, element: EffectElementData): void;
@@ -2789,7 +2973,6 @@ declare namespace gd3d.framework {
         private speedDir;
         private movespeed;
         private simulationSpeed;
-        startFrameId: number;
         data: Emission;
         private vertexSize;
         private vertexCount;
@@ -2838,12 +3021,9 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Particles {
-        gameObject: gameObject;
-        name: string;
         emissionElements: EmissionElement[];
         vf: number;
         effectSys: effectSystem;
-        loopFrame: number;
         constructor(sys: effectSystem);
         addEmission(_emissionNew: EffectElementData): void;
         update(delta: number): void;
@@ -2865,8 +3045,6 @@ declare namespace gd3d.framework {
         private beloop;
         simulateInLocalSpace: boolean;
         active: boolean;
-        private delayTime;
-        private delayFlag;
         private _continueSpaceTime;
         perVertexCount: number;
         perIndexxCount: number;
@@ -2887,6 +3065,7 @@ declare namespace gd3d.framework {
         updateEmission(delta: number): void;
         addParticle(count?: number): void;
         private addBatcher();
+        renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
         isOver(): boolean;
@@ -3028,9 +3207,9 @@ declare namespace gd3d.framework {
         getChild(index: number): transform;
         getChildByName(name: string): transform;
         getRoot(): transform;
-        pickAll(ray: ray, isPickMesh?: boolean): Array<pickinfo>;
-        pick(ray: ray, isPickMesh?: boolean): pickinfo;
-        private doPick(ray, pickall?, isPickMesh?);
+        pickAll(ray: ray, isPickMesh?: boolean, root?: transform): Array<pickinfo>;
+        pick(ray: ray, isPickMesh?: boolean, root?: transform): pickinfo;
+        private doPick(ray, pickall, isPickMesh, root);
         private pickMesh(ray, tran, pickedList);
         private pickCollider(ray, tran, pickedList);
     }
@@ -3114,7 +3293,7 @@ declare namespace gd3d.framework {
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3);
         intersectAABB(_aabb: aabb): boolean;
         intersectPlaneTransform(tran: transform): pickinfo;
-        private intersectPlane(planePoint, planeNormal);
+        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: any): gd3d.math.vector3;
         intersectCollider(tran: transform): pickinfo;
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
@@ -3233,6 +3412,7 @@ declare namespace gd3d.framework {
         static COMPONENT_MESHRENDER: string;
         static COMPONENT_EFFECTSYSTEM: string;
         static COMPONENT_LABEL: string;
+        static COMPONENT_uirect: string;
         static COMPONENT_IMAGE: string;
         static COMPONENT_RAWIMAGE: string;
         static COMPONENT_BUTTON: string;
@@ -3279,6 +3459,8 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+}
+declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {
@@ -3412,6 +3594,7 @@ declare namespace gd3d.render {
         static lastZTestMethod: number;
         static lastBlend: boolean;
         static lastBlendEquation: number;
+        static lastBlendVal: string;
         static lastState: string;
         curState: string;
         program: glProgram;
@@ -3437,6 +3620,7 @@ declare namespace gd3d.render {
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
         private getCurDrawState();
+        private getCurBlendVal();
         private formate(str, out);
         uniformFloat(name: string, number: number): void;
         uniformFloatv(name: string, numbers: Float32Array): void;
