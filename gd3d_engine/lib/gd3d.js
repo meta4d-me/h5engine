@@ -9535,7 +9535,8 @@ var gd3d;
             };
             effectSystem.prototype.remove = function () {
                 this.state = framework.EffectPlayStateEnum.Dispose;
-                this.data.dispose();
+                if (this.data)
+                    this.data.dispose();
                 for (var key in this.effectBatchers) {
                     this.effectBatchers[key].dispose();
                 }
@@ -9553,11 +9554,39 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            effectSystem.prototype.addEffectElement = function (type) {
+                if (this.effectElements == undefined)
+                    this.effectElements = [];
+                var effe;
+                if (type == gd3d.framework.EffectElementTypeEnum.SingleMeshType) {
+                    effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr());
+                    effe.name = "singlemesh" + this.effectElements.length;
+                    effe.transform = this.gameObject.transform;
+                }
+                else if (type == gd3d.framework.EffectElementTypeEnum.EmissionType) {
+                    effe = new gd3d.framework.EffectElementEmission();
+                    effe.name = "emission" + this.effectElements.length;
+                }
+                this.effectElements.push(effe);
+                return effe;
+            };
             effectSystem.fps = 30;
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], effectSystem.prototype, "autoplay", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], effectSystem.prototype, "beLoop", void 0);
             __decorate([
                 gd3d.reflect.Field("textasset"),
                 __metadata("design:type", framework.textasset)
             ], effectSystem.prototype, "jsonData", void 0);
+            __decorate([
+                gd3d.reflect.Field("IEffectElement[]"),
+                __metadata("design:type", Array)
+            ], effectSystem.prototype, "effectElements", void 0);
             effectSystem = effectSystem_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -15990,6 +16019,233 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var Vector3AttributeData = (function () {
+            function Vector3AttributeData() {
+            }
+            Vector3AttributeData.prototype.init = function () {
+                if (this.attributeType == AttributeType.FixedValType) {
+                    this.data = new gd3d.math.vector3();
+                }
+                else if (this.attributeType == AttributeType.LerpType) {
+                    this.data = {};
+                    this.data[-1] = new gd3d.math.vector3();
+                }
+            };
+            Vector3AttributeData.prototype.addFramePoint = function (frameId, data) {
+                this.data[frameId] = data;
+            };
+            Vector3AttributeData.prototype.removeKeyPoint = function (frameId, data) {
+                if (this.data[frameId] == undefined) {
+                    console.warn("当前时间线中没有记录这一帧：" + frameId);
+                    return;
+                }
+                delete this.data[frameId];
+            };
+            Vector3AttributeData = __decorate([
+                gd3d.reflect.SerializeType
+            ], Vector3AttributeData);
+            return Vector3AttributeData;
+        }());
+        framework.Vector3AttributeData = Vector3AttributeData;
+        var Vector2AttributeData = (function () {
+            function Vector2AttributeData() {
+            }
+            Vector2AttributeData.prototype.init = function () {
+                if (this.attributeType == AttributeType.FixedValType) {
+                    this.data = new gd3d.math.vector3();
+                }
+                else if (this.attributeType == AttributeType.LerpType) {
+                    this.data = {};
+                    this.data[-1] = new gd3d.math.vector3();
+                }
+            };
+            Vector2AttributeData.prototype.addFramePoint = function (frameId, data) {
+                this.data[frameId] = data;
+            };
+            Vector2AttributeData.prototype.removeKeyPoint = function (frameId, data) {
+                if (this.data[frameId] == undefined) {
+                    console.warn("当前时间线中没有记录这一帧：" + frameId);
+                    return;
+                }
+                delete this.data[frameId];
+            };
+            Vector2AttributeData = __decorate([
+                gd3d.reflect.SerializeType
+            ], Vector2AttributeData);
+            return Vector2AttributeData;
+        }());
+        framework.Vector2AttributeData = Vector2AttributeData;
+        var NumberAttributeData = (function () {
+            function NumberAttributeData() {
+            }
+            NumberAttributeData.prototype.init = function () {
+                if (this.attributeType == AttributeType.FixedValType) {
+                    this.data = new gd3d.math.vector3();
+                }
+                else if (this.attributeType == AttributeType.LerpType) {
+                    this.data = {};
+                    this.data[-1] = new gd3d.math.vector3();
+                }
+            };
+            NumberAttributeData.prototype.addFramePoint = function (frameId, data) {
+                this.data[frameId] = data;
+            };
+            NumberAttributeData.prototype.removeKeyPoint = function (frameId, data) {
+                if (this.data[frameId] == undefined) {
+                    console.warn("当前时间线中没有记录这一帧：" + frameId);
+                    return;
+                }
+                delete this.data[frameId];
+            };
+            NumberAttributeData = __decorate([
+                gd3d.reflect.SerializeType
+            ], NumberAttributeData);
+            return NumberAttributeData;
+        }());
+        framework.NumberAttributeData = NumberAttributeData;
+        var AttributeUIState;
+        (function (AttributeUIState) {
+            AttributeUIState[AttributeUIState["None"] = 0] = "None";
+            AttributeUIState[AttributeUIState["Show"] = 1] = "Show";
+            AttributeUIState[AttributeUIState["Hide"] = 2] = "Hide";
+        })(AttributeUIState = framework.AttributeUIState || (framework.AttributeUIState = {}));
+        var AttributeUIType;
+        (function (AttributeUIType) {
+            AttributeUIType[AttributeUIType["Number"] = 0] = "Number";
+            AttributeUIType[AttributeUIType["Vector2"] = 1] = "Vector2";
+            AttributeUIType[AttributeUIType["Vector3"] = 2] = "Vector3";
+            AttributeUIType[AttributeUIType["Vector4"] = 3] = "Vector4";
+        })(AttributeUIType = framework.AttributeUIType || (framework.AttributeUIType = {}));
+        var AttributeType;
+        (function (AttributeType) {
+            AttributeType[AttributeType["FixedValType"] = 0] = "FixedValType";
+            AttributeType[AttributeType["LerpType"] = 1] = "LerpType";
+        })(AttributeType = framework.AttributeType || (framework.AttributeType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var EffectElementSingleMesh = (function () {
+            function EffectElementSingleMesh(assetMgr) {
+                this.elementType = gd3d.framework.EffectElementTypeEnum.SingleMeshType;
+                this.beloop = false;
+                this.delayTime = 0;
+                this.mat = new gd3d.framework.material();
+                this.mesh = new gd3d.framework.mesh();
+                this.position = new framework.Vector3AttributeData();
+                this.euler = new framework.Vector3AttributeData();
+                this.scale = new framework.Vector3AttributeData();
+                this.color = new framework.Vector3AttributeData();
+                this.alpha = new framework.NumberAttributeData();
+                this.tilling = new framework.Vector2AttributeData();
+                this.colorRate = 1;
+                this.uv = new gd3d.math.vector2();
+                this.renderModel = gd3d.framework.RenderModel.None;
+                this.startVboIndex = 0;
+                this.startEboIndex = 0;
+                this.endEboIndex = 0;
+                this.actionActive = false;
+                this.loopFrame = Number.MAX_VALUE;
+                this.active = true;
+                this.mgr = assetMgr;
+                this.mesh = this.mgr.getDefaultMesh("quad");
+                this.shader = this.mgr.getShader("diffuse.shader.json");
+                this.mat.setShader(this.shader);
+            }
+            ;
+            ;
+            ;
+            EffectElementSingleMesh.prototype.initData = function () {
+                this.actions = [];
+                this.timelineFrame = {};
+            };
+            EffectElementSingleMesh.prototype.WriteToJson = function (obj) {
+            };
+            __decorate([
+                gd3d.reflect.Field("EffectElementTypeEnum"),
+                __metadata("design:type", Number)
+            ], EffectElementSingleMesh.prototype, "elementType", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], EffectElementSingleMesh.prototype, "beloop", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], EffectElementSingleMesh.prototype, "delayTime", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], EffectElementSingleMesh.prototype, "texturePath", void 0);
+            __decorate([
+                gd3d.reflect.Field("shader"),
+                __metadata("design:type", gd3d.framework.shader)
+            ], EffectElementSingleMesh.prototype, "shader", void 0);
+            __decorate([
+                gd3d.reflect.Field("mesh"),
+                __metadata("design:type", gd3d.framework.mesh)
+            ], EffectElementSingleMesh.prototype, "mesh", void 0);
+            __decorate([
+                gd3d.reflect.Field("Vector3AttributeData"),
+                __metadata("design:type", framework.Vector3AttributeData)
+            ], EffectElementSingleMesh.prototype, "position", void 0);
+            __decorate([
+                gd3d.reflect.Field("Vector3AttributeData"),
+                __metadata("design:type", framework.Vector3AttributeData)
+            ], EffectElementSingleMesh.prototype, "euler", void 0);
+            __decorate([
+                gd3d.reflect.Field("Vector3AttributeData"),
+                __metadata("design:type", framework.Vector3AttributeData)
+            ], EffectElementSingleMesh.prototype, "scale", void 0);
+            __decorate([
+                gd3d.reflect.Field("Vector3AttributeData"),
+                __metadata("design:type", framework.Vector3AttributeData)
+            ], EffectElementSingleMesh.prototype, "color", void 0);
+            __decorate([
+                gd3d.reflect.Field("NumberAttributeData"),
+                __metadata("design:type", framework.NumberAttributeData)
+            ], EffectElementSingleMesh.prototype, "alpha", void 0);
+            __decorate([
+                gd3d.reflect.Field("Vector2AttributeData"),
+                __metadata("design:type", framework.Vector2AttributeData)
+            ], EffectElementSingleMesh.prototype, "tilling", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], EffectElementSingleMesh.prototype, "colorRate", void 0);
+            __decorate([
+                gd3d.reflect.Field("RenderModel"),
+                __metadata("design:type", Number)
+            ], EffectElementSingleMesh.prototype, "renderModel", void 0);
+            EffectElementSingleMesh = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [gd3d.framework.assetMgr])
+            ], EffectElementSingleMesh);
+            return EffectElementSingleMesh;
+        }());
+        framework.EffectElementSingleMesh = EffectElementSingleMesh;
+        var EffectElementEmission = (function () {
+            function EffectElementEmission() {
+                this.elementType = gd3d.framework.EffectElementTypeEnum.EmissionType;
+                this.simulateInLocalSpace = true;
+                this.renderModel = gd3d.framework.RenderModel.None;
+            }
+            EffectElementEmission.prototype.WriteToJson = function (obj) {
+            };
+            EffectElementEmission = __decorate([
+                gd3d.reflect.SerializeType
+            ], EffectElementEmission);
+            return EffectElementEmission;
+        }());
+        framework.EffectElementEmission = EffectElementEmission;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var Curve3 = (function () {
             function Curve3(points, nbPoints) {
                 this._beizerPoints = points;
@@ -17887,7 +18143,6 @@ var gd3d;
             function Particles(sys) {
                 this.emissionElements = [];
                 this.vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
-                this.loopFrame = Number.MAX_VALUE;
                 this.effectSys = sys;
             }
             Particles.prototype.addEmission = function (_emissionNew) {

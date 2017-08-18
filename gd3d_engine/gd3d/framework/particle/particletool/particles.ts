@@ -6,12 +6,9 @@ namespace gd3d.framework
      */
     export class Particles
     {
-        public gameObject: gameObject;
-        public name: string;
         public emissionElements: EmissionElement[] = [];//一个特效系统可以有多个发射器元素
         public vf: number = gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
         public effectSys: effectSystem;
-        public loopFrame: number = Number.MAX_VALUE;//循环帧数
         constructor(sys: effectSystem)
         {
             this.effectSys = sys;
