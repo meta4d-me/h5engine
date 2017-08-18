@@ -230,7 +230,12 @@ namespace gd3d.framework
 
                 gd3d.math.vec3Clone(this.localTranslate, translation);
                 //var cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
-                var cam = gd3d.framework.sceneMgr.camera;
+                //var cam = gd3d.framework.sceneMgr.camera;
+                var cam=this.batcher.emissionElement.renderCamera;
+                if(cam==null)
+                {
+                    cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                }
                 var camPosInWorld=cam.gameObject.transform.getWorldTranslate();
 
                 gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);

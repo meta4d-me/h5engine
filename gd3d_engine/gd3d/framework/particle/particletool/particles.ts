@@ -244,8 +244,10 @@ namespace gd3d.framework
             this.curbatcher = batcher;
         }
 
+        renderCamera:camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
+            this.renderCamera=camera;
             if (this.simulateInLocalSpace)
             {
                 context.updateModel(this.gameObject.transform);

@@ -9281,6 +9281,8 @@ var gd3d;
                 }
             };
             effectSystem.prototype.render = function (context, assetmgr, camera) {
+                if (!(camera.CullingMask & this.renderLayer))
+                    return;
                 if (this.state == framework.EffectPlayStateEnum.Play) {
                     context.updateModel(this.gameObject.transform);
                     for (var i in this.effectBatchers) {
@@ -17852,7 +17854,10 @@ var gd3d;
                     var worldRotation = gd3d.math.pool.new_quaternion();
                     var invTransformRotation = gd3d.math.pool.new_quaternion();
                     gd3d.math.vec3Clone(this.localTranslate, translation);
-                    var cam = gd3d.framework.sceneMgr.camera;
+                    var cam = this.batcher.emissionElement.renderCamera;
+                    if (cam == null) {
+                        cam = gd3d.framework.sceneMgr.app.getScene().mainCamera;
+                    }
                     var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
                     gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
                     if (this.renderModel == framework.RenderModel.BillBoard) {
@@ -18295,6 +18300,7 @@ var gd3d;
                 this.curbatcher = batcher;
             };
             EmissionElement.prototype.render = function (context, assetmgr, camera) {
+                this.renderCamera = camera;
                 if (this.simulateInLocalSpace) {
                     context.updateModel(this.gameObject.transform);
                 }
@@ -18760,7 +18766,6 @@ var gd3d;
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];
                 var context = this.renderContext[camindex];
-                framework.sceneMgr.camera = cam;
                 if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0) {
                     context.updateCamera(this.app, cam);
                     context.updateLights(this.renderLights);
@@ -20403,6 +20408,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
@@ -21024,6 +21043,40 @@ var gd3d;
             };
             glDrawPass.prototype.use = function (webgl, applyUniForm) {
                 if (applyUniForm === void 0) { applyUniForm = true; }
+                if (this.state_showface == ShowFaceStateEnum.ALL) {
+                    webgl.disable(webgl.CULL_FACE);
+                }
+                else {
+                    if (this.state_showface == ShowFaceStateEnum.CCW) {
+                        webgl.frontFace(webgl.CCW);
+                    }
+                    else {
+                        webgl.frontFace(webgl.CW);
+                    }
+                    webgl.cullFace(webgl.BACK);
+                    webgl.enable(webgl.CULL_FACE);
+                }
+                if (this.state_zwrite) {
+                    webgl.depthMask(true);
+                }
+                else {
+                    webgl.depthMask(false);
+                }
+                if (this.state_ztest) {
+                    webgl.enable(webgl.DEPTH_TEST);
+                    webgl.depthFunc(this.state_ztest_method);
+                }
+                else {
+                    webgl.disable(webgl.DEPTH_TEST);
+                }
+                if (this.state_blend) {
+                    webgl.enable(webgl.BLEND);
+                    webgl.blendEquation(this.state_blendEquation);
+                    webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
+                }
+                else {
+                    webgl.disable(webgl.BLEND);
+                }
                 if (glDrawPass.lastShowFace == undefined || glDrawPass.lastShowFace != this.state_showface) {
                     if (this.state_showface == ShowFaceStateEnum.ALL) {
                         webgl.disable(webgl.CULL_FACE);

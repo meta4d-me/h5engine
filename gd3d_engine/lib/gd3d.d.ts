@@ -107,7 +107,6 @@ declare namespace gd3d.framework {
         static readonly ins: sceneMgr;
         static app: application;
         static scene: scene;
-        static camera: camera;
     }
 }
 declare namespace Stats {
@@ -3061,6 +3060,7 @@ declare namespace gd3d.framework {
         updateEmission(delta: number): void;
         addParticle(count?: number): void;
         private addBatcher();
+        renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
         isOver(): boolean;
@@ -3453,6 +3453,8 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+}
+declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {
