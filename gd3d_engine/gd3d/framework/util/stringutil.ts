@@ -201,17 +201,10 @@ namespace gd3d.framework
         {
             if (!obj)
                 return true;
-            try
-            {
-                let _str = JSON.stringify(obj);
-                if (_str == '{}')
-                    return true;
-                return false;
+            for (var n in obj) {
+                return false
             }
-            catch (e)
-            {
-                return false;
-            }
+            return true;
         }
     }
 

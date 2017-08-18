@@ -138,6 +138,8 @@ namespace gd3d.framework
             this.renderLights.length = 0;
             this.renderList.clear();
 
+            aniplayer.playerCaches = [];
+
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
 
@@ -268,7 +270,6 @@ namespace gd3d.framework
         }
         private objupdate(node: transform, delta)//play状态下
         {
-            aniplayer.playerCaches = [];
             node.gameObject.init();//组件还未初始化的初始化
             if (node.gameObject.components.length > 0)
             {

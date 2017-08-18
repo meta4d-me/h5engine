@@ -199,7 +199,7 @@ namespace gd3d.framework
                 this.mix = true;
             }
 
-            if (this.isCache && !this.mix && !StringUtil.isNullOrEmptyObject(this.carelist) && aniplayer.playerCaches[this.cacheKey] != null)
+            if (this.isCache && !this.mix && StringUtil.isNullOrEmptyObject(this.carelist) && aniplayer.playerCaches[this.cacheKey] != null)
                 return;
 
             for (var i = 0; i < this._playClip.boneCount; i++)

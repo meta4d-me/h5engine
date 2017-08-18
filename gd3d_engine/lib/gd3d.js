@@ -8078,7 +8078,7 @@ var gd3d;
                     this.crossdelta -= delta / this.speed * this.crossspeed;
                     this.mix = true;
                 }
-                if (this.isCache && !this.mix && !framework.StringUtil.isNullOrEmptyObject(this.carelist) && aniplayer_1.playerCaches[this.cacheKey] != null)
+                if (this.isCache && !this.mix && framework.StringUtil.isNullOrEmptyObject(this.carelist) && aniplayer_1.playerCaches[this.cacheKey] != null)
                     return;
                 for (var i = 0; i < this._playClip.boneCount; i++) {
                     var bone = this._playClip.bones[i];
@@ -18755,6 +18755,7 @@ var gd3d;
                 this.renderCameras.length = 0;
                 this.renderLights.length = 0;
                 this.renderList.clear();
+                framework.aniplayer.playerCaches = [];
                 this.updateScene(this.rootNode, delta);
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
@@ -18839,7 +18840,6 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
-                framework.aniplayer.playerCaches = [];
                 node.gameObject.init();
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
@@ -20147,15 +20147,10 @@ var gd3d;
             StringUtil.isNullOrEmptyObject = function (obj) {
                 if (!obj)
                     return true;
-                try {
-                    var _str = JSON.stringify(obj);
-                    if (_str == '{}')
-                        return true;
+                for (var n in obj) {
                     return false;
                 }
-                catch (e) {
-                    return false;
-                }
+                return true;
             };
             return StringUtil;
         }());

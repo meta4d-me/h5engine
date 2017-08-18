@@ -3658,8 +3658,8 @@ var test_multipleplayer_anim = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
                         var a = 10;
                         var b = 10;
-                        for (var i = -14; i <= 14; i++) {
-                            for (var j = -14; j <= 14; j++) {
+                        for (var i = -5; i <= 5; i++) {
+                            for (var j = -5; j <= 5; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);
