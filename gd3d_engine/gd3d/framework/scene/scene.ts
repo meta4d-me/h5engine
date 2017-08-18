@@ -76,12 +76,12 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         public get mainCamera()
-         {
-            if(this._mainCamera == null)
+        {
+            if (this._mainCamera == null)
             {
                 this._mainCamera = this.renderCameras[0];
             }
-             return this._mainCamera;
+            return this._mainCamera;
         }
         /**
          * @public
@@ -91,8 +91,10 @@ namespace gd3d.framework
          * @param _camera 相机组件实例
          * @version egret-gd3d 1.0
          */
-        public set mainCamera(_camera: camera) {
-            for (let i in this.renderCameras) {
+        public set mainCamera(_camera: camera)
+        {
+            for (let i in this.renderCameras)
+            {
                 if (this.renderCameras[i] == _camera)
                 {
                     this._mainCamera = _camera;
@@ -116,7 +118,7 @@ namespace gd3d.framework
          * 雾效
          * @version egret-gd3d 1.0
          */
-        fog:Fog;
+        fog: Fog;
         /**
          * @public
          * @language zh_CN
@@ -155,7 +157,7 @@ namespace gd3d.framework
             {
                 this._renderCamera(i);
             }
-            
+
             if (this.RealCameraNumber == 0)
             {
                 this.webgl.clearColor(0, 0, 0, 1);
@@ -188,7 +190,7 @@ namespace gd3d.framework
                 {
                     if (cam.CullingMask & CullingMask.ui)
                     {
-                        overLays[i].render(context, this.assetmgr, cam);         
+                        overLays[i].render(context, this.assetmgr, cam);
                     }
                 }
             }
@@ -200,28 +202,28 @@ namespace gd3d.framework
                 cam.renderScene(this, context);
                 this.RealCameraNumber++;
                 //----------------------------------场编相机的overlay展示----------------------------------------------------
-                if(this.app.be2dstate)
+                if (this.app.be2dstate)
                 {
                     let overLays: IOverLay[] = cam.getOverLays();
                     for (var i = 0; i < overLays.length; i++)
                     {
                         if (cam.CullingMask & CullingMask.ui)
                         {
-                            overLays[i].render(context, this.assetmgr, cam);         
+                            overLays[i].render(context, this.assetmgr, cam);
                         }
                     }
                 }
             }
-            if(!this.app.bePlay&&this.app.be2dstate)
+            if (!this.app.bePlay && this.app.be2dstate)
             {
-                if (camindex==this.app.curcameraindex)
+                if (camindex == this.app.curcameraindex)
                 {
                     let overLays: IOverLay[] = cam.getOverLays();
                     for (var i = 0; i < overLays.length; i++)
                     {
                         if (cam.CullingMask & CullingMask.ui)
                         {
-                            overLays[i].render(context, this.assetmgr, cam);         
+                            overLays[i].render(context, this.assetmgr, cam);
                         }
                     }
                 }
@@ -231,29 +233,29 @@ namespace gd3d.framework
 
         private updateScene(node: transform, delta)
         {
-            if(this.app.bePlay)
+            if (this.app.bePlay)
             {
-                this.objupdate(node,delta);
+                this.objupdate(node, delta);
             }
             else
             {
-                this.objupdateInEditor(node,delta);
+                this.objupdateInEditor(node, delta);
             }
         }
 
         private objupdateInEditor(node: transform, delta)//场编下
         {
             node.gameObject.init();//组件还未初始化的初始化
-            if(node.gameObject.renderer!=null)
+            if (node.gameObject.renderer != null)
             {
                 node.gameObject.renderer.update(delta);//update 了啥
             }
             var c = node.gameObject.camera;
-            if(c!=null)
+            if (c != null)
             {
                 node.gameObject.camera.update(delta);//update 了啥
             }
-            
+
             this.collectCameraAndLight(node);
 
             if (node.children != null)
@@ -266,8 +268,9 @@ namespace gd3d.framework
         }
         private objupdate(node: transform, delta)//play状态下
         {
+            aniplayer.playerCaches = [];
             node.gameObject.init();//组件还未初始化的初始化
-            if(node.gameObject.components.length>0)
+            if (node.gameObject.components.length > 0)
             {
                 node.gameObject.update(delta);
 
@@ -315,7 +318,7 @@ namespace gd3d.framework
         {
             this.rootNode.addChild(node);
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -328,7 +331,7 @@ namespace gd3d.framework
         {
             this.rootNode.removeChild(node);
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -340,7 +343,7 @@ namespace gd3d.framework
         {
             return this.rootNode.children;
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -353,7 +356,7 @@ namespace gd3d.framework
             if (this.rootNode.children == null) return 0;
             return this.rootNode.children.length;
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -366,7 +369,7 @@ namespace gd3d.framework
         {
             return this.rootNode.children[index];
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -380,7 +383,7 @@ namespace gd3d.framework
             let res = this.rootNode.find(name);
             return res;
         }
-        
+
         /**
          * @public
          * @language zh_CN
