@@ -891,7 +891,7 @@ namespace gd3d.framework
          * @param pworld 位置
          * @version egret-gd3d 1.0
          */
-        ContainsCanvasPoint(pworld: math.vector2): boolean
+        ContainsCanvasPoint(pworld: math.vector2,tolerance:number=0): boolean
         {
             var mworld = this.getWorldMatrix();
             var mout = new math.matrix3x2();
@@ -901,7 +901,7 @@ namespace gd3d.framework
             gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
             p2.x += this.pivot.x * this.width;
             p2.y += this.pivot.y * this.height;
-            return p2.x >= 0 && p2.y >= 0 && p2.x < this.width && p2.y < this.height;
+            return p2.x+tolerance >=0 && p2.y+tolerance >= 0 && p2.x < this.width+tolerance && p2.y < this.height+tolerance;
         }
 
         /**
