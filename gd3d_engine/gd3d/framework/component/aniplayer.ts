@@ -8,7 +8,7 @@ namespace gd3d.framework
      * @classdesc
      * 动画播放器
      * @version egret-gd3d 1.0
-     */    
+     */
     @reflect.nodeComponent
     export class aniplayer implements INodeComponent
     {
@@ -29,7 +29,7 @@ namespace gd3d.framework
          * @classdesc
          * 返回动画数组（clips）所有动画的名字
          * @version egret-gd3d 1.0
-         */    
+         */
         get clipnames()
         {
             if (this._clipnames == null || this._clipnameCount != this.clips.length)
@@ -49,7 +49,7 @@ namespace gd3d.framework
          * @classdesc
          * 动画数组
          * @version egret-gd3d 1.0
-         */    
+         */
         @reflect.Field("animationClip[]")
         clips: animationClip[];
         /**
@@ -58,7 +58,7 @@ namespace gd3d.framework
          * @classdesc
          * 是否自动播放
          * @version egret-gd3d 1.0
-         */   
+         */
         @reflect.Field("boolean")
         public autoplay: boolean = true;
         private playIndex: number = 0;
@@ -69,7 +69,7 @@ namespace gd3d.framework
          * @classdesc
          * 骨骼数组
          * @version egret-gd3d 1.0
-         */   
+         */
         @reflect.Field("tPoseInfo[]")
         bones: tPoseInfo[];
         /**
@@ -78,7 +78,7 @@ namespace gd3d.framework
          * @classdesc
          * 初始位置
          * @version egret-gd3d 1.0
-         */ 
+         */
         @reflect.Field("PoseBoneMatrix[]")
         startPos: PoseBoneMatrix[];
         /**
@@ -99,9 +99,9 @@ namespace gd3d.framework
         carelist: { [id: string]: transform } = {};
 
         private _playFrameid: number = 0;
-         /**
-         * @private
-         */       
+        /**
+        * @private
+        */
         public _playTimer: number = 0;
         /**
          * @public
@@ -109,15 +109,15 @@ namespace gd3d.framework
          * @classdesc
          * 播放速度
          * @version egret-gd3d 1.0
-         */    
+         */
         speed: number = 1.0;
-         /**
-         * @private
-         */  
+        /**
+        * @private
+        */
         crossdelta: number = 0;
-         /**
-         * @private
-         */  
+        /**
+        * @private
+        */
         crossspeed: number = 0;
 
         private beRevert: boolean = false;
@@ -129,20 +129,26 @@ namespace gd3d.framework
          * @classdesc
          * 是否动画融合
          * @version egret-gd3d 1.0
-         */    
-        public mix:boolean = false;
+         */
+        public mix: boolean = false;
+
+        public isCache: boolean = false;
+        public static playerCaches: { key: string, data: aniplayer }[] = [];
+
         /**
          * @public
          * @language zh_CN
          * @classdesc
          * 返回当前播放帧数
          * @version egret-gd3d 1.0
-         */    
-        get cacheKey(){
-            if(this._playClip)
-                return this._playClip.getGUID()+"_"+this._playFrameid;
+         */
+        get cacheKey()
+        {
+            if (this._playClip)
+                return this._playClip.getGUID() + "_" + this._playFrameid;
             return this._playFrameid;
         }
+
 
         private init()
         {
@@ -165,7 +171,7 @@ namespace gd3d.framework
                 this.care(asbones[key].gameObject.transform);
             }
 
-            if (this.autoplay && this.clips != null && this.clips.length>0)
+            if (this.autoplay && this.clips != null && this.clips.length > 0)
             {
                 this.playByIndex(this.playIndex);
             }
@@ -193,9 +199,20 @@ namespace gd3d.framework
                 this.mix = true;
             }
 
+            let cached = false;
+            if (this.isCache && !this.mix && aniplayer.playerCaches[this.cacheKey])
+            {
+                cached = true;
+                if(StringUtil.isNullOrEmptyObject(this.carelist))
+                    return;
+            }
+
             for (var i = 0; i < this._playClip.boneCount; i++)
             {
                 var bone = this._playClip.bones[i];
+                
+                if(cached && !this.carelist[bone])
+                    continue;
 
                 var frame = this._playClip.frames[this._playFrameid];
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
@@ -223,22 +240,6 @@ namespace gd3d.framework
                     }
                 }
 
-
-
-                //else//动画里有player我没有的骨骼
-                //{//这就需要单独分离出来那些cpu 做tpose处理的骨骼
-                //    //if (this.tpose[bone] != undefined)
-                //    //{
-                //    //    var tb
-                //    //    this.nowpose[bone] = FreeNode.PoseBoneMatrix.sMultiply(this.tpose[bone], next);
-                //    //    if (mix)
-                //    //    {
-                //    //        this.lerppose[bone] = this.nowpose[bone].Clone();
-                //    //    }
-                //    //}
-                //}
-
-
                 var careobj = this.carelist[bone];
                 if (careobj != undefined)
                 {
@@ -259,6 +260,10 @@ namespace gd3d.framework
                     math.pool.delete_matrix(_newmatrix);
                 }
             }
+
+            if (!cached){
+                aniplayer.playerCaches[this.cacheKey] = this;
+            }
         }
         /**
          * @public
@@ -269,7 +274,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据动画片段索引播放普通动画
          * @version egret-gd3d 1.0
-         */   
+         */
         playByIndex(animIndex: number, speed: number = 1.0, beRevert: boolean = false)
         {
             this.playIndex = animIndex;

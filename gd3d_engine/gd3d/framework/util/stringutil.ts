@@ -195,6 +195,17 @@ namespace gd3d.framework
             let other = str.substr(1);
             return firstChar + other;
         }
+
+
+        static isNullOrEmptyObject(obj: any): boolean
+        {
+            if (!obj)
+                return true;
+            for (var n in obj) {
+                return false
+            }
+            return true;
+        }
     }
 
 }

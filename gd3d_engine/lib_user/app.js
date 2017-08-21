@@ -394,11 +394,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
-    main = __decorate([
-        gd3d.reflect.userCode
-    ], main);
     return main;
 }());
+main = __decorate([
+    gd3d.reflect.userCode
+], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -875,11 +875,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
-    CameraShock = __decorate([
-        gd3d.reflect.nodeComponent
-    ], CameraShock);
     return CameraShock;
 }());
+CameraShock = __decorate([
+    gd3d.reflect.nodeComponent
+], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -3636,6 +3636,7 @@ var test_multipleplayer_anim = (function () {
         this.cubes = {};
         this.infos = {};
         this.timer = 0;
+        this.aniplayers = [];
     }
     test_multipleplayer_anim.prototype.init = function () {
         this.infos[53] = { abName: "prefabs/elong/elong.assetbundle.json", prefabName: "elong.prefab.json", materialCount: 1 };
@@ -3657,8 +3658,8 @@ var test_multipleplayer_anim = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
                         var a = 10;
                         var b = 10;
-                        for (var i = -14; i <= 14; i++) {
-                            for (var j = -14; j <= 14; j++) {
+                        for (var i = -10; i <= 10; i++) {
+                            for (var j = -10; j <= 10; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);
@@ -3667,8 +3668,7 @@ var test_multipleplayer_anim = (function () {
                                     objCam.lookat(trans);
                                 }
                                 var ap = trans.gameObject.getComponent("aniplayer");
-                                ap.autoplay = true;
-                                ap._playTimer = Math.random() * 1000;
+                                _this.aniplayers.push(ap);
                             }
                         }
                         objCam.markDirty();
@@ -3685,6 +3685,22 @@ var test_multipleplayer_anim = (function () {
         this.camera.far = 199;
         objCam.localTranslate = new gd3d.math.vector3(0, 86, 0);
         objCam.markDirty();
+        var tipsLabel = document.createElement("label");
+        tipsLabel.style.top = "300px";
+        tipsLabel.style.position = "absolute";
+        tipsLabel.textContent = "开启cache";
+        this.app.container.appendChild(tipsLabel);
+        var cacheOpenCheckBox = document.createElement("input");
+        cacheOpenCheckBox.type = "checkbox";
+        cacheOpenCheckBox.checked = false;
+        cacheOpenCheckBox.onchange = function () {
+            for (var key in _this.aniplayers) {
+                _this.aniplayers[key].isCache = cacheOpenCheckBox.checked;
+            }
+        };
+        cacheOpenCheckBox.style.top = "350px";
+        cacheOpenCheckBox.style.position = "absolute";
+        this.app.container.appendChild(cacheOpenCheckBox);
     };
     test_multipleplayer_anim.prototype.update = function (delta) {
     };
@@ -7045,11 +7061,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
-    testUserCodeUpdate = __decorate([
-        gd3d.reflect.userCode
-    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
+testUserCodeUpdate = __decorate([
+    gd3d.reflect.userCode
+], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {

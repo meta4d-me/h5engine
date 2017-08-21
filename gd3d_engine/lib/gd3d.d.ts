@@ -1358,6 +1358,11 @@ declare namespace gd3d.framework {
         private playStyle;
         private percent;
         mix: boolean;
+        isCache: boolean;
+        static playerCaches: {
+            key: string;
+            data: aniplayer;
+        }[];
         readonly cacheKey: string | number;
         private init();
         start(): void;
@@ -3437,6 +3442,7 @@ declare namespace gd3d.framework {
         static replaceAll(srcStr: string, fromStr: string, toStr: string): string;
         static trimAll(str: string): string;
         static firstCharToLowerCase(str: string): string;
+        static isNullOrEmptyObject(obj: any): boolean;
     }
 }
 declare namespace gd3d.framework {

@@ -534,6 +534,7 @@ declare class test_multipleplayer_anim implements IState {
     cube2: gd3d.framework.transform;
     cube3: gd3d.framework.transform;
     timer: number;
+    aniplayers: gd3d.framework.aniplayer[];
     update(delta: number): void;
 }
 declare class test_navmesh implements IState {
