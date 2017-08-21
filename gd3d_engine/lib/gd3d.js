@@ -8078,10 +8078,16 @@ var gd3d;
                     this.crossdelta -= delta / this.speed * this.crossspeed;
                     this.mix = true;
                 }
-                if (this.isCache && !this.mix && framework.StringUtil.isNullOrEmptyObject(this.carelist) && aniplayer_1.playerCaches[this.cacheKey] != null)
-                    return;
+                var cached = false;
+                if (this.isCache && !this.mix && aniplayer_1.playerCaches[this.cacheKey]) {
+                    cached = true;
+                    if (framework.StringUtil.isNullOrEmptyObject(this.carelist))
+                        return;
+                }
                 for (var i = 0; i < this._playClip.boneCount; i++) {
                     var bone = this._playClip.bones[i];
+                    if (cached && !this.carelist[bone])
+                        continue;
                     var frame = this._playClip.frames[this._playFrameid];
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
@@ -8113,7 +8119,7 @@ var gd3d;
                         gd3d.math.pool.delete_matrix(_newmatrix);
                     }
                 }
-                if (this.isCache && !this.mix) {
+                if (!cached) {
                     aniplayer_1.playerCaches[this.cacheKey] = this;
                 }
             };
