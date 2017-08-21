@@ -3,10 +3,9 @@ namespace gd3d.framework
     export interface IAttributeData
     {
         uiState: AttributeUIState;
-        data: any;
-        // timeLine: { [frameIndex: number]: any };
+        data: { [frameIndex: number]: FrameKeyPointData };
         attributeType: AttributeType;
-        actions: { [frameIndex: number]: IEffectAction };
+        actions: { [frameIndex: number]: IEffectAction[] };
         init();
     }
     @gd3d.reflect.SerializeType
@@ -14,32 +13,40 @@ namespace gd3d.framework
     {
         public uiState: AttributeUIState;
         public attributeType: AttributeType;
-        public data: any;
-        // public timeLine: { [frameIndex: number]: gd3d.math.vector3 };
-        public actions: { [frameIndex: number]: IEffectAction };
+        public data: { [frameIndex: number]: FrameKeyPointData };
+        public actions: { [frameIndex: number]: IEffectAction[] }
+        constructor()
+        {
+            this.init();
+        }
         init()
         {
-            if (this.attributeType == AttributeType.FixedValType)
-            {
-                this.data = new gd3d.math.vector3();
-            } else if (this.attributeType == AttributeType.LerpType)
-            {
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1);
+            keyPoint.val = new gd3d.math.vector3();
+            this.data[keyPoint.frameIndex] = keyPoint;
+        }
+        addFramePoint(frameId: number, data: FrameKeyPointData)
+        {
+            if (this.data == undefined)
                 this.data = {};
-                this.data[-1] = new gd3d.math.vector3();
+            this.data[frameId] = data;
+            if (data.actions != undefined)
+            {
+                if (this.actions == undefined)
+                    this.actions = {};
+                this.actions[frameId] = data.actions;
             }
         }
-        addFramePoint(frameId: number, data: gd3d.math.vector3)
-        {
-            this.data[frameId] = data;
-        }
-        removeKeyPoint(frameId: number, data: any)
+        removeFramePoint(frameId: number, data: any)
         {
             if (this.data[frameId] == undefined)
             {
                 console.warn("当前时间线中没有记录这一帧：" + frameId);
                 return;
-            }
-            delete this.data[frameId];
+            } else
+                delete this.data[frameId];
+            if (this.actions != undefined && this.actions[frameId] != undefined)
+                delete this.actions[frameId];
         }
     }
     @gd3d.reflect.SerializeType
@@ -47,32 +54,40 @@ namespace gd3d.framework
     {
         public uiState: AttributeUIState;
         public attributeType: AttributeType;
-        public data: any;
-        public timeLine: { [frameIndex: number]: gd3d.math.vector2 };
-        public actions: { [frameIndex: number]: IEffectAction };
+        public data: { [frameIndex: number]: FrameKeyPointData };
+        public actions: { [frameIndex: number]: IEffectAction[] }
+        constructor()
+        {
+            this.init();
+        }
         init()
         {
-            if (this.attributeType == AttributeType.FixedValType)
-            {
-                this.data = new gd3d.math.vector3();
-            } else if (this.attributeType == AttributeType.LerpType)
-            {
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1);
+            keyPoint.val = new gd3d.math.vector2();
+            this.data[keyPoint.frameIndex] = keyPoint;
+        }
+        addFramePoint(frameId: number, data: FrameKeyPointData)
+        {
+            if (this.data == undefined)
                 this.data = {};
-                this.data[-1] = new gd3d.math.vector3();
+            this.data[frameId] = data;
+            if (data.actions != undefined)
+            {
+                if (this.actions == undefined)
+                    this.actions = {};
+                this.actions[frameId] = data.actions;
             }
         }
-        addFramePoint(frameId: number, data: gd3d.math.vector2)
-        {
-            this.data[frameId] = data;
-        }
-        removeKeyPoint(frameId: number, data: gd3d.math.vector2)
+        removeFramePoint(frameId: number, data: gd3d.math.vector2)
         {
             if (this.data[frameId] == undefined)
             {
                 console.warn("当前时间线中没有记录这一帧：" + frameId);
                 return;
-            }
-            delete this.data[frameId];
+            } else
+                delete this.data[frameId];
+            if (this.actions != undefined && this.actions[frameId] != undefined)
+                delete this.actions[frameId];
         }
     }
     @gd3d.reflect.SerializeType
@@ -80,39 +95,48 @@ namespace gd3d.framework
     {
         public uiState: AttributeUIState;
         public attributeType: AttributeType;
-        public data: any;
+        public data: { [frameIndex: number]: FrameKeyPointData };
         public timeLine: { [frameIndex: number]: number };
-        public actions: { [frameIndex: number]: IEffectAction };
+        public actions: { [frameIndex: number]: IEffectAction[] };
+        constructor()
+        {
+            this.init();
+        }
         init()
         {
-            if (this.attributeType == AttributeType.FixedValType)
-            {
-                this.data = new gd3d.math.vector3();
-            } else if (this.attributeType == AttributeType.LerpType)
-            {
-                this.data = {};
-                this.data[-1] = new gd3d.math.vector3();
-            }
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1);
+            keyPoint.val = 0;
+            this.data[keyPoint.frameIndex] = keyPoint;
         }
         addFramePoint(frameId: number, data: any)
         {
+            if (this.data == undefined)
+                this.data = {};
             this.data[frameId] = data;
+            if (data.actions != undefined)
+            {
+                if (this.actions == undefined)
+                    this.actions = {};
+                this.actions[frameId] = data.actions;
+            }
         }
-        removeKeyPoint(frameId: number, data: number)
+        removeFramePoint(frameId: number, data: number)
         {
             if (this.data[frameId] == undefined)
             {
                 console.warn("当前时间线中没有记录这一帧：" + frameId);
                 return;
-            }
-            delete this.data[frameId];
+            } else
+                delete this.data[frameId];
+            if (this.actions != undefined && this.actions[frameId] != undefined)
+                delete this.actions[frameId];
         }
     }
 
     export interface ILerpAttributeInterface
     {
         addFramePoint(frameId: number, data: any);
-        removeKeyPoint(frameId: number, data: any);
+        removeFramePoint(frameId: number, data: any);
     }
 
     export enum AttributeUIState
@@ -134,6 +158,17 @@ namespace gd3d.framework
     {
         FixedValType = 0,
         LerpType = 1
+    }
+
+    export class FrameKeyPointData
+    {
+        public frameIndex: number;
+        public val: any;
+        public actions: IEffectAction[];
+        constructor(frameIndex: number)
+        {
+            this.frameIndex = frameIndex;
+        }
     }
 
     // export class VectorLerpAttribute implements LerpAttributeInterface
@@ -196,5 +231,5 @@ namespace gd3d.framework
     //         if (this.timeLine[frameId].r == -1 && this.timeLine[frameId].a == -1)
     //             delete this.timeLine[frameId];
     //     }
-// }
+    // }
 }

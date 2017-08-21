@@ -802,7 +802,7 @@ namespace gd3d.framework
             let effe: IEffectElement;
             if (type == gd3d.framework.EffectElementTypeEnum.SingleMeshType)
             {
-                effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr());
+                effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr(), this);
                 effe.name = "singlemesh" + this.effectElements.length;
 
                 (effe as gd3d.framework.EffectElementSingleMesh).transform = this.gameObject.transform;

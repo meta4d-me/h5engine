@@ -2585,55 +2585,63 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     interface IAttributeData {
         uiState: AttributeUIState;
-        data: any;
+        data: {
+            [frameIndex: number]: FrameKeyPointData;
+        };
         attributeType: AttributeType;
         actions: {
-            [frameIndex: number]: IEffectAction;
+            [frameIndex: number]: IEffectAction[];
         };
         init(): any;
     }
     class Vector3AttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
         attributeType: AttributeType;
-        data: any;
-        actions: {
-            [frameIndex: number]: IEffectAction;
+        data: {
+            [frameIndex: number]: FrameKeyPointData;
         };
+        actions: {
+            [frameIndex: number]: IEffectAction[];
+        };
+        constructor();
         init(): void;
-        addFramePoint(frameId: number, data: gd3d.math.vector3): void;
-        removeKeyPoint(frameId: number, data: any): void;
+        addFramePoint(frameId: number, data: FrameKeyPointData): void;
+        removeFramePoint(frameId: number, data: any): void;
     }
     class Vector2AttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
         attributeType: AttributeType;
-        data: any;
-        timeLine: {
-            [frameIndex: number]: gd3d.math.vector2;
+        data: {
+            [frameIndex: number]: FrameKeyPointData;
         };
         actions: {
-            [frameIndex: number]: IEffectAction;
+            [frameIndex: number]: IEffectAction[];
         };
+        constructor();
         init(): void;
-        addFramePoint(frameId: number, data: gd3d.math.vector2): void;
-        removeKeyPoint(frameId: number, data: gd3d.math.vector2): void;
+        addFramePoint(frameId: number, data: FrameKeyPointData): void;
+        removeFramePoint(frameId: number, data: gd3d.math.vector2): void;
     }
     class NumberAttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
         attributeType: AttributeType;
-        data: any;
+        data: {
+            [frameIndex: number]: FrameKeyPointData;
+        };
         timeLine: {
             [frameIndex: number]: number;
         };
         actions: {
-            [frameIndex: number]: IEffectAction;
+            [frameIndex: number]: IEffectAction[];
         };
+        constructor();
         init(): void;
         addFramePoint(frameId: number, data: any): void;
-        removeKeyPoint(frameId: number, data: number): void;
+        removeFramePoint(frameId: number, data: number): void;
     }
     interface ILerpAttributeInterface {
         addFramePoint(frameId: number, data: any): any;
-        removeKeyPoint(frameId: number, data: any): any;
+        removeFramePoint(frameId: number, data: any): any;
     }
     enum AttributeUIState {
         None = 0,
@@ -2650,6 +2658,12 @@ declare namespace gd3d.framework {
         FixedValType = 0,
         LerpType = 1,
     }
+    class FrameKeyPointData {
+        frameIndex: number;
+        val: any;
+        actions: IEffectAction[];
+        constructor(frameIndex: number);
+    }
 }
 declare namespace gd3d.framework {
     interface IEffectElement {
@@ -2665,6 +2679,7 @@ declare namespace gd3d.framework {
         elementType: gd3d.framework.EffectElementTypeEnum;
         beloop: boolean;
         delayTime: number;
+        life: number;
         mat: gd3d.framework.material;
         texturePath: string;
         shader: gd3d.framework.shader;
@@ -2678,9 +2693,6 @@ declare namespace gd3d.framework {
         colorRate: number;
         uv: gd3d.math.vector2;
         renderModel: gd3d.framework.RenderModel;
-        timelineFrame: {
-            [frameIndex: number]: EffectFrameData;
-        };
         ref: string;
         actions: IEffectAction[];
         curAttrData: EffectAttrsData;
@@ -2693,9 +2705,13 @@ declare namespace gd3d.framework {
         active: boolean;
         transform: transform;
         private mgr;
-        constructor(assetMgr: gd3d.framework.assetMgr);
+        private effectIns;
+        constructor(assetMgr: gd3d.framework.assetMgr, effectIns: effectSystem);
         initData(): void;
         WriteToJson(obj: any): any;
+        private recordElementLerpAttributes(data);
+        private recordLerpValues(effectFrameData);
+        private recordLerp(effectFrameData, lerpData, key);
     }
     class EffectElementEmission implements IEffectElement {
         name: string;
@@ -3453,8 +3469,6 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-}
-declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {

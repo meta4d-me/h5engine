@@ -9561,7 +9561,7 @@ var gd3d;
                     this.effectElements = [];
                 var effe;
                 if (type == gd3d.framework.EffectElementTypeEnum.SingleMeshType) {
-                    effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr());
+                    effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr(), this);
                     effe.name = "singlemesh" + this.effectElements.length;
                     effe.transform = this.gameObject.transform;
                 }
@@ -16023,84 +16023,108 @@ var gd3d;
     (function (framework) {
         var Vector3AttributeData = (function () {
             function Vector3AttributeData() {
+                this.init();
             }
             Vector3AttributeData.prototype.init = function () {
-                if (this.attributeType == AttributeType.FixedValType) {
-                    this.data = new gd3d.math.vector3();
-                }
-                else if (this.attributeType == AttributeType.LerpType) {
-                    this.data = {};
-                    this.data[-1] = new gd3d.math.vector3();
-                }
+                var keyPoint = new FrameKeyPointData(-1);
+                keyPoint.val = new gd3d.math.vector3();
+                this.data[keyPoint.frameIndex] = keyPoint;
             };
             Vector3AttributeData.prototype.addFramePoint = function (frameId, data) {
+                if (this.data == undefined)
+                    this.data = {};
                 this.data[frameId] = data;
+                if (data.actions != undefined) {
+                    if (this.actions == undefined)
+                        this.actions = {};
+                    this.actions[frameId] = data.actions;
+                }
             };
-            Vector3AttributeData.prototype.removeKeyPoint = function (frameId, data) {
+            Vector3AttributeData.prototype.removeFramePoint = function (frameId, data) {
                 if (this.data[frameId] == undefined) {
                     console.warn("当前时间线中没有记录这一帧：" + frameId);
                     return;
                 }
-                delete this.data[frameId];
+                else
+                    delete this.data[frameId];
+                if (this.actions != undefined && this.actions[frameId] != undefined)
+                    delete this.actions[frameId];
             };
             Vector3AttributeData = __decorate([
-                gd3d.reflect.SerializeType
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [])
             ], Vector3AttributeData);
             return Vector3AttributeData;
         }());
         framework.Vector3AttributeData = Vector3AttributeData;
         var Vector2AttributeData = (function () {
             function Vector2AttributeData() {
+                this.init();
             }
             Vector2AttributeData.prototype.init = function () {
-                if (this.attributeType == AttributeType.FixedValType) {
-                    this.data = new gd3d.math.vector3();
-                }
-                else if (this.attributeType == AttributeType.LerpType) {
-                    this.data = {};
-                    this.data[-1] = new gd3d.math.vector3();
-                }
+                var keyPoint = new FrameKeyPointData(-1);
+                keyPoint.val = new gd3d.math.vector2();
+                this.data[keyPoint.frameIndex] = keyPoint;
             };
             Vector2AttributeData.prototype.addFramePoint = function (frameId, data) {
+                if (this.data == undefined)
+                    this.data = {};
                 this.data[frameId] = data;
+                if (data.actions != undefined) {
+                    if (this.actions == undefined)
+                        this.actions = {};
+                    this.actions[frameId] = data.actions;
+                }
             };
-            Vector2AttributeData.prototype.removeKeyPoint = function (frameId, data) {
+            Vector2AttributeData.prototype.removeFramePoint = function (frameId, data) {
                 if (this.data[frameId] == undefined) {
                     console.warn("当前时间线中没有记录这一帧：" + frameId);
                     return;
                 }
-                delete this.data[frameId];
+                else
+                    delete this.data[frameId];
+                if (this.actions != undefined && this.actions[frameId] != undefined)
+                    delete this.actions[frameId];
             };
             Vector2AttributeData = __decorate([
-                gd3d.reflect.SerializeType
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [])
             ], Vector2AttributeData);
             return Vector2AttributeData;
         }());
         framework.Vector2AttributeData = Vector2AttributeData;
         var NumberAttributeData = (function () {
             function NumberAttributeData() {
+                this.init();
             }
             NumberAttributeData.prototype.init = function () {
-                if (this.attributeType == AttributeType.FixedValType) {
-                    this.data = new gd3d.math.vector3();
-                }
-                else if (this.attributeType == AttributeType.LerpType) {
-                    this.data = {};
-                    this.data[-1] = new gd3d.math.vector3();
-                }
+                var keyPoint = new FrameKeyPointData(-1);
+                keyPoint.val = 0;
+                this.data[keyPoint.frameIndex] = keyPoint;
             };
             NumberAttributeData.prototype.addFramePoint = function (frameId, data) {
+                if (this.data == undefined)
+                    this.data = {};
                 this.data[frameId] = data;
+                if (data.actions != undefined) {
+                    if (this.actions == undefined)
+                        this.actions = {};
+                    this.actions[frameId] = data.actions;
+                }
             };
-            NumberAttributeData.prototype.removeKeyPoint = function (frameId, data) {
+            NumberAttributeData.prototype.removeFramePoint = function (frameId, data) {
                 if (this.data[frameId] == undefined) {
                     console.warn("当前时间线中没有记录这一帧：" + frameId);
                     return;
                 }
-                delete this.data[frameId];
+                else
+                    delete this.data[frameId];
+                if (this.actions != undefined && this.actions[frameId] != undefined)
+                    delete this.actions[frameId];
             };
             NumberAttributeData = __decorate([
-                gd3d.reflect.SerializeType
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [])
             ], NumberAttributeData);
             return NumberAttributeData;
         }());
@@ -16123,6 +16147,13 @@ var gd3d;
             AttributeType[AttributeType["FixedValType"] = 0] = "FixedValType";
             AttributeType[AttributeType["LerpType"] = 1] = "LerpType";
         })(AttributeType = framework.AttributeType || (framework.AttributeType = {}));
+        var FrameKeyPointData = (function () {
+            function FrameKeyPointData(frameIndex) {
+                this.frameIndex = frameIndex;
+            }
+            return FrameKeyPointData;
+        }());
+        framework.FrameKeyPointData = FrameKeyPointData;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -16130,10 +16161,11 @@ var gd3d;
     var framework;
     (function (framework) {
         var EffectElementSingleMesh = (function () {
-            function EffectElementSingleMesh(assetMgr) {
+            function EffectElementSingleMesh(assetMgr, effectIns) {
                 this.elementType = gd3d.framework.EffectElementTypeEnum.SingleMeshType;
                 this.beloop = false;
                 this.delayTime = 0;
+                this.life = 5;
                 this.mat = new gd3d.framework.material();
                 this.mesh = new gd3d.framework.mesh();
                 this.position = new framework.Vector3AttributeData();
@@ -16152,18 +16184,61 @@ var gd3d;
                 this.loopFrame = Number.MAX_VALUE;
                 this.active = true;
                 this.mgr = assetMgr;
+                this.effectIns = effectIns;
                 this.mesh = this.mgr.getDefaultMesh("quad");
                 this.shader = this.mgr.getShader("diffuse.shader.json");
                 this.mat.setShader(this.shader);
+                this.initData();
             }
             ;
             ;
             ;
             EffectElementSingleMesh.prototype.initData = function () {
                 this.actions = [];
-                this.timelineFrame = {};
             };
             EffectElementSingleMesh.prototype.WriteToJson = function (obj) {
+            };
+            EffectElementSingleMesh.prototype.recordElementLerpAttributes = function (data) {
+                if (data.data != undefined) {
+                    for (var i in data.data) {
+                        var frameData = data.data[i];
+                        if (frameData.actions != undefined) {
+                        }
+                    }
+                }
+            };
+            EffectElementSingleMesh.prototype.recordLerpValues = function (effectFrameData) {
+                for (var i in effectFrameData.lerpDatas) {
+                    if (effectFrameData.lerpDatas[i].type == framework.EffectLerpTypeEnum.Linear) {
+                        for (var key in effectFrameData.lerpDatas[i].attrsList) {
+                            var attrname = effectFrameData.lerpDatas[i].attrsList[key];
+                            this.recordLerp(effectFrameData, effectFrameData.lerpDatas[i], attrname);
+                        }
+                    }
+                }
+            };
+            EffectElementSingleMesh.prototype.recordLerp = function (effectFrameData, lerpData, key) {
+                var fromFrame = lerpData.fromFrame;
+                var toFrame = lerpData.toFrame.getValue();
+                var toVal = lerpData.attrsData.getAttribute(key);
+                if (effectFrameData.attrsData[key] == undefined) {
+                    effectFrameData.attrsData.initAttribute(key);
+                }
+                var fromVal = effectFrameData.attrsData.getAttribute(key);
+                for (var i = fromFrame + 1; i <= toFrame; i++) {
+                    var outVal = void 0;
+                    if (fromVal instanceof gd3d.math.vector3) {
+                        outVal = new gd3d.math.vector3();
+                        gd3d.math.vec3SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
+                    }
+                    else if (fromVal instanceof gd3d.math.vector2) {
+                        outVal = new gd3d.math.vector2();
+                        gd3d.math.vec2SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
+                    }
+                    else if (typeof (fromVal) === 'number') {
+                        outVal = gd3d.math.numberLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame));
+                    }
+                }
             };
             __decorate([
                 gd3d.reflect.Field("EffectElementTypeEnum"),
@@ -16177,6 +16252,10 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], EffectElementSingleMesh.prototype, "delayTime", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], EffectElementSingleMesh.prototype, "life", void 0);
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -16223,7 +16302,7 @@ var gd3d;
             ], EffectElementSingleMesh.prototype, "renderModel", void 0);
             EffectElementSingleMesh = __decorate([
                 gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [gd3d.framework.assetMgr])
+                __metadata("design:paramtypes", [gd3d.framework.assetMgr, framework.effectSystem])
             ], EffectElementSingleMesh);
             return EffectElementSingleMesh;
         }());
@@ -20408,20 +20487,6 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
-var web3d;
-(function (web3d) {
-    var io;
-    (function (io) {
-        onmessage = function (msg) {
-            switch (msg.data.type) {
-                case "load":
-                    break;
-                case "loadShaders":
-                    break;
-            }
-        };
-    })(io = web3d.io || (web3d.io = {}));
-})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
