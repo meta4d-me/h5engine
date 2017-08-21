@@ -199,12 +199,20 @@ namespace gd3d.framework
                 this.mix = true;
             }
 
-            if (this.isCache && !this.mix && StringUtil.isNullOrEmptyObject(this.carelist) && aniplayer.playerCaches[this.cacheKey] != null)
-                return;
+            let cached = false;
+            if (this.isCache && !this.mix && aniplayer.playerCaches[this.cacheKey])
+            {
+                cached = true;
+                if(StringUtil.isNullOrEmptyObject(this.carelist))
+                    return;
+            }
 
             for (var i = 0; i < this._playClip.boneCount; i++)
             {
                 var bone = this._playClip.bones[i];
+                
+                if(cached && !this.carelist[bone])
+                    continue;
 
                 var frame = this._playClip.frames[this._playFrameid];
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
@@ -252,7 +260,8 @@ namespace gd3d.framework
                     math.pool.delete_matrix(_newmatrix);
                 }
             }
-            if (this.isCache && !this.mix){
+
+            if (!cached){
                 aniplayer.playerCaches[this.cacheKey] = this;
             }
         }
