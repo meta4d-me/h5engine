@@ -392,18 +392,27 @@ namespace gd3d.framework
 
             if (this.player != null)
             {
-                if (!this.player.mix)
+                if (this.player.isCache && !this.player.mix)
                 {
                     let cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
                     let data: Float32Array = skinnedMeshRenderer.dataCaches[cacheKey];
                     if (!data)
                     {
-                        data = new Float32Array(8 * 40);
-                        this.player.fillPoseData(data, this.bones, true);
-                        skinnedMeshRenderer.dataCaches[cacheKey] = data;
+                        let _cachePlayer = aniplayer.playerCaches[this.player.cacheKey];
+                        if (_cachePlayer)
+                        {
+                            data = new Float32Array(8 * 40);
+                            _cachePlayer.fillPoseData(data, this.bones, true);
+                            skinnedMeshRenderer.dataCaches[cacheKey] = data;
+                            this.cacheData = data;
+                            return;
+                        }
                     }
-                    this.cacheData = data;
-                    return;
+                    else
+                    {
+                        this.cacheData = data;
+                        return;
+                    }
                 }
                 this.cacheData = null;
 

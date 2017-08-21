@@ -38,9 +38,9 @@ class test_multipleplayer_anim implements IState
                         var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(data.prefabName) as gd3d.framework.prefab;
                         let a = 10;
                         let b = 10;
-                        for (let i = -14; i <=14; i++)
+                        for (let i = -10; i <=10; i++)
                         {
-                            for (let j = -14; j <=14; j++)
+                            for (let j = -10; j <=10; j++)
                             {
                                 let trans = _prefab.getCloneTrans();
 
@@ -53,8 +53,7 @@ class test_multipleplayer_anim implements IState
                                     objCam.lookat(trans);
                                 }
                                 var ap = trans.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
-                                ap.autoplay = true;
-                                ap._playTimer = Math.random() * 1000;
+                                this.aniplayers.push(ap);
                             }
                         }
                         objCam.markDirty();
@@ -76,6 +75,26 @@ class test_multipleplayer_anim implements IState
         objCam.markDirty();//标记为需要刷新
 
 
+
+        var tipsLabel = document.createElement("label");
+        tipsLabel.style.top = "300px";
+        tipsLabel.style.position = "absolute";
+        tipsLabel.textContent = "开启cache";
+        this.app.container.appendChild(tipsLabel);
+
+        let cacheOpenCheckBox = document.createElement("input");
+        cacheOpenCheckBox.type = "checkbox";
+        cacheOpenCheckBox.checked = false;
+        cacheOpenCheckBox.onchange = () =>
+        {
+            for(let key in this.aniplayers)
+            {
+                this.aniplayers[key].isCache = cacheOpenCheckBox.checked;
+            }
+        }
+        cacheOpenCheckBox.style.top = "350px";
+        cacheOpenCheckBox.style.position = "absolute";
+        this.app.container.appendChild(cacheOpenCheckBox);
     }
 
     camera: gd3d.framework.camera;
@@ -83,6 +102,7 @@ class test_multipleplayer_anim implements IState
     cube2: gd3d.framework.transform;
     cube3: gd3d.framework.transform;
     timer: number = 0;
+    aniplayers:gd3d.framework.aniplayer[] = [];
     update(delta: number)
     {
         // this.timer += delta;
