@@ -11,6 +11,17 @@ namespace gd3d.framework
 
         WriteToJson(obj: any): any;
     }
+
+    export enum AttributeType
+    {
+        PositionType = 1,
+        EulerType = 2,
+        ScaleType = 3,
+        ColorType = 4,
+        ColorRateType = 5,
+        AlphaType = 6,
+        TillingType = 7,
+    }
     @gd3d.reflect.SerializeType
     export class EffectElementSingleMesh implements IEffectElement
     {
@@ -57,14 +68,16 @@ namespace gd3d.framework
         @gd3d.reflect.Field("Vector2AttributeData")
         public tilling: Vector2AttributeData = new Vector2AttributeData();;
 
-        @gd3d.reflect.Field("number")
-        public colorRate: number = 1;//几倍颜色叠加
+        @gd3d.reflect.Field("NumberAttributeData")
+        public colorRate: NumberAttributeData = new NumberAttributeData();//几倍颜色叠加
         public uv: gd3d.math.vector2 = new gd3d.math.vector2();
 
         @gd3d.reflect.Field("RenderModel")
         public renderModel: gd3d.framework.RenderModel = gd3d.framework.RenderModel.None;
 
-        // public timelineFrame: { [frameIndex: number]: EffectAttrsData };
+        //每个属性是一个单独的timeline
+        public timelineFrames: { [attributeType: number]: { [frameIndex: number]: EffectAttrsData } } = {};
+
         public ref: string;//数据整体引用
         public actions: IEffectAction[];
         public curAttrData: EffectAttrsData;
@@ -94,12 +107,28 @@ namespace gd3d.framework
         public initData()
         {
             this.actions = [];
-            // this.timelineFrame = {};
-            // for (let i = 0; i < this.life * effectSystem.fps; i++)
-            // {
-            //     let data: EffectAttrsData = new EffectAttrsData();
-
-            // }
+            this.timelineFrames = {};
+            this.timelineFrames[AttributeType.PositionType] = {};
+            this.timelineFrames[AttributeType.EulerType] = {};
+            this.timelineFrames[AttributeType.ScaleType] = {};
+            this.timelineFrames[AttributeType.ColorType] = {};
+            this.timelineFrames[AttributeType.ColorRateType] = {};
+            this.timelineFrames[AttributeType.AlphaType] = {};
+            this.timelineFrames[AttributeType.TillingType] = {};
+            this.position.attributeType = AttributeType.PositionType;
+            this.euler.attributeType = AttributeType.EulerType;
+            this.scale.attributeType = AttributeType.ScaleType;
+            this.color.attributeType = AttributeType.ColorType;
+            this.colorRate.attributeType = AttributeType.ColorRateType;
+            this.alpha.attributeType = AttributeType.AlphaType;
+            this.tilling.attributeType = AttributeType.TillingType;
+            this.recordElementLerpAttributes(this.position);
+            this.recordElementLerpAttributes(this.euler);
+            this.recordElementLerpAttributes(this.scale);
+            this.recordElementLerpAttributes(this.color);
+            this.recordElementLerpAttributes(this.colorRate);
+            this.recordElementLerpAttributes(this.alpha);
+            this.recordElementLerpAttributes(this.tilling);
         }
 
         WriteToJson(obj: any): any
@@ -115,108 +144,47 @@ namespace gd3d.framework
         {
             if (data.data != undefined)
             {
-                for (let i in data.data)
+                for (let i = 0; i < data.frameIndexs.length; i++)
                 {
-                    let frameData: FrameKeyPointData = data.data[i];
-                    if (frameData.actions != undefined)
-                    {
-                        //action
-                    }
-                    // if (frameData.frameIndex != -1)
-                    // {
-                    //     if (frameData. != undefined && frameData.lerpDatas.length != 0)
-                    //     {
-                    //         this.recordLerpValues(frameData);
-                    //     } else if (frameData.attrsData != undefined)
-                    //     {
-                    //         if (this.timelineFrame[frameData.frameIndex] == undefined)
-                    //         {
-                    //             this.timelineFrame[frameData.frameIndex] = new EffectFrameData();
-                    //             this.timelineFrame[frameData.frameIndex].attrsData = new EffectAttrsData();
-                    //             this.timelineFrame[frameData.frameIndex].frameIndex = frameData.frameIndex;
-                    //         }
-                    //         for (let k in frameData.attrsData)
-                    //         {
-                    //             this.timelineFrame[frameData.frameIndex].attrsData.setLerpAttribute(k, frameData.attrsData.getAttribute(k));
-                    //         }
-                    //     }
-                    // }
-                }
-            }
-        }
+                    let fromFrameId = data.frameIndexs[i];
+                    let toFrameId = data.frameIndexs[i];
 
-        /**
-         * 录制插值数据
-         * 
-         * @private
-         * @param {EffectElementData} elementData 
-         * @param {EffectFrameData} effectFrameData 
-         * 
-         * @memberof effectSystem
-         */
-        private recordLerpValues(effectFrameData: EffectFrameData)
-        {
-            //每一帧所需要进行插值的属性分别进行插值
-            for (let i in effectFrameData.lerpDatas)
-            {
-                if (effectFrameData.lerpDatas[i].type == EffectLerpTypeEnum.Linear)
-                {
-                    //effectFrameData.lerpDatas[i].attrsList 每一帧中的需要插值的列表
-                    for (let key in effectFrameData.lerpDatas[i].attrsList)
+                    let fromFrameData: FrameKeyPointData = data.data[fromFrameId];
+                    let toFrameData: FrameKeyPointData = data.data[toFrameId];
+                    let timeLine: { [frameIndex: number]: EffectAttrsData } = this.timelineFrames[data.attributeType]
+                    if (fromFrameData.actions == null)
                     {
-                        //attrname 插值的属性名
-                        let attrname = effectFrameData.lerpDatas[i].attrsList[key];
-                        //对该属性进行插值
-                        this.recordLerp(effectFrameData, effectFrameData.lerpDatas[i], attrname);
+                        //lerp操作
+                        this.lerp(fromFrameId, toFrameId, fromFrameData, toFrameData, timeLine);
+                    } else
+                    {
+                        //记录action
                     }
                 }
             }
         }
-        // private newFrameData: EffectFrameData;
-        /**
-         * 记录插值
-         */
-        private recordLerp(effectFrameData: EffectFrameData, lerpData: EffectLerpData, key: string)
-        {
 
-            let fromFrame = lerpData.fromFrame;
-            let toFrame = lerpData.toFrame.getValue();
-            let toVal = lerpData.attrsData.getAttribute(key);
-            if (effectFrameData.attrsData[key] == undefined)
-            {
-                effectFrameData.attrsData.initAttribute(key);
-            }
-            let fromVal = effectFrameData.attrsData.getAttribute(key);
-            //在需要进行插值的帧里面进行插值
-            for (let i = fromFrame + 1; i <= toFrame; i++)
+        private lerp(fromFrameId: number, toFrameId: number, fromFrameVal: any, toFrameVal: any, timeLine: { [frameIndex: number]: EffectAttrsData })
+        {
+            for (let i = fromFrameId; i <= toFrameId; i++)
             {
                 let outVal;
-                if (fromVal instanceof gd3d.math.vector3)
+                if (fromFrameVal instanceof gd3d.math.vector3)
                 {
                     outVal = new gd3d.math.vector3();
-                    gd3d.math.vec3SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
+                    gd3d.math.vec3SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
                 }
-                else if (fromVal instanceof gd3d.math.vector2)
+                else if (fromFrameVal instanceof gd3d.math.vector2)
                 {
                     outVal = new gd3d.math.vector2();
-                    gd3d.math.vec2SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
-                } else if (typeof (fromVal) === 'number')
+                    gd3d.math.vec2SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
+                } else if (typeof (fromFrameVal) === 'number')
                 {
-                    outVal = gd3d.math.numberLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame));
+                    outVal = gd3d.math.numberLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId));
                 }
-
-                // let newFrameData: EffectFrameData = this.timelineFrame[i];
-                // if (newFrameData == undefined) 
-                // {
-                //     newFrameData = new EffectFrameData();
-                //     newFrameData.attrsData = new EffectAttrsData();
-                //     newFrameData.frameIndex = i;
-                //     this.timelineFrame[i] = newFrameData;
-                // }
-                // newFrameData.attrsData.setLerpAttribute(key, outVal);
+                timeLine[i] = outVal;
             }
         }
-
     }
     @gd3d.reflect.SerializeType
     export class EffectElementEmission implements IEffectElement

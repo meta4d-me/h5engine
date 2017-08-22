@@ -1242,7 +1242,8 @@ var gd3d;
                 var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
                 this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
             };
-            overlay2D.prototype.pick2d = function (mx, my) {
+            overlay2D.prototype.pick2d = function (mx, my, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (this.camera == null)
                     return null;
                 var vp = new gd3d.math.rect();
@@ -1253,28 +1254,30 @@ var gd3d;
                 outv2.x = sx;
                 outv2.y = sy;
                 var root = this.canvas.getRoot();
-                return this.dopick2d(outv2, root);
+                return this.dopick2d(outv2, root, tolerance);
             };
-            overlay2D.prototype.dopick2d = function (outv, tran) {
+            overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (tran.components != null) {
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv)) {
+                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
                                 return comp.comp.transform;
                             }
                     }
                 }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(outv, tran.children[i]);
+                        var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
                         if (tran2 != null)
                             return tran2;
                     }
                 }
                 return null;
             };
-            overlay2D.prototype.pick2d_new = function (mx, my) {
+            overlay2D.prototype.pick2d_new = function (mx, my, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (this.camera == null)
                     return null;
                 var vp = new gd3d.math.rect();
@@ -1285,9 +1288,10 @@ var gd3d;
                 outv2.x = sx;
                 outv2.y = sy;
                 var root = this.canvas.getRoot();
-                return this.dopick2d_new(outv2, root);
+                return this.dopick2d_new(outv2, root, tolerance);
             };
-            overlay2D.prototype.dopick2d_new = function (outv, tran) {
+            overlay2D.prototype.dopick2d_new = function (outv, tran, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
                         var tran2 = this.dopick2d_new(outv, tran.children[i]);
@@ -1297,7 +1301,7 @@ var gd3d;
                 }
                 var uirect = tran.getComponent("uirect");
                 if (uirect != null) {
-                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv)) {
+                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance)) {
                         return uirect.transform;
                     }
                 }
@@ -1975,7 +1979,8 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.ContainsCanvasPoint = function (pworld) {
+            transform2D.prototype.ContainsCanvasPoint = function (pworld, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 var mworld = this.getWorldMatrix();
                 var mout = new gd3d.math.matrix3x2();
                 gd3d.math.matrix3x2Inverse(mworld, mout);
@@ -1983,7 +1988,7 @@ var gd3d;
                 gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
                 p2.x += this.pivot.x * this.width;
                 p2.y += this.pivot.y * this.height;
-                return p2.x >= 0 && p2.y >= 0 && p2.x < this.width && p2.y < this.height;
+                return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
             };
             transform2D.prototype.onPointEvent = function (canvas, ev) {
                 if (this.children != null) {
@@ -8024,7 +8029,9 @@ var gd3d;
                 this.playStyle = PlayStyle.NormalPlay;
                 this.percent = 0;
                 this.mix = false;
+                this.isCache = false;
             }
+            aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
                 get: function () {
                     if (this._clipnames == null || this._clipnameCount != this.clips.length) {
@@ -8081,8 +8088,16 @@ var gd3d;
                     this.crossdelta -= delta / this.speed * this.crossspeed;
                     this.mix = true;
                 }
+                var cached = false;
+                if (this.isCache && !this.mix && aniplayer_1.playerCaches[this.cacheKey]) {
+                    cached = true;
+                    if (framework.StringUtil.isNullOrEmptyObject(this.carelist))
+                        return;
+                }
                 for (var i = 0; i < this._playClip.boneCount; i++) {
                     var bone = this._playClip.bones[i];
+                    if (cached && !this.carelist[bone])
+                        continue;
                     var frame = this._playClip.frames[this._playFrameid];
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
@@ -8113,6 +8128,9 @@ var gd3d;
                         gd3d.math.pool.delete_matrix(_matrix);
                         gd3d.math.pool.delete_matrix(_newmatrix);
                     }
+                }
+                if (!cached) {
+                    aniplayer_1.playerCaches[this.cacheKey] = this;
                 }
             };
             aniplayer.prototype.playByIndex = function (animIndex, speed, beRevert) {
@@ -8311,6 +8329,7 @@ var gd3d;
                     pnode = pnode.parent;
                 }
             };
+            aniplayer.playerCaches = [];
             __decorate([
                 gd3d.reflect.Field("animationClip[]"),
                 __metadata("design:type", Array)
@@ -8327,10 +8346,11 @@ var gd3d;
                 gd3d.reflect.Field("PoseBoneMatrix[]"),
                 __metadata("design:type", Array)
             ], aniplayer.prototype, "startPos", void 0);
-            aniplayer = __decorate([
+            aniplayer = aniplayer_1 = __decorate([
                 gd3d.reflect.nodeComponent
             ], aniplayer);
             return aniplayer;
+            var aniplayer_1;
         }());
         framework.aniplayer = aniplayer;
         var tPoseInfo = (function () {
@@ -10265,16 +10285,23 @@ var gd3d;
                     }
                 }
                 if (this.player != null) {
-                    if (!this.player.mix) {
+                    if (this.player.isCache && !this.player.mix) {
                         var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
                         var data = skinnedMeshRenderer_1.dataCaches[cacheKey];
                         if (!data) {
-                            data = new Float32Array(8 * 40);
-                            this.player.fillPoseData(data, this.bones, true);
-                            skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                            var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
+                            if (_cachePlayer) {
+                                data = new Float32Array(8 * 40);
+                                _cachePlayer.fillPoseData(data, this.bones, true);
+                                skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                                this.cacheData = data;
+                                return;
+                            }
                         }
-                        this.cacheData = data;
-                        return;
+                        else {
+                            this.cacheData = data;
+                            return;
+                        }
                     }
                     this.cacheData = null;
                     if (this._skeletonMatrixData != null) {
@@ -16026,19 +16053,19 @@ var gd3d;
                 this.init();
             }
             Vector3AttributeData.prototype.init = function () {
-                var keyPoint = new FrameKeyPointData(-1);
-                keyPoint.val = new gd3d.math.vector3();
-                this.data[keyPoint.frameIndex] = keyPoint;
+                this.data = {};
+                this.frameIndexs = [];
+                var keyPoint = new FrameKeyPointData(-1, new gd3d.math.vector3());
+                this.addFramePoint(keyPoint);
             };
-            Vector3AttributeData.prototype.addFramePoint = function (frameId, data) {
-                if (this.data == undefined)
-                    this.data = {};
-                this.data[frameId] = data;
+            Vector3AttributeData.prototype.addFramePoint = function (data) {
+                this.data[data.frameIndex] = data;
                 if (data.actions != undefined) {
                     if (this.actions == undefined)
                         this.actions = {};
-                    this.actions[frameId] = data.actions;
+                    this.actions[data.frameIndex] = data.actions;
                 }
+                AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
             };
             Vector3AttributeData.prototype.removeFramePoint = function (frameId, data) {
                 if (this.data[frameId] == undefined) {
@@ -16062,19 +16089,19 @@ var gd3d;
                 this.init();
             }
             Vector2AttributeData.prototype.init = function () {
-                var keyPoint = new FrameKeyPointData(-1);
-                keyPoint.val = new gd3d.math.vector2();
-                this.data[keyPoint.frameIndex] = keyPoint;
+                this.data = {};
+                this.frameIndexs = [];
+                var keyPoint = new FrameKeyPointData(-1, new gd3d.math.vector2());
+                this.addFramePoint(keyPoint);
             };
-            Vector2AttributeData.prototype.addFramePoint = function (frameId, data) {
-                if (this.data == undefined)
-                    this.data = {};
-                this.data[frameId] = data;
+            Vector2AttributeData.prototype.addFramePoint = function (data) {
+                this.data[data.frameIndex] = data;
                 if (data.actions != undefined) {
                     if (this.actions == undefined)
                         this.actions = {};
-                    this.actions[frameId] = data.actions;
+                    this.actions[data.frameIndex] = data.actions;
                 }
+                AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
             };
             Vector2AttributeData.prototype.removeFramePoint = function (frameId, data) {
                 if (this.data[frameId] == undefined) {
@@ -16098,19 +16125,19 @@ var gd3d;
                 this.init();
             }
             NumberAttributeData.prototype.init = function () {
-                var keyPoint = new FrameKeyPointData(-1);
-                keyPoint.val = 0;
-                this.data[keyPoint.frameIndex] = keyPoint;
+                this.data = {};
+                this.frameIndexs = [];
+                var keyPoint = new FrameKeyPointData(-1, 0);
+                this.addFramePoint(keyPoint);
             };
-            NumberAttributeData.prototype.addFramePoint = function (frameId, data) {
-                if (this.data == undefined)
-                    this.data = {};
-                this.data[frameId] = data;
+            NumberAttributeData.prototype.addFramePoint = function (data) {
+                this.data[data.frameIndex] = data;
                 if (data.actions != undefined) {
                     if (this.actions == undefined)
                         this.actions = {};
-                    this.actions[frameId] = data.actions;
+                    this.actions[data.frameIndex] = data.actions;
                 }
+                AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
             };
             NumberAttributeData.prototype.removeFramePoint = function (frameId, data) {
                 if (this.data[frameId] == undefined) {
@@ -16142,24 +16169,50 @@ var gd3d;
             AttributeUIType[AttributeUIType["Vector3"] = 2] = "Vector3";
             AttributeUIType[AttributeUIType["Vector4"] = 3] = "Vector4";
         })(AttributeUIType = framework.AttributeUIType || (framework.AttributeUIType = {}));
-        var AttributeType;
-        (function (AttributeType) {
-            AttributeType[AttributeType["FixedValType"] = 0] = "FixedValType";
-            AttributeType[AttributeType["LerpType"] = 1] = "LerpType";
-        })(AttributeType = framework.AttributeType || (framework.AttributeType = {}));
+        var AttributeValType;
+        (function (AttributeValType) {
+            AttributeValType[AttributeValType["FixedValType"] = 0] = "FixedValType";
+            AttributeValType[AttributeValType["LerpType"] = 1] = "LerpType";
+        })(AttributeValType = framework.AttributeValType || (framework.AttributeValType = {}));
         var FrameKeyPointData = (function () {
-            function FrameKeyPointData(frameIndex) {
+            function FrameKeyPointData(frameIndex, val) {
                 this.frameIndex = frameIndex;
+                this.val = val;
             }
             return FrameKeyPointData;
         }());
         framework.FrameKeyPointData = FrameKeyPointData;
+        var AttributeUtil = (function () {
+            function AttributeUtil() {
+            }
+            AttributeUtil.addFrameIndex = function (datas, index) {
+                for (var i = 0; i < datas.length - 1; i++) {
+                    if (index > datas[i] && index <= datas[i + 1]) {
+                        datas.splice(i, 0, index);
+                        return;
+                    }
+                }
+                datas.push(index);
+            };
+            return AttributeUtil;
+        }());
+        framework.AttributeUtil = AttributeUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AttributeType;
+        (function (AttributeType) {
+            AttributeType[AttributeType["PositionType"] = 1] = "PositionType";
+            AttributeType[AttributeType["EulerType"] = 2] = "EulerType";
+            AttributeType[AttributeType["ScaleType"] = 3] = "ScaleType";
+            AttributeType[AttributeType["ColorType"] = 4] = "ColorType";
+            AttributeType[AttributeType["ColorRateType"] = 5] = "ColorRateType";
+            AttributeType[AttributeType["AlphaType"] = 6] = "AlphaType";
+            AttributeType[AttributeType["TillingType"] = 7] = "TillingType";
+        })(AttributeType = framework.AttributeType || (framework.AttributeType = {}));
         var EffectElementSingleMesh = (function () {
             function EffectElementSingleMesh(assetMgr, effectIns) {
                 this.elementType = gd3d.framework.EffectElementTypeEnum.SingleMeshType;
@@ -16174,9 +16227,10 @@ var gd3d;
                 this.color = new framework.Vector3AttributeData();
                 this.alpha = new framework.NumberAttributeData();
                 this.tilling = new framework.Vector2AttributeData();
-                this.colorRate = 1;
+                this.colorRate = new framework.NumberAttributeData();
                 this.uv = new gd3d.math.vector2();
                 this.renderModel = gd3d.framework.RenderModel.None;
+                this.timelineFrames = {};
                 this.startVboIndex = 0;
                 this.startEboIndex = 0;
                 this.endEboIndex = 0;
@@ -16195,49 +16249,62 @@ var gd3d;
             ;
             EffectElementSingleMesh.prototype.initData = function () {
                 this.actions = [];
+                this.timelineFrames = {};
+                this.timelineFrames[AttributeType.PositionType] = {};
+                this.timelineFrames[AttributeType.EulerType] = {};
+                this.timelineFrames[AttributeType.ScaleType] = {};
+                this.timelineFrames[AttributeType.ColorType] = {};
+                this.timelineFrames[AttributeType.ColorRateType] = {};
+                this.timelineFrames[AttributeType.AlphaType] = {};
+                this.timelineFrames[AttributeType.TillingType] = {};
+                this.position.attributeType = AttributeType.PositionType;
+                this.euler.attributeType = AttributeType.EulerType;
+                this.scale.attributeType = AttributeType.ScaleType;
+                this.color.attributeType = AttributeType.ColorType;
+                this.colorRate.attributeType = AttributeType.ColorRateType;
+                this.alpha.attributeType = AttributeType.AlphaType;
+                this.tilling.attributeType = AttributeType.TillingType;
+                this.recordElementLerpAttributes(this.position);
+                this.recordElementLerpAttributes(this.euler);
+                this.recordElementLerpAttributes(this.scale);
+                this.recordElementLerpAttributes(this.color);
+                this.recordElementLerpAttributes(this.colorRate);
+                this.recordElementLerpAttributes(this.alpha);
+                this.recordElementLerpAttributes(this.tilling);
             };
             EffectElementSingleMesh.prototype.WriteToJson = function (obj) {
             };
             EffectElementSingleMesh.prototype.recordElementLerpAttributes = function (data) {
                 if (data.data != undefined) {
-                    for (var i in data.data) {
-                        var frameData = data.data[i];
-                        if (frameData.actions != undefined) {
+                    for (var i = 0; i < data.frameIndexs.length; i++) {
+                        var fromFrameId = data.frameIndexs[i];
+                        var toFrameId = data.frameIndexs[i];
+                        var fromFrameData = data.data[fromFrameId];
+                        var toFrameData = data.data[toFrameId];
+                        var timeLine = this.timelineFrames[data.attributeType];
+                        if (fromFrameData.actions == null) {
+                            this.lerp(fromFrameId, toFrameId, fromFrameData, toFrameData, timeLine);
+                        }
+                        else {
                         }
                     }
                 }
             };
-            EffectElementSingleMesh.prototype.recordLerpValues = function (effectFrameData) {
-                for (var i in effectFrameData.lerpDatas) {
-                    if (effectFrameData.lerpDatas[i].type == framework.EffectLerpTypeEnum.Linear) {
-                        for (var key in effectFrameData.lerpDatas[i].attrsList) {
-                            var attrname = effectFrameData.lerpDatas[i].attrsList[key];
-                            this.recordLerp(effectFrameData, effectFrameData.lerpDatas[i], attrname);
-                        }
-                    }
-                }
-            };
-            EffectElementSingleMesh.prototype.recordLerp = function (effectFrameData, lerpData, key) {
-                var fromFrame = lerpData.fromFrame;
-                var toFrame = lerpData.toFrame.getValue();
-                var toVal = lerpData.attrsData.getAttribute(key);
-                if (effectFrameData.attrsData[key] == undefined) {
-                    effectFrameData.attrsData.initAttribute(key);
-                }
-                var fromVal = effectFrameData.attrsData.getAttribute(key);
-                for (var i = fromFrame + 1; i <= toFrame; i++) {
+            EffectElementSingleMesh.prototype.lerp = function (fromFrameId, toFrameId, fromFrameVal, toFrameVal, timeLine) {
+                for (var i = fromFrameId; i <= toFrameId; i++) {
                     var outVal = void 0;
-                    if (fromVal instanceof gd3d.math.vector3) {
+                    if (fromFrameVal instanceof gd3d.math.vector3) {
                         outVal = new gd3d.math.vector3();
-                        gd3d.math.vec3SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec3SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
                     }
-                    else if (fromVal instanceof gd3d.math.vector2) {
+                    else if (fromFrameVal instanceof gd3d.math.vector2) {
                         outVal = new gd3d.math.vector2();
-                        gd3d.math.vec2SLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame), outVal);
+                        gd3d.math.vec2SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
                     }
-                    else if (typeof (fromVal) === 'number') {
-                        outVal = gd3d.math.numberLerp(fromVal, toVal, (i - fromFrame) / (toFrame - fromFrame));
+                    else if (typeof (fromFrameVal) === 'number') {
+                        outVal = gd3d.math.numberLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId));
                     }
+                    timeLine[i] = outVal;
                 }
             };
             __decorate([
@@ -16293,8 +16360,8 @@ var gd3d;
                 __metadata("design:type", framework.Vector2AttributeData)
             ], EffectElementSingleMesh.prototype, "tilling", void 0);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("NumberAttributeData"),
+                __metadata("design:type", framework.NumberAttributeData)
             ], EffectElementSingleMesh.prototype, "colorRate", void 0);
             __decorate([
                 gd3d.reflect.Field("RenderModel"),
@@ -18825,6 +18892,7 @@ var gd3d;
                 this.renderCameras.length = 0;
                 this.renderLights.length = 0;
                 this.renderList.clear();
+                framework.aniplayer.playerCaches = [];
                 this.updateScene(this.rootNode, delta);
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
@@ -20212,6 +20280,14 @@ var gd3d;
                 var firstChar = str.substr(0, 1).toLowerCase();
                 var other = str.substr(1);
                 return firstChar + other;
+            };
+            StringUtil.isNullOrEmptyObject = function (obj) {
+                if (!obj)
+                    return true;
+                for (var n in obj) {
+                    return false;
+                }
+                return true;
             };
             StringUtil.COMPONENT_CAMERA = "camera";
             StringUtil.COMPONENT_BOXCOLLIDER = "boxcollider";

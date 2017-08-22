@@ -4,6 +4,8 @@ namespace gd3d.framework
     {
         uiState: AttributeUIState;
         data: { [frameIndex: number]: FrameKeyPointData };
+        frameIndexs: number[];
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
         actions: { [frameIndex: number]: IEffectAction[] };
         init();
@@ -12,8 +14,10 @@ namespace gd3d.framework
     export class Vector3AttributeData implements IAttributeData, ILerpAttributeInterface
     {
         public uiState: AttributeUIState;
-        public attributeType: AttributeType;
+        public attributeValType: AttributeValType;
+        attributeType: AttributeType;
         public data: { [frameIndex: number]: FrameKeyPointData };
+        public frameIndexs: number[];
         public actions: { [frameIndex: number]: IEffectAction[] }
         constructor()
         {
@@ -21,22 +25,23 @@ namespace gd3d.framework
         }
         init()
         {
-            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1);
-            keyPoint.val = new gd3d.math.vector3();
-            this.data[keyPoint.frameIndex] = keyPoint;
+            this.data = {};
+            this.frameIndexs = [];
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1, new gd3d.math.vector3());
+            this.addFramePoint(keyPoint);
         }
-        addFramePoint(frameId: number, data: FrameKeyPointData)
+        addFramePoint(data: FrameKeyPointData)
         {
-            if (this.data == undefined)
-                this.data = {};
-            this.data[frameId] = data;
+            this.data[data.frameIndex] = data;
             if (data.actions != undefined)
             {
                 if (this.actions == undefined)
                     this.actions = {};
-                this.actions[frameId] = data.actions;
+                this.actions[data.frameIndex] = data.actions;
             }
+            AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
         }
+
         removeFramePoint(frameId: number, data: any)
         {
             if (this.data[frameId] == undefined)
@@ -53,7 +58,9 @@ namespace gd3d.framework
     export class Vector2AttributeData implements IAttributeData, ILerpAttributeInterface
     {
         public uiState: AttributeUIState;
-        public attributeType: AttributeType;
+        public attributeValType: AttributeValType;
+        attributeType: AttributeType;
+        public frameIndexs: number[];
         public data: { [frameIndex: number]: FrameKeyPointData };
         public actions: { [frameIndex: number]: IEffectAction[] }
         constructor()
@@ -62,21 +69,21 @@ namespace gd3d.framework
         }
         init()
         {
-            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1);
-            keyPoint.val = new gd3d.math.vector2();
-            this.data[keyPoint.frameIndex] = keyPoint;
+            this.data = {};
+            this.frameIndexs = [];
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1, new gd3d.math.vector2());
+            this.addFramePoint(keyPoint);
         }
-        addFramePoint(frameId: number, data: FrameKeyPointData)
+        addFramePoint(data: FrameKeyPointData)
         {
-            if (this.data == undefined)
-                this.data = {};
-            this.data[frameId] = data;
+            this.data[data.frameIndex] = data;
             if (data.actions != undefined)
             {
                 if (this.actions == undefined)
                     this.actions = {};
-                this.actions[frameId] = data.actions;
+                this.actions[data.frameIndex] = data.actions;
             }
+            AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
         }
         removeFramePoint(frameId: number, data: gd3d.math.vector2)
         {
@@ -94,8 +101,10 @@ namespace gd3d.framework
     export class NumberAttributeData implements IAttributeData, ILerpAttributeInterface
     {
         public uiState: AttributeUIState;
-        public attributeType: AttributeType;
+        public attributeValType: AttributeValType;
+        attributeType: AttributeType;
         public data: { [frameIndex: number]: FrameKeyPointData };
+        public frameIndexs: number[];
         public timeLine: { [frameIndex: number]: number };
         public actions: { [frameIndex: number]: IEffectAction[] };
         constructor()
@@ -104,21 +113,21 @@ namespace gd3d.framework
         }
         init()
         {
-            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1);
-            keyPoint.val = 0;
-            this.data[keyPoint.frameIndex] = keyPoint;
+            this.data = {};
+            this.frameIndexs = [];
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1, 0);
+            this.addFramePoint(keyPoint);
         }
-        addFramePoint(frameId: number, data: any)
+        addFramePoint(data: any)
         {
-            if (this.data == undefined)
-                this.data = {};
-            this.data[frameId] = data;
+            this.data[data.frameIndex] = data;
             if (data.actions != undefined)
             {
                 if (this.actions == undefined)
                     this.actions = {};
-                this.actions[frameId] = data.actions;
+                this.actions[data.frameIndex] = data.actions;
             }
+            AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
         }
         removeFramePoint(frameId: number, data: number)
         {
@@ -135,7 +144,7 @@ namespace gd3d.framework
 
     export interface ILerpAttributeInterface
     {
-        addFramePoint(frameId: number, data: any);
+        addFramePoint(data: any);
         removeFramePoint(frameId: number, data: any);
     }
 
@@ -154,7 +163,7 @@ namespace gd3d.framework
         Vector4,
     }
 
-    export enum AttributeType
+    export enum AttributeValType
     {
         FixedValType = 0,
         LerpType = 1
@@ -165,9 +174,26 @@ namespace gd3d.framework
         public frameIndex: number;
         public val: any;
         public actions: IEffectAction[];
-        constructor(frameIndex: number)
+        constructor(frameIndex: number, val: any)
         {
             this.frameIndex = frameIndex;
+            this.val = val;
+        }
+    }
+
+    export class AttributeUtil
+    {
+        public static addFrameIndex(datas: number[], index: number)
+        {
+            for (let i = 0; i < datas.length - 1; i++)
+            {
+                if (index > datas[i] && index <= datas[i + 1])
+                {
+                    datas.splice(i, 0, index);
+                    return;
+                }
+            }
+            datas.push(index);
         }
     }
 

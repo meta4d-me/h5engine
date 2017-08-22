@@ -292,10 +292,10 @@ declare namespace gd3d.framework {
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         update(delta: number): void;
-        pick2d(mx: number, my: number): transform2D;
-        dopick2d(outv: math.vector2, tran: transform2D): transform2D;
-        pick2d_new(mx: number, my: number): transform2D;
-        dopick2d_new(outv: math.vector2, tran: transform2D): transform2D;
+        pick2d(mx: number, my: number, tolerance?: number): transform2D;
+        dopick2d(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
+        pick2d_new(mx: number, my: number, tolerance?: number): transform2D;
+        dopick2d_new(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
         calScreenPosToCanvasPos(mousePos: gd3d.math.vector2, canvasPos: gd3d.math.vector2): void;
     }
 }
@@ -433,7 +433,7 @@ declare namespace gd3d.framework {
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents(node, _type, comps);
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
-        ContainsCanvasPoint(pworld: math.vector2): boolean;
+        ContainsCanvasPoint(pworld: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
     }
 }
@@ -2593,6 +2593,8 @@ declare namespace gd3d.framework {
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
+        frameIndexs: number[];
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
         actions: {
             [frameIndex: number]: IEffectAction[];
@@ -2601,21 +2603,25 @@ declare namespace gd3d.framework {
     }
     class Vector3AttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
+        frameIndexs: number[];
         actions: {
             [frameIndex: number]: IEffectAction[];
         };
         constructor();
         init(): void;
-        addFramePoint(frameId: number, data: FrameKeyPointData): void;
+        addFramePoint(data: FrameKeyPointData): void;
         removeFramePoint(frameId: number, data: any): void;
     }
     class Vector2AttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
+        frameIndexs: number[];
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
@@ -2624,15 +2630,17 @@ declare namespace gd3d.framework {
         };
         constructor();
         init(): void;
-        addFramePoint(frameId: number, data: FrameKeyPointData): void;
+        addFramePoint(data: FrameKeyPointData): void;
         removeFramePoint(frameId: number, data: gd3d.math.vector2): void;
     }
     class NumberAttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
+        frameIndexs: number[];
         timeLine: {
             [frameIndex: number]: number;
         };
@@ -2641,11 +2649,11 @@ declare namespace gd3d.framework {
         };
         constructor();
         init(): void;
-        addFramePoint(frameId: number, data: any): void;
+        addFramePoint(data: any): void;
         removeFramePoint(frameId: number, data: number): void;
     }
     interface ILerpAttributeInterface {
-        addFramePoint(frameId: number, data: any): any;
+        addFramePoint(data: any): any;
         removeFramePoint(frameId: number, data: any): any;
     }
     enum AttributeUIState {
@@ -2659,7 +2667,7 @@ declare namespace gd3d.framework {
         Vector3 = 2,
         Vector4 = 3,
     }
-    enum AttributeType {
+    enum AttributeValType {
         FixedValType = 0,
         LerpType = 1,
     }
@@ -2667,7 +2675,10 @@ declare namespace gd3d.framework {
         frameIndex: number;
         val: any;
         actions: IEffectAction[];
-        constructor(frameIndex: number);
+        constructor(frameIndex: number, val: any);
+    }
+    class AttributeUtil {
+        static addFrameIndex(datas: number[], index: number): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2678,6 +2689,15 @@ declare namespace gd3d.framework {
         delayTime: number;
         mat: gd3d.framework.material;
         WriteToJson(obj: any): any;
+    }
+    enum AttributeType {
+        PositionType = 1,
+        EulerType = 2,
+        ScaleType = 3,
+        ColorType = 4,
+        ColorRateType = 5,
+        AlphaType = 6,
+        TillingType = 7,
     }
     class EffectElementSingleMesh implements IEffectElement {
         name: string;
@@ -2695,9 +2715,14 @@ declare namespace gd3d.framework {
         color: Vector3AttributeData;
         alpha: NumberAttributeData;
         tilling: Vector2AttributeData;
-        colorRate: number;
+        colorRate: NumberAttributeData;
         uv: gd3d.math.vector2;
         renderModel: gd3d.framework.RenderModel;
+        timelineFrames: {
+            [attributeType: number]: {
+                [frameIndex: number]: EffectAttrsData;
+            };
+        };
         ref: string;
         actions: IEffectAction[];
         curAttrData: EffectAttrsData;
@@ -2715,8 +2740,7 @@ declare namespace gd3d.framework {
         initData(): void;
         WriteToJson(obj: any): any;
         private recordElementLerpAttributes(data);
-        private recordLerpValues(effectFrameData);
-        private recordLerp(effectFrameData, lerpData, key);
+        private lerp(fromFrameId, toFrameId, fromFrameVal, toFrameVal, timeLine);
     }
     class EffectElementEmission implements IEffectElement {
         name: string;
