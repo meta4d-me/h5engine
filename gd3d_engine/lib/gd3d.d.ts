@@ -2614,8 +2614,9 @@ declare namespace gd3d.framework {
         };
         constructor();
         init(): void;
-        addFramePoint(data: FrameKeyPointData): void;
-        removeFramePoint(frameId: number, data: any): void;
+        addFramePoint(data: FrameKeyPointData, func?: Function): void;
+        removeFramePoint(frameId: number, data: any, func?: Function): void;
+        updateFramePoint(data: any, func?: Function): void;
     }
     class Vector2AttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
@@ -2630,8 +2631,9 @@ declare namespace gd3d.framework {
         };
         constructor();
         init(): void;
-        addFramePoint(data: FrameKeyPointData): void;
-        removeFramePoint(frameId: number, data: gd3d.math.vector2): void;
+        addFramePoint(data: FrameKeyPointData, func?: Function): void;
+        removeFramePoint(frameId: number, data: gd3d.math.vector2, func?: Function): void;
+        updateFramePoint(data: any, func?: Function): void;
     }
     class NumberAttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
@@ -2649,12 +2651,14 @@ declare namespace gd3d.framework {
         };
         constructor();
         init(): void;
-        addFramePoint(data: any): void;
-        removeFramePoint(frameId: number, data: number): void;
+        addFramePoint(data: any, func?: Function): void;
+        removeFramePoint(frameId: number, data: number, func?: Function): void;
+        updateFramePoint(data: any, func?: Function): void;
     }
     interface ILerpAttributeInterface {
-        addFramePoint(data: any): any;
-        removeFramePoint(frameId: number, data: any): any;
+        addFramePoint(data: any, func?: Function): any;
+        removeFramePoint(frameId: number, data: any, func?: Function): any;
+        updateFramePoint(data: any, func?: Function): any;
     }
     enum AttributeUIState {
         None = 0,

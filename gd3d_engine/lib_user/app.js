@@ -394,11 +394,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
+    main = __decorate([
+        gd3d.reflect.userCode
+    ], main);
     return main;
 }());
-main = __decorate([
-    gd3d.reflect.userCode
-], main);
 var t;
 (function (t_1) {
     var test_blend = (function () {
@@ -875,11 +875,11 @@ var CameraShock = (function () {
     };
     CameraShock.prototype.clone = function () {
     };
+    CameraShock = __decorate([
+        gd3d.reflect.nodeComponent
+    ], CameraShock);
     return CameraShock;
 }());
-CameraShock = __decorate([
-    gd3d.reflect.nodeComponent
-], CameraShock);
 var Joystick = (function () {
     function Joystick() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -2640,8 +2640,10 @@ var test_effect = (function () {
         var btn = document.createElement("button");
         btn.textContent = "Play";
         btn.onclick = function () {
-            _this.effect.stop();
-            _this.effect.play();
+            var tr = new gd3d.framework.transform();
+            _this.scene.addChild(tr);
+            var effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+            var ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";
@@ -7061,11 +7063,11 @@ var testUserCodeUpdate = (function () {
     testUserCodeUpdate.prototype.isClosed = function () {
         return false;
     };
+    testUserCodeUpdate = __decorate([
+        gd3d.reflect.userCode
+    ], testUserCodeUpdate);
     return testUserCodeUpdate;
 }());
-testUserCodeUpdate = __decorate([
-    gd3d.reflect.userCode
-], testUserCodeUpdate);
 var t;
 (function (t) {
     var test_uvroll = (function () {

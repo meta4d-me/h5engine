@@ -16055,10 +16055,10 @@ var gd3d;
             Vector3AttributeData.prototype.init = function () {
                 this.data = {};
                 this.frameIndexs = [];
-                var keyPoint = new FrameKeyPointData(-1, new gd3d.math.vector3());
+                var keyPoint = new FrameKeyPointData(0, new gd3d.math.vector3());
                 this.addFramePoint(keyPoint);
             };
-            Vector3AttributeData.prototype.addFramePoint = function (data) {
+            Vector3AttributeData.prototype.addFramePoint = function (data, func) {
                 this.data[data.frameIndex] = data;
                 if (data.actions != undefined) {
                     if (this.actions == undefined)
@@ -16066,8 +16066,10 @@ var gd3d;
                     this.actions[data.frameIndex] = data.actions;
                 }
                 AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
+                if (func != null)
+                    func();
             };
-            Vector3AttributeData.prototype.removeFramePoint = function (frameId, data) {
+            Vector3AttributeData.prototype.removeFramePoint = function (frameId, data, func) {
                 if (this.data[frameId] == undefined) {
                     console.warn("当前时间线中没有记录这一帧：" + frameId);
                     return;
@@ -16076,6 +16078,22 @@ var gd3d;
                     delete this.data[frameId];
                 if (this.actions != undefined && this.actions[frameId] != undefined)
                     delete this.actions[frameId];
+                if (this.frameIndexs[frameId] != undefined)
+                    this.frameIndexs.splice(this.frameIndexs.indexOf(this.frameIndexs[frameId]), 1);
+                if (func != null)
+                    func();
+            };
+            Vector3AttributeData.prototype.updateFramePoint = function (data, func) {
+                if (this.data[data.frameIndex] == undefined) {
+                    if (func != null)
+                        func();
+                    return;
+                }
+                this.data[data.frameIndex] = data;
+                if (data.actions != undefined)
+                    this.actions[data.frameIndex] = data.actions;
+                if (func != null)
+                    func();
             };
             Vector3AttributeData = __decorate([
                 gd3d.reflect.SerializeType,
@@ -16091,10 +16109,10 @@ var gd3d;
             Vector2AttributeData.prototype.init = function () {
                 this.data = {};
                 this.frameIndexs = [];
-                var keyPoint = new FrameKeyPointData(-1, new gd3d.math.vector2());
+                var keyPoint = new FrameKeyPointData(0, new gd3d.math.vector2());
                 this.addFramePoint(keyPoint);
             };
-            Vector2AttributeData.prototype.addFramePoint = function (data) {
+            Vector2AttributeData.prototype.addFramePoint = function (data, func) {
                 this.data[data.frameIndex] = data;
                 if (data.actions != undefined) {
                     if (this.actions == undefined)
@@ -16102,8 +16120,10 @@ var gd3d;
                     this.actions[data.frameIndex] = data.actions;
                 }
                 AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
+                if (func != null)
+                    func();
             };
-            Vector2AttributeData.prototype.removeFramePoint = function (frameId, data) {
+            Vector2AttributeData.prototype.removeFramePoint = function (frameId, data, func) {
                 if (this.data[frameId] == undefined) {
                     console.warn("当前时间线中没有记录这一帧：" + frameId);
                     return;
@@ -16112,6 +16132,22 @@ var gd3d;
                     delete this.data[frameId];
                 if (this.actions != undefined && this.actions[frameId] != undefined)
                     delete this.actions[frameId];
+                if (this.frameIndexs[frameId] != undefined)
+                    this.frameIndexs.splice(this.frameIndexs.indexOf(this.frameIndexs[frameId]), 1);
+                if (func != null)
+                    func();
+            };
+            Vector2AttributeData.prototype.updateFramePoint = function (data, func) {
+                if (this.data[data.frameIndex] == undefined) {
+                    if (func != null)
+                        func();
+                    return;
+                }
+                this.data[data.frameIndex] = data;
+                if (data.actions != undefined)
+                    this.actions[data.frameIndex] = data.actions;
+                if (func != null)
+                    func();
             };
             Vector2AttributeData = __decorate([
                 gd3d.reflect.SerializeType,
@@ -16127,10 +16163,10 @@ var gd3d;
             NumberAttributeData.prototype.init = function () {
                 this.data = {};
                 this.frameIndexs = [];
-                var keyPoint = new FrameKeyPointData(-1, 0);
-                this.addFramePoint(keyPoint);
+                var keyPoint = new FrameKeyPointData(0, 0);
+                this.addFramePoint(keyPoint, null);
             };
-            NumberAttributeData.prototype.addFramePoint = function (data) {
+            NumberAttributeData.prototype.addFramePoint = function (data, func) {
                 this.data[data.frameIndex] = data;
                 if (data.actions != undefined) {
                     if (this.actions == undefined)
@@ -16138,8 +16174,10 @@ var gd3d;
                     this.actions[data.frameIndex] = data.actions;
                 }
                 AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
+                if (func != null)
+                    func();
             };
-            NumberAttributeData.prototype.removeFramePoint = function (frameId, data) {
+            NumberAttributeData.prototype.removeFramePoint = function (frameId, data, func) {
                 if (this.data[frameId] == undefined) {
                     console.warn("当前时间线中没有记录这一帧：" + frameId);
                     return;
@@ -16148,6 +16186,22 @@ var gd3d;
                     delete this.data[frameId];
                 if (this.actions != undefined && this.actions[frameId] != undefined)
                     delete this.actions[frameId];
+                if (this.frameIndexs[frameId] != undefined)
+                    this.frameIndexs.splice(this.frameIndexs.indexOf(this.frameIndexs[frameId]), 1);
+                if (func != null)
+                    func();
+            };
+            NumberAttributeData.prototype.updateFramePoint = function (data, func) {
+                if (this.data[data.frameIndex] == undefined) {
+                    if (func != null)
+                        func();
+                    return;
+                }
+                this.data[data.frameIndex] = data;
+                if (data.actions != undefined)
+                    this.actions[data.frameIndex] = data.actions;
+                if (func != null)
+                    func();
             };
             NumberAttributeData = __decorate([
                 gd3d.reflect.SerializeType,
@@ -16264,6 +16318,7 @@ var gd3d;
                 this.colorRate.attributeType = AttributeType.ColorRateType;
                 this.alpha.attributeType = AttributeType.AlphaType;
                 this.tilling.attributeType = AttributeType.TillingType;
+                this.position.addFramePoint(new framework.FrameKeyPointData(60, new gd3d.math.vector3(3, 3, 3)));
                 this.recordElementLerpAttributes(this.position);
                 this.recordElementLerpAttributes(this.euler);
                 this.recordElementLerpAttributes(this.scale);
@@ -16276,14 +16331,14 @@ var gd3d;
             };
             EffectElementSingleMesh.prototype.recordElementLerpAttributes = function (data) {
                 if (data.data != undefined) {
-                    for (var i = 0; i < data.frameIndexs.length; i++) {
+                    for (var i = 0; i < data.frameIndexs.length - 1; i++) {
                         var fromFrameId = data.frameIndexs[i];
-                        var toFrameId = data.frameIndexs[i];
+                        var toFrameId = data.frameIndexs[i + 1];
                         var fromFrameData = data.data[fromFrameId];
                         var toFrameData = data.data[toFrameId];
                         var timeLine = this.timelineFrames[data.attributeType];
                         if (fromFrameData.actions == null) {
-                            this.lerp(fromFrameId, toFrameId, fromFrameData, toFrameData, timeLine);
+                            this.lerp(fromFrameId, toFrameId, fromFrameData.val, toFrameData.val, timeLine);
                         }
                         else {
                         }

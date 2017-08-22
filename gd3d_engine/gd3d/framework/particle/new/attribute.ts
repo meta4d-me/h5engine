@@ -27,10 +27,10 @@ namespace gd3d.framework
         {
             this.data = {};
             this.frameIndexs = [];
-            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1, new gd3d.math.vector3());
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(0, new gd3d.math.vector3());
             this.addFramePoint(keyPoint);
         }
-        addFramePoint(data: FrameKeyPointData)
+        addFramePoint(data: FrameKeyPointData, func?: Function)
         {
             this.data[data.frameIndex] = data;
             if (data.actions != undefined)
@@ -40,9 +40,11 @@ namespace gd3d.framework
                 this.actions[data.frameIndex] = data.actions;
             }
             AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
+            if (func != null)
+                func();
         }
 
-        removeFramePoint(frameId: number, data: any)
+        removeFramePoint(frameId: number, data: any, func?: Function)
         {
             if (this.data[frameId] == undefined)
             {
@@ -52,6 +54,24 @@ namespace gd3d.framework
                 delete this.data[frameId];
             if (this.actions != undefined && this.actions[frameId] != undefined)
                 delete this.actions[frameId];
+            if (this.frameIndexs[frameId] != undefined)
+                this.frameIndexs.splice(this.frameIndexs.indexOf(this.frameIndexs[frameId]), 1);
+            if (func != null)
+                func();
+        }
+        updateFramePoint(data: any, func?: Function)
+        {
+            if (this.data[data.frameIndex] == undefined)
+            {
+                if (func != null)
+                    func();
+                return;
+            }
+            this.data[data.frameIndex] = data;
+            if (data.actions != undefined)
+                this.actions[data.frameIndex] = data.actions;
+            if (func != null)
+                func();
         }
     }
     @gd3d.reflect.SerializeType
@@ -71,10 +91,10 @@ namespace gd3d.framework
         {
             this.data = {};
             this.frameIndexs = [];
-            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1, new gd3d.math.vector2());
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(0, new gd3d.math.vector2());
             this.addFramePoint(keyPoint);
         }
-        addFramePoint(data: FrameKeyPointData)
+        addFramePoint(data: FrameKeyPointData, func?: Function)
         {
             this.data[data.frameIndex] = data;
             if (data.actions != undefined)
@@ -84,8 +104,10 @@ namespace gd3d.framework
                 this.actions[data.frameIndex] = data.actions;
             }
             AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
+            if (func != null)
+                func();
         }
-        removeFramePoint(frameId: number, data: gd3d.math.vector2)
+        removeFramePoint(frameId: number, data: gd3d.math.vector2, func?: Function)
         {
             if (this.data[frameId] == undefined)
             {
@@ -95,6 +117,24 @@ namespace gd3d.framework
                 delete this.data[frameId];
             if (this.actions != undefined && this.actions[frameId] != undefined)
                 delete this.actions[frameId];
+            if (this.frameIndexs[frameId] != undefined)
+                this.frameIndexs.splice(this.frameIndexs.indexOf(this.frameIndexs[frameId]), 1);
+            if (func != null)
+                func();
+        }
+        updateFramePoint(data: any, func?: Function)
+        {
+            if (this.data[data.frameIndex] == undefined)
+            {
+                if (func != null)
+                    func();
+                return;
+            }
+            this.data[data.frameIndex] = data;
+            if (data.actions != undefined)
+                this.actions[data.frameIndex] = data.actions;
+            if (func != null)
+                func();
         }
     }
     @gd3d.reflect.SerializeType
@@ -115,10 +155,10 @@ namespace gd3d.framework
         {
             this.data = {};
             this.frameIndexs = [];
-            let keyPoint: FrameKeyPointData = new FrameKeyPointData(-1, 0);
-            this.addFramePoint(keyPoint);
+            let keyPoint: FrameKeyPointData = new FrameKeyPointData(0, 0);
+            this.addFramePoint(keyPoint, null);
         }
-        addFramePoint(data: any)
+        addFramePoint(data: any, func?: Function)
         {
             this.data[data.frameIndex] = data;
             if (data.actions != undefined)
@@ -128,8 +168,10 @@ namespace gd3d.framework
                 this.actions[data.frameIndex] = data.actions;
             }
             AttributeUtil.addFrameIndex(this.frameIndexs, data.frameIndex);
+            if (func != null)
+                func();
         }
-        removeFramePoint(frameId: number, data: number)
+        removeFramePoint(frameId: number, data: number, func?: Function)
         {
             if (this.data[frameId] == undefined)
             {
@@ -139,13 +181,32 @@ namespace gd3d.framework
                 delete this.data[frameId];
             if (this.actions != undefined && this.actions[frameId] != undefined)
                 delete this.actions[frameId];
+            if (this.frameIndexs[frameId] != undefined)
+                this.frameIndexs.splice(this.frameIndexs.indexOf(this.frameIndexs[frameId]), 1);
+            if (func != null)
+                func();
+        }
+        updateFramePoint(data: any, func?: Function)
+        {
+            if (this.data[data.frameIndex] == undefined)
+            {
+                if (func != null)
+                    func();
+                return;
+            }
+            this.data[data.frameIndex] = data;
+            if (data.actions != undefined)
+                this.actions[data.frameIndex] = data.actions;
+            if (func != null)
+                func();
         }
     }
 
     export interface ILerpAttributeInterface
     {
-        addFramePoint(data: any);
-        removeFramePoint(frameId: number, data: any);
+        addFramePoint(data: any, func?: Function);
+        removeFramePoint(frameId: number, data: any, func?: Function);
+        updateFramePoint(data: any, func?: Function);
     }
 
     export enum AttributeUIState

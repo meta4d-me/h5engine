@@ -122,6 +122,8 @@ namespace gd3d.framework
             this.colorRate.attributeType = AttributeType.ColorRateType;
             this.alpha.attributeType = AttributeType.AlphaType;
             this.tilling.attributeType = AttributeType.TillingType;
+            this.position.addFramePoint(new FrameKeyPointData(60, new gd3d.math.vector3(3, 3, 3)));
+
             this.recordElementLerpAttributes(this.position);
             this.recordElementLerpAttributes(this.euler);
             this.recordElementLerpAttributes(this.scale);
@@ -144,10 +146,10 @@ namespace gd3d.framework
         {
             if (data.data != undefined)
             {
-                for (let i = 0; i < data.frameIndexs.length; i++)
+                for (let i = 0; i < data.frameIndexs.length - 1; i++)
                 {
                     let fromFrameId = data.frameIndexs[i];
-                    let toFrameId = data.frameIndexs[i];
+                    let toFrameId = data.frameIndexs[i + 1];
 
                     let fromFrameData: FrameKeyPointData = data.data[fromFrameId];
                     let toFrameData: FrameKeyPointData = data.data[toFrameId];
@@ -155,7 +157,7 @@ namespace gd3d.framework
                     if (fromFrameData.actions == null)
                     {
                         //lerp操作
-                        this.lerp(fromFrameId, toFrameId, fromFrameData, toFrameData, timeLine);
+                        this.lerp(fromFrameId, toFrameId, fromFrameData.val, toFrameData.val, timeLine);
                     } else
                     {
                         //记录action
