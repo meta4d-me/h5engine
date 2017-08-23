@@ -442,7 +442,7 @@ namespace gd3d.framework
         public color: math.vector3;
         public colorRate: number;//几倍颜色叠加
         public scale: math.vector3;
-        public uv: math.vector2;
+        public uv: math.vector2 = new gd3d.math.vector2(1, 1);
         public alpha: number;
         public mat: EffectMatData;
         public renderModel: RenderModel = RenderModel.None;

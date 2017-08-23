@@ -9576,22 +9576,6 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            effectSystem.prototype.addEffectElement = function (type) {
-                if (this.effectElements == undefined)
-                    this.effectElements = [];
-                var effe;
-                if (type == gd3d.framework.EffectElementTypeEnum.SingleMeshType) {
-                    effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr(), this);
-                    effe.name = "singlemesh" + this.effectElements.length;
-                    effe.transform = this.gameObject.transform;
-                }
-                else if (type == gd3d.framework.EffectElementTypeEnum.EmissionType) {
-                    effe = new gd3d.framework.EffectElementEmission();
-                    effe.name = "emission" + this.effectElements.length;
-                }
-                this.effectElements.push(effe);
-                return effe;
-            };
             effectSystem.fps = 30;
             __decorate([
                 gd3d.reflect.Field("boolean"),
@@ -9605,10 +9589,6 @@ var gd3d;
                 gd3d.reflect.Field("textasset"),
                 __metadata("design:type", framework.textasset)
             ], effectSystem.prototype, "jsonData", void 0);
-            __decorate([
-                gd3d.reflect.Field("IEffectElement[]"),
-                __metadata("design:type", Array)
-            ], effectSystem.prototype, "effectElements", void 0);
             effectSystem = effectSystem_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -9618,6 +9598,484 @@ var gd3d;
             var effectSystem_1;
         }());
         framework.effectSystem = effectSystem;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var effectSystemNew = (function () {
+            function effectSystemNew() {
+                this.layer = framework.RenderLayerEnum.Transparent;
+                this.renderLayer = framework.CullingMask.default;
+                this.queue = 0;
+                this.autoplay = true;
+                this.state = framework.EffectPlayStateEnum.None;
+                this.curFrameId = -1;
+                this.playTimer = 0;
+                this.speed = 1;
+                this.parser = new gd3d.framework.EffectParser();
+                this.vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                this.effectBatchers = [];
+                this.matDataGroups = [];
+                this.particleElementDic = {};
+                this.delayElements = [];
+                this.refElements = [];
+                this.beExecuteNextFrame = true;
+            }
+            effectSystemNew.prototype.setJsonData = function (_jsonData) {
+                this.webgl = gd3d.framework.sceneMgr.app.webgl;
+                this.jsonData = _jsonData;
+                this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+            };
+            Object.defineProperty(effectSystemNew.prototype, "data", {
+                get: function () {
+                    return this._data;
+                },
+                set: function (value) {
+                    this._data = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            effectSystemNew.prototype.init = function () {
+            };
+            Object.defineProperty(effectSystemNew.prototype, "totalFrameCount", {
+                get: function () {
+                    return this.data.life * framework.effectSystem.fps;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            effectSystemNew.prototype.start = function () {
+                this.init();
+            };
+            effectSystemNew.prototype.update = function (delta) {
+                if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
+                    return;
+                if (this.state == framework.EffectPlayStateEnum.Play || this.state == framework.EffectPlayStateEnum.Pause) {
+                    if (this.state == framework.EffectPlayStateEnum.Play)
+                        this.playTimer += delta * this.speed;
+                    if (!this.beLoop) {
+                        if (this.playTimer >= this.data.life) {
+                            this.stop();
+                        }
+                    }
+                    this._update(delta);
+                }
+                else if (this.state == framework.EffectPlayStateEnum.BeReady) {
+                    if (this.autoplay) {
+                        this.play();
+                        this._update(delta);
+                    }
+                    else {
+                        this.gameObject.visible = false;
+                        this.gameObject.transform.markDirty();
+                    }
+                }
+            };
+            effectSystemNew.prototype._update = function (delta) {
+                if (this.checkFrameId()) {
+                    for (var i in this.effectBatchers) {
+                        var subEffectBatcher = this.effectBatchers[i];
+                        for (var key in subEffectBatcher.effectElements) {
+                            var element = subEffectBatcher.effectElements[key];
+                            if (element.delayTime == undefined || element.delayTime <= this.playTimer) {
+                                subEffectBatcher.mesh.submesh[0].size = element.endEboIndex;
+                            }
+                            else {
+                                if (subEffectBatcher.mesh.submesh[0].size > element.startEboIndex)
+                                    subEffectBatcher.mesh.submesh[0].size = element.startEboIndex;
+                            }
+                            var frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
+                            if (element.active) {
+                                element.actionActive = false;
+                                this.mergeLerpAttribData(element.curAttrData, element, frameId);
+                                if (element.actions != undefined) {
+                                    element.actionActive = true;
+                                    for (var j in element.actions) {
+                                        element.actions[j].update(frameId);
+                                    }
+                                }
+                            }
+                            element.update();
+                            if (element.isCurFrameNeedRefresh(frameId)) {
+                                this.updateEffectBatcher(element.effectBatcher, element.curAttrData, element.mesh, element.startVboIndex);
+                            }
+                        }
+                    }
+                }
+            };
+            effectSystemNew.prototype.mergeLerpAttribData = function (realUseCurFrameData, effect, frameId) {
+                var timeLinePos = effect.timelineFrames[framework.AttributeType.PositionType];
+                if (timeLinePos[frameId] != undefined)
+                    realUseCurFrameData.pos = timeLinePos[frameId];
+                var timeLineEuler = effect.timelineFrames[framework.AttributeType.EulerType];
+                if (timeLineEuler[frameId] != undefined)
+                    realUseCurFrameData.euler = timeLineEuler[frameId];
+                var timeLineScale = effect.timelineFrames[framework.AttributeType.ScaleType];
+                if (timeLineScale[frameId] != undefined)
+                    realUseCurFrameData.scale = timeLineScale[frameId];
+                var timeLineColor = effect.timelineFrames[framework.AttributeType.ColorType];
+                if (timeLineColor[frameId] != undefined)
+                    realUseCurFrameData.color = timeLineColor[frameId];
+                var timeLineAlpha = effect.timelineFrames[framework.AttributeType.AlphaType];
+                if (timeLineAlpha[frameId] != undefined)
+                    realUseCurFrameData.alpha = timeLineAlpha[frameId];
+                var timeLineTilling = effect.timelineFrames[framework.AttributeType.TillingType];
+                if (timeLineTilling[frameId] != undefined)
+                    realUseCurFrameData.tilling = timeLineTilling[frameId];
+            };
+            effectSystemNew.prototype.updateEffectBatcher = function (effectBatcher, curAttrsData, mesh, vertexStartIndex) {
+                if (mesh == undefined)
+                    return;
+                if (curAttrsData.meshdataVbo == undefined) {
+                    curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
+                }
+                var vertexCount = mesh.data.pos.length;
+                var vertexArr = curAttrsData.meshdataVbo;
+                var vertexSize = effectBatcher.vertexSize;
+                for (var i = 0; i < vertexCount; i++) {
+                    {
+                        var vertex = gd3d.math.pool.new_vector3();
+                        vertex.x = vertexArr[i * vertexSize + 0];
+                        vertex.y = vertexArr[i * vertexSize + 1];
+                        vertex.z = vertexArr[i * vertexSize + 2];
+                        gd3d.math.matrixTransformVector3(vertex, curAttrsData.matrix, vertex);
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 0] = vertex.x;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 1] = vertex.y;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 2] = vertex.z;
+                        gd3d.math.pool.delete_vector3(vertex);
+                    }
+                    {
+                        var r = vertexArr[i * vertexSize + 9];
+                        var g = vertexArr[i * vertexSize + 10];
+                        var b = vertexArr[i * vertexSize + 11];
+                        var a = vertexArr[i * vertexSize + 12];
+                        if (curAttrsData.color != undefined) {
+                            r = curAttrsData.color.x;
+                            g = curAttrsData.color.y;
+                            b = curAttrsData.color.z;
+                        }
+                        if (curAttrsData.alpha != undefined)
+                            a = a * curAttrsData.alpha;
+                        if (curAttrsData.colorRate != undefined) {
+                            r *= curAttrsData.colorRate;
+                            g *= curAttrsData.colorRate;
+                            b *= curAttrsData.colorRate;
+                            a *= curAttrsData.colorRate;
+                        }
+                        r = gd3d.math.floatClamp(r, 0, 3);
+                        g = gd3d.math.floatClamp(g, 0, 3);
+                        b = gd3d.math.floatClamp(b, 0, 3);
+                        a = gd3d.math.floatClamp(a, 0, 3);
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 12] = a;
+                    }
+                    {
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * curAttrsData.tilling.x + curAttrsData.uv.x;
+                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * curAttrsData.tilling.y + curAttrsData.uv.y;
+                    }
+                }
+            };
+            effectSystemNew.prototype.render = function (context, assetmgr, camera) {
+                if (!(camera.CullingMask & this.renderLayer))
+                    return;
+                if (this.state == framework.EffectPlayStateEnum.Play) {
+                    context.updateModel(this.gameObject.transform);
+                    for (var i in this.effectBatchers) {
+                        var subEffectBatcher = this.effectBatchers[i];
+                        var mesh_3 = subEffectBatcher.mesh;
+                        if (subEffectBatcher.state === framework.EffectBatcherState.NotInitedStateType) {
+                            mesh_3.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
+                            if (mesh_3.glMesh.ebos.length == 0) {
+                                mesh_3.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
+                            }
+                            else {
+                                mesh_3.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
+                            }
+                            mesh_3.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_3.submesh[0].size = subEffectBatcher.dataForEbo.length;
+                            subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
+                        }
+                        else if (subEffectBatcher.state === framework.EffectBatcherState.ResizeCapacityStateType) {
+                            mesh_3.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
+                            mesh_3.submesh[0].size = subEffectBatcher.dataForEbo.length;
+                            mesh_3.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_3.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);
+                            subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
+                        }
+                        mesh_3.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
+                        if (this.gameObject.getScene().fog) {
+                            context.fog = this.gameObject.getScene().fog;
+                            subEffectBatcher.mat.draw(context, mesh_3, mesh_3.submesh[0], "base_fog");
+                        }
+                        else {
+                            subEffectBatcher.mat.draw(context, mesh_3, mesh_3.submesh[0], "base");
+                        }
+                    }
+                    if (this.particles != undefined) {
+                        this.particles.render(context, assetmgr, camera);
+                    }
+                }
+            };
+            effectSystemNew.prototype.clone = function () {
+                var effect = new framework.effectSystem();
+                effect.data = this.data.clone();
+                return effect;
+            };
+            effectSystemNew.prototype.play = function (speed) {
+                if (speed === void 0) { speed = 1; }
+                this.speed = speed;
+                this.state = framework.EffectPlayStateEnum.Play;
+                this.gameObject.visible = true;
+                this.gameObject.transform.markDirty();
+            };
+            effectSystemNew.prototype.pause = function () {
+                this.state = framework.EffectPlayStateEnum.Pause;
+            };
+            effectSystemNew.prototype.stop = function () {
+                this.reset();
+                this.state = framework.EffectPlayStateEnum.Stop;
+            };
+            effectSystemNew.prototype.reset = function (restSinglemesh, resetParticle) {
+                if (restSinglemesh === void 0) { restSinglemesh = true; }
+                if (resetParticle === void 0) { resetParticle = true; }
+                this.state = framework.EffectPlayStateEnum.BeReady;
+                this.gameObject.visible = false;
+                this.playTimer = 0;
+                this.resetSingleMesh();
+            };
+            effectSystemNew.prototype.resetSingleMesh = function () {
+            };
+            effectSystemNew.prototype.setFrameId = function (id) {
+                if (this.state == framework.EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
+                    this.curFrameId = id;
+            };
+            effectSystemNew.prototype.getDelayFrameCount = function (delayTime) {
+                return delayTime * framework.effectSystem.fps;
+            };
+            effectSystemNew.prototype.checkFrameId = function () {
+                var curid = (framework.effectSystem.fps * this.playTimer) | 0;
+                if (curid != this.curFrameId) {
+                    if (this.state == framework.EffectPlayStateEnum.Play)
+                        this.curFrameId = curid;
+                    this.beExecuteNextFrame = true;
+                    return true;
+                }
+                return false;
+            };
+            effectSystemNew.prototype.remove = function () {
+                this.state = framework.EffectPlayStateEnum.Dispose;
+                if (this.data)
+                    this.data.dispose();
+                for (var key in this.effectBatchers) {
+                    this.effectBatchers[key].dispose();
+                }
+                if (this.particles)
+                    this.particles.dispose();
+            };
+            Object.defineProperty(effectSystemNew.prototype, "leftLifeTime", {
+                get: function () {
+                    if (this.data != null) {
+                        return this.data.life - this.playTimer;
+                    }
+                    else
+                        return 9999999999;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            effectSystemNew.prototype.addEffectElement = function (type) {
+                if (this.effectElements == undefined)
+                    this.effectElements = [];
+                var effe;
+                if (type == gd3d.framework.EffectElementTypeEnum.SingleMeshType) {
+                    effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr(), this);
+                    effe.name = "singlemesh" + this.effectElements.length;
+                    var singleMeshElement = effe;
+                    singleMeshElement.transform = this.gameObject.transform;
+                    this.addInitFrameNew(singleMeshElement);
+                    this.state = framework.EffectPlayStateEnum.BeReady;
+                }
+                else if (type == gd3d.framework.EffectElementTypeEnum.EmissionType) {
+                    effe = new gd3d.framework.EffectElementEmission();
+                    effe.name = "emission" + this.effectElements.length;
+                }
+                this.effectElements.push(effe);
+                return effe;
+            };
+            effectSystemNew.prototype.addInitFrameNew = function (effect) {
+                if (effect == undefined || effect.mesh == undefined || effect.mat == undefined)
+                    return;
+                var vertexStartIndex = 0;
+                var vertexCount = effect.mesh.data.pos.length;
+                var indexCount = effect.mesh.data.genIndexDataArray();
+                var subEffectBatcher = new EffectBatcherNew(this.vf);
+                subEffectBatcher.curTotalVertexCount = vertexCount;
+                subEffectBatcher.mesh = new framework.mesh();
+                subEffectBatcher.mesh.data = new gd3d.render.meshData();
+                subEffectBatcher.mesh.glMesh = new gd3d.render.glMesh();
+                subEffectBatcher.mat = new framework.material();
+                subEffectBatcher.mesh.submesh = [];
+                {
+                    var sm = new framework.subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = 0;
+                    sm.line = false;
+                    subEffectBatcher.mesh.submesh.push(sm);
+                }
+                vertexStartIndex = 0;
+                this.effectBatchers.push(subEffectBatcher);
+                effect.effectBatcher = subEffectBatcher;
+                effect.startVboIndex = vertexStartIndex;
+                var vertexSize = subEffectBatcher.vertexSize;
+                var vertexArr = effect.mesh.data.genVertexDataArray(this.vf);
+                effect.curAttrData = effect.copyandinit();
+                effect.update();
+                subEffectBatcher.effectElements.push(effect);
+                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                    {
+                        var vertex = gd3d.math.pool.new_vector3();
+                        vertex.x = vertexArr[i_5 * vertexSize + 0];
+                        vertex.y = vertexArr[i_5 * vertexSize + 1];
+                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        gd3d.math.matrixTransformVector3(vertex, effect.curAttrData.matrix, vertex);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        gd3d.math.pool.delete_vector3(vertex);
+                    }
+                    {
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                    }
+                    {
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                    }
+                    {
+                        var color = effect.getFrameVal(framework.AttributeType.ColorType, 0);
+                        var r = gd3d.math.floatClamp(color.x, 0, 1);
+                        var g = gd3d.math.floatClamp(color.y, 0, 1);
+                        var b = gd3d.math.floatClamp(color.z, 0, 1);
+                        var alpha = effect.getFrameVal(framework.AttributeType.AlphaType, 0);
+                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                    }
+                    {
+                        var tilling = effect.getFrameVal(framework.AttributeType.TillingType, 0);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * tilling.y;
+                    }
+                }
+                var indexArray = effect.mesh.data.genIndexDataArray();
+                var _startIndex = subEffectBatcher.indexStartIndex;
+                effect.startEboIndex = _startIndex;
+                subEffectBatcher.indexStartIndex += indexArray.length;
+                effect.endEboIndex = subEffectBatcher.indexStartIndex;
+                for (var i = 0; i < indexArray.length; i++) {
+                    subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
+                }
+            };
+            effectSystemNew.fps = 30;
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], effectSystemNew.prototype, "autoplay", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], effectSystemNew.prototype, "beLoop", void 0);
+            __decorate([
+                gd3d.reflect.Field("textasset"),
+                __metadata("design:type", framework.textasset)
+            ], effectSystemNew.prototype, "jsonData", void 0);
+            __decorate([
+                gd3d.reflect.Field("IEffectElement[]"),
+                __metadata("design:type", Array)
+            ], effectSystemNew.prototype, "effectElements", void 0);
+            effectSystemNew = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent,
+                gd3d.reflect.selfClone
+            ], effectSystemNew);
+            return effectSystemNew;
+        }());
+        framework.effectSystemNew = effectSystemNew;
+        var EffectBatcherNew = (function () {
+            function EffectBatcherNew(formate) {
+                this.state = framework.EffectBatcherState.NotInitedStateType;
+                this.effectElements = [];
+                this._totalVertexCount = 0;
+                this._indexStartIndex = 0;
+                this._vbosize = 0;
+                this.vertexSize = 0;
+                this.vertexSize = gd3d.render.meshData.calcByteSize(formate) / 4;
+            }
+            Object.defineProperty(EffectBatcherNew.prototype, "curTotalVertexCount", {
+                get: function () {
+                    return this._totalVertexCount;
+                },
+                set: function (val) {
+                    this._totalVertexCount = val;
+                    this.resizeVboSize(this._totalVertexCount * this.vertexSize);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(EffectBatcherNew.prototype, "indexStartIndex", {
+                get: function () {
+                    return this._indexStartIndex;
+                },
+                set: function (value) {
+                    this._indexStartIndex = value;
+                    if (this.dataForEbo != null) {
+                        var ebo = new Uint16Array(this._indexStartIndex);
+                        ebo.set(this.dataForEbo, 0);
+                        this.dataForEbo = ebo;
+                    }
+                    else {
+                        this.dataForEbo = new Uint16Array(this._indexStartIndex);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            EffectBatcherNew.prototype.resizeVboSize = function (value) {
+                if (this._vbosize > value)
+                    return;
+                this._vbosize = value;
+                if (this.dataForVbo != null) {
+                    var vbo = new Float32Array(this._vbosize);
+                    vbo.set(this.dataForVbo, 0);
+                    this.dataForVbo = vbo;
+                }
+                else {
+                    this.dataForVbo = new Float32Array(this._vbosize);
+                }
+            };
+            EffectBatcherNew.prototype.dispose = function () {
+                this.mesh.dispose();
+                this.mat.dispose();
+                this.dataForVbo = null;
+                this.dataForEbo = null;
+                for (var key in this.effectElements) {
+                    this.effectElements[key].dispose();
+                }
+            };
+            return EffectBatcherNew;
+        }());
+        framework.EffectBatcherNew = EffectBatcherNew;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -10313,24 +10771,24 @@ var gd3d;
                 if (this.player != null) {
                     context.updateModel(this.player.gameObject.transform);
                 }
-                for (var i_5 = 0; i_5 < this.materials.length; i_5++) {
-                    if (this.materials[i_5] == null)
+                for (var i_6 = 0; i_6 < this.materials.length; i_6++) {
+                    if (this.materials[i_6] == null)
                         continue;
                     if (this.cacheData != null && this._skintype > 0) {
                         if (this._efficient) {
-                            this.materials[i_5].setVector4v("glstate_vec4_bones", this.cacheData);
+                            this.materials[i_6].setVector4v("glstate_vec4_bones", this.cacheData);
                         }
                         else {
-                            this.materials[i_5].setMatrixv("glstate_matrix_bones", this.cacheData);
+                            this.materials[i_6].setMatrixv("glstate_matrix_bones", this.cacheData);
                         }
                         continue;
                     }
                     if (this._skeletonMatrixData != null && this._skintype > 0) {
                         if (this._efficient) {
-                            this.materials[i_5].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
+                            this.materials[i_6].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
                         }
                         else {
-                            this.materials[i_5].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
+                            this.materials[i_6].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
                         }
                     }
                 }
@@ -15116,6 +15574,7 @@ var gd3d;
         framework.EffectElementData = EffectElementData;
         var EffectAttrsData = (function () {
             function EffectAttrsData() {
+                this.uv = new gd3d.math.vector2(1, 1);
                 this.renderModel = RenderModel.None;
                 this.matrix = new gd3d.math.matrix();
                 this.rotationByEuler = new gd3d.math.quaternion();
@@ -16291,6 +16750,8 @@ var gd3d;
                 this.actionActive = false;
                 this.loopFrame = Number.MAX_VALUE;
                 this.active = true;
+                this.rotationByEuler = new gd3d.math.quaternion();
+                this.localRotation = new gd3d.math.quaternion();
                 this.mgr = assetMgr;
                 this.effectIns = effectIns;
                 this.mesh = this.mgr.getDefaultMesh("quad");
@@ -16327,7 +16788,144 @@ var gd3d;
                 this.recordElementLerpAttributes(this.alpha);
                 this.recordElementLerpAttributes(this.tilling);
             };
-            EffectElementSingleMesh.prototype.WriteToJson = function (obj) {
+            EffectElementSingleMesh.prototype.getFrameVal = function (attributeType, frameIndex) {
+                if (frameIndex === void 0) { frameIndex = 0; }
+                var timeLine = this.timelineFrames[attributeType];
+                if (timeLine[frameIndex] != undefined)
+                    return timeLine[frameIndex];
+                return null;
+            };
+            EffectElementSingleMesh.prototype.writeToJson = function (obj) {
+            };
+            EffectElementSingleMesh.prototype.copyandinit = function () {
+                var data = new framework.EffectAttrsData();
+                var pos = this.getFrameVal(AttributeType.PositionType);
+                if (pos != null)
+                    data.pos = gd3d.math.pool.clone_vector3(pos);
+                else
+                    data.initAttribute("");
+                if (this.euler != undefined)
+                    data.euler = gd3d.math.pool.clone_vector3(this.getFrameVal(AttributeType.EulerType));
+                else
+                    data.initAttribute("euler");
+                if (this.color != undefined)
+                    data.color = gd3d.math.pool.clone_vector3(this.getFrameVal(AttributeType.ColorType));
+                else
+                    data.initAttribute("color");
+                if (this.scale != undefined)
+                    data.scale = gd3d.math.pool.clone_vector3(this.getFrameVal(AttributeType.ScaleType));
+                else
+                    data.initAttribute("scale");
+                if (this.uv != undefined)
+                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
+                else
+                    data.initAttribute("uv");
+                if (this.tilling != undefined)
+                    data.tilling = gd3d.math.pool.clone_vector2(this.getFrameVal(AttributeType.TillingType));
+                else
+                    data.initAttribute("tilling");
+                if (this.colorRate != undefined)
+                    data.colorRate = this.getFrameVal(AttributeType.ColorRateType);
+                else
+                    data.initAttribute("colorRate");
+                if (this.rotationByEuler != undefined)
+                    data.rotationByEuler = gd3d.math.pool.clone_quaternion(this.rotationByEuler);
+                if (this.localRotation != undefined)
+                    data.localRotation = gd3d.math.pool.clone_quaternion(this.localRotation);
+                data.alpha = this.getFrameVal(AttributeType.AlphaType);
+                data.renderModel = this.renderModel;
+                data.mesh = this.mesh;
+                return data;
+            };
+            EffectElementSingleMesh.prototype.update = function () {
+                if (this.curAttrData == undefined || this.curAttrData == null)
+                    return;
+                if (this.active) {
+                    if (this.curAttrData.euler != undefined) {
+                        gd3d.math.quatFromEulerAngles(this.curAttrData.euler.x, this.curAttrData.euler.y, this.curAttrData.euler.z, this.curAttrData.rotationByEuler);
+                    }
+                    this.updateElementRotation();
+                    gd3d.math.matrixMakeTransformRTS(this.curAttrData.pos, this.curAttrData.scale, this.curAttrData.localRotation, this.curAttrData.matrix);
+                }
+                else {
+                    this.curAttrData.resetMatrix();
+                }
+            };
+            EffectElementSingleMesh.prototype.updateElementRotation = function () {
+                var cameraTransform = gd3d.framework.sceneMgr.app.getScene().mainCamera.gameObject.transform;
+                var worldRotation = gd3d.math.pool.new_quaternion();
+                var localRotation = gd3d.math.pool.new_quaternion();
+                if (this.curAttrData.renderModel != framework.RenderModel.None) {
+                    var invTransformRotation = gd3d.math.pool.new_quaternion();
+                    var worldTranslation = gd3d.math.pool.new_vector3();
+                    var translation = gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Clone(this.curAttrData.pos, translation);
+                    if (this.transform != undefined) {
+                        gd3d.math.matrixTransformVector3(translation, this.transform.getWorldMatrix(), worldTranslation);
+                    }
+                    if (this.curAttrData.renderModel == framework.RenderModel.BillBoard) {
+                        gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    }
+                    else if (this.curAttrData.renderModel == framework.RenderModel.HorizontalBillBoard) {
+                        worldRotation.x = -0.5;
+                        worldRotation.y = 0.5;
+                        worldRotation.z = 0.5;
+                        worldRotation.w = 0.5;
+                    }
+                    else if (this.curAttrData.renderModel == framework.RenderModel.VerticalBillBoard) {
+                        var forwardTarget = gd3d.math.pool.new_vector3();
+                        gd3d.math.vec3Clone(cameraTransform.getWorldTranslate(), forwardTarget);
+                        forwardTarget.y = worldTranslation.y;
+                        gd3d.math.quatLookat(worldTranslation, forwardTarget, worldRotation);
+                        gd3d.math.pool.delete_vector3(forwardTarget);
+                    }
+                    else if (this.curAttrData.renderModel == framework.RenderModel.StretchedBillBoard) {
+                        gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
+                        gd3d.math.quatLookat(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                        var lookRot = new gd3d.math.quaternion();
+                        gd3d.math.quatClone(this.transform.getWorldRotate(), invTransformRotation);
+                        gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+                        gd3d.math.quatMultiply(invTransformRotation, worldRotation, lookRot);
+                        var inverRot = gd3d.math.pool.new_quaternion();
+                        gd3d.math.quatInverse(this.curAttrData.localRotation, inverRot);
+                        gd3d.math.quatMultiply(inverRot, lookRot, lookRot);
+                        var angle = gd3d.math.pool.new_vector3();
+                        gd3d.math.quatToEulerAngles(lookRot, angle);
+                        gd3d.math.quatFromEulerAngles(0, angle.y, 0, lookRot);
+                        gd3d.math.quatMultiply(this.curAttrData.localRotation, lookRot, this.curAttrData.localRotation);
+                        gd3d.math.pool.delete_quaternion(inverRot);
+                        gd3d.math.pool.delete_vector3(angle);
+                        gd3d.math.pool.delete_quaternion(lookRot);
+                        return;
+                    }
+                    else if (this.curAttrData.renderModel == framework.RenderModel.Mesh) {
+                        framework.EffectUtil.quatLookatZ(worldTranslation, cameraTransform.getWorldTranslate(), worldRotation);
+                    }
+                    gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, worldRotation);
+                    gd3d.math.quatClone(this.transform.gameObject.transform.getWorldRotate(), invTransformRotation);
+                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.curAttrData.localRotation);
+                    gd3d.math.pool.delete_vector3(translation);
+                    gd3d.math.pool.delete_vector3(worldTranslation);
+                    gd3d.math.pool.delete_quaternion(invTransformRotation);
+                }
+                else {
+                    gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
+                }
+                gd3d.math.pool.delete_quaternion(localRotation);
+                gd3d.math.pool.delete_quaternion(worldRotation);
+            };
+            EffectElementSingleMesh.prototype.dispose = function () {
+            };
+            EffectElementSingleMesh.prototype.isCurFrameNeedRefresh = function (frameIndex) {
+                for (var index in this.timelineFrames) {
+                    if (this.timelineFrames[index][frameIndex] != undefined)
+                        return true;
+                }
+                if (this.curAttrData != undefined && this.curAttrData.renderModel != framework.RenderModel.None) {
+                    return true;
+                }
+                return this.actionActive;
             };
             EffectElementSingleMesh.prototype.recordElementLerpAttributes = function (data) {
                 if (data.data != undefined) {
@@ -16424,7 +17022,7 @@ var gd3d;
             ], EffectElementSingleMesh.prototype, "renderModel", void 0);
             EffectElementSingleMesh = __decorate([
                 gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [gd3d.framework.assetMgr, framework.effectSystem])
+                __metadata("design:paramtypes", [gd3d.framework.assetMgr, framework.effectSystemNew])
             ], EffectElementSingleMesh);
             return EffectElementSingleMesh;
         }());
@@ -16435,7 +17033,11 @@ var gd3d;
                 this.simulateInLocalSpace = true;
                 this.renderModel = gd3d.framework.RenderModel.None;
             }
-            EffectElementEmission.prototype.WriteToJson = function (obj) {
+            EffectElementEmission.prototype.writeToJson = function (obj) {
+            };
+            EffectElementEmission.prototype.Update = function () {
+            };
+            EffectElementEmission.prototype.dispose = function () {
             };
             EffectElementEmission = __decorate([
                 gd3d.reflect.SerializeType
@@ -18696,8 +19298,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_6 = 0; obj.transform.children != undefined && i_6 < obj.transform.children.length; i_6++) {
-                    var _obj = obj.transform.children[i_6].gameObject;
+                for (var i_7 = 0; obj.transform.children != undefined && i_7 < obj.transform.children.length; i_7++) {
+                    var _obj = obj.transform.children[i_7].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };

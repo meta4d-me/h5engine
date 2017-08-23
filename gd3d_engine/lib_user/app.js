@@ -2642,7 +2642,7 @@ var test_effect = (function () {
         btn.onclick = function () {
             var tr = new gd3d.framework.transform();
             _this.scene.addChild(tr);
-            var effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+            var effect = tr.gameObject.addComponent("effectSystemNew");
             var ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
         };
         btn.style.top = "160px";

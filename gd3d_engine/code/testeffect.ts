@@ -149,7 +149,7 @@ class test_effect implements IState
 
             let tr = new gd3d.framework.transform();
             this.scene.addChild(tr);
-            let effect = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
+            let effect = tr.gameObject.addComponent("effectSystemNew") as gd3d.framework.effectSystemNew;
             let ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
             // gd3d.io.serializeObj(effect);
         }
