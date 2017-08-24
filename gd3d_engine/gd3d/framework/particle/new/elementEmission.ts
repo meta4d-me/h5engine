@@ -6,7 +6,7 @@ namespace gd3d.framework
         //---------------------------private hierachy---------------------------------------------------------
         public webgl: WebGLRenderingContext;
         public gameObject: gameObject;
-        public effectSys: effectSystem;
+        public effectSys: TestEffectSystem;
         public active: boolean = true;//激活状态
         //-------静态属性----------------------------
         public vf: number=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
@@ -100,7 +100,7 @@ namespace gd3d.framework
         private isover: boolean = false;
         //-----------------------------------------------------------------
 
-        constructor(sys: effectSystem,data:EmissionData=null)
+        constructor(sys: TestEffectSystem,data:EffectElementData=null)
         {
             this.webgl = gd3d.framework.sceneMgr.app.webgl;
             this.effectSys = sys;
@@ -135,11 +135,11 @@ namespace gd3d.framework
         private initDefparticleData()
         {
             //emissiontype
-            this.duration.setValue(5.0);
-            this.emissionCount.setValue(3);
+            this.duration.setValue(2.0);
+            this.emissionCount.setValue(10);
             //emissionShape
             this.shapeType=ParticleSystemShape.CONE;
-            this.simulationSpeed.setValue(1.0);
+            this.simulationSpeed.setValue(0.1);
             this.radius=1.0;
             this.angle=45;
             this.height=1.0;
@@ -147,7 +147,7 @@ namespace gd3d.framework
             this.mat=sceneMgr.app.getAssetMgr().getDefParticleMat();
             this.mesh=sceneMgr.app.getAssetMgr().getDefaultMesh("quad");
         }
-        private initByEmissonData(data:EmissionData)
+        private initByEmissonData(data:EffectElementData)
         {
 
         }
@@ -368,9 +368,8 @@ namespace gd3d.framework
 
 
 
-        WriteToJson(obj: any): any
-        {
-
+        writeToJson(obj: any) {
+            throw new Error("Method not implemented.");
         }
     }
 

@@ -1571,7 +1571,6 @@ declare namespace gd3d.framework {
         private particleElementDic;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
-        updateJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
         init(): void;
         private _data;
@@ -1668,6 +1667,56 @@ declare namespace gd3d.framework {
         dispose(): void;
         vertexSize: number;
         constructor(formate: number);
+    }
+}
+declare namespace gd3d.framework {
+    class TestEffectSystem implements IRenderer {
+        gameObject: gameObject;
+        layer: RenderLayerEnum;
+        renderLayer: CullingMask;
+        queue: number;
+        autoplay: boolean;
+        beLoop: boolean;
+        state: EffectPlayStateEnum;
+        private curFrameId;
+        static fps: number;
+        private playTimer;
+        private speed;
+        webgl: WebGLRenderingContext;
+        private parser;
+        vf: number;
+        private emissionElement;
+        private effectBatchers;
+        private particles;
+        private matDataGroups;
+        private particleElementDic;
+        jsonData: textasset;
+        setJsonData(_jsonData: textasset): void;
+        data: EffectSystemData;
+        init(): void;
+        private _data;
+        readonly totalFrameCount: number;
+        start(): void;
+        update(delta: number): void;
+        private _update(delta);
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        clone(): effectSystem;
+        play(speed?: number): void;
+        pause(): void;
+        stop(): void;
+        reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
+        private resetSingleMesh();
+        private delayElements;
+        private refElements;
+        private addElements();
+        private addElement(data);
+        addEmissionElement(data?: EffectElementData): void;
+        setFrameId(id: number): void;
+        getDelayFrameCount(delayTime: number): number;
+        private beExecuteNextFrame;
+        private checkFrameId();
+        remove(): void;
+        readonly leftLifeTime: number;
     }
 }
 declare namespace gd3d.framework {
@@ -2825,55 +2874,12 @@ declare namespace gd3d.framework {
         private recordElementLerpAttributes(data);
         private lerp(fromFrameId, toFrameId, fromFrameVal, toFrameVal, timeLine);
     }
-    class EffectElementEmission implements IEffectElement {
-        name: string;
-        effectBatcher: EffectBatcherNew;
-        elementType: gd3d.framework.EffectElementTypeEnum;
-        beloop: boolean;
-        delayTime: number;
-        emissionType: gd3d.framework.ParticleEmissionType;
-        simulateInLocalSpace: boolean;
-        rootpos: gd3d.math.vector3;
-        rootRotAngle: gd3d.math.vector3;
-        rootScale: gd3d.math.vector3;
-        maxEmissionCount: number;
-        emissionCount: number;
-        time: number;
-        moveSpeed: gd3d.framework.ParticleNode;
-        gravity: number;
-        euler: gd3d.framework.ParticleNode;
-        eulerNodes: Array<gd3d.framework.ParticleNode>;
-        eulerSpeed: gd3d.framework.ParticleNode;
-        scale: gd3d.framework.ParticleNode;
-        scaleNodes: Array<gd3d.framework.ParticleNodeNumber>;
-        scaleSpeed: gd3d.framework.ParticleNode;
-        color: gd3d.framework.ParticleNode;
-        colorRate: number;
-        colorNodes: Array<gd3d.framework.ParticleNode>;
-        colorSpeed: gd3d.framework.ParticleNode;
-        simulationSpeed: gd3d.framework.ParticleNodeNumber;
-        alpha: gd3d.framework.ParticleNodeNumber;
-        alphaNodes: Array<gd3d.framework.ParticleNodeNumber>;
-        alphaSpeed: gd3d.framework.ParticleNodeNumber;
-        uv: gd3d.framework.ParticleNodeVec2;
-        uvType: gd3d.framework.UVTypeEnum;
-        uvRoll: gd3d.framework.UVRoll;
-        uvSprite: gd3d.framework.UVSprite;
-        tilling: gd3d.math.vector2;
-        mat: gd3d.framework.material;
-        life: gd3d.framework.ValueData;
-        renderModel: gd3d.framework.RenderModel;
-        mesh: gd3d.framework.mesh;
-        writeToJson(obj: any): any;
-        Update(): void;
-        dispose(): void;
-    }
 }
 declare namespace gd3d.framework {
     class EffectElementEmission implements IEffectElement {
         webgl: WebGLRenderingContext;
         gameObject: gameObject;
-        effectSys: effectSystem;
+        effectSys: TestEffectSystem;
         active: boolean;
         vf: number;
         private maxVertexCount;
@@ -2932,7 +2938,7 @@ declare namespace gd3d.framework {
         private needbeDelay;
         private numcount;
         private isover;
-        constructor(sys: effectSystem, data?: EmissionData);
+        constructor(sys: TestEffectSystem, data?: EffectElementData);
         private initDefparticleData();
         private initByEmissonData(data);
         private worldRotation;
@@ -2958,7 +2964,7 @@ declare namespace gd3d.framework {
         private getMesh();
         cloneMeshVBO(): Float32Array;
         cloneMeshEBO(): Uint16Array;
-        WriteToJson(obj: any): any;
+        writeToJson(obj: any): void;
     }
 }
 declare namespace gd3d.framework {
@@ -3789,6 +3795,8 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+}
+declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {
