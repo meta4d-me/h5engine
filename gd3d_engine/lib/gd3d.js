@@ -16803,31 +16803,36 @@ var gd3d;
                 if (pos != null)
                     data.pos = gd3d.math.pool.clone_vector3(pos);
                 else
-                    data.initAttribute("");
-                if (this.euler != undefined)
-                    data.euler = gd3d.math.pool.clone_vector3(this.getFrameVal(AttributeType.EulerType));
+                    data.initAttribute("pos");
+                var euler = this.getFrameVal(AttributeType.EulerType);
+                if (euler != null)
+                    data.euler = gd3d.math.pool.clone_vector3(euler);
                 else
                     data.initAttribute("euler");
-                if (this.color != undefined)
-                    data.color = gd3d.math.pool.clone_vector3(this.getFrameVal(AttributeType.ColorType));
-                else
-                    data.initAttribute("color");
-                if (this.scale != undefined)
-                    data.scale = gd3d.math.pool.clone_vector3(this.getFrameVal(AttributeType.ScaleType));
+                var scale = this.getFrameVal(AttributeType.ScaleType);
+                if (scale != null)
+                    data.scale = gd3d.math.pool.clone_vector3(scale);
                 else
                     data.initAttribute("scale");
+                var color = this.getFrameVal(AttributeType.ColorType);
+                if (color != null)
+                    data.color = gd3d.math.pool.clone_vector3(color);
+                else
+                    data.initAttribute("color");
+                var tilling = this.getFrameVal(AttributeType.TillingType);
+                if (tilling != null)
+                    data.tilling = gd3d.math.pool.clone_vector3(tilling);
+                else
+                    data.initAttribute("tilling");
+                var colorRate = this.getFrameVal(AttributeType.ColorRateType);
+                if (colorRate != null)
+                    data.colorRate = colorRate;
+                else
+                    data.initAttribute("colorRate");
                 if (this.uv != undefined)
                     data.uv = gd3d.math.pool.clone_vector2(this.uv);
                 else
                     data.initAttribute("uv");
-                if (this.tilling != undefined)
-                    data.tilling = gd3d.math.pool.clone_vector2(this.getFrameVal(AttributeType.TillingType));
-                else
-                    data.initAttribute("tilling");
-                if (this.colorRate != undefined)
-                    data.colorRate = this.getFrameVal(AttributeType.ColorRateType);
-                else
-                    data.initAttribute("colorRate");
                 if (this.rotationByEuler != undefined)
                     data.rotationByEuler = gd3d.math.pool.clone_quaternion(this.rotationByEuler);
                 if (this.localRotation != undefined)
