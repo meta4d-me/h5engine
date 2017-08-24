@@ -1597,8 +1597,74 @@ declare namespace gd3d.framework {
         private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
+    }
+}
+declare namespace gd3d.framework {
+    class effectSystemNew implements IRenderer {
+        gameObject: gameObject;
+        layer: RenderLayerEnum;
+        renderLayer: CullingMask;
+        queue: number;
+        autoplay: boolean;
+        beLoop: boolean;
+        state: EffectPlayStateEnum;
+        private curFrameId;
+        static fps: number;
+        private playTimer;
+        private speed;
+        webgl: WebGLRenderingContext;
+        private parser;
+        vf: number;
+        private effectBatchers;
+        private matDataGroups;
+        private particles;
+        private particleElementDic;
+        jsonData: textasset;
+        setJsonData(_jsonData: textasset): void;
+        data: EffectSystemData;
+        init(): void;
+        private _data;
+        readonly totalFrameCount: number;
+        start(): void;
+        update(delta: number): void;
+        private _update(delta);
+        private mergeLerpAttribData(realUseCurFrameData, effect, frameId);
+        private updateEffectBatcher(effectBatcher, curAttrsData, mesh, vertexStartIndex);
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        clone(): effectSystem;
+        play(speed?: number): void;
+        pause(): void;
+        stop(): void;
+        reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
+        private resetSingleMesh();
+        private delayElements;
+        private refElements;
+        setFrameId(id: number): void;
+        getDelayFrameCount(delayTime: number): number;
+        private beExecuteNextFrame;
+        private checkFrameId();
+        remove(): void;
+        readonly leftLifeTime: number;
         effectElements: IEffectElement[];
         addEffectElement(type: gd3d.framework.EffectElementTypeEnum): IEffectElement;
+        private addInitFrameNew(effect);
+    }
+    class EffectBatcherNew {
+        mesh: mesh;
+        mat: material;
+        state: EffectBatcherState;
+        dataForVbo: Float32Array;
+        dataForEbo: Uint16Array;
+        effectElements: EffectElementSingleMesh[];
+        private _totalVertexCount;
+        curTotalVertexCount: number;
+        private _indexStartIndex;
+        indexStartIndex: number;
+        private _vbosize;
+        resizeVboSize(value: number): void;
+        dispose(): void;
+        vertexSize: number;
+        constructor(formate: number);
     }
 }
 declare namespace gd3d.framework {
@@ -2593,6 +2659,8 @@ declare namespace gd3d.framework {
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
+        frameIndexs: number[];
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
         actions: {
             [frameIndex: number]: IEffectAction[];
@@ -2601,21 +2669,26 @@ declare namespace gd3d.framework {
     }
     class Vector3AttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
+        frameIndexs: number[];
         actions: {
             [frameIndex: number]: IEffectAction[];
         };
         constructor();
         init(): void;
-        addFramePoint(frameId: number, data: FrameKeyPointData): void;
-        removeFramePoint(frameId: number, data: any): void;
+        addFramePoint(data: FrameKeyPointData, func?: Function): void;
+        removeFramePoint(frameId: number, data: any, func?: Function): void;
+        updateFramePoint(data: any, func?: Function): void;
     }
     class Vector2AttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
+        frameIndexs: number[];
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
@@ -2624,15 +2697,18 @@ declare namespace gd3d.framework {
         };
         constructor();
         init(): void;
-        addFramePoint(frameId: number, data: FrameKeyPointData): void;
-        removeFramePoint(frameId: number, data: gd3d.math.vector2): void;
+        addFramePoint(data: FrameKeyPointData, func?: Function): void;
+        removeFramePoint(frameId: number, data: gd3d.math.vector2, func?: Function): void;
+        updateFramePoint(data: any, func?: Function): void;
     }
     class NumberAttributeData implements IAttributeData, ILerpAttributeInterface {
         uiState: AttributeUIState;
+        attributeValType: AttributeValType;
         attributeType: AttributeType;
         data: {
             [frameIndex: number]: FrameKeyPointData;
         };
+        frameIndexs: number[];
         timeLine: {
             [frameIndex: number]: number;
         };
@@ -2641,12 +2717,14 @@ declare namespace gd3d.framework {
         };
         constructor();
         init(): void;
-        addFramePoint(frameId: number, data: any): void;
-        removeFramePoint(frameId: number, data: number): void;
+        addFramePoint(data: any, func?: Function): void;
+        removeFramePoint(frameId: number, data: number, func?: Function): void;
+        updateFramePoint(data: any, func?: Function): void;
     }
     interface ILerpAttributeInterface {
-        addFramePoint(frameId: number, data: any): any;
-        removeFramePoint(frameId: number, data: any): any;
+        addFramePoint(data: any, func?: Function): any;
+        removeFramePoint(frameId: number, data: any, func?: Function): any;
+        updateFramePoint(data: any, func?: Function): any;
     }
     enum AttributeUIState {
         None = 0,
@@ -2659,7 +2737,7 @@ declare namespace gd3d.framework {
         Vector3 = 2,
         Vector4 = 3,
     }
-    enum AttributeType {
+    enum AttributeValType {
         FixedValType = 0,
         LerpType = 1,
     }
@@ -2667,17 +2745,31 @@ declare namespace gd3d.framework {
         frameIndex: number;
         val: any;
         actions: IEffectAction[];
-        constructor(frameIndex: number);
+        constructor(frameIndex: number, val: any);
+    }
+    class AttributeUtil {
+        static addFrameIndex(datas: number[], index: number): void;
     }
 }
 declare namespace gd3d.framework {
     interface IEffectElement {
         name: string;
-        elementType: gd3d.framework.EffectElementTypeEnum;
+        elementType: EffectElementTypeEnum;
         beloop: boolean;
         delayTime: number;
-        mat: gd3d.framework.material;
-        WriteToJson(obj: any): any;
+        mat: material;
+        mesh: mesh;
+        writeToJson(obj: any): any;
+        dispose(): any;
+    }
+    enum AttributeType {
+        PositionType = 1,
+        EulerType = 2,
+        ScaleType = 3,
+        ColorType = 4,
+        ColorRateType = 5,
+        AlphaType = 6,
+        TillingType = 7,
     }
     class EffectElementSingleMesh implements IEffectElement {
         name: string;
@@ -2695,13 +2787,18 @@ declare namespace gd3d.framework {
         color: Vector3AttributeData;
         alpha: NumberAttributeData;
         tilling: Vector2AttributeData;
-        colorRate: number;
+        colorRate: NumberAttributeData;
         uv: gd3d.math.vector2;
         renderModel: gd3d.framework.RenderModel;
+        timelineFrames: {
+            [attributeType: number]: {
+                [frameIndex: number]: any;
+            };
+        };
         ref: string;
         actions: IEffectAction[];
         curAttrData: EffectAttrsData;
-        effectBatcher: EffectBatcher;
+        effectBatcher: EffectBatcherNew;
         startVboIndex: number;
         startEboIndex: number;
         endEboIndex: number;
@@ -2711,12 +2808,19 @@ declare namespace gd3d.framework {
         transform: transform;
         private mgr;
         private effectIns;
-        constructor(assetMgr: gd3d.framework.assetMgr, effectIns: effectSystem);
+        rotationByEuler: math.quaternion;
+        localRotation: math.quaternion;
+        constructor(assetMgr: gd3d.framework.assetMgr, effectIns: effectSystemNew);
         initData(): void;
-        WriteToJson(obj: any): any;
+        getFrameVal(attributeType: AttributeType, frameIndex?: number): any;
+        writeToJson(obj: any): any;
+        copyandinit(): EffectAttrsData;
+        update(): void;
+        private updateElementRotation();
+        dispose(): void;
+        isCurFrameNeedRefresh(frameIndex: number): boolean;
         private recordElementLerpAttributes(data);
-        private recordLerpValues(effectFrameData);
-        private recordLerp(effectFrameData, lerpData, key);
+        private lerp(fromFrameId, toFrameId, fromFrameVal, toFrameVal, timeLine);
     }
 }
 declare namespace gd3d.framework {
@@ -2725,6 +2829,7 @@ declare namespace gd3d.framework {
         rootRotAngle: gd3d.math.vector3;
         rootScale: gd3d.math.vector3;
         name: string;
+        effectBatcher: EffectBatcherNew;
         elementType: gd3d.framework.EffectElementTypeEnum;
         delayTime: number;
         beloop: boolean;
@@ -2758,7 +2863,9 @@ declare namespace gd3d.framework {
         life: gd3d.framework.ValueData;
         renderModel: gd3d.framework.RenderModel;
         mesh: gd3d.framework.mesh;
-        WriteToJson(obj: any): any;
+        writeToJson(obj: any): any;
+        Update(): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {

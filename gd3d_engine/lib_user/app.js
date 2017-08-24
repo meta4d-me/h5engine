@@ -2641,8 +2641,10 @@ var test_effect = (function () {
         var btn = document.createElement("button");
         btn.textContent = "Play";
         btn.onclick = function () {
-            _this.effect.stop();
-            _this.effect.play();
+            var tr = new gd3d.framework.transform();
+            _this.scene.addChild(tr);
+            var effect = tr.gameObject.addComponent("effectSystemNew");
+            var ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";
