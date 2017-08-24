@@ -2822,22 +2822,25 @@ declare namespace gd3d.framework {
         private recordElementLerpAttributes(data);
         private lerp(fromFrameId, toFrameId, fromFrameVal, toFrameVal, timeLine);
     }
+}
+declare namespace gd3d.framework {
     class EffectElementEmission implements IEffectElement {
-        name: string;
-        effectBatcher: EffectBatcherNew;
-        elementType: gd3d.framework.EffectElementTypeEnum;
-        beloop: boolean;
-        delayTime: number;
-        emissionType: gd3d.framework.ParticleEmissionType;
-        simulateInLocalSpace: boolean;
         rootpos: gd3d.math.vector3;
         rootRotAngle: gd3d.math.vector3;
         rootScale: gd3d.math.vector3;
+        name: string;
+        effectBatcher: EffectBatcherNew;
+        elementType: gd3d.framework.EffectElementTypeEnum;
+        delayTime: number;
+        beloop: boolean;
+        simulateInLocalSpace: boolean;
+        emissionType: gd3d.framework.ParticleEmissionType;
         maxEmissionCount: number;
         emissionCount: number;
         time: number;
         moveSpeed: gd3d.framework.ParticleNode;
         gravity: number;
+        simulationSpeed: gd3d.framework.ParticleNodeNumber;
         euler: gd3d.framework.ParticleNode;
         eulerNodes: Array<gd3d.framework.ParticleNode>;
         eulerSpeed: gd3d.framework.ParticleNode;
@@ -2848,7 +2851,6 @@ declare namespace gd3d.framework {
         colorRate: number;
         colorNodes: Array<gd3d.framework.ParticleNode>;
         colorSpeed: gd3d.framework.ParticleNode;
-        simulationSpeed: gd3d.framework.ParticleNodeNumber;
         alpha: gd3d.framework.ParticleNodeNumber;
         alphaNodes: Array<gd3d.framework.ParticleNodeNumber>;
         alphaSpeed: gd3d.framework.ParticleNodeNumber;
@@ -3582,6 +3584,8 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+}
+declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {

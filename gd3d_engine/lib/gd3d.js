@@ -17032,10 +17032,19 @@ var gd3d;
             return EffectElementSingleMesh;
         }());
         framework.EffectElementSingleMesh = EffectElementSingleMesh;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var EffectElementEmission = (function () {
             function EffectElementEmission() {
                 this.elementType = gd3d.framework.EffectElementTypeEnum.EmissionType;
+                this.delayTime = 0;
+                this.beloop = false;
                 this.simulateInLocalSpace = true;
+                this.emissionType = framework.ParticleEmissionType.burst;
                 this.renderModel = gd3d.framework.RenderModel.None;
             }
             EffectElementEmission.prototype.writeToJson = function (obj) {
@@ -21225,6 +21234,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;

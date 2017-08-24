@@ -30,6 +30,45 @@ namespace gd3d.framework
             gd3d.math.pool.delete_vector3(dir);
             gd3d.math.pool.delete_vector3(crossup);
         }
+        public static eulerFromQuaternion(out:math.vector3, q:math.quaternion, order) {
+            // Borrowed from Three.JS :)
+            // q is assumed to be normalized
+            // http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
+            var sqx = q.x * q.x;
+            var sqy = q.y * q.y;
+            var sqz = q.z * q.z;
+            var sqw = q.w * q.w;
+
+            if ( order === 'XYZ' ) {
+                out.x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( sqw - sqx - sqy + sqz ) );
+                out.y = Math.asin(  gd3d.math.floatClamp( 2 * ( q.x * q.z + q.y * q.w ), -1, 1 ) );
+                out.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw + sqx - sqy - sqz ) );
+            } else if ( order ===  'YXZ' ) {
+                out.x = Math.asin(   gd3d.math.floatClamp( 2 * ( q.x * q.w - q.y * q.z ), -1, 1 ) );
+                out.y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw - sqx - sqy + sqz ) );
+                out.z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw - sqx + sqy - sqz ) );
+            } else if ( order === 'ZXY' ) {
+                out.x = Math.asin(   gd3d.math.floatClamp( 2 * ( q.x * q.w + q.y * q.z ), -1, 1 ) );
+                out.y = Math.atan2( 2 * ( q.y * q.w - q.z * q.x ), ( sqw - sqx - sqy + sqz ) );
+                out.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw - sqx + sqy - sqz ) );
+            } else if ( order === 'ZYX' ) {
+                out.x = Math.atan2( 2 * ( q.x * q.w + q.z * q.y ), ( sqw - sqx - sqy + sqz ) );
+                out.y = Math.asin(   gd3d.math.floatClamp( 2 * ( q.y * q.w - q.x * q.z ), -1, 1 ) );
+                out.z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw + sqx - sqy - sqz ) );
+            } else if ( order === 'YZX' ) {
+                out.x = Math.atan2( 2 * ( q.x * q.w - q.z * q.y ), ( sqw - sqx + sqy - sqz ) );
+                out.y = Math.atan2( 2 * ( q.y * q.w - q.x * q.z ), ( sqw + sqx - sqy - sqz ) );
+                out.z = Math.asin(   gd3d.math.floatClamp( 2 * ( q.x * q.y + q.z * q.w ), -1, 1 ) );
+            } else if ( order === 'XZY' ) {
+                out.x = Math.atan2( 2 * ( q.x * q.w + q.y * q.z ), ( sqw - sqx + sqy - sqz ) );
+                out.y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw + sqx - sqy - sqz ) );
+                out.z = Math.asin(   gd3d.math.floatClamp( 2 * ( q.z * q.w - q.x * q.y ), -1, 1 ) );
+            } else {
+                console.log('No order given for quaternion to euler conversion.');
+                return;
+            }
+        }
+
         //范围内随机  isInteger是否为整数
         public static RandomRange(min: number, max: number, isInteger: boolean = false)
         {
