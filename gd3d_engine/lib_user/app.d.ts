@@ -1056,6 +1056,33 @@ declare class db_test_cameraViewport implements IState {
     bere: boolean;
     update(delta: number): void;
 }
+declare class db_test_newEff implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    effect: gd3d.framework.effectSystem;
+    label: HTMLLabelElement;
+    private loadShader(laststate, state);
+    private dragon;
+    private loadModel(laststate, state);
+    start(app: gd3d.framework.application): void;
+    private loadEffect(laststate, state);
+    private loadScene(laststate, state);
+    private loadScene_nocompress(laststate, state);
+    private testNewEff(laststate, state);
+    private addcam(laststate, state);
+    private addbtn(laststate, state);
+    tr: gd3d.framework.transform;
+    ttr: gd3d.framework.transform;
+    eff: gd3d.framework.effectSystem;
+    beclone: boolean;
+    effectloaded: boolean;
+    bestop: boolean;
+    bereplay: boolean;
+    update(delta: number): void;
+}
 declare class db_test_effect implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

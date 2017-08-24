@@ -601,7 +601,7 @@ namespace gd3d.framework
             }
             else if (type == gd3d.framework.EffectElementTypeEnum.EmissionType)
             {
-                effe = new gd3d.framework.EffectElementEmission();
+                //effe = new gd3d.framework.EffectElementEmission();
                 effe.name = "emission" + this.effectElements.length;
 
             }

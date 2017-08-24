@@ -13,17 +13,17 @@ namespace gd3d.framework
         public startRotation: gd3d.math.quaternion = new gd3d.math.quaternion();
         public rotationByShape: math.quaternion = new math.quaternion();
         public Starteuler: math.vector3;
-        public rotAngle:number;
+        public rotAngle:number=0;
         public eulerSpeed:number;
         public rotationByEuler: math.quaternion = new math.quaternion();
 
         public localMatrix: math.matrix = new math.matrix();
 
-        public localTranslate: math.vector3;
+        public localTranslate: math.vector3=new math.vector3();
         public localRotation: math.quaternion = new math.quaternion();
-        public localScale: math.vector3;
+        public localScale: math.vector3=new math.vector3(1,1,1);
         public startColor:math.color;
-        public color: math.vector3;
+        public color: math.vector3=new math.vector3(1,1,1);
         public alpha: number;
         public tex_ST:math.vector4=new gd3d.math.vector4(1,1,0,0);
 
@@ -73,19 +73,28 @@ namespace gd3d.framework
             //--------------location speed
             effTools.getRandomDirAndPosByZEmission(this.emisson,this.speedDir,this.localTranslate);
             this.simulationSpeed=this.emisson.simulationSpeed.getValue();
-            this.movespeed=this.emisson.moveSpeed.getValue();
             //--------------rotation
             this.Starteuler=this.emisson.startEuler.getValue();
-            this.eulerSpeed=this.emisson.angleSpeed.getValue();
             gd3d.math.quatFromEulerAngles(this.Starteuler.x, this.Starteuler.y, this.Starteuler.z, this.rotationByEuler);
             //--------------scale
             this.localScale=this.emisson.startScale.getValue();
             //--------------color
             this.startColor=this.emisson.startColor;
-            //--------------tex_UV
+
+            //-------------------------------------------------可选类型----------------------
             this.sizeNodes=this.emisson.sizeNodes;
             this.colorNodes=this.emisson.colorNodes;
             this.alphaNodes=this.emisson.alphaNodes;
+
+            if(this.emisson.enableVelocityOverLifetime)
+            {
+                this.movespeed=this.emisson.moveSpeed.getValue();
+            }
+            if(this.emisson.enableRotOverLifeTime)
+            {
+                this.eulerSpeed=this.emisson.angleSpeed.getValue();
+            }
+
 
             if(this.emisson.rendermodel==RenderModel.StretchedBillBoard)
             {

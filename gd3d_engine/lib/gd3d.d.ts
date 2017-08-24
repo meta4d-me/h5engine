@@ -756,6 +756,8 @@ declare namespace gd3d.framework {
         loadImmediate(url: string, type?: AssetTypeEnum): any;
         getFileName(url: string): string;
         calcType(url: string): AssetTypeEnum;
+        private particlemat;
+        getDefParticleMat(): material;
     }
     class assetRef {
         asset: IAsset;
@@ -1665,6 +1667,56 @@ declare namespace gd3d.framework {
         dispose(): void;
         vertexSize: number;
         constructor(formate: number);
+    }
+}
+declare namespace gd3d.framework {
+    class TestEffectSystem implements IRenderer {
+        gameObject: gameObject;
+        layer: RenderLayerEnum;
+        renderLayer: CullingMask;
+        queue: number;
+        autoplay: boolean;
+        beLoop: boolean;
+        state: EffectPlayStateEnum;
+        private curFrameId;
+        static fps: number;
+        private playTimer;
+        private speed;
+        webgl: WebGLRenderingContext;
+        private parser;
+        vf: number;
+        private emissionElement;
+        private effectBatchers;
+        private particles;
+        private matDataGroups;
+        private particleElementDic;
+        jsonData: textasset;
+        setJsonData(_jsonData: textasset): void;
+        data: EffectSystemData;
+        init(): void;
+        private _data;
+        readonly totalFrameCount: number;
+        start(): void;
+        update(delta: number): void;
+        private _update(delta);
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        clone(): effectSystem;
+        play(speed?: number): void;
+        pause(): void;
+        stop(): void;
+        reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
+        private resetSingleMesh();
+        private delayElements;
+        private refElements;
+        private addElements();
+        private addElement(data);
+        addEmissionElement(data?: EffectElementData): void;
+        setFrameId(id: number): void;
+        getDelayFrameCount(delayTime: number): number;
+        private beExecuteNextFrame;
+        private checkFrameId();
+        remove(): void;
+        readonly leftLifeTime: number;
     }
 }
 declare namespace gd3d.framework {
@@ -2825,46 +2877,204 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class EffectElementEmission implements IEffectElement {
-        rootpos: gd3d.math.vector3;
-        rootRotAngle: gd3d.math.vector3;
-        rootScale: gd3d.math.vector3;
+        webgl: WebGLRenderingContext;
+        gameObject: gameObject;
+        effectSys: TestEffectSystem;
+        active: boolean;
+        vf: number;
+        private maxVertexCount;
+        rotTranslate: gd3d.math.vector3;
+        rotScale: gd3d.math.vector3;
+        rotRotation: gd3d.math.vector3;
+        private rotQuta;
         name: string;
-        effectBatcher: EffectBatcherNew;
-        elementType: gd3d.framework.EffectElementTypeEnum;
+        elementType: EffectElementTypeEnum;
         delayTime: number;
         beloop: boolean;
+        lifeTime: NumberData;
         simulateInLocalSpace: boolean;
-        emissionType: gd3d.framework.ParticleEmissionType;
-        maxEmissionCount: number;
-        emissionCount: number;
-        time: number;
-        moveSpeed: gd3d.framework.ParticleNode;
-        gravity: number;
-        simulationSpeed: gd3d.framework.ParticleNodeNumber;
-        euler: gd3d.framework.ParticleNode;
-        eulerNodes: Array<gd3d.framework.ParticleNode>;
-        eulerSpeed: gd3d.framework.ParticleNode;
-        scale: gd3d.framework.ParticleNode;
-        scaleNodes: Array<gd3d.framework.ParticleNodeNumber>;
-        scaleSpeed: gd3d.framework.ParticleNode;
-        color: gd3d.framework.ParticleNode;
+        startScale: Vector3Data;
+        startEuler: Vector3Data;
+        startColor: math.color;
         colorRate: number;
-        colorNodes: Array<gd3d.framework.ParticleNode>;
-        colorSpeed: gd3d.framework.ParticleNode;
-        alpha: gd3d.framework.ParticleNodeNumber;
-        alphaNodes: Array<gd3d.framework.ParticleNodeNumber>;
-        alphaSpeed: gd3d.framework.ParticleNodeNumber;
-        uv: gd3d.framework.ParticleNodeVec2;
-        uvType: gd3d.framework.UVTypeEnum;
-        uvRoll: gd3d.framework.UVRoll;
-        uvSprite: gd3d.framework.UVSprite;
-        tilling: gd3d.math.vector2;
-        mat: gd3d.framework.material;
-        life: gd3d.framework.ValueData;
-        renderModel: gd3d.framework.RenderModel;
+        duration: NumberData;
+        emissionCount: NumberData;
+        emissionType: ParticleEmissionType;
+        shapeType: ParticleSystemShape;
+        simulationSpeed: NumberData;
+        width: number;
+        height: number;
+        depth: number;
+        radius: number;
+        angle: number;
+        emitFrom: emitfromenum;
+        rendermodel: RenderModel;
+        mat: material;
         mesh: gd3d.framework.mesh;
-        writeToJson(obj: any): any;
-        Update(): void;
+        enableVelocityOverLifetime: boolean;
+        moveSpeed: Vector3Data;
+        enableSizeOverLifetime: boolean;
+        sizeNodes: NumberKey[];
+        enableRotOverLifeTime: boolean;
+        angleSpeed: NumberData;
+        enableColorOverLifetime: boolean;
+        colorNodes: Vector3Key[];
+        alphaNodes: NumberKey[];
+        enableTexAnimation: boolean;
+        uvType: UVTypeEnum;
+        uSpeed: number;
+        vSpeed: number;
+        row: number;
+        column: number;
+        count: number;
+        private _continueSpaceTime;
+        perVertexCount: number;
+        perIndexxCount: number;
+        vertexSize: number;
+        emissionBatchers: EmissionBatcher_new[];
+        private curbatcher;
+        deadParticles: Particle_new[];
+        private curTime;
+        private needbeDelay;
+        private numcount;
+        private isover;
+        constructor(sys: TestEffectSystem, data?: EffectElementData);
+        private initDefparticleData();
+        private initByEmissonData(data);
+        private worldRotation;
+        getWorldRotation(): gd3d.math.quaternion;
+        matToObj: gd3d.math.matrix;
+        private matToWorld;
+        getmatrixToObj(): void;
+        getmatrixToWorld(): gd3d.math.matrix;
+        update(delta: number): void;
+        private updateBatcher(delta);
+        private burstDelayTime;
+        private burstDelay;
+        private updateEmission(delta);
+        private addParticle(count?);
+        private addBatcher();
+        private _renderCamera;
+        readonly renderCamera: camera;
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        dispose(): void;
+        isOver(): boolean;
+        vbo: Float32Array;
+        private ebo;
+        private getMesh();
+        cloneMeshVBO(): Float32Array;
+        cloneMeshEBO(): Uint16Array;
+        writeToJson(obj: any): void;
+    }
+}
+declare namespace gd3d.framework {
+    class EmissionBatcher_new {
+        emission: EffectElementEmission;
+        private webgl;
+        mesh: mesh;
+        mat: material;
+        dataForVbo: Float32Array;
+        dataForEbo: Uint16Array;
+        particles: Particle_new[];
+        constructor(emissionElement: EffectElementEmission);
+        private initMesh();
+        curVerCount: number;
+        curIndexCount: number;
+        addParticle(): void;
+        private refreshBuffer();
+        update(delta: number): void;
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class NumberData {
+        isRandom: boolean;
+        private _value;
+        private _valueLimitMin;
+        private _valueLimitMax;
+        private beInited;
+        private key;
+        setValue(value: number): void;
+        setRandomValue(max: number, min: number): void;
+        getValue(reRandom?: boolean): number;
+        constructor(value?: number);
+        static RandomRange(min: number, max: number, isInteger?: boolean): number;
+    }
+    class Vector3Data {
+        x: NumberData;
+        y: NumberData;
+        z: NumberData;
+        constructor(x?: number, y?: number, z?: number);
+        getValue(): gd3d.math.vector3;
+    }
+    class NumberKey {
+        key: number;
+        value: number;
+        constructor(_key: number, _value: number);
+    }
+    class Vector3Key {
+        key: number;
+        value: math.vector3;
+        constructor(_key: number, _value: math.vector3);
+    }
+    class effTools {
+        static getRandomDirAndPosByZEmission(emission: EffectElementEmission, outDir: gd3d.math.vector3, outPos: gd3d.math.vector3): void;
+        static getTex_ST(emission: EffectElementEmission, out_St: math.vector4): void;
+    }
+}
+declare namespace gd3d.framework {
+    class Particle_new {
+        gameObject: gameObject;
+        private emisson;
+        private batcher;
+        private startScale;
+        startRotation: gd3d.math.quaternion;
+        rotationByShape: math.quaternion;
+        Starteuler: math.vector3;
+        rotAngle: number;
+        eulerSpeed: number;
+        rotationByEuler: math.quaternion;
+        localMatrix: math.matrix;
+        localTranslate: math.vector3;
+        localRotation: math.quaternion;
+        localScale: math.vector3;
+        startColor: math.color;
+        color: math.vector3;
+        alpha: number;
+        tex_ST: math.vector4;
+        private totalLife;
+        private curLife;
+        private life;
+        private speedDir;
+        private movespeed;
+        private simulationSpeed;
+        sourceVbo: Float32Array;
+        vertexStartIndex: number;
+        dataForVbo: Float32Array;
+        dataForEbo: Uint16Array;
+        private emissionMatToWorld;
+        private emissionWorldRotation;
+        private sizeNodes;
+        private colorNodes;
+        private alphaNodes;
+        constructor(batcher: EmissionBatcher_new);
+        uploadData(array: Float32Array): void;
+        initByData(): void;
+        actived: boolean;
+        update(delta: number): void;
+        private transformVertex;
+        private _updateLocalMatrix(delta);
+        private matToworld;
+        private refreshEmissionData();
+        private _updateRotation(delta);
+        private _updatePos(delta);
+        private _updateEuler(delta);
+        private _updateScale(delta);
+        private _updateColor(delta);
+        private spriteIndex;
+        private _updateUV(delta);
+        private _updateVBO();
         dispose(): void;
     }
 }
@@ -3031,6 +3241,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class EffectUtil {
         static lookatbyXAxis(pos: gd3d.math.vector3, xAxis: gd3d.math.vector3, yAxis: gd3d.math.vector3, zAxis: gd3d.math.vector3, targetpos: gd3d.math.vector3, quat: gd3d.math.quaternion): void;
+        static eulerFromQuaternion(out: math.vector3, q: math.quaternion, order: any): void;
         static RandomRange(min: number, max: number, isInteger?: boolean): number;
         static vecMuliNum(vec: gd3d.math.vector3, num: number): gd3d.math.vector3;
         static parseVector3(value: any): gd3d.math.vector3;
