@@ -292,10 +292,10 @@ declare namespace gd3d.framework {
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         update(delta: number): void;
-        pick2d(mx: number, my: number): transform2D;
-        dopick2d(outv: math.vector2, tran: transform2D): transform2D;
-        pick2d_new(mx: number, my: number): transform2D;
-        dopick2d_new(outv: math.vector2, tran: transform2D): transform2D;
+        pick2d(mx: number, my: number, tolerance?: number): transform2D;
+        dopick2d(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
+        pick2d_new(mx: number, my: number, tolerance?: number): transform2D;
+        dopick2d_new(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
         calScreenPosToCanvasPos(mousePos: gd3d.math.vector2, canvasPos: gd3d.math.vector2): void;
     }
 }
@@ -433,7 +433,7 @@ declare namespace gd3d.framework {
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents(node, _type, comps);
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
-        ContainsCanvasPoint(pworld: math.vector2): boolean;
+        ContainsCanvasPoint(pworld: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
     }
 }
@@ -2718,21 +2718,24 @@ declare namespace gd3d.framework {
         private recordLerpValues(effectFrameData);
         private recordLerp(effectFrameData, lerpData, key);
     }
+}
+declare namespace gd3d.framework {
     class EffectElementEmission implements IEffectElement {
-        name: string;
-        elementType: gd3d.framework.EffectElementTypeEnum;
-        beloop: boolean;
-        delayTime: number;
-        emissionType: gd3d.framework.ParticleEmissionType;
-        simulateInLocalSpace: boolean;
         rootpos: gd3d.math.vector3;
         rootRotAngle: gd3d.math.vector3;
         rootScale: gd3d.math.vector3;
+        name: string;
+        elementType: gd3d.framework.EffectElementTypeEnum;
+        delayTime: number;
+        beloop: boolean;
+        simulateInLocalSpace: boolean;
+        emissionType: gd3d.framework.ParticleEmissionType;
         maxEmissionCount: number;
         emissionCount: number;
         time: number;
         moveSpeed: gd3d.framework.ParticleNode;
         gravity: number;
+        simulationSpeed: gd3d.framework.ParticleNodeNumber;
         euler: gd3d.framework.ParticleNode;
         eulerNodes: Array<gd3d.framework.ParticleNode>;
         eulerSpeed: gd3d.framework.ParticleNode;
@@ -2743,7 +2746,6 @@ declare namespace gd3d.framework {
         colorRate: number;
         colorNodes: Array<gd3d.framework.ParticleNode>;
         colorSpeed: gd3d.framework.ParticleNode;
-        simulationSpeed: gd3d.framework.ParticleNodeNumber;
         alpha: gd3d.framework.ParticleNodeNumber;
         alphaNodes: Array<gd3d.framework.ParticleNodeNumber>;
         alphaSpeed: gd3d.framework.ParticleNodeNumber;
@@ -3475,6 +3477,8 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+}
+declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {

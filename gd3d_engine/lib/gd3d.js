@@ -1242,7 +1242,8 @@ var gd3d;
                 var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
                 this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
             };
-            overlay2D.prototype.pick2d = function (mx, my) {
+            overlay2D.prototype.pick2d = function (mx, my, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (this.camera == null)
                     return null;
                 var vp = new gd3d.math.rect();
@@ -1253,28 +1254,30 @@ var gd3d;
                 outv2.x = sx;
                 outv2.y = sy;
                 var root = this.canvas.getRoot();
-                return this.dopick2d(outv2, root);
+                return this.dopick2d(outv2, root, tolerance);
             };
-            overlay2D.prototype.dopick2d = function (outv, tran) {
+            overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (tran.components != null) {
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv)) {
+                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
                                 return comp.comp.transform;
                             }
                     }
                 }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(outv, tran.children[i]);
+                        var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
                         if (tran2 != null)
                             return tran2;
                     }
                 }
                 return null;
             };
-            overlay2D.prototype.pick2d_new = function (mx, my) {
+            overlay2D.prototype.pick2d_new = function (mx, my, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (this.camera == null)
                     return null;
                 var vp = new gd3d.math.rect();
@@ -1285,9 +1288,10 @@ var gd3d;
                 outv2.x = sx;
                 outv2.y = sy;
                 var root = this.canvas.getRoot();
-                return this.dopick2d_new(outv2, root);
+                return this.dopick2d_new(outv2, root, tolerance);
             };
-            overlay2D.prototype.dopick2d_new = function (outv, tran) {
+            overlay2D.prototype.dopick2d_new = function (outv, tran, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
                         var tran2 = this.dopick2d_new(outv, tran.children[i]);
@@ -1297,7 +1301,7 @@ var gd3d;
                 }
                 var uirect = tran.getComponent("uirect");
                 if (uirect != null) {
-                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv)) {
+                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance)) {
                         return uirect.transform;
                     }
                 }
@@ -1975,7 +1979,8 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.ContainsCanvasPoint = function (pworld) {
+            transform2D.prototype.ContainsCanvasPoint = function (pworld, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
                 var mworld = this.getWorldMatrix();
                 var mout = new gd3d.math.matrix3x2();
                 gd3d.math.matrix3x2Inverse(mworld, mout);
@@ -1983,7 +1988,7 @@ var gd3d;
                 gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
                 p2.x += this.pivot.x * this.width;
                 p2.y += this.pivot.y * this.height;
-                return p2.x >= 0 && p2.y >= 0 && p2.x < this.width && p2.y < this.height;
+                return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
             };
             transform2D.prototype.onPointEvent = function (canvas, ev) {
                 if (this.children != null) {
@@ -8024,7 +8029,9 @@ var gd3d;
                 this.playStyle = PlayStyle.NormalPlay;
                 this.percent = 0;
                 this.mix = false;
+                this.isCache = false;
             }
+            aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
                 get: function () {
                     if (this._clipnames == null || this._clipnameCount != this.clips.length) {
@@ -8081,8 +8088,16 @@ var gd3d;
                     this.crossdelta -= delta / this.speed * this.crossspeed;
                     this.mix = true;
                 }
+                var cached = false;
+                if (this.isCache && !this.mix && aniplayer_1.playerCaches[this.cacheKey]) {
+                    cached = true;
+                    if (framework.StringUtil.isNullOrEmptyObject(this.carelist))
+                        return;
+                }
                 for (var i = 0; i < this._playClip.boneCount; i++) {
                     var bone = this._playClip.bones[i];
+                    if (cached && !this.carelist[bone])
+                        continue;
                     var frame = this._playClip.frames[this._playFrameid];
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
@@ -8113,6 +8128,9 @@ var gd3d;
                         gd3d.math.pool.delete_matrix(_matrix);
                         gd3d.math.pool.delete_matrix(_newmatrix);
                     }
+                }
+                if (!cached) {
+                    aniplayer_1.playerCaches[this.cacheKey] = this;
                 }
             };
             aniplayer.prototype.playByIndex = function (animIndex, speed, beRevert) {
@@ -8311,6 +8329,7 @@ var gd3d;
                     pnode = pnode.parent;
                 }
             };
+            aniplayer.playerCaches = [];
             __decorate([
                 gd3d.reflect.Field("animationClip[]"),
                 __metadata("design:type", Array)
@@ -8327,10 +8346,11 @@ var gd3d;
                 gd3d.reflect.Field("PoseBoneMatrix[]"),
                 __metadata("design:type", Array)
             ], aniplayer.prototype, "startPos", void 0);
-            aniplayer = __decorate([
+            aniplayer = aniplayer_1 = __decorate([
                 gd3d.reflect.nodeComponent
             ], aniplayer);
             return aniplayer;
+            var aniplayer_1;
         }());
         framework.aniplayer = aniplayer;
         var tPoseInfo = (function () {
@@ -10265,16 +10285,23 @@ var gd3d;
                     }
                 }
                 if (this.player != null) {
-                    if (!this.player.mix) {
+                    if (this.player.isCache && !this.player.mix) {
                         var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
                         var data = skinnedMeshRenderer_1.dataCaches[cacheKey];
                         if (!data) {
-                            data = new Float32Array(8 * 40);
-                            this.player.fillPoseData(data, this.bones, true);
-                            skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                            var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
+                            if (_cachePlayer) {
+                                data = new Float32Array(8 * 40);
+                                _cachePlayer.fillPoseData(data, this.bones, true);
+                                skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                                this.cacheData = data;
+                                return;
+                            }
                         }
-                        this.cacheData = data;
-                        return;
+                        else {
+                            this.cacheData = data;
+                            return;
+                        }
                     }
                     this.cacheData = null;
                     if (this._skeletonMatrixData != null) {
@@ -16307,10 +16334,19 @@ var gd3d;
             return EffectElementSingleMesh;
         }());
         framework.EffectElementSingleMesh = EffectElementSingleMesh;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var EffectElementEmission = (function () {
             function EffectElementEmission() {
                 this.elementType = gd3d.framework.EffectElementTypeEnum.EmissionType;
+                this.delayTime = 0;
+                this.beloop = false;
                 this.simulateInLocalSpace = true;
+                this.emissionType = framework.ParticleEmissionType.burst;
                 this.renderModel = gd3d.framework.RenderModel.None;
             }
             EffectElementEmission.prototype.WriteToJson = function (obj) {
@@ -18825,6 +18861,7 @@ var gd3d;
                 this.renderCameras.length = 0;
                 this.renderLights.length = 0;
                 this.renderList.clear();
+                framework.aniplayer.playerCaches = [];
                 this.updateScene(this.rootNode, delta);
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
@@ -20213,6 +20250,14 @@ var gd3d;
                 var other = str.substr(1);
                 return firstChar + other;
             };
+            StringUtil.isNullOrEmptyObject = function (obj) {
+                if (!obj)
+                    return true;
+                for (var n in obj) {
+                    return false;
+                }
+                return true;
+            };
             StringUtil.COMPONENT_CAMERA = "camera";
             StringUtil.COMPONENT_BOXCOLLIDER = "boxcollider";
             StringUtil.COMPONENT_LIGHT = "light";
@@ -20487,6 +20532,20 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
+var web3d;
+(function (web3d) {
+    var io;
+    (function (io) {
+        onmessage = function (msg) {
+            switch (msg.data.type) {
+                case "load":
+                    break;
+                case "loadShaders":
+                    break;
+            }
+        };
+    })(io = web3d.io || (web3d.io = {}));
+})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;

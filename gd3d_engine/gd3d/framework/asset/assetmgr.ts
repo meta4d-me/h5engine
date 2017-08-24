@@ -1837,6 +1837,25 @@ namespace gd3d.framework
             }
             return AssetTypeEnum.Unknown;
         }
+
+        private particlemat:material;
+        getDefParticleMat():material
+        {
+            if(this.particlemat==null)
+            {
+                var mat=new material("defparticle");
+                var shader=this.getShader("particles_additive.shader.json");
+                if(shader==null)
+                {
+                    shader=this.getShader("shader/def");
+                }
+                mat.setShader(shader);
+                var tex=this.getDefaultTexture("grid");
+                mat.setTexture("_MainTex",tex);
+                this.particlemat=mat;
+            }
+            return this.particlemat;
+        }
     }
 
 
