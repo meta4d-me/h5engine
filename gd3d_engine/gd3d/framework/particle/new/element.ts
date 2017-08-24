@@ -155,41 +155,48 @@ namespace gd3d.framework
         copyandinit(): EffectAttrsData//没有的数据初始化
         {
             let data = new EffectAttrsData();
+
             let pos = this.getFrameVal(AttributeType.PositionType);
             if (pos != null)
                 data.pos = math.pool.clone_vector3(pos);
             else
-                data.initAttribute("");
+                data.initAttribute("pos");
 
-
-            
-            if (this.euler != undefined)
-                data.euler = math.pool.clone_vector3(this.getFrameVal(AttributeType.EulerType));
+            let euler = this.getFrameVal(AttributeType.EulerType);
+            if (euler != null)
+                data.euler = math.pool.clone_vector3(euler);
             else
                 data.initAttribute("euler");
 
-            if (this.color != undefined)
-                data.color = math.pool.clone_vector3(this.getFrameVal(AttributeType.ColorType));
+            let scale = this.getFrameVal(AttributeType.ScaleType);
+            if (scale != null)
+                data.scale = math.pool.clone_vector3(scale);
+            else
+                data.initAttribute("scale");
+
+            let color = this.getFrameVal(AttributeType.ColorType);
+            if (color != null)
+                data.color = math.pool.clone_vector3(color);
             else
                 data.initAttribute("color");
 
-            if (this.scale != undefined)
-                data.scale = math.pool.clone_vector3(this.getFrameVal(AttributeType.ScaleType));
+            let tilling = this.getFrameVal(AttributeType.TillingType);
+            if (tilling != null)
+                data.tilling = math.pool.clone_vector3(tilling);
             else
-                data.initAttribute("scale");
+                data.initAttribute("tilling");
+
+            let colorRate = this.getFrameVal(AttributeType.ColorRateType);
+            if (colorRate != null)
+                data.colorRate = colorRate;
+            else
+                data.initAttribute("colorRate");
 
             if (this.uv != undefined)
                 data.uv = math.pool.clone_vector2(this.uv);
             else
                 data.initAttribute("uv");
-            if (this.tilling != undefined)
-                data.tilling = math.pool.clone_vector2(this.getFrameVal(AttributeType.TillingType));
-            else
-                data.initAttribute("tilling");
-            if (this.colorRate != undefined)
-                data.colorRate = this.getFrameVal(AttributeType.ColorRateType);
-            else
-                data.initAttribute("colorRate");
+
             // if (this.mat != undefined)
             //     data.mat = this.mat.clone();
 
@@ -353,21 +360,27 @@ namespace gd3d.framework
         {
             if (data.data != undefined)
             {
-                for (let i = 0; i < data.frameIndexs.length - 1; i++)
+                if (data.frameIndexs.length == 1)
                 {
-                    let fromFrameId = data.frameIndexs[i];
-                    let toFrameId = data.frameIndexs[i + 1];
 
-                    let fromFrameData: FrameKeyPointData = data.data[fromFrameId];
-                    let toFrameData: FrameKeyPointData = data.data[toFrameId];
-                    let timeLine: { [frameIndex: number]: any } = this.timelineFrames[data.attributeType]
-                    if (fromFrameData.actions == null)
+                } else
+                {
+                    for (let i = 0; i < data.frameIndexs.length - 1; i++)
                     {
-                        //lerp操作
-                        this.lerp(fromFrameId, toFrameId, fromFrameData.val, toFrameData.val, timeLine);
-                    } else
-                    {
-                        //记录action
+                        let fromFrameId = data.frameIndexs[i];
+                        let toFrameId = data.frameIndexs[i + 1];
+
+                        let fromFrameData: FrameKeyPointData = data.data[fromFrameId];
+                        let toFrameData: FrameKeyPointData = data.data[toFrameId];
+                        let timeLine: { [frameIndex: number]: any } = this.timelineFrames[data.attributeType]
+                        if (fromFrameData.actions == null)
+                        {
+                            //lerp操作
+                            this.lerp(fromFrameId, toFrameId, fromFrameData.val, toFrameData.val, timeLine);
+                        } else
+                        {
+                            //记录action
+                        }
                     }
                 }
             }
