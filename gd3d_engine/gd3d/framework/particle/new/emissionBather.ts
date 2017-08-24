@@ -19,10 +19,9 @@ namespace gd3d.framework
         {
             this.emission = emissionElement;
             this.webgl = emissionElement.webgl;
+            this.mat =this.emission.mat;
             this.initMesh();
 
-            //初始化材质信息
-            this.mat =this.emission.mat;
         }
 
         private initMesh()
