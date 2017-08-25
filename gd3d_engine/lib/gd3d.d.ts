@@ -1571,6 +1571,7 @@ declare namespace gd3d.framework {
         private particleElementDic;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
+        updateJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
         init(): void;
         private _data;
@@ -3795,8 +3796,6 @@ declare namespace gd3d.io {
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-}
-declare namespace web3d.io {
 }
 declare namespace gd3d.math {
     class pool {

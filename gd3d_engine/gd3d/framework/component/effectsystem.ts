@@ -773,12 +773,19 @@ namespace gd3d.framework
             this.state = EffectPlayStateEnum.Dispose;
             if (this.data)
                 this.data.dispose();
-            for (let key in this.effectBatchers)
+            while (this.effectBatchers.length > 0)
             {
-                this.effectBatchers[key].dispose();
+                this.effectBatchers[0].dispose();
+                this.effectBatchers.splice(0, 1);
+            }
+            while (this.matDataGroups.length > 0)
+            {
+                this.matDataGroups.splice(0, 1);
             }
             if (this.particles)
                 this.particles.dispose();
+            this.curFrameId = -1;
+            this.playTimer = 0;
         }
         /**
         * @private

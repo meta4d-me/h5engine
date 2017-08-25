@@ -9144,6 +9144,12 @@ var gd3d;
                 this.jsonData = _jsonData;
                 this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
             };
+            effectSystem.prototype.updateJsonData = function (_jsonData) {
+                this.remove();
+                this.jsonData = _jsonData;
+                this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+                this.init();
+            };
             Object.defineProperty(effectSystem.prototype, "data", {
                 get: function () {
                     return this._data;
@@ -9573,11 +9579,17 @@ var gd3d;
                 this.state = framework.EffectPlayStateEnum.Dispose;
                 if (this.data)
                     this.data.dispose();
-                for (var key in this.effectBatchers) {
-                    this.effectBatchers[key].dispose();
+                while (this.effectBatchers.length > 0) {
+                    this.effectBatchers[0].dispose();
+                    this.effectBatchers.splice(0, 1);
+                }
+                while (this.matDataGroups.length > 0) {
+                    this.matDataGroups.splice(0, 1);
                 }
                 if (this.particles)
                     this.particles.dispose();
+                this.curFrameId = -1;
+                this.playTimer = 0;
             };
             Object.defineProperty(effectSystem.prototype, "leftLifeTime", {
                 get: function () {
@@ -22276,20 +22288,6 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
-var web3d;
-(function (web3d) {
-    var io;
-    (function (io) {
-        onmessage = function (msg) {
-            switch (msg.data.type) {
-                case "load":
-                    break;
-                case "loadShaders":
-                    break;
-            }
-        };
-    })(io = web3d.io || (web3d.io = {}));
-})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
