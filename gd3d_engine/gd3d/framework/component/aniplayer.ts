@@ -586,7 +586,10 @@ namespace gd3d.framework
                     this.carelist[pnode.name] = pnode;
                     return;
                 }
-                pnode = pnode.parent;
+                if(pnode.parent)
+                    pnode = pnode.parent;
+                else
+                    return;
                 // if (pnode instanceof transform)
                 // {
 

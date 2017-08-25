@@ -8340,7 +8340,10 @@ var gd3d;
                         this.carelist[pnode.name] = pnode;
                         return;
                     }
-                    pnode = pnode.parent;
+                    if (pnode.parent)
+                        pnode = pnode.parent;
+                    else
+                        return;
                 }
             };
             aniplayer.playerCaches = [];
@@ -9143,6 +9146,12 @@ var gd3d;
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.jsonData = _jsonData;
                 this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+            };
+            effectSystem.prototype.updateJsonData = function (_jsonData) {
+                this.remove();
+                this.jsonData = _jsonData;
+                this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+                this.init();
             };
             Object.defineProperty(effectSystem.prototype, "data", {
                 get: function () {
@@ -22276,20 +22285,6 @@ var gd3d;
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
-var web3d;
-(function (web3d) {
-    var io;
-    (function (io) {
-        onmessage = function (msg) {
-            switch (msg.data.type) {
-                case "load":
-                    break;
-                case "loadShaders":
-                    break;
-            }
-        };
-    })(io = web3d.io || (web3d.io = {}));
-})(web3d || (web3d = {}));
 var gd3d;
 (function (gd3d) {
     var math;
