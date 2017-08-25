@@ -8340,7 +8340,10 @@ var gd3d;
                         this.carelist[pnode.name] = pnode;
                         return;
                     }
-                    pnode = pnode.parent;
+                    if (pnode.parent)
+                        pnode = pnode.parent;
+                    else
+                        return;
                 }
             };
             aniplayer.playerCaches = [];
