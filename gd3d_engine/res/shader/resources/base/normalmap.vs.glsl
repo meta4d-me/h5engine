@@ -1,36 +1,36 @@
 
 // in  attributes from our SpriteBatch
-attribute vec3 _glesVertex;
-attribute vec2 _glesMultiTexCoord0;
-attribute vec4 _glesColor;
-attribute vec3 _glesNormal;
-attribute vec3 _glesTangent;  
+attribute highp vec3 _glesVertex;
+attribute mediump vec2 _glesMultiTexCoord0;
+attribute lowp vec4 _glesColor;
+attribute lowp vec3 _glesNormal;
+attribute lowp vec3 _glesTangent;  
 
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp mat4 glstate_matrix_model;
 uniform highp mat4 glstate_matrix_modelview;
 uniform highp vec4 glstate_eyepos;
 
-uniform highp vec4 glstate_vec4_lightposs[8];
-uniform highp vec4 glstate_vec4_lightdirs[8];
-uniform highp float glstate_float_spotangelcoss[8];
-uniform highp float glstate_lightcount;
+uniform lowp vec4 glstate_vec4_lightposs[8];
+uniform lowp vec4 glstate_vec4_lightdirs[8];
+uniform lowp float glstate_float_spotangelcoss[8];
+uniform lowp float glstate_lightcount;
 
 
 // out  varyings to our fragment shader
-varying highp vec4 xlv_COLOR;
+varying lowp vec4 xlv_COLOR;
 varying highp vec3 xlv_Position;      
-varying highp vec2 xlv_TEXCOORD0;
+varying mediump vec2 xlv_TEXCOORD0;
 
-varying highp mat3 TBNmat;
-varying highp vec3 worldpos;
+varying lowp mat3 TBNmat;
+varying lowp vec3 worldpos;
 
 
-highp mat3 calBTNMatrix(highp mat3 NormalMatToWorld,highp vec3 _normal,highp vec3 _tangent)
+lowp mat3 calBTNMatrix(lowp mat3 NormalMatToWorld,lowp vec3 _normal,lowp vec3 _tangent)
 {
-    highp vec3 normal=normalize(NormalMatToWorld*_normal);
-    highp vec3 tangent=normalize(NormalMatToWorld*_tangent);
-    highp vec3 binormal=cross(normal,tangent);
+    lowp vec3 normal=normalize(NormalMatToWorld*_normal);
+    lowp vec3 tangent=normalize(NormalMatToWorld*_tangent);
+    lowp vec3 binormal=cross(normal,tangent);
   	return (mat3(tangent,binormal,normal));
 
 }

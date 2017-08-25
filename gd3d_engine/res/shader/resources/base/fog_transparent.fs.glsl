@@ -1,8 +1,8 @@
-uniform sampler2D _MainTex;     
-uniform highp vec4 glstate_fog_color; 
+uniform lowp sampler2D _MainTex;     
+uniform lowp vec4 glstate_fog_color; 
  
-varying highp float factor;                                                                                           
-varying highp vec2 xlv_TEXCOORD0;
+varying lowp float factor;                                                                                           
+varying mediump vec2 xlv_TEXCOORD0;
 void main() 
 {
     lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);

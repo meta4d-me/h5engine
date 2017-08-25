@@ -1,9 +1,9 @@
-uniform sampler2D _MainTex;  
-uniform highp vec4 glstate_fog_color; 
+uniform lowp sampler2D _MainTex;  
+uniform lowp vec4 glstate_fog_color; 
 
-varying highp float factor;                                                 
+varying lowp float factor;                                                 
 varying lowp vec4 xlv_COLOR;                                                 
-varying highp vec2 xlv_TEXCOORD0;   
+varying mediump vec2 xlv_TEXCOORD0;   
 void main() 
 {
     lowp vec4 tmpvar_3;

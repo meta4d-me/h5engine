@@ -4,9 +4,9 @@ precision highp float;
 precision mediump float;  
 #endif 
 
-uniform sampler2D _MainTex;
-uniform lowp float _AlphaCut;
-varying highp vec2 xlv_TEXCOORD0;
+uniform lowp sampler2D _MainTex;
+uniform float _AlphaCut;
+varying mediump vec2 xlv_TEXCOORD0;
 void main() 
 {
     lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);

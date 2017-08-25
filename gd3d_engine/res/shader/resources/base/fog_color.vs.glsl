@@ -1,14 +1,14 @@
-attribute vec4 _glesVertex;   
-attribute vec4 _glesColor;                  
-attribute vec4 _glesMultiTexCoord0;        
+attribute highp vec4 _glesVertex;   
+attribute lowp vec4 _glesColor;                  
+attribute mediump vec4 _glesMultiTexCoord0;        
 uniform highp mat4 glstate_matrix_mvp;
-uniform highp float glstate_fog_start;
-uniform highp float glstate_fog_end;
-uniform highp vec4 _MainTex_ST;
+uniform lowp float glstate_fog_start;
+uniform lowp float glstate_fog_end;
+uniform mediump vec4 _MainTex_ST;
 
-varying highp float factor;      
+varying lowp float factor;      
 varying lowp vec4 xlv_COLOR;                
-varying highp vec2 xlv_TEXCOORD0;           
+varying mediump vec2 xlv_TEXCOORD0;           
 void main()                                     
 {                                               
     highp vec4 tmpvar_1;                        

@@ -1,10 +1,10 @@
-uniform sampler2D _MainTex;  
-uniform highp vec4 _MainColor;
-uniform highp float _alpha;
-uniform highp vec4 glstate_fog_color; 
+uniform lowp sampler2D _MainTex;  
+uniform lowp vec4 _MainColor;
+uniform lowp float _alpha;
+uniform lowp vec4 glstate_fog_color; 
 
-varying highp float factor; 
-varying highp vec2 _base_uv;
+varying lowp float factor; 
+varying mediump vec2 _base_uv;
 
 void main() 
 {

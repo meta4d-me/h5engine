@@ -1,17 +1,17 @@
-uniform sampler2D _MainTex;  
-uniform sampler2D _asm;
-uniform sampler2D _streamlight;
-uniform highp float _LightRate;
-uniform highp vec4 _LightColor;
-uniform highp float _emitpow;
-uniform highp float _diffuse;
-uniform highp float _alpha;
-uniform highp vec4 glstate_fog_color; 
+uniform lowp sampler2D _MainTex;  
+uniform lowp sampler2D _asm;
+uniform lowp sampler2D _streamlight;
+uniform lowp float _LightRate;
+uniform lowp vec4 _LightColor;
+uniform lowp float _emitpow;
+uniform lowp float _diffuse;
+uniform lowp float _alpha;
+uniform lowp vec4 glstate_fog_color; 
 
-varying highp float factor;  
-varying highp vec2 _base_uv;
-varying highp vec2 _asm_uv;
-varying highp vec2 _light_uv;
+varying lowp float factor;  
+varying mediump vec2 _base_uv;
+varying mediump vec2 _asm_uv;
+varying mediump vec2 _light_uv;
 
 
 void main() 
@@ -20,11 +20,11 @@ void main()
     {
         discard;
     }
-    highp vec3 baseTex=texture2D(_MainTex,_base_uv).rgb;
+    lowp vec3 baseTex=texture2D(_MainTex,_base_uv).rgb;
 
-    highp float asi_g=texture2D(_asm,_asm_uv).g;
+    lowp float asi_g=texture2D(_asm,_asm_uv).g;
 
-    highp vec3 d_color=baseTex*_diffuse;
+    lowp vec3 d_color=baseTex*_diffuse;
     lowp vec3 e_color=baseTex*_emitpow*asi_g;
     
     lowp vec3 light = texture2D(_streamlight, _light_uv).rgb* _LightRate*_LightColor.xyz;

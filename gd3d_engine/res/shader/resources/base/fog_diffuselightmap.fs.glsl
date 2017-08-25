@@ -1,14 +1,14 @@
-uniform sampler2D _MainTex;
-uniform sampler2D _LightmapTex;
+uniform lowp sampler2D _MainTex;
+uniform lowp sampler2D _LightmapTex;
 uniform lowp float _AlphaCut;
-uniform highp vec4 glstate_fog_color;  
+uniform lowp vec4 glstate_fog_color;  
 
-varying highp float factor;    
-varying highp vec2 xlv_TEXCOORD0;
-varying highp vec2 xlv_TEXCOORD1;
+varying lowp float factor;    
+varying mediump vec2 xlv_TEXCOORD0;
+varying mediump vec2 xlv_TEXCOORD1;
 lowp vec3 decode_hdr(lowp vec4 data)
 {
-    highp float power =pow( 2.0 ,data.a * 255.0 - 128.0);
+    lowp float power =pow( 2.0 ,data.a * 255.0 - 128.0);
     return data.rgb * power * 2.0 ;
 }
 void main() 

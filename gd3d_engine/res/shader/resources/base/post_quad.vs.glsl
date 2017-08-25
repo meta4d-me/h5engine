@@ -1,7 +1,7 @@
-attribute vec4 _glesVertex;
-attribute vec4 _glesMultiTexCoord0; 
-uniform highp vec4 _MainTex_ST; 
-varying highp vec2 xlv_TEXCOORD0;   
+attribute lowp vec4 _glesVertex;
+attribute mediump vec4 _glesMultiTexCoord0; 
+uniform mediump vec4 _MainTex_ST; 
+varying mediump vec2 xlv_TEXCOORD0;   
 void main()                     
 { 
     gl_Position = _glesVertex;

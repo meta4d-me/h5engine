@@ -1,7 +1,7 @@
-uniform sampler2D _MainTex;  
-uniform highp vec4 _MainColor;
-uniform highp float _alpha;
-varying highp vec2 _base_uv;
+uniform lowp sampler2D _MainTex;  
+uniform lowp vec4 _MainColor;
+uniform lowp float _alpha;
+varying mediump vec2 _base_uv;
 
 void main() 
 {

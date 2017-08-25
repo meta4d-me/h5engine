@@ -1,42 +1,42 @@
 
-uniform sampler2D _MainTex;  
-uniform sampler2D _NormalTex;   //normal map
+uniform lowp sampler2D _MainTex;  
+uniform lowp sampler2D _NormalTex;   //normal map
 
-uniform highp vec4 glstate_vec4_lightposs[8];
-uniform highp vec4 glstate_vec4_lightdirs[8];
-uniform highp float glstate_float_spotangelcoss[8];
-uniform highp float glstate_lightcount;
+uniform lowp vec4 glstate_vec4_lightposs[8];
+uniform lowp vec4 glstate_vec4_lightdirs[8];
+uniform lowp float glstate_float_spotangelcoss[8];
+uniform lowp float glstate_lightcount;
 //varying lowp vec4 xlv_COLOR;     
 //varying highp vec3 xlv_Position;                                             
-varying highp vec2 xlv_TEXCOORD0; 
+varying mediump vec2 xlv_TEXCOORD0; 
 //varying highp vec3 xlv_Normal; 
 //varying highp mat4 normalmat;
-varying highp mat3 TBNmat;
-varying highp vec3 worldpos; 
-varying highp vec3 eyedir;
+varying lowp mat3 TBNmat;
+varying lowp vec3 worldpos; 
+varying lowp vec3 eyedir;
 
-highp float calcDiffuse(highp vec3 N,highp vec3 worldpos,highp vec4 lightPos,highp vec4 lightDir,highp float cosspot);
-highp float calcSpec(highp vec3 N,highp vec3 worldpos,highp vec3 eyedir,highp vec4 lightPos,highp vec4 lightDir,highp float cosspot);
+lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot);
+lowp float calcSpec(lowp vec3 N,lowp vec3 worldpos,lowp vec3 eyedir,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot);
 void main() 
 {
     //不需要法线图时，normal 就是这个N
     //highp vec3 N =normalize((vec4(xlv_Normal,1)*normalmat).xyz);
 
-    highp float diff=0.0;
-    highp float spec=0.0;
+    lowp float diff=0.0;
+    lowp float spec=0.0;
     //calcDiffuse(N,worldpos,glstate_vec4_lightposs[0],glstate_vec4_lightdirs[0],0.8);
     for(int i=0;i<8;i++)
     {
         int c =int(glstate_lightcount);
         if(i>=c)break;
     
-		highp vec4 lpos=glstate_vec4_lightposs[i];
+		lowp vec4 lpos=glstate_vec4_lightposs[i];
 		//lpos.xyz = TBN*lpos.xyz;
-		highp vec4 ldir =glstate_vec4_lightdirs[i];
+		lowp vec4 ldir =glstate_vec4_lightdirs[i];
 		//ldir.xyz = TBN*ldir.xyz;
 		
 		//这是进入切空间的原因
-		highp vec3 normal;// = TBN*N;
+		lowp vec3 normal;// = TBN*N;
 		normal =  texture2D(_NormalTex, xlv_TEXCOORD0).xyz *2.0 -1.0;
         normal =normalize(normal);
 		normal =TBNmat*(normal);
@@ -54,16 +54,16 @@ void main()
     gl_FragData[0] = fcolor;
 }
 
-highp float calcDiffuse(highp vec3 N,highp vec3 worldpos,highp vec4 lightPos,highp vec4 lightDir,highp float cosspot)
+lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot)
 {
     //求入射角，点光源&聚光灯
-    highp vec3 L = normalize(lightPos.xyz - worldpos); 
+    lowp vec3 L = normalize(lightPos.xyz - worldpos); 
     //求张角 聚光灯 也是方向光入射角
-    highp vec3 L2 = -lightDir.xyz;
-    highp float dotSpot = dot(L,L2);
+    lowp vec3 L2 = -lightDir.xyz;
+    lowp float dotSpot = dot(L,L2);
     //漫反射强度
-    highp float diffuse =clamp(dot(N.xyz,L.xyz),0.0,1.0); 
-    highp float diffuseD =clamp(dot(N.xyz,L2.xyz),0.0,1.0); 
+    lowp float diffuse =clamp(dot(N.xyz,L.xyz),0.0,1.0); 
+    lowp float diffuseD =clamp(dot(N.xyz,L2.xyz),0.0,1.0); 
 
     //pos.w 和 dir.w 至少有一个1，刚好组合出三种光源
     diffuse= mix(diffuse,diffuse*smoothstep(cosspot,1.0,dotSpot),lightDir.w);
@@ -72,16 +72,16 @@ highp float calcDiffuse(highp vec3 N,highp vec3 worldpos,highp vec4 lightPos,hig
     return diffuse;
      
 }
-highp float calcSpec(highp vec3 N,highp vec3 worldpos,highp vec3 eyedir,highp vec4 lightPos,highp vec4 lightDir,highp float cosspot)
+lowp float calcSpec(lowp vec3 N,lowp vec3 worldpos,lowp vec3 eyedir,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot)
 {
 
-    highp float shininess=30.0;//高光系数
-    highp vec3 L = normalize(lightPos.xyz - worldpos); 
-    highp vec3 L2 = -lightDir.xyz;
-    highp float dotSpot = dot(L,L2);
+    lowp float shininess=30.0;//高光系数
+    lowp vec3 L = normalize(lightPos.xyz - worldpos); 
+    lowp vec3 L2 = -lightDir.xyz;
+    lowp float dotSpot = dot(L,L2);
     //三种光源 计算出三个 高光强度，然后根据条件选出一个
-    highp float spec =pow(clamp(dot(N,normalize(L+eyedir)),0.0,1.0), shininess);
-    highp float specD =pow(clamp(dot(N,normalize(L2+eyedir)),0.0,1.0), shininess);
+    lowp float spec =pow(clamp(dot(N,normalize(L+eyedir)),0.0,1.0), shininess);
+    lowp float specD =pow(clamp(dot(N,normalize(L2+eyedir)),0.0,1.0), shininess);
     spec= mix(spec,spec*smoothstep(cosspot,1.0,dotSpot),lightDir.w);
     spec= mix(specD,spec,lightPos.w);
 
