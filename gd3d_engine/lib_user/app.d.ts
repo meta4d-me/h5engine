@@ -377,6 +377,7 @@ declare class test_effect implements IState {
     private dragon;
     private loadModel(laststate, state);
     start(app: gd3d.framework.application): void;
+    private text;
     private loadEffect(laststate, state);
     private addButton();
     private getNameFromURL(path);

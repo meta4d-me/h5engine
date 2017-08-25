@@ -10,7 +10,7 @@ namespace gd3d.framework
     @reflect.nodeRender
     @reflect.nodeComponent
     @reflect.selfClone
-    export class effectSystem implements IRenderer
+    export class effectSystemNew implements IRenderer
     {
         /**
          * @public
@@ -87,9 +87,11 @@ namespace gd3d.framework
         */
         //public particleVF=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;//法线切线不要
 
-        private effectBatchers: EffectBatcher[] = [];
-        private particles: Particles;//粒子系统 发射器统一管理
+        private effectBatchers: EffectBatcherNew[] = [];
         private matDataGroups: EffectMatData[] = [];
+
+
+        private particles: Particles;//粒子系统 发射器统一管理
         private particleElementDic: { [name: string]: EffectElementData } = {};
 
         /**
@@ -110,14 +112,6 @@ namespace gd3d.framework
             this.jsonData = _jsonData;
             this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
-
-        updateJsonData(_jsonData: textasset)
-        {
-            this.remove();
-            this.jsonData = _jsonData;
-            this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
-            this.init();
-        }
         /**
         * @private
         */
@@ -137,10 +131,7 @@ namespace gd3d.framework
         */
         init()
         {
-            if (this._data)
-            {
-                this.addElements();
-            }
+
         }
         private _data: EffectSystemData;
         /**
@@ -197,20 +188,20 @@ namespace gd3d.framework
          */
         private _update(delta: number)
         {
-            if (this.delayElements.length > 0)
-            {
-                if (this.refElements.length > 0)
-                    this.refElements = [];
-                for (let i = this.delayElements.length - 1; i >= 0; i--)
-                {
-                    let data = this.delayElements[i];
-                    if (data.delayTime <= this.playTimer)
-                    {
-                        this.addElement(this.delayElements[i]);
-                        this.delayElements.splice(i, 1);
-                    }
-                }
-            }
+            // if (this.delayElements.length > 0)
+            // {
+            //     if (this.refElements.length > 0)
+            //         this.refElements = [];
+            //     for (let i = this.delayElements.length - 1; i >= 0; i--)
+            //     {
+            //         let data = this.delayElements[i];
+            //         if (data.delayTime <= this.playTimer)
+            //         {
+            //             this.addElement(this.delayElements[i]);
+            //             this.delayElements.splice(i, 1);
+            //         }
+            //     }
+            // }
             if (this.checkFrameId())
             {
                 for (let i in this.effectBatchers)
@@ -233,9 +224,7 @@ namespace gd3d.framework
                         if (element.active)
                         {
                             element.actionActive = false;
-
-                            this.mergeLerpAttribData(element.curAttrData, element.timelineFrame[frameId]);
-
+                            this.mergeLerpAttribData(element.curAttrData, element, frameId);
                             if (element.actions != undefined)
                             {
                                 element.actionActive = true;
@@ -248,14 +237,14 @@ namespace gd3d.framework
                         element.update();
                         if (element.isCurFrameNeedRefresh(frameId))
                         {
-                            this.updateEffectBatcher(element.effectBatcher, element.curAttrData, element.data.initFrameData, element.startVboIndex);
+                            this.updateEffectBatcher(element.effectBatcher, element.curAttrData, element.mesh, element.startVboIndex);
                         }
                     }
                 }
-                if (this.particles != undefined)
-                {
-                    this.particles.update(1 / effectSystem.fps);
-                }
+                // if (this.particles != undefined)
+                // {
+                //     this.particles.update(1 / effectSystem.fps);
+                // }
             }
 
         }
@@ -269,26 +258,27 @@ namespace gd3d.framework
          * 
          * @memberof effectSystem
          */
-        private mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, curFrameData: EffectFrameData)
+        private mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, effect: EffectElementSingleMesh, frameId: number)
         {
-            if (curFrameData == undefined)
-                return;
-            if (realUseCurFrameData == undefined)//这里可能是个bug
-                return;
-            for (let key in curFrameData.attrsData)
-            {
-                if (curFrameData.attrsData[key] != undefined && realUseCurFrameData[key] != undefined)
-                {
-                    let val = curFrameData.attrsData.getAttribute(key);
-                    if (val == null)
-                        continue;
-                    if (val instanceof math.vector3 || val instanceof math.vector2 || typeof (val) === 'number')
-                    {
-                        if (key != "renderModel")
-                            realUseCurFrameData[key] = val;
-                    }
-                }
-            }
+            let timeLinePos = effect.timelineFrames[AttributeType.PositionType];
+            if (timeLinePos[frameId] != undefined)
+                realUseCurFrameData.pos = timeLinePos[frameId];
+            let timeLineEuler = effect.timelineFrames[AttributeType.EulerType];
+            if (timeLineEuler[frameId] != undefined)
+                realUseCurFrameData.euler = timeLineEuler[frameId];
+            let timeLineScale = effect.timelineFrames[AttributeType.ScaleType];
+            if (timeLineScale[frameId] != undefined)
+                realUseCurFrameData.scale = timeLineScale[frameId];
+            let timeLineColor = effect.timelineFrames[AttributeType.ColorType];
+            if (timeLineColor[frameId] != undefined)
+                realUseCurFrameData.color = timeLineColor[frameId];
+            let timeLineAlpha = effect.timelineFrames[AttributeType.AlphaType];
+            if (timeLineAlpha[frameId] != undefined)
+                realUseCurFrameData.alpha = timeLineAlpha[frameId];
+
+            let timeLineTilling = effect.timelineFrames[AttributeType.TillingType];
+            if (timeLineTilling[frameId] != undefined)
+                realUseCurFrameData.tilling = timeLineTilling[frameId];
         }
 
         /**
@@ -304,13 +294,13 @@ namespace gd3d.framework
          * 
          * @memberof effectSystem
          */
-        private updateEffectBatcher(effectBatcher: EffectBatcher, curAttrsData: EffectAttrsData, initFrameData: EffectFrameData, vertexStartIndex: number)
+        private updateEffectBatcher(effectBatcher: EffectBatcherNew, curAttrsData: EffectAttrsData, mesh: gd3d.framework.mesh, vertexStartIndex: number)
         {
-            let mesh = curAttrsData.mesh;
-            if (mesh == undefined)
-            {
-                mesh = initFrameData.attrsData.mesh;
-            }
+            // let mesh = curAttrsData.mesh;
+            // if (mesh == undefined)
+            // {
+            //     mesh = initFrameData.attrsData.mesh;
+            // }
             if (mesh == undefined)
                 return;
             if (curAttrsData.meshdataVbo == undefined)
@@ -500,233 +490,26 @@ namespace gd3d.framework
             this.playTimer = 0;
 
             this.resetSingleMesh();
-            this.resetparticle();
+            // this.resetparticle();
         }
         private resetSingleMesh()
         {
-            for (let i in this.effectBatchers)
-            {
-                let subEffectBatcher = this.effectBatchers[i];
-                for (let key in subEffectBatcher.effectElements)
-                {
-                    let element = subEffectBatcher.effectElements[key];
-                    element.setActive(true);
-                    if (element.data.initFrameData != undefined)//引用问题还没处理
-                        element.curAttrData = element.data.initFrameData.attrsData.copyandinit();
-                }
-            }
-        }
-        private resetparticle()
-        {
-            if (this.particles != undefined)
-                this.particles.dispose();
-
-            for (let name in this.particleElementDic)
-            {
-                let data = this.data.elementDic[name];
-                if (data.delayTime > 0)
-                {
-                    this.delayElements.push(data);
-                    continue;
-                }
-                if (data.refFrom == undefined)
-                {
-                    if (this.particles == undefined)
-                    {
-                        this.particles = new Particles(this);
-                    }
-                    this.particles.addEmission(data);
-                } else
-                {
-                    this.refElements.push(data);
-                }
-            }
+            // for (let i in this.effectBatchers)
+            // {
+            //     let subEffectBatcher = this.effectBatchers[i];
+            //     for (let key in subEffectBatcher.effectElements)
+            //     {
+            //         let element = subEffectBatcher.effectElements[key];
+            //         element.setActive(true);
+            //         if (element.data.initFrameData != undefined)//引用问题还没处理
+            //             element.curAttrData = element.data.initFrameData.attrsData.copyandinit();
+            //     }
+            // }
         }
 
         private delayElements: EffectElementData[] = [];
         private refElements: EffectElementData[] = [];
-        /**
-         * 向特效中增加元素
-         */
-        private addElements()
-        {
-            for (let name in this.data.elementDic)
-            {
-                let data = this.data.elementDic[name];
-                if (data.delayTime > 0)
-                {
-                    this.delayElements.push(data);
-                    continue;
-                }
-                this.addElement(data);
-            }
-            this.state = EffectPlayStateEnum.BeReady;
-            this.beLoop = this.data.beLoop;
-        }
 
-        private addElement(data: EffectElementData)
-        {
-            if (data.type == EffectElementTypeEnum.EmissionType)
-            {
-                if (this.particles == undefined)
-                {
-                    this.particles = new Particles(this);
-                }
-                this.particles.addEmission(data);
-                this.particleElementDic[data.name] = data;
-            }
-            else if (data.type == EffectElementTypeEnum.SingleMeshType)
-            {
-                this.addInitFrame(data);
-            }
-        }
-
-        /**
-        * 根据初始化帧的数据，初始effectbatcher。根据mesh的材质增加或者合并mesh。同材质的就合并。
-        */
-        private addInitFrame(elementData: EffectElementData)
-        {
-            let element: EffectElement = new EffectElement(elementData);
-            element.transform = this.gameObject.transform;
-            let _initFrameData = element.data.initFrameData;
-            if (_initFrameData == undefined || _initFrameData.attrsData == undefined || _initFrameData.attrsData.mesh == undefined)//初始化帧如果不存在,或者没有设置mesh信息，就不处理这个元素
-                return;
-            let index = -1;
-            if (_initFrameData.attrsData.mat != null)
-            {
-                for (let i = 0; i < this.matDataGroups.length; i++)
-                {
-                    if (EffectMatData.beEqual(this.matDataGroups[i], _initFrameData.attrsData.mat))
-                    {
-                        index = i;
-                        break;
-                    }
-                }
-            }
-            let vertexStartIndex = 0;
-            let vertexCount = _initFrameData.attrsData.mesh.data.pos.length;//顶点数量
-            let indexCount = _initFrameData.attrsData.mesh.data.genIndexDataArray
-            let subEffectBatcher: EffectBatcher = null;
-            if (index >= 0)
-            {
-                subEffectBatcher = this.effectBatchers[index];
-                vertexStartIndex = subEffectBatcher.curTotalVertexCount;
-                subEffectBatcher.curTotalVertexCount += vertexCount;
-                if (subEffectBatcher.state == EffectBatcherState.InitedStateType)
-                    subEffectBatcher.state = EffectBatcherState.ResizeCapacityStateType;
-            } else
-            {
-                subEffectBatcher = new EffectBatcher(this.vf);
-                subEffectBatcher.curTotalVertexCount = vertexCount;
-                subEffectBatcher.mesh = new mesh();
-                subEffectBatcher.mesh.data = new render.meshData();
-                subEffectBatcher.mesh.glMesh = new render.glMesh();
-                subEffectBatcher.mat = new material();
-                subEffectBatcher.mesh.submesh = [];
-                {
-                    var sm = new subMeshInfo();
-                    sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
-                    sm.start = 0;
-                    sm.size = 0;
-                    sm.line = false;
-                    subEffectBatcher.mesh.submesh.push(sm);
-                }
-                vertexStartIndex = 0;
-                index = 0;
-                if (_initFrameData.attrsData.mat.shader == null)
-                {
-                    subEffectBatcher.mat.setShader(sceneMgr.app.getAssetMgr().getShader("diffuse.shader.json"));
-                    console.error("特效{0}shader为空", elementData.name);
-                } else
-                {
-                    subEffectBatcher.mat.setShader(_initFrameData.attrsData.mat.shader);
-                }
-
-                if (_initFrameData.attrsData.mat.alphaCut != undefined)
-                    subEffectBatcher.mat.setFloat("_AlphaCut", _initFrameData.attrsData.mat.alphaCut);
-                if (_initFrameData.attrsData.mat.diffuseTexture != null)
-                    subEffectBatcher.mat.setTexture("_MainTex", _initFrameData.attrsData.mat.diffuseTexture);
-                if (_initFrameData.attrsData.mat.alphaTexture != null)
-                    subEffectBatcher.mat.setTexture("_AlphaTex", _initFrameData.attrsData.mat.alphaTexture);
-                this.effectBatchers.push(subEffectBatcher);
-                this.matDataGroups.push(_initFrameData.attrsData.mat);
-
-            }
-            element.effectBatcher = subEffectBatcher;
-            element.startVboIndex = vertexStartIndex;
-            // element.endEboIndex = ;vertexStartIndex + vertexCount;
-            element.curAttrData = elementData.initFrameData.attrsData.copyandinit();
-            let vertexSize = subEffectBatcher.vertexSize;
-            let vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
-            // if (_initFrameData.attrsData.startEuler)
-            //  {
-            //     _initFrameData.attrsData.startRotation = new gd3d.math.quaternion();
-            //     gd3d.math.quatFromEulerAngles(_initFrameData.attrsData.startEuler.x, _initFrameData.attrsData.startEuler.y, _initFrameData.attrsData.startEuler.z, _initFrameData.attrsData.startRotation);
-            // }
-            element.update();
-
-            subEffectBatcher.effectElements.push(element);
-
-            for (let i = 0; i < vertexCount; i++)
-            {
-                {//postion
-                    let vertex = gd3d.math.pool.new_vector3();
-                    vertex.x = vertexArr[i * vertexSize + 0];
-                    vertex.y = vertexArr[i * vertexSize + 1];
-                    vertex.z = vertexArr[i * vertexSize + 2];
-
-                    gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 0] = vertex.x;
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 1] = vertex.y;
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 2] = vertex.z;
-                    gd3d.math.pool.delete_vector3(vertex);
-                }
-                {//normal
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 3] = vertexArr[i * vertexSize + 3];
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 4] = vertexArr[i * vertexSize + 4];
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 5] = vertexArr[i * vertexSize + 5];
-                }
-
-                {//tangent
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 6] = vertexArr[i * vertexSize + 6];
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 7] = vertexArr[i * vertexSize + 7];
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 8] = vertexArr[i * vertexSize + 8];
-                }
-                {//color
-                    //处理一下颜色，以防灰度值 > 1\
-                    let r = math.floatClamp(element.curAttrData.color.x, 0, 1);
-                    let g = math.floatClamp(element.curAttrData.color.y, 0, 1);
-                    let b = math.floatClamp(element.curAttrData.color.z, 0, 1);
-                    let a = math.floatClamp(vertexArr[i * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-
-
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 12] = a;
-
-                }
-                {//uv
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * element.curAttrData.tilling.x;
-                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * element.curAttrData.tilling.y;
-                    //  this.dataForVbo[(this._vercount + i) * total + 13] = vertexArr[i * total + 13] * materialData.tiling.x + materialData.offset.x;
-                    // this.dataForVbo[(this._vercount + i) * total + 14] = vertexArr[i * total + 14] * materialData.tiling.y + materialData.offset.y;
-                }
-            }
-
-            //index
-            var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
-            let _startIndex = subEffectBatcher.indexStartIndex;
-            element.startEboIndex = _startIndex;
-            subEffectBatcher.indexStartIndex += indexArray.length;
-            element.endEboIndex = subEffectBatcher.indexStartIndex;
-            for (var i = 0; i < indexArray.length; i++)
-            {
-                subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
-            }
-        }
         /**
         * @private
         */
@@ -773,19 +556,12 @@ namespace gd3d.framework
             this.state = EffectPlayStateEnum.Dispose;
             if (this.data)
                 this.data.dispose();
-            while (this.effectBatchers.length > 0)
+            for (let key in this.effectBatchers)
             {
-                this.effectBatchers[0].dispose();
-                this.effectBatchers.splice(0, 1);
-            }
-            while (this.matDataGroups.length > 0)
-            {
-                this.matDataGroups.splice(0, 1);
+                this.effectBatchers[key].dispose();
             }
             if (this.particles)
                 this.particles.dispose();
-            this.curFrameId = -1;
-            this.playTimer = 0;
         }
         /**
         * @private
@@ -802,7 +578,258 @@ namespace gd3d.framework
             } else
                 return 9999999999;
         }
+
+        /**
+         * /////////////////////////////////////////////////////代码重构///////////////////////////////////////////////////////
+         */
+        @gd3d.reflect.Field("IEffectElement[]")
+        public effectElements: IEffectElement[];
+        public addEffectElement(type: gd3d.framework.EffectElementTypeEnum): IEffectElement
+        {
+            if (this.effectElements == undefined)
+                this.effectElements = [];
+            let effe: IEffectElement;
+            if (type == gd3d.framework.EffectElementTypeEnum.SingleMeshType)
+            {
+                effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr(), this);
+                effe.name = "singlemesh" + this.effectElements.length;
+                let singleMeshElement = effe as gd3d.framework.EffectElementSingleMesh;
+                singleMeshElement.transform = this.gameObject.transform;
+                this.addInitFrameNew(singleMeshElement);
+                this.state = EffectPlayStateEnum.BeReady;
+                // this.beLoop = this.data.beLoop;
+            }
+            else if (type == gd3d.framework.EffectElementTypeEnum.EmissionType)
+            {
+                //effe = new gd3d.framework.EffectElementEmission();
+                effe.name = "emission" + this.effectElements.length;
+
+            }
+            this.effectElements.push(effe);
+            return effe;
+        }
+
+
+        private addInitFrameNew(effect: EffectElementSingleMesh)
+        {
+            if (effect == undefined || effect.mesh == undefined || effect.mat == undefined)//初始化帧如果不存在,或者没有设置mesh信息，就不处理这个元素
+                return;
+            // let index = -1;
+            // for (let i = 0; i < this.matDataGroups.length; i++)
+            // {
+            //     if (EffectMatData.beEqual(this.matDataGroups[i], effect.mat))
+            //     {
+            //         index = i;
+            //         break;
+            //     }
+            // }
+
+            let vertexStartIndex = 0;
+            let vertexCount = effect.mesh.data.pos.length;//顶点数量
+            let indexCount = effect.mesh.data.genIndexDataArray();
+            // let subEffectBatcher: EffectBatcher = null;
+            // if (index >= 0)
+            // {
+            //     subEffectBatcher = this.effectBatchers[index];
+            //     vertexStartIndex = subEffectBatcher.curTotalVertexCount;
+            //     subEffectBatcher.curTotalVertexCount += vertexCount;
+            //     if (subEffectBatcher.state == EffectBatcherState.InitedStateType)
+            //         subEffectBatcher.state = EffectBatcherState.ResizeCapacityStateType;
+            // } else
+            // {
+
+
+
+            let subEffectBatcher = new EffectBatcherNew(this.vf);
+            subEffectBatcher.curTotalVertexCount = vertexCount;
+            subEffectBatcher.mesh = new mesh();
+            subEffectBatcher.mesh.data = new render.meshData();
+            subEffectBatcher.mesh.glMesh = new render.glMesh();
+            subEffectBatcher.mat = new material();
+            subEffectBatcher.mesh.submesh = [];
+            {
+                var sm = new subMeshInfo();
+                sm.matIndex = 0;
+                sm.useVertexIndex = 0;
+                sm.start = 0;
+                sm.size = 0;
+                sm.line = false;
+                subEffectBatcher.mesh.submesh.push(sm);
+            }
+            vertexStartIndex = 0;
+            // index = 0;
+
+            this.effectBatchers.push(subEffectBatcher);
+            // this.matDataGroups.push(_initFrameData.attrsData.mat);
+
+            // }
+            effect.effectBatcher = subEffectBatcher;
+            effect.startVboIndex = vertexStartIndex;
+            // element.endEboIndex = ;vertexStartIndex + vertexCount;
+            // element.curAttrData = elementData.initFrameData.attrsData.copyandinit();
+            let vertexSize = subEffectBatcher.vertexSize;
+            let vertexArr = effect.mesh.data.genVertexDataArray(this.vf);
+            effect.curAttrData = effect.copyandinit();
+            effect.update();
+            subEffectBatcher.effectElements.push(effect);
+
+            for (let i = 0; i < vertexCount; i++)
+            {
+                {//postion
+                    let vertex = gd3d.math.pool.new_vector3();
+                    vertex.x = vertexArr[i * vertexSize + 0];
+                    vertex.y = vertexArr[i * vertexSize + 1];
+                    vertex.z = vertexArr[i * vertexSize + 2];
+
+                    gd3d.math.matrixTransformVector3(vertex, effect.curAttrData.matrix, vertex);
+
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 0] = vertex.x;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 1] = vertex.y;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 2] = vertex.z;
+                    gd3d.math.pool.delete_vector3(vertex);
+                }
+                {//normal
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 3] = vertexArr[i * vertexSize + 3];
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 4] = vertexArr[i * vertexSize + 4];
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 5] = vertexArr[i * vertexSize + 5];
+                }
+
+                {//tangent
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 6] = vertexArr[i * vertexSize + 6];
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 7] = vertexArr[i * vertexSize + 7];
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 8] = vertexArr[i * vertexSize + 8];
+                }
+                {//color
+                    //处理一下颜色，以防灰度值 > 1\
+                    let color = effect.getFrameVal(AttributeType.ColorType, 0) as gd3d.math.vector3;
+                    let r = math.floatClamp(color.x, 0, 1);
+                    let g = math.floatClamp(color.y, 0, 1);
+                    let b = math.floatClamp(color.z, 0, 1);
+                    let alpha = <number>effect.getFrameVal(AttributeType.AlphaType, 0);
+                    let a = math.floatClamp(vertexArr[i * vertexSize + 12] * alpha, 0, 1);
+
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 12] = a;
+
+                }
+                {//uv
+                    let tilling = effect.getFrameVal(AttributeType.TillingType, 0);
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * tilling.x;
+                    subEffectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * tilling.y;
+                    //  this.dataForVbo[(this._vercount + i) * total + 13] = vertexArr[i * total + 13] * materialData.tiling.x + materialData.offset.x;
+                    // this.dataForVbo[(this._vercount + i) * total + 14] = vertexArr[i * total + 14] * materialData.tiling.y + materialData.offset.y;
+                }
+            }
+
+            //index
+            var indexArray = effect.mesh.data.genIndexDataArray();
+            let _startIndex = subEffectBatcher.indexStartIndex;
+            effect.startEboIndex = _startIndex;
+            subEffectBatcher.indexStartIndex += indexArray.length;
+            effect.endEboIndex = subEffectBatcher.indexStartIndex;
+            for (var i = 0; i < indexArray.length; i++)
+            {
+                subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
+            }
+
+        }
     }
 
+    /**
+    * @private
+    */
+    export class EffectBatcherNew
+    {
+        public mesh: mesh;
+        public mat: material;
+        public state: EffectBatcherState = EffectBatcherState.NotInitedStateType;
+        public dataForVbo: Float32Array;
+        public dataForEbo: Uint16Array;
 
+        public effectElements: EffectElementSingleMesh[] = [];
+        /**
+         * 当前总的顶点数量
+         * 
+         * @private
+         * @type {number}
+         * @memberof effect
+         */
+        private _totalVertexCount: number = 0;
+        public get curTotalVertexCount(): number
+        {
+            return this._totalVertexCount;
+        }
+        public set curTotalVertexCount(val: number)
+        {
+            this._totalVertexCount = val;
+            this.resizeVboSize(this._totalVertexCount * this.vertexSize);
+        }
+
+        private _indexStartIndex = 0;
+        public get indexStartIndex()
+        {
+            return this._indexStartIndex;
+        }
+        public set indexStartIndex(value: number)
+        {
+            this._indexStartIndex = value;
+            if (this.dataForEbo != null)
+            {
+                let ebo = new Uint16Array(this._indexStartIndex);
+                ebo.set(this.dataForEbo, 0);
+                this.dataForEbo = ebo;
+            } else
+            {
+                this.dataForEbo = new Uint16Array(this._indexStartIndex);
+            }
+        }
+
+        private _vbosize: number = 0;
+        /**
+         * 动态设定vbo大小
+         * 
+         * @param {number} value 
+         * @returns 
+         * 
+         * @memberof effect
+         */
+        public resizeVboSize(value: number)
+        {
+            if (this._vbosize > value) return;
+            this._vbosize = value;
+            if (this.dataForVbo != null)
+            {
+                let vbo = new Float32Array(this._vbosize);
+                vbo.set(this.dataForVbo, 0);
+                this.dataForVbo = vbo;
+            } else
+            {
+                this.dataForVbo = new Float32Array(this._vbosize);
+            }
+        }
+        public dispose()
+        {
+            this.mesh.dispose();
+            this.mat.dispose();
+            this.dataForVbo = null;
+            this.dataForEbo = null;
+            for (let key in this.effectElements)
+            {
+                this.effectElements[key].dispose();
+            }
+        }
+        /**
+         * 顶点大小
+         * @public
+         * @type {number}
+         * @memberof effect
+         */
+        public vertexSize: number = 0;
+        constructor(formate: number)
+        {
+            this.vertexSize = gd3d.render.meshData.calcByteSize(formate) / 4;
+        }
+    }
 }
