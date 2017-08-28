@@ -749,6 +749,7 @@ declare namespace t {
         private loadShader(laststate, state);
         private loadText(laststate, state);
         private loadPvr(laststate, state);
+        private changeShader();
         private addcam(laststate, state);
         private addcube(laststate, state);
         cubetrail: gd3d.framework.transform;

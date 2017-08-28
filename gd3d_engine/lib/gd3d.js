@@ -4193,6 +4193,9 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.PVR, new framework.AssetFactory_PVR());
             };
             assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
+                if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1) {
+                    console.log("aaa");
+                }
                 var assetFactory = this.getAssetFactory(type);
                 if (assetFactory != null) {
                     assetFactory.load(url, onstate, state, this, asset);
@@ -4373,7 +4376,7 @@ var gd3d;
                 onComplete();
             };
             assetMgr.prototype.saveScene = function (fun) {
-                gd3d.io.SerializeDependent.resoursePaths = [];
+                gd3d.io.SerializeDependent.resourseDatas = [];
                 var info = new SaveInfo();
                 var _scene = {};
                 var _rootNode = gd3d.io.serializeObj(this.app.getScene().getRoot(), this);
@@ -4391,17 +4394,17 @@ var gd3d;
                 _rawscene.Parse(_sceneStr, this);
                 var url = this.getAssetUrl(_rawscene);
                 info.files[url] = _sceneStr;
-                fun(info, gd3d.io.SerializeDependent.resoursePaths);
+                fun(info, gd3d.io.SerializeDependent.resourseDatas);
             };
             assetMgr.prototype.savePrefab = function (trans, prefabName, fun) {
-                gd3d.io.SerializeDependent.resoursePaths = [];
+                gd3d.io.SerializeDependent.resourseDatas = [];
                 var info = new SaveInfo();
                 var _prefab = this.getAssetByName(prefabName);
                 _prefab.apply(trans);
                 var _rootTrans = gd3d.io.serializeObj(trans, null, this);
                 var url = this.getAssetUrl(_prefab);
                 info.files[url] = JSON.stringify(_rootTrans);
-                fun(info, gd3d.io.SerializeDependent.resoursePaths);
+                fun(info, gd3d.io.SerializeDependent.resourseDatas);
             };
             assetMgr.prototype.saveMaterial = function (mat, fun) {
                 var info = new SaveInfo();
@@ -6745,6 +6748,27 @@ var gd3d;
                 }
                 return mat;
             };
+            material.prototype.save = function () {
+                var obj = {};
+                obj["shader"] = this.shader.getName();
+                obj["srcshader"] = "";
+                obj["mapUniform"] = {};
+                for (var key in this.mapUniform) {
+                    var data = {};
+                    data["type"] = this.mapUniform[key].type;
+                    data["value"] = this.mapUniform[key].value;
+                    obj["mapUniform"][key] = data;
+                }
+                if (this.mapUniformTemp != undefined) {
+                    for (var key in this.mapUniformTemp) {
+                        var data = {};
+                        data["type"] = this.mapUniformTemp[key].type;
+                        data["value"] = this.mapUniformTemp[key].value;
+                        obj["mapUniform"][key] = data;
+                    }
+                }
+                return JSON.stringify(obj);
+            };
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -8209,6 +8233,42 @@ var gd3d;
                 for (var key in this.nowpose) {
                     var src = this.nowpose[key];
                     this.lerppose[key] = src.Clone();
+                }
+            };
+            aniplayer.prototype.updateAnimation = function (animIndex, _frame) {
+                if (!this.clips)
+                    return;
+                if (animIndex >= this.clips.length)
+                    return;
+                var _clip = this.clips[animIndex];
+                if (!_clip)
+                    return;
+                for (var i = 0; i < _clip.boneCount; i++) {
+                    var bone = _clip.bones[i];
+                    var frame = _clip.frames[_frame];
+                    var nextseek = i * 7 + 1;
+                    var outb = this.nowpose[bone];
+                    var tpose = this.tpose[bone];
+                    if (outb != undefined) {
+                        outb.copyFromData(frame, nextseek);
+                    }
+                    var careobj = this.carelist[bone];
+                    if (careobj != undefined) {
+                        var fmat = framework.PoseBoneMatrix.sMultiply(outb, tpose);
+                        var _matrix = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMakeTransformRTS(fmat.t, gd3d.math.pool.vector3_one, fmat.r, _matrix);
+                        var _newmatrix = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
+                        careobj.setWorldMatrix(_newmatrix);
+                        careobj.updateTran(false);
+                        gd3d.math.pool.delete_matrix(_matrix);
+                        gd3d.math.pool.delete_matrix(_newmatrix);
+                    }
+                }
+                var renders = this.gameObject.getComponentsInChildren(framework.StringUtil.COMPONENT_SKINMESHRENDER);
+                for (var key in renders) {
+                    var _render = renders[key];
+                    _render.update(0);
                 }
             };
             aniplayer.prototype.stop = function () {
@@ -12849,16 +12909,28 @@ var gd3d;
 (function (gd3d) {
     var io;
     (function (io) {
+        var SaveAssetType;
+        (function (SaveAssetType) {
+            SaveAssetType[SaveAssetType["FullUrl"] = 0] = "FullUrl";
+            SaveAssetType[SaveAssetType["NameAndContent"] = 1] = "NameAndContent";
+            SaveAssetType[SaveAssetType["DefaultAssets"] = 2] = "DefaultAssets";
+        })(SaveAssetType = io.SaveAssetType || (io.SaveAssetType = {}));
         var SerializeDependent = (function () {
             function SerializeDependent() {
             }
+            SerializeDependent.GetAssetContent = function (asset) {
+                var data = {};
+                if (asset instanceof gd3d.framework.material)
+                    return { "name": asset.getName() + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+            };
             SerializeDependent.GetAssetUrl = function (asset, assetMgr) {
                 if (!assetMgr || !asset)
                     return;
                 var url = assetMgr.getAssetUrl(asset);
-                if (!url)
-                    return;
-                SerializeDependent.resoursePaths.push(url);
+                if (url)
+                    SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+                else
+                    SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
                 if (asset instanceof gd3d.framework.material) {
                     var _mapUniform = asset.mapUniform;
                     if (!_mapUniform)
@@ -12872,19 +12944,22 @@ var gd3d;
                         if (!_texture)
                             continue;
                         url = assetMgr.getAssetUrl(_texture);
-                        if (!url)
+                        if (url)
+                            SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+                        else {
+                            SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(_texture));
                             continue;
-                        SerializeDependent.resoursePaths.push(url);
+                        }
                         if (url.indexOf(".imgdesc.json") < 0)
                             continue;
                         if (!_texture.realName)
                             continue;
                         url = url.replace(_texture.getName(), _texture.realName);
-                        SerializeDependent.resoursePaths.push(url);
+                        SerializeDependent.resourseDatas.push(url);
                     }
                 }
             };
-            SerializeDependent.resoursePaths = [];
+            SerializeDependent.resourseDatas = [];
             return SerializeDependent;
         }());
         io.SerializeDependent = SerializeDependent;
@@ -13482,6 +13557,7 @@ var gd3d;
                 if (assetName.indexOf("SystemDefaultAsset-") >= 0) {
                     assetName = assetName.replace("SystemDefaultAsset-", "");
                     if (type == "mesh") {
+                        assetName = assetName.replace(".mesh.bin", "");
                         _asset = assetMgr.getDefaultMesh(assetName);
                     }
                     else if (type == "texture") {

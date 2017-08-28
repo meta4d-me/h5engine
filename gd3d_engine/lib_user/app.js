@@ -2230,6 +2230,9 @@ var test_anim = (function () {
                             else if (ev.code == "KeyN") {
                                 ap.playCrossByIndex(1, 0.2);
                             }
+                            else if (ev.code == "KeyS") {
+                                ap.stop();
+                            }
                         };
                         var wingroot = baihu.find("Bip001 Xtra17Nub");
                         var trans = new gd3d.framework.transform();
@@ -2620,13 +2623,13 @@ var test_effect = (function () {
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
         var names = ["0fx_boss_02", "fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
-        var name = names[0];
+        var name = names[2];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
                 _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
-                _this.effect.setJsonData(text);
+                _this.text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
+                _this.effect.setJsonData(_this.text);
                 _this.scene.addChild(_this.tr);
                 _this.tr.markDirty();
                 state.finish = true;
@@ -2640,6 +2643,7 @@ var test_effect = (function () {
         var btn = document.createElement("button");
         btn.textContent = "Play";
         btn.onclick = function () {
+            _this.effect.updateJsonData(_this.text);
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";
@@ -5653,6 +5657,25 @@ var t;
                 }
             });
         };
+        TestRotate.prototype.changeShader = function () {
+            var _this = this;
+            var btn = document.createElement("button");
+            btn.textContent = "save";
+            btn.onclick = function () {
+                var trans = _this.cube;
+                var name = trans.name;
+                var prefab = new gd3d.framework.prefab(name + ".prefab.json");
+                prefab.assetbundle = name + ".assetbundle.json";
+                prefab.apply(trans);
+                _this.app.getAssetMgr().use(prefab);
+                _this.app.getAssetMgr().savePrefab(trans, name + ".prefab.json", function (data, resourses, content) {
+                    console.log(data);
+                });
+            };
+            btn.style.top = "160px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+        };
         TestRotate.prototype.addcam = function (laststate, state) {
             var objCam = new gd3d.framework.transform();
             objCam.name = "sth.";
@@ -5731,9 +5754,9 @@ var t;
             this.scene = this.app.getScene();
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
-            this.taskmgr.addTaskCall(this.loadPvr.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this));
             this.taskmgr.addTaskCall(this.addcam.bind(this));
+            this.changeShader();
         };
         TestRotate.prototype.update = function (delta) {
             this.taskmgr.move(delta);

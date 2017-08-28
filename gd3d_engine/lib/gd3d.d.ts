@@ -750,7 +750,7 @@ declare namespace gd3d.framework {
         unload(url: string, onstate?: () => void): void;
         loadScene(sceneName: string, onComplete: () => void): void;
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
-        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[]) => void): void;
+        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
         saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;
         loadSingleResImmediate(url: string, type: AssetTypeEnum): any;
         loadImmediate(url: string, type?: AssetTypeEnum): any;
@@ -1101,6 +1101,7 @@ declare namespace gd3d.framework {
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
+        save(): string;
     }
 }
 declare namespace gd3d.framework {
@@ -1374,6 +1375,7 @@ declare namespace gd3d.framework {
         play(animName: string, speed?: number, beRevert?: boolean): void;
         playCross(animName: string, crosstimer: number, speed?: number, beRevert?: boolean): void;
         private playAniamtion(index, speed?, beRevert?);
+        updateAnimation(animIndex: number, _frame: number): void;
         stop(): void;
         isPlay(): boolean;
         isStop(): boolean;
@@ -2115,8 +2117,18 @@ declare namespace gd3d.io {
     function stringToUtf8Array(str: string): number[];
 }
 declare namespace gd3d.io {
+    enum SaveAssetType {
+        FullUrl = 0,
+        NameAndContent = 1,
+        DefaultAssets = 2,
+    }
     class SerializeDependent {
-        static resoursePaths: string[];
+        static resourseDatas: any[];
+        static GetAssetContent(asset: any): {
+            "name": string;
+            "value": string;
+            "type": SaveAssetType;
+        };
         static GetAssetUrl(asset: any, assetMgr: any): void;
     }
     function SerializeForInspector(obj: any): string;

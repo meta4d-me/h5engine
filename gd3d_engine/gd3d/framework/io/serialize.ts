@@ -2,23 +2,42 @@
 
 namespace gd3d.io
 {
+    export enum SaveAssetType
+    {
+        FullUrl,
+        NameAndContent,
+        DefaultAssets
+    }
     //依赖的资源路径
     /**
      * @private
      */
     export class SerializeDependent
     {
-        static resoursePaths: string[] = [];
-
+        static resourseDatas: any[] = [];
+        // static resourcesContent: any[] = [];
+        static GetAssetContent(asset: any)
+        {
+            let data: any = {};
+            if (asset instanceof gd3d.framework.material)
+                return { "name": asset.getName() + ".mat.json", "value": (asset as gd3d.framework.material).save(), "type": SaveAssetType.NameAndContent };
+            // if (asset instanceof gd3d.framework.mesh)
+            //     return { "name": asset.getName() + "_enginedefault.mesh.bin", "type": SaveAssetType.DefaultAssets };
+            // if (asset instanceof gd3d.framework.texture)
+            //     return { "name": asset.getName() + "_enginedefault.png", "type": SaveAssetType.DefaultAssets };
+        }
         static GetAssetUrl(asset: any, assetMgr: any)
         {
             if (!assetMgr || !asset)
                 return;
             let url: string = assetMgr.getAssetUrl(asset);
-            if (!url)
-                return;
-            SerializeDependent.resoursePaths.push(url);
-
+            // if (!url)
+            //     return;
+            //为了序列化存储而修改的逻辑hjx
+            if (url)
+                SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+            else
+                SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
             if (asset instanceof gd3d.framework.material)
             {
                 let _mapUniform = (asset as gd3d.framework.material).mapUniform;
@@ -34,10 +53,16 @@ namespace gd3d.io
                     if (!_texture)
                         continue;
                     url = assetMgr.getAssetUrl(_texture);
-                    if (!url)
+                    // if (!url)
+                    //     continue;
+                    //为了序列化存储而修改的逻辑hjx
+                    if (url)
+                        SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+                    else
+                    {
+                        SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(_texture));
                         continue;
-                    SerializeDependent.resoursePaths.push(url);
-
+                    }
                     if (url.indexOf(".imgdesc.json") < 0)
                         continue;
 
@@ -45,7 +70,7 @@ namespace gd3d.io
                         continue;
 
                     url = url.replace(_texture.getName(), _texture.realName);
-                    SerializeDependent.resoursePaths.push(url);
+                    SerializeDependent.resourseDatas.push(url);
                 }
             }
         }
@@ -868,6 +893,7 @@ namespace gd3d.io
                 assetName = assetName.replace("SystemDefaultAsset-", "");
                 if (type == "mesh")
                 {
+                    assetName = assetName.replace(".mesh.bin", "");
                     _asset = assetMgr.getDefaultMesh(assetName);
                 }
                 else if (type == "texture")
@@ -885,7 +911,7 @@ namespace gd3d.io
             //     instanceObj.setMesh(_asset);
             // }
             // else
-            if(_asset == null && type == "animationClip")
+            if (_asset == null && type == "animationClip")
             {
                 _asset = new framework.animationClip(assetName);
             }
@@ -904,7 +930,7 @@ namespace gd3d.io
         {
             if (serializedObj[key].parse == "reference")
             {
-                
+
             }
             else
             {
