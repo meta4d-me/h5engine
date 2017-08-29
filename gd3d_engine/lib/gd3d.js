@@ -4046,12 +4046,20 @@ var gd3d;
                     if (assetbundle != null)
                         id = assetbundle.mapNamed[name];
                 }
-                if (id == null)
-                    return null;
-                var r = this.mapRes[id];
-                if (r == null)
-                    return null;
-                return r.asset;
+                var flag = true;
+                if (id != null) {
+                    var r = this.mapRes[id];
+                    if (r != null)
+                        return r.asset;
+                }
+                if (flag) {
+                    if (this.mapDefaultMesh[name] != undefined)
+                        return this.mapDefaultMesh[name];
+                    if (this.mapDefaultTexture[name] != undefined)
+                        return this.mapDefaultTexture[name];
+                    if (this.mapShader[name] != undefined)
+                        return this.mapShader[name];
+                }
             };
             assetMgr.prototype.getAssetBundle = function (bundlename) {
                 if (this.mapBundle[bundlename])
@@ -12955,7 +12963,7 @@ var gd3d;
                         if (!_texture.realName)
                             continue;
                         url = url.replace(_texture.getName(), _texture.realName);
-                        SerializeDependent.resourseDatas.push(url);
+                        SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                     }
                 }
             };

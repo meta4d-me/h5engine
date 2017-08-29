@@ -358,6 +358,7 @@ var main = (function () {
         this.addBtn("post_景深", function () { return new t.test_posteffect_cc(); });
         this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
+        this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -3309,6 +3310,163 @@ var test_loadScene = (function () {
     };
     return test_loadScene;
 }());
+var t;
+(function (t) {
+    var test_xinshouMask = (function () {
+        function test_xinshouMask() {
+            this.timer = 0;
+        }
+        test_xinshouMask.prototype.start = function (app) {
+            var _this = this;
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state.isfinish) {
+                    var image = new gd3d.framework.transform();
+                    image.name = "cube";
+                    image.localScale.x = image.localScale.y = image.localScale.z = 1;
+                    image.localTranslate.z = 0.01;
+                    _this.scene.addChild(image);
+                    var mesh = image.gameObject.addComponent("meshFilter");
+                    mesh.mesh = _this.app.getAssetMgr().getDefaultMesh("quad");
+                    var imageRender_1 = image.gameObject.addComponent("meshRenderer");
+                    var imageMask = new gd3d.framework.transform();
+                    imageMask.name = "mask";
+                    imageMask.localScale.x = imageMask.localScale.y = imageMask.localScale.z = 1;
+                    _this.scene.addChild(imageMask);
+                    var meshMask = imageMask.gameObject.addComponent("meshFilter");
+                    meshMask.mesh = _this.app.getAssetMgr().getDefaultMesh("quad");
+                    _this.imageRenderMask = imageMask.gameObject.addComponent("meshRenderer");
+                    var objCam = new gd3d.framework.transform();
+                    objCam.name = "sth.";
+                    _this.scene.addChild(objCam);
+                    _this.camera = objCam.gameObject.addComponent("camera");
+                    _this.camera.near = 0.01;
+                    _this.camera.far = 110;
+                    objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+                    objCam.lookat(image);
+                    objCam.markDirty();
+                    var assetmgr = _this.app.getAssetMgr();
+                    var sh = assetmgr.getShader("diffuse.shader.json");
+                    if (sh != null) {
+                        imageRender_1.materials = [];
+                        imageRender_1.materials.push(new gd3d.framework.material());
+                        imageRender_1.materials[0].setShader(sh);
+                        _this.app.getAssetMgr().load("res/uvSprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                console.warn("Finish load img.");
+                                var texture = _this.app.getAssetMgr().getAssetByName("uvSprite.png");
+                                imageRender_1.materials[0].setTexture("_MainTex", texture);
+                            }
+                        });
+                    }
+                    var shaderMask = assetmgr.getShader("unlit_transparent.shader.json");
+                    if (shaderMask != null) {
+                        _this.imageRenderMask.materials = [];
+                        _this.imageRenderMask.materials.push(new gd3d.framework.material());
+                        _this.imageRenderMask.materials[0].setShader(shaderMask);
+                        var url_1 = "res/mask.png";
+                        gd3d.io.loadImg(url_1, function (_tex, _err) {
+                            var fileName = getFileName(url_1);
+                            _this.texture = new gd3d.framework.texture(fileName);
+                            var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+                            var t2d = new gd3d.render.glTexture2D(_this.app.getAssetMgr().webgl, _textureFormat);
+                            t2d.uploadImage(_tex, true, true, true, false);
+                            _this.texture.glTexture = t2d;
+                            _this.app.getAssetMgr().setAssetUrl(_this.texture, url_1);
+                            _this.app.getAssetMgr().use(_this.texture);
+                            _this.imageRenderMask.materials[0].setTexture("_MainTex", _this.texture);
+                            _this.imageRenderMask.materials[0].setVector4("_MaskTex_ST", new gd3d.math.vector4(1, 1, 0, 0));
+                        }, function (loadedLength, totalLength) { });
+                    }
+                }
+            });
+            this.addDomUI();
+        };
+        test_xinshouMask.prototype.addDomUI = function () {
+            var _this = this;
+            var tillingX = document.createElement("label");
+            tillingX.style.top = "160px";
+            tillingX.style.position = "absolute";
+            tillingX.textContent = "tillingX:";
+            this.app.container.appendChild(tillingX);
+            var inputEle0 = document.createElement("input");
+            inputEle0.style.top = "160px";
+            inputEle0.style.left = "60px";
+            inputEle0.style.width = "100px";
+            inputEle0.style.position = "absolute";
+            inputEle0.value = "1";
+            this.app.container.appendChild(inputEle0);
+            var tillingY = document.createElement("label");
+            tillingY.style.top = "160px";
+            tillingY.style.left = "180px";
+            tillingY.style.position = "absolute";
+            tillingY.textContent = "tillingY:";
+            this.app.container.appendChild(tillingY);
+            var inputEle1 = document.createElement("input");
+            inputEle1.style.top = "160px";
+            inputEle1.style.left = "240px";
+            inputEle1.style.width = "100px";
+            inputEle1.style.position = "absolute";
+            inputEle1.value = "1";
+            this.app.container.appendChild(inputEle1);
+            var offsetX = document.createElement("label");
+            offsetX.style.top = "160px";
+            offsetX.style.left = "360px";
+            offsetX.style.position = "absolute";
+            offsetX.textContent = "offsetX:";
+            this.app.container.appendChild(offsetX);
+            var inputEle2 = document.createElement("input");
+            inputEle2.style.top = "160px";
+            inputEle2.style.left = "420px";
+            inputEle2.style.width = "100px";
+            inputEle2.style.position = "absolute";
+            inputEle2.value = "0";
+            this.app.container.appendChild(inputEle2);
+            var offsetY = document.createElement("label");
+            offsetY.style.top = "160px";
+            offsetY.style.left = "540px";
+            offsetY.style.position = "absolute";
+            offsetY.textContent = "offsetY:";
+            this.app.container.appendChild(offsetY);
+            var inputEle3 = document.createElement("input");
+            inputEle3.style.top = "160px";
+            inputEle3.style.left = "620px";
+            inputEle3.style.width = "100px";
+            inputEle3.style.position = "absolute";
+            inputEle3.value = "0";
+            this.app.container.appendChild(inputEle3);
+            var button = document.createElement("button");
+            button.style.top = "220px";
+            button.textContent = "update";
+            button.style.position = "absolute";
+            button.onclick = function () {
+                var tillingXVal = parseFloat(inputEle0.value);
+                var tillingYVal = parseFloat(inputEle1.value);
+                var offsetXVal = parseFloat(inputEle2.value);
+                var offsetYVal = parseFloat(inputEle3.value);
+                _this.imageRenderMask.materials[0].setVector4("_MaskTex_ST", new gd3d.math.vector4(tillingXVal, tillingYVal, offsetXVal, offsetYVal));
+            };
+            this.app.container.appendChild(button);
+        };
+        test_xinshouMask.prototype.update = function (delta) {
+            this.timer += delta;
+            var x2 = Math.sin(this.timer * 0.1);
+            var z2 = Math.cos(this.timer * 0.1);
+            if (!this.camera)
+                return;
+            var objCam = this.camera.gameObject.transform;
+        };
+        return test_xinshouMask;
+    }());
+    t.test_xinshouMask = test_xinshouMask;
+    function getFileName(url) {
+        var filei = url.lastIndexOf("/");
+        var file = url.substr(filei + 1);
+        return file;
+    }
+    t.getFileName = getFileName;
+})(t || (t = {}));
 var test_load = (function () {
     function test_load() {
         this.timer = 0;
@@ -5389,39 +5547,17 @@ var test_loadprefab = (function () {
         }
     };
     test_loadprefab.prototype.start = function (app) {
-        var _this = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         var names = ["elongmul", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
         var name = names[0];
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-            if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/" + name + "/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                        _this.baihu = _prefab.getCloneTrans();
-                        _this.scene.addChild(_this.baihu);
-                        _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
-                        objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
-                        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-                        objCam.markDirty();
-                        _this.app.getAssetMgr().load("res/prefabs/" + name + "/textures/" + name + "texture.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                            if (s.isfinish) {
-                                _this.refreshTexture(_this.baihu);
-                            }
-                        });
-                        _this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/" + name + "aniclip.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                            if (s.isfinish) {
-                                _this.refreshAniclip(_this.baihu);
-                            }
-                        });
-                    }
-                });
-            }
-        });
+        var mesh = this.app.getAssetMgr().getAssetByName("cube");
+        if (mesh == null)
+            console.log("fuck is null");
+        else
+            console.log("good");
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);

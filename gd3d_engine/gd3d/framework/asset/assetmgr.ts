@@ -950,10 +950,22 @@ namespace gd3d.framework
                     id = assetbundle.mapNamed[name];
             }
 
-            if (id == null) return null;
-            var r = this.mapRes[id];
-            if (r == null) return null;
-            return r.asset;
+            let flag: boolean = true;
+            if (id != null)
+            {
+                var r = this.mapRes[id];
+                if (r != null)
+                    return r.asset;
+            }
+            if (flag)
+            {
+                if (this.mapDefaultMesh[name] != undefined)
+                    return this.mapDefaultMesh[name];
+                if (this.mapDefaultTexture[name] != undefined)
+                    return this.mapDefaultTexture[name];
+                if (this.mapShader[name] != undefined)
+                    return this.mapShader[name];
+            }
         }
         /**
          * @public

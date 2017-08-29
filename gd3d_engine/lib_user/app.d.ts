@@ -478,6 +478,20 @@ declare class test_loadScene implements IState {
     bere: boolean;
     update(delta: number): void;
 }
+declare namespace t {
+    class test_xinshouMask implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        imageRenderMask: gd3d.framework.meshRenderer;
+        texture: gd3d.framework.texture;
+        start(app: gd3d.framework.application): void;
+        addDomUI(): void;
+        camera: gd3d.framework.camera;
+        timer: number;
+        update(delta: number): void;
+    }
+    function getFileName(url: string): string;
+}
 declare class test_load implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

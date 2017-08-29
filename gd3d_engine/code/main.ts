@@ -66,7 +66,11 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("post_景深", () => new t.test_posteffect_cc());
         this.addBtn("test_effecteditor", () => new test_effecteditor());
-        this.addBtn("test_shadowmap",()=>new test_ShadowMap());
+        this.addBtn("test_shadowmap", () => new test_ShadowMap());
+        this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
+
+
+
     }
     private x: number = 0;
     private y: number = 100;

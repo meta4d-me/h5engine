@@ -70,7 +70,7 @@ namespace gd3d.io
                         continue;
 
                     url = url.replace(_texture.getName(), _texture.realName);
-                    SerializeDependent.resourseDatas.push(url);
+                    SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                 }
             }
         }
