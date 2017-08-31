@@ -3263,29 +3263,23 @@ var test_loadScene = (function () {
         var isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/citycompress/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                    if (s1.isfinish) {
-                        var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
-                        var totalLength_1 = index[name + ".assetbundle.json"];
-                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json", function (s) {
-                            console.log(s.curtask + "/" + s.totaltask);
-                            console.log(s.curByteLength + "/" + totalLength_1);
-                            console.log(s.bundleLoadState);
-                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded) {
-                                isloaded = true;
-                                console.log(s.isfinish);
-                                var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
-                                var _root = _scene.getSceneRoot();
-                                _this.scene.addChild(_root);
-                                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                                _root.markDirty();
-                                _this.app.getScene().lightmaps = [];
-                                _scene.useLightMap(_this.app.getScene());
-                                _scene.useFog(_this.app.getScene());
-                            }
-                        });
-                    }
-                });
+                {
+                    _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        console.log(s.curtask + "/" + s.totaltask);
+                        console.log(s.progress);
+                        if (s.isfinish) {
+                            var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                            var _root = _scene.getSceneRoot();
+                            _root.name = "changjing";
+                            _this.scene.addChild(_root);
+                            _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                            _root.markDirty();
+                            _this.app.getScene().lightmaps = [];
+                            _scene.useLightMap(_this.app.getScene());
+                            _scene.useFog(_this.app.getScene());
+                        }
+                    });
+                }
             }
         });
         var objCam = new gd3d.framework.transform();
@@ -5547,17 +5541,39 @@ var test_loadprefab = (function () {
         }
     };
     test_loadprefab.prototype.start = function (app) {
+        var _this = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         var names = ["elongmul", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
         var name = names[0];
-        var mesh = this.app.getAssetMgr().getAssetByName("cube");
-        if (mesh == null)
-            console.log("fuck is null");
-        else
-            console.log("good");
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.app.getAssetMgr().load("res/prefabs/" + name + "/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                        _this.baihu = _prefab.getCloneTrans();
+                        _this.scene.addChild(_this.baihu);
+                        _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
+                        objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                        objCam.markDirty();
+                        _this.app.getAssetMgr().load("res/prefabs/" + name + "/textures/" + name + "texture.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.refreshTexture(_this.baihu);
+                            }
+                        });
+                        _this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/" + name + "aniclip.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.refreshAniclip(_this.baihu);
+                            }
+                        });
+                    }
+                });
+            }
+        });
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);

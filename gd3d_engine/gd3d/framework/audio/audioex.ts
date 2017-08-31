@@ -136,10 +136,16 @@
             var cc = new AudioChannel();
             cc.source = this.audioContext.createBufferSource();
             cc.pannerNode = this.audioContext.createPanner();
-            cc.source.connect(this.audioContext.destination);
-            cc.gainNode = AudioEx.instance().audioContext.createGain();
+
+            // cc.source.connect(this.audioContext.destination);
+            //3d音效
+            cc.source.connect(cc.pannerNode);
+            cc.pannerNode.connect(this.audioContext.destination);
+
+            //声音调节
+            cc.gainNode = this.audioContext.createGain();
             cc.source.connect(cc.gainNode);
-            cc.gainNode.connect(AudioEx.instance().audioContext.destination);
+            cc.gainNode.connect(this.audioContext.destination);
             cc.gainNode.gain.value = 1;
             return cc;
         }
