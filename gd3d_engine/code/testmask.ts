@@ -55,8 +55,7 @@ namespace t
                         imageRender.materials = [];
                         imageRender.materials.push(new gd3d.framework.material());
                         imageRender.materials[0].setShader(sh);
-                        //shader 修改为 不和一般资源一样加载,而是统一用getShader方法
-                        //cuber.materials[0].shader = this.app.getAssetMgr().getResourceByName("color") as gd3d.framework.shader;
+                        
                         this.app.getAssetMgr().load("res/uvSprite.png", gd3d.framework.AssetTypeEnum.Auto, (s) => 
                         {
                             if (s.isfinish) 

@@ -811,6 +811,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class defShader {
+        static vsshader: string;
         static vscode: string;
         static fscode: string;
         static fscode2: string;
@@ -1244,7 +1245,7 @@ declare namespace gd3d.framework {
         layer: RenderLayerEnum;
         queue: number;
         parse(assetmgr: assetMgr, json: any): void;
-        private _parseProperties(assetmgr, properties);
+        _parseProperties(assetmgr: assetMgr, properties: any): void;
         private _parsePass(assetmgr, json);
         private static mapUniformGlobal;
         private static setGlobal(key, value, type);

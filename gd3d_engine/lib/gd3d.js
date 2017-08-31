@@ -4852,6 +4852,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.vsshader).properties);
                     p.state_ztest = true;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
                     p.state_zwrite = true;
@@ -4945,153 +4946,160 @@ var gd3d;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
+            defShader.vsshader = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\",\
+              \"_MainTex_ST('MainTex_ST',Vector) = (1,1,1,1)\"\
+            ]\
+          }";
             defShader.vscode = "\
-    attribute vec4 _glesVertex;   \
-    attribute vec4 _glesColor;                  \
-    attribute vec4 _glesMultiTexCoord0;         \
-    uniform highp mat4 glstate_matrix_mvp;      \
-    varying lowp vec4 xlv_COLOR;                \
-    varying highp vec2 xlv_TEXCOORD0;           \
-    void main()                                     \
-    {                                               \
-        highp vec4 tmpvar_1;                        \
-        tmpvar_1.w = 1.0;                           \
-        tmpvar_1.xyz = _glesVertex.xyz;             \
-        xlv_COLOR = _glesColor;                     \
-        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-    }";
+        attribute vec4 _glesVertex;   \
+        attribute vec4 _glesColor;                  \
+        attribute vec4 _glesMultiTexCoord0;         \
+        uniform highp mat4 glstate_matrix_mvp;      \
+        varying lowp vec4 xlv_COLOR;                \
+        varying highp vec2 xlv_TEXCOORD0;           \
+        void main()                                     \
+        {                                               \
+            highp vec4 tmpvar_1;                        \
+            tmpvar_1.w = 1.0;                           \
+            tmpvar_1.xyz = _glesVertex.xyz;             \
+            xlv_COLOR = _glesColor;                     \
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
+        }";
             defShader.fscode = "         \
-    uniform sampler2D _MainTex;                                                 \
-    varying lowp vec4 xlv_COLOR;                                                 \
-    varying highp vec2 xlv_TEXCOORD0;   \
-    void main() \
-    {\
-        lowp vec4 col_1;    \
-        mediump vec4 prev_2;\
-        lowp vec4 tmpvar_3;\
-        tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-        prev_2 = tmpvar_3;\
-        mediump vec4 tmpvar_4;\
-        tmpvar_4 = mix(vec4(1.0, 1.0, 1.0, 1.0), prev_2, prev_2.wwww);\
-        col_1 = tmpvar_4;\
-        col_1.x =xlv_TEXCOORD0.x;\
-        col_1.y =xlv_TEXCOORD0.y;\
-        gl_FragData[0] = col_1;\
-    }\
-    ";
+        uniform sampler2D _MainTex;                                                 \
+        varying lowp vec4 xlv_COLOR;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;   \
+        void main() \
+        {\
+            lowp vec4 col_1;    \
+            mediump vec4 prev_2;\
+            lowp vec4 tmpvar_3;\
+            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
+            prev_2 = tmpvar_3;\
+            mediump vec4 tmpvar_4;\
+            tmpvar_4 = mix(vec4(1.0, 1.0, 1.0, 1.0), prev_2, prev_2.wwww);\
+            col_1 = tmpvar_4;\
+            col_1.x =xlv_TEXCOORD0.x;\
+            col_1.y =xlv_TEXCOORD0.y;\
+            gl_FragData[0] = col_1;\
+        }\
+        ";
             defShader.fscode2 = "         \
-    void main() \
-    {\
-        gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\
-    }\
-    ";
+        void main() \
+        {\
+            gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\
+        }\
+        ";
             defShader.fscodeui = "         \
-    uniform sampler2D _MainTex;                                                 \
-    varying lowp vec4 xlv_COLOR;                                                 \
-    varying highp vec2 xlv_TEXCOORD0;   \
-    void main() \
-    {\
-        lowp vec4 tmpvar_3;\
-        tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-        gl_FragData[0] = tmpvar_3;\
-    }\
-    ";
+        uniform sampler2D _MainTex;                                                 \
+        varying lowp vec4 xlv_COLOR;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;   \
+        void main() \
+        {\
+            lowp vec4 tmpvar_3;\
+            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
+            gl_FragData[0] = tmpvar_3;\
+        }\
+        ";
             defShader.vscodeuifont = "\
-    attribute vec4 _glesVertex;   \
-    attribute vec4 _glesColor;                  \
-    attribute vec4 _glesColorEx;                  \
-    attribute vec4 _glesMultiTexCoord0;         \
-    uniform highp mat4 glstate_matrix_mvp;      \
-    varying lowp vec4 xlv_COLOR;                \
-    varying lowp vec4 xlv_COLOREx;                                                 \
-    varying highp vec2 xlv_TEXCOORD0;           \
-    void main()                                     \
-    {                                               \
-        highp vec4 tmpvar_1;                        \
-        tmpvar_1.w = 1.0;                           \
-        tmpvar_1.xyz = _glesVertex.xyz;             \
-        xlv_COLOR = _glesColor;                     \
-        xlv_COLOREx = _glesColorEx;                     \
-        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-    }";
+        attribute vec4 _glesVertex;   \
+        attribute vec4 _glesColor;                  \
+        attribute vec4 _glesColorEx;                  \
+        attribute vec4 _glesMultiTexCoord0;         \
+        uniform highp mat4 glstate_matrix_mvp;      \
+        varying lowp vec4 xlv_COLOR;                \
+        varying lowp vec4 xlv_COLOREx;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;           \
+        void main()                                     \
+        {                                               \
+            highp vec4 tmpvar_1;                        \
+            tmpvar_1.w = 1.0;                           \
+            tmpvar_1.xyz = _glesVertex.xyz;             \
+            xlv_COLOR = _glesColor;                     \
+            xlv_COLOREx = _glesColorEx;                     \
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
+        }";
             defShader.fscodeuifont = "\
-precision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \n\
-uniform sampler2D _MainTex; \n\
-varying lowp vec4 xlv_COLOR;\n\
-varying lowp vec4 xlv_COLOREx;\n\
-varying highp vec2 xlv_TEXCOORD0;   \n\
-void main() \n\
-{\n\
-float scale = 10.0;//  \n\
-float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  //0.5\n\
-float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  //0.34\n\
-\n\
-float c=xlv_COLOR.a * clamp ( d,0.0,1.0); \n\
-float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0); \n\
-bc =min(1.0-c,bc);\n\
-\n\
-\n\
-\n\
-gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
-}";
+        precision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \n\
+        uniform sampler2D _MainTex; \n\
+        varying lowp vec4 xlv_COLOR;\n\
+        varying lowp vec4 xlv_COLOREx;\n\
+        varying highp vec2 xlv_TEXCOORD0;   \n\
+        void main() \n\
+        {\n\
+        float scale = 10.0;//  \n\
+        float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  //0.5\n\
+        float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  //0.34\n\
+        \n\
+        float c=xlv_COLOR.a * clamp ( d,0.0,1.0); \n\
+        float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0); \n\
+        bc =min(1.0-c,bc);\n\
+        \n\
+        \n\
+        \n\
+        gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
+        }";
             defShader.vsdiffuse = "\
-    attribute vec4 _glesVertex;\
-    attribute vec4 _glesMultiTexCoord0;\
-    uniform highp mat4 glstate_matrix_mvp;\
-    varying highp vec2 xlv_TEXCOORD0;\
-    void main()\
-    {\
-        highp vec4 tmpvar_1;\
-        tmpvar_1.w = 1.0;\
-        tmpvar_1.xyz = _glesVertex.xyz;\
-        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
-    }";
+        attribute vec4 _glesVertex;\
+        attribute vec4 _glesMultiTexCoord0;\
+        uniform highp mat4 glstate_matrix_mvp;\
+        varying highp vec2 xlv_TEXCOORD0;\
+        void main()\
+        {\
+            highp vec4 tmpvar_1;\
+            tmpvar_1.w = 1.0;\
+            tmpvar_1.xyz = _glesVertex.xyz;\
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+        }";
             defShader.fsdiffuse = "\
-    uniform sampler2D _MainTex;\
-    uniform lowp float _AlphaCut;\
-    varying highp vec2 xlv_TEXCOORD0;\
-    void main() \
-    {\
-        lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
-        if(tmpvar_3.a < _AlphaCut)\
-            discard;\
-        gl_FragData[0] = tmpvar_3;\
-    }";
+        uniform sampler2D _MainTex;\
+        uniform lowp float _AlphaCut;\
+        varying highp vec2 xlv_TEXCOORD0;\
+        void main() \
+        {\
+            lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
+            if(tmpvar_3.a < _AlphaCut)\
+                discard;\
+            gl_FragData[0] = tmpvar_3;\
+        }";
             defShader.vsline = "\
-    attribute vec4 _glesVertex;\
-    attribute vec4 _glesColor;\
-    uniform highp mat4 glstate_matrix_mvp;\
-    varying lowp vec4 xlv_COLOR;\
-    void main()\
-    {\
-        highp vec4 tmpvar_1;\
-        tmpvar_1.w = 1.0;\
-        tmpvar_1.xyz = _glesVertex.xyz;\
-        xlv_COLOR = _glesColor;\
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
-    }";
+        attribute vec4 _glesVertex;\
+        attribute vec4 _glesColor;\
+        uniform highp mat4 glstate_matrix_mvp;\
+        varying lowp vec4 xlv_COLOR;\
+        void main()\
+        {\
+            highp vec4 tmpvar_1;\
+            tmpvar_1.w = 1.0;\
+            tmpvar_1.xyz = _glesVertex.xyz;\
+            xlv_COLOR = _glesColor;\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+        }";
             defShader.fsline = "\
-    varying lowp vec4 xlv_COLOR;\
-    void main()\
-    {\
-        gl_FragData[0] = xlv_COLOR;\
-    }";
+        varying lowp vec4 xlv_COLOR;\
+        void main()\
+        {\
+            gl_FragData[0] = xlv_COLOR;\
+        }";
             defShader.vsmaterialcolor = "\
-    attribute vec4 _glesVertex;\
-    uniform vec4 _Color;\
-    uniform highp mat4 glstate_matrix_mvp;\
-    varying lowp vec4 xlv_COLOR;\
-    void main()\
-    {\
-        highp vec4 tmpvar_1;\
-        tmpvar_1.w = 1.0;\
-        tmpvar_1.xyz = _glesVertex.xyz;\
-        xlv_COLOR = _Color;\
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
-    }";
+        attribute vec4 _glesVertex;\
+        uniform vec4 _Color;\
+        uniform highp mat4 glstate_matrix_mvp;\
+        varying lowp vec4 xlv_COLOR;\
+        void main()\
+        {\
+            highp vec4 tmpvar_1;\
+            tmpvar_1.w = 1.0;\
+            tmpvar_1.xyz = _glesVertex.xyz;\
+            xlv_COLOR = _Color;\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+        }";
             return defShader;
         }());
         framework.defShader = defShader;
