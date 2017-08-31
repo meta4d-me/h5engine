@@ -4852,7 +4852,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
-                    sh._parseProperties(assetmgr, JSON.parse(this.vsshader).properties);
+                    sh._parseProperties(assetmgr, JSON.parse(this.shader0).properties);
                     p.state_ztest = true;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
                     p.state_zwrite = true;
@@ -4868,6 +4868,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.diffuseShader).properties);
                     p.state_ztest = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
                     p.state_zwrite = false;
@@ -4883,6 +4884,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
                     p.setProgram(program2);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -4896,6 +4898,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
                     p.setProgram(program2);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -4910,6 +4913,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                     p.setProgram(programuifont);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -4938,6 +4942,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.materialShader).properties);
                     p.setProgram(programmaterialcolor);
                     p.state_ztest = false;
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
@@ -4946,11 +4951,9 @@ var gd3d;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
-            defShader.vsshader = "{\
+            defShader.shader0 = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\",\
-              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\",\
-              \"_MainTex_ST('MainTex_ST',Vector) = (1,1,1,1)\"\
             ]\
           }";
             defShader.vscode = "\
@@ -4994,6 +4997,11 @@ var gd3d;
             gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\
         }\
         ";
+            defShader.uishader = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+            ]\
+            }";
             defShader.fscodeui = "         \
         uniform sampler2D _MainTex;                                                 \
         varying lowp vec4 xlv_COLOR;                                                 \
@@ -5005,6 +5013,11 @@ var gd3d;
             gl_FragData[0] = tmpvar_3;\
         }\
         ";
+            defShader.shaderuifront = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+            ]\
+            }";
             defShader.vscodeuifont = "\
         attribute vec4 _glesVertex;   \
         attribute vec4 _glesColor;                  \
@@ -5044,6 +5057,12 @@ var gd3d;
         \n\
         gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         }";
+            defShader.diffuseShader = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\",\
+            ]\
+            }";
             defShader.vsdiffuse = "\
         attribute vec4 _glesVertex;\
         attribute vec4 _glesMultiTexCoord0;\
@@ -5087,6 +5106,11 @@ var gd3d;
         {\
             gl_FragData[0] = xlv_COLOR;\
         }";
+            defShader.materialShader = "{\
+            \"properties\": [\
+              \"_Color('Color',Vector) = (1,1,1,1)\",\
+            ]\
+            }";
             defShader.vsmaterialcolor = "\
         attribute vec4 _glesVertex;\
         uniform vec4 _Color;\
@@ -6707,6 +6731,7 @@ var gd3d;
             material.prototype.Parse = function (assetmgr, json, bundleName) {
                 if (bundleName === void 0) { bundleName = null; }
                 var shaderName = json["shader"];
+                console.log("shaderName:" + shaderName);
                 this.setShader(assetmgr.getShader(shaderName));
                 var mapUniform = json["mapUniform"];
                 for (var i in mapUniform) {
@@ -8047,10 +8072,11 @@ var gd3d;
                 var cc = new framework.AudioChannel();
                 cc.source = this.audioContext.createBufferSource();
                 cc.pannerNode = this.audioContext.createPanner();
-                cc.source.connect(this.audioContext.destination);
-                cc.gainNode = AudioEx.instance().audioContext.createGain();
+                cc.source.connect(cc.pannerNode);
+                cc.pannerNode.connect(this.audioContext.destination);
+                cc.gainNode = this.audioContext.createGain();
                 cc.source.connect(cc.gainNode);
-                cc.gainNode.connect(AudioEx.instance().audioContext.destination);
+                cc.gainNode.connect(this.audioContext.destination);
                 cc.gainNode.gain.value = 1;
                 return cc;
             };
@@ -11183,14 +11209,6 @@ var gd3d;
                 gd3d.reflect.Field("transform"),
                 __metadata("design:type", framework.transform)
             ], skinnedMeshRenderer.prototype, "rootBone", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "size", void 0);
             skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,

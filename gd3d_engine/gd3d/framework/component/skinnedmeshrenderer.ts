@@ -142,12 +142,12 @@ namespace gd3d.framework
         /**
          * @private
          */
-        @gd3d.reflect.Field("vector3")
+        // @gd3d.reflect.Field("vector3")
         center: math.vector3;
         /**
          * @private
          */
-        @gd3d.reflect.Field("vector3")
+        // @gd3d.reflect.Field("vector3")
         size: math.vector3;
         /**
          * @public

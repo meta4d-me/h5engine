@@ -811,17 +811,21 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class defShader {
-        static vsshader: string;
+        static shader0: string;
         static vscode: string;
         static fscode: string;
         static fscode2: string;
+        static uishader: string;
         static fscodeui: string;
+        static shaderuifront: string;
         static vscodeuifont: string;
         static fscodeuifont: string;
+        static diffuseShader: string;
         static vsdiffuse: string;
         static fsdiffuse: string;
         static vsline: string;
         static fsline: string;
+        static materialShader: string;
         static vsmaterialcolor: string;
         static initDefaultShader(assetmgr: assetMgr): void;
     }

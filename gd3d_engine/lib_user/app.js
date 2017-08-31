@@ -3263,23 +3263,29 @@ var test_loadScene = (function () {
         var isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                {
-                    _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                        console.log(s.curtask + "/" + s.totaltask);
-                        console.log(s.progress);
-                        if (s.isfinish) {
-                            var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
-                            var _root = _scene.getSceneRoot();
-                            _root.name = "changjing";
-                            _this.scene.addChild(_root);
-                            _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                            _root.markDirty();
-                            _this.app.getScene().lightmaps = [];
-                            _scene.useLightMap(_this.app.getScene());
-                            _scene.useFog(_this.app.getScene());
-                        }
-                    });
-                }
+                _this.app.getAssetMgr().load("res/scenes/citycompress/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
+                        var totalLength_1 = index[name + ".assetbundle.json"];
+                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json", function (s) {
+                            console.log(s.curtask + "/" + s.totaltask);
+                            console.log(s.curByteLength + "/" + totalLength_1);
+                            console.log(s.bundleLoadState);
+                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded) {
+                                isloaded = true;
+                                console.log(s.isfinish);
+                                var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                                var _root = _scene.getSceneRoot();
+                                _this.scene.addChild(_root);
+                                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                                _root.markDirty();
+                                _this.app.getScene().lightmaps = [];
+                                _scene.useLightMap(_this.app.getScene());
+                                _scene.useFog(_this.app.getScene());
+                            }
+                        });
+                    }
+                });
             }
         });
         var objCam = new gd3d.framework.transform();

@@ -2,11 +2,9 @@ namespace gd3d.framework
 {
     export class defShader
     {
-        static vsshader: string = "{\
+        static shader0: string = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\",\
-              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\",\
-              \"_MainTex_ST('MainTex_ST',Vector) = (1,1,1,1)\"\
             ]\
           }";
         static vscode: string = "\
@@ -53,6 +51,12 @@ namespace gd3d.framework
         }\
         ";
 
+        static uishader: string = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+            ]\
+            }";
+
         static fscodeui: string = "         \
         uniform sampler2D _MainTex;                                                 \
         varying lowp vec4 xlv_COLOR;                                                 \
@@ -64,6 +68,12 @@ namespace gd3d.framework
             gl_FragData[0] = tmpvar_3;\
         }\
         ";
+
+        static shaderuifront: string = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+            ]\
+            }";
 
         static vscodeuifont: string = "\
         attribute vec4 _glesVertex;   \
@@ -105,6 +115,13 @@ namespace gd3d.framework
         \n\
         gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
         }";
+
+        static diffuseShader: string = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\",\
+            ]\
+            }";
 
         static vsdiffuse: string = "\
         attribute vec4 _glesVertex;\
@@ -156,6 +173,11 @@ namespace gd3d.framework
         }";
 
 
+        static materialShader: string = "{\
+            \"properties\": [\
+              \"_Color('Color',Vector) = (1,1,1,1)\",\
+            ]\
+            }";
         static vsmaterialcolor: string = "\
         attribute vec4 _glesVertex;\
         uniform vec4 _Color;\
@@ -176,15 +198,21 @@ namespace gd3d.framework
             //鍙戠幇鏄簳灞備竴涓紩鐢ㄤ贡浜嗭紝鍘熺粨鏋勬病闂
             pool.compileVS(assetmgr.webgl, "def", defShader.vscode);
             pool.compileFS(assetmgr.webgl, "def", defShader.fscode);
+
             pool.compileFS(assetmgr.webgl, "def2", defShader.fscode2);
             pool.compileFS(assetmgr.webgl, "defui", defShader.fscodeui);
+
             pool.compileVS(assetmgr.webgl, "defuifont", defShader.vscodeuifont);
             pool.compileFS(assetmgr.webgl, "defuifont", defShader.fscodeuifont);
+
             pool.compileVS(assetmgr.webgl, "diffuse", defShader.vsdiffuse);
             pool.compileFS(assetmgr.webgl, "diffuse", defShader.fsdiffuse);
+
             pool.compileVS(assetmgr.webgl, "line", defShader.vsline);
             pool.compileFS(assetmgr.webgl, "line", defShader.fsline);
+
             pool.compileVS(assetmgr.webgl, "materialcolor", defShader.vsmaterialcolor);
+            
             var program = pool.linkProgram(assetmgr.webgl, "def", "def");
             var program2 = pool.linkProgram(assetmgr.webgl, "def", "defui");
             var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
@@ -197,7 +225,7 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.vsshader).properties);
+                sh._parseProperties(assetmgr,JSON.parse(this.shader0).properties);
                 p.state_ztest = true;
                 p.state_ztest_method = render.webglkit.LEQUAL;
                 p.state_zwrite = true;
@@ -213,6 +241,7 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
+                sh._parseProperties(assetmgr,JSON.parse(this.diffuseShader).properties);
                 p.state_ztest = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
                 p.state_zwrite = false;
@@ -228,6 +257,7 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
+                sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.setProgram(program2);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
@@ -241,6 +271,7 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
+                sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.setProgram(program2);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
@@ -255,6 +286,8 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
+                sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties);
+                
                 p.setProgram(programuifont);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
@@ -283,6 +316,7 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
+                sh._parseProperties(assetmgr,JSON.parse(this.materialShader).properties);
                 p.setProgram(programmaterialcolor);
                 p.state_ztest = false;
                 //p.state_ztest_method = render.webglkit.LEQUAL;
