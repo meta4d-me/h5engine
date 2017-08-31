@@ -1,7 +1,7 @@
 {
     "layer": "transparent",
 	"properties": [
-        "_MainTex('MainTex',Texture)='white'{}",
+        "_MainTex('MainTex',Texture)='white'{}"
     ],
     "passes": {
         "base": [
