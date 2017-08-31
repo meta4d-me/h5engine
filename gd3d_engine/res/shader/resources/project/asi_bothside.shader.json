@@ -1,5 +1,9 @@
 {
     "layer": "geometry",
+	"properties": [
+        "_MainTex('MainTex',Texture)='white'{}",
+		"_LightColor('LightColor',color)=(1,1,1,1)"
+    ],
     "passes": {
         "base": [
             {

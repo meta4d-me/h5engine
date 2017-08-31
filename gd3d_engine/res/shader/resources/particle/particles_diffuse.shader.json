@@ -1,5 +1,8 @@
 {
   "layer": "common",
+  "properties": [
+        "_MainTex('MainTex',Texture)='white'{}"
+    ],
   "queue":  0,
     "passes": {
         "base": [
