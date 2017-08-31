@@ -1,9 +1,5 @@
 {
     "layer": "common",
-	"properties": [
-        "_MainTex('MainTex',Texture)='white'{}",
-		"_MainColor('MainColor',color)=(1,1,1,1)"
-    ],
     "passes": {
         "base": [
             {
