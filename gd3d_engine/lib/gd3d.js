@@ -4953,7 +4953,7 @@ var gd3d;
             };
             defShader.shader0 = "{\
             \"properties\": [\
-              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
           }";
             defShader.vscode = "\
@@ -4999,7 +4999,7 @@ var gd3d;
         ";
             defShader.uishader = "{\
             \"properties\": [\
-              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
             }";
             defShader.fscodeui = "         \
@@ -5015,7 +5015,7 @@ var gd3d;
         ";
             defShader.shaderuifront = "{\
             \"properties\": [\
-              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
             }";
             defShader.vscodeuifont = "\
@@ -5060,7 +5060,7 @@ var gd3d;
             defShader.diffuseShader = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\",\
-              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\",\
+              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\"\
             ]\
             }";
             defShader.vsdiffuse = "\
@@ -5108,7 +5108,7 @@ var gd3d;
         }";
             defShader.materialShader = "{\
             \"properties\": [\
-              \"_Color('Color',Vector) = (1,1,1,1)\",\
+              \"_Color('Color',Vector) = (1,1,1,1)\"\
             ]\
             }";
             defShader.vsmaterialcolor = "\
@@ -6731,7 +6731,6 @@ var gd3d;
             material.prototype.Parse = function (assetmgr, json, bundleName) {
                 if (bundleName === void 0) { bundleName = null; }
                 var shaderName = json["shader"];
-                console.log("shaderName:" + shaderName);
                 this.setShader(assetmgr.getShader(shaderName));
                 var mapUniform = json["mapUniform"];
                 for (var i in mapUniform) {
@@ -8015,6 +8014,11 @@ var gd3d;
                     console.error("!Your browser does not support AudioContext");
                 }
             }
+            AudioEx.instance = function () {
+                if (AudioEx.g_this == null)
+                    AudioEx.g_this = new AudioEx();
+                return AudioEx.g_this;
+            };
             AudioEx.prototype.clickInit = function () {
                 if (!this.isAvailable())
                     return;
@@ -8025,31 +8029,6 @@ var gd3d;
                     source.connect(this.audioContext.destination);
                     source.start();
                 }
-            };
-            AudioEx.instance = function () {
-                if (AudioEx.g_this == null)
-                    AudioEx.g_this = new AudioEx();
-                return AudioEx.g_this;
-            };
-            AudioEx.loadArrayBuffer = function (url, fun) {
-                var req = new XMLHttpRequest();
-                req.open("GET", url);
-                req.responseType = "arraybuffer";
-                req.onreadystatechange = function () {
-                    if (req.readyState == 4) {
-                        if (req.status == 404)
-                            fun(null, new Error("onerr 404"));
-                        else
-                            fun(req.response, null);
-                    }
-                };
-                req.onerror = function () {
-                    fun(null, new Error("onerr in req:"));
-                };
-                req.send();
-            };
-            AudioEx.prototype.isAvailable = function () {
-                return this.audioContext ? true : false;
             };
             AudioEx.prototype.loadAudioBufferFromArrayBuffer = function (ab, fun) {
                 this.audioContext.decodeAudioData(ab, function (audiobuffer) {
@@ -8068,21 +8047,65 @@ var gd3d;
                     }
                 });
             };
+            AudioEx.prototype.isAvailable = function () {
+                return this.audioContext ? true : false;
+            };
             AudioEx.prototype.createAudioChannel = function () {
-                var cc = new framework.AudioChannel();
+                var cc = new AudioChannel();
                 cc.source = this.audioContext.createBufferSource();
                 cc.pannerNode = this.audioContext.createPanner();
-                cc.source.connect(cc.pannerNode);
-                cc.pannerNode.connect(this.audioContext.destination);
                 cc.gainNode = this.audioContext.createGain();
-                cc.source.connect(cc.gainNode);
+                cc.source.connect(cc.pannerNode);
+                cc.pannerNode.connect(cc.gainNode);
                 cc.gainNode.connect(this.audioContext.destination);
                 cc.gainNode.gain.value = 1;
                 return cc;
             };
+            AudioEx.loadArrayBuffer = function (url, fun) {
+                var req = new XMLHttpRequest();
+                req.open("GET", url);
+                req.responseType = "arraybuffer";
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4) {
+                        if (req.status == 404)
+                            fun(null, new Error("onerr 404"));
+                        else
+                            fun(req.response, null);
+                    }
+                };
+                req.onerror = function () {
+                    fun(null, new Error("onerr in req:"));
+                };
+                req.send();
+            };
             return AudioEx;
         }());
         framework.AudioEx = AudioEx;
+        var AudioChannel = (function () {
+            function AudioChannel() {
+            }
+            Object.defineProperty(AudioChannel.prototype, "volume", {
+                get: function () {
+                    return this.gainNode.gain.value;
+                },
+                set: function (val) {
+                    val = val > 100 ? 100 : val;
+                    val = val <= 0 ? 0 : val;
+                    this.gainNode.gain.value = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AudioChannel.prototype.stop = function () {
+                if (this.source != null) {
+                    this.source.stop();
+                    this.source = null;
+                }
+                this.isplay = false;
+            };
+            return AudioChannel;
+        }());
+        framework.AudioChannel = AudioChannel;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -8529,27 +8552,50 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AudioListener = (function () {
+            function AudioListener() {
+                this.lastX = 0;
+                this.lastY = 0;
+                this.lastZ = 0;
+            }
+            AudioListener.prototype.start = function () {
+                this.listener = framework.AudioEx.instance().audioContext.listener;
+            };
+            AudioListener.prototype.update = function (delta) {
+                this.curPos = this.gameObject.transform.getWorldTranslate();
+                if (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ) {
+                    this.listener.setPosition(this.curPos.x, this.curPos.y, this.curPos.z);
+                    this.lastX = this.curPos.x;
+                    this.lastY = this.curPos.y;
+                    this.lastZ = this.curPos.z;
+                }
+            };
+            AudioListener.prototype.remove = function () {
+            };
+            AudioListener.prototype.clone = function () {
+            };
+            AudioListener = __decorate([
+                gd3d.reflect.nodeComponent
+            ], AudioListener);
+            return AudioListener;
+        }());
+        framework.AudioListener = AudioListener;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var AudioPlayer = (function () {
             function AudioPlayer() {
+                this.lastX = 0;
+                this.lastY = 0;
+                this.lastZ = 0;
             }
-            AudioPlayer.prototype.init = function (name, audioChannel, beLoop) {
+            AudioPlayer.prototype.play = function (buffer, beLoop, volume, onended) {
                 if (beLoop === void 0) { beLoop = false; }
-                this.name = name;
-                this.audioChannel = audioChannel;
-                this.beLoop = beLoop;
-            };
-            AudioPlayer.prototype.start = function () {
-            };
-            AudioPlayer.prototype.update = function (delta) {
-            };
-            AudioPlayer.prototype.remove = function () {
-            };
-            AudioPlayer.prototype.clone = function () {
-            };
-            AudioPlayer.prototype.play = function (buffer, volume, onended, x, y, z) {
                 if (volume === void 0) { volume = 0; }
-                if (this.audioChannel == null)
-                    return null;
+                this.audioChannel = framework.AudioEx.instance().createAudioChannel();
                 this.buffer = buffer;
                 this.volume = volume;
                 var c = this.audioChannel;
@@ -8557,8 +8603,6 @@ var gd3d;
                 c.source.buffer = this.buffer;
                 c.volume = this.volume;
                 c.source.start();
-                if (x && y && z)
-                    c.pannerNode.setPosition(x, y, z);
                 c.isplay = true;
                 if (!this.beLoop) {
                     c.source.onended = function () {
@@ -8587,37 +8631,28 @@ var gd3d;
             AudioPlayer.prototype.isPlaying = function () {
                 return this.audioChannel == undefined ? false : this.audioChannel.isplay;
             };
+            AudioPlayer.prototype.start = function () {
+                this.audioChannel = framework.AudioEx.instance().createAudioChannel();
+            };
+            AudioPlayer.prototype.update = function (delta) {
+                this.curPos = this.gameObject.transform.getWorldTranslate();
+                if (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ) {
+                    this.audioChannel.pannerNode.setPosition(this.curPos.x, this.curPos.y, this.curPos.z);
+                    this.lastX = this.curPos.x;
+                    this.lastY = this.curPos.y;
+                    this.lastZ = this.curPos.z;
+                }
+            };
+            AudioPlayer.prototype.remove = function () {
+            };
+            AudioPlayer.prototype.clone = function () {
+            };
             AudioPlayer = __decorate([
                 gd3d.reflect.nodeComponent
             ], AudioPlayer);
             return AudioPlayer;
         }());
         framework.AudioPlayer = AudioPlayer;
-        var AudioChannel = (function () {
-            function AudioChannel() {
-            }
-            Object.defineProperty(AudioChannel.prototype, "volume", {
-                get: function () {
-                    return this.gainNode.gain.value;
-                },
-                set: function (val) {
-                    val = val > 1 ? 1 : val;
-                    val = val <= -1 ? -0.999 : val;
-                    this.gainNode.gain.value = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            AudioChannel.prototype.stop = function () {
-                if (this.source != null) {
-                    this.source.stop();
-                    this.source = null;
-                }
-                this.isplay = false;
-            };
-            return AudioChannel;
-        }());
-        framework.AudioChannel = AudioChannel;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

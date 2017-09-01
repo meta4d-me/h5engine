@@ -6336,7 +6336,7 @@ var t;
             this.counttimer = 0;
             this.angularVelocity = new gd3d.math.vector3(10, 0, 0);
             this.eulerAngle = gd3d.math.pool.new_vector3();
-            this.looped = null;
+            this.loopedBuffer = null;
             this.once1 = null;
             this.once2 = null;
         }
@@ -6366,6 +6366,7 @@ var t;
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
             state.finish = true;
+            CameraController.instance().init(this.app, this.camera);
         };
         test_sound.prototype.addcube = function (laststate, state) {
             {
@@ -6396,28 +6397,19 @@ var t;
         test_sound.prototype.loadSoundInfe = function (laststate, state) {
             var _this = this;
             {
+                var listener = this.camera.gameObject.addComponent("AudioListener");
                 var tr = new gd3d.framework.transform();
                 var player_1 = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER);
                 this.app.getScene().addChild(tr);
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", function (buf, err) {
-                    _this.looped = buf;
-                    player_1.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                    player_1.play(buf, 0);
-                });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", function (buf, err) {
-                    _this.once1 = buf;
-                });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", function (buf, err) {
-                    _this.once2 = buf;
-                    player_1.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                    player_1.play(buf, 0);
-                });
+                tr.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
                     button.onclick = function () {
-                        player_1.init("once1", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                        player_1.play(_this.once1, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", function (buf, err) {
+                            _this.once1 = buf;
+                            player_1.play(_this.once1, false, 10);
+                        });
                     };
                     button.style.top = "130px";
                     button.style.position = "absolute";
@@ -6427,8 +6419,10 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play once2";
                     button.onclick = function () {
-                        player_1.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                        player_1.play(_this.once2, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", function (buf, err) {
+                            _this.once2 = buf;
+                            player_1.play(_this.once2, false, 1);
+                        });
                     };
                     button.style.top = "130px";
                     button.style.left = "90px";
@@ -6439,8 +6433,10 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play loop";
                     button.onclick = function () {
-                        player_1.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), true);
-                        player_1.play(_this.looped, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", function (buf, err) {
+                            _this.loopedBuffer = buf;
+                            player_1.play(buf, false, 1);
+                        });
                     };
                     button.style.top = "160px";
                     button.style.position = "absolute";
@@ -6461,11 +6457,10 @@ var t;
                     document.body.appendChild(document.createElement("p"));
                     var input = document.createElement("input");
                     input.type = "range";
-                    input.valueAsNumber = 10;
-                    player_1.volume = -0.2;
+                    input.valueAsNumber = 5;
+                    player_1.volume = input.valueAsNumber;
                     input.oninput = function (e) {
-                        var value = (input.valueAsNumber - 50) / 50;
-                        player_1.volume = value;
+                        player_1.volume = input.valueAsNumber;
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";
@@ -6486,6 +6481,7 @@ var t;
             gd3d.framework.AudioEx.instance().clickInit();
         };
         test_sound.prototype.update = function (delta) {
+            CameraController.instance().update(delta);
             this.taskmgr.move(delta);
             this.timer += delta;
             if (this.cube != null) {

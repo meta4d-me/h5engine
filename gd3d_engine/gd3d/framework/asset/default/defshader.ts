@@ -4,7 +4,7 @@ namespace gd3d.framework
     {
         static shader0: string = "{\
             \"properties\": [\
-              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
           }";
         static vscode: string = "\
@@ -53,7 +53,7 @@ namespace gd3d.framework
 
         static uishader: string = "{\
             \"properties\": [\
-              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
             }";
 
@@ -71,7 +71,7 @@ namespace gd3d.framework
 
         static shaderuifront: string = "{\
             \"properties\": [\
-              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
             }";
 
@@ -119,7 +119,7 @@ namespace gd3d.framework
         static diffuseShader: string = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\",\
-              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\",\
+              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\"\
             ]\
             }";
 
@@ -175,7 +175,7 @@ namespace gd3d.framework
 
         static materialShader: string = "{\
             \"properties\": [\
-              \"_Color('Color',Vector) = (1,1,1,1)\",\
+              \"_Color('Color',Vector) = (1,1,1,1)\"\
             ]\
             }";
         static vsmaterialcolor: string = "\

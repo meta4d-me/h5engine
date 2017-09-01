@@ -14,7 +14,7 @@ namespace t
         counttimer: number = 0;
         private angularVelocity: gd3d.math.vector3 = new gd3d.math.vector3(10, 0, 0);
         private eulerAngle = gd3d.math.pool.new_vector3();
-        looped: AudioBuffer = null;
+        loopedBuffer: AudioBuffer = null;
         once1: AudioBuffer = null;
         once2: AudioBuffer = null;
 
@@ -58,6 +58,7 @@ namespace t
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();//标记为需要刷新
             state.finish = true;
+            CameraController.instance().init(this.app, this.camera);
 
         }
 
@@ -100,74 +101,74 @@ namespace t
         private loadSoundInfe(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             {
+                //接收器
+                let listener = this.camera.gameObject.addComponent("AudioListener") as gd3d.framework.AudioListener;
+
+                //播放器1
                 let tr = new gd3d.framework.transform();
                 let player: gd3d.framework.AudioPlayer = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER) as gd3d.framework.AudioPlayer;
                 this.app.getScene().addChild(tr);
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", (buf, err) =>
-                {
-                    this.looped = buf;
-                    player.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                    player.play(buf, 0);
-                    // gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
-                });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", (buf, err) =>
-                {
-                    this.once1 = buf;
-                });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", (buf, err) =>
-                {
-                    this.once2 = buf;
-                    player.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                    player.play(buf, 0);
-                    // gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
-                });
+                tr.localTranslate = new gd3d.math.vector3(0, 0, 0);
+
+
+
+
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
                     button.onclick = () =>
                     {
-                        // gd3d.framework.AudioEx.instance().playOnce("once1", this.once1);
-                        player.init("once1", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                        player.play(this.once1, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", (buf, err) =>
+                        {
+                            this.once1 = buf;
+                            // player.stop();
+                            player.play(this.once1, false, 10);
+                        });
                     };
                     button.style.top = "130px";
                     button.style.position = "absolute";
                     this.app.container.appendChild(button);
                 }
+
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once2";
                     button.onclick = () =>
                     {
-                        // gd3d.framework.AudioEx.instance().playOnce("once2", this.once2);
-                        player.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                        player.play(this.once2, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", (buf, err) =>
+                        {
+                            this.once2 = buf;
+                            player.play(this.once2, false, 1);
+                        });
                     };
                     button.style.top = "130px";
                     button.style.left = "90px"
                     button.style.position = "absolute";
                     this.app.container.appendChild(button);
                 }
+
                 {
                     var button = document.createElement("button");
                     button.textContent = "play loop";
                     button.onclick = () =>
                     {
-                        // gd3d.framework.AudioEx.instance().playLooped("abc", this.looped);
-                        player.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), true);
-                        player.play(this.looped, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", (buf, err) =>
+                        {
+                            this.loopedBuffer = buf;
+                            player.play(buf, false, 1);
+                        });
                     };
 
                     button.style.top = "160px";
                     button.style.position = "absolute";
                     this.app.container.appendChild(button);
                 }
+
                 {
                     var button = document.createElement("button");
                     button.textContent = "stop loop";
                     button.onclick = () =>
                     {
-                        // gd3d.framework.AudioEx.instance().stopLooped("abc");
                         player.stop();
                     };
                     button.style.top = "160px";
@@ -179,16 +180,11 @@ namespace t
                     document.body.appendChild(document.createElement("p"));
                     var input = document.createElement("input");
                     input.type = "range";
-                    input.valueAsNumber = 10;
-                    player.volume = -0.2;
-                    // gd3d.framework.AudioEx.instance().setSoundVolume(-0.2);
-                    // gd3d.framework.AudioEx.instance().setMusicVolume(-0.2);
+                    input.valueAsNumber = 5;
+                    player.volume = input.valueAsNumber;
                     input.oninput = (e) =>
                     {
-                        var value = (input.valueAsNumber - 50) / 50;
-                        player.volume = value;
-                        // gd3d.framework.AudioEx.instance().setSoundVolume(value);
-                        // gd3d.framework.AudioEx.instance().setMusicVolume(value);
+                        player.volume = input.valueAsNumber;
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";
@@ -217,6 +213,7 @@ namespace t
 
         update(delta: number)
         {
+            CameraController.instance().update(delta);
             this.taskmgr.move(delta);
 
             this.timer += delta;

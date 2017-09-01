@@ -840,7 +840,7 @@ declare namespace t {
         counttimer: number;
         private angularVelocity;
         private eulerAngle;
-        looped: AudioBuffer;
+        loopedBuffer: AudioBuffer;
         once1: AudioBuffer;
         once2: AudioBuffer;
         private loadShader(laststate, state);

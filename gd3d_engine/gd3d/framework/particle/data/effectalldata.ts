@@ -378,12 +378,14 @@ namespace gd3d.framework
         public name: string;
         public type: EffectElementTypeEnum;//singlemesh,emission....
         public timelineFrame: { [frameIndex: number]: EffectFrameData };
-        public initFrameData: EffectFrameData;
         public refFrom: string;//数据整体引用
         public beloop: boolean;
         public delayTime: number = 0;
         public actionData: EffectActionData[];
         public emissionData: Emission;
+
+
+        public initFrameData: EffectFrameData;
         clone()
         {
             let elementdata = new EffectElementData();
