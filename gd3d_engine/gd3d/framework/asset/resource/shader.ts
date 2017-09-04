@@ -182,7 +182,7 @@ namespace gd3d.framework
             }
         }
 
-        private _parseProperties(assetmgr: assetMgr, properties: any)
+        public _parseProperties(assetmgr: assetMgr, properties: any)
         {
             this.defaultValue = {};
             for (var index in properties)

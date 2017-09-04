@@ -496,7 +496,7 @@
             "name": "resources/test/mask_quad.vs.glsl",
             "length": 0
         },
-		{
+        {
             "name": "resources/test/blur.shader.json",
             "length": 0
         },
@@ -512,7 +512,7 @@
             "name": "resources/test/blur_quad.vs.glsl",
             "length": 0
         },
-		{
+        {
             "name": "resources/test/GaussianBlur.shader.json",
             "length": 0
         },
@@ -534,6 +534,18 @@
         },
         {
             "name": "resources/project/additive_alpha.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/project/unlit_transparent.shader.json",
+            "length": 0
+        },
+        {
+            "name": "resources/project/unlit_transparent.vs.glsl",
+            "length": 0
+        },
+        {
+            "name": "resources/project/unlit_transparent.fs.glsl",
             "length": 0
         },
         {

@@ -63,6 +63,9 @@ class test_anim implements IState
                             {
                                 ap.playCrossByIndex(1, 0.2);
                             }
+                            else if(ev.code == "KeyS"){
+                                ap.stop();
+                            }
                         }
 
                         let wingroot = baihu.find("Bip001 Xtra17Nub");

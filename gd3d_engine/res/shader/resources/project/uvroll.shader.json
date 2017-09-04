@@ -1,6 +1,8 @@
 {
     "layer": "geometry",
-    "properties": [],
+    "properties": [
+	"_MainTex('MainTex',Texture)='white'{}"
+	],
     "passes": {
         "base": [
             {

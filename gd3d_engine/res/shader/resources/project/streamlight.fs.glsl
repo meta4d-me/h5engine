@@ -1,11 +1,11 @@
-uniform sampler2D _MainTex;
-uniform sampler2D _LightTex;
+uniform lowp sampler2D _MainTex;
+uniform lowp sampler2D _LightTex;
 uniform lowp vec4 _LightColor;
 uniform lowp float _LightRate;
-uniform sampler2D _MaskTex;
+uniform lowp sampler2D _MaskTex;
 uniform lowp float _AlphaCut;
-varying highp vec2 xlv_TEXCOORD0;
-varying highp vec2 _StreamLightUV;
+varying mediump vec2 xlv_TEXCOORD0;
+varying mediump vec2 _StreamLightUV;
 void main() 
 {
     lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);

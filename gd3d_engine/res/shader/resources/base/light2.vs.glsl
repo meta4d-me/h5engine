@@ -1,19 +1,19 @@
-attribute vec3 _glesVertex;   
-attribute vec3 _glesNormal;   
-attribute vec4 _glesColor;                  
-attribute vec4 _glesMultiTexCoord0; 
+attribute highp vec3 _glesVertex;   
+attribute lowp vec3 _glesNormal;   
+attribute lowp vec4 _glesColor;                  
+attribute mediump vec4 _glesMultiTexCoord0; 
 
-uniform highp sampler2D _NormalTex;   //normal map
+uniform lowp sampler2D _NormalTex;   //normal map
 
 uniform highp mat4 glstate_matrix_mvp;      
 uniform highp mat4 glstate_matrix_model;
 uniform highp mat4 glstate_matrix_modelview;
 uniform highp vec4 glstate_eyepos;
 
-varying highp vec3 vWorldpos;
-varying highp vec3 vNormal;
-varying highp vec2 xlv_TEXCOORD0;
-varying highp vec3 vEyepos;
+varying lowp vec3 vWorldpos;
+varying lowp vec3 vNormal;
+varying mediump vec2 xlv_TEXCOORD0;
+varying lowp vec3 vEyepos;
 
 
 void main()
@@ -27,11 +27,11 @@ void main()
     vEyepos=glstate_eyepos.xyz;
       
     //求世界空间法线
-    highp mat4 vnormalMat = glstate_matrix_model;
+    lowp mat4 vnormalMat = glstate_matrix_model;
     vnormalMat[3] =vec4(0,0,0,1);
     xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
-    highp vec3 NormalMap = texture2D(_NormalTex, xlv_TEXCOORD0).rgb;
-    highp vec3 N = normalize(NormalMap * 2.0 - vec3(1.0));
+    lowp vec3 NormalMap = texture2D(_NormalTex, xlv_TEXCOORD0).rgb;
+    lowp vec3 N = normalize(NormalMap * 2.0 - vec3(1.0));
 
     vNormal =normalize((vec4(_glesNormal,1)*vnormalMat).xyz);
 

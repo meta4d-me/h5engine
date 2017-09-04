@@ -50,7 +50,33 @@
                 }
             });
         }
+        private changeShader()
+        {
+            var btn = document.createElement("button");
+            // btn.textContent = "切换Shader到：diffuse.shader.json";
+            btn.textContent = "save";
 
+            btn.onclick = () =>
+            {
+                // var sh = this.app.getAssetMgr().getShader("diffuse.shader.json") as gd3d.framework.shader;
+                // this.change(sh);
+                let trans = this.cube;
+                let name = trans.name;
+                let prefab = new gd3d.framework.prefab(name + ".prefab.json");
+                prefab.assetbundle = name + ".assetbundle.json";
+                prefab.apply(trans);
+                // this.app.getAssetMgr().setAssetUrl(prefab, url);
+                this.app.getAssetMgr().use(prefab);
+                this.app.getAssetMgr().savePrefab(trans, name + ".prefab.json", (data: gd3d.framework.SaveInfo, resourses?: string[], content?: any) =>
+                {
+                    console.log(data);
+                });
+            }
+            btn.style.top = "160px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+
+        }
 
 
         private addcam(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
@@ -99,7 +125,7 @@
                         if (texture == null)
                             console.error("为什么他是空的呀");
                         else
-                        cuber.materials[0].setTexture("_MainTex", texture);
+                            cuber.materials[0].setTexture("_MainTex", texture);
 
                     }
                     this.cube = cube;
@@ -155,9 +181,10 @@
             //任务排队执行系统
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
-            this.taskmgr.addTaskCall(this.loadPvr.bind(this));
+            // this.taskmgr.addTaskCall(this.loadPvr.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this))
             this.taskmgr.addTaskCall(this.addcam.bind(this));
+            this.changeShader();
         }
 
         private angularVelocity: gd3d.math.vector3 = new gd3d.math.vector3(10, 0, 0);

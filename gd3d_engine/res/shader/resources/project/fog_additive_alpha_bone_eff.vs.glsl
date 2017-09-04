@@ -1,16 +1,16 @@
-attribute vec3 _glesVertex;
-attribute vec2 _glesMultiTexCoord0;
+attribute highp vec3 _glesVertex;
+attribute mediump vec2 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
-uniform highp vec4 _MainTex_ST;
-varying highp vec2 _base_uv;
+uniform mediump vec4 _MainTex_ST;
+varying mediump vec2 _base_uv;
 
-attribute vec4 _glesBlendIndex4;
-attribute vec4 _glesBlendWeight4;
+attribute lowp vec4 _glesBlendIndex4;
+attribute lowp vec4 _glesBlendWeight4;
 uniform highp vec4 glstate_vec4_bones[80];
 
-uniform highp float glstate_fog_start;
-uniform highp float glstate_fog_end;
-varying highp float factor;
+uniform lowp float glstate_fog_start;
+uniform lowp float glstate_fog_end;
+varying lowp float factor;
 
 mat4 buildMat4(int index)
 {

@@ -1,18 +1,18 @@
-attribute vec4 _glesVertex;   
-attribute vec4 _glesBlendIndex4;
-attribute vec4 _glesBlendWeight4;
-attribute vec4 _glesMultiTexCoord0;
+attribute highp vec4 _glesVertex;   
+attribute lowp vec4 _glesBlendIndex4;
+attribute lowp vec4 _glesBlendWeight4;
+attribute mediump vec4 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp vec4 glstate_vec4_bones[80];
-uniform highp float _SpeedU;
-uniform highp float _SpeedV;
-uniform highp float glstate_timer;
-uniform highp vec4 _LightTex_ST;
-uniform highp vec4 _MainTex_ST; 
+uniform lowp float _SpeedU;
+uniform lowp float _SpeedV;
+uniform lowp float glstate_timer;
+uniform mediump vec4 _LightTex_ST;
+uniform mediump vec4 _MainTex_ST; 
 
 
-varying highp vec2 xlv_TEXCOORD0;
-varying highp vec2 _StreamLightUV;
+varying mediump vec2 xlv_TEXCOORD0;
+varying mediump vec2 _StreamLightUV;
 mat4 buildMat4(int index)
 {
 	vec4 quat = glstate_vec4_bones[index * 2 + 0];
@@ -53,7 +53,7 @@ void main()
     gl_Position = (glstate_matrix_mvp * mat)* tmpvar_1;
 
 	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;  
-    highp vec2 _speed;
+    lowp vec2 _speed;
     _speed = vec2(_SpeedU,-_SpeedV);
     _StreamLightUV = (_glesMultiTexCoord0.xy * _LightTex_ST.xy + _LightTex_ST.zw)  + _speed * glstate_timer;
 }

@@ -15,7 +15,7 @@ namespace gd3d.framework
         value: any;
         defaultValue: any;
 
-        resname:string;
+        resname: string;
 
         constructor(type: render.UniformTypeEnum, value: any, defaultValue: any = null)
         {
@@ -369,15 +369,15 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _number;
-            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float)
             {
-                this.mapUniformTemp[_id].value=_number;
+                this.mapUniformTemp[_id].value = _number;
             }
             else
             {
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float, _number);
             }
-                
+
         }
         /**
          * @private
@@ -386,9 +386,9 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _numbers;
-            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Floatv)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Floatv)
             {
-                this.mapUniformTemp[_id].value=_numbers;
+                this.mapUniformTemp[_id].value = _numbers;
             }
             else
             {
@@ -402,9 +402,9 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _vector4;
-            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4)
             {
-                this.mapUniformTemp[_id].value=_vector4;
+                this.mapUniformTemp[_id].value = _vector4;
             }
             else
             {
@@ -418,9 +418,9 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _vector4v;
-            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4v)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4v)
             {
-                this.mapUniformTemp[_id].value=_vector4v;
+                this.mapUniformTemp[_id].value = _vector4v;
             }
             else
             {
@@ -434,9 +434,9 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _matrix;
-            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4x4)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4x4)
             {
-                this.mapUniformTemp[_id].value=_matrix;
+                this.mapUniformTemp[_id].value = _matrix;
             }
             else
             {
@@ -451,9 +451,9 @@ namespace gd3d.framework
         {
             if (this.mapUniform[_id] != undefined)
                 this.mapUniform[_id].value = _matrixv;
-            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Float4x4v)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4x4v)
             {
-                this.mapUniformTemp[_id].value=_matrixv;
+                this.mapUniformTemp[_id].value = _matrixv;
             }
             else
             {
@@ -463,7 +463,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        setTexture(_id: string, _texture: gd3d.framework.texture, resname:string = "")
+        setTexture(_id: string, _texture: gd3d.framework.texture, resname: string = "")
         {
             if (this.mapUniform[_id] != undefined)
             {
@@ -472,7 +472,7 @@ namespace gd3d.framework
                     this.mapUniform[_id].value.unuse();
                 }
                 this.mapUniform[_id].value = _texture;
-                if(resname != "")
+                if (resname != "")
                 {
                     this.mapUniform[_id].resname = resname;
                 }
@@ -483,15 +483,15 @@ namespace gd3d.framework
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (this.mapUniform[_texelsizeName] != undefined && _gltexture!=undefined)
+                    if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
             }
-            else if(this.mapUniformTemp[_id]!=undefined&&this.mapUniformTemp[_id].type==render.UniformTypeEnum.Texture)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Texture)
             {
-                this.mapUniformTemp[_id].value=_texture;
+                this.mapUniformTemp[_id].value = _texture;
             }
             else
             {
@@ -503,12 +503,12 @@ namespace gd3d.framework
          */
         uploadUniform(pass: render.glDrawPass)
         {
-            this.uploadMapUniform(pass,this.mapUniform);
-            this.uploadMapUniform(pass,this.mapUniformTemp);
-            this.uploadMapUniform(pass,shader.getGlobalMapUniform());
+            this.uploadMapUniform(pass, this.mapUniform);
+            this.uploadMapUniform(pass, this.mapUniformTemp);
+            this.uploadMapUniform(pass, shader.getGlobalMapUniform());
         }
 
-        private uploadMapUniform(pass: render.glDrawPass,mapUniform:{[id: string]: UniformData})
+        private uploadMapUniform(pass: render.glDrawPass, mapUniform: { [id: string]: UniformData })
         {
             for (let id in mapUniform)
             {
@@ -565,7 +565,7 @@ namespace gd3d.framework
          * @param sm 渲染的submesh信息
          * @version egret-gd3d 1.0
          */
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base",useGLobalLightMap:boolean=true)
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", useGLobalLightMap: boolean = true)
         {
 
             let drawPasses = this.shader.passes[basetype + context.drawtype];
@@ -628,7 +628,7 @@ namespace gd3d.framework
                             this.setVector4(key, context.eyePos);
                             break;
                         case "_LightmapTex":
-                            if(!useGLobalLightMap) break;
+                            if (!useGLobalLightMap) break;
                             this.setTexture(key, context.lightmap);
                             break;
                         case "glstate_lightmapOffset":
@@ -687,7 +687,7 @@ namespace gd3d.framework
          * @param json json数据
          * @version egret-gd3d 1.0
          */
-        Parse(assetmgr: assetMgr, json: any,bundleName:string=null)
+        Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
         {
             var shaderName = json["shader"];
             this.setShader(assetmgr.getShader(shaderName) as gd3d.framework.shader);
@@ -700,7 +700,7 @@ namespace gd3d.framework
                 {
                     case render.UniformTypeEnum.Texture:
                         var _value: string = jsonChild["value"];
-                        var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value,bundleName) as gd3d.framework.texture;
+                        var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
                         if (_texture == undefined)
                         {
                             _texture = assetmgr.getDefaultTexture("grid");
@@ -764,6 +764,32 @@ namespace gd3d.framework
                 }
             }
             return mat;
+        }
+
+        public save(): string
+        {
+            let obj: any = {};
+            obj["shader"] = this.shader.getName();
+            obj["srcshader"] = "";
+            obj["mapUniform"] = {};
+            for (let key in this.mapUniform)
+            {
+                let data = {};
+                data["type"] = this.mapUniform[key].type;
+                data["value"] = this.mapUniform[key].value;
+                obj["mapUniform"][key] = data;
+            }
+            if (this.mapUniformTemp != undefined)
+            {
+                for (let key in this.mapUniformTemp)
+                {
+                    let data = {};
+                    data["type"] = this.mapUniformTemp[key].type;
+                    data["value"] = this.mapUniformTemp[key].value;
+                    obj["mapUniform"][key] = data;
+                }
+            }
+            return JSON.stringify(obj);
         }
     }
 }

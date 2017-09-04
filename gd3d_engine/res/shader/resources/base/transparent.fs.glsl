@@ -1,4 +1,4 @@
-uniform sampler2D _MainTex;                                                                                                
+uniform lowp sampler2D _MainTex;                                                                                                
 varying highp vec2 xlv_TEXCOORD0;
 void main() 
 {

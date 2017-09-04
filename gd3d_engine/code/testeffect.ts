@@ -103,22 +103,22 @@ class test_effect implements IState
         this.taskmgr.addTaskCall(this.loadEffect.bind(this));
     }
 
-
+    private text:gd3d.framework.textasset;
     private loadEffect(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) 
     {
         // this._loadEffect("res/particleEffect/hjxnew/hjxnew.assetbundle.json", "hjxnew");//
         // this._loadEffect("res/particleEffect/particle/particle.assetbundle.json", "particle.effect.json");//
         //fx_0005_sword_sword
         let names: string[] = ["0fx_boss_02", "fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
-        let name = names[0];
+        let name = names[2];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
         {
             if (_state.isfinish)
             {
                 this.tr = new gd3d.framework.transform();
                 this.effect = this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM) as gd3d.framework.effectSystem;
-                var text: gd3d.framework.textasset = this.app.getAssetMgr().getAssetByName(name + ".effect.json") as gd3d.framework.textasset;
-                this.effect.setJsonData(text);
+                this.text = this.app.getAssetMgr().getAssetByName(name + ".effect.json") as gd3d.framework.textasset;
+                this.effect.setJsonData(this.text);
                 this.scene.addChild(this.tr);
                 this.tr.markDirty();
                 state.finish = true;
@@ -147,11 +147,13 @@ class test_effect implements IState
             // this.effect.stop();
             // this.effect.play();
 
-            let tr = new gd3d.framework.transform();
-            this.scene.addChild(tr);
-            let effect = tr.gameObject.addComponent("effectSystemNew") as gd3d.framework.effectSystemNew;
-            let ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
+            // let tr = new gd3d.framework.transform();
+            // this.scene.addChild(tr);
+            // let effect = tr.gameObject.addComponent("effectSystemNew") as gd3d.framework.effectSystemNew;
+            // let ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
             // gd3d.io.serializeObj(effect);
+
+            this.effect.updateJsonData(this.text);
         }
         btn.style.top = "160px";
         btn.style.position = "absolute";

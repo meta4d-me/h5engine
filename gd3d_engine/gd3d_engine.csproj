@@ -22,6 +22,8 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="code\build.cmd" />
+    <Content Include="code\tsconfig.json" />
     <Content Include="gd3d\namedrule.txt" />
     <Content Include="index.html" />
     <Content Include="lib\bootstrap\css\bootstrap-theme.css" />
@@ -420,30 +422,43 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="code\controller\cameracontroller.ts" />
+    <TypeScriptCompile Include="code\effectEditor\effectdata.ts" />
+    <TypeScriptCompile Include="code\effectEditor\testeffect_editor.ts" />
     <TypeScriptCompile Include="code\light_d1.ts" />
+    <TypeScriptCompile Include="code\localSave.ts" />
     <TypeScriptCompile Include="code\main.ts" />
     <TypeScriptCompile Include="code\test1.ts" />
     <TypeScriptCompile Include="code\testanim.ts" />
+    <TypeScriptCompile Include="code\testasi.ts" />
     <TypeScriptCompile Include="code\testassestmgr.ts" />
     <TypeScriptCompile Include="code\testchangeshader.ts" />
     <TypeScriptCompile Include="code\testcleardepth0.ts" />
+    <TypeScriptCompile Include="code\testeffect.ts" />
     <TypeScriptCompile Include="code\testintegratedrender.ts" />
     <TypeScriptCompile Include="code\testlight1.ts" />
     <TypeScriptCompile Include="code\testloadimmediate.ts" />
+    <TypeScriptCompile Include="code\testLoadmulBundle.ts" />
     <TypeScriptCompile Include="code\testLoadScene.ts" />
+    <TypeScriptCompile Include="code\testmask.ts" />
     <TypeScriptCompile Include="code\testmesh.ts" />
     <TypeScriptCompile Include="code\testmetal.ts" />
     <TypeScriptCompile Include="code\testmultipleanims.ts" />
     <TypeScriptCompile Include="code\testnavmesh.ts" />
     <TypeScriptCompile Include="code\testnormalmap.ts" />
+    <TypeScriptCompile Include="code\testPathAsset.ts" />
     <TypeScriptCompile Include="code\testpick.ts" />
+    <TypeScriptCompile Include="code\testPosteff.ts" />
     <TypeScriptCompile Include="code\testposteffect.ts" />
+    <TypeScriptCompile Include="code\testpost_bloom.ts" />
     <TypeScriptCompile Include="code\testPrefab.ts" />
     <TypeScriptCompile Include="code\testReload.ts" />
     <TypeScriptCompile Include="code\testrotate.ts" />
+    <TypeScriptCompile Include="code\testshadowmap.ts" />
     <TypeScriptCompile Include="code\testskillsystem.ts" />
     <TypeScriptCompile Include="code\testsound.ts" />
     <TypeScriptCompile Include="code\teststreamlight.ts" />
+    <TypeScriptCompile Include="code\testswordtrail.ts" />
+    <TypeScriptCompile Include="code\testtexxUV.ts" />
     <TypeScriptCompile Include="code\testtrailrender.ts" />
     <TypeScriptCompile Include="code\testui.ts" />
     <TypeScriptCompile Include="code\testusercodeupdate.ts" />
@@ -451,7 +466,10 @@
     <TypeScriptCompile Include="code\test_blend.ts" />
     <TypeScriptCompile Include="code\test_fakepbr.ts" />
     <TypeScriptCompile Include="code\test_like_rendertexture.ts" />
+    <TypeScriptCompile Include="code\test_long.ts" />
     <TypeScriptCompile Include="code\test_tank.ts" />
+    <TypeScriptCompile Include="code\test_three_leaved_rose_curve.ts" />
+    <TypeScriptCompile Include="code\test_uimove.ts" />
     <TypeScriptCompile Include="code_loader\loader.ts" />
     <TypeScriptCompile Include="gd3d\framework\2d\canvas.ts" />
     <TypeScriptCompile Include="gd3d\framework\2d\canvasrenderer.ts" />
@@ -569,8 +587,6 @@
     <TypeScriptCompile Include="lib_user\loader.d.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="code\build.cmd" />
-    <Content Include="code\tsconfig.json" />
     <Content Include="code_loader\build.cmd" />
     <Content Include="code_loader\tsconfig.json" />
     <Content Include="gd3d\build.cmd" />

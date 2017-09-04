@@ -1,6 +1,6 @@
-uniform sampler2D _MainTex;                                                 
+uniform lowp sampler2D _MainTex;                                                 
 varying lowp vec4 xlv_COLOR;                                                 
-varying highp vec2 xlv_TEXCOORD0;   
+varying mediump vec2 xlv_TEXCOORD0;   
 void main() 
 {
     lowp vec4 tmpvar_3;

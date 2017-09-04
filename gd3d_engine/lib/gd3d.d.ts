@@ -432,7 +432,6 @@ declare namespace gd3d.framework {
         getLocalMatrix(): gd3d.math.matrix3x2;
         getWorldMatrix(): gd3d.math.matrix3x2;
         static getTransInfoInCanvas(trans: transform2D, out: t2dInfo): void;
-        static getMatrixToCanvas(trans: transform2D, mattoCanvas: math.matrix3x2): void;
         setWorldPosition(pos: math.vector2): void;
         dispose(): void;
         renderer: IRectRenderer;
@@ -730,7 +729,7 @@ declare namespace gd3d.framework {
         unload(url: string, onstate?: () => void): void;
         loadScene(sceneName: string, onComplete: () => void): void;
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
-        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[]) => void): void;
+        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
         saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;
         loadSingleResImmediate(url: string, type: AssetTypeEnum): any;
         loadImmediate(url: string, type?: AssetTypeEnum): any;
@@ -757,16 +756,21 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class defShader {
+        static shader0: string;
         static vscode: string;
         static fscode: string;
         static fscode2: string;
+        static uishader: string;
         static fscodeui: string;
+        static shaderuifront: string;
         static vscodeuifont: string;
         static fscodeuifont: string;
+        static diffuseShader: string;
         static vsdiffuse: string;
         static fsdiffuse: string;
         static vsline: string;
         static fsline: string;
+        static materialShader: string;
         static vsmaterialcolor: string;
         static initDefaultShader(assetmgr: assetMgr): void;
     }
@@ -1081,6 +1085,7 @@ declare namespace gd3d.framework {
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
+        save(): string;
     }
 }
 declare namespace gd3d.framework {
@@ -1223,7 +1228,7 @@ declare namespace gd3d.framework {
         layer: RenderLayerEnum;
         queue: number;
         parse(assetmgr: assetMgr, json: any): void;
-        private _parseProperties(assetmgr, properties);
+        _parseProperties(assetmgr: assetMgr, properties: any): void;
         private _parsePass(assetmgr, json);
         private static mapUniformGlobal;
         private static setGlobal(key, value, type);
@@ -1293,16 +1298,24 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AudioEx {
-        private constructor();
-        clickInit(): void;
         private static g_this;
         static instance(): AudioEx;
         audioContext: AudioContext;
-        private static loadArrayBuffer(url, fun);
-        isAvailable(): boolean;
+        private constructor();
+        clickInit(): void;
         loadAudioBufferFromArrayBuffer(ab: ArrayBuffer, fun: (buf: AudioBuffer, _err: Error) => void): void;
         loadAudioBuffer(url: string, fun: (buf: AudioBuffer, _err: Error) => void): void;
+        isAvailable(): boolean;
         createAudioChannel(): AudioChannel;
+        private static loadArrayBuffer(url, fun);
+    }
+    class AudioChannel {
+        source: AudioBufferSourceNode;
+        gainNode: GainNode;
+        pannerNode: PannerNode;
+        volume: number;
+        isplay: boolean;
+        stop(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1354,6 +1367,7 @@ declare namespace gd3d.framework {
         play(animName: string, speed?: number, beRevert?: boolean): void;
         playCross(animName: string, crosstimer: number, speed?: number, beRevert?: boolean): void;
         private playAniamtion(index, speed?, beRevert?);
+        updateAnimation(animIndex: number, _frame: number): void;
         stop(): void;
         isPlay(): boolean;
         isStop(): boolean;
@@ -1388,30 +1402,37 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class AudioPlayer implements INodeComponent {
-        private _volume;
-        audioChannel: AudioChannel;
-        buffer: AudioBuffer;
-        beLoop: boolean;
-        name: String;
-        init(name: string, audioChannel: AudioChannel, beLoop?: boolean): void;
+    class AudioListener implements INodeComponent {
+        private listener;
         start(): void;
-        update(delta: number): void;
+        private lastX;
+        private lastY;
+        private lastZ;
+        private curPos;
         gameObject: gameObject;
+        update(delta: number): void;
         remove(): void;
         clone(): void;
-        play(buffer: AudioBuffer, volume?: number, onended?: Function, x?: number, y?: number, z?: number): any;
+    }
+}
+declare namespace gd3d.framework {
+    class AudioPlayer implements INodeComponent {
+        buffer: AudioBuffer;
+        beLoop: boolean;
+        private audioChannel;
+        gameObject: gameObject;
+        play(buffer: AudioBuffer, beLoop?: boolean, volume?: number, onended?: Function): void;
         stop(): void;
         volume: number;
         isPlaying(): boolean;
-    }
-    class AudioChannel {
-        source: AudioBufferSourceNode;
-        gainNode: GainNode;
-        pannerNode: PannerNode;
-        volume: number;
-        isplay: boolean;
-        stop(): void;
+        start(): void;
+        private lastX;
+        private lastY;
+        private lastZ;
+        private curPos;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1551,6 +1572,7 @@ declare namespace gd3d.framework {
         private particleElementDic;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
+        updateJsonData(_jsonData: textasset): void;
         data: EffectSystemData;
         init(): void;
         private _data;
@@ -2094,8 +2116,18 @@ declare namespace gd3d.io {
     function stringToUtf8Array(str: string): number[];
 }
 declare namespace gd3d.io {
+    enum SaveAssetType {
+        FullUrl = 0,
+        NameAndContent = 1,
+        DefaultAssets = 2,
+    }
     class SerializeDependent {
-        static resoursePaths: string[];
+        static resourseDatas: any[];
+        static GetAssetContent(asset: any): {
+            "name": string;
+            "value": string;
+            "type": SaveAssetType;
+        };
         static GetAssetUrl(asset: any, assetMgr: any): void;
     }
     function SerializeForInspector(obj: any): string;
@@ -2405,12 +2437,12 @@ declare namespace gd3d.framework {
         timelineFrame: {
             [frameIndex: number]: EffectFrameData;
         };
-        initFrameData: EffectFrameData;
         refFrom: string;
         beloop: boolean;
         delayTime: number;
         actionData: EffectActionData[];
         emissionData: Emission;
+        initFrameData: EffectFrameData;
         clone(): EffectElementData;
         dispose(): void;
     }

@@ -6,9 +6,10 @@
     "passes": {
         "base": [
             {
-                "showface": "cw",
-                "vs": "speculartexture",
-                "fs": "speculartexture"
+                "blendmode": "blend",
+                "showface": "ccw",
+                "vs": "unlit_transparent",
+                "fs": "unlit_transparent"
             }
         ],
         "shadowgen": [],

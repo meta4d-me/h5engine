@@ -539,6 +539,7 @@ declare class test_effect implements IState {
     private dragon;
     private loadModel(laststate, state);
     start(app: gd3d.framework.application): void;
+    private text;
     private loadEffect(laststate, state);
     private addButton();
     private getNameFromURL(path);
@@ -638,6 +639,20 @@ declare class test_loadScene implements IState {
     timer: number;
     bere: boolean;
     update(delta: number): void;
+}
+declare namespace t {
+    class test_xinshouMask implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        imageRenderMask: gd3d.framework.meshRenderer;
+        texture: gd3d.framework.texture;
+        start(app: gd3d.framework.application): void;
+        addDomUI(): void;
+        camera: gd3d.framework.camera;
+        timer: number;
+        update(delta: number): void;
+    }
+    function getFileName(url: string): string;
 }
 declare class test_load implements IState {
     app: gd3d.framework.application;
@@ -910,6 +925,7 @@ declare namespace t {
         private loadShader(laststate, state);
         private loadText(laststate, state);
         private loadPvr(laststate, state);
+        private changeShader();
         private addcam(laststate, state);
         private addcube(laststate, state);
         cubetrail: gd3d.framework.transform;
@@ -986,7 +1002,7 @@ declare namespace t {
         counttimer: number;
         private angularVelocity;
         private eulerAngle;
-        looped: AudioBuffer;
+        loopedBuffer: AudioBuffer;
         once1: AudioBuffer;
         once2: AudioBuffer;
         private loadShader(laststate, state);
@@ -1086,8 +1102,6 @@ declare namespace t {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
         start(app: gd3d.framework.application): void;
-        t2d_1: any;
-        o2d: any;
         img_3: gd3d.framework.image2D;
         img_4: gd3d.framework.image2D;
         img_5: gd3d.framework.image2D;

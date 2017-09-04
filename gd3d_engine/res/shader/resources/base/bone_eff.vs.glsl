@@ -1,11 +1,11 @@
-attribute vec4 _glesVertex;   
-attribute vec4 _glesBlendIndex4;
-attribute vec4 _glesBlendWeight4;
-attribute vec4 _glesMultiTexCoord0;
+attribute highp vec4 _glesVertex;   
+attribute lowp vec4 _glesBlendIndex4;
+attribute lowp vec4 _glesBlendWeight4;
+attribute mediump vec4 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
 uniform highp vec4 glstate_vec4_bones[80];
-uniform highp vec4 _MainTex_ST; 
-varying highp vec2 xlv_TEXCOORD0;
+uniform mediump vec4 _MainTex_ST; 
+varying mediump vec2 xlv_TEXCOORD0;
 mat4 buildMat4(int index)
 {
 	vec4 quat = glstate_vec4_bones[index * 2 + 0];
@@ -28,7 +28,7 @@ mat4 buildMat4(int index)
 	return matrix;
 }
 
-highp vec4 calcVertex(highp vec4 srcVertex,highp vec4 blendIndex,highp vec4 blendWeight)
+highp vec4 calcVertex(highp vec4 srcVertex,lowp vec4 blendIndex,lowp vec4 blendWeight)
 {
 	int i = int(blendIndex.x);  
     int i2 =int(blendIndex.y);

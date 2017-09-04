@@ -2814,14 +2814,6 @@ var gd3d;
                 gd3d.math.pool.delete_vector2(rotscale);
                 gd3d.math.pool.delete_vector2(rotPos);
             };
-            transform2D.getMatrixToCanvas = function (trans, mattoCanvas) {
-                var mat = trans.getWorldMatrix();
-                var rotmat = trans.canvas.getRoot().getWorldMatrix();
-                var inversemat = gd3d.math.pool.new_matrix3x2();
-                gd3d.math.matrix3x2Inverse(rotmat, inversemat);
-                gd3d.math.matrix3x2Multiply(inversemat, mat, mattoCanvas);
-                gd3d.math.pool.delete_matrix3x2(inversemat);
-            };
             transform2D.prototype.setWorldPosition = function (pos) {
                 this.dirty = true;
                 this.updateWorldTran();
@@ -3945,12 +3937,20 @@ var gd3d;
                     if (assetbundle != null)
                         id = assetbundle.mapNamed[name];
                 }
-                if (id == null)
-                    return null;
-                var r = this.mapRes[id];
-                if (r == null)
-                    return null;
-                return r.asset;
+                var flag = true;
+                if (id != null) {
+                    var r = this.mapRes[id];
+                    if (r != null)
+                        return r.asset;
+                }
+                if (flag) {
+                    if (this.mapDefaultMesh[name] != undefined)
+                        return this.mapDefaultMesh[name];
+                    if (this.mapDefaultTexture[name] != undefined)
+                        return this.mapDefaultTexture[name];
+                    if (this.mapShader[name] != undefined)
+                        return this.mapShader[name];
+                }
             };
             assetMgr.prototype.getAssetBundle = function (bundlename) {
                 if (this.mapBundle[bundlename])
@@ -4092,6 +4092,9 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.PVR, new framework.AssetFactory_PVR());
             };
             assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
+                if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1) {
+                    console.log("aaa");
+                }
                 var assetFactory = this.getAssetFactory(type);
                 if (assetFactory != null) {
                     assetFactory.load(url, onstate, state, this, asset);
@@ -4272,7 +4275,7 @@ var gd3d;
                 onComplete();
             };
             assetMgr.prototype.saveScene = function (fun) {
-                gd3d.io.SerializeDependent.resoursePaths = [];
+                gd3d.io.SerializeDependent.resourseDatas = [];
                 var info = new SaveInfo();
                 var _scene = {};
                 var _rootNode = gd3d.io.serializeObj(this.app.getScene().getRoot(), this);
@@ -4290,17 +4293,17 @@ var gd3d;
                 _rawscene.Parse(_sceneStr, this);
                 var url = this.getAssetUrl(_rawscene);
                 info.files[url] = _sceneStr;
-                fun(info, gd3d.io.SerializeDependent.resoursePaths);
+                fun(info, gd3d.io.SerializeDependent.resourseDatas);
             };
             assetMgr.prototype.savePrefab = function (trans, prefabName, fun) {
-                gd3d.io.SerializeDependent.resoursePaths = [];
+                gd3d.io.SerializeDependent.resourseDatas = [];
                 var info = new SaveInfo();
                 var _prefab = this.getAssetByName(prefabName);
                 _prefab.apply(trans);
                 var _rootTrans = gd3d.io.serializeObj(trans, null, this);
                 var url = this.getAssetUrl(_prefab);
                 info.files[url] = JSON.stringify(_rootTrans);
-                fun(info, gd3d.io.SerializeDependent.resoursePaths);
+                fun(info, gd3d.io.SerializeDependent.resourseDatas);
             };
             assetMgr.prototype.saveMaterial = function (mat, fun) {
                 var info = new SaveInfo();
@@ -4579,6 +4582,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.shader0).properties);
                     p.state_ztest = true;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
                     p.state_zwrite = true;
@@ -4594,6 +4598,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.diffuseShader).properties);
                     p.state_ztest = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
                     p.state_zwrite = false;
@@ -4609,6 +4614,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
                     p.setProgram(program2);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -4622,6 +4628,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
                     p.setProgram(program2);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -4636,6 +4643,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                     p.setProgram(programuifont);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -4664,6 +4672,7 @@ var gd3d;
                     sh.passes["base"] = [];
                     var p = new gd3d.render.glDrawPass();
                     sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.materialShader).properties);
                     p.setProgram(programmaterialcolor);
                     p.state_ztest = false;
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
@@ -4672,153 +4681,179 @@ var gd3d;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
+            defShader.shader0 = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
+            ]\
+          }";
             defShader.vscode = "\
-    attribute vec4 _glesVertex;   \
-    attribute vec4 _glesColor;                  \
-    attribute vec4 _glesMultiTexCoord0;         \
-    uniform highp mat4 glstate_matrix_mvp;      \
-    varying lowp vec4 xlv_COLOR;                \
-    varying highp vec2 xlv_TEXCOORD0;           \
-    void main()                                     \
-    {                                               \
-        highp vec4 tmpvar_1;                        \
-        tmpvar_1.w = 1.0;                           \
-        tmpvar_1.xyz = _glesVertex.xyz;             \
-        xlv_COLOR = _glesColor;                     \
-        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-    }";
+        attribute vec4 _glesVertex;   \
+        attribute vec4 _glesColor;                  \
+        attribute vec4 _glesMultiTexCoord0;         \
+        uniform highp mat4 glstate_matrix_mvp;      \
+        varying lowp vec4 xlv_COLOR;                \
+        varying highp vec2 xlv_TEXCOORD0;           \
+        void main()                                     \
+        {                                               \
+            highp vec4 tmpvar_1;                        \
+            tmpvar_1.w = 1.0;                           \
+            tmpvar_1.xyz = _glesVertex.xyz;             \
+            xlv_COLOR = _glesColor;                     \
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
+        }";
             defShader.fscode = "         \
-    uniform sampler2D _MainTex;                                                 \
-    varying lowp vec4 xlv_COLOR;                                                 \
-    varying highp vec2 xlv_TEXCOORD0;   \
-    void main() \
-    {\
-        lowp vec4 col_1;    \
-        mediump vec4 prev_2;\
-        lowp vec4 tmpvar_3;\
-        tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-        prev_2 = tmpvar_3;\
-        mediump vec4 tmpvar_4;\
-        tmpvar_4 = mix(vec4(1.0, 1.0, 1.0, 1.0), prev_2, prev_2.wwww);\
-        col_1 = tmpvar_4;\
-        col_1.x =xlv_TEXCOORD0.x;\
-        col_1.y =xlv_TEXCOORD0.y;\
-        gl_FragData[0] = col_1;\
-    }\
-    ";
+        uniform sampler2D _MainTex;                                                 \
+        varying lowp vec4 xlv_COLOR;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;   \
+        void main() \
+        {\
+            lowp vec4 col_1;    \
+            mediump vec4 prev_2;\
+            lowp vec4 tmpvar_3;\
+            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
+            prev_2 = tmpvar_3;\
+            mediump vec4 tmpvar_4;\
+            tmpvar_4 = mix(vec4(1.0, 1.0, 1.0, 1.0), prev_2, prev_2.wwww);\
+            col_1 = tmpvar_4;\
+            col_1.x =xlv_TEXCOORD0.x;\
+            col_1.y =xlv_TEXCOORD0.y;\
+            gl_FragData[0] = col_1;\
+        }\
+        ";
             defShader.fscode2 = "         \
-    void main() \
-    {\
-        gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\
-    }\
-    ";
+        void main() \
+        {\
+            gl_FragData[0] = vec4(1.0, 1.0, 1.0, 1.0);\
+        }\
+        ";
+            defShader.uishader = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
+            ]\
+            }";
             defShader.fscodeui = "         \
-    uniform sampler2D _MainTex;                                                 \
-    varying lowp vec4 xlv_COLOR;                                                 \
-    varying highp vec2 xlv_TEXCOORD0;   \
-    void main() \
-    {\
-        lowp vec4 tmpvar_3;\
-        tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-        gl_FragData[0] = tmpvar_3;\
-    }\
-    ";
+        uniform sampler2D _MainTex;                                                 \
+        varying lowp vec4 xlv_COLOR;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;   \
+        void main() \
+        {\
+            lowp vec4 tmpvar_3;\
+            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
+            gl_FragData[0] = tmpvar_3;\
+        }\
+        ";
+            defShader.shaderuifront = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
+            ]\
+            }";
             defShader.vscodeuifont = "\
-    attribute vec4 _glesVertex;   \
-    attribute vec4 _glesColor;                  \
-    attribute vec4 _glesColorEx;                  \
-    attribute vec4 _glesMultiTexCoord0;         \
-    uniform highp mat4 glstate_matrix_mvp;      \
-    varying lowp vec4 xlv_COLOR;                \
-    varying lowp vec4 xlv_COLOREx;                                                 \
-    varying highp vec2 xlv_TEXCOORD0;           \
-    void main()                                     \
-    {                                               \
-        highp vec4 tmpvar_1;                        \
-        tmpvar_1.w = 1.0;                           \
-        tmpvar_1.xyz = _glesVertex.xyz;             \
-        xlv_COLOR = _glesColor;                     \
-        xlv_COLOREx = _glesColorEx;                     \
-        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-    }";
+        attribute vec4 _glesVertex;   \
+        attribute vec4 _glesColor;                  \
+        attribute vec4 _glesColorEx;                  \
+        attribute vec4 _glesMultiTexCoord0;         \
+        uniform highp mat4 glstate_matrix_mvp;      \
+        varying lowp vec4 xlv_COLOR;                \
+        varying lowp vec4 xlv_COLOREx;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;           \
+        void main()                                     \
+        {                                               \
+            highp vec4 tmpvar_1;                        \
+            tmpvar_1.w = 1.0;                           \
+            tmpvar_1.xyz = _glesVertex.xyz;             \
+            xlv_COLOR = _glesColor;                     \
+            xlv_COLOREx = _glesColorEx;                     \
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
+        }";
             defShader.fscodeuifont = "\
-precision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \n\
-uniform sampler2D _MainTex; \n\
-varying lowp vec4 xlv_COLOR;\n\
-varying lowp vec4 xlv_COLOREx;\n\
-varying highp vec2 xlv_TEXCOORD0;   \n\
-void main() \n\
-{\n\
-float scale = 10.0;//  \n\
-float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  //0.5\n\
-float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  //0.34\n\
-\n\
-float c=xlv_COLOR.a * clamp ( d,0.0,1.0); \n\
-float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0); \n\
-bc =min(1.0-c,bc);\n\
-\n\
-\n\
-\n\
-gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
-}";
+        precision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \n\
+        uniform sampler2D _MainTex; \n\
+        varying lowp vec4 xlv_COLOR;\n\
+        varying lowp vec4 xlv_COLOREx;\n\
+        varying highp vec2 xlv_TEXCOORD0;   \n\
+        void main() \n\
+        {\n\
+        float scale = 10.0;//  \n\
+        float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  //0.5\n\
+        float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  //0.34\n\
+        \n\
+        float c=xlv_COLOR.a * clamp ( d,0.0,1.0); \n\
+        float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0); \n\
+        bc =min(1.0-c,bc);\n\
+        \n\
+        \n\
+        \n\
+        gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
+        }";
+            defShader.diffuseShader = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5\"\
+            ]\
+            }";
             defShader.vsdiffuse = "\
-    attribute vec4 _glesVertex;\
-    attribute vec4 _glesMultiTexCoord0;\
-    uniform highp mat4 glstate_matrix_mvp;\
-    varying highp vec2 xlv_TEXCOORD0;\
-    void main()\
-    {\
-        highp vec4 tmpvar_1;\
-        tmpvar_1.w = 1.0;\
-        tmpvar_1.xyz = _glesVertex.xyz;\
-        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
-    }";
+        attribute vec4 _glesVertex;\
+        attribute vec4 _glesMultiTexCoord0;\
+        uniform highp mat4 glstate_matrix_mvp;\
+        varying highp vec2 xlv_TEXCOORD0;\
+        void main()\
+        {\
+            highp vec4 tmpvar_1;\
+            tmpvar_1.w = 1.0;\
+            tmpvar_1.xyz = _glesVertex.xyz;\
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+        }";
             defShader.fsdiffuse = "\
-    uniform sampler2D _MainTex;\
-    uniform lowp float _AlphaCut;\
-    varying highp vec2 xlv_TEXCOORD0;\
-    void main() \
-    {\
-        lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
-        if(tmpvar_3.a < _AlphaCut)\
-            discard;\
-        gl_FragData[0] = tmpvar_3;\
-    }";
+        uniform sampler2D _MainTex;\
+        uniform lowp float _AlphaCut;\
+        varying highp vec2 xlv_TEXCOORD0;\
+        void main() \
+        {\
+            lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);\
+            if(tmpvar_3.a < _AlphaCut)\
+                discard;\
+            gl_FragData[0] = tmpvar_3;\
+        }";
             defShader.vsline = "\
-    attribute vec4 _glesVertex;\
-    attribute vec4 _glesColor;\
-    uniform highp mat4 glstate_matrix_mvp;\
-    varying lowp vec4 xlv_COLOR;\
-    void main()\
-    {\
-        highp vec4 tmpvar_1;\
-        tmpvar_1.w = 1.0;\
-        tmpvar_1.xyz = _glesVertex.xyz;\
-        xlv_COLOR = _glesColor;\
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
-    }";
+        attribute vec4 _glesVertex;\
+        attribute vec4 _glesColor;\
+        uniform highp mat4 glstate_matrix_mvp;\
+        varying lowp vec4 xlv_COLOR;\
+        void main()\
+        {\
+            highp vec4 tmpvar_1;\
+            tmpvar_1.w = 1.0;\
+            tmpvar_1.xyz = _glesVertex.xyz;\
+            xlv_COLOR = _glesColor;\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+        }";
             defShader.fsline = "\
-    varying lowp vec4 xlv_COLOR;\
-    void main()\
-    {\
-        gl_FragData[0] = xlv_COLOR;\
-    }";
+        varying lowp vec4 xlv_COLOR;\
+        void main()\
+        {\
+            gl_FragData[0] = xlv_COLOR;\
+        }";
+            defShader.materialShader = "{\
+            \"properties\": [\
+              \"_Color('Color',Vector) = (1,1,1,1)\"\
+            ]\
+            }";
             defShader.vsmaterialcolor = "\
-    attribute vec4 _glesVertex;\
-    uniform vec4 _Color;\
-    uniform highp mat4 glstate_matrix_mvp;\
-    varying lowp vec4 xlv_COLOR;\
-    void main()\
-    {\
-        highp vec4 tmpvar_1;\
-        tmpvar_1.w = 1.0;\
-        tmpvar_1.xyz = _glesVertex.xyz;\
-        xlv_COLOR = _Color;\
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);\
-    }";
+        attribute vec4 _glesVertex;\
+        uniform vec4 _Color;\
+        uniform highp mat4 glstate_matrix_mvp;\
+        varying lowp vec4 xlv_COLOR;\
+        void main()\
+        {\
+            highp vec4 tmpvar_1;\
+            tmpvar_1.w = 1.0;\
+            tmpvar_1.xyz = _glesVertex.xyz;\
+            xlv_COLOR = _Color;\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);\
+        }";
             return defShader;
         }());
         framework.defShader = defShader;
@@ -6642,6 +6677,27 @@ var gd3d;
                 }
                 return mat;
             };
+            material.prototype.save = function () {
+                var obj = {};
+                obj["shader"] = this.shader.getName();
+                obj["srcshader"] = "";
+                obj["mapUniform"] = {};
+                for (var key in this.mapUniform) {
+                    var data = {};
+                    data["type"] = this.mapUniform[key].type;
+                    data["value"] = this.mapUniform[key].value;
+                    obj["mapUniform"][key] = data;
+                }
+                if (this.mapUniformTemp != undefined) {
+                    for (var key in this.mapUniformTemp) {
+                        var data = {};
+                        data["type"] = this.mapUniformTemp[key].type;
+                        data["value"] = this.mapUniformTemp[key].value;
+                        obj["mapUniform"][key] = data;
+                    }
+                }
+                return JSON.stringify(obj);
+            };
             __decorate([
                 gd3d.reflect.Field("constText"), 
                 __metadata('design:type', framework.constText)
@@ -7842,6 +7898,11 @@ var gd3d;
                     console.error("!Your browser does not support AudioContext");
                 }
             }
+            AudioEx.instance = function () {
+                if (AudioEx.g_this == null)
+                    AudioEx.g_this = new AudioEx();
+                return AudioEx.g_this;
+            };
             AudioEx.prototype.clickInit = function () {
                 if (!this.isAvailable())
                     return;
@@ -7852,31 +7913,6 @@ var gd3d;
                     source.connect(this.audioContext.destination);
                     source.start();
                 }
-            };
-            AudioEx.instance = function () {
-                if (AudioEx.g_this == null)
-                    AudioEx.g_this = new AudioEx();
-                return AudioEx.g_this;
-            };
-            AudioEx.loadArrayBuffer = function (url, fun) {
-                var req = new XMLHttpRequest();
-                req.open("GET", url);
-                req.responseType = "arraybuffer";
-                req.onreadystatechange = function () {
-                    if (req.readyState == 4) {
-                        if (req.status == 404)
-                            fun(null, new Error("onerr 404"));
-                        else
-                            fun(req.response, null);
-                    }
-                };
-                req.onerror = function () {
-                    fun(null, new Error("onerr in req:"));
-                };
-                req.send();
-            };
-            AudioEx.prototype.isAvailable = function () {
-                return this.audioContext ? true : false;
             };
             AudioEx.prototype.loadAudioBufferFromArrayBuffer = function (ab, fun) {
                 this.audioContext.decodeAudioData(ab, function (audiobuffer) {
@@ -7895,20 +7931,65 @@ var gd3d;
                     }
                 });
             };
+            AudioEx.prototype.isAvailable = function () {
+                return this.audioContext ? true : false;
+            };
             AudioEx.prototype.createAudioChannel = function () {
-                var cc = new framework.AudioChannel();
+                var cc = new AudioChannel();
                 cc.source = this.audioContext.createBufferSource();
                 cc.pannerNode = this.audioContext.createPanner();
-                cc.source.connect(this.audioContext.destination);
-                cc.gainNode = AudioEx.instance().audioContext.createGain();
-                cc.source.connect(cc.gainNode);
-                cc.gainNode.connect(AudioEx.instance().audioContext.destination);
+                cc.gainNode = this.audioContext.createGain();
+                cc.source.connect(cc.pannerNode);
+                cc.pannerNode.connect(cc.gainNode);
+                cc.gainNode.connect(this.audioContext.destination);
                 cc.gainNode.gain.value = 1;
                 return cc;
+            };
+            AudioEx.loadArrayBuffer = function (url, fun) {
+                var req = new XMLHttpRequest();
+                req.open("GET", url);
+                req.responseType = "arraybuffer";
+                req.onreadystatechange = function () {
+                    if (req.readyState == 4) {
+                        if (req.status == 404)
+                            fun(null, new Error("onerr 404"));
+                        else
+                            fun(req.response, null);
+                    }
+                };
+                req.onerror = function () {
+                    fun(null, new Error("onerr in req:"));
+                };
+                req.send();
             };
             return AudioEx;
         }());
         framework.AudioEx = AudioEx;
+        var AudioChannel = (function () {
+            function AudioChannel() {
+            }
+            Object.defineProperty(AudioChannel.prototype, "volume", {
+                get: function () {
+                    return this.gainNode.gain.value;
+                },
+                set: function (val) {
+                    val = val > 100 ? 100 : val;
+                    val = val <= 0 ? 0 : val;
+                    this.gainNode.gain.value = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AudioChannel.prototype.stop = function () {
+                if (this.source != null) {
+                    this.source.stop();
+                    this.source = null;
+                }
+                this.isplay = false;
+            };
+            return AudioChannel;
+        }());
+        framework.AudioChannel = AudioChannel;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -8102,6 +8183,42 @@ var gd3d;
                     this.lerppose[key] = src.Clone();
                 }
             };
+            aniplayer.prototype.updateAnimation = function (animIndex, _frame) {
+                if (!this.clips)
+                    return;
+                if (animIndex >= this.clips.length)
+                    return;
+                var _clip = this.clips[animIndex];
+                if (!_clip)
+                    return;
+                for (var i = 0; i < _clip.boneCount; i++) {
+                    var bone = _clip.bones[i];
+                    var frame = _clip.frames[_frame];
+                    var nextseek = i * 7 + 1;
+                    var outb = this.nowpose[bone];
+                    var tpose = this.tpose[bone];
+                    if (outb != undefined) {
+                        outb.copyFromData(frame, nextseek);
+                    }
+                    var careobj = this.carelist[bone];
+                    if (careobj != undefined) {
+                        var fmat = framework.PoseBoneMatrix.sMultiply(outb, tpose);
+                        var _matrix = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMakeTransformRTS(fmat.t, gd3d.math.pool.vector3_one, fmat.r, _matrix);
+                        var _newmatrix = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
+                        careobj.setWorldMatrix(_newmatrix);
+                        careobj.updateTran(false);
+                        gd3d.math.pool.delete_matrix(_matrix);
+                        gd3d.math.pool.delete_matrix(_newmatrix);
+                    }
+                }
+                var renders = this.gameObject.getComponentsInChildren(framework.StringUtil.COMPONENT_SKINMESHRENDER);
+                for (var key in renders) {
+                    var _render = renders[key];
+                    _render.update(0);
+                }
+            };
             aniplayer.prototype.stop = function () {
                 this._playClip = null;
             };
@@ -8231,7 +8348,10 @@ var gd3d;
                         this.carelist[pnode.name] = pnode;
                         return;
                     }
-                    pnode = pnode.parent;
+                    if (pnode.parent)
+                        pnode = pnode.parent;
+                    else
+                        return;
                 }
             };
             aniplayer.playerCaches = [];
@@ -8316,27 +8436,51 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AudioListener = (function () {
+            function AudioListener() {
+                this.lastX = 0;
+                this.lastY = 0;
+                this.lastZ = 0;
+            }
+            AudioListener.prototype.start = function () {
+                this.listener = framework.AudioEx.instance().audioContext.listener;
+            };
+            AudioListener.prototype.update = function (delta) {
+                this.curPos = this.gameObject.transform.getWorldTranslate();
+                if (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ) {
+                    this.listener.setPosition(this.curPos.x, this.curPos.y, this.curPos.z);
+                    this.lastX = this.curPos.x;
+                    this.lastY = this.curPos.y;
+                    this.lastZ = this.curPos.z;
+                }
+            };
+            AudioListener.prototype.remove = function () {
+            };
+            AudioListener.prototype.clone = function () {
+            };
+            AudioListener = __decorate([
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
+            ], AudioListener);
+            return AudioListener;
+        }());
+        framework.AudioListener = AudioListener;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var AudioPlayer = (function () {
             function AudioPlayer() {
+                this.lastX = 0;
+                this.lastY = 0;
+                this.lastZ = 0;
             }
-            AudioPlayer.prototype.init = function (name, audioChannel, beLoop) {
+            AudioPlayer.prototype.play = function (buffer, beLoop, volume, onended) {
                 if (beLoop === void 0) { beLoop = false; }
-                this.name = name;
-                this.audioChannel = audioChannel;
-                this.beLoop = beLoop;
-            };
-            AudioPlayer.prototype.start = function () {
-            };
-            AudioPlayer.prototype.update = function (delta) {
-            };
-            AudioPlayer.prototype.remove = function () {
-            };
-            AudioPlayer.prototype.clone = function () {
-            };
-            AudioPlayer.prototype.play = function (buffer, volume, onended, x, y, z) {
                 if (volume === void 0) { volume = 0; }
-                if (this.audioChannel == null)
-                    return null;
+                this.audioChannel = framework.AudioEx.instance().createAudioChannel();
                 this.buffer = buffer;
                 this.volume = volume;
                 var c = this.audioChannel;
@@ -8344,8 +8488,6 @@ var gd3d;
                 c.source.buffer = this.buffer;
                 c.volume = this.volume;
                 c.source.start();
-                if (x && y && z)
-                    c.pannerNode.setPosition(x, y, z);
                 c.isplay = true;
                 if (!this.beLoop) {
                     c.source.onended = function () {
@@ -8374,6 +8516,22 @@ var gd3d;
             AudioPlayer.prototype.isPlaying = function () {
                 return this.audioChannel == undefined ? false : this.audioChannel.isplay;
             };
+            AudioPlayer.prototype.start = function () {
+                this.audioChannel = framework.AudioEx.instance().createAudioChannel();
+            };
+            AudioPlayer.prototype.update = function (delta) {
+                this.curPos = this.gameObject.transform.getWorldTranslate();
+                if (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ) {
+                    this.audioChannel.pannerNode.setPosition(this.curPos.x, this.curPos.y, this.curPos.z);
+                    this.lastX = this.curPos.x;
+                    this.lastY = this.curPos.y;
+                    this.lastZ = this.curPos.z;
+                }
+            };
+            AudioPlayer.prototype.remove = function () {
+            };
+            AudioPlayer.prototype.clone = function () {
+            };
             AudioPlayer = __decorate([
                 gd3d.reflect.nodeComponent, 
                 __metadata('design:paramtypes', [])
@@ -8381,31 +8539,6 @@ var gd3d;
             return AudioPlayer;
         }());
         framework.AudioPlayer = AudioPlayer;
-        var AudioChannel = (function () {
-            function AudioChannel() {
-            }
-            Object.defineProperty(AudioChannel.prototype, "volume", {
-                get: function () {
-                    return this.gainNode.gain.value;
-                },
-                set: function (val) {
-                    val = val > 1 ? 1 : val;
-                    val = val <= -1 ? -0.999 : val;
-                    this.gainNode.gain.value = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            AudioChannel.prototype.stop = function () {
-                if (this.source != null) {
-                    this.source.stop();
-                    this.source = null;
-                }
-                this.isplay = false;
-            };
-            return AudioChannel;
-        }());
-        framework.AudioChannel = AudioChannel;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9036,6 +9169,12 @@ var gd3d;
                 this.jsonData = _jsonData;
                 this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
             };
+            effectSystem.prototype.updateJsonData = function (_jsonData) {
+                this.remove();
+                this.jsonData = _jsonData;
+                this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+                this.init();
+            };
             Object.defineProperty(effectSystem.prototype, "data", {
                 get: function () {
                     return this._data;
@@ -9466,11 +9605,17 @@ var gd3d;
                 this.state = framework.EffectPlayStateEnum.Dispose;
                 if (this.data)
                     this.data.dispose();
-                for (var key in this.effectBatchers) {
-                    this.effectBatchers[key].dispose();
+                while (this.effectBatchers.length > 0) {
+                    this.effectBatchers[0].dispose();
+                    this.effectBatchers.splice(0, 1);
+                }
+                while (this.matDataGroups.length > 0) {
+                    this.matDataGroups.splice(0, 1);
                 }
                 if (this.particles)
                     this.particles.dispose();
+                this.curFrameId = -1;
+                this.playTimer = 0;
             };
             Object.defineProperty(effectSystem.prototype, "leftLifeTime", {
                 get: function () {
@@ -10988,14 +11133,6 @@ var gd3d;
                 gd3d.reflect.Field("transform"), 
                 __metadata('design:type', framework.transform)
             ], skinnedMeshRenderer.prototype, "rootBone", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"), 
-                __metadata('design:type', gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"), 
-                __metadata('design:type', gd3d.math.vector3)
-            ], skinnedMeshRenderer.prototype, "size", void 0);
             skinnedMeshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent, 
@@ -12732,16 +12869,28 @@ var gd3d;
 (function (gd3d) {
     var io;
     (function (io) {
+        (function (SaveAssetType) {
+            SaveAssetType[SaveAssetType["FullUrl"] = 0] = "FullUrl";
+            SaveAssetType[SaveAssetType["NameAndContent"] = 1] = "NameAndContent";
+            SaveAssetType[SaveAssetType["DefaultAssets"] = 2] = "DefaultAssets";
+        })(io.SaveAssetType || (io.SaveAssetType = {}));
+        var SaveAssetType = io.SaveAssetType;
         var SerializeDependent = (function () {
             function SerializeDependent() {
             }
+            SerializeDependent.GetAssetContent = function (asset) {
+                var data = {};
+                if (asset instanceof gd3d.framework.material)
+                    return { "name": asset.getName() + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+            };
             SerializeDependent.GetAssetUrl = function (asset, assetMgr) {
                 if (!assetMgr || !asset)
                     return;
                 var url = assetMgr.getAssetUrl(asset);
-                if (!url)
-                    return;
-                SerializeDependent.resoursePaths.push(url);
+                if (url)
+                    SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+                else
+                    SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
                 if (asset instanceof gd3d.framework.material) {
                     var _mapUniform = asset.mapUniform;
                     if (!_mapUniform)
@@ -12755,19 +12904,22 @@ var gd3d;
                         if (!_texture)
                             continue;
                         url = assetMgr.getAssetUrl(_texture);
-                        if (!url)
+                        if (url)
+                            SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+                        else {
+                            SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(_texture));
                             continue;
-                        SerializeDependent.resoursePaths.push(url);
+                        }
                         if (url.indexOf(".imgdesc.json") < 0)
                             continue;
                         if (!_texture.realName)
                             continue;
                         url = url.replace(_texture.getName(), _texture.realName);
-                        SerializeDependent.resoursePaths.push(url);
+                        SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                     }
                 }
             };
-            SerializeDependent.resoursePaths = [];
+            SerializeDependent.resourseDatas = [];
             return SerializeDependent;
         }());
         io.SerializeDependent = SerializeDependent;
@@ -13365,6 +13517,7 @@ var gd3d;
                 if (assetName.indexOf("SystemDefaultAsset-") >= 0) {
                     assetName = assetName.replace("SystemDefaultAsset-", "");
                     if (type == "mesh") {
+                        assetName = assetName.replace(".mesh.bin", "");
                         _asset = assetMgr.getDefaultMesh(assetName);
                     }
                     else if (type == "texture") {

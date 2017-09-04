@@ -703,9 +703,7 @@ var main = (function () {
         this.addBtn("post_景深", function () { return new t.test_posteffect_cc(); });
         this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
-        this.addBtn("test_newEff", function () { return new db_test_newEff(); });
-        this.addBtn("test_eff", function () { return new db_test_effect(); });
-        this.addBtn("test_math", function () { return new db_test_math(); });
+        this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -3052,6 +3050,9 @@ var test_anim = (function () {
                             else if (ev.code == "KeyN") {
                                 ap.playCrossByIndex(1, 0.2);
                             }
+                            else if (ev.code == "KeyS") {
+                                ap.stop();
+                            }
                         };
                         var wingroot = baihu.find("Bip001 Xtra17Nub");
                         var trans = new gd3d.framework.transform();
@@ -3442,13 +3443,13 @@ var test_effect = (function () {
     test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
         var names = ["0fx_boss_02", "fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
-        var name = names[0];
+        var name = names[2];
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
                 _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
-                _this.effect.setJsonData(text);
+                _this.text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
+                _this.effect.setJsonData(_this.text);
                 _this.scene.addChild(_this.tr);
                 _this.tr.markDirty();
                 state.finish = true;
@@ -3462,10 +3463,7 @@ var test_effect = (function () {
         var btn = document.createElement("button");
         btn.textContent = "Play";
         btn.onclick = function () {
-            var tr = new gd3d.framework.transform();
-            _this.scene.addChild(tr);
-            var effect = tr.gameObject.addComponent("effectSystemNew");
-            var ins = effect.addEffectElement(gd3d.framework.EffectElementTypeEnum.SingleMeshType);
+            _this.effect.updateJsonData(_this.text);
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";
@@ -4131,6 +4129,163 @@ var test_loadScene = (function () {
     };
     return test_loadScene;
 }());
+var t;
+(function (t) {
+    var test_xinshouMask = (function () {
+        function test_xinshouMask() {
+            this.timer = 0;
+        }
+        test_xinshouMask.prototype.start = function (app) {
+            var _this = this;
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state.isfinish) {
+                    var image = new gd3d.framework.transform();
+                    image.name = "cube";
+                    image.localScale.x = image.localScale.y = image.localScale.z = 1;
+                    image.localTranslate.z = 0.01;
+                    _this.scene.addChild(image);
+                    var mesh = image.gameObject.addComponent("meshFilter");
+                    mesh.mesh = _this.app.getAssetMgr().getDefaultMesh("quad");
+                    var imageRender_1 = image.gameObject.addComponent("meshRenderer");
+                    var imageMask = new gd3d.framework.transform();
+                    imageMask.name = "mask";
+                    imageMask.localScale.x = imageMask.localScale.y = imageMask.localScale.z = 1;
+                    _this.scene.addChild(imageMask);
+                    var meshMask = imageMask.gameObject.addComponent("meshFilter");
+                    meshMask.mesh = _this.app.getAssetMgr().getDefaultMesh("quad");
+                    _this.imageRenderMask = imageMask.gameObject.addComponent("meshRenderer");
+                    var objCam = new gd3d.framework.transform();
+                    objCam.name = "sth.";
+                    _this.scene.addChild(objCam);
+                    _this.camera = objCam.gameObject.addComponent("camera");
+                    _this.camera.near = 0.01;
+                    _this.camera.far = 110;
+                    objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+                    objCam.lookat(image);
+                    objCam.markDirty();
+                    var assetmgr = _this.app.getAssetMgr();
+                    var sh = assetmgr.getShader("diffuse.shader.json");
+                    if (sh != null) {
+                        imageRender_1.materials = [];
+                        imageRender_1.materials.push(new gd3d.framework.material());
+                        imageRender_1.materials[0].setShader(sh);
+                        _this.app.getAssetMgr().load("res/uvSprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                console.warn("Finish load img.");
+                                var texture = _this.app.getAssetMgr().getAssetByName("uvSprite.png");
+                                imageRender_1.materials[0].setTexture("_MainTex", texture);
+                            }
+                        });
+                    }
+                    var shaderMask = assetmgr.getShader("unlit_transparent.shader.json");
+                    if (shaderMask != null) {
+                        _this.imageRenderMask.materials = [];
+                        _this.imageRenderMask.materials.push(new gd3d.framework.material());
+                        _this.imageRenderMask.materials[0].setShader(shaderMask);
+                        var url_1 = "res/mask.png";
+                        gd3d.io.loadImg(url_1, function (_tex, _err) {
+                            var fileName = getFileName(url_1);
+                            _this.texture = new gd3d.framework.texture(fileName);
+                            var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+                            var t2d = new gd3d.render.glTexture2D(_this.app.getAssetMgr().webgl, _textureFormat);
+                            t2d.uploadImage(_tex, true, true, true, false);
+                            _this.texture.glTexture = t2d;
+                            _this.app.getAssetMgr().setAssetUrl(_this.texture, url_1);
+                            _this.app.getAssetMgr().use(_this.texture);
+                            _this.imageRenderMask.materials[0].setTexture("_MainTex", _this.texture);
+                            _this.imageRenderMask.materials[0].setVector4("_MaskTex_ST", new gd3d.math.vector4(1, 1, 0, 0));
+                        }, function (loadedLength, totalLength) { });
+                    }
+                }
+            });
+            this.addDomUI();
+        };
+        test_xinshouMask.prototype.addDomUI = function () {
+            var _this = this;
+            var tillingX = document.createElement("label");
+            tillingX.style.top = "160px";
+            tillingX.style.position = "absolute";
+            tillingX.textContent = "tillingX:";
+            this.app.container.appendChild(tillingX);
+            var inputEle0 = document.createElement("input");
+            inputEle0.style.top = "160px";
+            inputEle0.style.left = "60px";
+            inputEle0.style.width = "100px";
+            inputEle0.style.position = "absolute";
+            inputEle0.value = "1";
+            this.app.container.appendChild(inputEle0);
+            var tillingY = document.createElement("label");
+            tillingY.style.top = "160px";
+            tillingY.style.left = "180px";
+            tillingY.style.position = "absolute";
+            tillingY.textContent = "tillingY:";
+            this.app.container.appendChild(tillingY);
+            var inputEle1 = document.createElement("input");
+            inputEle1.style.top = "160px";
+            inputEle1.style.left = "240px";
+            inputEle1.style.width = "100px";
+            inputEle1.style.position = "absolute";
+            inputEle1.value = "1";
+            this.app.container.appendChild(inputEle1);
+            var offsetX = document.createElement("label");
+            offsetX.style.top = "160px";
+            offsetX.style.left = "360px";
+            offsetX.style.position = "absolute";
+            offsetX.textContent = "offsetX:";
+            this.app.container.appendChild(offsetX);
+            var inputEle2 = document.createElement("input");
+            inputEle2.style.top = "160px";
+            inputEle2.style.left = "420px";
+            inputEle2.style.width = "100px";
+            inputEle2.style.position = "absolute";
+            inputEle2.value = "0";
+            this.app.container.appendChild(inputEle2);
+            var offsetY = document.createElement("label");
+            offsetY.style.top = "160px";
+            offsetY.style.left = "540px";
+            offsetY.style.position = "absolute";
+            offsetY.textContent = "offsetY:";
+            this.app.container.appendChild(offsetY);
+            var inputEle3 = document.createElement("input");
+            inputEle3.style.top = "160px";
+            inputEle3.style.left = "620px";
+            inputEle3.style.width = "100px";
+            inputEle3.style.position = "absolute";
+            inputEle3.value = "0";
+            this.app.container.appendChild(inputEle3);
+            var button = document.createElement("button");
+            button.style.top = "220px";
+            button.textContent = "update";
+            button.style.position = "absolute";
+            button.onclick = function () {
+                var tillingXVal = parseFloat(inputEle0.value);
+                var tillingYVal = parseFloat(inputEle1.value);
+                var offsetXVal = parseFloat(inputEle2.value);
+                var offsetYVal = parseFloat(inputEle3.value);
+                _this.imageRenderMask.materials[0].setVector4("_MaskTex_ST", new gd3d.math.vector4(tillingXVal, tillingYVal, offsetXVal, offsetYVal));
+            };
+            this.app.container.appendChild(button);
+        };
+        test_xinshouMask.prototype.update = function (delta) {
+            this.timer += delta;
+            var x2 = Math.sin(this.timer * 0.1);
+            var z2 = Math.cos(this.timer * 0.1);
+            if (!this.camera)
+                return;
+            var objCam = this.camera.gameObject.transform;
+        };
+        return test_xinshouMask;
+    }());
+    t.test_xinshouMask = test_xinshouMask;
+    function getFileName(url) {
+        var filei = url.lastIndexOf("/");
+        var file = url.substr(filei + 1);
+        return file;
+    }
+    t.getFileName = getFileName;
+})(t || (t = {}));
 var test_load = (function () {
     function test_load() {
         this.timer = 0;
@@ -6479,6 +6634,25 @@ var t;
                 }
             });
         };
+        TestRotate.prototype.changeShader = function () {
+            var _this = this;
+            var btn = document.createElement("button");
+            btn.textContent = "save";
+            btn.onclick = function () {
+                var trans = _this.cube;
+                var name = trans.name;
+                var prefab = new gd3d.framework.prefab(name + ".prefab.json");
+                prefab.assetbundle = name + ".assetbundle.json";
+                prefab.apply(trans);
+                _this.app.getAssetMgr().use(prefab);
+                _this.app.getAssetMgr().savePrefab(trans, name + ".prefab.json", function (data, resourses, content) {
+                    console.log(data);
+                });
+            };
+            btn.style.top = "160px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+        };
         TestRotate.prototype.addcam = function (laststate, state) {
             var objCam = new gd3d.framework.transform();
             objCam.name = "sth.";
@@ -6557,9 +6731,9 @@ var t;
             this.scene = this.app.getScene();
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
-            this.taskmgr.addTaskCall(this.loadPvr.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this));
             this.taskmgr.addTaskCall(this.addcam.bind(this));
+            this.changeShader();
         };
         TestRotate.prototype.update = function (delta) {
             this.taskmgr.move(delta);
@@ -6981,7 +7155,7 @@ var t;
             this.counttimer = 0;
             this.angularVelocity = new gd3d.math.vector3(10, 0, 0);
             this.eulerAngle = gd3d.math.pool.new_vector3();
-            this.looped = null;
+            this.loopedBuffer = null;
             this.once1 = null;
             this.once2 = null;
         }
@@ -7011,6 +7185,7 @@ var t;
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
             state.finish = true;
+            CameraController.instance().init(this.app, this.camera);
         };
         test_sound.prototype.addcube = function (laststate, state) {
             {
@@ -7041,28 +7216,19 @@ var t;
         test_sound.prototype.loadSoundInfe = function (laststate, state) {
             var _this = this;
             {
+                var listener = this.camera.gameObject.addComponent("AudioListener");
                 var tr = new gd3d.framework.transform();
                 var player_1 = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER);
                 this.app.getScene().addChild(tr);
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", function (buf, err) {
-                    _this.looped = buf;
-                    player_1.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                    player_1.play(buf, 0);
-                });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", function (buf, err) {
-                    _this.once1 = buf;
-                });
-                gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", function (buf, err) {
-                    _this.once2 = buf;
-                    player_1.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                    player_1.play(buf, 0);
-                });
+                tr.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
                     button.onclick = function () {
-                        player_1.init("once1", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                        player_1.play(_this.once1, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound1.mp3", function (buf, err) {
+                            _this.once1 = buf;
+                            player_1.play(_this.once1, false, 10);
+                        });
                     };
                     button.style.top = "130px";
                     button.style.position = "absolute";
@@ -7072,8 +7238,10 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play once2";
                     button.onclick = function () {
-                        player_1.init("once2", gd3d.framework.AudioEx.instance().createAudioChannel(), false);
-                        player_1.play(_this.once2, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", function (buf, err) {
+                            _this.once2 = buf;
+                            player_1.play(_this.once2, false, 1);
+                        });
                     };
                     button.style.top = "130px";
                     button.style.left = "90px";
@@ -7084,8 +7252,10 @@ var t;
                     var button = document.createElement("button");
                     button.textContent = "play loop";
                     button.onclick = function () {
-                        player_1.init("abc", gd3d.framework.AudioEx.instance().createAudioChannel(), true);
-                        player_1.play(_this.looped, 0);
+                        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", function (buf, err) {
+                            _this.loopedBuffer = buf;
+                            player_1.play(buf, false, 1);
+                        });
                     };
                     button.style.top = "160px";
                     button.style.position = "absolute";
@@ -7106,11 +7276,10 @@ var t;
                     document.body.appendChild(document.createElement("p"));
                     var input = document.createElement("input");
                     input.type = "range";
-                    input.valueAsNumber = 10;
-                    player_1.volume = -0.2;
+                    input.valueAsNumber = 5;
+                    player_1.volume = input.valueAsNumber;
                     input.oninput = function (e) {
-                        var value = (input.valueAsNumber - 50) / 50;
-                        player_1.volume = value;
+                        player_1.volume = input.valueAsNumber;
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";
@@ -7131,6 +7300,7 @@ var t;
             gd3d.framework.AudioEx.instance().clickInit();
         };
         test_sound.prototype.update = function (delta) {
+            CameraController.instance().update(delta);
             this.taskmgr.move(delta);
             this.timer += delta;
             if (this.cube != null) {
@@ -7659,15 +7829,12 @@ var t;
                 var t2d_1 = new gd3d.framework.transform2D();
                 t2d_1.width = 150;
                 t2d_1.height = 150;
-                t2d_1.width = o2d.canvas.pixelWidth;
-                t2d_1.height = o2d.canvas.pixelHeight;
                 t2d_1.pivot.x = 0;
                 t2d_1.pivot.y = 0;
+                t2d_1.localTranslate.x = 150;
                 var img_1_1 = t2d_1.addComponent("image2D");
                 img_1_1.imageType = gd3d.framework.ImageType.Simple;
                 o2d.addChild(t2d_1);
-                this.t2d_1 = t2d_1;
-                this.o2d = o2d;
                 var t2d_2 = new gd3d.framework.transform2D();
                 t2d_2.width = 150;
                 t2d_2.height = 150;
@@ -7837,8 +8004,6 @@ var t;
             }
         };
         test_ui.prototype.update = function (delta) {
-            this.t2d_1.localTranslate.x = this.o2d.canvas.pixelWidth / 2;
-            this.t2d_1.localTranslate.y = this.o2d.canvas.pixelHeight / 2;
             this.timer += delta;
             var x = Math.sin(this.timer);
             var z = Math.cos(this.timer);

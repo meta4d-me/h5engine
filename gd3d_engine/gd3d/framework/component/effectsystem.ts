@@ -110,6 +110,14 @@ namespace gd3d.framework
             this.jsonData = _jsonData;
             this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
         }
+
+        updateJsonData(_jsonData: textasset)
+        {
+            this.remove();
+            this.jsonData = _jsonData;
+            this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+            this.init();
+        }
         /**
         * @private
         */
@@ -228,7 +236,7 @@ namespace gd3d.framework
                             element.actionActive = false;
 
                             this.mergeLerpAttribData(element.curAttrData, element.timelineFrame[frameId]);
-                            
+
                             if (element.actions != undefined)
                             {
                                 element.actionActive = true;
@@ -766,12 +774,19 @@ namespace gd3d.framework
             this.state = EffectPlayStateEnum.Dispose;
             if (this.data)
                 this.data.dispose();
-            for (let key in this.effectBatchers)
+            while (this.effectBatchers.length > 0)
             {
-                this.effectBatchers[key].dispose();
+                this.effectBatchers[0].dispose();
+                this.effectBatchers.splice(0, 1);
+            }
+            while (this.matDataGroups.length > 0)
+            {
+                this.matDataGroups.splice(0, 1);
             }
             if (this.particles)
                 this.particles.dispose();
+            this.curFrameId = -1;
+            this.playTimer = 0;
         }
         /**
         * @private

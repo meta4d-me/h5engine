@@ -1,9 +1,9 @@
-attribute vec3 _glesVertex;
-attribute vec2 _glesMultiTexCoord0;
+attribute highp vec3 _glesVertex;
+attribute mediump vec2 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
-uniform highp vec4 _MainTex_ST;
+uniform mediump vec4 _MainTex_ST;
 
-varying highp vec2 _base_uv;
+varying mediump vec2 _base_uv;
 
 
 void main()

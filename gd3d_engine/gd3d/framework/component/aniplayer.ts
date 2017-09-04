@@ -203,15 +203,15 @@ namespace gd3d.framework
             if (this.isCache && !this.mix && aniplayer.playerCaches[this.cacheKey])
             {
                 cached = true;
-                if(StringUtil.isNullOrEmptyObject(this.carelist))
+                if (StringUtil.isNullOrEmptyObject(this.carelist))
                     return;
             }
 
             for (var i = 0; i < this._playClip.boneCount; i++)
             {
                 var bone = this._playClip.bones[i];
-                
-                if(cached && !this.carelist[bone])
+
+                if (cached && !this.carelist[bone])
                     continue;
 
                 var frame = this._playClip.frames[this._playFrameid];
@@ -261,7 +261,8 @@ namespace gd3d.framework
                 }
             }
 
-            if (!cached){
+            if (!cached)
+            {
                 aniplayer.playerCaches[this.cacheKey] = this;
             }
         }
@@ -384,6 +385,60 @@ namespace gd3d.framework
             {
                 var src = this.nowpose[key];
                 this.lerppose[key] = src.Clone();
+            }
+        }
+
+        public updateAnimation(animIndex: number, _frame: number)
+        {
+            if (!this.clips)
+                return;
+
+            if (animIndex >= this.clips.length)
+                return;
+
+            let _clip = this.clips[animIndex];
+            if (!_clip)
+                return;
+
+            for (var i = 0; i < _clip.boneCount; i++)
+            {
+                var bone = _clip.bones[i];
+
+                var frame = _clip.frames[_frame];
+                var nextseek = i * 7 + 1;
+                var outb = this.nowpose[bone];
+                var tpose = this.tpose[bone];
+                if (outb != undefined)
+                {
+                    outb.copyFromData(frame, nextseek);
+                }
+
+                var careobj = this.carelist[bone];
+                if (careobj != undefined)
+                {
+                    //tbone ,一串算出最终坐标
+                    //把恶心的计算集中提纯到一起去，有空再修改
+
+                    let fmat = PoseBoneMatrix.sMultiply(outb, tpose);
+
+                    let _matrix: math.matrix = math.pool.new_matrix();
+                    math.matrixMakeTransformRTS(fmat.t, math.pool.vector3_one, fmat.r, _matrix);
+
+                    let _newmatrix: math.matrix = math.pool.new_matrix();
+                    math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
+
+                    careobj.setWorldMatrix(_newmatrix);
+                    careobj.updateTran(false);
+                    math.pool.delete_matrix(_matrix);
+                    math.pool.delete_matrix(_newmatrix);
+                }
+            }
+
+            let renders = this.gameObject.getComponentsInChildren(StringUtil.COMPONENT_SKINMESHRENDER) as gd3d.framework.skinnedMeshRenderer[];
+            for (let key in renders)
+            {
+                let _render = renders[key];
+                _render.update(0);
             }
         }
         /**
@@ -586,7 +641,10 @@ namespace gd3d.framework
                     this.carelist[pnode.name] = pnode;
                     return;
                 }
-                pnode = pnode.parent;
+                if(pnode.parent)
+                    pnode = pnode.parent;
+                else
+                    return;
                 // if (pnode instanceof transform)
                 // {
 

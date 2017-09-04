@@ -1,24 +1,24 @@
-attribute vec3 _glesVertex;
-attribute vec2 _glesMultiTexCoord0;
+attribute highp vec3 _glesVertex;
+attribute mediump vec2 _glesMultiTexCoord0;
 
-attribute vec4 _glesBlendIndex4;
-attribute vec4 _glesBlendWeight4;
+attribute lowp vec4 _glesBlendIndex4;
+attribute lowp vec4 _glesBlendWeight4;
 uniform highp vec4 glstate_vec4_bones[80];
 
 uniform highp mat4 glstate_matrix_mvp;
-uniform highp vec4 _MainTex_ST;
-uniform highp vec4 _asm_ST;
-uniform highp vec4 _streamlight_ST;
-uniform highp float _speedu;
-uniform highp float _speedv;
-uniform highp float glstate_timer;
-uniform highp float glstate_fog_start;
-uniform highp float glstate_fog_end;
+uniform mediump vec4 _MainTex_ST;
+uniform mediump vec4 _asm_ST;
+uniform mediump vec4 _streamlight_ST;
+uniform lowp float _speedu;
+uniform lowp float _speedv;
+uniform lowp float glstate_timer;
+uniform lowp float glstate_fog_start;
+uniform lowp float glstate_fog_end;
 
-varying highp float factor;
-varying highp vec2 _base_uv;
-varying highp vec2 _asm_uv;
-varying highp vec2 _light_uv;
+varying lowp float factor;
+varying mediump vec2 _base_uv;
+varying mediump vec2 _asm_uv;
+varying mediump vec2 _light_uv;
 
 mat4 buildMat4(int index)
 {
@@ -46,7 +46,7 @@ void main()
 {
 	_base_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + _asm_ST.zw;
-	highp vec2 _speed;
+	lowp vec2 _speed;
     _speed = vec2(_speedu,_speedv);
     _light_uv = (_glesMultiTexCoord0.xy * _streamlight_ST.xy + _streamlight_ST.zw)  + _speed * glstate_timer;
 
