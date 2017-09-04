@@ -249,9 +249,7 @@ namespace gd3d.framework
          * 当前2d节点的旋转
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("number")
         localRotate: number = 0;//旋转
-
         private localMatrix: math.matrix3x2 = new gd3d.math.matrix3x2;//2d矩阵
         //这个是如果爹改了就要跟着算的
 
@@ -506,6 +504,32 @@ namespace gd3d.framework
         getWorldMatrix(): gd3d.math.matrix3x2
         {
             return this.worldMatrix;
+        }
+
+        public static getTransInfoInCanvas(trans:transform2D,out:t2dInfo)//实际上是rootnode space
+        {
+            var mat=trans.getWorldMatrix();
+            var rotmat=trans.canvas.getRoot().getWorldMatrix();
+            var inversemat=gd3d.math.pool.new_matrix3x2();
+            gd3d.math.matrix3x2Inverse(rotmat,inversemat);
+            var mattoRoot=gd3d.math.pool.new_matrix3x2();
+            gd3d.math.matrix3x2Multiply(inversemat,mat,mattoRoot);
+
+            var rotscale=gd3d.math.pool.new_vector2();
+            var rotRot:gd3d.math.angelref=new gd3d.math.angelref();
+            var rotPos=gd3d.math.pool.new_vector2();
+            math.matrix3x2Decompose(mattoRoot, rotscale, rotRot, rotPos);
+            gd3d.math.vec2Clone(trans.pivot,out.pivot);
+            gd3d.math.vec2Clone(rotPos,out.pivotPos);
+
+            out.rot=rotRot.v;
+            out.width=trans.width*rotscale.x;
+            out.height=trans.height*rotscale.y;
+
+            gd3d.math.pool.delete_matrix3x2(inversemat);
+            gd3d.math.pool.delete_matrix3x2(mattoRoot);
+            gd3d.math.pool.delete_vector2(rotscale);
+            gd3d.math.pool.delete_vector2(rotPos);
         }
 
         /**
@@ -951,4 +975,21 @@ namespace gd3d.framework
 
         }
     }
+
+    export class t2dInfo
+    {
+        pivot:math.vector2=new math.vector2();
+        pivotPos:math.vector2=new math.vector2();
+        width:number;
+        height:number;
+        rot:number;
+
+        public static getCenter(info:t2dInfo,outCenter:math.vector2)
+        {
+            outCenter.x=info.pivotPos.x+info.width*(0.5-info.pivot.x)*Math.cos(info.rot)-info.height*(0.5-info.pivot.y)*Math.sin(info.rot);
+            outCenter.y=info.pivotPos.y-info.width*(0.5-info.pivot.x)*Math.sin(info.rot)+info.height*(0.5-info.pivot.y)*Math.cos(info.rot);
+        }
+    }
+
+    
 }

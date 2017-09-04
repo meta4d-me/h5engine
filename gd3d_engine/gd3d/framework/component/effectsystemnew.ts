@@ -221,6 +221,7 @@ namespace gd3d.framework
                         }
                         // let frameId = this.curFrameId % element.loopFrame;
                         let frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
+                        
                         if (element.active)
                         {
                             element.actionActive = false;
