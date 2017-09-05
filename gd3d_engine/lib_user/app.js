@@ -2551,6 +2551,7 @@ var test_effect = (function () {
     function test_effect() {
         this.timer = 0;
         this.taskmgr = new gd3d.framework.taskMgr();
+        this.testStr = "\n    {\n      \"life\": 1.1,\n      \"elements\": [\n        {\n          \"name\": \"glow\",\n          \"type\": \"singlemesh\",\n          \"timeline\": [\n            {\n              \"frame\": -1,\n              \"attrs\": {\n                \"pos\": {\n                  \"x\": 0,\n                  \"y\": 1,\n                  \"z\": 0\n                },\n                \"euler\": {\n                  \"x\": 0,\n                  \"y\": 0,\n                  \"z\": 0\n                },\n                \"scale\": {\n                  \"x\": 6,\n                  \"y\": 6,\n                  \"z\": 1\n                },\n                \"alpha\": 1,\n                \"uv\": {\n                  \"u\": 1,\n                  \"v\": 1\n                },\n                \"color\": {\n                  \"x\": 1,\n                  \"y\": 0.6,\n                  \"z\": 0.1\n                },\n                \"mesh\": \"quad\",\n                \"mat\": {\n                  \"shader\": \"particles_additive.shader.json\",\n                  \"diffuseTexture\": \"E_glow001.png\"\n                },\n                \"billboard\": \"billboard\"\n              }\n            },\n            {\n              \"frame\": 0,\n              \"attrs\": {\n                \"alpha\": 1,\n                \"scale\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 1\n                }\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 3,\n                  \"attribute\": {\n                    \"scale\": {\n                      \"x\": 15,\n                      \"y\": 15,\n                      \"z\": 1\n                    }\n                  }\n                },\n                {\n                  \"type\": \"linear\",\n                  \"to\": 10,\n                  \"attribute\": {\n                    \"alpha\": 0.8\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 10,\n              \"attrs\": {\n                \"alpha\": 0.8\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 15,\n                  \"attribute\": {\n                    \"alpha\": 0\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 18,\n              \"actions\": [\n                {\n                  \"action\": \"destroy\",\n                  \"param\": {}\n                }\n              ]\n            }\n          ]\n        },\n        {\n          \"name\": \"chibang\",\n          \"type\": \"singlemesh\",\n          \"timeline\": [\n            {\n              \"frame\": -1,\n              \"attrs\": {\n                \"pos\": {\n                  \"x\": 0,\n                  \"y\": 2,\n                  \"z\": 0\n                },\n                \"euler\": {\n                  \"x\": 0,\n                  \"y\": 0,\n                  \"z\": 0\n                },\n                \"scale\": {\n                  \"x\": 8,\n                  \"y\": 8,\n                  \"z\": 1\n                },\n                \"alpha\": 1,\n                \"uv\": {\n                  \"u\": 1,\n                  \"v\": 1\n                },\n                \"color\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 1\n                },\n                \"mesh\": \"quad\",\n                \"mat\": {\n                  \"shader\": \"particles_additive.shader.json\",\n                  \"diffuseTexture\": \"ui_3043-120.png\"\n                },\n                \"billboard\": \"billboard\"\n              }\n            },\n            {\n              \"frame\": 0,\n              \"attrs\": {\n                \"alpha\": 1,\n                \"scale\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 1\n                }\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 3,\n                  \"attribute\": {\n                    \"scale\": {\n                      \"x\": 8,\n                      \"y\": 8,\n                      \"z\": 1\n                    }\n                  }\n                },\n                {\n                  \"type\": \"linear\",\n                  \"to\": 10,\n                  \"attribute\": {\n                    \"alpha\": 0.8\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 20,\n              \"attrs\": {\n                \"alpha\": 0.8\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 28,\n                  \"attribute\": {\n                    \"alpha\": 0\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 30,\n              \"actions\": [\n                {\n                  \"action\": \"destroy\",\n                  \"param\": {}\n                }\n              ]\n            }\n          ]\n        },\n        {\n          \"name\": \"glow1\",\n          \"type\": \"singlemesh\",\n          \"timeline\": [\n            {\n              \"frame\": -1,\n              \"attrs\": {\n                \"pos\": {\n                  \"x\": 0,\n                  \"y\": 1,\n                  \"z\": 0\n                },\n                \"euler\": {\n                  \"x\": 0,\n                  \"y\": 0,\n                  \"z\": 0\n                },\n                \"scale\": {\n                  \"x\": 6,\n                  \"y\": 6,\n                  \"z\": 1\n                },\n                \"alpha\": 1,\n                \"uv\": {\n                  \"u\": 1,\n                  \"v\": 1\n                },\n                \"color\": {\n                  \"x\": 0.5,\n                  \"y\": 0.5,\n                  \"z\": 0.2\n                },\n                \"mesh\": \"quad\",\n                \"mat\": {\n                  \"shader\": \"particles_additive.shader.json\",\n                  \"diffuseTexture\": \"len_01.png\"\n                },\n                \"billboard\": \"billboard\"\n              }\n            },\n            {\n              \"frame\": 0,\n              \"attrs\": {\n                \"scale\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 1\n                }\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 3,\n                  \"attribute\": {\n                    \"color\": {\n                      \"x\": 1,\n                      \"y\": 0.9,\n                      \"z\": 0.5\n                    }\n                  }\n                },\n                {\n                  \"type\": \"linear\",\n                  \"to\": 6,\n                  \"attribute\": {\n                    \"scale\": {\n                      \"x\": 15,\n                      \"y\": 15,\n                      \"z\": 1\n                    },\n                    \"color\": {\n                      \"x\": 1,\n                      \"y\": 0.8,\n                      \"z\": 0.4\n                    }\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 6,\n              \"attrs\": {\n                \"scale\": {\n                  \"x\": 15,\n                  \"y\": 15,\n                  \"z\": 1\n                },\n                \"color\": {\n                  \"x\": 1,\n                  \"y\": 0.8,\n                  \"z\": 0.4\n                },\n                \"alpha\": 1\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 10,\n                  \"attribute\": {\n                    \"alpha\": 0.8,\n                    \"scale\": {\n                      \"x\": 12,\n                      \"y\": 12,\n                      \"z\": 1\n                    },\n                    \"color\": {\n                      \"x\": 0.7,\n                      \"y\": 0.4,\n                      \"z\": 0.1\n                    }\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 10,\n              \"attrs\": {\n                \"alpha\": 0.8,\n                \"scale\": {\n                  \"x\": 12,\n                  \"y\": 12,\n                  \"z\": 1\n                }\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 15,\n                  \"attribute\": {\n                    \"scale\": {\n                      \"x\": 8,\n                      \"y\": 8,\n                      \"z\": 1\n                    },\n                    \"alpha\": 0\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 18,\n              \"actions\": [\n                {\n                  \"action\": \"destroy\",\n                  \"param\": {}\n                }\n              ]\n            }\n          ]\n        },\n        {\n          \"name\": \"kuosan\",\n          \"type\": \"singlemesh\",\n          \"timeline\": [\n            {\n              \"frame\": -1,\n              \"attrs\": {\n                \"pos\": {\n                  \"x\": 0,\n                  \"y\": 1,\n                  \"z\": 0\n                },\n                \"euler\": {\n                  \"x\": 90,\n                  \"y\": 0,\n                  \"z\": 0\n                },\n                \"color\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 0.1\n                },\n                \"scale\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 1\n                },\n                \"alpha\": 1,\n                \"uv\": {\n                  \"u\": 1,\n                  \"v\": 1\n                },\n                \"mesh\": \"quad\",\n                \"mat\": {\n                  \"shader\": \"particles_additive.shader.json\",\n                  \"diffuseTexture\": \"light0029.png\"\n                }\n              }\n            },\n            {\n              \"frame\": 0,\n              \"attrs\": {\n                \"scale\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 1\n                }\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 5,\n                  \"attribute\": {\n                    \"scale\": {\n                      \"x\": 15,\n                      \"y\": 15,\n                      \"z\": 15\n                    }\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 5,\n              \"attrs\": {\n                \"scale\": {\n                  \"x\": 15,\n                  \"y\": 15,\n                  \"z\": 15\n                },\n                \"alpha\": 1\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 7,\n                  \"attribute\": {\n                    \"alpha\": 0.8,\n                    \"scale\": {\n                      \"x\": 17,\n                      \"y\": 17,\n                      \"z\": 17\n                    }\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 7,\n              \"attrs\": {\n                \"alpha\": 0.8\n              },\n              \"lerp\": [\n                {\n                  \"type\": \"linear\",\n                  \"to\": 10,\n                  \"attribute\": {\n                    \"alpha\": 0\n                  }\n                }\n              ]\n            },\n            {\n              \"frame\": 11,\n              \"actions\": [\n                {\n                  \"action\": \"destroy\",\n                  \"param\": {}\n                }\n              ]\n            }\n          ]\n        },\n        {\n          \"name\": \"fazhen\",\n          \"type\": \"singlemesh\",\n          \"timeline\": [\n            {\n              \"frame\": -1,\n              \"attrs\": {\n                \"pos\": {\n                  \"x\": 0,\n                  \"y\": 0,\n                  \"z\": 0\n                },\n                \"euler\": {\n                  \"x\": 90,\n                  \"y\": 0,\n                  \"z\": 0\n                },\n                \"color\": {\n                  \"x\": 1,\n                  \"y\": 1,\n                  \"z\": 0.1\n                },\n                \"scale\": {\n                  \"x\": 4,\n                  \"y\": 4,\n                  \"z\": 4\n                },\n                \"alpha\": 1,\n                \"uv\": {\n                  \"u\": 1,\n                  \"v\": 1\n                },\n                \"mesh\": \"quad\",\n                \"mat\": {\n                  \"shader\": \"particles_additive.shader.json\",\n                  \"diffuseTexture\": \"Effects_Textures_232-1.png\"\n                }\n              }\n            },\n            {\n              \"frame\": 25,\n              \"actions\": [\n                {\n                  \"action\": \"destroy\",\n                  \"param\": {}\n                }\n              ]\n            }\n          ]\n        }\n      ]\n    }\n    \n    ";
         this.beclone = false;
         this.effectloaded = false;
         this.bestop = false;
@@ -2630,7 +2631,7 @@ var test_effect = (function () {
                 _this.tr = new gd3d.framework.transform();
                 _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
                 _this.text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
-                _this.effect.setJsonData(_this.text);
+                _this.effect.setJsonDataStr(_this.testStr);
                 _this.scene.addChild(_this.tr);
                 _this.tr.markDirty();
                 state.finish = true;
@@ -2644,59 +2645,15 @@ var test_effect = (function () {
         var btn = document.createElement("button");
         btn.textContent = "Play";
         btn.onclick = function () {
-            _this.effect.updateJsonData(_this.text);
+            _this.effect.play();
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";
         this.app.container.appendChild(btn);
         var btn1 = document.createElement("button");
-        btn1.textContent = "Save To Prefab";
+        btn1.textContent = "pause";
         btn1.onclick = function () {
-            var name = _this.tr.name;
-            var _prefab = new gd3d.framework.prefab(name);
-            _this.app.getAssetMgr().use(_prefab);
-            _prefab.assetbundle = name;
-            var path = "";
-            _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
-                console.log(data.files);
-                console.log(resourses.length);
-                var _loop_1 = function (key) {
-                    var val = data.files[key];
-                    var blob = localSave.Instance.file_str2blob(val);
-                    var files = [];
-                    var resPath = path + "/resources/";
-                    var _loop_2 = function (i) {
-                        var resourceUrl = resourses[i];
-                        var resourceName = _this.getNameFromURL(resourceUrl);
-                        var resourceLength = 0;
-                        if (resourceName.indexOf(".txt") != -1 || resourceName.indexOf(".json")) {
-                            localSave.Instance.loadTextImmediate(resourceUrl, function (_txt, _err) {
-                                var blob = localSave.Instance.file_str2blob(_txt);
-                                localSave.Instance.save(resPath + resourceName, blob);
-                            });
-                        }
-                        else {
-                            localSave.Instance.loadBlobImmediate(resourceUrl, function (_blob, _err) {
-                                localSave.Instance.save(resPath + resourceName, _blob);
-                            });
-                        }
-                        var fileInfo_1 = { "name": "resources/" + resourceName, "length": 100 };
-                        files.push(fileInfo_1);
-                    };
-                    for (var i = 0; i < resourses.length; i++) {
-                        _loop_2(i);
-                    }
-                    localSave.Instance.save(resPath + name + ".prefab.json", blob);
-                    var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
-                    files.push(fileInfo);
-                    var assetBundleStr = JSON.stringify({ "files": files });
-                    var assetBundleBlob = localSave.Instance.file_str2blob(assetBundleStr);
-                    localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
-                };
-                for (var key in data.files) {
-                    _loop_1(key);
-                }
-            });
+            _this.effect.pause();
         };
         btn1.style.top = "320px";
         btn1.style.position = "absolute";
@@ -7673,12 +7630,12 @@ var test_effecteditor = (function () {
             _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
                 console.log(data.files);
                 console.log(resourses.length);
-                var _loop_3 = function (key) {
+                var _loop_1 = function (key) {
                     var val = data.files[key];
                     var blob = localSave.Instance.file_str2blob(val);
                     var files = [];
                     var resPath = path + "/resources/";
-                    var _loop_4 = function (i) {
+                    var _loop_2 = function (i) {
                         var resourceUrl = resourses[i];
                         var resourceName = _this.getNameFromURL(resourceUrl);
                         var resourceLength = 0;
@@ -7693,11 +7650,11 @@ var test_effecteditor = (function () {
                                 localSave.Instance.save(resPath + resourceName, _blob);
                             });
                         }
-                        var fileInfo_2 = { "name": "resources/" + resourceName, "length": 100 };
-                        files.push(fileInfo_2);
+                        var fileInfo_1 = { "name": "resources/" + resourceName, "length": 100 };
+                        files.push(fileInfo_1);
                     };
                     for (var i = 0; i < resourses.length; i++) {
-                        _loop_4(i);
+                        _loop_2(i);
                     }
                     localSave.Instance.save(resPath + name + ".prefab.json", blob);
                     var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
@@ -7707,7 +7664,7 @@ var test_effecteditor = (function () {
                     localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
                 };
                 for (var key in data.files) {
-                    _loop_3(key);
+                    _loop_1(key);
                 }
             });
         };

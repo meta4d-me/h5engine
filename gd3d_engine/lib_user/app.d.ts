@@ -379,6 +379,7 @@ declare class test_effect implements IState {
     start(app: gd3d.framework.application): void;
     private text;
     private loadEffect(laststate, state);
+    private testStr;
     private addButton();
     private getNameFromURL(path);
     private addcam(laststate, state);

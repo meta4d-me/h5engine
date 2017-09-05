@@ -9301,7 +9301,7 @@ var gd3d;
                 this.layer = framework.RenderLayerEnum.Transparent;
                 this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
-                this.autoplay = true;
+                this.autoplay = false;
                 this.state = framework.EffectPlayStateEnum.None;
                 this.curFrameId = -1;
                 this.playTimer = 0;
@@ -9323,6 +9323,7 @@ var gd3d;
             effectSystem.prototype.setJsonDataStr = function (_jsonStr) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
+                this.init();
             };
             effectSystem.prototype.updateJsonData = function (_jsonData) {
                 this.jsonData = _jsonData;
@@ -9356,7 +9357,6 @@ var gd3d;
                 configurable: true
             });
             effectSystem.prototype.start = function () {
-                this.init();
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
@@ -9507,7 +9507,7 @@ var gd3d;
             effectSystem.prototype.render = function (context, assetmgr, camera) {
                 if (!(camera.CullingMask & this.renderLayer))
                     return;
-                if (this.state == framework.EffectPlayStateEnum.Play) {
+                if (this.state == framework.EffectPlayStateEnum.Play || this.state == framework.EffectPlayStateEnum.Pause) {
                     context.updateModel(this.gameObject.transform);
                     for (var i in this.effectBatchers) {
                         var subEffectBatcher = this.effectBatchers[i];
@@ -9552,6 +9552,8 @@ var gd3d;
             };
             effectSystem.prototype.play = function (speed) {
                 if (speed === void 0) { speed = 1; }
+                if (this.state != framework.EffectPlayStateEnum.Pause)
+                    this.stop();
                 this.speed = speed;
                 this.state = framework.EffectPlayStateEnum.Play;
                 this.gameObject.visible = true;
@@ -16257,6 +16259,7 @@ var gd3d;
             function EffectMatData() {
             }
             EffectMatData.beEqual = function (data0, data1) {
+                console.log(data0.diffuseTexture + "/" + data1.diffuseTexture);
                 return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
             };
             EffectMatData.prototype.clone = function () {

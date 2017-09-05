@@ -45,7 +45,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        autoplay: boolean = true;
+        autoplay: boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -114,6 +114,7 @@ namespace gd3d.framework
         {
             this.webgl = gd3d.framework.sceneMgr.app.webgl;
             this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
+            this.init();
         }
 
         /**
@@ -166,7 +167,7 @@ namespace gd3d.framework
 
         start()
         {
-            this.init();
+            // this.init();
         }
         update(delta: number)
         {
@@ -402,7 +403,7 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
             if (!(camera.CullingMask & this.renderLayer)) return;
-            if (this.state == EffectPlayStateEnum.Play)
+            if (this.state == EffectPlayStateEnum.Play || this.state == EffectPlayStateEnum.Pause)
             {
                 context.updateModel(this.gameObject.transform);
                 for (let i in this.effectBatchers)
@@ -469,6 +470,8 @@ namespace gd3d.framework
          */
         play(speed: number = 1)
         {
+            if (this.state != EffectPlayStateEnum.Pause)
+                this.stop();
             this.speed = speed;
             this.state = EffectPlayStateEnum.Play;
             this.gameObject.visible = true;
