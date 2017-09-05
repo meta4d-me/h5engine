@@ -106,16 +106,29 @@ namespace gd3d.framework
          */
         setJsonData(_jsonData: textasset)
         {
-            this.webgl = gd3d.framework.sceneMgr.app.webgl;
             this.jsonData = _jsonData;
-            this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+            this.setJsonDataStr(this.jsonData.content);
         }
 
+        setJsonDataStr(_jsonStr: string)
+        {
+            this.webgl = gd3d.framework.sceneMgr.app.webgl;
+            this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
+        }
+
+        /**
+         * 更新特效数据
+         * @param _jsonData 
+         */
         updateJsonData(_jsonData: textasset)
         {
-            this.remove();
             this.jsonData = _jsonData;
-            this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
+            this.updateJsonDataStr(this.jsonData.content);
+        }
+        updateJsonDataStr(_jsonStr: string)
+        {
+            this.remove();
+            this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
             this.init();
         }
         /**
@@ -230,7 +243,7 @@ namespace gd3d.framework
                         }
                         // let frameId = this.curFrameId % element.loopFrame;
                         let frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
-                        frameId=Math.floor(frameId);
+                        frameId = Math.floor(frameId);
                         if (element.active)
                         {
                             element.actionActive = false;

@@ -1,4 +1,136 @@
 /// <reference path="Reflect.d.ts" />
+declare namespace gd3d.framework {
+    interface INotify {
+        notify(trans: any, type: NotifyType): any;
+    }
+    enum NotifyType {
+        AddChild = 0,
+        RemoveChild = 1,
+        ChangeVisible = 2,
+        AddCamera = 3,
+        AddCanvasRender = 4,
+    }
+    enum CanvasFixedType {
+        FixedWidthType = 0,
+        FixedHeightType = 1,
+    }
+    class application {
+        webgl: WebGLRenderingContext;
+        stats: Stats.Stats;
+        container: HTMLDivElement;
+        width: number;
+        height: number;
+        limitFrame: boolean;
+        notify: INotify;
+        private _timeScale;
+        timeScale: number;
+        private version;
+        private build;
+        private _tar;
+        private _standDeltaTime;
+        targetFrame: number;
+        private _fixHeight;
+        private _fixWidth;
+        private beWidthSetted;
+        private beHeightSetted;
+        private _canvasClientWidth;
+        private _canvasClientHeight;
+        canvasFixHeight: number;
+        canvasFixWidth: number;
+        readonly canvasClientWidth: number;
+        readonly canvasClientHeight: number;
+        scale: number;
+        start(div: HTMLDivElement, type?: CanvasFixedType, val?: number): void;
+        markNotify(trans: any, type: NotifyType): void;
+        private doNotify(trans, type);
+        checkFilter(trans: any): boolean;
+        showFps(): void;
+        closeFps(): void;
+        private beStepNumber;
+        private update(delta);
+        preusercodetimer: number;
+        usercodetime: number;
+        getUserUpdateTimer(): number;
+        private beginTimer;
+        private lastTimer;
+        private totalTime;
+        getTotalTime(): number;
+        private _deltaTime;
+        readonly deltaTime: number;
+        private pretimer;
+        private updateTimer;
+        getUpdateTimer(): any;
+        isFrustumCulling: boolean;
+        private loop();
+        private _scene;
+        private initScene();
+        getScene(): scene;
+        private _assetmgr;
+        private initAssetMgr();
+        getAssetMgr(): assetMgr;
+        private _inputmgr;
+        private initInputMgr();
+        getInputMgr(): inputMgr;
+        private _userCode;
+        private _userCodeNew;
+        private _editorCode;
+        private _editorCodeNew;
+        private _bePlay;
+        be2dstate: boolean;
+        curcameraindex: number;
+        bePlay: boolean;
+        private _bePause;
+        bePause: boolean;
+        private _beStepForward;
+        beStepForward: boolean;
+        private updateUserCode(delta);
+        private updateEditorCode(delta);
+        addUserCodeDirect(program: IUserCode): void;
+        addUserCode(classname: string): void;
+        addEditorCode(classname: string): void;
+        addEditorCodeDirect(program: IEditorCode): void;
+    }
+    interface IUserCode {
+        onStart(app: gd3d.framework.application): any;
+        onUpdate(delta: number): any;
+        isClosed(): boolean;
+    }
+    interface IEditorCode {
+        onStart(app: gd3d.framework.application): any;
+        onUpdate(delta: number): any;
+        isClosed(): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class sceneMgr {
+        private static _ins;
+        static readonly ins: sceneMgr;
+        static app: application;
+        static scene: scene;
+    }
+}
+declare namespace Stats {
+    class Stats {
+        constructor(app: gd3d.framework.application);
+        update(): void;
+        app: gd3d.framework.application;
+        container: HTMLDivElement;
+        private mode;
+        private REVISION;
+        private beginTime;
+        private prevTime;
+        private frames;
+        private fpsPanel;
+        private msPanel;
+        private memPanel;
+        private ratePanel;
+        private userratePanel;
+        private showPanel(id);
+        private addPanel(panel);
+        private begin();
+        private end();
+    }
+}
 declare namespace gd3d.reflect {
     function getPrototypes(): {
         [id: string]: any;
@@ -120,151 +252,6 @@ declare namespace gd3d.framework {
         remove(): void;
         clone(): void;
         renderLayer: CullingMask;
-    }
-}
-declare namespace gd3d.framework {
-    enum TransitionType {
-        None = 0,
-        ColorTint = 1,
-        SpriteSwap = 2,
-    }
-    class button implements IRectRenderer {
-        private _transition;
-        transition: TransitionType;
-        private _originalColor;
-        private _originalSprite;
-        private _targetImage;
-        targetImage: image2D;
-        private _pressedSprite;
-        pressedGraphic: sprite;
-        private _normalColor;
-        normalColor: math.color;
-        private _pressedColor;
-        pressedColor: math.color;
-        private _fadeDuration;
-        fadeDuration: number;
-        render(canvas: canvas): void;
-        updateTran(): void;
-        start(): void;
-        update(delta: number): void;
-        transform: transform2D;
-        remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        onClick: UIEvent;
-        private _downInThis;
-        private _dragOut;
-        private showNormal();
-        private showPress();
-        private changeColor(targetColor);
-        private changeSprite(sprite);
-    }
-}
-declare namespace gd3d.framework {
-    class image2D implements IRectRenderer {
-        constructor();
-        private datar;
-        private _sprite;
-        color: math.color;
-        mat: material;
-        private _imageType;
-        imageType: ImageType;
-        private _fillMethod;
-        fillMethod: FillMethod;
-        private _fillAmmount;
-        fillAmmount: FillMethod;
-        setTexture(texture: texture, border?: math.border, rect?: math.rect): void;
-        sprite: sprite;
-        render(canvas: canvas): void;
-        start(): void;
-        update(delta: number): void;
-        transform: transform2D;
-        remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        private prepareData();
-        updateTran(): void;
-        private updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3, quadIndex?, mirror?);
-        private updateSimpleData(x0, y0, x1, y1, x2, y2, x3, y3);
-        private updateSlicedData(x0, y0, x1, y1, x2, y2, x3, y3);
-        private updateFilledData(x0, y0, x1, y1, x2, y2, x3, y3);
-        private updateTiledData(x0, y0, x1, y1, x2, y2, x3, y3);
-    }
-    enum ImageType {
-        Simple = 0,
-        Sliced = 1,
-        Tiled = 2,
-        Filled = 3,
-    }
-    enum FillMethod {
-        Horizontal = 0,
-        Vertical = 1,
-        Radial_90 = 2,
-        Radial_180 = 3,
-        Radial_360 = 4,
-    }
-}
-declare namespace gd3d.framework {
-    class label implements IRectRenderer {
-        private _text;
-        text: string;
-        private _font;
-        font: font;
-        private _fontsize;
-        fontsize: number;
-        linespace: number;
-        horizontalType: HorizontalType;
-        verticalType: VerticalType;
-        private indexarr;
-        private remainarrx;
-        updateData(_font: gd3d.framework.font): void;
-        private data_begin;
-        private datar;
-        color: math.color;
-        color2: math.color;
-        mat: material;
-        private dirtyData;
-        render(canvas: canvas): void;
-        updateTran(): void;
-        start(): void;
-        update(delta: number): void;
-        transform: transform2D;
-        remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-    }
-    enum HorizontalType {
-        Center = 0,
-        Left = 1,
-        Right = 2,
-    }
-    enum VerticalType {
-        Center = 0,
-        Top = 1,
-        Boom = 2,
-    }
-}
-declare namespace gd3d.framework {
-    class rawImage2D implements IRectRenderer {
-        private datar;
-        private _image;
-        image: texture;
-        color: math.color;
-        mat: material;
-        render(canvas: canvas): void;
-        updateTran(): void;
-        start(): void;
-        update(delta: number): void;
-        transform: transform2D;
-        remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-    }
-}
-declare namespace gd3d.framework {
-    class uirect implements I2DComponent {
-        canbeClick: boolean;
-        start(): void;
-        update(delta: number): void;
-        transform: transform2D;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        remove(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -460,105 +447,148 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    interface INotify {
-        notify(trans: any, type: NotifyType): any;
+    enum TransitionType {
+        None = 0,
+        ColorTint = 1,
+        SpriteSwap = 2,
     }
-    enum NotifyType {
-        AddChild = 0,
-        RemoveChild = 1,
-        ChangeVisible = 2,
-        AddCamera = 3,
-        AddCanvasRender = 4,
+    class button implements IRectRenderer {
+        private _transition;
+        transition: TransitionType;
+        private _originalColor;
+        private _originalSprite;
+        private _targetImage;
+        targetImage: image2D;
+        private _pressedSprite;
+        pressedGraphic: sprite;
+        private _normalColor;
+        normalColor: math.color;
+        private _pressedColor;
+        pressedColor: math.color;
+        private _fadeDuration;
+        fadeDuration: number;
+        render(canvas: canvas): void;
+        updateTran(): void;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        remove(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        onClick: UIEvent;
+        private _downInThis;
+        private _dragOut;
+        private showNormal();
+        private showPress();
+        private changeColor(targetColor);
+        private changeSprite(sprite);
     }
-    enum CanvasFixedType {
-        FixedWidthType = 0,
-        FixedHeightType = 1,
+}
+declare namespace gd3d.framework {
+    class image2D implements IRectRenderer {
+        constructor();
+        private datar;
+        private _sprite;
+        color: math.color;
+        mat: material;
+        private _imageType;
+        imageType: ImageType;
+        private _fillMethod;
+        fillMethod: FillMethod;
+        private _fillAmmount;
+        fillAmmount: FillMethod;
+        setTexture(texture: texture, border?: math.border, rect?: math.rect): void;
+        sprite: sprite;
+        render(canvas: canvas): void;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        remove(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        private prepareData();
+        updateTran(): void;
+        private updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3, quadIndex?, mirror?);
+        private updateSimpleData(x0, y0, x1, y1, x2, y2, x3, y3);
+        private updateSlicedData(x0, y0, x1, y1, x2, y2, x3, y3);
+        private updateFilledData(x0, y0, x1, y1, x2, y2, x3, y3);
+        private updateTiledData(x0, y0, x1, y1, x2, y2, x3, y3);
     }
-    class application {
-        webgl: WebGLRenderingContext;
-        stats: Stats.Stats;
-        container: HTMLDivElement;
-        width: number;
-        height: number;
-        limitFrame: boolean;
-        notify: INotify;
-        private _timeScale;
-        timeScale: number;
-        private version;
-        private build;
-        private _tar;
-        private _standDeltaTime;
-        targetFrame: number;
-        private _fixHeight;
-        private _fixWidth;
-        private beWidthSetted;
-        private beHeightSetted;
-        private _canvasClientWidth;
-        private _canvasClientHeight;
-        canvasFixHeight: number;
-        canvasFixWidth: number;
-        readonly canvasClientWidth: number;
-        readonly canvasClientHeight: number;
-        scale: number;
-        start(div: HTMLDivElement, type?: CanvasFixedType, val?: number): void;
-        markNotify(trans: any, type: NotifyType): void;
-        private doNotify(trans, type);
-        checkFilter(trans: any): boolean;
-        showFps(): void;
-        closeFps(): void;
-        private beStepNumber;
-        private update(delta);
-        preusercodetimer: number;
-        usercodetime: number;
-        getUserUpdateTimer(): number;
-        private beginTimer;
-        private lastTimer;
-        private totalTime;
-        getTotalTime(): number;
-        private _deltaTime;
-        readonly deltaTime: number;
-        private pretimer;
-        private updateTimer;
-        getUpdateTimer(): any;
-        isFrustumCulling: boolean;
-        private loop();
-        private _scene;
-        private initScene();
-        getScene(): scene;
-        private _assetmgr;
-        private initAssetMgr();
-        getAssetMgr(): assetMgr;
-        private _inputmgr;
-        private initInputMgr();
-        getInputMgr(): inputMgr;
-        private _userCode;
-        private _userCodeNew;
-        private _editorCode;
-        private _editorCodeNew;
-        private _bePlay;
-        be2dstate: boolean;
-        curcameraindex: number;
-        bePlay: boolean;
-        private _bePause;
-        bePause: boolean;
-        private _beStepForward;
-        beStepForward: boolean;
-        private updateUserCode(delta);
-        private updateEditorCode(delta);
-        addUserCodeDirect(program: IUserCode): void;
-        addUserCode(classname: string): void;
-        addEditorCode(classname: string): void;
-        addEditorCodeDirect(program: IEditorCode): void;
+    enum ImageType {
+        Simple = 0,
+        Sliced = 1,
+        Tiled = 2,
+        Filled = 3,
     }
-    interface IUserCode {
-        onStart(app: gd3d.framework.application): any;
-        onUpdate(delta: number): any;
-        isClosed(): boolean;
+    enum FillMethod {
+        Horizontal = 0,
+        Vertical = 1,
+        Radial_90 = 2,
+        Radial_180 = 3,
+        Radial_360 = 4,
     }
-    interface IEditorCode {
-        onStart(app: gd3d.framework.application): any;
-        onUpdate(delta: number): any;
-        isClosed(): boolean;
+}
+declare namespace gd3d.framework {
+    class label implements IRectRenderer {
+        private _text;
+        text: string;
+        private _font;
+        font: font;
+        private _fontsize;
+        fontsize: number;
+        linespace: number;
+        horizontalType: HorizontalType;
+        verticalType: VerticalType;
+        private indexarr;
+        private remainarrx;
+        updateData(_font: gd3d.framework.font): void;
+        private data_begin;
+        private datar;
+        color: math.color;
+        color2: math.color;
+        mat: material;
+        private dirtyData;
+        render(canvas: canvas): void;
+        updateTran(): void;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        remove(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+    enum HorizontalType {
+        Center = 0,
+        Left = 1,
+        Right = 2,
+    }
+    enum VerticalType {
+        Center = 0,
+        Top = 1,
+        Boom = 2,
+    }
+}
+declare namespace gd3d.framework {
+    class rawImage2D implements IRectRenderer {
+        private datar;
+        private _image;
+        image: texture;
+        color: math.color;
+        mat: material;
+        render(canvas: canvas): void;
+        updateTran(): void;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        remove(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+}
+declare namespace gd3d.framework {
+    class uirect implements I2DComponent {
+        canbeClick: boolean;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -748,6 +778,40 @@ declare namespace gd3d.framework {
         };
     }
 }
+declare class PvrParse {
+    private version;
+    private flags;
+    private pixelFormatH;
+    private pixelFormatL;
+    private channelType;
+    height: number;
+    width: number;
+    private depth;
+    private numFaces;
+    private mipMapCount;
+    private metaDataSize;
+    private gl;
+    constructor(gl: WebGLRenderingContext);
+    parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D;
+    private parseV3(tool);
+}
+declare enum ChannelTypes {
+    UnsignedByteNorm = 0,
+    SignedByteNorm = 1,
+    UnsignedByte = 2,
+    SignedByte = 3,
+    UnsignedShortNorm = 4,
+    SignedShortNorm = 5,
+    UnsignedShort = 6,
+    SignedShort = 7,
+    UnsignedIntegerNorm = 8,
+    SignedIntegerNorm = 9,
+    UnsignedInteger = 10,
+    SignedInteger = 11,
+    SignedFloat = 12,
+    Float = 12,
+    UnsignedFloat = 13,
+}
 declare namespace gd3d.framework {
     class defMesh {
         static initDefaultMesh(assetmgr: assetMgr): void;
@@ -898,40 +962,6 @@ declare namespace gd3d.framework {
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
     }
-}
-declare class PvrParse {
-    private version;
-    private flags;
-    private pixelFormatH;
-    private pixelFormatL;
-    private channelType;
-    height: number;
-    width: number;
-    private depth;
-    private numFaces;
-    private mipMapCount;
-    private metaDataSize;
-    private gl;
-    constructor(gl: WebGLRenderingContext);
-    parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D;
-    private parseV3(tool);
-}
-declare enum ChannelTypes {
-    UnsignedByteNorm = 0,
-    SignedByteNorm = 1,
-    UnsignedByte = 2,
-    SignedByte = 3,
-    UnsignedShortNorm = 4,
-    SignedShortNorm = 5,
-    UnsignedShort = 6,
-    SignedShort = 7,
-    UnsignedIntegerNorm = 8,
-    SignedIntegerNorm = 9,
-    UnsignedInteger = 10,
-    SignedInteger = 11,
-    SignedFloat = 12,
-    Float = 12,
-    UnsignedFloat = 13,
 }
 declare namespace gd3d.framework {
     class animationClip implements IAsset {
@@ -1573,7 +1603,9 @@ declare namespace gd3d.framework {
         private particleElementDic;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
+        setJsonDataStr(_jsonStr: string): void;
         updateJsonData(_jsonData: textasset): void;
+        updateJsonDataStr(_jsonStr: string): void;
         data: EffectSystemData;
         init(): void;
         private _data;
@@ -3565,36 +3597,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class sceneMgr {
-        private static _ins;
-        static readonly ins: sceneMgr;
-        static app: application;
-        static scene: scene;
-    }
-}
-declare namespace Stats {
-    class Stats {
-        constructor(app: gd3d.framework.application);
-        update(): void;
-        app: gd3d.framework.application;
-        container: HTMLDivElement;
-        private mode;
-        private REVISION;
-        private beginTime;
-        private prevTime;
-        private frames;
-        private fpsPanel;
-        private msPanel;
-        private memPanel;
-        private ratePanel;
-        private userratePanel;
-        private showPanel(id);
-        private addPanel(panel);
-        private begin();
-        private end();
-    }
-}
-declare namespace gd3d.framework {
     class taskstate {
         finish: boolean;
         error: boolean;
@@ -3896,6 +3898,54 @@ declare namespace gd3d.math {
         static clone_quaternion(src: quaternion): quaternion;
         static delete_quaternion(v: quaternion): void;
         static collect_quaternion(): void;
+    }
+}
+declare namespace gd3d.render {
+    class caps {
+        maxTexturesImageUnits: number;
+        maxTextureSize: number;
+        maxCubemapTextureSize: number;
+        maxRenderTextureSize: number;
+        standardDerivatives: boolean;
+        s3tc: WEBGL_compressed_texture_s3tc;
+        textureFloat: boolean;
+        textureAnisotropicFilterExtension: EXT_texture_filter_anisotropic;
+        maxAnisotropy: number;
+        instancedArrays: ANGLE_instanced_arrays;
+        uintIndices: boolean;
+        highPrecisionShaderSupported: boolean;
+        fragmentDepthSupported: boolean;
+        textureFloatLinearFiltering: boolean;
+        textureLOD: boolean;
+        drawBuffersExtension: any;
+        pvrtcExtension: any;
+    }
+    class webglkit {
+        private static _maxVertexAttribArray;
+        static SetMaxVertexAttribArray(webgl: WebGLRenderingContext, count: number): void;
+        private static _texNumber;
+        static GetTextureNumber(webgl: WebGLRenderingContext, index: number): number;
+        static FUNC_ADD: number;
+        static FUNC_SUBTRACT: number;
+        static FUNC_REVERSE_SUBTRACT: number;
+        static ONE: number;
+        static ZERO: number;
+        static SRC_ALPHA: number;
+        static SRC_COLOR: number;
+        static ONE_MINUS_SRC_ALPHA: number;
+        static ONE_MINUS_SRC_COLOR: number;
+        static ONE_MINUS_DST_ALPHA: number;
+        static ONE_MINUS_DST_COLOR: number;
+        static LEQUAL: number;
+        static EQUAL: number;
+        static GEQUAL: number;
+        static NOTEQUAL: number;
+        static LESS: number;
+        static GREATER: number;
+        static ALWAYS: number;
+        static NEVER: number;
+        static caps: caps;
+        static initConst(webgl: WebGLRenderingContext): void;
     }
 }
 declare namespace gd3d.render {
@@ -4247,53 +4297,5 @@ declare namespace gd3d.render {
         height: number;
         dispose(webgl: WebGLRenderingContext): void;
         caclByteLength(): number;
-    }
-}
-declare namespace gd3d.render {
-    class caps {
-        maxTexturesImageUnits: number;
-        maxTextureSize: number;
-        maxCubemapTextureSize: number;
-        maxRenderTextureSize: number;
-        standardDerivatives: boolean;
-        s3tc: WEBGL_compressed_texture_s3tc;
-        textureFloat: boolean;
-        textureAnisotropicFilterExtension: EXT_texture_filter_anisotropic;
-        maxAnisotropy: number;
-        instancedArrays: ANGLE_instanced_arrays;
-        uintIndices: boolean;
-        highPrecisionShaderSupported: boolean;
-        fragmentDepthSupported: boolean;
-        textureFloatLinearFiltering: boolean;
-        textureLOD: boolean;
-        drawBuffersExtension: any;
-        pvrtcExtension: any;
-    }
-    class webglkit {
-        private static _maxVertexAttribArray;
-        static SetMaxVertexAttribArray(webgl: WebGLRenderingContext, count: number): void;
-        private static _texNumber;
-        static GetTextureNumber(webgl: WebGLRenderingContext, index: number): number;
-        static FUNC_ADD: number;
-        static FUNC_SUBTRACT: number;
-        static FUNC_REVERSE_SUBTRACT: number;
-        static ONE: number;
-        static ZERO: number;
-        static SRC_ALPHA: number;
-        static SRC_COLOR: number;
-        static ONE_MINUS_SRC_ALPHA: number;
-        static ONE_MINUS_SRC_COLOR: number;
-        static ONE_MINUS_DST_ALPHA: number;
-        static ONE_MINUS_DST_COLOR: number;
-        static LEQUAL: number;
-        static EQUAL: number;
-        static GEQUAL: number;
-        static NOTEQUAL: number;
-        static LESS: number;
-        static GREATER: number;
-        static ALWAYS: number;
-        static NEVER: number;
-        static caps: caps;
-        static initConst(webgl: WebGLRenderingContext): void;
     }
 }
