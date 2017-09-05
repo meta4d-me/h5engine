@@ -25,6 +25,11 @@
         out.x = from.x * scale;
         out.y = from.y * scale;
     }
+    export function vec2ScaleByVec2(from: vector2, scale: vector2, out: vector2)
+    {
+        out.x = from.x * scale.x;
+        out.y = from.y * scale.y;
+    }
     export function vec4Clone(from: vector4, to: vector4) {
         to.x = from.x;
         to.y = from.y;

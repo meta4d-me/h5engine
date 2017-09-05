@@ -82,11 +82,27 @@
         translation.x = src.rawData[4];
         translation.y = src.rawData[5];
 
-        var xs = sign(src.rawData[0] * src.rawData[1]) < 0 ? -1 : 1;
-        var ys = sign(src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+        // var xs = sign(src.rawData[0] * src.rawData[1]) < 0 ? -1 : 1;
+        // var ys = sign(src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
 
-        scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1]);
-        scale.y = ys * Math.sqrt(src.rawData[2] * src.rawData[2] + src.rawData[3] * src.rawData[3]);
+        // scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1]);
+        // scale.y = ys * Math.sqrt(src.rawData[2] * src.rawData[2] + src.rawData[3] * src.rawData[3]);
+
+        // if (scale.x === 0 || scale.y === 0)
+        // {
+        //     rotation.v = 0;
+        //     return false;
+        // }
+
+        // var sx = src.rawData[0] / scale.x;
+        // var csx = src.rawData[1] / scale.x;
+        // var r1 = Math.asin(sx);
+        // var r2 = Math.acos(csx);
+        // rotation.v = r1;
+        // return true;
+
+        scale.x = Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1]);
+        scale.y = Math.sqrt(src.rawData[2] * src.rawData[2] + src.rawData[3] * src.rawData[3]);
 
         if (scale.x === 0 || scale.y === 0)
         {
@@ -95,9 +111,13 @@
         }
 
         var sx = src.rawData[0] / scale.x;
-        var csx = src.rawData[1] / scale.x;
-        var r1 = Math.asin(sx);
-        var r2 = Math.acos(csx);
+        var r1 = Math.acos(sx);
+        var sxs=src.rawData[1] / scale.x;
+        var r2=Math.asin(sxs);
+        if(r2<0)
+        {
+            r1=r1+Math.PI;
+        }
         rotation.v = r1;
         return true;
     }
@@ -277,6 +297,24 @@
         out.rawData[1] = -(((l2))) * l27;
         out.rawData[3] = (((l1))) * l27;
         out.rawData[5] = (((l1 * -l14) - (l2 * -l13))) * l27;
+
+        // var m0=src.rawData[0];
+        // var m1=src.rawData[1];
+        // var m2=0;
+        // var m3=src.rawData[2];
+        // var m4=src.rawData[3];
+        // var m5=0;
+        // var m6=src.rawData[4];
+        // var m7=src.rawData[5];
+        // var m8=1;
+        // var Determinant=m0 * (m4 * m8 - m5 * m7)- m1 * (m3 * m8 - m5 * m6)+m2 * (m3 * m7 - m4 * m6);
+        // out[0]=(m4 * m8 - m5 * m7)/Determinant;
+        // out[1]=-(m1 * m8 -m2 * m7)/Determinant;
+        // out[2]=-(m3 * m8 - m5 * m6)/Determinant;
+        // out[3]=(m0 * m8 -m2 * m6)/Determinant;
+        // out[4]=(m3 * m7 - m4 * m6)/Determinant;
+        // out[5]=-(m0 * m7 - m1 * m6)/Determinant;
+
     }
 
     export function matrixMakeTransformRTS(pos: vector3, scale: vector3, rot: quaternion, out: matrix)

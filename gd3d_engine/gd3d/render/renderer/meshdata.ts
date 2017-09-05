@@ -235,6 +235,7 @@
             data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, -halfsize));
             data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
             data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, -halfsize));
+            gd3d.math.vec3Cross(new gd3d.math.vector3(halfsize, height, halfsize), new gd3d.math.vector3(halfsize, -height, -halfsize), vec1);
             data.normal.push(vec1);
             data.normal.push(vec1);
             data.normal.push(vec1);
@@ -249,6 +250,7 @@
             data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, -halfsize));
             data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
             data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, halfsize));
+            gd3d.math.vec3Cross(new gd3d.math.vector3(-halfsize, height, halfsize), new gd3d.math.vector3(halfsize, -height, halfsize), vec2);
             data.normal.push(vec2);
             data.normal.push(vec2);
             data.normal.push(vec2);
@@ -263,6 +265,7 @@
             data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, halfsize));
             data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
             data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, halfsize));
+            gd3d.math.vec3Cross(new gd3d.math.vector3(-halfsize, height, -halfsize), new gd3d.math.vector3(-halfsize, -height, halfsize), vec3);
             data.normal.push(vec3);
             data.normal.push(vec3);
             data.normal.push(vec3);
@@ -277,6 +280,7 @@
             data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, halfsize));
             data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
             data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, -halfsize));
+            gd3d.math.vec3Cross(new gd3d.math.vector3(halfsize, height, -halfsize), new gd3d.math.vector3(-halfsize, -height, -halfsize), vec4);
             data.normal.push(vec4);
             data.normal.push(vec4);
             data.normal.push(vec4);

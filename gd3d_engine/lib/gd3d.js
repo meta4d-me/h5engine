@@ -7,538 +7,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var NotifyType;
-        (function (NotifyType) {
-            NotifyType[NotifyType["AddChild"] = 0] = "AddChild";
-            NotifyType[NotifyType["RemoveChild"] = 1] = "RemoveChild";
-            NotifyType[NotifyType["ChangeVisible"] = 2] = "ChangeVisible";
-            NotifyType[NotifyType["AddCamera"] = 3] = "AddCamera";
-            NotifyType[NotifyType["AddCanvasRender"] = 4] = "AddCanvasRender";
-        })(NotifyType = framework.NotifyType || (framework.NotifyType = {}));
-        var CanvasFixedType;
-        (function (CanvasFixedType) {
-            CanvasFixedType[CanvasFixedType["FixedWidthType"] = 0] = "FixedWidthType";
-            CanvasFixedType[CanvasFixedType["FixedHeightType"] = 1] = "FixedHeightType";
-        })(CanvasFixedType = framework.CanvasFixedType || (framework.CanvasFixedType = {}));
-        var application = (function () {
-            function application() {
-                this.limitFrame = true;
-                this.version = "v0.0.1";
-                this.build = "b000010";
-                this._tar = -1;
-                this._standDeltaTime = -1;
-                this.beWidthSetted = false;
-                this.beHeightSetted = false;
-                this.scale = 0;
-                this.beStepNumber = 0;
-                this.pretimer = 0;
-                this.isFrustumCulling = true;
-                this._userCode = [];
-                this._userCodeNew = [];
-                this._editorCode = [];
-                this._editorCodeNew = [];
-                this._bePlay = false;
-                this.be2dstate = false;
-                this.curcameraindex = -1;
-                this._bePause = false;
-                this._beStepForward = false;
-            }
-            Object.defineProperty(application.prototype, "timeScale", {
-                get: function () {
-                    return this._timeScale;
-                },
-                set: function (val) {
-                    this._timeScale = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "targetFrame", {
-                get: function () {
-                    return this._tar;
-                },
-                set: function (val) {
-                    if (val == 0)
-                        val = -1;
-                    this._tar = val;
-                    this._standDeltaTime = 1 / this._tar;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "canvasFixHeight", {
-                set: function (val) {
-                    this.beHeightSetted = true;
-                    this._fixHeight = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "canvasFixWidth", {
-                set: function (val) {
-                    this.beWidthSetted = true;
-                    this._fixWidth = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "canvasClientWidth", {
-                get: function () {
-                    return this._canvasClientWidth;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "canvasClientHeight", {
-                get: function () {
-                    return this._canvasClientHeight;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            application.prototype.start = function (div, type, val) {
-                if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
-                if (val === void 0) { val = 1200; }
-                console.log("version: " + this.version + "  build: " + this.build);
-                framework.sceneMgr.app = this;
-                this._timeScale = 1;
-                this.container = div;
-                var canvas = document.createElement("canvas");
-                canvas.className = "full";
-                canvas.style.position = "absolute";
-                canvas.style.width = "100%";
-                canvas.style.height = "100%";
-                canvas.style.backgroundColor = "#1e1e1e";
-                canvas.setAttribute("tabindex", "1");
-                div.appendChild(canvas);
-                this.webgl = canvas.getContext('webgl') ||
-                    canvas.getContext("experimental-webgl");
-                switch (type) {
-                    case CanvasFixedType.FixedWidthType:
-                        this.canvasFixWidth = val;
-                        break;
-                    case CanvasFixedType.FixedHeightType:
-                        this.canvasFixHeight = val;
-                        break;
-                }
-                if (this.beWidthSetted) {
-                    this.webgl.canvas.width = this._fixWidth;
-                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                }
-                else if (this.beHeightSetted) {
-                    this.webgl.canvas.height = this._fixHeight;
-                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                }
-                this._canvasClientWidth = this.webgl.canvas.clientWidth;
-                this._canvasClientHeight = this.webgl.canvas.clientHeight;
-                gd3d.render.webglkit.initConst(this.webgl);
-                this.initAssetMgr();
-                this.initInputMgr();
-                this.initScene();
-                this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
-                this.loop();
-                gd3d.io.referenceInfo.regDefaultType();
-                var initovercallback = window["initovercallback"];
-                if (initovercallback != null) {
-                    initovercallback(this);
-                }
-            };
-            application.prototype.markNotify = function (trans, type) {
-                this.doNotify(trans, type);
-            };
-            application.prototype.doNotify = function (trans, type) {
-                if (trans == null)
-                    return;
-                if (!this.checkFilter(trans))
-                    return;
-                if (this.notify)
-                    this.notify.notify(trans, type);
-                if (trans.children != null) {
-                    for (var index in trans.children) {
-                        this.doNotify(trans.children[index], type);
-                    }
-                }
-            };
-            application.prototype.checkFilter = function (trans) {
-                if (trans instanceof gd3d.framework.transform) {
-                    if (trans.gameObject.hideFlags & gd3d.framework.HideFlags.HideInHierarchy) {
-                        return false;
-                    }
-                }
-                if (trans instanceof gd3d.framework.transform2D) {
-                    if (trans.hideFlags & gd3d.framework.HideFlags.HideInHierarchy) {
-                        return false;
-                    }
-                }
-                return true;
-            };
-            application.prototype.showFps = function () {
-                if (this.stats == null) {
-                    this.stats = new Stats.Stats(this);
-                    this.stats.container.style.position = 'absolute';
-                    this.stats.container.style.left = '0px';
-                    this.stats.container.style.top = '0px';
-                    this.container.appendChild(this.stats.container);
-                }
-                else {
-                    this.container.appendChild(this.stats.container);
-                }
-            };
-            application.prototype.closeFps = function () {
-                if (this.stats != null) {
-                    this.container.removeChild(this.stats.container);
-                }
-            };
-            application.prototype.update = function (delta) {
-                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
-                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
-                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
-                    if (this.beWidthSetted) {
-                        this.webgl.canvas.width = this._fixWidth;
-                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    }
-                    else if (this.beHeightSetted) {
-                        this.webgl.canvas.height = this._fixHeight;
-                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                        this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                    }
-                    console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
-                }
-                this.width = this.webgl.canvas.width;
-                this.height = this.webgl.canvas.height;
-                if (this.bePlay) {
-                    if (this.bePause) {
-                        if (this.beStepForward && this.beStepNumber > 0) {
-                            this.beStepNumber--;
-                            this.updateUserCode(delta);
-                        }
-                    }
-                    else {
-                        this.updateUserCode(delta);
-                    }
-                }
-                this.updateEditorCode(delta);
-                if (this._scene != null) {
-                    this._scene.update(delta);
-                }
-            };
-            application.prototype.getUserUpdateTimer = function () {
-                return this.usercodetime;
-            };
-            application.prototype.getTotalTime = function () {
-                return this.totalTime;
-            };
-            Object.defineProperty(application.prototype, "deltaTime", {
-                get: function () {
-                    return this._deltaTime * this._timeScale;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            application.prototype.getUpdateTimer = function () {
-                return this.updateTimer;
-            };
-            application.prototype.loop = function () {
-                var now = Date.now() / 1000;
-                this._deltaTime = now - this.lastTimer;
-                this.totalTime = now - this.beginTimer;
-                this.updateTimer = now - this.pretimer;
-                if (this._deltaTime < this._standDeltaTime) {
-                    var _this_1 = this;
-                    var del = this._standDeltaTime - this._deltaTime;
-                    setTimeout(function () {
-                        var _now = Date.now() / 1000;
-                        _this_1.lastTimer = _now;
-                        _this_1.pretimer = _now;
-                        _this_1.update(_this_1._standDeltaTime);
-                        if (_this_1.stats != null)
-                            _this_1.stats.update();
-                        _this_1.loop();
-                    }, del * 1000);
-                }
-                else {
-                    this.update(this.deltaTime);
-                    if (this.stats != null)
-                        this.stats.update();
-                    this.lastTimer = now;
-                    this.pretimer = now;
-                    if (this.limitFrame) {
-                        requestAnimationFrame(this.loop.bind(this));
-                    }
-                    else {
-                        setTimeout(this.loop.bind(this), 1);
-                    }
-                }
-            };
-            application.prototype.initScene = function () {
-                if (this._scene == null) {
-                    this._scene = new framework.scene(this);
-                    framework.sceneMgr.scene = this._scene;
-                }
-            };
-            application.prototype.getScene = function () {
-                return this._scene;
-            };
-            application.prototype.initAssetMgr = function () {
-                if (this._assetmgr == null) {
-                    this._assetmgr = new framework.assetMgr(this);
-                    this._assetmgr.initDefAsset();
-                }
-            };
-            application.prototype.getAssetMgr = function () {
-                return this._assetmgr;
-            };
-            application.prototype.initInputMgr = function () {
-                if (this._inputmgr == null) {
-                    this._inputmgr = new framework.inputMgr(this);
-                }
-            };
-            application.prototype.getInputMgr = function () {
-                return this._inputmgr;
-            };
-            Object.defineProperty(application.prototype, "bePlay", {
-                get: function () {
-                    return this._bePlay;
-                },
-                set: function (value) {
-                    this._bePlay = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "bePause", {
-                get: function () {
-                    return this._bePause;
-                },
-                set: function (value) {
-                    this._bePause = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "beStepForward", {
-                get: function () {
-                    return this._beStepForward;
-                },
-                set: function (value) {
-                    this._beStepForward = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            application.prototype.updateUserCode = function (delta) {
-                for (var i = this._userCodeNew.length - 1; i >= 0; i--) {
-                    var c = this._userCodeNew[i];
-                    if (c.isClosed() == false) {
-                        c.onStart(this);
-                        this._userCode.push(c);
-                        this._userCodeNew.splice(i, 1);
-                    }
-                }
-                var closeindex = -1;
-                for (var i = 0; i < this._userCode.length; i++) {
-                    var c = this._userCode[i];
-                    if (c.isClosed() == false) {
-                        c.onUpdate(delta);
-                    }
-                    else if (closeindex < 0) {
-                        closeindex = i;
-                    }
-                }
-                if (closeindex >= 0) {
-                    this._userCode.splice(closeindex, 1);
-                }
-            };
-            application.prototype.updateEditorCode = function (delta) {
-                for (var i = this._editorCodeNew.length - 1; i >= 0; i--) {
-                    var c = this._editorCodeNew[i];
-                    if (c.isClosed() == false) {
-                        c.onStart(this);
-                        this._editorCode.push(c);
-                        this._editorCodeNew.splice(i, 1);
-                    }
-                }
-                var closeindex = -1;
-                for (var i = this._editorCode.length - 1; i >= 0; i--) {
-                    var c = this._editorCode[i];
-                    if (c.isClosed()) {
-                        this._editorCode.splice(i, 1);
-                    }
-                    else {
-                        c.onUpdate(delta);
-                    }
-                }
-            };
-            application.prototype.addUserCodeDirect = function (program) {
-                this._userCodeNew.push(program);
-            };
-            application.prototype.addUserCode = function (classname) {
-                var prototype = gd3d.reflect.getPrototype(classname);
-                if (prototype != null) {
-                    var code = gd3d.reflect.createInstance(prototype, { "usercode": "1" });
-                    this.addUserCodeDirect(code);
-                }
-            };
-            application.prototype.addEditorCode = function (classname) {
-                var prototype = gd3d.reflect.getPrototype(classname);
-                if (prototype != null) {
-                    var code = gd3d.reflect.createInstance(prototype, { "editorcode": "1" });
-                    this.addEditorCodeDirect(code);
-                }
-            };
-            application.prototype.addEditorCodeDirect = function (program) {
-                this._editorCodeNew.push(program);
-            };
-            return application;
-        }());
-        framework.application = application;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var sceneMgr = (function () {
-            function sceneMgr() {
-            }
-            Object.defineProperty(sceneMgr, "ins", {
-                get: function () {
-                    if (sceneMgr._ins == null)
-                        sceneMgr._ins = new sceneMgr();
-                    return sceneMgr._ins;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            return sceneMgr;
-        }());
-        framework.sceneMgr = sceneMgr;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var Stats;
-(function (Stats_1) {
-    var Stats = (function () {
-        function Stats(app) {
-            var _this = this;
-            this.mode = 0;
-            this.app = app;
-            this.container = document.createElement('div');
-            this.container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.7;z-index:1';
-            this.container.addEventListener('click', function (event) {
-                event.preventDefault();
-                _this.showPanel(++_this.mode % _this.container.children.length);
-            }, false);
-            this.beginTime = (performance || Date).now(), this.prevTime = this.beginTime, this.frames = 0;
-            this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
-            this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
-            this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
-            this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
-            if (self.performance && self.performance["memory"]) {
-                this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
-            }
-            this.showPanel(0);
-        }
-        Stats.prototype.update = function () {
-            this.beginTime = this.end();
-        };
-        Stats.prototype.showPanel = function (id) {
-            for (var i = 0; i < this.container.children.length; i++) {
-                this.container.children[i]["style"].display = i === id ? 'block' : 'none';
-            }
-            this.mode = id;
-        };
-        Stats.prototype.addPanel = function (panel) {
-            this.container.appendChild(panel.canvas);
-            return panel;
-        };
-        Stats.prototype.begin = function () {
-            this.beginTime = (performance || Date).now();
-        };
-        Stats.prototype.end = function () {
-            this.frames++;
-            var time = (performance || Date).now();
-            this.msPanel.update(time - this.beginTime, 200);
-            if (time > this.prevTime + 1000) {
-                var fps = (this.frames * 1000) / (time - this.prevTime);
-                this.fpsPanel.update(fps, 100);
-                this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
-                this.userratePanel.update(this.app.getUserUpdateTimer() * this.frames / 10, 100);
-                this.prevTime = time;
-                this.frames = 0;
-                if (this.memPanel) {
-                    var memory = performance["memory"];
-                    this.memPanel.update(memory.usedJSHeapSize / 1048576, memory.jsHeapSizeLimit / 1048576);
-                }
-            }
-            return time;
-        };
-        return Stats;
-    }());
-    Stats_1.Stats = Stats;
-    var Panel = (function () {
-        function Panel(name, fg, bg) {
-            this.name = name;
-            this.fg = fg;
-            this.bg = bg;
-            this.min = Infinity;
-            this.max = 0;
-            this.PR = Math.round(window.devicePixelRatio || 1);
-            this.WIDTH = 80 * this.PR;
-            this.HEIGHT = 48 * this.PR;
-            this.TEXT_X = 3 * this.PR;
-            this.TEXT_Y = 2 * this.PR;
-            this.GRAPH_X = 3 * this.PR;
-            this.GRAPH_Y = 15 * this.PR;
-            this.GRAPH_WIDTH = 74 * this.PR, this.GRAPH_HEIGHT = 30 * this.PR;
-            this.canvas = document.createElement('canvas');
-            this.canvas.width = this.WIDTH;
-            this.canvas.height = this.HEIGHT;
-            this.canvas.style.cssText = 'width:80px;height:48px';
-            this.context = this.canvas.getContext('2d');
-            this.context.font = 'bold ' + (9 * this.PR) + 'px Helvetica,Arial,sans-serif';
-            this.context.textBaseline = 'top';
-            this.context.fillStyle = bg;
-            this.context.fillRect(0, 0, this.WIDTH, this.HEIGHT);
-            this.context.fillStyle = fg;
-            this.context.fillText(name, this.TEXT_X, this.TEXT_Y);
-            this.context.fillRect(this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH, this.GRAPH_HEIGHT);
-            this.context.fillStyle = bg;
-            this.context.globalAlpha = 0.9;
-            this.context.fillRect(this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH, this.GRAPH_HEIGHT);
-        }
-        Panel.prototype.update = function (value, maxValue) {
-            this.min = Math.min(this.min, value);
-            this.max = Math.max(this.max, value);
-            this.context.fillStyle = this.bg;
-            this.context.globalAlpha = 1;
-            this.context.fillRect(0, 0, this.WIDTH, this.GRAPH_Y);
-            this.context.fillStyle = this.fg;
-            this.context.fillText(Math.round(value) + ' ' + this.name + ' (' + Math.round(this.min) + '-' + Math.round(this.max) + ')', this.TEXT_X, this.TEXT_Y);
-            this.context.drawImage(this.canvas, this.GRAPH_X + this.PR, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT, this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT);
-            this.context.fillRect(this.GRAPH_X + this.GRAPH_WIDTH - this.PR, this.GRAPH_Y, this.PR, this.GRAPH_HEIGHT);
-            this.context.fillStyle = this.bg;
-            this.context.globalAlpha = 0.9;
-            this.context.fillRect(this.GRAPH_X + this.GRAPH_WIDTH - this.PR, this.GRAPH_Y, this.PR, Math.round((1 - (value / maxValue)) * this.GRAPH_HEIGHT));
-        };
-        return Panel;
-    }());
-})(Stats || (Stats = {}));
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var gd3d;
 (function (gd3d) {
     var reflect;
@@ -782,13 +255,13 @@ var gd3d;
             };
         }
         reflect.UIComment = UIComment;
-        var FieldUIStyle;
         (function (FieldUIStyle) {
             FieldUIStyle[FieldUIStyle["None"] = 0] = "None";
             FieldUIStyle[FieldUIStyle["RangeFloat"] = 1] = "RangeFloat";
             FieldUIStyle[FieldUIStyle["MultiLineString"] = 2] = "MultiLineString";
             FieldUIStyle[FieldUIStyle["Enum"] = 3] = "Enum";
-        })(FieldUIStyle = reflect.FieldUIStyle || (reflect.FieldUIStyle = {}));
+        })(reflect.FieldUIStyle || (reflect.FieldUIStyle = {}));
+        var FieldUIStyle = reflect.FieldUIStyle;
         function UIStyle(style, min, max, defvalue) {
             return function (target, propertyKey) {
                 regField(target, propertyKey, {
@@ -925,20 +398,20 @@ var gd3d;
                 return this.rootNode;
             };
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], canvas.prototype, "pixelWidth", void 0);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], canvas.prototype, "pixelHeight", void 0);
             __decorate([
-                gd3d.reflect.Field("transform2D"),
-                __metadata("design:type", framework.transform2D)
+                gd3d.reflect.Field("transform2D"), 
+                __metadata('design:type', framework.transform2D)
             ], canvas.prototype, "rootNode", void 0);
             canvas = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], canvas);
             return canvas;
         }());
@@ -1134,14 +607,14 @@ var gd3d;
             canvasRenderer.prototype.clone = function () {
             };
             __decorate([
-                gd3d.reflect.Field("canvas"),
-                __metadata("design:type", framework.canvas)
+                gd3d.reflect.Field("canvas"), 
+                __metadata('design:type', framework.canvas)
             ], canvasRenderer.prototype, "canvas", void 0);
             canvasRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeCanvasRendererCollider,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.nodeCanvasRendererCollider, 
+                __metadata('design:paramtypes', [])
             ], canvasRenderer);
             return canvasRenderer;
         }());
@@ -1152,918 +625,12 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var PointEventEnum;
-        (function (PointEventEnum) {
-            PointEventEnum[PointEventEnum["PointNothing"] = 0] = "PointNothing";
-            PointEventEnum[PointEventEnum["PointDown"] = 1] = "PointDown";
-            PointEventEnum[PointEventEnum["PointHold"] = 2] = "PointHold";
-            PointEventEnum[PointEventEnum["PointUp"] = 3] = "PointUp";
-        })(PointEventEnum = framework.PointEventEnum || (framework.PointEventEnum = {}));
-        var PointEvent = (function () {
-            function PointEvent() {
-            }
-            return PointEvent;
-        }());
-        framework.PointEvent = PointEvent;
-        var UIEvent = (function () {
-            function UIEvent() {
-                this.funcs = [];
-            }
-            UIEvent.prototype.addListener = function (func) {
-                this.funcs.push(func);
-            };
-            UIEvent.prototype.excute = function () {
-                for (var key in this.funcs) {
-                    this.funcs[key]();
-                }
-            };
-            UIEvent.prototype.clear = function () {
-                this.funcs.length = 0;
-            };
-            return UIEvent;
-        }());
-        framework.UIEvent = UIEvent;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var overlay2D = (function () {
-            function overlay2D() {
-                this.init = false;
-                this.autoAsp = true;
-                this.canvas = new framework.canvas();
-                framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
-            }
-            overlay2D.prototype.start = function (camera) {
-                this.camera = camera;
-                this.app = camera.gameObject.getScene().app;
-                this.canvas.scene = camera.gameObject.getScene();
-                this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
-            };
-            overlay2D.prototype.addChild = function (node) {
-                this.canvas.addChild(node);
-            };
-            overlay2D.prototype.removeChild = function (node) {
-                this.canvas.removeChild(node);
-            };
-            overlay2D.prototype.getChildren = function () {
-                return this.canvas.getChildren();
-            };
-            overlay2D.prototype.getChildCount = function () {
-                return this.canvas.getChildCount();
-            };
-            overlay2D.prototype.getChild = function (index) {
-                return this.canvas.getChild(index);
-            };
-            overlay2D.prototype.render = function (context, assetmgr, camera) {
-                if (!this.canvas.getRoot().visible)
-                    return;
-                if (this.camera == null || this.camera == undefined)
-                    return;
-                if (this.autoAsp) {
-                    var vp = new gd3d.math.rect();
-                    this.camera.calcViewPortPixel(assetmgr.app, vp);
-                    var aspcam = vp.w / vp.h;
-                    var aspc = this.canvas.pixelWidth / this.canvas.pixelHeight;
-                    if (aspc != aspcam) {
-                        this.canvas.pixelWidth = this.canvas.pixelHeight * aspcam;
-                        this.canvas.getRoot().markDirty();
-                    }
-                }
-                context.updateOverlay();
-                this.canvas.render(context, assetmgr);
-            };
-            overlay2D.prototype.update = function (delta) {
-                var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (this.inputmgr.point.x / vp.w) * 2 - 1;
-                var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
-                this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
-            };
-            overlay2D.prototype.pick2d = function (mx, my, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (this.camera == null)
-                    return null;
-                var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (mx / vp.w) * 2 - 1;
-                var sy = (my / vp.h) * -2 + 1;
-                var outv2 = gd3d.math.pool.new_vector2();
-                outv2.x = sx;
-                outv2.y = sy;
-                var root = this.canvas.getRoot();
-                return this.dopick2d(outv2, root, tolerance);
-            };
-            overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (tran.components != null) {
-                    for (var i = tran.components.length - 1; i >= 0; i--) {
-                        var comp = tran.components[i];
-                        if (comp != null)
-                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
-                                return comp.comp.transform;
-                            }
-                    }
-                }
-                if (tran.children != null) {
-                    for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
-                        if (tran2 != null)
-                            return tran2;
-                    }
-                }
-                return null;
-            };
-            overlay2D.prototype.pick2d_new = function (mx, my, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (this.camera == null)
-                    return null;
-                var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (mx / vp.w) * 2 - 1;
-                var sy = (my / vp.h) * -2 + 1;
-                var outv2 = gd3d.math.pool.new_vector2();
-                outv2.x = sx;
-                outv2.y = sy;
-                var root = this.canvas.getRoot();
-                return this.dopick2d_new(outv2, root, tolerance);
-            };
-            overlay2D.prototype.dopick2d_new = function (outv, tran, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (tran.children != null) {
-                    for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d_new(outv, tran.children[i]);
-                        if (tran2 != null)
-                            return tran2;
-                    }
-                }
-                var uirect = tran.getComponent("uirect");
-                if (uirect != null) {
-                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance)) {
-                        return uirect.transform;
-                    }
-                }
-                return null;
-            };
-            overlay2D.prototype.calScreenPosToCanvasPos = function (mousePos, canvasPos) {
-                var vp = new gd3d.math.rect();
-                this.camera.calcViewPortPixel(this.app, vp);
-                var temt = gd3d.math.pool.new_vector2();
-                temt.x = (mousePos.x / vp.w) * 2 - 1;
-                temt.y = (mousePos.y / vp.h) * -2 + 1;
-                var mat = gd3d.math.pool.new_matrix3x2();
-                gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
-                gd3d.math.matrix3x2Inverse(mat, mat);
-                gd3d.math.matrix3x2TransformVector2(mat, temt, canvasPos);
-                gd3d.math.pool.delete_vector2(temt);
-            };
-            __decorate([
-                gd3d.reflect.Field("canvas"),
-                __metadata("design:type", framework.canvas)
-            ], overlay2D.prototype, "canvas", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], overlay2D.prototype, "autoAsp", void 0);
-            overlay2D = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
-            ], overlay2D);
-            return overlay2D;
-        }());
-        framework.overlay2D = overlay2D;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var math;
-    (function (math) {
-        var vector2 = (function () {
-            function vector2(x, y) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                this.x = x;
-                this.y = y;
-            }
-            vector2.prototype.toString = function () {
-                return this.x + "," + this.y;
-            };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector2.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector2.prototype, "y", void 0);
-            vector2 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number])
-            ], vector2);
-            return vector2;
-        }());
-        math.vector2 = vector2;
-        var rect = (function () {
-            function rect(x, y, w, h) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                if (w === void 0) { w = 0; }
-                if (h === void 0) { h = 0; }
-                this.x = x;
-                this.y = y;
-                this.w = w;
-                this.h = h;
-            }
-            rect.prototype.toString = function () {
-                return this.x + "," + this.y + "," + this.w + "," + this.h;
-            };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "w", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], rect.prototype, "h", void 0);
-            rect = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], rect);
-            return rect;
-        }());
-        math.rect = rect;
-        var border = (function () {
-            function border(l, t, r, b) {
-                if (l === void 0) { l = 0; }
-                if (t === void 0) { t = 0; }
-                if (r === void 0) { r = 0; }
-                if (b === void 0) { b = 0; }
-                this.l = l;
-                this.t = t;
-                this.r = r;
-                this.b = b;
-            }
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "l", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "t", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "r", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], border.prototype, "b", void 0);
-            border = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], border);
-            return border;
-        }());
-        math.border = border;
-        var color = (function () {
-            function color(r, g, b, a) {
-                if (r === void 0) { r = 1; }
-                if (g === void 0) { g = 1; }
-                if (b === void 0) { b = 1; }
-                if (a === void 0) { a = 1; }
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                this.a = a;
-            }
-            color.prototype.toString = function () {
-                return this.r + "," + this.g + "," + this.b + "," + this.a;
-            };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "r", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "g", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "b", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], color.prototype, "a", void 0);
-            color = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], color);
-            return color;
-        }());
-        math.color = color;
-        var vector3 = (function () {
-            function vector3(x, y, z) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                if (z === void 0) { z = 0; }
-                this.x = x;
-                this.y = y;
-                this.z = z;
-            }
-            vector3.prototype.toString = function () {
-                return this.x + "," + this.y + "," + this.z;
-            };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector3.prototype, "z", void 0);
-            vector3 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number])
-            ], vector3);
-            return vector3;
-        }());
-        math.vector3 = vector3;
-        var vector4 = (function () {
-            function vector4(x, y, z, w) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                if (z === void 0) { z = 0; }
-                if (w === void 0) { w = 0; }
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                this.w = w;
-            }
-            vector4.prototype.toString = function () {
-                return this.x + "," + this.y + "," + this.z + "," + this.w;
-            };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "z", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], vector4.prototype, "w", void 0);
-            vector4 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], vector4);
-            return vector4;
-        }());
-        math.vector4 = vector4;
-        var quaternion = (function () {
-            function quaternion(x, y, z, w) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                if (z === void 0) { z = 0; }
-                if (w === void 0) { w = 1; }
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                this.w = w;
-            }
-            quaternion.prototype.toString = function () {
-                return this.x + "," + this.y + "," + this.z + "," + this.w;
-            };
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "x", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "y", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "z", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], quaternion.prototype, "w", void 0);
-            quaternion = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
-            ], quaternion);
-            return quaternion;
-        }());
-        math.quaternion = quaternion;
-        var matrix = (function () {
-            function matrix(datas) {
-                if (datas === void 0) { datas = null; }
-                if (datas) {
-                    this.rawData = datas;
-                }
-                else
-                    this.rawData = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
-            }
-            matrix.prototype.toString = function () {
-                return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3] + "],"
-                    + "[" + this.rawData[4] + "," + this.rawData[5] + "," + this.rawData[6] + "," + this.rawData[7] + "],"
-                    + "[" + this.rawData[8] + "," + this.rawData[9] + "," + this.rawData[10] + "," + this.rawData[11] + "],"
-                    + "[" + this.rawData[12] + "," + this.rawData[13] + "," + this.rawData[14] + "," + this.rawData[15] + "]";
-            };
-            return matrix;
-        }());
-        math.matrix = matrix;
-        var matrix3x2 = (function () {
-            function matrix3x2(datas) {
-                if (datas === void 0) { datas = null; }
-                if (datas) {
-                    this.rawData = datas;
-                }
-                else
-                    this.rawData = new Float32Array([1, 0, 0, 0, 1, 0]);
-            }
-            matrix3x2.prototype.toString = function () {
-                return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "],"
-                    + "[" + this.rawData[3] + "," + this.rawData[4] + "," + this.rawData[5] + "]";
-            };
-            return matrix3x2;
-        }());
-        math.matrix3x2 = matrix3x2;
-    })(math = gd3d.math || (gd3d.math = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var C2DComponent = (function () {
-            function C2DComponent(comp, init) {
-                if (init === void 0) { init = false; }
-                this.comp = comp;
-                this.init = init;
-            }
-            __decorate([
-                gd3d.reflect.Field("I2DComponent"),
-                __metadata("design:type", Object)
-            ], C2DComponent.prototype, "comp", void 0);
-            C2DComponent = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Object, Boolean])
-            ], C2DComponent);
-            return C2DComponent;
-        }());
-        framework.C2DComponent = C2DComponent;
-        var transform2D = (function () {
-            function transform2D() {
-                this.name = "noname";
-                this.pivot = new gd3d.math.vector2(0, 0);
-                this.hideFlags = framework.HideFlags.None;
-                this._visible = true;
-                this.insId = new framework.insID();
-                this.dirty = true;
-                this.dirtyChild = true;
-                this.dirtyWorldDecompose = false;
-                this.localTranslate = new gd3d.math.vector2(0, 0);
-                this.localScale = new gd3d.math.vector2(1, 1);
-                this.localRotate = 0;
-                this.localMatrix = new gd3d.math.matrix3x2;
-                this.worldMatrix = new gd3d.math.matrix3x2();
-                this.worldRotate = new gd3d.math.angelref();
-                this.worldTranslate = new gd3d.math.vector2(0, 0);
-                this.worldScale = new gd3d.math.vector2(1, 1);
-                this.components = [];
-            }
-            Object.defineProperty(transform2D.prototype, "canvas", {
-                get: function () {
-                    if (this._canvas == null) {
-                        if (this.parent == null)
-                            return null;
-                        return this.parent.canvas;
-                    }
-                    return this._canvas;
-                },
-                set: function (val) {
-                    this._canvas = val;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform2D.prototype, "visibleInScene", {
-                get: function () {
-                    var obj = this;
-                    while (obj.visible) {
-                        obj = obj.parent;
-                    }
-                    return obj.visible;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform2D.prototype, "visible", {
-                get: function () {
-                    return this._visible;
-                },
-                set: function (val) {
-                    if (val != this._visible) {
-                        this._visible = val;
-                        framework.sceneMgr.app.markNotify(this, framework.NotifyType.ChangeVisible);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(transform2D.prototype, "transform", {
-                get: function () {
-                    return this;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            transform2D.prototype.addChild = function (node) {
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
-                }
-                if (this.children == null)
-                    this.children = [];
-                this.children.push(node);
-                node.parent = this;
-                node.canvas = this.canvas;
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
-            };
-            transform2D.prototype.addChildAt = function (node, index) {
-                if (index < 0)
-                    return;
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
-                }
-                if (this.children == null)
-                    this.children = [];
-                this.children.splice(index, 0, node);
-                node.canvas = this.canvas;
-                node.parent = this;
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
-            };
-            transform2D.prototype.removeChild = function (node) {
-                if (node.parent != this || this.children == null) {
-                    throw new Error("not my child.");
-                }
-                var i = this.children.indexOf(node);
-                if (i >= 0) {
-                    this.children.splice(i, 1);
-                }
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
-            };
-            transform2D.prototype.removeAllChild = function () {
-                while (this.children.length > 0) {
-                    this.removeChild(this.children[0]);
-                }
-            };
-            transform2D.prototype.markDirty = function () {
-                this.dirty = true;
-                var p = this.parent;
-                while (p != null) {
-                    p.dirtyChild = true;
-                    p = p.parent;
-                }
-            };
-            transform2D.prototype.updateTran = function (parentChange) {
-                if (this.dirtyChild == false && this.dirty == false && parentChange == false)
-                    return;
-                if (this.dirty) {
-                    gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
-                }
-                if (this.dirty || parentChange) {
-                    if (this.parent == null) {
-                        gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
-                    }
-                    else {
-                        gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
-                    }
-                    if (this.renderer != null) {
-                        this.renderer.updateTran();
-                    }
-                    this.dirtyWorldDecompose = true;
-                }
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.children[i].updateTran(parentChange || this.dirty);
-                    }
-                }
-                this.dirty = false;
-                this.dirtyChild = false;
-            };
-            transform2D.prototype.updateWorldTran = function () {
-                var p = this.parent;
-                var dirtylist = [];
-                dirtylist.push(this);
-                while (p != null) {
-                    if (p.dirty)
-                        dirtylist.push(p);
-                    p = p.parent;
-                }
-                var top = dirtylist.pop();
-                top.updateTran(false);
-            };
-            transform2D.prototype.getWorldTranslate = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
-                return this.worldTranslate;
-            };
-            transform2D.prototype.getWorldScale = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
-                return this.worldScale;
-            };
-            transform2D.prototype.getWorldRotate = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
-                return this.worldRotate;
-            };
-            transform2D.prototype.getLocalMatrix = function () {
-                return this.localMatrix;
-            };
-            transform2D.prototype.getWorldMatrix = function () {
-                return this.worldMatrix;
-            };
-            transform2D.prototype.setWorldPosition = function (pos) {
-                this.dirty = true;
-                this.updateWorldTran();
-                var thispos = this.getWorldTranslate();
-                var dir = gd3d.math.pool.new_vector2();
-                dir.x = pos.x - thispos.x;
-                dir.y = pos.y - thispos.y;
-                var pworld = gd3d.math.pool.new_matrix3x2();
-                if (this.parent != null) {
-                    gd3d.math.matrix3x2Clone(this.parent.worldMatrix, pworld);
-                }
-                else {
-                    gd3d.math.matrix3x2MakeIdentity(pworld);
-                }
-                var matinv = gd3d.math.pool.new_matrix3x2();
-                gd3d.math.matrix3x2Inverse(pworld, matinv);
-                var dirinv = gd3d.math.pool.new_vector2();
-                gd3d.math.matrix3x2TransformNormal(matinv, dir, dirinv);
-                this.localTranslate.x += dirinv.x;
-                this.localTranslate.y += dirinv.y;
-                gd3d.math.pool.delete_matrix3x2(matinv);
-                gd3d.math.pool.delete_vector2(dir);
-                gd3d.math.pool.delete_vector2(dirinv);
-            };
-            transform2D.prototype.dispose = function () {
-                if (this.children) {
-                    for (var k in this.children) {
-                        this.children[k].dispose();
-                    }
-                    this.removeAllChild();
-                }
-                this.removeAllComponents();
-            };
-            transform2D.prototype.update = function (delta) {
-                if (this.components != null) {
-                    for (var i = 0; i < this.components.length; i++) {
-                        if (this.components[i].init == false) {
-                            this.components[i].comp.start();
-                            this.components[i].init = true;
-                        }
-                        if (framework.sceneMgr.app.bePlay && !framework.sceneMgr.app.bePause)
-                            this.components[i].comp.update(delta);
-                    }
-                }
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.children[i].update(delta);
-                    }
-                }
-            };
-            transform2D.prototype.addComponent = function (type) {
-                if (this.components == null)
-                    this.components = [];
-                for (var key in this.components) {
-                    var st = this.components[key]["comp"]["constructor"]["name"];
-                    if (st == type) {
-                        throw new Error("已经有一个" + type + "的组件了，不能俩");
-                    }
-                }
-                var pp = gd3d.reflect.getPrototype(type);
-                var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
-                return this.addComponentDirect(comp);
-            };
-            transform2D.prototype.addComponentDirect = function (comp) {
-                if (comp.transform != null) {
-                    throw new Error("this components has added to a  gameObject");
-                }
-                comp.transform = this;
-                if (this.components == null)
-                    this.components = [];
-                var _comp = new C2DComponent(comp, false);
-                this.components.push(_comp);
-                if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1") {
-                    if (this.renderer == null) {
-                        this.renderer = comp;
-                    }
-                    else {
-                        throw new Error("已经有一个渲染器的组件了，不能俩");
-                    }
-                }
-                return comp;
-            };
-            transform2D.prototype.removeComponent = function (comp) {
-                for (var i = 0; i < this.components.length; i++) {
-                    if (this.components[i].comp == comp) {
-                        if (this.components[i].init) {
-                        }
-                        this.components.splice(i, 1);
-                    }
-                }
-            };
-            transform2D.prototype.removeComponentByTypeName = function (type) {
-                for (var i = 0; i < this.components.length; i++) {
-                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
-                        var p = this.components.splice(i, 1);
-                        if (p[0].comp == this.renderer)
-                            this.renderer = null;
-                        return p[0];
-                    }
-                }
-            };
-            transform2D.prototype.removeAllComponents = function () {
-                for (var i = 0; i < this.components.length; i++) {
-                    this.components[i].comp.remove();
-                    if (this.components[i].comp == this.renderer)
-                        this.renderer = null;
-                }
-                this.components.length = 0;
-            };
-            transform2D.prototype.getComponent = function (type) {
-                for (var i = 0; i < this.components.length; i++) {
-                    var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
-                    if (cname == type) {
-                        return this.components[i].comp;
-                    }
-                }
-                return null;
-            };
-            transform2D.prototype.getComponents = function () {
-                var components = [];
-                for (var i = 0; i < this.components.length; i++) {
-                    components.push(this.components[i].comp);
-                }
-                return components;
-            };
-            transform2D.prototype.getComponentsInChildren = function (type) {
-                var components = [];
-                this.getNodeCompoents(this, type, components);
-                return components;
-            };
-            transform2D.prototype.getNodeCompoents = function (node, _type, comps) {
-                for (var i in node.components) {
-                    var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                    if (cname == _type) {
-                        comps.push(this.components[i].comp);
-                    }
-                }
-                if (node.children != null) {
-                    for (var i in node.children) {
-                        this.getNodeCompoents(node.children[i], _type, comps);
-                    }
-                }
-            };
-            transform2D.prototype.onCapturePointEvent = function (canvas, ev) {
-                if (this.components != null) {
-                    for (var i = 0; i <= this.components.length; i++) {
-                        if (ev.eated == false) {
-                            var comp = this.components[i];
-                            if (comp != null)
-                                if (comp.init) {
-                                    comp.comp.onPointEvent(canvas, ev, true);
-                                }
-                        }
-                    }
-                }
-                if (ev.eated == false) {
-                    if (this.children != null) {
-                        for (var i = 0; i <= this.children.length; i++) {
-                            var c = this.children[i];
-                            if (c != null)
-                                c.onCapturePointEvent(canvas, ev);
-                        }
-                    }
-                }
-            };
-            transform2D.prototype.ContainsCanvasPoint = function (pworld, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                var mworld = this.getWorldMatrix();
-                var mout = new gd3d.math.matrix3x2();
-                gd3d.math.matrix3x2Inverse(mworld, mout);
-                var p2 = new gd3d.math.vector2();
-                gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
-                p2.x += this.pivot.x * this.width;
-                p2.y += this.pivot.y * this.height;
-                return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
-            };
-            transform2D.prototype.onPointEvent = function (canvas, ev) {
-                if (this.children != null) {
-                    for (var i = this.children.length - 1; i >= 0; i--) {
-                        if (ev.eated == false) {
-                            var c = this.children[i];
-                            if (c != null)
-                                c.onPointEvent(canvas, ev);
-                        }
-                    }
-                }
-                if (ev.eated == false && this.components != null) {
-                    for (var i = this.components.length - 1; i >= 0; i--) {
-                        var comp = this.components[i];
-                        if (comp != null)
-                            if (comp.init) {
-                                comp.comp.onPointEvent(canvas, ev, false);
-                            }
-                    }
-                }
-            };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], transform2D.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform2D[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "children", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "width", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "height", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "pivot", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "localTranslate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector2"),
-                __metadata("design:type", gd3d.math.vector2)
-            ], transform2D.prototype, "localScale", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], transform2D.prototype, "localRotate", void 0);
-            __decorate([
-                gd3d.reflect.Field("C2DComponent[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "components", void 0);
-            transform2D = __decorate([
-                gd3d.reflect.SerializeType
-            ], transform2D);
-            return transform2D;
-        }());
-        framework.transform2D = transform2D;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var TransitionType;
         (function (TransitionType) {
             TransitionType[TransitionType["None"] = 0] = "None";
             TransitionType[TransitionType["ColorTint"] = 1] = "ColorTint";
             TransitionType[TransitionType["SpriteSwap"] = 2] = "SpriteSwap";
-        })(TransitionType = framework.TransitionType || (framework.TransitionType = {}));
+        })(framework.TransitionType || (framework.TransitionType = {}));
+        var TransitionType = framework.TransitionType;
         var button = (function () {
             function button() {
                 this._transition = TransitionType.ColorTint;
@@ -2236,22 +803,20 @@ var gd3d;
                 }
             };
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Object)
             ], button.prototype, "transition", null);
             __decorate([
-                gd3d.reflect.Field("color"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [gd3d.math.color])
+                gd3d.reflect.Field("color"), 
+                __metadata('design:type', Object)
             ], button.prototype, "normalColor", null);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Object)
             ], button.prototype, "fadeDuration", null);
             button = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent, 
+                __metadata('design:paramtypes', [])
             ], button);
             return button;
         }());
@@ -3137,44 +1702,42 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
-                __metadata("design:type", gd3d.math.color)
+                gd3d.reflect.UIStyle("vector4"), 
+                __metadata('design:type', gd3d.math.color)
             ], image2D.prototype, "color", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("ImageType"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
+                gd3d.reflect.UIStyle("ImageType"), 
+                __metadata('design:type', Object)
             ], image2D.prototype, "imageType", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("FillMethod"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
+                gd3d.reflect.UIStyle("FillMethod"), 
+                __metadata('design:type', Object)
             ], image2D.prototype, "fillMethod", null);
             image2D = __decorate([
                 gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.nodeRender, 
+                __metadata('design:paramtypes', [])
             ], image2D);
             return image2D;
         }());
         framework.image2D = image2D;
-        var ImageType;
         (function (ImageType) {
             ImageType[ImageType["Simple"] = 0] = "Simple";
             ImageType[ImageType["Sliced"] = 1] = "Sliced";
             ImageType[ImageType["Tiled"] = 2] = "Tiled";
             ImageType[ImageType["Filled"] = 3] = "Filled";
-        })(ImageType = framework.ImageType || (framework.ImageType = {}));
-        var FillMethod;
+        })(framework.ImageType || (framework.ImageType = {}));
+        var ImageType = framework.ImageType;
         (function (FillMethod) {
             FillMethod[FillMethod["Horizontal"] = 0] = "Horizontal";
             FillMethod[FillMethod["Vertical"] = 1] = "Vertical";
             FillMethod[FillMethod["Radial_90"] = 2] = "Radial_90";
             FillMethod[FillMethod["Radial_180"] = 3] = "Radial_180";
             FillMethod[FillMethod["Radial_360"] = 4] = "Radial_360";
-        })(FillMethod = framework.FillMethod || (framework.FillMethod = {}));
+        })(framework.FillMethod || (framework.FillMethod = {}));
+        var FillMethod = framework.FillMethod;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -3399,39 +1962,37 @@ var gd3d;
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String),
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.Field("string"), 
+                __metadata('design:type', String)
             ], label.prototype, "text", null);
             __decorate([
-                gd3d.reflect.Field("font"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.font])
+                gd3d.reflect.Field("font"), 
+                __metadata('design:type', Object)
             ], label.prototype, "font", null);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Number])
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Object)
             ], label.prototype, "fontsize", null);
             label = __decorate([
                 gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender
+                gd3d.reflect.nodeRender, 
+                __metadata('design:paramtypes', [])
             ], label);
             return label;
         }());
         framework.label = label;
-        var HorizontalType;
         (function (HorizontalType) {
             HorizontalType[HorizontalType["Center"] = 0] = "Center";
             HorizontalType[HorizontalType["Left"] = 1] = "Left";
             HorizontalType[HorizontalType["Right"] = 2] = "Right";
-        })(HorizontalType = framework.HorizontalType || (framework.HorizontalType = {}));
-        var VerticalType;
+        })(framework.HorizontalType || (framework.HorizontalType = {}));
+        var HorizontalType = framework.HorizontalType;
         (function (VerticalType) {
             VerticalType[VerticalType["Center"] = 0] = "Center";
             VerticalType[VerticalType["Top"] = 1] = "Top";
             VerticalType[VerticalType["Boom"] = 2] = "Boom";
-        })(VerticalType = framework.VerticalType || (framework.VerticalType = {}));
+        })(framework.VerticalType || (framework.VerticalType = {}));
+        var VerticalType = framework.VerticalType;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -3518,22 +2079,23 @@ var gd3d;
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             __decorate([
-                gd3d.reflect.Field("texture"),
-                __metadata("design:type", framework.texture)
+                gd3d.reflect.Field("texture"), 
+                __metadata('design:type', framework.texture)
             ], rawImage2D.prototype, "_image", void 0);
             __decorate([
                 gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
-                __metadata("design:type", gd3d.math.color)
+                gd3d.reflect.UIStyle("vector4"), 
+                __metadata('design:type', gd3d.math.color)
             ], rawImage2D.prototype, "color", void 0);
             __decorate([
                 gd3d.reflect.Field("material"),
-                gd3d.reflect.UIStyle("material"),
-                __metadata("design:type", framework.material)
+                gd3d.reflect.UIStyle("material"), 
+                __metadata('design:type', framework.material)
             ], rawImage2D.prototype, "mat", void 0);
             rawImage2D = __decorate([
                 gd3d.reflect.node2DComponent,
-                gd3d.reflect.nodeRender
+                gd3d.reflect.nodeRender, 
+                __metadata('design:paramtypes', [])
             ], rawImage2D);
             return rawImage2D;
         }());
@@ -3557,11 +2119,1341 @@ var gd3d;
             uirect.prototype.remove = function () {
             };
             uirect = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent, 
+                __metadata('design:paramtypes', [])
             ], uirect);
             return uirect;
         }());
         framework.uirect = uirect;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        (function (PointEventEnum) {
+            PointEventEnum[PointEventEnum["PointNothing"] = 0] = "PointNothing";
+            PointEventEnum[PointEventEnum["PointDown"] = 1] = "PointDown";
+            PointEventEnum[PointEventEnum["PointHold"] = 2] = "PointHold";
+            PointEventEnum[PointEventEnum["PointUp"] = 3] = "PointUp";
+        })(framework.PointEventEnum || (framework.PointEventEnum = {}));
+        var PointEventEnum = framework.PointEventEnum;
+        var PointEvent = (function () {
+            function PointEvent() {
+            }
+            return PointEvent;
+        }());
+        framework.PointEvent = PointEvent;
+        var UIEvent = (function () {
+            function UIEvent() {
+                this.funcs = [];
+            }
+            UIEvent.prototype.addListener = function (func) {
+                this.funcs.push(func);
+            };
+            UIEvent.prototype.excute = function () {
+                for (var key in this.funcs) {
+                    this.funcs[key]();
+                }
+            };
+            UIEvent.prototype.clear = function () {
+                this.funcs.length = 0;
+            };
+            return UIEvent;
+        }());
+        framework.UIEvent = UIEvent;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var overlay2D = (function () {
+            function overlay2D() {
+                this.init = false;
+                this.autoAsp = true;
+                this.canvas = new framework.canvas();
+                framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
+            }
+            overlay2D.prototype.start = function (camera) {
+                this.camera = camera;
+                this.app = camera.gameObject.getScene().app;
+                this.canvas.scene = camera.gameObject.getScene();
+                this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
+            };
+            overlay2D.prototype.addChild = function (node) {
+                this.canvas.addChild(node);
+            };
+            overlay2D.prototype.removeChild = function (node) {
+                this.canvas.removeChild(node);
+            };
+            overlay2D.prototype.getChildren = function () {
+                return this.canvas.getChildren();
+            };
+            overlay2D.prototype.getChildCount = function () {
+                return this.canvas.getChildCount();
+            };
+            overlay2D.prototype.getChild = function (index) {
+                return this.canvas.getChild(index);
+            };
+            overlay2D.prototype.render = function (context, assetmgr, camera) {
+                if (!this.canvas.getRoot().visible)
+                    return;
+                if (this.camera == null || this.camera == undefined)
+                    return;
+                if (this.autoAsp) {
+                    var vp = new gd3d.math.rect();
+                    this.camera.calcViewPortPixel(assetmgr.app, vp);
+                    var aspcam = vp.w / vp.h;
+                    var aspc = this.canvas.pixelWidth / this.canvas.pixelHeight;
+                    if (aspc != aspcam) {
+                        this.canvas.pixelWidth = this.canvas.pixelHeight * aspcam;
+                        this.canvas.getRoot().markDirty();
+                    }
+                }
+                context.updateOverlay();
+                this.canvas.render(context, assetmgr);
+            };
+            overlay2D.prototype.update = function (delta) {
+                var vp = new gd3d.math.rect();
+                var app = this.camera.calcViewPortPixel(this.app, vp);
+                var sx = (this.inputmgr.point.x / vp.w) * 2 - 1;
+                var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
+                this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
+            };
+            overlay2D.prototype.pick2d = function (mx, my, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
+                if (this.camera == null)
+                    return null;
+                var vp = new gd3d.math.rect();
+                var app = this.camera.calcViewPortPixel(this.app, vp);
+                var sx = (mx / vp.w) * 2 - 1;
+                var sy = (my / vp.h) * -2 + 1;
+                var outv2 = gd3d.math.pool.new_vector2();
+                outv2.x = sx;
+                outv2.y = sy;
+                var root = this.canvas.getRoot();
+                return this.dopick2d(outv2, root, tolerance);
+            };
+            overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
+                if (tran.components != null) {
+                    for (var i = tran.components.length - 1; i >= 0; i--) {
+                        var comp = tran.components[i];
+                        if (comp != null)
+                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
+                                return comp.comp.transform;
+                            }
+                    }
+                }
+                if (tran.children != null) {
+                    for (var i = tran.children.length - 1; i >= 0; i--) {
+                        var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
+                        if (tran2 != null)
+                            return tran2;
+                    }
+                }
+                return null;
+            };
+            overlay2D.prototype.pick2d_new = function (mx, my, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
+                if (this.camera == null)
+                    return null;
+                var vp = new gd3d.math.rect();
+                var app = this.camera.calcViewPortPixel(this.app, vp);
+                var sx = (mx / vp.w) * 2 - 1;
+                var sy = (my / vp.h) * -2 + 1;
+                var outv2 = gd3d.math.pool.new_vector2();
+                outv2.x = sx;
+                outv2.y = sy;
+                var root = this.canvas.getRoot();
+                return this.dopick2d_new(outv2, root, tolerance);
+            };
+            overlay2D.prototype.dopick2d_new = function (outv, tran, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
+                if (tran.children != null) {
+                    for (var i = tran.children.length - 1; i >= 0; i--) {
+                        var tran2 = this.dopick2d_new(outv, tran.children[i]);
+                        if (tran2 != null)
+                            return tran2;
+                    }
+                }
+                var uirect = tran.getComponent("uirect");
+                if (uirect != null) {
+                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance)) {
+                        return uirect.transform;
+                    }
+                }
+                return null;
+            };
+            overlay2D.prototype.calScreenPosToCanvasPos = function (mousePos, canvasPos) {
+                var vp = new gd3d.math.rect();
+                this.camera.calcViewPortPixel(this.app, vp);
+                var temt = gd3d.math.pool.new_vector2();
+                temt.x = (mousePos.x / vp.w) * 2 - 1;
+                temt.y = (mousePos.y / vp.h) * -2 + 1;
+                var mat = gd3d.math.pool.new_matrix3x2();
+                gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
+                gd3d.math.matrix3x2Inverse(mat, mat);
+                gd3d.math.matrix3x2TransformVector2(mat, temt, canvasPos);
+                gd3d.math.pool.delete_vector2(temt);
+            };
+            __decorate([
+                gd3d.reflect.Field("canvas"), 
+                __metadata('design:type', framework.canvas)
+            ], overlay2D.prototype, "canvas", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
+            ], overlay2D.prototype, "autoAsp", void 0);
+            overlay2D = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
+            ], overlay2D);
+            return overlay2D;
+        }());
+        framework.overlay2D = overlay2D;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var math;
+    (function (math) {
+        var vector2 = (function () {
+            function vector2(x, y) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                this.x = x;
+                this.y = y;
+            }
+            vector2.prototype.toString = function () {
+                return this.x + "," + this.y;
+            };
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector2.prototype, "x", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector2.prototype, "y", void 0);
+            vector2 = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Number])
+            ], vector2);
+            return vector2;
+        }());
+        math.vector2 = vector2;
+        var rect = (function () {
+            function rect(x, y, w, h) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (w === void 0) { w = 0; }
+                if (h === void 0) { h = 0; }
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
+            }
+            rect.prototype.toString = function () {
+                return this.x + "," + this.y + "," + this.w + "," + this.h;
+            };
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], rect.prototype, "x", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], rect.prototype, "y", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], rect.prototype, "w", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], rect.prototype, "h", void 0);
+            rect = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Number, Number, Number])
+            ], rect);
+            return rect;
+        }());
+        math.rect = rect;
+        var border = (function () {
+            function border(l, t, r, b) {
+                if (l === void 0) { l = 0; }
+                if (t === void 0) { t = 0; }
+                if (r === void 0) { r = 0; }
+                if (b === void 0) { b = 0; }
+                this.l = l;
+                this.t = t;
+                this.r = r;
+                this.b = b;
+            }
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], border.prototype, "l", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], border.prototype, "t", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], border.prototype, "r", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], border.prototype, "b", void 0);
+            border = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Number, Number, Number])
+            ], border);
+            return border;
+        }());
+        math.border = border;
+        var color = (function () {
+            function color(r, g, b, a) {
+                if (r === void 0) { r = 1; }
+                if (g === void 0) { g = 1; }
+                if (b === void 0) { b = 1; }
+                if (a === void 0) { a = 1; }
+                this.r = r;
+                this.g = g;
+                this.b = b;
+                this.a = a;
+            }
+            color.prototype.toString = function () {
+                return this.r + "," + this.g + "," + this.b + "," + this.a;
+            };
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], color.prototype, "r", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], color.prototype, "g", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], color.prototype, "b", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], color.prototype, "a", void 0);
+            color = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Number, Number, Number])
+            ], color);
+            return color;
+        }());
+        math.color = color;
+        var vector3 = (function () {
+            function vector3(x, y, z) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+            vector3.prototype.toString = function () {
+                return this.x + "," + this.y + "," + this.z;
+            };
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector3.prototype, "x", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector3.prototype, "y", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector3.prototype, "z", void 0);
+            vector3 = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Number, Number])
+            ], vector3);
+            return vector3;
+        }());
+        math.vector3 = vector3;
+        var vector4 = (function () {
+            function vector4(x, y, z, w) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
+                if (w === void 0) { w = 0; }
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.w = w;
+            }
+            vector4.prototype.toString = function () {
+                return this.x + "," + this.y + "," + this.z + "," + this.w;
+            };
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector4.prototype, "x", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector4.prototype, "y", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector4.prototype, "z", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], vector4.prototype, "w", void 0);
+            vector4 = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Number, Number, Number])
+            ], vector4);
+            return vector4;
+        }());
+        math.vector4 = vector4;
+        var quaternion = (function () {
+            function quaternion(x, y, z, w) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
+                if (w === void 0) { w = 1; }
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.w = w;
+            }
+            quaternion.prototype.toString = function () {
+                return this.x + "," + this.y + "," + this.z + "," + this.w;
+            };
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], quaternion.prototype, "x", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], quaternion.prototype, "y", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], quaternion.prototype, "z", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], quaternion.prototype, "w", void 0);
+            quaternion = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Number, Number, Number])
+            ], quaternion);
+            return quaternion;
+        }());
+        math.quaternion = quaternion;
+        var matrix = (function () {
+            function matrix(datas) {
+                if (datas === void 0) { datas = null; }
+                if (datas) {
+                    this.rawData = datas;
+                }
+                else
+                    this.rawData = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+            }
+            matrix.prototype.toString = function () {
+                return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3] + "],"
+                    + "[" + this.rawData[4] + "," + this.rawData[5] + "," + this.rawData[6] + "," + this.rawData[7] + "],"
+                    + "[" + this.rawData[8] + "," + this.rawData[9] + "," + this.rawData[10] + "," + this.rawData[11] + "],"
+                    + "[" + this.rawData[12] + "," + this.rawData[13] + "," + this.rawData[14] + "," + this.rawData[15] + "]";
+            };
+            return matrix;
+        }());
+        math.matrix = matrix;
+        var matrix3x2 = (function () {
+            function matrix3x2(datas) {
+                if (datas === void 0) { datas = null; }
+                if (datas) {
+                    this.rawData = datas;
+                }
+                else
+                    this.rawData = new Float32Array([1, 0, 0, 0, 1, 0]);
+            }
+            matrix3x2.prototype.toString = function () {
+                return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "],"
+                    + "[" + this.rawData[3] + "," + this.rawData[4] + "," + this.rawData[5] + "]";
+            };
+            return matrix3x2;
+        }());
+        math.matrix3x2 = matrix3x2;
+    })(math = gd3d.math || (gd3d.math = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var C2DComponent = (function () {
+            function C2DComponent(comp, init) {
+                if (init === void 0) { init = false; }
+                this.comp = comp;
+                this.init = init;
+            }
+            __decorate([
+                gd3d.reflect.Field("I2DComponent"), 
+                __metadata('design:type', Object)
+            ], C2DComponent.prototype, "comp", void 0);
+            C2DComponent = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Object, Boolean])
+            ], C2DComponent);
+            return C2DComponent;
+        }());
+        framework.C2DComponent = C2DComponent;
+        var transform2D = (function () {
+            function transform2D() {
+                this.name = "noname";
+                this.pivot = new gd3d.math.vector2(0, 0);
+                this.hideFlags = framework.HideFlags.None;
+                this._visible = true;
+                this.insId = new framework.insID();
+                this.dirty = true;
+                this.dirtyChild = true;
+                this.dirtyWorldDecompose = false;
+                this.localTranslate = new gd3d.math.vector2(0, 0);
+                this.localScale = new gd3d.math.vector2(1, 1);
+                this.localRotate = 0;
+                this.localMatrix = new gd3d.math.matrix3x2;
+                this.worldMatrix = new gd3d.math.matrix3x2();
+                this.worldRotate = new gd3d.math.angelref();
+                this.worldTranslate = new gd3d.math.vector2(0, 0);
+                this.worldScale = new gd3d.math.vector2(1, 1);
+                this.components = [];
+            }
+            Object.defineProperty(transform2D.prototype, "canvas", {
+                get: function () {
+                    if (this._canvas == null) {
+                        if (this.parent == null)
+                            return null;
+                        return this.parent.canvas;
+                    }
+                    return this._canvas;
+                },
+                set: function (val) {
+                    this._canvas = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(transform2D.prototype, "visibleInScene", {
+                get: function () {
+                    var obj = this;
+                    while (obj.visible) {
+                        obj = obj.parent;
+                    }
+                    return obj.visible;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(transform2D.prototype, "visible", {
+                get: function () {
+                    return this._visible;
+                },
+                set: function (val) {
+                    if (val != this._visible) {
+                        this._visible = val;
+                        framework.sceneMgr.app.markNotify(this, framework.NotifyType.ChangeVisible);
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(transform2D.prototype, "transform", {
+                get: function () {
+                    return this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform2D.prototype.addChild = function (node) {
+                if (node.parent != null) {
+                    node.parent.removeChild(node);
+                }
+                if (this.children == null)
+                    this.children = [];
+                this.children.push(node);
+                node.parent = this;
+                node.canvas = this.canvas;
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+            };
+            transform2D.prototype.addChildAt = function (node, index) {
+                if (index < 0)
+                    return;
+                if (node.parent != null) {
+                    node.parent.removeChild(node);
+                }
+                if (this.children == null)
+                    this.children = [];
+                this.children.splice(index, 0, node);
+                node.canvas = this.canvas;
+                node.parent = this;
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+            };
+            transform2D.prototype.removeChild = function (node) {
+                if (node.parent != this || this.children == null) {
+                    throw new Error("not my child.");
+                }
+                var i = this.children.indexOf(node);
+                if (i >= 0) {
+                    this.children.splice(i, 1);
+                }
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
+            };
+            transform2D.prototype.removeAllChild = function () {
+                while (this.children.length > 0) {
+                    this.removeChild(this.children[0]);
+                }
+            };
+            transform2D.prototype.markDirty = function () {
+                this.dirty = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p = p.parent;
+                }
+            };
+            transform2D.prototype.updateTran = function (parentChange) {
+                if (this.dirtyChild == false && this.dirty == false && parentChange == false)
+                    return;
+                if (this.dirty) {
+                    gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                }
+                if (this.dirty || parentChange) {
+                    if (this.parent == null) {
+                        gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
+                    }
+                    else {
+                        gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
+                    }
+                    if (this.renderer != null) {
+                        this.renderer.updateTran();
+                    }
+                    this.dirtyWorldDecompose = true;
+                }
+                if (this.children != null) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        this.children[i].updateTran(parentChange || this.dirty);
+                    }
+                }
+                this.dirty = false;
+                this.dirtyChild = false;
+            };
+            transform2D.prototype.updateWorldTran = function () {
+                var p = this.parent;
+                var dirtylist = [];
+                dirtylist.push(this);
+                while (p != null) {
+                    if (p.dirty)
+                        dirtylist.push(p);
+                    p = p.parent;
+                }
+                var top = dirtylist.pop();
+                top.updateTran(false);
+            };
+            transform2D.prototype.getWorldTranslate = function () {
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
+                return this.worldTranslate;
+            };
+            transform2D.prototype.getWorldScale = function () {
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
+                return this.worldScale;
+            };
+            transform2D.prototype.getWorldRotate = function () {
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
+                return this.worldRotate;
+            };
+            transform2D.prototype.getLocalMatrix = function () {
+                return this.localMatrix;
+            };
+            transform2D.prototype.getWorldMatrix = function () {
+                return this.worldMatrix;
+            };
+            transform2D.getTransInfoInCanvas = function (trans, out) {
+                var mat = trans.getWorldMatrix();
+                var rotmat = trans.canvas.getRoot().getWorldMatrix();
+                var inversemat = gd3d.math.pool.new_matrix3x2();
+                gd3d.math.matrix3x2Inverse(rotmat, inversemat);
+                var mattoRoot = gd3d.math.pool.new_matrix3x2();
+                gd3d.math.matrix3x2Multiply(inversemat, mat, mattoRoot);
+                var rotscale = gd3d.math.pool.new_vector2();
+                var rotRot = new gd3d.math.angelref();
+                var rotPos = gd3d.math.pool.new_vector2();
+                gd3d.math.matrix3x2Decompose(mattoRoot, rotscale, rotRot, rotPos);
+                gd3d.math.vec2Clone(trans.pivot, out.pivot);
+                gd3d.math.vec2Clone(rotPos, out.pivotPos);
+                out.rot = rotRot.v;
+                out.width = trans.width * rotscale.x;
+                out.height = trans.height * rotscale.y;
+                gd3d.math.pool.delete_matrix3x2(inversemat);
+                gd3d.math.pool.delete_matrix3x2(mattoRoot);
+                gd3d.math.pool.delete_vector2(rotscale);
+                gd3d.math.pool.delete_vector2(rotPos);
+            };
+            transform2D.prototype.setWorldPosition = function (pos) {
+                this.dirty = true;
+                this.updateWorldTran();
+                var thispos = this.getWorldTranslate();
+                var dir = gd3d.math.pool.new_vector2();
+                dir.x = pos.x - thispos.x;
+                dir.y = pos.y - thispos.y;
+                var pworld = gd3d.math.pool.new_matrix3x2();
+                if (this.parent != null) {
+                    gd3d.math.matrix3x2Clone(this.parent.worldMatrix, pworld);
+                }
+                else {
+                    gd3d.math.matrix3x2MakeIdentity(pworld);
+                }
+                var matinv = gd3d.math.pool.new_matrix3x2();
+                gd3d.math.matrix3x2Inverse(pworld, matinv);
+                var dirinv = gd3d.math.pool.new_vector2();
+                gd3d.math.matrix3x2TransformNormal(matinv, dir, dirinv);
+                this.localTranslate.x += dirinv.x;
+                this.localTranslate.y += dirinv.y;
+                gd3d.math.pool.delete_matrix3x2(matinv);
+                gd3d.math.pool.delete_vector2(dir);
+                gd3d.math.pool.delete_vector2(dirinv);
+            };
+            transform2D.prototype.dispose = function () {
+                if (this.children) {
+                    for (var k in this.children) {
+                        this.children[k].dispose();
+                    }
+                    this.removeAllChild();
+                }
+                this.removeAllComponents();
+            };
+            transform2D.prototype.update = function (delta) {
+                if (this.components != null) {
+                    for (var i = 0; i < this.components.length; i++) {
+                        if (this.components[i].init == false) {
+                            this.components[i].comp.start();
+                            this.components[i].init = true;
+                        }
+                        if (framework.sceneMgr.app.bePlay && !framework.sceneMgr.app.bePause)
+                            this.components[i].comp.update(delta);
+                    }
+                }
+                if (this.children != null) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        this.children[i].update(delta);
+                    }
+                }
+            };
+            transform2D.prototype.addComponent = function (type) {
+                if (this.components == null)
+                    this.components = [];
+                for (var key in this.components) {
+                    var st = this.components[key]["comp"]["constructor"]["name"];
+                    if (st == type) {
+                        throw new Error("已经有一个" + type + "的组件了，不能俩");
+                    }
+                }
+                var pp = gd3d.reflect.getPrototype(type);
+                var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
+                return this.addComponentDirect(comp);
+            };
+            transform2D.prototype.addComponentDirect = function (comp) {
+                if (comp.transform != null) {
+                    throw new Error("this components has added to a  gameObject");
+                }
+                comp.transform = this;
+                if (this.components == null)
+                    this.components = [];
+                var _comp = new C2DComponent(comp, false);
+                this.components.push(_comp);
+                if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1") {
+                    if (this.renderer == null) {
+                        this.renderer = comp;
+                    }
+                    else {
+                        throw new Error("已经有一个渲染器的组件了，不能俩");
+                    }
+                }
+                return comp;
+            };
+            transform2D.prototype.removeComponent = function (comp) {
+                for (var i = 0; i < this.components.length; i++) {
+                    if (this.components[i].comp == comp) {
+                        if (this.components[i].init) {
+                        }
+                        this.components.splice(i, 1);
+                    }
+                }
+            };
+            transform2D.prototype.removeComponentByTypeName = function (type) {
+                for (var i = 0; i < this.components.length; i++) {
+                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
+                        var p = this.components.splice(i, 1);
+                        if (p[0].comp == this.renderer)
+                            this.renderer = null;
+                        return p[0];
+                    }
+                }
+            };
+            transform2D.prototype.removeAllComponents = function () {
+                for (var i = 0; i < this.components.length; i++) {
+                    this.components[i].comp.remove();
+                    if (this.components[i].comp == this.renderer)
+                        this.renderer = null;
+                }
+                this.components.length = 0;
+            };
+            transform2D.prototype.getComponent = function (type) {
+                for (var i = 0; i < this.components.length; i++) {
+                    var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
+                    if (cname == type) {
+                        return this.components[i].comp;
+                    }
+                }
+                return null;
+            };
+            transform2D.prototype.getComponents = function () {
+                var components = [];
+                for (var i = 0; i < this.components.length; i++) {
+                    components.push(this.components[i].comp);
+                }
+                return components;
+            };
+            transform2D.prototype.getComponentsInChildren = function (type) {
+                var components = [];
+                this.getNodeCompoents(this, type, components);
+                return components;
+            };
+            transform2D.prototype.getNodeCompoents = function (node, _type, comps) {
+                for (var i in node.components) {
+                    var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
+                    if (cname == _type) {
+                        comps.push(this.components[i].comp);
+                    }
+                }
+                if (node.children != null) {
+                    for (var i in node.children) {
+                        this.getNodeCompoents(node.children[i], _type, comps);
+                    }
+                }
+            };
+            transform2D.prototype.onCapturePointEvent = function (canvas, ev) {
+                if (this.components != null) {
+                    for (var i = 0; i <= this.components.length; i++) {
+                        if (ev.eated == false) {
+                            var comp = this.components[i];
+                            if (comp != null)
+                                if (comp.init) {
+                                    comp.comp.onPointEvent(canvas, ev, true);
+                                }
+                        }
+                    }
+                }
+                if (ev.eated == false) {
+                    if (this.children != null) {
+                        for (var i = 0; i <= this.children.length; i++) {
+                            var c = this.children[i];
+                            if (c != null)
+                                c.onCapturePointEvent(canvas, ev);
+                        }
+                    }
+                }
+            };
+            transform2D.prototype.ContainsCanvasPoint = function (pworld, tolerance) {
+                if (tolerance === void 0) { tolerance = 0; }
+                var mworld = this.getWorldMatrix();
+                var mout = new gd3d.math.matrix3x2();
+                gd3d.math.matrix3x2Inverse(mworld, mout);
+                var p2 = new gd3d.math.vector2();
+                gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
+                p2.x += this.pivot.x * this.width;
+                p2.y += this.pivot.y * this.height;
+                return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+            };
+            transform2D.prototype.onPointEvent = function (canvas, ev) {
+                if (this.children != null) {
+                    for (var i = this.children.length - 1; i >= 0; i--) {
+                        if (ev.eated == false) {
+                            var c = this.children[i];
+                            if (c != null)
+                                c.onPointEvent(canvas, ev);
+                        }
+                    }
+                }
+                if (ev.eated == false && this.components != null) {
+                    for (var i = this.components.length - 1; i >= 0; i--) {
+                        var comp = this.components[i];
+                        if (comp != null)
+                            if (comp.init) {
+                                comp.comp.onPointEvent(canvas, ev, false);
+                            }
+                    }
+                }
+            };
+            __decorate([
+                gd3d.reflect.Field("string"), 
+                __metadata('design:type', String)
+            ], transform2D.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("transform2D[]"), 
+                __metadata('design:type', Array)
+            ], transform2D.prototype, "children", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], transform2D.prototype, "width", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
+            ], transform2D.prototype, "height", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector2"), 
+                __metadata('design:type', gd3d.math.vector2)
+            ], transform2D.prototype, "pivot", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector2"), 
+                __metadata('design:type', gd3d.math.vector2)
+            ], transform2D.prototype, "localTranslate", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector2"), 
+                __metadata('design:type', gd3d.math.vector2)
+            ], transform2D.prototype, "localScale", void 0);
+            __decorate([
+                gd3d.reflect.Field("C2DComponent[]"), 
+                __metadata('design:type', Array)
+            ], transform2D.prototype, "components", void 0);
+            transform2D = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
+            ], transform2D);
+            return transform2D;
+        }());
+        framework.transform2D = transform2D;
+        var t2dInfo = (function () {
+            function t2dInfo() {
+                this.pivot = new gd3d.math.vector2();
+                this.pivotPos = new gd3d.math.vector2();
+            }
+            t2dInfo.getCenter = function (info, outCenter) {
+                outCenter.x = info.pivotPos.x + info.width * (0.5 - info.pivot.x) * Math.cos(info.rot) - info.height * (0.5 - info.pivot.y) * Math.sin(info.rot);
+                outCenter.y = info.pivotPos.y - info.width * (0.5 - info.pivot.x) * Math.sin(info.rot) + info.height * (0.5 - info.pivot.y) * Math.cos(info.rot);
+            };
+            return t2dInfo;
+        }());
+        framework.t2dInfo = t2dInfo;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        (function (NotifyType) {
+            NotifyType[NotifyType["AddChild"] = 0] = "AddChild";
+            NotifyType[NotifyType["RemoveChild"] = 1] = "RemoveChild";
+            NotifyType[NotifyType["ChangeVisible"] = 2] = "ChangeVisible";
+            NotifyType[NotifyType["AddCamera"] = 3] = "AddCamera";
+            NotifyType[NotifyType["AddCanvasRender"] = 4] = "AddCanvasRender";
+        })(framework.NotifyType || (framework.NotifyType = {}));
+        var NotifyType = framework.NotifyType;
+        (function (CanvasFixedType) {
+            CanvasFixedType[CanvasFixedType["FixedWidthType"] = 0] = "FixedWidthType";
+            CanvasFixedType[CanvasFixedType["FixedHeightType"] = 1] = "FixedHeightType";
+        })(framework.CanvasFixedType || (framework.CanvasFixedType = {}));
+        var CanvasFixedType = framework.CanvasFixedType;
+        var application = (function () {
+            function application() {
+                this.limitFrame = true;
+                this.version = "v0.0.1";
+                this.build = "b000010";
+                this._tar = -1;
+                this._standDeltaTime = -1;
+                this.beWidthSetted = false;
+                this.beHeightSetted = false;
+                this.scale = 0;
+                this.beStepNumber = 0;
+                this.pretimer = 0;
+                this.isFrustumCulling = true;
+                this._userCode = [];
+                this._userCodeNew = [];
+                this._editorCode = [];
+                this._editorCodeNew = [];
+                this._bePlay = false;
+                this.be2dstate = false;
+                this.curcameraindex = -1;
+                this._bePause = false;
+                this._beStepForward = false;
+            }
+            Object.defineProperty(application.prototype, "timeScale", {
+                get: function () {
+                    return this._timeScale;
+                },
+                set: function (val) {
+                    this._timeScale = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "targetFrame", {
+                get: function () {
+                    return this._tar;
+                },
+                set: function (val) {
+                    if (val == 0)
+                        val = -1;
+                    this._tar = val;
+                    this._standDeltaTime = 1 / this._tar;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "canvasFixHeight", {
+                set: function (val) {
+                    this.beHeightSetted = true;
+                    this._fixHeight = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "canvasFixWidth", {
+                set: function (val) {
+                    this.beWidthSetted = true;
+                    this._fixWidth = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "canvasClientWidth", {
+                get: function () {
+                    return this._canvasClientWidth;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "canvasClientHeight", {
+                get: function () {
+                    return this._canvasClientHeight;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            application.prototype.start = function (div, type, val) {
+                if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
+                if (val === void 0) { val = 1200; }
+                console.log("version: " + this.version + "  build: " + this.build);
+                framework.sceneMgr.app = this;
+                this._timeScale = 1;
+                this.container = div;
+                var canvas = document.createElement("canvas");
+                canvas.className = "full";
+                canvas.style.position = "absolute";
+                canvas.style.width = "100%";
+                canvas.style.height = "100%";
+                canvas.style.backgroundColor = "#1e1e1e";
+                canvas.setAttribute("tabindex", "1");
+                div.appendChild(canvas);
+                this.webgl = canvas.getContext('webgl') ||
+                    canvas.getContext("experimental-webgl");
+                switch (type) {
+                    case CanvasFixedType.FixedWidthType:
+                        this.canvasFixWidth = val;
+                        break;
+                    case CanvasFixedType.FixedHeightType:
+                        this.canvasFixHeight = val;
+                        break;
+                }
+                if (this.beWidthSetted) {
+                    this.webgl.canvas.width = this._fixWidth;
+                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                }
+                else if (this.beHeightSetted) {
+                    this.webgl.canvas.height = this._fixHeight;
+                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                }
+                this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                gd3d.render.webglkit.initConst(this.webgl);
+                this.initAssetMgr();
+                this.initInputMgr();
+                this.initScene();
+                this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
+                this.loop();
+                gd3d.io.referenceInfo.regDefaultType();
+                var initovercallback = window["initovercallback"];
+                if (initovercallback != null) {
+                    initovercallback(this);
+                }
+            };
+            application.prototype.markNotify = function (trans, type) {
+                this.doNotify(trans, type);
+            };
+            application.prototype.doNotify = function (trans, type) {
+                if (trans == null)
+                    return;
+                if (!this.checkFilter(trans))
+                    return;
+                if (this.notify)
+                    this.notify.notify(trans, type);
+                if (trans.children != null) {
+                    for (var index in trans.children) {
+                        this.doNotify(trans.children[index], type);
+                    }
+                }
+            };
+            application.prototype.checkFilter = function (trans) {
+                if (trans instanceof gd3d.framework.transform) {
+                    if (trans.gameObject.hideFlags & gd3d.framework.HideFlags.HideInHierarchy) {
+                        return false;
+                    }
+                }
+                if (trans instanceof gd3d.framework.transform2D) {
+                    if (trans.hideFlags & gd3d.framework.HideFlags.HideInHierarchy) {
+                        return false;
+                    }
+                }
+                return true;
+            };
+            application.prototype.showFps = function () {
+                if (this.stats == null) {
+                    this.stats = new Stats.Stats(this);
+                    this.stats.container.style.position = 'absolute';
+                    this.stats.container.style.left = '0px';
+                    this.stats.container.style.top = '0px';
+                    this.container.appendChild(this.stats.container);
+                }
+                else {
+                    this.container.appendChild(this.stats.container);
+                }
+            };
+            application.prototype.closeFps = function () {
+                if (this.stats != null) {
+                    this.container.removeChild(this.stats.container);
+                }
+            };
+            application.prototype.update = function (delta) {
+                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
+                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                    if (this.beWidthSetted) {
+                        this.webgl.canvas.width = this._fixWidth;
+                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    }
+                    else if (this.beHeightSetted) {
+                        this.webgl.canvas.height = this._fixHeight;
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                        this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    }
+                    console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
+                }
+                this.width = this.webgl.canvas.width;
+                this.height = this.webgl.canvas.height;
+                if (this.bePlay) {
+                    if (this.bePause) {
+                        if (this.beStepForward && this.beStepNumber > 0) {
+                            this.beStepNumber--;
+                            this.updateUserCode(delta);
+                        }
+                    }
+                    else {
+                        this.updateUserCode(delta);
+                    }
+                }
+                this.updateEditorCode(delta);
+                if (this._scene != null) {
+                    this._scene.update(delta);
+                }
+            };
+            application.prototype.getUserUpdateTimer = function () {
+                return this.usercodetime;
+            };
+            application.prototype.getTotalTime = function () {
+                return this.totalTime;
+            };
+            Object.defineProperty(application.prototype, "deltaTime", {
+                get: function () {
+                    return this._deltaTime * this._timeScale;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            application.prototype.getUpdateTimer = function () {
+                return this.updateTimer;
+            };
+            application.prototype.loop = function () {
+                var now = Date.now() / 1000;
+                this._deltaTime = now - this.lastTimer;
+                this.totalTime = now - this.beginTimer;
+                this.updateTimer = now - this.pretimer;
+                if (this._deltaTime < this._standDeltaTime) {
+                    var _this_1 = this;
+                    var del = this._standDeltaTime - this._deltaTime;
+                    setTimeout(function () {
+                        var _now = Date.now() / 1000;
+                        _this_1.lastTimer = _now;
+                        _this_1.pretimer = _now;
+                        _this_1.update(_this_1._standDeltaTime);
+                        if (_this_1.stats != null)
+                            _this_1.stats.update();
+                        _this_1.loop();
+                    }, del * 1000);
+                }
+                else {
+                    this.update(this.deltaTime);
+                    if (this.stats != null)
+                        this.stats.update();
+                    this.lastTimer = now;
+                    this.pretimer = now;
+                    if (this.limitFrame) {
+                        requestAnimationFrame(this.loop.bind(this));
+                    }
+                    else {
+                        setTimeout(this.loop.bind(this), 1);
+                    }
+                }
+            };
+            application.prototype.initScene = function () {
+                if (this._scene == null) {
+                    this._scene = new framework.scene(this);
+                    framework.sceneMgr.scene = this._scene;
+                }
+            };
+            application.prototype.getScene = function () {
+                return this._scene;
+            };
+            application.prototype.initAssetMgr = function () {
+                if (this._assetmgr == null) {
+                    this._assetmgr = new framework.assetMgr(this);
+                    this._assetmgr.initDefAsset();
+                }
+            };
+            application.prototype.getAssetMgr = function () {
+                return this._assetmgr;
+            };
+            application.prototype.initInputMgr = function () {
+                if (this._inputmgr == null) {
+                    this._inputmgr = new framework.inputMgr(this);
+                }
+            };
+            application.prototype.getInputMgr = function () {
+                return this._inputmgr;
+            };
+            Object.defineProperty(application.prototype, "bePlay", {
+                get: function () {
+                    return this._bePlay;
+                },
+                set: function (value) {
+                    this._bePlay = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "bePause", {
+                get: function () {
+                    return this._bePause;
+                },
+                set: function (value) {
+                    this._bePause = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "beStepForward", {
+                get: function () {
+                    return this._beStepForward;
+                },
+                set: function (value) {
+                    this._beStepForward = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            application.prototype.updateUserCode = function (delta) {
+                for (var i = this._userCodeNew.length - 1; i >= 0; i--) {
+                    var c = this._userCodeNew[i];
+                    if (c.isClosed() == false) {
+                        c.onStart(this);
+                        this._userCode.push(c);
+                        this._userCodeNew.splice(i, 1);
+                    }
+                }
+                var closeindex = -1;
+                for (var i = 0; i < this._userCode.length; i++) {
+                    var c = this._userCode[i];
+                    if (c.isClosed() == false) {
+                        c.onUpdate(delta);
+                    }
+                    else if (closeindex < 0) {
+                        closeindex = i;
+                    }
+                }
+                if (closeindex >= 0) {
+                    this._userCode.splice(closeindex, 1);
+                }
+            };
+            application.prototype.updateEditorCode = function (delta) {
+                for (var i = this._editorCodeNew.length - 1; i >= 0; i--) {
+                    var c = this._editorCodeNew[i];
+                    if (c.isClosed() == false) {
+                        c.onStart(this);
+                        this._editorCode.push(c);
+                        this._editorCodeNew.splice(i, 1);
+                    }
+                }
+                var closeindex = -1;
+                for (var i = this._editorCode.length - 1; i >= 0; i--) {
+                    var c = this._editorCode[i];
+                    if (c.isClosed()) {
+                        this._editorCode.splice(i, 1);
+                    }
+                    else {
+                        c.onUpdate(delta);
+                    }
+                }
+            };
+            application.prototype.addUserCodeDirect = function (program) {
+                this._userCodeNew.push(program);
+            };
+            application.prototype.addUserCode = function (classname) {
+                var prototype = gd3d.reflect.getPrototype(classname);
+                if (prototype != null) {
+                    var code = gd3d.reflect.createInstance(prototype, { "usercode": "1" });
+                    this.addUserCodeDirect(code);
+                }
+            };
+            application.prototype.addEditorCode = function (classname) {
+                var prototype = gd3d.reflect.getPrototype(classname);
+                if (prototype != null) {
+                    var code = gd3d.reflect.createInstance(prototype, { "editorcode": "1" });
+                    this.addEditorCodeDirect(code);
+                }
+            };
+            application.prototype.addEditorCodeDirect = function (program) {
+                this._editorCodeNew.push(program);
+            };
+            return application;
+        }());
+        framework.application = application;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -3592,8 +3484,8 @@ var gd3d;
                 return this.name;
             };
             constText = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], constText);
             return constText;
         }());
@@ -3604,7 +3496,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var AssetTypeEnum;
         (function (AssetTypeEnum) {
             AssetTypeEnum[AssetTypeEnum["Unknown"] = 0] = "Unknown";
             AssetTypeEnum[AssetTypeEnum["Auto"] = 1] = "Auto";
@@ -3627,8 +3518,8 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["PackTxt"] = 18] = "PackTxt";
             AssetTypeEnum[AssetTypeEnum["PathAsset"] = 19] = "PathAsset";
             AssetTypeEnum[AssetTypeEnum["PVR"] = 20] = "PVR";
-        })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
-        var AssetBundleLoadState;
+        })(framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
+        var AssetTypeEnum = framework.AssetTypeEnum;
         (function (AssetBundleLoadState) {
             AssetBundleLoadState[AssetBundleLoadState["None"] = 0] = "None";
             AssetBundleLoadState[AssetBundleLoadState["Shader"] = 1] = "Shader";
@@ -3640,7 +3531,8 @@ var gd3d;
             AssetBundleLoadState[AssetBundleLoadState["Scene"] = 64] = "Scene";
             AssetBundleLoadState[AssetBundleLoadState["Textasset"] = 128] = "Textasset";
             AssetBundleLoadState[AssetBundleLoadState["Pvr"] = 256] = "Pvr";
-        })(AssetBundleLoadState = framework.AssetBundleLoadState || (framework.AssetBundleLoadState = {}));
+        })(framework.AssetBundleLoadState || (framework.AssetBundleLoadState = {}));
+        var AssetBundleLoadState = framework.AssetBundleLoadState;
         var ResourceState = (function () {
             function ResourceState() {
                 this.res = null;
@@ -3653,9 +3545,8 @@ var gd3d;
         var RefResourceState = (function (_super) {
             __extends(RefResourceState, _super);
             function RefResourceState() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.refLoadedLength = 0;
-                return _this;
+                _super.apply(this, arguments);
+                this.refLoadedLength = 0;
             }
             return RefResourceState;
         }(ResourceState));
@@ -4613,167 +4504,6 @@ var gd3d;
         framework.SaveInfo = SaveInfo;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-var PvrParse = (function () {
-    function PvrParse(gl) {
-        this.version = 0x03525650;
-        this.flags = 0;
-        this.pixelFormatH = 0;
-        this.pixelFormatL = 0;
-        this.channelType = 0;
-        this.height = 1;
-        this.width = 1;
-        this.depth = 1;
-        this.numFaces = 1;
-        this.mipMapCount = 1;
-        this.metaDataSize = 0;
-        this.gl = gl;
-    }
-    PvrParse.prototype.parse = function (_buffer) {
-        var ar = new Uint8Array(_buffer);
-        _buffer = null;
-        var tool = new gd3d.io.binTool();
-        tool.writeUint8Array(ar);
-        this.version = tool.readUInt32();
-        if (this.version === 0x03525650) {
-            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
-            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
-            var tex = this.parseV3(tool);
-            tool.dispose();
-            return tex;
-        }
-        else if (this.version === 0x50565203) {
-            console.error("v2");
-        }
-        else {
-            console.error("pvr parse error!:" + this.version);
-            return null;
-        }
-    };
-    PvrParse.prototype.parseV3 = function (tool) {
-        this.flags = tool.readUInt32();
-        if (this.flags == 0)
-            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
-        else
-            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-        this.pixelFormatH = tool.readUInt32();
-        this.pixelFormatL = tool.readUInt32();
-        tool.readBytes(4);
-        this.channelType = tool.readUInt32();
-        this.height = tool.readUInt32();
-        this.width = tool.readUInt32();
-        this.depth = tool.readUInt32();
-        tool.readBytes(4);
-        this.numFaces = tool.readUInt32();
-        this.mipMapCount = tool.readUInt32();
-        this.metaDataSize = tool.readUInt32();
-        tool.readBytes(this.metaDataSize);
-        var engineFormat;
-        var textureFormat;
-        var textureType;
-        var t2d = new gd3d.render.glTexture2D(this.gl);
-        switch (this.pixelFormatH) {
-            case 0:
-                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
-                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
-                break;
-            case 1:
-                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
-                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGBA;
-                break;
-            case 2:
-                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
-                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGB;
-                break;
-            case 3:
-                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
-                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGBA;
-                break;
-            default:
-                textureFormat = this.gl.RGB;
-                engineFormat = gd3d.render.TextureFormatEnum.RGB;
-                console.log("unknow pixel format::" + this.pixelFormatH);
-        }
-        t2d.format = engineFormat;
-        switch (this.channelType) {
-            case ChannelTypes.UnsignedByteNorm:
-                textureType = this.gl.UNSIGNED_BYTE;
-                break;
-            case ChannelTypes.UnsignedShortNorm:
-                break;
-        }
-        var target = this.gl.TEXTURE_2D;
-        if (this.numFaces > 1)
-            target = this.gl.TEXTURE_CUBE_MAP;
-        this.gl.activeTexture(this.gl.TEXTURE0);
-        this.gl.bindTexture(target, t2d.texture);
-        if (this.numFaces > 1)
-            target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
-        function textureLevelSize(format, width, height) {
-            switch (format) {
-                case t2d.ext.COMPRESSED_RGB_S3TC_DXT1_EXT:
-                case t2d.ext.COMPRESSED_RGB_ATC_WEBGL:
-                case t2d.ext.COMPRESSED_RGB_ETC1_WEBGL:
-                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 8;
-                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT3_EXT:
-                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT5_EXT:
-                case t2d.ext.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL:
-                case t2d.ext.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL:
-                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
-                case t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
-                case t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
-                    return Math.floor((Math.max(width, 8) * Math.max(height, 8) * 4 + 7) / 8);
-                case t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
-                case t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
-                    return Math.floor((Math.max(width, 16) * Math.max(height, 8) * 2 + 7) / 8);
-                default:
-                    return 0;
-            }
-        }
-        var offset = 0;
-        var _width = this.width;
-        var _height = this.height;
-        for (var i = 0; i < this.mipMapCount; ++i) {
-            var levelSize = textureLevelSize(textureFormat, _width, _height);
-            var data = tool.readBytes(levelSize);
-            this.gl.compressedTexImage2D(this.gl.TEXTURE_2D, i, textureFormat, _width, _height, 0, data);
-            _width = _width >> 1;
-            if (_width < 1)
-                _width = 1;
-            _height = _height >> 1;
-            if (_height < 1)
-                _height = 1;
-            offset += levelSize;
-        }
-        if (this.mipMapCount > 1) {
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
-        }
-        else {
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        }
-        return t2d;
-    };
-    return PvrParse;
-}());
-var ChannelTypes;
-(function (ChannelTypes) {
-    ChannelTypes[ChannelTypes["UnsignedByteNorm"] = 0] = "UnsignedByteNorm";
-    ChannelTypes[ChannelTypes["SignedByteNorm"] = 1] = "SignedByteNorm";
-    ChannelTypes[ChannelTypes["UnsignedByte"] = 2] = "UnsignedByte";
-    ChannelTypes[ChannelTypes["SignedByte"] = 3] = "SignedByte";
-    ChannelTypes[ChannelTypes["UnsignedShortNorm"] = 4] = "UnsignedShortNorm";
-    ChannelTypes[ChannelTypes["SignedShortNorm"] = 5] = "SignedShortNorm";
-    ChannelTypes[ChannelTypes["UnsignedShort"] = 6] = "UnsignedShort";
-    ChannelTypes[ChannelTypes["SignedShort"] = 7] = "SignedShort";
-    ChannelTypes[ChannelTypes["UnsignedIntegerNorm"] = 8] = "UnsignedIntegerNorm";
-    ChannelTypes[ChannelTypes["SignedIntegerNorm"] = 9] = "SignedIntegerNorm";
-    ChannelTypes[ChannelTypes["UnsignedInteger"] = 10] = "UnsignedInteger";
-    ChannelTypes[ChannelTypes["SignedInteger"] = 11] = "SignedInteger";
-    ChannelTypes[ChannelTypes["SignedFloat"] = 12] = "SignedFloat";
-    ChannelTypes[ChannelTypes["Float"] = 12] = "Float";
-    ChannelTypes[ChannelTypes["UnsignedFloat"] = 13] = "UnsignedFloat";
-})(ChannelTypes || (ChannelTypes = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -5847,6 +5577,167 @@ var gd3d;
         framework.AssetFactory_TextureDesc = AssetFactory_TextureDesc;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var PvrParse = (function () {
+    function PvrParse(gl) {
+        this.version = 0x03525650;
+        this.flags = 0;
+        this.pixelFormatH = 0;
+        this.pixelFormatL = 0;
+        this.channelType = 0;
+        this.height = 1;
+        this.width = 1;
+        this.depth = 1;
+        this.numFaces = 1;
+        this.mipMapCount = 1;
+        this.metaDataSize = 0;
+        this.gl = gl;
+    }
+    PvrParse.prototype.parse = function (_buffer) {
+        var ar = new Uint8Array(_buffer);
+        _buffer = null;
+        var tool = new gd3d.io.binTool();
+        tool.writeUint8Array(ar);
+        this.version = tool.readUInt32();
+        if (this.version === 0x03525650) {
+            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+            var tex = this.parseV3(tool);
+            tool.dispose();
+            return tex;
+        }
+        else if (this.version === 0x50565203) {
+            console.error("v2");
+        }
+        else {
+            console.error("pvr parse error!:" + this.version);
+            return null;
+        }
+    };
+    PvrParse.prototype.parseV3 = function (tool) {
+        this.flags = tool.readUInt32();
+        if (this.flags == 0)
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
+        else
+            this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        this.pixelFormatH = tool.readUInt32();
+        this.pixelFormatL = tool.readUInt32();
+        tool.readBytes(4);
+        this.channelType = tool.readUInt32();
+        this.height = tool.readUInt32();
+        this.width = tool.readUInt32();
+        this.depth = tool.readUInt32();
+        tool.readBytes(4);
+        this.numFaces = tool.readUInt32();
+        this.mipMapCount = tool.readUInt32();
+        this.metaDataSize = tool.readUInt32();
+        tool.readBytes(this.metaDataSize);
+        var engineFormat;
+        var textureFormat;
+        var textureType;
+        var t2d = new gd3d.render.glTexture2D(this.gl);
+        switch (this.pixelFormatH) {
+            case 0:
+                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                break;
+            case 1:
+                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC2_RGBA;
+                break;
+            case 2:
+                textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGB;
+                break;
+            case 3:
+                textureFormat = t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
+                engineFormat = gd3d.render.TextureFormatEnum.PVRTC4_RGBA;
+                break;
+            default:
+                textureFormat = this.gl.RGB;
+                engineFormat = gd3d.render.TextureFormatEnum.RGB;
+                console.log("unknow pixel format::" + this.pixelFormatH);
+        }
+        t2d.format = engineFormat;
+        switch (this.channelType) {
+            case ChannelTypes.UnsignedByteNorm:
+                textureType = this.gl.UNSIGNED_BYTE;
+                break;
+            case ChannelTypes.UnsignedShortNorm:
+                break;
+        }
+        var target = this.gl.TEXTURE_2D;
+        if (this.numFaces > 1)
+            target = this.gl.TEXTURE_CUBE_MAP;
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(target, t2d.texture);
+        if (this.numFaces > 1)
+            target = this.gl.TEXTURE_CUBE_MAP_POSITIVE_X;
+        function textureLevelSize(format, width, height) {
+            switch (format) {
+                case t2d.ext.COMPRESSED_RGB_S3TC_DXT1_EXT:
+                case t2d.ext.COMPRESSED_RGB_ATC_WEBGL:
+                case t2d.ext.COMPRESSED_RGB_ETC1_WEBGL:
+                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 8;
+                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT3_EXT:
+                case t2d.ext.COMPRESSED_RGBA_S3TC_DXT5_EXT:
+                case t2d.ext.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL:
+                case t2d.ext.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL:
+                    return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
+                case t2d.ext.COMPRESSED_RGB_PVRTC_4BPPV1_IMG:
+                case t2d.ext.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG:
+                    return Math.floor((Math.max(width, 8) * Math.max(height, 8) * 4 + 7) / 8);
+                case t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG:
+                case t2d.ext.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG:
+                    return Math.floor((Math.max(width, 16) * Math.max(height, 8) * 2 + 7) / 8);
+                default:
+                    return 0;
+            }
+        }
+        var offset = 0;
+        var _width = this.width;
+        var _height = this.height;
+        for (var i = 0; i < this.mipMapCount; ++i) {
+            var levelSize = textureLevelSize(textureFormat, _width, _height);
+            var data = tool.readBytes(levelSize);
+            this.gl.compressedTexImage2D(this.gl.TEXTURE_2D, i, textureFormat, _width, _height, 0, data);
+            _width = _width >> 1;
+            if (_width < 1)
+                _width = 1;
+            _height = _height >> 1;
+            if (_height < 1)
+                _height = 1;
+            offset += levelSize;
+        }
+        if (this.mipMapCount > 1) {
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
+        }
+        else {
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        }
+        return t2d;
+    };
+    return PvrParse;
+}());
+var ChannelTypes;
+(function (ChannelTypes) {
+    ChannelTypes[ChannelTypes["UnsignedByteNorm"] = 0] = "UnsignedByteNorm";
+    ChannelTypes[ChannelTypes["SignedByteNorm"] = 1] = "SignedByteNorm";
+    ChannelTypes[ChannelTypes["UnsignedByte"] = 2] = "UnsignedByte";
+    ChannelTypes[ChannelTypes["SignedByte"] = 3] = "SignedByte";
+    ChannelTypes[ChannelTypes["UnsignedShortNorm"] = 4] = "UnsignedShortNorm";
+    ChannelTypes[ChannelTypes["SignedShortNorm"] = 5] = "SignedShortNorm";
+    ChannelTypes[ChannelTypes["UnsignedShort"] = 6] = "UnsignedShort";
+    ChannelTypes[ChannelTypes["SignedShort"] = 7] = "SignedShort";
+    ChannelTypes[ChannelTypes["UnsignedIntegerNorm"] = 8] = "UnsignedIntegerNorm";
+    ChannelTypes[ChannelTypes["SignedIntegerNorm"] = 9] = "SignedIntegerNorm";
+    ChannelTypes[ChannelTypes["UnsignedInteger"] = 10] = "UnsignedInteger";
+    ChannelTypes[ChannelTypes["SignedInteger"] = 11] = "SignedInteger";
+    ChannelTypes[ChannelTypes["SignedFloat"] = 12] = "SignedFloat";
+    ChannelTypes[ChannelTypes["Float"] = 12] = "Float";
+    ChannelTypes[ChannelTypes["UnsignedFloat"] = 13] = "UnsignedFloat";
+})(ChannelTypes || (ChannelTypes = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -5932,12 +5823,12 @@ var gd3d;
                 buf = null;
             };
             __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
+                gd3d.reflect.Field("constText"), 
+                __metadata('design:type', framework.constText)
             ], animationClip.prototype, "name", void 0);
             animationClip = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], animationClip);
             return animationClip;
         }());
@@ -5945,13 +5836,12 @@ var gd3d;
         var PoseBoneMatrix = (function () {
             function PoseBoneMatrix() {
             }
-            PoseBoneMatrix_1 = PoseBoneMatrix;
             PoseBoneMatrix.caclByteLength = function () {
                 var total = 12 + 16;
                 return total;
             };
             PoseBoneMatrix.prototype.Clone = function () {
-                var p = new PoseBoneMatrix_1();
+                var p = new PoseBoneMatrix();
                 p.t = new gd3d.math.vector3();
                 p.r = new gd3d.math.quaternion();
                 gd3d.math.vec3Clone(this.t, p.t);
@@ -5974,7 +5864,7 @@ var gd3d;
                 }
             };
             PoseBoneMatrix.createDefault = function () {
-                var pt = new PoseBoneMatrix_1();
+                var pt = new PoseBoneMatrix();
                 pt.r = new gd3d.math.quaternion(0, 0, 0, 1);
                 pt.t = new gd3d.math.vector3(0, 0, 0);
                 return pt;
@@ -6005,25 +5895,25 @@ var gd3d;
                 this.t.z *= -1;
             };
             PoseBoneMatrix.prototype.lerpInWorld = function (_tpose, from, to, v) {
-                var t1 = PoseBoneMatrix_1.sMultiply(from, _tpose);
-                var t2 = PoseBoneMatrix_1.sMultiply(to, _tpose);
-                var outLerp = PoseBoneMatrix_1.sLerp(t1, t2, v);
+                var t1 = PoseBoneMatrix.sMultiply(from, _tpose);
+                var t2 = PoseBoneMatrix.sMultiply(to, _tpose);
+                var outLerp = PoseBoneMatrix.sLerp(t1, t2, v);
                 var itpose = _tpose.Clone();
                 itpose.invert();
-                PoseBoneMatrix_1.sMultiply(outLerp, itpose, this);
+                PoseBoneMatrix.sMultiply(outLerp, itpose, this);
             };
             PoseBoneMatrix.prototype.lerpInWorldWithData = function (_tpose, from, todata, toseek, v) {
-                var t1 = PoseBoneMatrix_1.sMultiply(from, _tpose);
-                var t2 = PoseBoneMatrix_1.sMultiplyDataAndMatrix(todata, toseek, _tpose);
-                var outLerp = PoseBoneMatrix_1.sLerp(t1, t2, v);
+                var t1 = PoseBoneMatrix.sMultiply(from, _tpose);
+                var t2 = PoseBoneMatrix.sMultiplyDataAndMatrix(todata, toseek, _tpose);
+                var outLerp = PoseBoneMatrix.sLerp(t1, t2, v);
                 var itpose = _tpose.Clone();
                 itpose.invert();
-                PoseBoneMatrix_1.sMultiply(outLerp, itpose, this);
+                PoseBoneMatrix.sMultiply(outLerp, itpose, this);
             };
             PoseBoneMatrix.sMultiply = function (left, right, target) {
                 if (target === void 0) { target = null; }
                 if (target == null)
-                    target = PoseBoneMatrix_1.createDefault();
+                    target = PoseBoneMatrix.createDefault();
                 var dir = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(right.t, dir);
                 var dirtran = gd3d.math.pool.new_vector3();
@@ -6039,7 +5929,7 @@ var gd3d;
             PoseBoneMatrix.sMultiplyDataAndMatrix = function (leftdata, leftseek, right, target) {
                 if (target === void 0) { target = null; }
                 if (target == null)
-                    target = PoseBoneMatrix_1.createDefault();
+                    target = PoseBoneMatrix.createDefault();
                 var dir = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Clone(right.t, dir);
                 var dirtran = gd3d.math.pool.new_vector3();
@@ -6055,7 +5945,7 @@ var gd3d;
             PoseBoneMatrix.sLerp = function (left, right, v, target) {
                 if (target === void 0) { target = null; }
                 if (target == null)
-                    target = PoseBoneMatrix_1.createDefault();
+                    target = PoseBoneMatrix.createDefault();
                 target.t.x = left.t.x * (1 - v) + right.t.x * v;
                 target.t.y = left.t.y * (1 - v) + right.t.y * v;
                 target.t.z = left.t.z * (1 - v) + right.t.z * v;
@@ -6063,18 +5953,18 @@ var gd3d;
                 return target;
             };
             __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
+                gd3d.reflect.Field("vector3"), 
+                __metadata('design:type', gd3d.math.vector3)
             ], PoseBoneMatrix.prototype, "t", void 0);
             __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
+                gd3d.reflect.Field("quaternion"), 
+                __metadata('design:type', gd3d.math.quaternion)
             ], PoseBoneMatrix.prototype, "r", void 0);
-            PoseBoneMatrix = PoseBoneMatrix_1 = __decorate([
-                gd3d.reflect.SerializeType
+            PoseBoneMatrix = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], PoseBoneMatrix);
             return PoseBoneMatrix;
-            var PoseBoneMatrix_1;
         }());
         framework.PoseBoneMatrix = PoseBoneMatrix;
         var subClip = (function () {
@@ -6173,8 +6063,8 @@ var gd3d;
                 }
             };
             atlas = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], atlas);
             return atlas;
         }());
@@ -6269,8 +6159,8 @@ var gd3d;
                 var n = d2 - d1;
             };
             font = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], font);
             return font;
         }());
@@ -6299,16 +6189,16 @@ var gd3d;
             }
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("UniformTypeEnum"),
-                __metadata("design:type", Number)
+                gd3d.reflect.UIStyle("UniformTypeEnum"), 
+                __metadata('design:type', Number)
             ], UniformData.prototype, "type", void 0);
             __decorate([
-                gd3d.reflect.Field("any"),
-                __metadata("design:type", Object)
+                gd3d.reflect.Field("any"), 
+                __metadata('design:type', Object)
             ], UniformData.prototype, "value", void 0);
             UniformData = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Object, Object])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Number, Object, Object])
             ], UniformData);
             return UniformData;
         }());
@@ -6328,7 +6218,6 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
                 this.mapUniformTemp = {};
             }
-            material_1 = material;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -6767,7 +6656,7 @@ var gd3d;
                 }
             };
             material.prototype.clone = function () {
-                var mat = new material_1(this.getName());
+                var mat = new material(this.getName());
                 mat.setShader(this.shader);
                 for (var i in this.mapUniform) {
                     var data = this.mapUniform[i];
@@ -6810,23 +6699,22 @@ var gd3d;
                 return JSON.stringify(obj);
             };
             __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
+                gd3d.reflect.Field("constText"), 
+                __metadata('design:type', framework.constText)
             ], material.prototype, "name", void 0);
             __decorate([
-                gd3d.reflect.Field("shader"),
-                __metadata("design:type", framework.shader)
+                gd3d.reflect.Field("shader"), 
+                __metadata('design:type', framework.shader)
             ], material.prototype, "shader", void 0);
             __decorate([
-                gd3d.reflect.Field("UniformDataDic"),
-                __metadata("design:type", Object)
+                gd3d.reflect.Field("UniformDataDic"), 
+                __metadata('design:type', Object)
             ], material.prototype, "mapUniform", void 0);
-            material = material_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+            material = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], material);
             return material;
-            var material_1;
         }());
         framework.material = material;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -6846,7 +6734,6 @@ var gd3d;
                 }
                 this.name = new framework.constText(assetName);
             }
-            mesh_1 = mesh;
             mesh.prototype.getName = function () {
                 if (!this.name) {
                     return null;
@@ -7093,7 +6980,7 @@ var gd3d;
                 return pickinfo;
             };
             mesh.prototype.clone = function () {
-                var _result = new mesh_1(this.getName());
+                var _result = new mesh(this.getName());
                 var vf = this.glMesh.vertexFormat;
                 var data = new gd3d.render.meshData();
                 if (this.data.pos != undefined) {
@@ -7196,12 +7083,11 @@ var gd3d;
                 _result.glMesh.uploadIndexSubData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
                 return _result;
             };
-            mesh = mesh_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+            mesh = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], mesh);
             return mesh;
-            var mesh_1;
         }());
         framework.mesh = mesh;
         var subMeshInfo = (function () {
@@ -7380,27 +7266,27 @@ var gd3d;
                 gd3d.math.vec3Add(start, out, out);
             };
             __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
+                gd3d.reflect.Field("constText"), 
+                __metadata('design:type', framework.constText)
             ], pathasset.prototype, "name", void 0);
             pathasset = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], pathasset);
             return pathasset;
         }());
         framework.pathasset = pathasset;
-        var pathtype;
         (function (pathtype) {
             pathtype[pathtype["once"] = 0] = "once";
             pathtype[pathtype["loop"] = 1] = "loop";
             pathtype[pathtype["pingpong"] = 2] = "pingpong";
-        })(pathtype = framework.pathtype || (framework.pathtype = {}));
-        var epointtype;
+        })(framework.pathtype || (framework.pathtype = {}));
+        var pathtype = framework.pathtype;
         (function (epointtype) {
             epointtype[epointtype["VertexPoint"] = 0] = "VertexPoint";
             epointtype[epointtype["ControlPoint"] = 1] = "ControlPoint";
-        })(epointtype = framework.epointtype || (framework.epointtype = {}));
+        })(framework.epointtype || (framework.epointtype = {}));
+        var epointtype = framework.epointtype;
         var pointitem = (function () {
             function pointitem() {
             }
@@ -7457,8 +7343,8 @@ var gd3d;
                 gd3d.io.deSerialize(JSON.parse(jsonStr), this.trans, assetmgr, this.assetbundle);
             };
             prefab = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], prefab);
             return prefab;
         }());
@@ -7565,8 +7451,8 @@ var gd3d;
                 }
             };
             rawscene = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], rawscene);
             return rawscene;
         }());
@@ -7598,7 +7484,6 @@ var gd3d;
                 }
                 this.name = new framework.constText(assetName);
             }
-            shader_1 = shader;
             shader.prototype.getName = function () {
                 return this.name.getText();
             };
@@ -7773,38 +7658,37 @@ var gd3d;
                 return pass;
             };
             shader.setGlobal = function (key, value, type) {
-                if (shader_1.mapUniformGlobal == undefined)
-                    shader_1.mapUniformGlobal = {};
-                if (shader_1.mapUniformGlobal[key] != undefined)
-                    shader_1.mapUniformGlobal[key].value = value;
+                if (shader.mapUniformGlobal == undefined)
+                    shader.mapUniformGlobal = {};
+                if (shader.mapUniformGlobal[key] != undefined)
+                    shader.mapUniformGlobal[key].value = value;
                 else
-                    shader_1.mapUniformGlobal[key] = new framework.UniformData(type, value);
+                    shader.mapUniformGlobal[key] = new framework.UniformData(type, value);
             };
             shader.setGlobalFloat = function (key, value) {
-                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float);
+                shader.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float);
             };
             shader.setGlobalVector4 = function (key, value) {
-                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float4);
+                shader.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float4);
             };
             shader.setGlobalMatrix = function (key, value) {
-                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float4x4);
+                shader.setGlobal(key, value, gd3d.render.UniformTypeEnum.Float4x4);
             };
             shader.setGlobalTexture = function (key, value) {
-                shader_1.setGlobal(key, value, gd3d.render.UniformTypeEnum.Texture);
+                shader.setGlobal(key, value, gd3d.render.UniformTypeEnum.Texture);
             };
             shader.getGlobalMapUniform = function () {
-                return shader_1.mapUniformGlobal;
+                return shader.mapUniformGlobal;
             };
             __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
+                gd3d.reflect.Field("constText"), 
+                __metadata('design:type', framework.constText)
             ], shader.prototype, "name", void 0);
-            shader = shader_1 = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+            shader = __decorate([
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], shader);
             return shader;
-            var shader_1;
         }());
         framework.shader = shader;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -7886,8 +7770,8 @@ var gd3d;
                 configurable: true
             });
             sprite = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], sprite);
             return sprite;
         }());
@@ -7929,12 +7813,12 @@ var gd3d;
                 }
             };
             __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
+                gd3d.reflect.Field("constText"), 
+                __metadata('design:type', framework.constText)
             ], textasset.prototype, "name", void 0);
             textasset = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], textasset);
             return textasset;
         }());
@@ -7987,12 +7871,12 @@ var gd3d;
                 configurable: true
             });
             __decorate([
-                gd3d.reflect.Field("constText"),
-                __metadata("design:type", framework.constText)
+                gd3d.reflect.Field("constText"), 
+                __metadata('design:type', framework.constText)
             ], texture.prototype, "name", void 0);
             texture = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [String])
             ], texture);
             return texture;
         }());
@@ -8139,7 +8023,6 @@ var gd3d;
                 this.mix = false;
                 this.isCache = false;
             }
-            aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
                 get: function () {
                     if (this._clipnames == null || this._clipnameCount != this.clips.length) {
@@ -8197,7 +8080,7 @@ var gd3d;
                     this.mix = true;
                 }
                 var cached = false;
-                if (this.isCache && !this.mix && aniplayer_1.playerCaches[this.cacheKey]) {
+                if (this.isCache && !this.mix && aniplayer.playerCaches[this.cacheKey]) {
                     cached = true;
                     if (framework.StringUtil.isNullOrEmptyObject(this.carelist))
                         return;
@@ -8238,7 +8121,7 @@ var gd3d;
                     }
                 }
                 if (!cached) {
-                    aniplayer_1.playerCaches[this.cacheKey] = this;
+                    aniplayer.playerCaches[this.cacheKey] = this;
                 }
             };
             aniplayer.prototype.playByIndex = function (animIndex, speed, beRevert) {
@@ -8478,55 +8361,56 @@ var gd3d;
             };
             aniplayer.playerCaches = [];
             __decorate([
-                gd3d.reflect.Field("animationClip[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("animationClip[]"), 
+                __metadata('design:type', Array)
             ], aniplayer.prototype, "clips", void 0);
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], aniplayer.prototype, "autoplay", void 0);
             __decorate([
-                gd3d.reflect.Field("tPoseInfo[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("tPoseInfo[]"), 
+                __metadata('design:type', Array)
             ], aniplayer.prototype, "bones", void 0);
             __decorate([
-                gd3d.reflect.Field("PoseBoneMatrix[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("PoseBoneMatrix[]"), 
+                __metadata('design:type', Array)
             ], aniplayer.prototype, "startPos", void 0);
-            aniplayer = aniplayer_1 = __decorate([
-                gd3d.reflect.nodeComponent
+            aniplayer = __decorate([
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], aniplayer);
             return aniplayer;
-            var aniplayer_1;
         }());
         framework.aniplayer = aniplayer;
         var tPoseInfo = (function () {
             function tPoseInfo() {
             }
             __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
+                gd3d.reflect.Field("string"), 
+                __metadata('design:type', String)
             ], tPoseInfo.prototype, "name", void 0);
             __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
+                gd3d.reflect.Field("vector3"), 
+                __metadata('design:type', gd3d.math.vector3)
             ], tPoseInfo.prototype, "tposep", void 0);
             __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
+                gd3d.reflect.Field("quaternion"), 
+                __metadata('design:type', gd3d.math.quaternion)
             ], tPoseInfo.prototype, "tposeq", void 0);
             tPoseInfo = __decorate([
-                gd3d.reflect.SerializeType
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], tPoseInfo);
             return tPoseInfo;
         }());
         framework.tPoseInfo = tPoseInfo;
-        var PlayStyle;
         (function (PlayStyle) {
             PlayStyle[PlayStyle["NormalPlay"] = 0] = "NormalPlay";
             PlayStyle[PlayStyle["FramePlay"] = 1] = "FramePlay";
             PlayStyle[PlayStyle["PingPang"] = 2] = "PingPang";
-        })(PlayStyle = framework.PlayStyle || (framework.PlayStyle = {}));
+        })(framework.PlayStyle || (framework.PlayStyle = {}));
+        var PlayStyle = framework.PlayStyle;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -8545,8 +8429,8 @@ var gd3d;
             asbone.prototype.clone = function () {
             };
             asbone = __decorate([
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], asbone);
             return asbone;
         }());
@@ -8580,7 +8464,8 @@ var gd3d;
             AudioListener.prototype.clone = function () {
             };
             AudioListener = __decorate([
-                gd3d.reflect.nodeComponent
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], AudioListener);
             return AudioListener;
         }());
@@ -8654,7 +8539,8 @@ var gd3d;
             AudioPlayer.prototype.clone = function () {
             };
             AudioPlayer = __decorate([
-                gd3d.reflect.nodeComponent
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], AudioPlayer);
             return AudioPlayer;
         }());
@@ -8789,16 +8675,17 @@ var gd3d;
             boxcollider.prototype.clone = function () {
             };
             __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
+                gd3d.reflect.Field("vector3"), 
+                __metadata('design:type', gd3d.math.vector3)
             ], boxcollider.prototype, "center", void 0);
             __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
+                gd3d.reflect.Field("vector3"), 
+                __metadata('design:type', gd3d.math.vector3)
             ], boxcollider.prototype, "size", void 0);
             boxcollider = __decorate([
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeBoxCollider
+                gd3d.reflect.nodeBoxCollider, 
+                __metadata('design:paramtypes', [])
             ], boxcollider);
             return boxcollider;
         }());
@@ -9222,34 +9109,32 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], camera.prototype, "near", null);
             __decorate([
                 gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 999),
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], camera.prototype, "far", null);
             __decorate([
-                gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }),
-                __metadata("design:type", Function),
-                __metadata("design:paramtypes", []),
-                __metadata("design:returntype", void 0)
+                gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }), 
+                __metadata('design:type', Function), 
+                __metadata('design:paramtypes', []), 
+                __metadata('design:returntype', void 0)
             ], camera.prototype, "markDirty", null);
             __decorate([
-                gd3d.reflect.Field("IOverLay[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("IOverLay[]"), 
+                __metadata('design:type', Array)
             ], camera.prototype, "overlays", void 0);
             camera = __decorate([
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeCamera
+                gd3d.reflect.nodeCamera, 
+                __metadata('design:paramtypes', [])
             ], camera);
             return camera;
         }());
         framework.camera = camera;
-        var CullingMask;
         (function (CullingMask) {
             CullingMask[CullingMask["ui"] = 1] = "ui";
             CullingMask[CullingMask["default"] = 2] = "default";
@@ -9258,7 +9143,8 @@ var gd3d;
             CullingMask[CullingMask["everything"] = 4294967295] = "everything";
             CullingMask[CullingMask["nothing"] = 0] = "nothing";
             CullingMask[CullingMask["modelbeforeui"] = 8] = "modelbeforeui";
-        })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
+        })(framework.CullingMask || (framework.CullingMask = {}));
+        var CullingMask = framework.CullingMask;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9284,7 +9170,6 @@ var gd3d;
                 this.refElements = [];
                 this.beExecuteNextFrame = true;
             }
-            effectSystem_1 = effectSystem;
             effectSystem.prototype.setJsonData = function (_jsonData) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.jsonData = _jsonData;
@@ -9313,7 +9198,7 @@ var gd3d;
             };
             Object.defineProperty(effectSystem.prototype, "totalFrameCount", {
                 get: function () {
-                    return this.data.life * effectSystem_1.fps;
+                    return this.data.life * effectSystem.fps;
                 },
                 enumerable: true,
                 configurable: true
@@ -9370,6 +9255,7 @@ var gd3d;
                                     subEffectBatcher.mesh.submesh[0].size = element.startEboIndex;
                             }
                             var frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
+                            frameId = Math.floor(frameId);
                             if (element.active) {
                                 element.actionActive = false;
                                 this.mergeLerpAttribData(element.curAttrData, element.timelineFrame[frameId]);
@@ -9387,7 +9273,7 @@ var gd3d;
                         }
                     }
                     if (this.particles != undefined) {
-                        this.particles.update(1 / effectSystem_1.fps);
+                        this.particles.update(1 / effectSystem.fps);
                     }
                 }
             };
@@ -9473,33 +9359,33 @@ var gd3d;
                     context.updateModel(this.gameObject.transform);
                     for (var i in this.effectBatchers) {
                         var subEffectBatcher = this.effectBatchers[i];
-                        var mesh_2 = subEffectBatcher.mesh;
+                        var mesh_1 = subEffectBatcher.mesh;
                         if (subEffectBatcher.state === framework.EffectBatcherState.NotInitedStateType) {
-                            mesh_2.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                            if (mesh_2.glMesh.ebos.length == 0) {
-                                mesh_2.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
+                            mesh_1.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
+                            if (mesh_1.glMesh.ebos.length == 0) {
+                                mesh_1.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
                             }
                             else {
-                                mesh_2.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
+                                mesh_1.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                             }
-                            mesh_2.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
-                            mesh_2.submesh[0].size = subEffectBatcher.dataForEbo.length;
+                            mesh_1.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_1.submesh[0].size = subEffectBatcher.dataForEbo.length;
                             subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
                         }
                         else if (subEffectBatcher.state === framework.EffectBatcherState.ResizeCapacityStateType) {
-                            mesh_2.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
-                            mesh_2.submesh[0].size = subEffectBatcher.dataForEbo.length;
-                            mesh_2.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
-                            mesh_2.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);
+                            mesh_1.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
+                            mesh_1.submesh[0].size = subEffectBatcher.dataForEbo.length;
+                            mesh_1.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_1.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);
                             subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
                         }
-                        mesh_2.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
+                        mesh_1.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
                         if (this.gameObject.getScene().fog) {
                             context.fog = this.gameObject.getScene().fog;
-                            subEffectBatcher.mat.draw(context, mesh_2, mesh_2.submesh[0], "base_fog");
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base_fog");
                         }
                         else {
-                            subEffectBatcher.mat.draw(context, mesh_2, mesh_2.submesh[0], "base");
+                            subEffectBatcher.mat.draw(context, mesh_1, mesh_1.submesh[0], "base");
                         }
                     }
                     if (this.particles != undefined) {
@@ -9508,7 +9394,7 @@ var gd3d;
                 }
             };
             effectSystem.prototype.clone = function () {
-                var effect = new effectSystem_1();
+                var effect = new effectSystem();
                 effect.data = this.data.clone();
                 return effect;
             };
@@ -9709,10 +9595,10 @@ var gd3d;
                     this.curFrameId = id;
             };
             effectSystem.prototype.getDelayFrameCount = function (delayTime) {
-                return delayTime * effectSystem_1.fps;
+                return delayTime * effectSystem.fps;
             };
             effectSystem.prototype.checkFrameId = function () {
-                var curid = (effectSystem_1.fps * this.playTimer) | 0;
+                var curid = (effectSystem.fps * this.playTimer) | 0;
                 if (curid != this.curFrameId) {
                     if (this.state == framework.EffectPlayStateEnum.Play)
                         this.curFrameId = curid;
@@ -9750,24 +9636,24 @@ var gd3d;
             });
             effectSystem.fps = 30;
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], effectSystem.prototype, "autoplay", void 0);
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], effectSystem.prototype, "beLoop", void 0);
             __decorate([
-                gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
+                gd3d.reflect.Field("textasset"), 
+                __metadata('design:type', framework.textasset)
             ], effectSystem.prototype, "jsonData", void 0);
-            effectSystem = effectSystem_1 = __decorate([
+            effectSystem = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.selfClone
+                gd3d.reflect.selfClone, 
+                __metadata('design:paramtypes', [])
             ], effectSystem);
             return effectSystem;
-            var effectSystem_1;
         }());
         framework.effectSystem = effectSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -9959,33 +9845,33 @@ var gd3d;
                     context.updateModel(this.gameObject.transform);
                     for (var i in this.effectBatchers) {
                         var subEffectBatcher = this.effectBatchers[i];
-                        var mesh_3 = subEffectBatcher.mesh;
+                        var mesh_2 = subEffectBatcher.mesh;
                         if (subEffectBatcher.state === framework.EffectBatcherState.NotInitedStateType) {
-                            mesh_3.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                            if (mesh_3.glMesh.ebos.length == 0) {
-                                mesh_3.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
+                            mesh_2.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
+                            if (mesh_2.glMesh.ebos.length == 0) {
+                                mesh_2.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
                             }
                             else {
-                                mesh_3.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
+                                mesh_2.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                             }
-                            mesh_3.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
-                            mesh_3.submesh[0].size = subEffectBatcher.dataForEbo.length;
+                            mesh_2.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_2.submesh[0].size = subEffectBatcher.dataForEbo.length;
                             subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
                         }
                         else if (subEffectBatcher.state === framework.EffectBatcherState.ResizeCapacityStateType) {
-                            mesh_3.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
-                            mesh_3.submesh[0].size = subEffectBatcher.dataForEbo.length;
-                            mesh_3.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
-                            mesh_3.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);
+                            mesh_2.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
+                            mesh_2.submesh[0].size = subEffectBatcher.dataForEbo.length;
+                            mesh_2.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_2.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);
                             subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
                         }
-                        mesh_3.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
+                        mesh_2.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
                         if (this.gameObject.getScene().fog) {
                             context.fog = this.gameObject.getScene().fog;
-                            subEffectBatcher.mat.draw(context, mesh_3, mesh_3.submesh[0], "base_fog");
+                            subEffectBatcher.mat.draw(context, mesh_2, mesh_2.submesh[0], "base_fog");
                         }
                         else {
-                            subEffectBatcher.mat.draw(context, mesh_3, mesh_3.submesh[0], "base");
+                            subEffectBatcher.mat.draw(context, mesh_2, mesh_2.submesh[0], "base");
                         }
                     }
                     if (this.particles != undefined) {
@@ -10160,25 +10046,26 @@ var gd3d;
             };
             effectSystemNew.fps = 30;
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], effectSystemNew.prototype, "autoplay", void 0);
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], effectSystemNew.prototype, "beLoop", void 0);
             __decorate([
-                gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
+                gd3d.reflect.Field("textasset"), 
+                __metadata('design:type', framework.textasset)
             ], effectSystemNew.prototype, "jsonData", void 0);
             __decorate([
-                gd3d.reflect.Field("IEffectElement[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("IEffectElement[]"), 
+                __metadata('design:type', Array)
             ], effectSystemNew.prototype, "effectElements", void 0);
             effectSystemNew = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.selfClone
+                gd3d.reflect.selfClone, 
+                __metadata('design:paramtypes', [])
             ], effectSystemNew);
             return effectSystemNew;
         }());
@@ -10458,21 +10345,22 @@ var gd3d;
             });
             TestEffectSystem.fps = 30;
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], TestEffectSystem.prototype, "autoplay", void 0);
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], TestEffectSystem.prototype, "beLoop", void 0);
             __decorate([
-                gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
+                gd3d.reflect.Field("textasset"), 
+                __metadata('design:type', framework.textasset)
             ], TestEffectSystem.prototype, "jsonData", void 0);
             TestEffectSystem = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.selfClone
+                gd3d.reflect.selfClone, 
+                __metadata('design:paramtypes', [])
             ], TestEffectSystem);
             return TestEffectSystem;
         }());
@@ -10495,8 +10383,8 @@ var gd3d;
             frustumculling.prototype.clone = function () {
             };
             frustumculling = __decorate([
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], frustumculling);
             return frustumculling;
         }());
@@ -10629,7 +10517,8 @@ var gd3d;
             guidpath.prototype.clone = function () {
             };
             guidpath = __decorate([
-                gd3d.reflect.nodeComponent
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], guidpath);
             return guidpath;
         }());
@@ -10640,12 +10529,12 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var LightTypeEnum;
         (function (LightTypeEnum) {
             LightTypeEnum[LightTypeEnum["Direction"] = 0] = "Direction";
             LightTypeEnum[LightTypeEnum["Point"] = 1] = "Point";
             LightTypeEnum[LightTypeEnum["Spot"] = 2] = "Spot";
-        })(LightTypeEnum = framework.LightTypeEnum || (framework.LightTypeEnum = {}));
+        })(framework.LightTypeEnum || (framework.LightTypeEnum = {}));
+        var LightTypeEnum = framework.LightTypeEnum;
         var light = (function () {
             function light() {
                 this.spotAngelCos = 0.9;
@@ -10660,7 +10549,8 @@ var gd3d;
             };
             light = __decorate([
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeLight
+                gd3d.reflect.nodeLight, 
+                __metadata('design:paramtypes', [])
             ], light);
             return light;
         }());
@@ -10749,7 +10639,8 @@ var gd3d;
             };
             meshcollider = __decorate([
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeMeshCollider
+                gd3d.reflect.nodeMeshCollider, 
+                __metadata('design:paramtypes', [])
             ], meshcollider);
             return meshcollider;
         }());
@@ -10794,12 +10685,12 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("mesh"),
-                gd3d.reflect.UIStyle("WidgetDragSelect"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
+                gd3d.reflect.UIStyle("WidgetDragSelect"), 
+                __metadata('design:type', Object)
             ], meshFilter.prototype, "mesh", null);
             meshFilter = __decorate([
-                gd3d.reflect.nodeComponent
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], meshFilter);
             return meshFilter;
         }());
@@ -10902,21 +10793,21 @@ var gd3d;
             meshRenderer.prototype.clone = function () {
             };
             __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("material[]"), 
+                __metadata('design:type', Array)
             ], meshRenderer.prototype, "materials", void 0);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], meshRenderer.prototype, "lightmapIndex", void 0);
             __decorate([
-                gd3d.reflect.Field("vector4"),
-                __metadata("design:type", gd3d.math.vector4)
+                gd3d.reflect.Field("vector4"), 
+                __metadata('design:type', gd3d.math.vector4)
             ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
             meshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], meshRenderer);
             return meshRenderer;
         }());
@@ -10937,7 +10828,6 @@ var gd3d;
                 this._skintype = 0;
                 this._efficient = true;
             }
-            skinnedMeshRenderer_1 = skinnedMeshRenderer;
             Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
                 get: function () {
                     return this._queue;
@@ -11146,13 +11036,13 @@ var gd3d;
                 if (this.player != null) {
                     if (this.player.isCache && !this.player.mix) {
                         var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
-                        var data = skinnedMeshRenderer_1.dataCaches[cacheKey];
+                        var data = skinnedMeshRenderer.dataCaches[cacheKey];
                         if (!data) {
                             var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
                             if (_cachePlayer) {
                                 data = new Float32Array(8 * 40);
                                 _cachePlayer.fillPoseData(data, this.bones, true);
-                                skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                                skinnedMeshRenderer.dataCaches[cacheKey] = data;
                                 this.cacheData = data;
                                 return;
                             }
@@ -11234,29 +11124,27 @@ var gd3d;
             };
             skinnedMeshRenderer.dataCaches = [];
             __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("material[]"), 
+                __metadata('design:type', Array)
             ], skinnedMeshRenderer.prototype, "materials", void 0);
             __decorate([
-                gd3d.reflect.Field("mesh"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
+                gd3d.reflect.Field("mesh"), 
+                __metadata('design:type', Object)
             ], skinnedMeshRenderer.prototype, "mesh", null);
             __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("transform[]"), 
+                __metadata('design:type', Array)
             ], skinnedMeshRenderer.prototype, "bones", void 0);
             __decorate([
-                gd3d.reflect.Field("transform"),
-                __metadata("design:type", framework.transform)
+                gd3d.reflect.Field("transform"), 
+                __metadata('design:type', framework.transform)
             ], skinnedMeshRenderer.prototype, "rootBone", void 0);
-            skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
+            skinnedMeshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], skinnedMeshRenderer);
             return skinnedMeshRenderer;
-            var skinnedMeshRenderer_1;
         }());
         framework.skinnedMeshRenderer = skinnedMeshRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -11402,16 +11290,17 @@ var gd3d;
             spherecollider.prototype.clone = function () {
             };
             __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
+                gd3d.reflect.Field("vector3"), 
+                __metadata('design:type', gd3d.math.vector3)
             ], spherecollider.prototype, "center", void 0);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], spherecollider.prototype, "radius", void 0);
             spherecollider = __decorate([
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeSphereCollider
+                gd3d.reflect.nodeSphereCollider, 
+                __metadata('design:paramtypes', [])
             ], spherecollider);
             return spherecollider;
         }());
@@ -11670,7 +11559,8 @@ var gd3d;
             };
             trailRender_recorde = __decorate([
                 gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], trailRender_recorde);
             return trailRender_recorde;
         }());
@@ -11922,7 +11812,8 @@ var gd3d;
             };
             trailRender = __decorate([
                 gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
+                gd3d.reflect.nodeComponent, 
+                __metadata('design:paramtypes', [])
             ], trailRender);
             return trailRender;
         }());
@@ -12457,7 +12348,7 @@ var gd3d;
         var binTool = (function (_super) {
             __extends(binTool, _super);
             function binTool() {
-                return _super !== null && _super.apply(this, arguments) || this;
+                _super.apply(this, arguments);
             }
             binTool.prototype.readSingle = function () {
                 var array = new Uint8Array(4);
@@ -12984,12 +12875,12 @@ var gd3d;
 (function (gd3d) {
     var io;
     (function (io) {
-        var SaveAssetType;
         (function (SaveAssetType) {
             SaveAssetType[SaveAssetType["FullUrl"] = 0] = "FullUrl";
             SaveAssetType[SaveAssetType["NameAndContent"] = 1] = "NameAndContent";
             SaveAssetType[SaveAssetType["DefaultAssets"] = 2] = "DefaultAssets";
-        })(SaveAssetType = io.SaveAssetType || (io.SaveAssetType = {}));
+        })(io.SaveAssetType || (io.SaveAssetType = {}));
+        var SaveAssetType = io.SaveAssetType;
         var SerializeDependent = (function () {
             function SerializeDependent() {
             }
@@ -14337,18 +14228,19 @@ var gd3d;
         function matrix3x2Decompose(src, scale, rotation, translation) {
             translation.x = src.rawData[4];
             translation.y = src.rawData[5];
-            var xs = math.sign(src.rawData[0] * src.rawData[1]) < 0 ? -1 : 1;
-            var ys = math.sign(src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
-            scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1]);
-            scale.y = ys * Math.sqrt(src.rawData[2] * src.rawData[2] + src.rawData[3] * src.rawData[3]);
+            scale.x = Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1]);
+            scale.y = Math.sqrt(src.rawData[2] * src.rawData[2] + src.rawData[3] * src.rawData[3]);
             if (scale.x === 0 || scale.y === 0) {
                 rotation.v = 0;
                 return false;
             }
             var sx = src.rawData[0] / scale.x;
-            var csx = src.rawData[1] / scale.x;
-            var r1 = Math.asin(sx);
-            var r2 = Math.acos(csx);
+            var r1 = Math.acos(sx);
+            var sxs = src.rawData[1] / scale.x;
+            var r2 = Math.asin(sxs);
+            if (r2 < 0) {
+                r1 = r1 + Math.PI;
+            }
             rotation.v = r1;
             return true;
         }
@@ -15396,6 +15288,11 @@ var gd3d;
             out.y = from.y * scale;
         }
         math.vec2ScaleByNum = vec2ScaleByNum;
+        function vec2ScaleByVec2(from, scale, out) {
+            out.x = from.x * scale.x;
+            out.y = from.y * scale.y;
+        }
+        math.vec2ScaleByVec2 = vec2ScaleByVec2;
         function vec4Clone(from, to) {
             to.x = from.x;
             to.y = from.y;
@@ -16226,12 +16123,12 @@ var gd3d;
             return EffectMatData;
         }());
         framework.EffectMatData = EffectMatData;
-        var EffectBatcherState;
         (function (EffectBatcherState) {
             EffectBatcherState[EffectBatcherState["NotInitedStateType"] = 0] = "NotInitedStateType";
             EffectBatcherState[EffectBatcherState["InitedStateType"] = 1] = "InitedStateType";
             EffectBatcherState[EffectBatcherState["ResizeCapacityStateType"] = 2] = "ResizeCapacityStateType";
-        })(EffectBatcherState = framework.EffectBatcherState || (framework.EffectBatcherState = {}));
+        })(framework.EffectBatcherState || (framework.EffectBatcherState = {}));
+        var EffectBatcherState = framework.EffectBatcherState;
         var EffectBatcher = (function () {
             function EffectBatcher(formate) {
                 this.state = EffectBatcherState.NotInitedStateType;
@@ -16296,7 +16193,6 @@ var gd3d;
             return EffectBatcher;
         }());
         framework.EffectBatcher = EffectBatcher;
-        var EffectPlayStateEnum;
         (function (EffectPlayStateEnum) {
             EffectPlayStateEnum[EffectPlayStateEnum["None"] = 0] = "None";
             EffectPlayStateEnum[EffectPlayStateEnum["BeReady"] = 1] = "BeReady";
@@ -16304,18 +16200,18 @@ var gd3d;
             EffectPlayStateEnum[EffectPlayStateEnum["Pause"] = 3] = "Pause";
             EffectPlayStateEnum[EffectPlayStateEnum["Stop"] = 4] = "Stop";
             EffectPlayStateEnum[EffectPlayStateEnum["Dispose"] = 5] = "Dispose";
-        })(EffectPlayStateEnum = framework.EffectPlayStateEnum || (framework.EffectPlayStateEnum = {}));
-        var EffectElementTypeEnum;
+        })(framework.EffectPlayStateEnum || (framework.EffectPlayStateEnum = {}));
+        var EffectPlayStateEnum = framework.EffectPlayStateEnum;
         (function (EffectElementTypeEnum) {
             EffectElementTypeEnum[EffectElementTypeEnum["SingleMeshType"] = 0] = "SingleMeshType";
             EffectElementTypeEnum[EffectElementTypeEnum["EmissionType"] = 1] = "EmissionType";
             EffectElementTypeEnum[EffectElementTypeEnum["MultiMeshType"] = 2] = "MultiMeshType";
-        })(EffectElementTypeEnum = framework.EffectElementTypeEnum || (framework.EffectElementTypeEnum = {}));
-        var EffectLerpTypeEnum;
+        })(framework.EffectElementTypeEnum || (framework.EffectElementTypeEnum = {}));
+        var EffectElementTypeEnum = framework.EffectElementTypeEnum;
         (function (EffectLerpTypeEnum) {
             EffectLerpTypeEnum[EffectLerpTypeEnum["Linear"] = 0] = "Linear";
-        })(EffectLerpTypeEnum = framework.EffectLerpTypeEnum || (framework.EffectLerpTypeEnum = {}));
-        var RenderModel;
+        })(framework.EffectLerpTypeEnum || (framework.EffectLerpTypeEnum = {}));
+        var EffectLerpTypeEnum = framework.EffectLerpTypeEnum;
         (function (RenderModel) {
             RenderModel[RenderModel["None"] = 0] = "None";
             RenderModel[RenderModel["BillBoard"] = 1] = "BillBoard";
@@ -16323,18 +16219,19 @@ var gd3d;
             RenderModel[RenderModel["HorizontalBillBoard"] = 3] = "HorizontalBillBoard";
             RenderModel[RenderModel["VerticalBillBoard"] = 4] = "VerticalBillBoard";
             RenderModel[RenderModel["Mesh"] = 5] = "Mesh";
-        })(RenderModel = framework.RenderModel || (framework.RenderModel = {}));
+        })(framework.RenderModel || (framework.RenderModel = {}));
+        var RenderModel = framework.RenderModel;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var ParticleEmissionType;
         (function (ParticleEmissionType) {
             ParticleEmissionType[ParticleEmissionType["burst"] = 0] = "burst";
             ParticleEmissionType[ParticleEmissionType["continue"] = 1] = "continue";
-        })(ParticleEmissionType = framework.ParticleEmissionType || (framework.ParticleEmissionType = {}));
+        })(framework.ParticleEmissionType || (framework.ParticleEmissionType = {}));
+        var ParticleEmissionType = framework.ParticleEmissionType;
         var EmissionData = (function () {
             function EmissionData() {
                 this.type = ParticleEmissionType.burst;
@@ -16488,12 +16385,12 @@ var gd3d;
             return UVRoll;
         }());
         framework.UVRoll = UVRoll;
-        var UVTypeEnum;
         (function (UVTypeEnum) {
             UVTypeEnum[UVTypeEnum["NONE"] = 0] = "NONE";
             UVTypeEnum[UVTypeEnum["UVRoll"] = 1] = "UVRoll";
             UVTypeEnum[UVTypeEnum["UVSprite"] = 2] = "UVSprite";
-        })(UVTypeEnum = framework.UVTypeEnum || (framework.UVTypeEnum = {}));
+        })(framework.UVTypeEnum || (framework.UVTypeEnum = {}));
+        var UVTypeEnum = framework.UVTypeEnum;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -16608,7 +16505,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var ParticleSystemShape;
         (function (ParticleSystemShape) {
             ParticleSystemShape[ParticleSystemShape["NORMAL"] = 0] = "NORMAL";
             ParticleSystemShape[ParticleSystemShape["BOX"] = 1] = "BOX";
@@ -16617,7 +16513,8 @@ var gd3d;
             ParticleSystemShape[ParticleSystemShape["CONE"] = 4] = "CONE";
             ParticleSystemShape[ParticleSystemShape["EDGE"] = 5] = "EDGE";
             ParticleSystemShape[ParticleSystemShape["CIRCLE"] = 6] = "CIRCLE";
-        })(ParticleSystemShape = framework.ParticleSystemShape || (framework.ParticleSystemShape = {}));
+        })(framework.ParticleSystemShape || (framework.ParticleSystemShape = {}));
+        var ParticleSystemShape = framework.ParticleSystemShape;
         var ParticleStartData = (function () {
             function ParticleStartData() {
                 this.shapeType = ParticleSystemShape.NORMAL;
@@ -16834,11 +16731,11 @@ var gd3d;
             return ParticleStartData;
         }());
         framework.ParticleStartData = ParticleStartData;
-        var emitfromenum;
         (function (emitfromenum) {
             emitfromenum[emitfromenum["base"] = 0] = "base";
             emitfromenum[emitfromenum["volume"] = 1] = "volume";
-        })(emitfromenum = framework.emitfromenum || (framework.emitfromenum = {}));
+        })(framework.emitfromenum || (framework.emitfromenum = {}));
+        var emitfromenum = framework.emitfromenum;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -16964,8 +16861,8 @@ var gd3d;
                     func();
             };
             Vector3AttributeData = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], Vector3AttributeData);
             return Vector3AttributeData;
         }());
@@ -17018,8 +16915,8 @@ var gd3d;
                     func();
             };
             Vector2AttributeData = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], Vector2AttributeData);
             return Vector2AttributeData;
         }());
@@ -17072,30 +16969,30 @@ var gd3d;
                     func();
             };
             NumberAttributeData = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], NumberAttributeData);
             return NumberAttributeData;
         }());
         framework.NumberAttributeData = NumberAttributeData;
-        var AttributeUIState;
         (function (AttributeUIState) {
             AttributeUIState[AttributeUIState["None"] = 0] = "None";
             AttributeUIState[AttributeUIState["Show"] = 1] = "Show";
             AttributeUIState[AttributeUIState["Hide"] = 2] = "Hide";
-        })(AttributeUIState = framework.AttributeUIState || (framework.AttributeUIState = {}));
-        var AttributeUIType;
+        })(framework.AttributeUIState || (framework.AttributeUIState = {}));
+        var AttributeUIState = framework.AttributeUIState;
         (function (AttributeUIType) {
             AttributeUIType[AttributeUIType["Number"] = 0] = "Number";
             AttributeUIType[AttributeUIType["Vector2"] = 1] = "Vector2";
             AttributeUIType[AttributeUIType["Vector3"] = 2] = "Vector3";
             AttributeUIType[AttributeUIType["Vector4"] = 3] = "Vector4";
-        })(AttributeUIType = framework.AttributeUIType || (framework.AttributeUIType = {}));
-        var AttributeValType;
+        })(framework.AttributeUIType || (framework.AttributeUIType = {}));
+        var AttributeUIType = framework.AttributeUIType;
         (function (AttributeValType) {
             AttributeValType[AttributeValType["FixedValType"] = 0] = "FixedValType";
             AttributeValType[AttributeValType["LerpType"] = 1] = "LerpType";
-        })(AttributeValType = framework.AttributeValType || (framework.AttributeValType = {}));
+        })(framework.AttributeValType || (framework.AttributeValType = {}));
+        var AttributeValType = framework.AttributeValType;
         var FrameKeyPointData = (function () {
             function FrameKeyPointData(frameIndex, val) {
                 this.frameIndex = frameIndex;
@@ -17125,7 +17022,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var AttributeType;
         (function (AttributeType) {
             AttributeType[AttributeType["PositionType"] = 1] = "PositionType";
             AttributeType[AttributeType["EulerType"] = 2] = "EulerType";
@@ -17134,7 +17030,8 @@ var gd3d;
             AttributeType[AttributeType["ColorRateType"] = 5] = "ColorRateType";
             AttributeType[AttributeType["AlphaType"] = 6] = "AlphaType";
             AttributeType[AttributeType["TillingType"] = 7] = "TillingType";
-        })(AttributeType = framework.AttributeType || (framework.AttributeType = {}));
+        })(framework.AttributeType || (framework.AttributeType = {}));
+        var AttributeType = framework.AttributeType;
         var EffectElementSingleMesh = (function () {
             function EffectElementSingleMesh(assetMgr, effectIns) {
                 this.elementType = gd3d.framework.EffectElementTypeEnum.SingleMeshType;
@@ -17379,68 +17276,68 @@ var gd3d;
                 }
             };
             __decorate([
-                gd3d.reflect.Field("EffectElementTypeEnum"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("EffectElementTypeEnum"), 
+                __metadata('design:type', Number)
             ], EffectElementSingleMesh.prototype, "elementType", void 0);
             __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
+                gd3d.reflect.Field("boolean"), 
+                __metadata('design:type', Boolean)
             ], EffectElementSingleMesh.prototype, "beloop", void 0);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], EffectElementSingleMesh.prototype, "delayTime", void 0);
             __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("number"), 
+                __metadata('design:type', Number)
             ], EffectElementSingleMesh.prototype, "life", void 0);
             __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
+                gd3d.reflect.Field("string"), 
+                __metadata('design:type', String)
             ], EffectElementSingleMesh.prototype, "texturePath", void 0);
             __decorate([
-                gd3d.reflect.Field("shader"),
-                __metadata("design:type", gd3d.framework.shader)
+                gd3d.reflect.Field("shader"), 
+                __metadata('design:type', gd3d.framework.shader)
             ], EffectElementSingleMesh.prototype, "shader", void 0);
             __decorate([
-                gd3d.reflect.Field("mesh"),
-                __metadata("design:type", gd3d.framework.mesh)
+                gd3d.reflect.Field("mesh"), 
+                __metadata('design:type', gd3d.framework.mesh)
             ], EffectElementSingleMesh.prototype, "mesh", void 0);
             __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
+                gd3d.reflect.Field("Vector3AttributeData"), 
+                __metadata('design:type', framework.Vector3AttributeData)
             ], EffectElementSingleMesh.prototype, "position", void 0);
             __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
+                gd3d.reflect.Field("Vector3AttributeData"), 
+                __metadata('design:type', framework.Vector3AttributeData)
             ], EffectElementSingleMesh.prototype, "euler", void 0);
             __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
+                gd3d.reflect.Field("Vector3AttributeData"), 
+                __metadata('design:type', framework.Vector3AttributeData)
             ], EffectElementSingleMesh.prototype, "scale", void 0);
             __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
+                gd3d.reflect.Field("Vector3AttributeData"), 
+                __metadata('design:type', framework.Vector3AttributeData)
             ], EffectElementSingleMesh.prototype, "color", void 0);
             __decorate([
-                gd3d.reflect.Field("NumberAttributeData"),
-                __metadata("design:type", framework.NumberAttributeData)
+                gd3d.reflect.Field("NumberAttributeData"), 
+                __metadata('design:type', framework.NumberAttributeData)
             ], EffectElementSingleMesh.prototype, "alpha", void 0);
             __decorate([
-                gd3d.reflect.Field("Vector2AttributeData"),
-                __metadata("design:type", framework.Vector2AttributeData)
+                gd3d.reflect.Field("Vector2AttributeData"), 
+                __metadata('design:type', framework.Vector2AttributeData)
             ], EffectElementSingleMesh.prototype, "tilling", void 0);
             __decorate([
-                gd3d.reflect.Field("NumberAttributeData"),
-                __metadata("design:type", framework.NumberAttributeData)
+                gd3d.reflect.Field("NumberAttributeData"), 
+                __metadata('design:type', framework.NumberAttributeData)
             ], EffectElementSingleMesh.prototype, "colorRate", void 0);
             __decorate([
-                gd3d.reflect.Field("RenderModel"),
-                __metadata("design:type", Number)
+                gd3d.reflect.Field("RenderModel"), 
+                __metadata('design:type', Number)
             ], EffectElementSingleMesh.prototype, "renderModel", void 0);
             EffectElementSingleMesh = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [gd3d.framework.assetMgr, framework.effectSystemNew])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [gd3d.framework.assetMgr, framework.effectSystemNew])
             ], EffectElementSingleMesh);
             return EffectElementSingleMesh;
         }());
@@ -17679,8 +17576,8 @@ var gd3d;
                 throw new Error("Method not implemented.");
             };
             EffectElementEmission = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [framework.TestEffectSystem, framework.EffectElementData])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [framework.TestEffectSystem, framework.EffectElementData])
             ], EffectElementEmission);
             return EffectElementEmission;
         }());
@@ -20157,12 +20054,12 @@ var gd3d;
             return Particle;
         }());
         framework.Particle = Particle;
-        var nodeType;
         (function (nodeType) {
             nodeType[nodeType["none"] = 0] = "none";
             nodeType[nodeType["alpha"] = 1] = "alpha";
             nodeType[nodeType["scale"] = 2] = "scale";
-        })(nodeType = framework.nodeType || (framework.nodeType = {}));
+        })(framework.nodeType || (framework.nodeType = {}));
+        var nodeType = framework.nodeType;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -20354,7 +20251,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var HideFlags;
         (function (HideFlags) {
             HideFlags[HideFlags["None"] = 0] = "None";
             HideFlags[HideFlags["HideInHierarchy"] = 1] = "HideInHierarchy";
@@ -20365,7 +20261,8 @@ var gd3d;
             HideFlags[HideFlags["DontUnloadUnusedAsset"] = 32] = "DontUnloadUnusedAsset";
             HideFlags[HideFlags["DontSave"] = 52] = "DontSave";
             HideFlags[HideFlags["HideAndDontSave"] = 61] = "HideAndDontSave";
-        })(HideFlags = framework.HideFlags || (framework.HideFlags = {}));
+        })(framework.HideFlags || (framework.HideFlags = {}));
+        var HideFlags = framework.HideFlags;
         var nodeComponent = (function () {
             function nodeComponent(comp, init) {
                 if (init === void 0) { init = false; }
@@ -20373,12 +20270,12 @@ var gd3d;
                 this.init = init;
             }
             __decorate([
-                gd3d.reflect.Field("INodeComponent"),
-                __metadata("design:type", Object)
+                gd3d.reflect.Field("INodeComponent"), 
+                __metadata('design:type', Object)
             ], nodeComponent.prototype, "comp", void 0);
             nodeComponent = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Object, Boolean])
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [Object, Boolean])
             ], nodeComponent);
             return nodeComponent;
         }());
@@ -20597,15 +20494,16 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("enum"),
-                __metadata("design:type", Number)
+                gd3d.reflect.UIStyle("enum"), 
+                __metadata('design:type', Number)
             ], gameObject.prototype, "layer", void 0);
             __decorate([
-                gd3d.reflect.Field("nodeComponent[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("nodeComponent[]"), 
+                __metadata('design:type', Array)
             ], gameObject.prototype, "components", void 0);
             gameObject = __decorate([
-                gd3d.reflect.SerializeType
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], gameObject);
             return gameObject;
         }());
@@ -20682,12 +20580,12 @@ var gd3d;
             return renderContext;
         }());
         framework.renderContext = renderContext;
-        var RenderLayerEnum;
         (function (RenderLayerEnum) {
             RenderLayerEnum[RenderLayerEnum["Common"] = 0] = "Common";
             RenderLayerEnum[RenderLayerEnum["Transparent"] = 1] = "Transparent";
             RenderLayerEnum[RenderLayerEnum["Overlay"] = 2] = "Overlay";
-        })(RenderLayerEnum = framework.RenderLayerEnum || (framework.RenderLayerEnum = {}));
+        })(framework.RenderLayerEnum || (framework.RenderLayerEnum = {}));
+        var RenderLayerEnum = framework.RenderLayerEnum;
         var renderList = (function () {
             function renderList() {
                 this.renderLayers = [];
@@ -20995,6 +20893,135 @@ var gd3d;
         framework.scene = scene;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var sceneMgr = (function () {
+            function sceneMgr() {
+            }
+            Object.defineProperty(sceneMgr, "ins", {
+                get: function () {
+                    if (sceneMgr._ins == null)
+                        sceneMgr._ins = new sceneMgr();
+                    return sceneMgr._ins;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return sceneMgr;
+        }());
+        framework.sceneMgr = sceneMgr;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var Stats;
+(function (Stats_1) {
+    var Stats = (function () {
+        function Stats(app) {
+            var _this = this;
+            this.mode = 0;
+            this.app = app;
+            this.container = document.createElement('div');
+            this.container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.7;z-index:1';
+            this.container.addEventListener('click', function (event) {
+                event.preventDefault();
+                _this.showPanel(++_this.mode % _this.container.children.length);
+            }, false);
+            this.beginTime = (performance || Date).now(), this.prevTime = this.beginTime, this.frames = 0;
+            this.fpsPanel = this.addPanel(new Panel('FPS', '#0ff', '#002'));
+            this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
+            this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
+            this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
+            if (self.performance && self.performance["memory"]) {
+                this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
+            }
+            this.showPanel(0);
+        }
+        Stats.prototype.update = function () {
+            this.beginTime = this.end();
+        };
+        Stats.prototype.showPanel = function (id) {
+            for (var i = 0; i < this.container.children.length; i++) {
+                this.container.children[i]["style"].display = i === id ? 'block' : 'none';
+            }
+            this.mode = id;
+        };
+        Stats.prototype.addPanel = function (panel) {
+            this.container.appendChild(panel.canvas);
+            return panel;
+        };
+        Stats.prototype.begin = function () {
+            this.beginTime = (performance || Date).now();
+        };
+        Stats.prototype.end = function () {
+            this.frames++;
+            var time = (performance || Date).now();
+            this.msPanel.update(time - this.beginTime, 200);
+            if (time > this.prevTime + 1000) {
+                var fps = (this.frames * 1000) / (time - this.prevTime);
+                this.fpsPanel.update(fps, 100);
+                this.ratePanel.update(this.app.getUpdateTimer() * this.frames / 10, 100);
+                this.userratePanel.update(this.app.getUserUpdateTimer() * this.frames / 10, 100);
+                this.prevTime = time;
+                this.frames = 0;
+                if (this.memPanel) {
+                    var memory = performance["memory"];
+                    this.memPanel.update(memory.usedJSHeapSize / 1048576, memory.jsHeapSizeLimit / 1048576);
+                }
+            }
+            return time;
+        };
+        return Stats;
+    }());
+    Stats_1.Stats = Stats;
+    var Panel = (function () {
+        function Panel(name, fg, bg) {
+            this.name = name;
+            this.fg = fg;
+            this.bg = bg;
+            this.min = Infinity;
+            this.max = 0;
+            this.PR = Math.round(window.devicePixelRatio || 1);
+            this.WIDTH = 80 * this.PR;
+            this.HEIGHT = 48 * this.PR;
+            this.TEXT_X = 3 * this.PR;
+            this.TEXT_Y = 2 * this.PR;
+            this.GRAPH_X = 3 * this.PR;
+            this.GRAPH_Y = 15 * this.PR;
+            this.GRAPH_WIDTH = 74 * this.PR, this.GRAPH_HEIGHT = 30 * this.PR;
+            this.canvas = document.createElement('canvas');
+            this.canvas.width = this.WIDTH;
+            this.canvas.height = this.HEIGHT;
+            this.canvas.style.cssText = 'width:80px;height:48px';
+            this.context = this.canvas.getContext('2d');
+            this.context.font = 'bold ' + (9 * this.PR) + 'px Helvetica,Arial,sans-serif';
+            this.context.textBaseline = 'top';
+            this.context.fillStyle = bg;
+            this.context.fillRect(0, 0, this.WIDTH, this.HEIGHT);
+            this.context.fillStyle = fg;
+            this.context.fillText(name, this.TEXT_X, this.TEXT_Y);
+            this.context.fillRect(this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH, this.GRAPH_HEIGHT);
+            this.context.fillStyle = bg;
+            this.context.globalAlpha = 0.9;
+            this.context.fillRect(this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH, this.GRAPH_HEIGHT);
+        }
+        Panel.prototype.update = function (value, maxValue) {
+            this.min = Math.min(this.min, value);
+            this.max = Math.max(this.max, value);
+            this.context.fillStyle = this.bg;
+            this.context.globalAlpha = 1;
+            this.context.fillRect(0, 0, this.WIDTH, this.GRAPH_Y);
+            this.context.fillStyle = this.fg;
+            this.context.fillText(Math.round(value) + ' ' + this.name + ' (' + Math.round(this.min) + '-' + Math.round(this.max) + ')', this.TEXT_X, this.TEXT_Y);
+            this.context.drawImage(this.canvas, this.GRAPH_X + this.PR, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT, this.GRAPH_X, this.GRAPH_Y, this.GRAPH_WIDTH - this.PR, this.GRAPH_HEIGHT);
+            this.context.fillRect(this.GRAPH_X + this.GRAPH_WIDTH - this.PR, this.GRAPH_Y, this.PR, this.GRAPH_HEIGHT);
+            this.context.fillStyle = this.bg;
+            this.context.globalAlpha = 0.9;
+            this.context.fillRect(this.GRAPH_X + this.GRAPH_WIDTH - this.PR, this.GRAPH_Y, this.PR, Math.round((1 - (value / maxValue)) * this.GRAPH_HEIGHT));
+        };
+        return Panel;
+    }());
+})(Stats || (Stats = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -22029,32 +22056,32 @@ var gd3d;
                 this._beDispose = true;
             };
             __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
+                gd3d.reflect.Field("string"), 
+                __metadata('design:type', String)
             ], transform.prototype, "name", void 0);
             __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("transform[]"), 
+                __metadata('design:type', Array)
             ], transform.prototype, "children", void 0);
             __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
+                gd3d.reflect.Field("quaternion"), 
+                __metadata('design:type', gd3d.math.quaternion)
             ], transform.prototype, "localRotate", void 0);
             __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
-                __metadata("design:type", gd3d.math.vector3)
+                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)), 
+                __metadata('design:type', gd3d.math.vector3)
             ], transform.prototype, "localTranslate", void 0);
             __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
-                __metadata("design:type", gd3d.math.vector3)
+                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)), 
+                __metadata('design:type', gd3d.math.vector3)
             ], transform.prototype, "localScale", void 0);
             __decorate([
-                gd3d.reflect.Field("gameObject"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [])
+                gd3d.reflect.Field("gameObject"), 
+                __metadata('design:type', Object)
             ], transform.prototype, "gameObject", null);
             transform = __decorate([
-                gd3d.reflect.SerializeType
+                gd3d.reflect.SerializeType, 
+                __metadata('design:paramtypes', [])
             ], transform);
             return transform;
         }());
@@ -22195,7 +22222,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var PrimitiveType;
         (function (PrimitiveType) {
             PrimitiveType[PrimitiveType["Sphere"] = 0] = "Sphere";
             PrimitiveType[PrimitiveType["Capsule"] = 1] = "Capsule";
@@ -22204,14 +22230,15 @@ var gd3d;
             PrimitiveType[PrimitiveType["Plane"] = 4] = "Plane";
             PrimitiveType[PrimitiveType["Quad"] = 5] = "Quad";
             PrimitiveType[PrimitiveType["Pyramid"] = 6] = "Pyramid";
-        })(PrimitiveType = framework.PrimitiveType || (framework.PrimitiveType = {}));
-        var Primitive2DType;
+        })(framework.PrimitiveType || (framework.PrimitiveType = {}));
+        var PrimitiveType = framework.PrimitiveType;
         (function (Primitive2DType) {
             Primitive2DType[Primitive2DType["RawImage2D"] = 0] = "RawImage2D";
             Primitive2DType[Primitive2DType["Image2D"] = 1] = "Image2D";
             Primitive2DType[Primitive2DType["Label"] = 2] = "Label";
             Primitive2DType[Primitive2DType["Button"] = 3] = "Button";
-        })(Primitive2DType = framework.Primitive2DType || (framework.Primitive2DType = {}));
+        })(framework.Primitive2DType || (framework.Primitive2DType = {}));
+        var Primitive2DType = framework.Primitive2DType;
         var TransformUtil = (function () {
             function TransformUtil() {
             }
@@ -22788,94 +22815,27 @@ var gd3d;
 (function (gd3d) {
     var render;
     (function (render) {
-        var caps = (function () {
-            function caps() {
-            }
-            return caps;
-        }());
-        render.caps = caps;
-        var webglkit = (function () {
-            function webglkit() {
-            }
-            webglkit.SetMaxVertexAttribArray = function (webgl, count) {
-                for (var i = count; i < webglkit._maxVertexAttribArray; i++) {
-                    webgl.disableVertexAttribArray(i);
-                }
-                webglkit._maxVertexAttribArray = count;
-            };
-            webglkit.GetTextureNumber = function (webgl, index) {
-                webglkit.initConst(webgl);
-                return webglkit._texNumber[index];
-            };
-            webglkit.initConst = function (webgl) {
-                if (webglkit._texNumber == null) {
-                    webglkit._texNumber = [];
-                    webglkit._texNumber.push(webgl.TEXTURE0);
-                    webglkit._texNumber.push(webgl.TEXTURE1);
-                    webglkit._texNumber.push(webgl.TEXTURE2);
-                    webglkit._texNumber.push(webgl.TEXTURE3);
-                    webglkit._texNumber.push(webgl.TEXTURE4);
-                    webglkit._texNumber.push(webgl.TEXTURE5);
-                    webglkit._texNumber.push(webgl.TEXTURE6);
-                    webglkit._texNumber.push(webgl.TEXTURE7);
-                    webglkit._texNumber.push(webgl.TEXTURE8);
-                    webglkit._texNumber.push(webgl.TEXTURE9);
-                    webglkit.LEQUAL = webgl.LEQUAL;
-                    webglkit.NEVER = webgl.NEVER;
-                    webglkit.EQUAL = webgl.EQUAL;
-                    webglkit.GEQUAL = webgl.GEQUAL;
-                    webglkit.NOTEQUAL = webgl.NOTEQUAL;
-                    webglkit.LESS = webgl.LESS;
-                    webglkit.GREATER = webgl.GREATER;
-                    webglkit.ALWAYS = webgl.ALWAYS;
-                    webglkit.FUNC_ADD = webgl.FUNC_ADD;
-                    webglkit.FUNC_SUBTRACT = webgl.FUNC_SUBTRACT;
-                    webglkit.FUNC_REVERSE_SUBTRACT = webgl.FUNC_REVERSE_SUBTRACT;
-                    webglkit.ONE = webgl.ONE;
-                    webglkit.ZERO = webgl.ZERO;
-                    webglkit.SRC_ALPHA = webgl.SRC_ALPHA;
-                    webglkit.SRC_COLOR = webgl.SRC_COLOR;
-                    webglkit.ONE_MINUS_SRC_ALPHA = webgl.ONE_MINUS_SRC_ALPHA;
-                    webglkit.ONE_MINUS_SRC_COLOR = webgl.ONE_MINUS_SRC_COLOR;
-                    webglkit.ONE_MINUS_DST_ALPHA = webgl.ONE_MINUS_DST_ALPHA;
-                    webglkit.ONE_MINUS_DST_COLOR = webgl.ONE_MINUS_DST_COLOR;
-                    webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
-                    webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
-                }
-            };
-            webglkit._maxVertexAttribArray = 0;
-            webglkit._texNumber = null;
-            webglkit.caps = new caps();
-            return webglkit;
-        }());
-        render.webglkit = webglkit;
-    })(render = gd3d.render || (gd3d.render = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var render;
-    (function (render) {
-        var ShowFaceStateEnum;
         (function (ShowFaceStateEnum) {
             ShowFaceStateEnum[ShowFaceStateEnum["ALL"] = 0] = "ALL";
             ShowFaceStateEnum[ShowFaceStateEnum["CCW"] = 1] = "CCW";
             ShowFaceStateEnum[ShowFaceStateEnum["CW"] = 2] = "CW";
-        })(ShowFaceStateEnum = render.ShowFaceStateEnum || (render.ShowFaceStateEnum = {}));
-        var DrawModeEnum;
+        })(render.ShowFaceStateEnum || (render.ShowFaceStateEnum = {}));
+        var ShowFaceStateEnum = render.ShowFaceStateEnum;
         (function (DrawModeEnum) {
             DrawModeEnum[DrawModeEnum["VboTri"] = 0] = "VboTri";
             DrawModeEnum[DrawModeEnum["VboLine"] = 1] = "VboLine";
             DrawModeEnum[DrawModeEnum["EboTri"] = 2] = "EboTri";
             DrawModeEnum[DrawModeEnum["EboLine"] = 3] = "EboLine";
-        })(DrawModeEnum = render.DrawModeEnum || (render.DrawModeEnum = {}));
-        var BlendModeEnum;
+        })(render.DrawModeEnum || (render.DrawModeEnum = {}));
+        var DrawModeEnum = render.DrawModeEnum;
         (function (BlendModeEnum) {
             BlendModeEnum[BlendModeEnum["Close"] = 0] = "Close";
             BlendModeEnum[BlendModeEnum["Blend"] = 1] = "Blend";
             BlendModeEnum[BlendModeEnum["Blend_PreMultiply"] = 2] = "Blend_PreMultiply";
             BlendModeEnum[BlendModeEnum["Add"] = 3] = "Add";
             BlendModeEnum[BlendModeEnum["Add_PreMultiply"] = 4] = "Add_PreMultiply";
-        })(BlendModeEnum = render.BlendModeEnum || (render.BlendModeEnum = {}));
+        })(render.BlendModeEnum || (render.BlendModeEnum = {}));
+        var BlendModeEnum = render.BlendModeEnum;
         var glDrawPass = (function () {
             function glDrawPass() {
                 this.state_showface = ShowFaceStateEnum.CCW;
@@ -23262,7 +23222,6 @@ var gd3d;
 (function (gd3d) {
     var render;
     (function (render) {
-        var VertexFormatMask;
         (function (VertexFormatMask) {
             VertexFormatMask[VertexFormatMask["Position"] = 1] = "Position";
             VertexFormatMask[VertexFormatMask["Normal"] = 2] = "Normal";
@@ -23273,19 +23232,20 @@ var gd3d;
             VertexFormatMask[VertexFormatMask["BlendIndex4"] = 64] = "BlendIndex4";
             VertexFormatMask[VertexFormatMask["BlendWeight4"] = 128] = "BlendWeight4";
             VertexFormatMask[VertexFormatMask["ColorEX"] = 256] = "ColorEX";
-        })(VertexFormatMask = render.VertexFormatMask || (render.VertexFormatMask = {}));
+        })(render.VertexFormatMask || (render.VertexFormatMask = {}));
+        var VertexFormatMask = render.VertexFormatMask;
         var number4 = (function () {
             function number4() {
             }
             return number4;
         }());
         render.number4 = number4;
-        var MeshTypeEnum;
         (function (MeshTypeEnum) {
             MeshTypeEnum[MeshTypeEnum["Static"] = 0] = "Static";
             MeshTypeEnum[MeshTypeEnum["Dynamic"] = 1] = "Dynamic";
             MeshTypeEnum[MeshTypeEnum["Stream"] = 2] = "Stream";
-        })(MeshTypeEnum = render.MeshTypeEnum || (render.MeshTypeEnum = {}));
+        })(render.MeshTypeEnum || (render.MeshTypeEnum = {}));
+        var MeshTypeEnum = render.MeshTypeEnum;
         var drawInfo = (function () {
             function drawInfo() {
             }
@@ -23724,6 +23684,7 @@ var gd3d;
                 data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, -halfsize));
                 data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
                 data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, -halfsize));
+                gd3d.math.vec3Cross(new gd3d.math.vector3(halfsize, height, halfsize), new gd3d.math.vector3(halfsize, -height, -halfsize), vec1);
                 data.normal.push(vec1);
                 data.normal.push(vec1);
                 data.normal.push(vec1);
@@ -23737,6 +23698,7 @@ var gd3d;
                 data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, -halfsize));
                 data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
                 data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, halfsize));
+                gd3d.math.vec3Cross(new gd3d.math.vector3(-halfsize, height, halfsize), new gd3d.math.vector3(halfsize, -height, halfsize), vec2);
                 data.normal.push(vec2);
                 data.normal.push(vec2);
                 data.normal.push(vec2);
@@ -23750,6 +23712,7 @@ var gd3d;
                 data.pos.push(new gd3d.math.vector3(halfsize, -height * 0.5, halfsize));
                 data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
                 data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, halfsize));
+                gd3d.math.vec3Cross(new gd3d.math.vector3(-halfsize, height, -halfsize), new gd3d.math.vector3(-halfsize, -height, halfsize), vec3);
                 data.normal.push(vec3);
                 data.normal.push(vec3);
                 data.normal.push(vec3);
@@ -23763,6 +23726,7 @@ var gd3d;
                 data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, halfsize));
                 data.pos.push(new gd3d.math.vector3(0, height * 0.5, 0));
                 data.pos.push(new gd3d.math.vector3(-halfsize, -height * 0.5, -halfsize));
+                gd3d.math.vec3Cross(new gd3d.math.vector3(halfsize, height, -halfsize), new gd3d.math.vector3(-halfsize, -height, -halfsize), vec4);
                 data.normal.push(vec4);
                 data.normal.push(vec4);
                 data.normal.push(vec4);
@@ -24490,7 +24454,6 @@ var gd3d;
 (function (gd3d) {
     var render;
     (function (render) {
-        var UniformTypeEnum;
         (function (UniformTypeEnum) {
             UniformTypeEnum[UniformTypeEnum["Texture"] = 0] = "Texture";
             UniformTypeEnum[UniformTypeEnum["Float"] = 1] = "Float";
@@ -24499,18 +24462,19 @@ var gd3d;
             UniformTypeEnum[UniformTypeEnum["Float4v"] = 4] = "Float4v";
             UniformTypeEnum[UniformTypeEnum["Float4x4"] = 5] = "Float4x4";
             UniformTypeEnum[UniformTypeEnum["Float4x4v"] = 6] = "Float4x4v";
-        })(UniformTypeEnum = render.UniformTypeEnum || (render.UniformTypeEnum = {}));
+        })(render.UniformTypeEnum || (render.UniformTypeEnum = {}));
+        var UniformTypeEnum = render.UniformTypeEnum;
         var uniform = (function () {
             function uniform() {
             }
             return uniform;
         }());
         render.uniform = uniform;
-        var ShaderTypeEnum;
         (function (ShaderTypeEnum) {
             ShaderTypeEnum[ShaderTypeEnum["VS"] = 0] = "VS";
             ShaderTypeEnum[ShaderTypeEnum["FS"] = 1] = "FS";
-        })(ShaderTypeEnum = render.ShaderTypeEnum || (render.ShaderTypeEnum = {}));
+        })(render.ShaderTypeEnum || (render.ShaderTypeEnum = {}));
+        var ShaderTypeEnum = render.ShaderTypeEnum;
         var glShader = (function () {
             function glShader(name, type, shader, code) {
                 this.mapUniform = {};
@@ -24697,7 +24661,6 @@ var gd3d;
 (function (gd3d) {
     var render;
     (function (render) {
-        var TextureFormatEnum;
         (function (TextureFormatEnum) {
             TextureFormatEnum[TextureFormatEnum["RGBA"] = 1] = "RGBA";
             TextureFormatEnum[TextureFormatEnum["RGB"] = 2] = "RGB";
@@ -24706,7 +24669,8 @@ var gd3d;
             TextureFormatEnum[TextureFormatEnum["PVRTC4_RGBA"] = 4] = "PVRTC4_RGBA";
             TextureFormatEnum[TextureFormatEnum["PVRTC2_RGB"] = 4] = "PVRTC2_RGB";
             TextureFormatEnum[TextureFormatEnum["PVRTC2_RGBA"] = 4] = "PVRTC2_RGBA";
-        })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
+        })(render.TextureFormatEnum || (render.TextureFormatEnum = {}));
+        var TextureFormatEnum = render.TextureFormatEnum;
         var textureReader = (function () {
             function textureReader(webgl, texRGBA, width, height, gray) {
                 if (gray === void 0) { gray = true; }
@@ -25167,6 +25131,73 @@ var gd3d;
             return WriteableTexture2D;
         }());
         render.WriteableTexture2D = WriteableTexture2D;
+    })(render = gd3d.render || (gd3d.render = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var render;
+    (function (render) {
+        var caps = (function () {
+            function caps() {
+            }
+            return caps;
+        }());
+        render.caps = caps;
+        var webglkit = (function () {
+            function webglkit() {
+            }
+            webglkit.SetMaxVertexAttribArray = function (webgl, count) {
+                for (var i = count; i < webglkit._maxVertexAttribArray; i++) {
+                    webgl.disableVertexAttribArray(i);
+                }
+                webglkit._maxVertexAttribArray = count;
+            };
+            webglkit.GetTextureNumber = function (webgl, index) {
+                webglkit.initConst(webgl);
+                return webglkit._texNumber[index];
+            };
+            webglkit.initConst = function (webgl) {
+                if (webglkit._texNumber == null) {
+                    webglkit._texNumber = [];
+                    webglkit._texNumber.push(webgl.TEXTURE0);
+                    webglkit._texNumber.push(webgl.TEXTURE1);
+                    webglkit._texNumber.push(webgl.TEXTURE2);
+                    webglkit._texNumber.push(webgl.TEXTURE3);
+                    webglkit._texNumber.push(webgl.TEXTURE4);
+                    webglkit._texNumber.push(webgl.TEXTURE5);
+                    webglkit._texNumber.push(webgl.TEXTURE6);
+                    webglkit._texNumber.push(webgl.TEXTURE7);
+                    webglkit._texNumber.push(webgl.TEXTURE8);
+                    webglkit._texNumber.push(webgl.TEXTURE9);
+                    webglkit.LEQUAL = webgl.LEQUAL;
+                    webglkit.NEVER = webgl.NEVER;
+                    webglkit.EQUAL = webgl.EQUAL;
+                    webglkit.GEQUAL = webgl.GEQUAL;
+                    webglkit.NOTEQUAL = webgl.NOTEQUAL;
+                    webglkit.LESS = webgl.LESS;
+                    webglkit.GREATER = webgl.GREATER;
+                    webglkit.ALWAYS = webgl.ALWAYS;
+                    webglkit.FUNC_ADD = webgl.FUNC_ADD;
+                    webglkit.FUNC_SUBTRACT = webgl.FUNC_SUBTRACT;
+                    webglkit.FUNC_REVERSE_SUBTRACT = webgl.FUNC_REVERSE_SUBTRACT;
+                    webglkit.ONE = webgl.ONE;
+                    webglkit.ZERO = webgl.ZERO;
+                    webglkit.SRC_ALPHA = webgl.SRC_ALPHA;
+                    webglkit.SRC_COLOR = webgl.SRC_COLOR;
+                    webglkit.ONE_MINUS_SRC_ALPHA = webgl.ONE_MINUS_SRC_ALPHA;
+                    webglkit.ONE_MINUS_SRC_COLOR = webgl.ONE_MINUS_SRC_COLOR;
+                    webglkit.ONE_MINUS_DST_ALPHA = webgl.ONE_MINUS_DST_ALPHA;
+                    webglkit.ONE_MINUS_DST_COLOR = webgl.ONE_MINUS_DST_COLOR;
+                    webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
+                    webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
+                }
+            };
+            webglkit._maxVertexAttribArray = 0;
+            webglkit._texNumber = null;
+            webglkit.caps = new caps();
+            return webglkit;
+        }());
+        render.webglkit = webglkit;
     })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
 //# sourceMappingURL=gd3d.js.map
