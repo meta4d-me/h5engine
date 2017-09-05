@@ -1327,7 +1327,7 @@ declare namespace gd3d.framework {
         loadAudioBufferFromArrayBuffer(ab: ArrayBuffer, fun: (buf: AudioBuffer, _err: Error) => void): void;
         loadAudioBuffer(url: string, fun: (buf: AudioBuffer, _err: Error) => void): void;
         isAvailable(): boolean;
-        createAudioChannel(): AudioChannel;
+        createAudioChannel(be3DSound: boolean): AudioChannel;
         private static loadArrayBuffer(url, fun);
     }
     class AudioChannel {
@@ -1440,6 +1440,7 @@ declare namespace gd3d.framework {
     class AudioPlayer implements INodeComponent {
         buffer: AudioBuffer;
         beLoop: boolean;
+        be3DSound: boolean;
         private audioChannel;
         gameObject: gameObject;
         play(buffer: AudioBuffer, beLoop?: boolean, volume?: number, onended?: Function): void;

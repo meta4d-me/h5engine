@@ -107,12 +107,9 @@ namespace t
                 //播放器1
                 let tr = new gd3d.framework.transform();
                 let player: gd3d.framework.AudioPlayer = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER) as gd3d.framework.AudioPlayer;
+                player.be3DSound = false;
                 this.app.getScene().addChild(tr);
                 tr.localTranslate = new gd3d.math.vector3(0, 0, 0);
-
-
-
-
                 {
                     var button = document.createElement("button");
                     button.textContent = "play once1";
@@ -181,10 +178,10 @@ namespace t
                     var input = document.createElement("input");
                     input.type = "range";
                     input.valueAsNumber = 5;
-                    player.volume = input.valueAsNumber;
+                    player.volume = input.valueAsNumber/100;
                     input.oninput = (e) =>
                     {
-                        player.volume = input.valueAsNumber;
+                        player.volume = input.valueAsNumber/100;
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";

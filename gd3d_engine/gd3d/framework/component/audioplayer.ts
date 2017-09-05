@@ -7,7 +7,7 @@ namespace gd3d.framework
     {
         public buffer: AudioBuffer;
         public beLoop: boolean;
-
+        public be3DSound: boolean = true;
         private audioChannel: AudioChannel;
         gameObject: gameObject;
 
@@ -22,7 +22,7 @@ namespace gd3d.framework
          */
         play(buffer: AudioBuffer, beLoop: boolean = false, volume: number = 0, onended?: Function)
         {
-            this.audioChannel = AudioEx.instance().createAudioChannel();
+            this.audioChannel = AudioEx.instance().createAudioChannel(this.be3DSound);
             this.buffer = buffer;
             this.volume = volume;
             var c = this.audioChannel;
@@ -94,7 +94,7 @@ namespace gd3d.framework
         }
         start()
         {
-            this.audioChannel = AudioEx.instance().createAudioChannel();
+            this.audioChannel = AudioEx.instance().createAudioChannel(this.be3DSound);
         }
         private lastX: number = 0;
         private lastY: number = 0;

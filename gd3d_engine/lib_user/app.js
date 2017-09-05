@@ -6400,6 +6400,7 @@ var t;
                 var listener = this.camera.gameObject.addComponent("AudioListener");
                 var tr = new gd3d.framework.transform();
                 var player_1 = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER);
+                player_1.be3DSound = false;
                 this.app.getScene().addChild(tr);
                 tr.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 {
@@ -6458,9 +6459,9 @@ var t;
                     var input = document.createElement("input");
                     input.type = "range";
                     input.valueAsNumber = 5;
-                    player_1.volume = input.valueAsNumber;
+                    player_1.volume = input.valueAsNumber / 100;
                     input.oninput = function (e) {
-                        player_1.volume = input.valueAsNumber;
+                        player_1.volume = input.valueAsNumber / 100;
                     };
                     input.style.top = "190px";
                     input.style.position = "absolute";

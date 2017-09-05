@@ -110,18 +110,32 @@
         }
 
 
-        public createAudioChannel(): AudioChannel
+        public createAudioChannel(be3DSound: boolean): AudioChannel
         {
             var cc = new AudioChannel();
+
             cc.source = this.audioContext.createBufferSource();
-            //3d音效
-            cc.pannerNode = this.audioContext.createPanner();
             cc.gainNode = this.audioContext.createGain();
-
-            cc.source.connect(cc.pannerNode);
-            cc.pannerNode.connect(cc.gainNode);
-            cc.gainNode.connect(this.audioContext.destination);
-
+            // var filterNode = this.audioContext.createBiquadFilter();
+            // let controlFrequency = function (value)
+            // {
+            //     filterNode.frequency.value = value;
+            // }
+            // // 音频为1000变调
+            // controlFrequency(1500);
+            // cc.source.connect(filterNode);
+            // filterNode.connect(cc.gainNode);
+            cc.source.connect(cc.gainNode);
+            if (be3DSound)
+            {
+                //3d音效
+                cc.pannerNode = this.audioContext.createPanner();
+                cc.gainNode.connect(cc.pannerNode);
+                cc.pannerNode.connect(this.audioContext.destination);
+            } else
+            {
+                cc.gainNode.connect(this.audioContext.destination);
+            }
             //声音调节
             cc.gainNode.gain.value = 1;
             return cc;
@@ -177,7 +191,7 @@
          */
         set volume(val: number)//0-100
         {
-            val = val > 100 ? 100 : val;
+            val = val > 1 ? 1 : val;
             val = val <= 0 ? 0 : val;
             this.gainNode.gain.value = val;
         }
