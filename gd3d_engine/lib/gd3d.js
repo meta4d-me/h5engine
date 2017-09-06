@@ -9301,7 +9301,7 @@ var gd3d;
                 this.layer = framework.RenderLayerEnum.Transparent;
                 this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
-                this.autoplay = false;
+                this.autoplay = true;
                 this.state = framework.EffectPlayStateEnum.None;
                 this.curFrameId = -1;
                 this.playTimer = 0;
@@ -9316,8 +9316,18 @@ var gd3d;
                 this.beExecuteNextFrame = true;
             }
             effectSystem_1 = effectSystem;
+            Object.defineProperty(effectSystem.prototype, "jsonData", {
+                get: function () {
+                    return this._textasset;
+                },
+                set: function (text) {
+                    this._textasset = text;
+                    this.setJsonData(this._textasset);
+                },
+                enumerable: true,
+                configurable: true
+            });
             effectSystem.prototype.setJsonData = function (_jsonData) {
-                this.jsonData = _jsonData;
                 this.setJsonDataStr(this.jsonData.content);
             };
             effectSystem.prototype.setJsonDataStr = function (_jsonStr) {
@@ -9332,6 +9342,7 @@ var gd3d;
             effectSystem.prototype.updateJsonDataStr = function (_jsonStr) {
                 this.remove();
                 this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
+                console.warn("开始解析特效");
                 this.init();
             };
             Object.defineProperty(effectSystem.prototype, "data", {
@@ -9547,7 +9558,12 @@ var gd3d;
             };
             effectSystem.prototype.clone = function () {
                 var effect = new effectSystem_1();
-                effect.data = this.data.clone();
+                if (this.jsonData)
+                    effect.jsonData = this.jsonData;
+                if (this.data)
+                    effect.data = this.data.clone();
+                effect.autoplay = this.autoplay;
+                effect.beLoop = this.beLoop;
                 return effect;
             };
             effectSystem.prototype.play = function (speed) {
@@ -9799,12 +9815,12 @@ var gd3d;
             ], effectSystem.prototype, "beLoop", void 0);
             __decorate([
                 gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
-            ], effectSystem.prototype, "jsonData", void 0);
+                __metadata("design:type", framework.textasset),
+                __metadata("design:paramtypes", [framework.textasset])
+            ], effectSystem.prototype, "jsonData", null);
             effectSystem = effectSystem_1 = __decorate([
                 gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.selfClone
+                gd3d.reflect.nodeComponent
             ], effectSystem);
             return effectSystem;
             var effectSystem_1;
@@ -16259,7 +16275,6 @@ var gd3d;
             function EffectMatData() {
             }
             EffectMatData.beEqual = function (data0, data1) {
-                console.log(data0.diffuseTexture + "/" + data1.diffuseTexture);
                 return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
             };
             EffectMatData.prototype.clone = function () {

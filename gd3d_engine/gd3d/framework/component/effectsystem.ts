@@ -9,7 +9,7 @@ namespace gd3d.framework
      */
     @reflect.nodeRender
     @reflect.nodeComponent
-    @reflect.selfClone
+    // @reflect.selfClone
     export class effectSystem implements IRenderer
     {
         /**
@@ -45,7 +45,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        autoplay: boolean = false;
+        autoplay: boolean = true;
         /**
          * @public
          * @language zh_CN
@@ -95,8 +95,17 @@ namespace gd3d.framework
         /**
         * @private
         */
+        private _textasset: textasset;
         @gd3d.reflect.Field("textasset")
-        jsonData: textasset;
+        set jsonData(text: textasset)
+        {
+            this._textasset = text;
+            this.setJsonData(this._textasset);
+        }
+        get jsonData()
+        {
+            return this._textasset;
+        }
         /**
          * @public
          * @language zh_CN
@@ -106,7 +115,7 @@ namespace gd3d.framework
          */
         setJsonData(_jsonData: textasset)
         {
-            this.jsonData = _jsonData;
+            // this.jsonData = _jsonData;
             this.setJsonDataStr(this.jsonData.content);
         }
 
@@ -130,6 +139,7 @@ namespace gd3d.framework
         {
             this.remove();
             this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
+            console.warn("开始解析特效");
             this.init();
         }
         /**
@@ -457,7 +467,12 @@ namespace gd3d.framework
         clone()
         {
             let effect = new effectSystem();
-            effect.data = this.data.clone();
+            if (this.jsonData)
+                effect.jsonData = this.jsonData;
+            if (this.data)
+                effect.data = this.data.clone();
+            effect.autoplay = this.autoplay;
+            effect.beLoop = this.beLoop;
             return effect;
         }
         /**

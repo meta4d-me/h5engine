@@ -1601,6 +1601,7 @@ declare namespace gd3d.framework {
         private particles;
         private matDataGroups;
         private particleElementDic;
+        private _textasset;
         jsonData: textasset;
         setJsonData(_jsonData: textasset): void;
         setJsonDataStr(_jsonStr: string): void;
