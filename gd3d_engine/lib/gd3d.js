@@ -9316,17 +9316,6 @@ var gd3d;
                 this.beExecuteNextFrame = true;
             }
             effectSystem_1 = effectSystem;
-            Object.defineProperty(effectSystem.prototype, "jsonData", {
-                get: function () {
-                    return this._textasset;
-                },
-                set: function (text) {
-                    this._textasset = text;
-                    this.setJsonData(this._textasset);
-                },
-                enumerable: true,
-                configurable: true
-            });
             effectSystem.prototype.setJsonData = function (_jsonData) {
                 this.setJsonDataStr(this.jsonData.content);
             };
@@ -9368,6 +9357,7 @@ var gd3d;
                 configurable: true
             });
             effectSystem.prototype.start = function () {
+                this.setJsonData(this._textasset);
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
@@ -9815,9 +9805,8 @@ var gd3d;
             ], effectSystem.prototype, "beLoop", void 0);
             __decorate([
                 gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset),
-                __metadata("design:paramtypes", [framework.textasset])
-            ], effectSystem.prototype, "jsonData", null);
+                __metadata("design:type", framework.textasset)
+            ], effectSystem.prototype, "jsonData", void 0);
             effectSystem = effectSystem_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
