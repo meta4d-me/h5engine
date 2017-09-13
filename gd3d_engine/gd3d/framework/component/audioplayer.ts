@@ -16,12 +16,19 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 播放声音
-         * @param x 音源在3D空间中的播放位置
-         * @param y 音源在3D空间中的播放位置
-         * @param z 音源在3D空间中的播放位置
+         * @param buffer 音源缓冲对象
+         * @param beLoop 是循环播放
+         * @param volume 音量 0-1
+         * @param onended 音源播放结束回调
          */
         play(buffer: AudioBuffer, beLoop: boolean = false, volume: number = 0, onended?: Function)
         {
+            if(this.audioChannel != null){
+                if(this.audioChannel.isplay){
+                    this.stop();
+                }
+                this.audioChannel = null;
+            }
             this.audioChannel = AudioEx.instance().createAudioChannel(this.be3DSound);
             this.buffer = buffer;
             this.volume = volume;
