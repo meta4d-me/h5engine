@@ -18,6 +18,14 @@ namespace gd3d.framework
             let _emissionElement = new EmissionElement(_emissionNew, this.effectSys, this);
             this.emissionElements.push(_emissionElement);
         }
+
+        updateForEmission(delta: number)
+        {
+            for (let key in this.emissionElements)
+            {
+                this.emissionElements[key].updateForEmission(delta);
+            }
+        }
         update(delta: number)
         {
             for (let key in this.emissionElements)
@@ -141,7 +149,7 @@ namespace gd3d.framework
 
         public update(delta: number)
         {
-            this.curTime += delta;
+            //this.curTime += delta;
             // if (this.delayTime != undefined && this.curTime < this.delayTime)
             // {
             //     return;
@@ -149,9 +157,18 @@ namespace gd3d.framework
             // {
             //     this.curTime = this.curTime - this.delayTime;
             // }
-            this.updateEmission(delta);
+            //this.updateEmission(delta);
             this.updateBatcher(delta);
         }
+
+        private testtime:number=0;
+        public updateForEmission(delta: number)
+        {
+            this.testtime+=delta;
+            this.curTime += delta;
+            this.updateEmission(delta);
+        }
+
 
         updateBatcher(delta: number)
         {
@@ -164,35 +181,62 @@ namespace gd3d.framework
         updateEmission(delta: number)
         {
             if (this.isover) return;
+            //detal为 0.01699995994567871  造成短短时间发射大量粒子困难(0.1 发射50)至少需要detal<=0.002,按照detal为0.0169需要0.8左右的时间才能发射完，于是不能deta仅发射一个粒子。
+            //改为按照时间比例发射粒子
             if (this.emissionData.emissionType == ParticleEmissionType.continue)
             {
-                if (this.numcount == 0) 
+                // if (this.numcount == 0) 
+                // {
+                //     this.addParticle();
+                //     this.numcount++;
+                // }
+                // console.log("curtime:"+this.curTime.toString()+"//detaltime:"+delta.toString());
+
+                // if (this.curTime > this._continueSpaceTime)
+                // {
+                //     if (this.numcount < this.emissionData.emissionCount)
+                //     {
+                //         console.log("addparticle  toteltime:"+this.testtime.toString()+"    //curnumber:"+this.numcount.toString());
+                //         this.addParticle();
+                //         this.curTime = 0;
+                //         this.numcount++;
+                //     }
+                //     else
+                //     {
+                //         if (this.beloop)
+                //         {
+                //             this.curTime = 0;
+                //             this.numcount = 0;
+                //             this.isover = false;
+                //         } else
+                //         {
+                //             this.isover = true;
+                //         }
+                //     }
+                // }
+
+                var rate=this.curTime/this.emissionData.time;
+                rate=gd3d.math.floatClamp(rate,0,1);
+                var needCount=Math.floor(rate*this.emissionData.emissionCount);
+                needCount=needCount-this.numcount;
+                for(var i=0;i<needCount;i++)
                 {
                     this.addParticle();
                     this.numcount++;
                 }
-
-                if (this.curTime > this._continueSpaceTime)
+                if(rate==1)
                 {
-                    if (this.numcount < this.emissionData.emissionCount)
+                    if (this.beloop)
                     {
-                        this.addParticle();
                         this.curTime = 0;
-                        this.numcount++;
-                    }
-                    else
+                        this.numcount = 0;
+                        this.isover = false;
+                    } else
                     {
-                        if (this.beloop)
-                        {
-                            this.curTime = 0;
-                            this.numcount = 0;
-                            this.isover = false;
-                        } else
-                        {
-                            this.isover = true;
-                        }
+                        this.isover = true;
                     }
                 }
+
             }
             else if (this.emissionData.emissionType == ParticleEmissionType.burst)
             {

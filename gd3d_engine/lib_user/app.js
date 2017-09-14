@@ -8052,6 +8052,7 @@ var db_test_effect = (function () {
         this.taskmgr.addTaskCall(this.addcam.bind(this));
         this.taskmgr.addTaskCall(this.loadModel.bind(this));
         this.taskmgr.addTaskCall(this.loadEffect.bind(this));
+        this.taskmgr.addTaskCall(this.loadEffect2.bind(this));
         this.taskmgr.addTaskCall(this.addbtn.bind(this));
     };
     db_test_effect.prototype.loadEffect = function (laststate, state) {
@@ -8061,7 +8062,6 @@ var db_test_effect = (function () {
         name = "fx_boss_02";
         name = "0fx_zs_male@attack_04";
         name = "0fx_juqing_maidong";
-        name = "fx_boss_03";
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
@@ -8069,12 +8069,28 @@ var db_test_effect = (function () {
                 _this.effect.autoplay = false;
                 var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
                 _this.effect.setJsonData(text);
-                var pp = new gd3d.framework.transform();
-                pp.addChild(_this.tr);
-                _this.dragon.addChild(pp);
-                _this.tr.localTranslate.z = 1.8;
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 45, pp.localRotate);
+                _this.scene.addChild(_this.tr);
                 _this.tr.markDirty();
+                state.finish = true;
+            }
+        });
+    };
+    db_test_effect.prototype.loadEffect2 = function (laststate, state) {
+        var _this = this;
+        var names = ["0fx_fs_female@attack_02", "fx_0_zs_male@attack_02", "0fx_boss_02"];
+        var name = names[2];
+        name = "fx_boss_02";
+        name = "0fx_zs_male@attack_04";
+        name = "0fx_juqing_maidong2";
+        this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                _this.tr2 = new gd3d.framework.transform();
+                _this.effect2 = _this.tr2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+                _this.effect2.autoplay = false;
+                var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
+                _this.effect2.setJsonData(text);
+                _this.scene.addChild(_this.tr2);
+                _this.tr2.markDirty();
                 state.finish = true;
             }
         });
@@ -8140,6 +8156,7 @@ var db_test_effect = (function () {
         btn.textContent = "播放funckkk";
         btn.onclick = function () {
             _this.effect.play();
+            _this.effect2.play();
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";

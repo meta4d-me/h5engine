@@ -326,7 +326,9 @@ namespace gd3d.framework
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
                     this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
-                console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
+                console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
+                console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
+                
             }
             this.width = this.webgl.canvas.width;
             this.height = this.webgl.canvas.height;

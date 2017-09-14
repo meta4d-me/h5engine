@@ -236,6 +236,12 @@ namespace gd3d.framework
                     }
                 }
             }
+            if (this.particles != undefined)
+            {
+                this.particles.updateForEmission(delta);
+            }
+
+
             if (this.checkFrameId())
             {
                 for (let i in this.effectBatchers)

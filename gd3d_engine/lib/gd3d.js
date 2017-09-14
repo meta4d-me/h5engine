@@ -220,7 +220,8 @@ var gd3d;
                         this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
                         this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
-                    console.log("canvas resize.   width:" + this.webgl.canvas.clientWidth + "   height:" + this.webgl.canvas.clientHeight);
+                    console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
+                    console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
                 }
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
@@ -8632,6 +8633,12 @@ var gd3d;
             AudioPlayer.prototype.play = function (buffer, beLoop, volume, onended) {
                 if (beLoop === void 0) { beLoop = false; }
                 if (volume === void 0) { volume = 0; }
+                if (this.audioChannel != null) {
+                    if (this.audioChannel.isplay) {
+                        this.stop();
+                    }
+                    this.audioChannel = null;
+                }
                 this.audioChannel = framework.AudioEx.instance().createAudioChannel(this.be3DSound);
                 this.buffer = buffer;
                 this.volume = volume;
@@ -9405,6 +9412,9 @@ var gd3d;
                             this.delayElements.splice(i, 1);
                         }
                     }
+                }
+                if (this.particles != undefined) {
+                    this.particles.updateForEmission(delta);
                 }
                 if (this.checkFrameId()) {
                     for (var i in this.effectBatchers) {
@@ -20242,6 +20252,11 @@ var gd3d;
                 var _emissionElement = new EmissionElement(_emissionNew, this.effectSys, this);
                 this.emissionElements.push(_emissionElement);
             };
+            Particles.prototype.updateForEmission = function (delta) {
+                for (var key in this.emissionElements) {
+                    this.emissionElements[key].updateForEmission(delta);
+                }
+            };
             Particles.prototype.update = function (delta) {
                 for (var key in this.emissionElements) {
                     this.emissionElements[key].update(delta);
@@ -20275,6 +20290,7 @@ var gd3d;
                 this.worldRotation = new gd3d.math.quaternion();
                 this.matToBatcher = new gd3d.math.matrix();
                 this.matToWorld = new gd3d.math.matrix();
+                this.testtime = 0;
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.effectSys = sys;
                 this.ParticleMgr = mgr;
@@ -20314,9 +20330,12 @@ var gd3d;
                 return this.matToWorld;
             };
             EmissionElement.prototype.update = function (delta) {
+                this.updateBatcher(delta);
+            };
+            EmissionElement.prototype.updateForEmission = function (delta) {
+                this.testtime += delta;
                 this.curTime += delta;
                 this.updateEmission(delta);
-                this.updateBatcher(delta);
             };
             EmissionElement.prototype.updateBatcher = function (delta) {
                 for (var key in this.emissionBatchers) {
@@ -20327,25 +20346,22 @@ var gd3d;
                 if (this.isover)
                     return;
                 if (this.emissionData.emissionType == framework.ParticleEmissionType.continue) {
-                    if (this.numcount == 0) {
+                    var rate = this.curTime / this.emissionData.time;
+                    rate = gd3d.math.floatClamp(rate, 0, 1);
+                    var needCount = Math.floor(rate * this.emissionData.emissionCount);
+                    needCount = needCount - this.numcount;
+                    for (var i = 0; i < needCount; i++) {
                         this.addParticle();
                         this.numcount++;
                     }
-                    if (this.curTime > this._continueSpaceTime) {
-                        if (this.numcount < this.emissionData.emissionCount) {
-                            this.addParticle();
+                    if (rate == 1) {
+                        if (this.beloop) {
                             this.curTime = 0;
-                            this.numcount++;
+                            this.numcount = 0;
+                            this.isover = false;
                         }
                         else {
-                            if (this.beloop) {
-                                this.curTime = 0;
-                                this.numcount = 0;
-                                this.isover = false;
-                            }
-                            else {
-                                this.isover = true;
-                            }
+                            this.isover = true;
                         }
                     }
                 }

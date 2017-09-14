@@ -3409,6 +3409,7 @@ declare namespace gd3d.framework {
         effectSys: effectSystem;
         constructor(sys: effectSystem);
         addEmission(_emissionNew: EffectElementData): void;
+        updateForEmission(delta: number): void;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
@@ -3444,6 +3445,8 @@ declare namespace gd3d.framework {
         private matToWorld;
         getmatrixToWorld(): gd3d.math.matrix;
         update(delta: number): void;
+        private testtime;
+        updateForEmission(delta: number): void;
         updateBatcher(delta: number): void;
         updateEmission(delta: number): void;
         addParticle(count?: number): void;
