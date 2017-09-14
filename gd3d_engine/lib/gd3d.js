@@ -9316,7 +9316,19 @@ var gd3d;
                 this.beExecuteNextFrame = true;
             }
             effectSystem_1 = effectSystem;
+            Object.defineProperty(effectSystem.prototype, "jsonData", {
+                get: function () {
+                    return this._textasset;
+                },
+                set: function (text) {
+                    this._textasset = text;
+                    this.setJsonDataStr(this.jsonData.content);
+                },
+                enumerable: true,
+                configurable: true
+            });
             effectSystem.prototype.setJsonData = function (_jsonData) {
+                this._textasset = _jsonData;
                 this.setJsonDataStr(this.jsonData.content);
             };
             effectSystem.prototype.setJsonDataStr = function (_jsonStr) {
@@ -9357,7 +9369,6 @@ var gd3d;
                 configurable: true
             });
             effectSystem.prototype.start = function () {
-                this.setJsonData(this._textasset);
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
@@ -9805,8 +9816,9 @@ var gd3d;
             ], effectSystem.prototype, "beLoop", void 0);
             __decorate([
                 gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
-            ], effectSystem.prototype, "jsonData", void 0);
+                __metadata("design:type", framework.textasset),
+                __metadata("design:paramtypes", [framework.textasset])
+            ], effectSystem.prototype, "jsonData", null);
             effectSystem = effectSystem_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
@@ -16402,7 +16414,7 @@ var gd3d;
         var Emission = (function () {
             function Emission() {
                 this.simulateInLocalSpace = true;
-                this.renderModel = framework.RenderModel.None;
+                this.renderModel = framework.RenderModel.Mesh;
                 this.particleStartData = new gd3d.framework.ParticleStartData();
             }
             Emission.prototype.getVboData = function (vf) {

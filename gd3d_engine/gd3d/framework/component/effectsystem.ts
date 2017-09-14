@@ -100,7 +100,8 @@ namespace gd3d.framework
         set jsonData(text: textasset)
         {
             this._textasset = text;
-            this.setJsonData(this._textasset);
+            //this.setJsonData(this._textasset);
+            this.setJsonDataStr(this.jsonData.content);
         }
         get jsonData()
         {
@@ -115,7 +116,7 @@ namespace gd3d.framework
          */
         setJsonData(_jsonData: textasset)
         {
-            // this.jsonData = _jsonData;
+            this._textasset = _jsonData;
             this.setJsonDataStr(this.jsonData.content);
         }
 

@@ -118,13 +118,13 @@ namespace gd3d.framework
         mat: EffectMatData;
 
         /**
-         * 生命周期
+         * 生命周期x
          * 
          * @type {ValueData}
          * @memberof EmissionNew
          */
         life: ValueData;
-        renderModel: RenderModel = RenderModel.None;
+        renderModel: RenderModel = RenderModel.Mesh;
         mesh: mesh;
 
         particleStartData: gd3d.framework.ParticleStartData = new gd3d.framework.ParticleStartData();
