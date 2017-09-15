@@ -24,7 +24,11 @@ namespace gd3d.framework
                     var _format: string = _texturedesc["format"];
                     var _mipmap: boolean = _texturedesc["mipmap"];
                     var _wrap: string = _texturedesc["wrap"];
+                    var _premultiplyAlpha:boolean = _texturedesc["premultiplyAlpha"];
 
+                    if(_premultiplyAlpha == undefined){
+                        _premultiplyAlpha = true;
+                    }
                     var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
                     if (_format == "RGB")
                         _textureFormat = render.TextureFormatEnum.RGB;
@@ -72,11 +76,15 @@ namespace gd3d.framework
                                 _texture.realName = _name;
 
                                 var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                                t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
+                                t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
                                 _texture.glTexture = t2d;
 
                                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
 
+                                if(url == "res/scenes/test_Terrain/resources/lvyexianzong.imgdesc.json"){
+                                    document["he"] = t2d;
+                                    t2d.getReader();
+                                }
                             },
                             (loadedLength, totalLength) =>
                             {
@@ -103,7 +111,11 @@ namespace gd3d.framework
             var _format: string = _texturedesc["format"];
             var _mipmap: boolean = _texturedesc["mipmap"];
             var _wrap: string = _texturedesc["wrap"];
-
+            var _premultiplyAlpha:boolean = _texturedesc["premultiplyAlpha"];
+            
+            if(_premultiplyAlpha == undefined){
+                _premultiplyAlpha = true;
+            }
             var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
             if (_format == "RGB")
             {
@@ -161,7 +173,7 @@ namespace gd3d.framework
                         _texture.realName = _name;
 
                         var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                        t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
+                        t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
                         _texture.glTexture = t2d;
 
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);

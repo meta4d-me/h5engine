@@ -445,6 +445,14 @@
             "length": 0
         },
         {
+            "name": "resources/base/terrainlightmap.fs.glsl",
+            "length": 0
+        },
+		{
+            "name": "resources/base/fog_terrainlightmap.fs.glsl",
+            "length": 0
+        },
+		{
             "name": "resources/base/terrain.fs.glsl",
             "length": 0
         },
