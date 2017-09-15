@@ -21,6 +21,20 @@
                 "vs": "fog_terrain",
                 "fs": "fog_terrain"
             }
+        ],
+		"lightmap": [
+            {
+                "showface": "ccw",
+                "vs": "terrain",
+                "fs": "terrainlightmap"
+            }
+        ],
+        "lightmap_fog": [
+            {
+                "showface": "ccw",
+                "vs": "fog_terrain",
+                "fs": "fog_terrainlightmap"
+            }
         ]
     }
 }

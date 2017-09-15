@@ -4,19 +4,17 @@ uniform lowp sampler2D _Splat2;
 uniform lowp sampler2D _Splat3;
 uniform lowp sampler2D _Control;
 uniform lowp sampler2D _LightmapTex;
-uniform lowp float _AlphaCut;
-uniform lowp vec4 glstate_fog_color;  
 
-varying lowp float factor;  
-varying mediump vec2 xlv_TEXCOORD0;
-varying mediump vec2 xlv_TEXCOORD1;
-varying mediump vec2 uv_Splat0;
-varying mediump vec2 uv_Splat1;
-varying mediump vec2 uv_Splat2;
-varying mediump vec2 uv_Splat3;
+uniform lowp float _AlphaCut;
+varying lowp vec2 xlv_TEXCOORD0;
+varying lowp vec2 xlv_TEXCOORD1;
+varying lowp vec2 uv_Splat0;
+varying lowp vec2 uv_Splat1;
+varying lowp vec2 uv_Splat2;
+varying lowp vec2 uv_Splat3;
 lowp vec3 decode_hdr(lowp vec4 data)
 {
-    highp float power =pow( 2.0 ,data.a * 255.0 - 128.0);
+    lowp float power =pow( 2.0 ,data.a * 255.0 - 128.0);
     return data.rgb * power * 2.0 ;
 }
 void main() 
@@ -31,7 +29,5 @@ void main()
     lowp vec4 lightmap = texture2D(_LightmapTex, xlv_TEXCOORD1);
     outColor.xyz *= decode_hdr(lightmap);
 
-    lowp vec3 afterFog = mix(glstate_fog_color.rgb, outColor.rgb, factor);
-
-    gl_FragData[0] = vec4(afterFog,outColor.a);
+    gl_FragData[0] = outColor;
 }
