@@ -3,9 +3,7 @@ uniform lowp sampler2D _Splat1;
 uniform lowp sampler2D _Splat2;
 uniform lowp sampler2D _Splat3;
 uniform lowp sampler2D _Control;
-uniform lowp sampler2D _LightmapTex;
 
-uniform lowp float _AlphaCut;
 varying lowp vec2 xlv_TEXCOORD0;
 varying lowp vec2 xlv_TEXCOORD1;
 varying lowp vec2 uv_Splat0;
@@ -24,13 +22,7 @@ void main()
     lowp vec3 lay2 = texture2D(_Splat1,uv_Splat1).xyz;
     lowp vec3 lay3 = texture2D(_Splat2,uv_Splat2).xyz;
     lowp vec3 lay4 = texture2D(_Splat3,uv_Splat2).xyz;
-    lowp vec4 outColor = vec4(lay1*control.r + lay2*control.g + lay3*control.b + lay4*(control.a),1);
-    // outColor = vec4(lay4,0);
+    lowp vec4 outColor = vec4(lay1*control.r + lay2*control.g + lay3*control.b + lay4*(control.a),1.0);
 
-    //lowp vec4 lightmap = texture2D(_LightmapTex, xlv_TEXCOORD1);
-    //outColor.xyz *= decode_hdr(lightmap);
-
-    // outColor.xyz *= lightmap.xyz;
     gl_FragData[0] = outColor;
-    // gl_FragData[0] = vec4(lay1,0);
 }
