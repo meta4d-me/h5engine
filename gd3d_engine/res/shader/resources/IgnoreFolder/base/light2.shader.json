@@ -1,14 +1,15 @@
 {
-    "layer": "geometry",
+    "layer": "transparent",
 	"properties": [
-        "_MainTex('MainTex',Texture)='white'{}"
+        "_MainTex('MainTex',Texture)='white'{}",
+		"_NormalTex('NormalTex',Texture)='white'{}"
     ],
     "passes": {
         "base": [
             {
                 "showface": "ccw",
-                "vs": "selftimer_uvroll",
-                "fs": "selftimer_uvroll"
+                "vs": "light2",
+                "fs": "light2"
             }
         ],
         "shadowgen": [],
