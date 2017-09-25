@@ -176,6 +176,7 @@ namespace gd3d.framework
             this.container = div;
             var canvas = document.createElement("canvas");
             if(canvas == null){
+                alert("Failed to create canvas at the application.start()");
                 throw Error("Failed to create canvas at the application.start()");
             }
             canvas.className = "full";
@@ -189,6 +190,11 @@ namespace gd3d.framework
             //init webgl;
             this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
                 <WebGLRenderingContext>canvas.getContext("experimental-webgl");
+            if(this.webgl == null){
+                    alert("Failed to get webgl at the application.start()");
+                throw Error("Failed to get webgl at the application.start()");
+            }
+
             switch (type)
             {
                 case CanvasFixedType.FixedWidthType:
