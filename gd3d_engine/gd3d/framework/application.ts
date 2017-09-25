@@ -175,6 +175,9 @@ namespace gd3d.framework
             this._timeScale = 1;
             this.container = div;
             var canvas = document.createElement("canvas");
+            if(canvas == null){
+                throw Error("Failed to create canvas at the application.start()");
+            }
             canvas.className = "full";
             canvas.style.position = "absolute";
             canvas.style.width = "100%";
