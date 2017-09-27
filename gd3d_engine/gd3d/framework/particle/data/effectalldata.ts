@@ -770,9 +770,23 @@ namespace gd3d.framework
         public alphaTexture: texture;
         public alphaCut: number;
 
+        public uniforms:any[]=[];
+
         static beEqual(data0: EffectMatData, data1: EffectMatData)
         {
-            return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
+            //return data0.alphaCut === data1.alphaCut && data0.diffuseTexture === data1.diffuseTexture && data0.shader === data1.shader && data0.alphaTexture === data1.alphaTexture;
+
+            if(data0.shader.getName()!=data1.shader.getName()) return false;
+            if(data0.uniforms.length!=data1.uniforms.length) return false;
+            
+            for(var i=0;i<data0.uniforms.length;i++)
+            {
+                if(data1.uniforms[i]==undefined||data1.uniforms[i].content!=data0.uniforms[i].content)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         clone(): EffectMatData

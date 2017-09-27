@@ -207,49 +207,6 @@ namespace gd3d.framework
             }
             if (this.checkFrameId())
             {
-                // for (let i in this.effectBatchers)
-                // {
-                //     let subEffectBatcher = this.effectBatchers[i];
-                //     for (let key in subEffectBatcher.effectElements)
-                //     {
-                //         let element = subEffectBatcher.effectElements[key];
-                //         if (element.delayTime == undefined || element.delayTime <= this.playTimer)
-                //         {
-                //             //没有延时或者延时已经结束
-                //             subEffectBatcher.mesh.submesh[0].size = element.endEboIndex;
-                //         } else
-                //         {
-                //             if (subEffectBatcher.mesh.submesh[0].size > element.startEboIndex)
-                //                 subEffectBatcher.mesh.submesh[0].size = element.startEboIndex;
-                //         }
-                //         // let frameId = this.curFrameId % element.loopFrame;
-                //         let frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
-                //         if (element.active)
-                //         {
-                //             element.actionActive = false;
-
-                //             this.mergeLerpAttribData(element.curAttrData, element.timelineFrame[frameId]);
-                            
-                //             if (element.actions != undefined)
-                //             {
-                //                 element.actionActive = true;
-                //                 for (let j in element.actions)
-                //                 {
-                //                     element.actions[j].update(frameId);
-                //                 }
-                //             }
-                //         }
-                //         element.update();
-                //         if (element.isCurFrameNeedRefresh(frameId))
-                //         {
-                //             this.updateEffectBatcher(element.effectBatcher, element.curAttrData, element.data.initFrameData, element.startVboIndex);
-                //         }
-                //     }
-                // }
-                // if (this.particles != undefined)
-                // {
-                //     this.particles.update(1 / effectSystem.fps);
-                // }
                 if(this.emissionElement!=null)
                 {
                     for(var i=0;i<this.emissionElement.length;i++)
