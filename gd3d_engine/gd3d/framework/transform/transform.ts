@@ -162,13 +162,13 @@ namespace gd3d.framework
         * 构建aabb
         * @version egret-gd3d 1.0
         */
-        buildAABB(): aabb
+        buildAABB(): aabb  
         {
             var minimum = new gd3d.math.vector3();
             var maximum = new gd3d.math.vector3();
 
             var filter = this.gameObject.getComponent("meshFilter") as meshFilter;
-            if (filter != null && filter.mesh != null)
+            if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null)
             {
                 var meshdata: gd3d.render.meshData = filter.mesh.data;
                 gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
@@ -183,7 +183,7 @@ namespace gd3d.framework
             else
             {
                 var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
-                if (skinmesh != null)
+                if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
                 {
                     var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
                     gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);

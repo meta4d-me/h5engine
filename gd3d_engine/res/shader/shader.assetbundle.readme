@@ -27,3 +27,9 @@
         }
     ]
 }
+
+打包工具  ShaderPackTool.exe 
+说明： 直接运行 会将resources 目录中所有子目录的shader文件打包成 shader.assetbundle.json
+
+忽略列表：shaderIgnore.txt
+可添加相对resources 路径的目录路径 ，被记录的路径在打包时将不被包含
