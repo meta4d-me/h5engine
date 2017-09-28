@@ -1092,6 +1092,7 @@ declare class db_test_newEff implements IState {
     start(app: gd3d.framework.application): void;
     private loadEffect(laststate, state);
     private loadScene(laststate, state);
+    private loadScene1(laststate, state);
     private loadScene_nocompress(laststate, state);
     private testNewEff(laststate, state);
     private addcam(laststate, state);
@@ -1124,6 +1125,8 @@ declare class db_test_effect implements IState {
     private loadScene_nocompress(laststate, state);
     private addcam(laststate, state);
     private addbtn(laststate, state);
+    private addbtn1(laststate, state);
+    private addbtn2(laststate, state);
     tr: gd3d.framework.transform;
     tr2: gd3d.framework.transform;
     ttr: gd3d.framework.transform;

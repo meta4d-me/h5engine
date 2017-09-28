@@ -359,7 +359,7 @@ var main = (function () {
         this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
         this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
-        this.addBtn("testeff", function () { return new db_test_effect(); });
+        this.addBtn("testeff", function () { return new db_test_newEff(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -7915,7 +7915,7 @@ var db_test_newEff = (function () {
         this.scene = this.app.getScene();
         this.taskmgr.addTaskCall(this.loadShader.bind(this));
         this.taskmgr.addTaskCall(this.addcam.bind(this));
-        this.taskmgr.addTaskCall(this.testNewEff.bind(this));
+        this.taskmgr.addTaskCall(this.loadScene1.bind(this));
     };
     db_test_newEff.prototype.loadEffect = function (laststate, state) {
         var _this = this;
@@ -7958,6 +7958,25 @@ var db_test_newEff = (function () {
                         state.finish = true;
                     }
                 });
+            }
+        });
+    };
+    db_test_newEff.prototype.loadScene1 = function (laststate, state) {
+        var _this = this;
+        var name = "MainCity_512";
+        this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                var mgr = _this.app.getAssetMgr();
+                var _root = _scene.getSceneRoot();
+                _root.name = "changjing";
+                _this.scene.addChild(_root);
+                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                _root.markDirty();
+                _this.app.getScene().lightmaps = [];
+                _scene.useLightMap(_this.app.getScene());
+                _scene.useFog(_this.app.getScene());
+                state.finish = true;
             }
         });
     };
@@ -8050,10 +8069,10 @@ var db_test_effect = (function () {
         this.scene = this.app.getScene();
         this.taskmgr.addTaskCall(this.loadShader.bind(this));
         this.taskmgr.addTaskCall(this.addcam.bind(this));
-        this.taskmgr.addTaskCall(this.loadModel.bind(this));
         this.taskmgr.addTaskCall(this.loadEffect.bind(this));
-        this.taskmgr.addTaskCall(this.loadEffect2.bind(this));
         this.taskmgr.addTaskCall(this.addbtn.bind(this));
+        this.taskmgr.addTaskCall(this.addbtn1.bind(this));
+        this.taskmgr.addTaskCall(this.addbtn2.bind(this));
     };
     db_test_effect.prototype.loadEffect = function (laststate, state) {
         var _this = this;
@@ -8062,11 +8081,12 @@ var db_test_effect = (function () {
         name = "fx_boss_02";
         name = "0fx_zs_male@attack_04";
         name = "0fx_juqing_maidong";
+        name = "0fx_fs_Mu@attack_03";
+        name = "fx_0000_zs_male@attack_08";
         this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
             if (_state.isfinish) {
                 _this.tr = new gd3d.framework.transform();
                 _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                _this.effect.autoplay = false;
                 var text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
                 _this.effect.setJsonData(text);
                 _this.scene.addChild(_this.tr);
@@ -8145,7 +8165,8 @@ var db_test_effect = (function () {
         this.camera.near = 0.01;
         this.camera.far = 200;
         this.camera.fov = Math.PI * 0.3;
-        objCam.localTranslate = new gd3d.math.vector3(0, 20, 0);
+        this.camera.backgroundColor = new gd3d.math.color(0, 0, 0, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
         state.finish = true;
@@ -8156,11 +8177,38 @@ var db_test_effect = (function () {
         btn.textContent = "播放funckkk";
         btn.onclick = function () {
             _this.effect.play();
-            _this.effect2.play();
         };
         btn.style.top = "160px";
         btn.style.position = "absolute";
         this.app.container.appendChild(btn);
+        state.finish = true;
+    };
+    db_test_effect.prototype.addbtn1 = function (laststate, state) {
+        var _this = this;
+        var btn = document.createElement("button");
+        btn.textContent = "停止funckkk";
+        btn.onclick = function () {
+            _this.effect.stop();
+        };
+        btn.style.top = "260px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+        state.finish = true;
+    };
+    db_test_effect.prototype.addbtn2 = function (laststate, state) {
+        var _this = this;
+        var btn = document.createElement("button");
+        btn.textContent = "clone——play";
+        btn.onclick = function () {
+            var trans = _this.effect.gameObject.transform.clone();
+            _this.scene.addChild(trans);
+            var eff = trans.gameObject.getComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+            eff.play();
+        };
+        btn.style.top = "360px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+        state.finish = true;
     };
     db_test_effect.prototype.update = function (delta) {
         this.taskmgr.move(delta);
