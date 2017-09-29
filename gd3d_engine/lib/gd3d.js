@@ -112,14 +112,19 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            application.prototype.start = function (div, type, val) {
+            application.prototype.start = function (div, type, val, webglDebug) {
                 if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
                 if (val === void 0) { val = 1200; }
+                if (webglDebug === void 0) { webglDebug = false; }
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
                 this._timeScale = 1;
                 this.container = div;
                 var canvas = document.createElement("canvas");
+                if (canvas == null) {
+                    alert("Failed to create canvas at the application.start()");
+                    throw Error("Failed to create canvas at the application.start()");
+                }
                 canvas.className = "full";
                 canvas.style.position = "absolute";
                 canvas.style.width = "100%";
@@ -127,8 +132,18 @@ var gd3d;
                 canvas.style.backgroundColor = "#1e1e1e";
                 canvas.setAttribute("tabindex", "1");
                 div.appendChild(canvas);
-                this.webgl = canvas.getContext('webgl') ||
-                    canvas.getContext("experimental-webgl");
+                var tempWebGlUtil = new framework.WebGLUtils();
+                this.webgl = tempWebGlUtil.setupWebGL(canvas);
+                console.error(" i am ---tempWebGlUtil-" + webglDebug);
+                if (this.webgl == null) {
+                    alert("Failed to get webgl at the application.start()");
+                    throw Error("Failed to get webgl at the application.start()");
+                }
+                if (webglDebug) {
+                    var tempWebGLDebugUtils = new framework.WebGLDebugUtils();
+                    this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
+                    console.error(" i am ---webglDebug-");
+                }
                 switch (type) {
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
@@ -5661,7 +5676,13 @@ var gd3d;
                     if (framework.AssetFactoryTools.catchError(err, onstate, state))
                         return;
                     var _shader = new framework.shader(filename);
-                    _shader.parse(assetMgr, JSON.parse(txt));
+                    try {
+                        _shader.parse(assetMgr, JSON.parse(txt));
+                    }
+                    catch (e) {
+                        console.error("error  filename :" + filename);
+                        throw new Error("shader on parse");
+                    }
                     assetMgr.setAssetUrl(_shader, url);
                     assetMgr.mapShader[filename] = _shader;
                     state.resstate[filename].state = 1;
@@ -5677,7 +5698,13 @@ var gd3d;
                 var txt = respack[filename];
                 state.resstate[filename].state = 1;
                 var _shader = new framework.shader(filename);
-                _shader.parse(assetMgr, JSON.parse(txt));
+                try {
+                    _shader.parse(assetMgr, JSON.parse(txt));
+                }
+                catch (e) {
+                    console.error("error  filename :" + filename);
+                    throw new Error("shader on parse");
+                }
                 assetMgr.setAssetUrl(_shader, url);
                 assetMgr.mapShader[filename] = _shader;
                 onstate(state);
@@ -5778,6 +5805,10 @@ var gd3d;
                     var _format = _texturedesc["format"];
                     var _mipmap = _texturedesc["mipmap"];
                     var _wrap = _texturedesc["wrap"];
+                    var _premultiplyAlpha = _texturedesc["premultiplyAlpha"];
+                    if (_premultiplyAlpha == undefined) {
+                        _premultiplyAlpha = true;
+                    }
                     var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                     if (_format == "RGB")
                         _textureFormat = gd3d.render.TextureFormatEnum.RGB;
@@ -5809,9 +5840,13 @@ var gd3d;
                             var _texture = asset ? asset : new framework.texture(filename);
                             _texture.realName = _name;
                             var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                            t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
+                            t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
                             _texture.glTexture = t2d;
                             framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                            if (url == "res/scenes/test_Terrain/resources/lvyexianzong.imgdesc.json") {
+                                document["he"] = t2d;
+                                t2d.getReader();
+                            }
                         }, function (loadedLength, totalLength) {
                             framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                         });
@@ -5829,6 +5864,10 @@ var gd3d;
                 var _format = _texturedesc["format"];
                 var _mipmap = _texturedesc["mipmap"];
                 var _wrap = _texturedesc["wrap"];
+                var _premultiplyAlpha = _texturedesc["premultiplyAlpha"];
+                if (_premultiplyAlpha == undefined) {
+                    _premultiplyAlpha = true;
+                }
                 var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                 if (_format == "RGB") {
                     _textureFormat = gd3d.render.TextureFormatEnum.RGB;
@@ -5866,7 +5905,7 @@ var gd3d;
                         var _texture = asset ? asset : new framework.texture(filename);
                         _texture.realName = _name;
                         var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                        t2d.uploadImage(_tex, _mipmap, _linear, true, _repeat);
+                        t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
                         _texture.glTexture = t2d;
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                     }, function (loadedLength, totalLength) {
@@ -21758,7 +21797,7 @@ var gd3d;
                 var minimum = new gd3d.math.vector3();
                 var maximum = new gd3d.math.vector3();
                 var filter = this.gameObject.getComponent("meshFilter");
-                if (filter != null && filter.mesh != null) {
+                if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
                     var meshdata = filter.mesh.data;
                     gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                     gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
@@ -21769,7 +21808,7 @@ var gd3d;
                 }
                 else {
                     var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
-                    if (skinmesh != null) {
+                    if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
                         var skinmeshdata = skinmesh.mesh.data;
                         gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                         gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
@@ -22408,115 +22447,636 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
+    var framework;
+    (function (framework) {
+        var WebGLDebugUtils = (function () {
+            function WebGLDebugUtils() {
+                this.glEnums = null;
+            }
+            WebGLDebugUtils.prototype.log = function (msg) {
+                if (window.console && window.console.log) {
+                    window.console.log(msg);
+                }
+            };
+            WebGLDebugUtils.prototype.init = function (ctx) {
+                if (this.glEnums == null) {
+                    this.glEnums = {};
+                    for (var propertyName in ctx) {
+                        if (typeof ctx[propertyName] == 'number') {
+                            this.glEnums[ctx[propertyName]] = propertyName;
+                        }
+                    }
+                }
+            };
+            WebGLDebugUtils.prototype.checkInit = function () {
+                if (this.glEnums == null) {
+                    throw 'WebGLDebugUtils.init(ctx) not called';
+                }
+            };
+            WebGLDebugUtils.prototype.mightBeEnum = function (value) {
+                this.checkInit();
+                return (this.glEnums[value] !== undefined);
+            };
+            WebGLDebugUtils.prototype.glEnumToString = function (value) {
+                this.checkInit();
+                var name = this.glEnums[value];
+                return (name !== undefined) ? name :
+                    ("*UNKNOWN WebGL ENUM (0x" + value.toString(16) + ")");
+            };
+            WebGLDebugUtils.prototype.glFunctionArgToString = function (functionName, argumentIndex, value) {
+                var funcInfo = WebGLDebugUtils.glValidEnumContexts[functionName];
+                if (funcInfo !== undefined) {
+                    if (funcInfo[argumentIndex]) {
+                        return this.glEnumToString(value);
+                    }
+                }
+                return value.toString();
+            };
+            WebGLDebugUtils.prototype.makeDebugContext = function (ctx, opt_onErrorFunc) {
+                if (opt_onErrorFunc === void 0) { opt_onErrorFunc = null; }
+                this.init(ctx);
+                opt_onErrorFunc = opt_onErrorFunc || function (err, functionName, args) {
+                    var argStr = "";
+                    for (var ii = 0; ii < args.length; ++ii) {
+                        argStr += ((ii == 0) ? '' : ', ') +
+                            this.glFunctionArgToString(functionName, ii, args[ii]);
+                    }
+                    this.log("WebGL error " + this.glEnumToString(err) + " in " + functionName +
+                        "(" + argStr + ")");
+                };
+                var glErrorShadow = {};
+                function makeErrorWrapper(ctx, functionName) {
+                    return function () {
+                        var result = ctx[functionName].apply(ctx, arguments);
+                        var err = ctx.getError();
+                        if (err != 0) {
+                            glErrorShadow[err] = true;
+                            opt_onErrorFunc(err, functionName, arguments);
+                        }
+                        return result;
+                    };
+                }
+                var wrapper = {};
+                for (var propertyName in ctx) {
+                    if (typeof ctx[propertyName] == 'function') {
+                        wrapper[propertyName] = makeErrorWrapper(ctx, propertyName);
+                    }
+                    else {
+                        wrapper[propertyName] = ctx[propertyName];
+                    }
+                }
+                wrapper["getError"] = function () {
+                    for (var err in glErrorShadow) {
+                        if (glErrorShadow[err]) {
+                            glErrorShadow[err] = false;
+                            return err;
+                        }
+                    }
+                    return ctx.NO_ERROR;
+                };
+                console.error(" i am ---makeDebugContext-");
+                return wrapper;
+            };
+            WebGLDebugUtils.prototype.resetToInitialState = function (ctx) {
+                var numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS);
+                var tmp = ctx.createBuffer();
+                ctx.bindBuffer(ctx.ARRAY_BUFFER, tmp);
+                for (var ii = 0; ii < numAttribs; ++ii) {
+                    ctx.disableVertexAttribArray(ii);
+                    ctx.vertexAttribPointer(ii, 4, ctx.FLOAT, false, 0, 0);
+                    ctx.vertexAttrib1f(ii, 0);
+                }
+                ctx.deleteBuffer(tmp);
+                var numTextureUnits = ctx.getParameter(ctx.MAX_TEXTURE_IMAGE_UNITS);
+                for (var ii = 0; ii < numTextureUnits; ++ii) {
+                    ctx.activeTexture(ctx.TEXTURE0 + ii);
+                    ctx.bindTexture(ctx.TEXTURE_CUBE_MAP, null);
+                    ctx.bindTexture(ctx.TEXTURE_2D, null);
+                }
+                ctx.activeTexture(ctx.TEXTURE0);
+                ctx.useProgram(null);
+                ctx.bindBuffer(ctx.ARRAY_BUFFER, null);
+                ctx.bindBuffer(ctx.ELEMENT_ARRAY_BUFFER, null);
+                ctx.bindFramebuffer(ctx.FRAMEBUFFER, null);
+                ctx.bindRenderbuffer(ctx.RENDERBUFFER, null);
+                ctx.disable(ctx.BLEND);
+                ctx.disable(ctx.CULL_FACE);
+                ctx.disable(ctx.DEPTH_TEST);
+                ctx.disable(ctx.DITHER);
+                ctx.disable(ctx.SCISSOR_TEST);
+                ctx.blendColor(0, 0, 0, 0);
+                ctx.blendEquation(ctx.FUNC_ADD);
+                ctx.blendFunc(ctx.ONE, ctx.ZERO);
+                ctx.clearColor(0, 0, 0, 0);
+                ctx.clearDepth(1);
+                ctx.clearStencil(-1);
+                ctx.colorMask(true, true, true, true);
+                ctx.cullFace(ctx.BACK);
+                ctx.depthFunc(ctx.LESS);
+                ctx.depthMask(true);
+                ctx.depthRange(0, 1);
+                ctx.frontFace(ctx.CCW);
+                ctx.hint(ctx.GENERATE_MIPMAP_HINT, ctx.DONT_CARE);
+                ctx.lineWidth(1);
+                ctx.pixelStorei(ctx.PACK_ALIGNMENT, 4);
+                ctx.pixelStorei(ctx.UNPACK_ALIGNMENT, 4);
+                ctx.pixelStorei(ctx.UNPACK_FLIP_Y_WEBGL, false);
+                ctx.pixelStorei(ctx.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+                if (ctx.UNPACK_COLORSPACE_CONVERSION_WEBGL) {
+                    ctx.pixelStorei(ctx.UNPACK_COLORSPACE_CONVERSION_WEBGL, ctx.BROWSER_DEFAULT_WEBGL);
+                }
+                ctx.polygonOffset(0, 0);
+                ctx.sampleCoverage(1, false);
+                ctx.scissor(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.stencilFunc(ctx.ALWAYS, 0, 0xFFFFFFFF);
+                ctx.stencilMask(0xFFFFFFFF);
+                ctx.stencilOp(ctx.KEEP, ctx.KEEP, ctx.KEEP);
+                ctx.viewport(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
+                ctx.clear(ctx.COLOR_BUFFER_BIT | ctx.DEPTH_BUFFER_BIT | ctx.STENCIL_BUFFER_BIT);
+                while (ctx.getError())
+                    ;
+            };
+            WebGLDebugUtils.prototype.makeLostContextSimulatingContext = function (ctx) {
+                var wrapper_ = {};
+                var contextId_ = 1;
+                var contextLost_ = false;
+                var resourceId_ = 0;
+                var resourceDb_ = [];
+                var onLost_ = undefined;
+                var onRestored_ = undefined;
+                var nextOnRestored_ = undefined;
+                var glErrorShadow_ = {};
+                function isWebGLObject(obj) {
+                    return (obj instanceof WebGLBuffer ||
+                        obj instanceof WebGLFramebuffer ||
+                        obj instanceof WebGLProgram ||
+                        obj instanceof WebGLRenderbuffer ||
+                        obj instanceof WebGLShader ||
+                        obj instanceof WebGLTexture);
+                }
+                function checkResources(args) {
+                    for (var ii = 0; ii < args.length; ++ii) {
+                        var arg = args[ii];
+                        if (isWebGLObject(arg)) {
+                            return arg.__webglDebugContextLostId__ == contextId_;
+                        }
+                    }
+                    return true;
+                }
+                function clearErrors() {
+                    var k = Object.keys(glErrorShadow_);
+                    for (var ii = 0; ii < k.length; ++ii) {
+                        delete glErrorShadow_[k[ii]];
+                    }
+                }
+                function makeLostContextWrapper(ctx, functionName) {
+                    var f = ctx[functionName];
+                    return function () {
+                        if (!contextLost_) {
+                            if (!checkResources(arguments)) {
+                                glErrorShadow_[ctx.INVALID_OPERATION] = true;
+                                return;
+                            }
+                            var result = f.apply(ctx, arguments);
+                            return result;
+                        }
+                    };
+                }
+                for (var propertyName in ctx) {
+                    if (typeof ctx[propertyName] == 'function') {
+                        wrapper_[propertyName] = makeLostContextWrapper(ctx, propertyName);
+                    }
+                    else {
+                        wrapper_[propertyName] = ctx[propertyName];
+                    }
+                }
+                function makeWebGLContextEvent(statusMessage) {
+                    return { statusMessage: statusMessage };
+                }
+                function freeResources() {
+                    for (var ii = 0; ii < resourceDb_.length; ++ii) {
+                        var resource = resourceDb_[ii];
+                        if (resource instanceof WebGLBuffer) {
+                            ctx.deleteBuffer(resource);
+                        }
+                    }
+                }
+                wrapper_["loseContext"] = function () {
+                    if (!contextLost_) {
+                        contextLost_ = true;
+                        ++contextId_;
+                        while (ctx.getError())
+                            ;
+                        clearErrors();
+                        glErrorShadow_[ctx.CONTEXT_LOST_WEBGL] = true;
+                        setTimeout(function () {
+                            if (onLost_) {
+                                onLost_(makeWebGLContextEvent("context lost"));
+                            }
+                        }, 0);
+                    }
+                };
+                wrapper_["restoreContext"] = function () {
+                    if (contextLost_) {
+                        if (onRestored_) {
+                            setTimeout(function () {
+                                freeResources();
+                                this.resetToInitialState(ctx);
+                                contextLost_ = false;
+                                if (onRestored_) {
+                                    var callback = onRestored_;
+                                    onRestored_ = nextOnRestored_;
+                                    nextOnRestored_ = undefined;
+                                    callback(makeWebGLContextEvent("context restored"));
+                                }
+                            }, 0);
+                        }
+                        else {
+                            throw "You can not restore the context without a listener";
+                        }
+                    }
+                };
+                wrapper_["getError"] = function () {
+                    if (!contextLost_) {
+                        var err;
+                        while (err = ctx.getError()) {
+                            glErrorShadow_[err] = true;
+                        }
+                    }
+                    for (var key in glErrorShadow_) {
+                        if (glErrorShadow_[key]) {
+                            delete glErrorShadow_[key];
+                            return key;
+                        }
+                    }
+                    return ctx.NO_ERROR;
+                };
+                var creationFunctions = [
+                    "createBuffer",
+                    "createFramebuffer",
+                    "createProgram",
+                    "createRenderbuffer",
+                    "createShader",
+                    "createTexture"
+                ];
+                for (var ii = 0; ii < creationFunctions.length; ++ii) {
+                    var functionName = creationFunctions[ii];
+                    wrapper_[functionName] = function (f) {
+                        return function () {
+                            if (contextLost_) {
+                                return null;
+                            }
+                            var obj = f.apply(ctx, arguments);
+                            obj.__webglDebugContextLostId__ = contextId_;
+                            resourceDb_.push(obj);
+                            return obj;
+                        };
+                    }(ctx[functionName]);
+                }
+                var functionsThatShouldReturnNull = [
+                    "getActiveAttrib",
+                    "getActiveUniform",
+                    "getBufferParameter",
+                    "getContextAttributes",
+                    "getAttachedShaders",
+                    "getFramebufferAttachmentParameter",
+                    "getParameter",
+                    "getProgramParameter",
+                    "getProgramInfoLog",
+                    "getRenderbufferParameter",
+                    "getShaderParameter",
+                    "getShaderInfoLog",
+                    "getShaderSource",
+                    "getTexParameter",
+                    "getUniform",
+                    "getUniformLocation",
+                    "getVertexAttrib"
+                ];
+                for (var ii = 0; ii < functionsThatShouldReturnNull.length; ++ii) {
+                    var functionName = functionsThatShouldReturnNull[ii];
+                    wrapper_[functionName] = function (f) {
+                        return function () {
+                            if (contextLost_) {
+                                return null;
+                            }
+                            return f.apply(ctx, arguments);
+                        };
+                    }(wrapper_[functionName]);
+                }
+                var isFunctions = [
+                    "isBuffer",
+                    "isEnabled",
+                    "isFramebuffer",
+                    "isProgram",
+                    "isRenderbuffer",
+                    "isShader",
+                    "isTexture"
+                ];
+                for (var ii = 0; ii < isFunctions.length; ++ii) {
+                    var functionName = isFunctions[ii];
+                    wrapper_[functionName] = function (f) {
+                        return function () {
+                            if (contextLost_) {
+                                return false;
+                            }
+                            return f.apply(ctx, arguments);
+                        };
+                    }(wrapper_[functionName]);
+                }
+                wrapper_["checkFramebufferStatus"] = function (f) {
+                    return function () {
+                        if (contextLost_) {
+                            return ctx.FRAMEBUFFER_UNSUPPORTED;
+                        }
+                        return f.apply(ctx, arguments);
+                    };
+                }(wrapper_["checkFramebufferStatus"]);
+                wrapper_["getAttribLocation"] = function (f) {
+                    return function () {
+                        if (contextLost_) {
+                            return -1;
+                        }
+                        return f.apply(ctx, arguments);
+                    };
+                }(wrapper_["getAttribLocation"]);
+                wrapper_["getVertexAttribOffset"] = function (f) {
+                    return function () {
+                        if (contextLost_) {
+                            return 0;
+                        }
+                        return f.apply(ctx, arguments);
+                    };
+                }(wrapper_["getVertexAttribOffset"]);
+                wrapper_["isContextLost"] = function () {
+                    return contextLost_;
+                };
+                function wrapEvent(listener) {
+                    if (typeof (listener) == "function") {
+                        return listener;
+                    }
+                    else {
+                        return function (info) {
+                            listener.handleEvent(info);
+                        };
+                    }
+                }
+                wrapper_["registerOnContextLostListener"] = function (listener) {
+                    onLost_ = wrapEvent(listener);
+                };
+                wrapper_["registerOnContextRestoredListener"] = function (listener) {
+                    if (contextLost_) {
+                        nextOnRestored_ = wrapEvent(listener);
+                    }
+                    else {
+                        onRestored_ = wrapEvent(listener);
+                    }
+                };
+                return wrapper_;
+            };
+            WebGLDebugUtils.glValidEnumContexts = {
+                'enable': { 0: true },
+                'disable': { 0: true },
+                'getParameter': { 0: true },
+                'drawArrays': { 0: true },
+                'drawElements': { 0: true, 2: true },
+                'createShader': { 0: true },
+                'getShaderParameter': { 1: true },
+                'getProgramParameter': { 1: true },
+                'getVertexAttrib': { 1: true },
+                'vertexAttribPointer': { 2: true },
+                'bindTexture': { 0: true },
+                'activeTexture': { 0: true },
+                'getTexParameter': { 0: true, 1: true },
+                'texParameterf': { 0: true, 1: true },
+                'texParameteri': { 0: true, 1: true, 2: true },
+                'texImage2D': { 0: true, 2: true, 6: true, 7: true },
+                'texSubImage2D': { 0: true, 6: true, 7: true },
+                'copyTexImage2D': { 0: true, 2: true },
+                'copyTexSubImage2D': { 0: true },
+                'generateMipmap': { 0: true },
+                'bindBuffer': { 0: true },
+                'bufferData': { 0: true, 2: true },
+                'bufferSubData': { 0: true },
+                'getBufferParameter': { 0: true, 1: true },
+                'pixelStorei': { 0: true, 1: true },
+                'readPixels': { 4: true, 5: true },
+                'bindRenderbuffer': { 0: true },
+                'bindFramebuffer': { 0: true },
+                'checkFramebufferStatus': { 0: true },
+                'framebufferRenderbuffer': { 0: true, 1: true, 2: true },
+                'framebufferTexture2D': { 0: true, 1: true, 2: true },
+                'getFramebufferAttachmentParameter': { 0: true, 1: true, 2: true },
+                'getRenderbufferParameter': { 0: true, 1: true },
+                'renderbufferStorage': { 0: true, 1: true },
+                'clear': { 0: true },
+                'depthFunc': { 0: true },
+                'blendFunc': { 0: true, 1: true },
+                'blendFuncSeparate': { 0: true, 1: true, 2: true, 3: true },
+                'blendEquation': { 0: true },
+                'blendEquationSeparate': { 0: true, 1: true },
+                'stencilFunc': { 0: true },
+                'stencilFuncSeparate': { 0: true, 1: true },
+                'stencilMaskSeparate': { 0: true },
+                'stencilOp': { 0: true, 1: true, 2: true },
+                'stencilOpSeparate': { 0: true, 1: true, 2: true, 3: true },
+                'cullFace': { 0: true },
+                'frontFace': { 0: true },
+            };
+            return WebGLDebugUtils;
+        }());
+        framework.WebGLDebugUtils = WebGLDebugUtils;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var WebGLUtils = (function () {
+            function WebGLUtils() {
+                this.makeFailHTML = function (msg) {
+                    return '' +
+                        '<div style="margin: auto; width:500px;z-index:10000;margin-top:20em;text-align:center;">' + msg + '</div>';
+                };
+                this.GET_A_WEBGL_BROWSER = '' +
+                    'This page requires a browser that supports WebGL.<br/>' +
+                    '<a href="http://get.webgl.org">Click here to upgrade your browser.</a>';
+                this.OTHER_PROBLEM = '' +
+                    "It doesn't appear your computer can support WebGL.<br/>" +
+                    '<a href="http://get.webgl.org">Click here for more information.</a>';
+                if (!window.requestAnimationFrame) {
+                    var tempwin = window;
+                    window.requestAnimationFrame =
+                        tempwin.requestAnimationFrame ||
+                            tempwin.webkitRequestAnimationFrame ||
+                            tempwin.mozRequestAnimationFrame ||
+                            tempwin.oRequestAnimationFrame ||
+                            tempwin.msRequestAnimationFrame ||
+                            function (callback, element) {
+                                window.setTimeout(callback, 1000 / 60);
+                            };
+                }
+                if (!window.cancelAnimationFrame) {
+                    var tempwin = window;
+                    window.cancelAnimationFrame = (tempwin.cancelRequestAnimationFrame ||
+                        window.webkitCancelAnimationFrame || tempwin.webkitCancelRequestAnimationFrame ||
+                        tempwin.mozCancelAnimationFrame || tempwin.mozCancelRequestAnimationFrame ||
+                        tempwin.msCancelAnimationFrame || tempwin.msCancelRequestAnimationFrame ||
+                        tempwin.oCancelAnimationFrame || tempwin.oCancelRequestAnimationFrame ||
+                        window.clearTimeout);
+                }
+            }
+            WebGLUtils.prototype.setupWebGL = function (canvas, opt_attribs, opt_onError) {
+                if (opt_attribs === void 0) { opt_attribs = null; }
+                if (opt_onError === void 0) { opt_onError = null; }
+                function handleCreationError(msg) {
+                    var container = document.getElementsByTagName("body")[0];
+                    if (container) {
+                        var str = WebGLRenderingContext ?
+                            this.OTHER_PROBLEM :
+                            this.GET_A_WEBGL_BROWSER;
+                        if (msg) {
+                            str += "<br/><br/>Status: " + msg;
+                        }
+                        container.innerHTML = this.makeFailHTML(str);
+                    }
+                }
+                ;
+                opt_onError = opt_onError || handleCreationError;
+                if (canvas.addEventListener) {
+                    canvas.addEventListener("webglcontextcreationerror", function (event) {
+                        opt_onError(event.statusMessage);
+                    }, false);
+                }
+                var context = this.create3DContext(canvas, opt_attribs);
+                if (!context) {
+                    if (!WebGLRenderingContext) {
+                        opt_onError("");
+                    }
+                    else {
+                        opt_onError("");
+                    }
+                }
+                return context;
+            };
+            WebGLUtils.prototype.create3DContext = function (canvas, opt_attribs) {
+                var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
+                var context = null;
+                for (var ii = 0; ii < names.length; ++ii) {
+                    try {
+                        context = canvas.getContext(names[ii], opt_attribs);
+                    }
+                    catch (e) { }
+                    if (context) {
+                        break;
+                    }
+                }
+                return context;
+            };
+            return WebGLUtils;
+        }());
+        framework.WebGLUtils = WebGLUtils;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var io;
     (function (io) {
-        function loadText(url, fun, onprocess) {
+        var loadRetryMgr = (function () {
+            function loadRetryMgr() {
+            }
+            return loadRetryMgr;
+        }());
+        function xhrLoad(url, fun, onprocess, responseType, loadedFun) {
             if (onprocess === void 0) { onprocess = null; }
             var req = new XMLHttpRequest();
+            var isLoaded = false;
             req.open("GET", url);
-            req.responseType = "text";
+            req.responseType = responseType;
             req.onreadystatechange = function () {
                 if (req.readyState == 4) {
-                    if (req.status == 404) {
-                        fun(null, new Error("got a 404:" + url));
-                        return;
+                    if (req.status == 200) {
+                        loadedFun(req);
+                        isLoaded = true;
                     }
-                    fun(req.responseText, null);
+                    else {
+                        switch (req.status) {
+                            case 404:
+                                fun(null, new Error("got a 404:" + url));
+                                break;
+                        }
+                    }
                 }
             };
             req.onprogress = function (ev) {
-                if (onprocess) {
+                if (onprocess)
                     onprocess(ev.loaded, ev.total);
-                }
             };
             req.onerror = function () {
                 fun(null, new Error("onerr in req:"));
             };
-            req.send();
+            req.onloadend = function () {
+                if (!isLoaded) {
+                    if (!loadRetryMgr.urlCaseDic)
+                        loadRetryMgr.urlCaseDic = {};
+                    var dic = loadRetryMgr.urlCaseDic;
+                    dic[url] = isNaN(dic[url]) || dic[url] < 0 ? 0 : dic[url];
+                    if (dic[url] >= 2) {
+                        dic[url] = 0;
+                        fun(null, new Error("load this url fail  ：" + url), true);
+                    }
+                    else {
+                        xhrLoad(url, fun, onprocess, responseType, loadedFun);
+                        dic[url]++;
+                    }
+                }
+            };
+            try {
+                req.send();
+            }
+            catch (err) {
+                fun(null, err);
+            }
+        }
+        function loadText(url, fun, onprocess) {
+            if (onprocess === void 0) { onprocess = null; }
+            xhrLoad(url, fun, onprocess, "text", function (req) {
+                fun(req.responseText, null);
+            });
         }
         io.loadText = loadText;
         function loadArrayBuffer(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            var req = new XMLHttpRequest();
-            req.open("GET", url);
-            req.responseType = "arraybuffer";
-            req.onreadystatechange = function () {
-                if (req.readyState == 4) {
-                    if (req.status == 404) {
-                        fun(null, new Error("got a 404:" + url));
-                        return;
-                    }
-                    fun(req.response, null);
-                }
-            };
-            req.onprogress = function (ev) {
-                if (onprocess) {
-                    onprocess(ev.loaded, ev.total);
-                }
-            };
-            req.onerror = function () {
-                fun(null, new Error("onerr in req:"));
-            };
-            req.send();
+            xhrLoad(url, fun, onprocess, "arraybuffer", function (req) {
+                fun(req.response, null);
+            });
         }
         io.loadArrayBuffer = loadArrayBuffer;
         function loadBlob(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            var req = new XMLHttpRequest();
-            req.open("GET", url);
-            req.responseType = "blob";
-            req.onreadystatechange = function () {
-                if (req.readyState == 4) {
-                    if (req.status == 404) {
-                        fun(null, new Error("got a 404:" + url));
-                        return;
-                    }
-                    fun(req.response, null);
-                }
-            };
-            req.onprogress = function (ev) {
-                if (onprocess) {
-                    onprocess(ev.loaded, ev.total);
-                }
-            };
-            req.onerror = function () {
-                fun(null, new Error("onerr in req:"));
-            };
-            req.send();
+            xhrLoad(url, fun, onprocess, "blob", function (req) {
+                fun(req.response, null);
+            });
         }
         io.loadBlob = loadBlob;
         function loadImg(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            var req = new XMLHttpRequest();
-            req.open("GET", url);
-            req.responseType = "blob";
-            req.onreadystatechange = function () {
-                if (req.readyState == 4) {
-                    if (req.status == 404) {
-                        fun(null, new Error("got a 404:" + url));
-                        return;
-                    }
-                    var blob = req.response;
-                    var img = document.createElement("img");
-                    img.onload = function (e) {
-                        window.URL.revokeObjectURL(img.src);
-                        fun(img, null);
-                    };
-                    img.onerror = function (e) {
-                        fun(null, new Error("error when blob to img:" + url));
-                    };
+            xhrLoad(url, fun, onprocess, "blob", function (req) {
+                var blob = req.response;
+                var img = document.createElement("img");
+                img.onload = function (e) {
+                    window.URL.revokeObjectURL(img.src);
+                    fun(img, null);
+                };
+                img.onerror = function (e) {
+                    fun(null, new Error("error when blob to img:" + url));
+                };
+                try {
                     img.src = window.URL.createObjectURL(blob);
                 }
-            };
-            req.onprogress = function (ev) {
-                if (onprocess) {
-                    onprocess(ev.loaded, ev.total);
+                catch (e) {
+                    fun(null, e);
                 }
-            };
-            req.onerror = function () {
-                fun(null, new Error("onerr in req:"));
-            };
-            req.send();
+            });
         }
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));
