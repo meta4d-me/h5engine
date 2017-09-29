@@ -156,7 +156,7 @@ namespace gd3d.framework
          * @param div 绘制区域的dom
          * @version egret-gd3d 1.0
          */
-        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.FixedHeightType, val: number = 1200)
+        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.FixedHeightType, val: number = 1200 ,webglDebug = false)
         {
             console.log("version: " + this.version + "  build: " + this.build);
             // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
@@ -176,6 +176,7 @@ namespace gd3d.framework
             this.container = div;
             var canvas = document.createElement("canvas");
             if(canvas == null){
+                alert("Failed to create canvas at the application.start()");
                 throw Error("Failed to create canvas at the application.start()");
             }
             canvas.className = "full";
@@ -187,8 +188,25 @@ namespace gd3d.framework
             div.appendChild(canvas);
 
             //init webgl;
-            this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
-                <WebGLRenderingContext>canvas.getContext("experimental-webgl");
+
+            // this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
+            //     <WebGLRenderingContext>canvas.getContext("experimental-webgl");
+
+            let tempWebGlUtil = new WebGLUtils();
+            this.webgl = tempWebGlUtil.setupWebGL(canvas);
+            console.error(" i am ---tempWebGlUtil-" + webglDebug);
+            if(this.webgl == null){
+                    alert("Failed to get webgl at the application.start()");
+                throw Error("Failed to get webgl at the application.start()");
+            }
+
+            //debug 
+            if (webglDebug) {
+                let tempWebGLDebugUtils = new WebGLDebugUtils();
+                this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
+                console.error(" i am ---webglDebug-");
+              }
+
             switch (type)
             {
                 case CanvasFixedType.FixedWidthType:
