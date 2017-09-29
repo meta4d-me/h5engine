@@ -1638,74 +1638,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class effectSystemNew implements IRenderer {
-        gameObject: gameObject;
-        layer: RenderLayerEnum;
-        renderLayer: CullingMask;
-        queue: number;
-        autoplay: boolean;
-        beLoop: boolean;
-        state: EffectPlayStateEnum;
-        private curFrameId;
-        static fps: number;
-        private playTimer;
-        private speed;
-        webgl: WebGLRenderingContext;
-        private parser;
-        vf: number;
-        private effectBatchers;
-        private matDataGroups;
-        private particles;
-        private particleElementDic;
-        jsonData: textasset;
-        setJsonData(_jsonData: textasset): void;
-        data: EffectSystemData;
-        init(): void;
-        private _data;
-        readonly totalFrameCount: number;
-        start(): void;
-        update(delta: number): void;
-        private _update(delta);
-        private mergeLerpAttribData(realUseCurFrameData, effect, frameId);
-        private updateEffectBatcher(effectBatcher, curAttrsData, mesh, vertexStartIndex);
-        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
-        clone(): effectSystem;
-        play(speed?: number): void;
-        pause(): void;
-        stop(): void;
-        reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
-        private resetSingleMesh();
-        private delayElements;
-        private refElements;
-        setFrameId(id: number): void;
-        getDelayFrameCount(delayTime: number): number;
-        private beExecuteNextFrame;
-        private checkFrameId();
-        remove(): void;
-        readonly leftLifeTime: number;
-        effectElements: IEffectElement[];
-        addEffectElement(type: gd3d.framework.EffectElementTypeEnum): IEffectElement;
-        private addInitFrameNew(effect);
-    }
-    class EffectBatcherNew {
-        mesh: mesh;
-        mat: material;
-        state: EffectBatcherState;
-        dataForVbo: Float32Array;
-        dataForEbo: Uint16Array;
-        effectElements: EffectElementSingleMesh[];
-        private _totalVertexCount;
-        curTotalVertexCount: number;
-        private _indexStartIndex;
-        indexStartIndex: number;
-        private _vbosize;
-        resizeVboSize(value: number): void;
-        dispose(): void;
-        vertexSize: number;
-        constructor(formate: number);
-    }
-}
-declare namespace gd3d.framework {
     class TestEffectSystem implements IRenderer {
         gameObject: gameObject;
         layer: RenderLayerEnum;
@@ -2877,49 +2809,31 @@ declare namespace gd3d.framework {
         delayTime: number;
         life: number;
         mat: gd3d.framework.material;
-        texturePath: string;
-        shader: gd3d.framework.shader;
         mesh: gd3d.framework.mesh;
-        position: Vector3AttributeData;
-        euler: Vector3AttributeData;
-        scale: Vector3AttributeData;
-        color: Vector3AttributeData;
-        alpha: NumberAttributeData;
-        tilling: Vector2AttributeData;
-        colorRate: NumberAttributeData;
-        uv: gd3d.math.vector2;
+        colorRate: number;
         renderModel: gd3d.framework.RenderModel;
-        timelineFrames: {
-            [attributeType: number]: {
-                [frameIndex: number]: any;
-            };
-        };
-        ref: string;
+        tex_ST: math.vector4;
+        position: Vector3Key[];
+        euler: Vector3Key[];
+        scale: Vector3Key[];
+        color: Vector3Key[];
+        alpha: NumberKey[];
         actions: IEffectAction[];
         curAttrData: EffectAttrsData;
-        effectBatcher: EffectBatcherNew;
-        startVboIndex: number;
-        startEboIndex: number;
-        endEboIndex: number;
-        actionActive: boolean;
         loopFrame: number;
         active: boolean;
         transform: transform;
         private mgr;
-        private effectIns;
+        private effectSys;
         rotationByEuler: math.quaternion;
         localRotation: math.quaternion;
-        constructor(assetMgr: gd3d.framework.assetMgr, effectIns: effectSystemNew);
-        initData(): void;
-        getFrameVal(attributeType: AttributeType, frameIndex?: number): any;
+        constructor(sys: TestEffectSystem, data?: EffectElementData);
+        private initByElementdata(data);
+        private initByDefData();
         writeToJson(obj: any): any;
-        copyandinit(): EffectAttrsData;
         update(): void;
         private updateElementRotation();
         dispose(): void;
-        isCurFrameNeedRefresh(frameIndex: number): boolean;
-        private recordElementLerpAttributes(data);
-        private lerp(fromFrameId, toFrameId, fromFrameVal, toFrameVal, timeLine);
     }
 }
 declare namespace gd3d.framework {
@@ -2982,9 +2896,9 @@ declare namespace gd3d.framework {
         private curbatcher;
         deadParticles: Particle_new[];
         private curTime;
-        private needbeDelay;
+        private beBurst;
         private numcount;
-        private isover;
+        private beover;
         constructor(sys: TestEffectSystem, data?: EffectElementData);
         private initDefparticleData();
         private initByEmissonData(data);
@@ -2996,16 +2910,15 @@ declare namespace gd3d.framework {
         getmatrixToWorld(): gd3d.math.matrix;
         update(delta: number): void;
         private updateBatcher(delta);
-        private burstDelayTime;
-        private burstDelay;
-        private updateEmission(delta);
+        private updateLife(delta);
+        private reInit();
+        private updateEmission();
         private addParticle(count?);
         private addBatcher();
         private _renderCamera;
         readonly renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
-        isOver(): boolean;
         vbo: Float32Array;
         private ebo;
         private getMesh();
@@ -3064,6 +2977,11 @@ declare namespace gd3d.framework {
         key: number;
         value: math.vector3;
         constructor(_key: number, _value: math.vector3);
+    }
+    class Vector2Key {
+        key: number;
+        value: math.vector2;
+        constructor(_key: number, _value: math.vector2);
     }
     class effTools {
         static getRandomDirAndPosByZEmission(emission: EffectElementEmission, outDir: gd3d.math.vector3, outPos: gd3d.math.vector3): void;

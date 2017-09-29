@@ -51,7 +51,7 @@ namespace gd3d.framework
         {
             this.refreshBuffer();
             let p = new Particle_new(this);
-            p.uploadData(this.dataForVbo);
+            //p.uploadData(this.dataForVbo);
             for (let i = 0; i < p.dataForEbo.length; i++)
             {
                 this.dataForEbo[this.curIndexCount + i] = p.dataForEbo[i] + this.curVerCount;

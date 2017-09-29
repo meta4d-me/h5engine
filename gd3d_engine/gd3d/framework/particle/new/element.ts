@@ -27,202 +27,69 @@ namespace gd3d.framework
     export class EffectElementSingleMesh implements IEffectElement
     {
         public name: string;
-        @gd3d.reflect.Field("EffectElementTypeEnum")
         public elementType: gd3d.framework.EffectElementTypeEnum = gd3d.framework.EffectElementTypeEnum.SingleMeshType;//singlemesh,emission....
-
-        @gd3d.reflect.Field("boolean")
         public beloop: boolean = false;
-
-        @gd3d.reflect.Field("number")
         public delayTime: number = 0;
-
-        @gd3d.reflect.Field("number")
         public life: number = 5;
-        // @gd3d.reflect.Field("material")
-        public mat: gd3d.framework.material = new gd3d.framework.material();
+        public mat: gd3d.framework.material;
+        public mesh: gd3d.framework.mesh;
+        
+        public colorRate: number =1;//几倍颜色叠加
+        public renderModel: gd3d.framework.RenderModel = gd3d.framework.RenderModel.Mesh;
+        public tex_ST:math.vector4=new math.vector4(1,1,0,0);
 
-        @gd3d.reflect.Field("string")
-        public texturePath: string;
+        public position: Vector3Key[]=[];
+        public euler: Vector3Key[] =[];
+        public scale: Vector3Key[] =[];
+        public color: Vector3Key[] =[];
+        public alpha: NumberKey[] =[];
 
-        @gd3d.reflect.Field("shader")
-        public shader: gd3d.framework.shader;
+        public actions: IEffectAction[];//脚本驱动
 
-        @gd3d.reflect.Field("mesh")
-        public mesh: gd3d.framework.mesh = new gd3d.framework.mesh();
-
-        @gd3d.reflect.Field("Vector3AttributeData")
-        public position: Vector3AttributeData = new Vector3AttributeData();
-
-        @gd3d.reflect.Field("Vector3AttributeData")
-        public euler: Vector3AttributeData = new Vector3AttributeData();
-
-        @gd3d.reflect.Field("Vector3AttributeData")
-        public scale: Vector3AttributeData = new Vector3AttributeData();;
-
-        @gd3d.reflect.Field("Vector3AttributeData")
-        public color: Vector3AttributeData = new Vector3AttributeData();;
-
-        @gd3d.reflect.Field("NumberAttributeData")
-        public alpha: NumberAttributeData = new NumberAttributeData();
-
-        @gd3d.reflect.Field("Vector2AttributeData")
-        public tilling: Vector2AttributeData = new Vector2AttributeData();;
-
-        @gd3d.reflect.Field("NumberAttributeData")
-        public colorRate: NumberAttributeData = new NumberAttributeData();//几倍颜色叠加
-        public uv: gd3d.math.vector2 = new gd3d.math.vector2();
-
-        @gd3d.reflect.Field("RenderModel")
-        public renderModel: gd3d.framework.RenderModel = gd3d.framework.RenderModel.None;
-
-        //每个属性是一个单独的timeline
-        public timelineFrames: { [attributeType: number]: { [frameIndex: number]: any } } = {};
-
-        public ref: string;//数据整体引用
-        public actions: IEffectAction[];
         public curAttrData: EffectAttrsData;
-        public effectBatcher: EffectBatcherNew;
-        // public meshdataVbo: Float32Array;
+        //public effectBatcher: EffectBatcherNew;
 
-        //在effectbatcher中顶点的开始位置
-        public startVboIndex: number = 0;
-        //在effectbatcher中索引的开始位置，用来动态计算当前要渲染到哪个顶点，主要针对delaytime类型的特效重播时的处理
-        public startEboIndex: number = 0;
-        //在effectbatcher中索引的结束位置，用来动态计算当前要渲染到哪个顶点，主要针对delaytime类型的特效重播时的处理
-        public endEboIndex: number = 0;
-        public actionActive: boolean = false;//当前帧action状态
         public loopFrame: number = Number.MAX_VALUE;//循环帧数
         public active: boolean = true;//激活状态
         public transform: transform;
         private mgr: gd3d.framework.assetMgr;
-        private effectIns: effectSystemNew;
+        private effectSys: TestEffectSystem;
 
         public rotationByEuler: math.quaternion = new math.quaternion();
         public localRotation: math.quaternion = new math.quaternion();
 
-        constructor(assetMgr: gd3d.framework.assetMgr, effectIns: effectSystemNew)
+        constructor(sys: TestEffectSystem,data:EffectElementData=null)
         {
-            this.mgr = assetMgr;
-            this.effectIns = effectIns;
+            this.effectSys = sys;
+            if(data!=null)
+            {
+                this.initByElementdata(data);
+            }
+            else
+            {
+                this.initByDefData();
+            }
+        }
+
+        private initByElementdata(data:EffectElementData)
+        {
+            
+        }
+        private initByDefData()
+        {
             this.mesh = this.mgr.getDefaultMesh("quad");
-            this.shader = this.mgr.getShader("diffuse.shader.json");
-            this.mat.setShader(this.shader);
-            this.initData();
+            var shader = this.mgr.getShader("diffuse.shader.json");
+            this.mat.setShader(shader);
         }
-
-        public initData()
-        {
-            this.actions = [];
-            this.timelineFrames = {};
-            this.timelineFrames[AttributeType.PositionType] = {};
-            this.timelineFrames[AttributeType.EulerType] = {};
-            this.timelineFrames[AttributeType.ScaleType] = {};
-            this.timelineFrames[AttributeType.ColorType] = {};
-            this.timelineFrames[AttributeType.ColorRateType] = {};
-            this.timelineFrames[AttributeType.AlphaType] = {};
-            this.timelineFrames[AttributeType.TillingType] = {};
-            this.position.attributeType = AttributeType.PositionType;
-            this.euler.attributeType = AttributeType.EulerType;
-            this.scale.attributeType = AttributeType.ScaleType;
-            this.color.attributeType = AttributeType.ColorType;
-            this.colorRate.attributeType = AttributeType.ColorRateType;
-            this.alpha.attributeType = AttributeType.AlphaType;
-            this.tilling.attributeType = AttributeType.TillingType;
-            this.position.addFramePoint(new FrameKeyPointData(60, new gd3d.math.vector3(3, 3, 3)));
-
-            this.recordElementLerpAttributes(this.position);
-            this.recordElementLerpAttributes(this.euler);
-            this.recordElementLerpAttributes(this.scale);
-            this.recordElementLerpAttributes(this.color);
-            this.recordElementLerpAttributes(this.colorRate);
-            this.recordElementLerpAttributes(this.alpha);
-            this.recordElementLerpAttributes(this.tilling);
-        }
-
-        public getFrameVal(attributeType: AttributeType, frameIndex: number = 0)
-        {
-            let timeLine = this.timelineFrames[attributeType];
-            if (timeLine[frameIndex] != undefined)
-                return timeLine[frameIndex];
-            return null;
-        }
-
         writeToJson(obj: any): any
         {
 
         }
 
-        copyandinit(): EffectAttrsData//没有的数据初始化
-        {
-            let data = new EffectAttrsData();
-
-            let pos = this.getFrameVal(AttributeType.PositionType);
-            if (pos != null)
-                data.pos = math.pool.clone_vector3(pos);
-            else
-                data.initAttribute("pos");
-
-            let euler = this.getFrameVal(AttributeType.EulerType);
-            if (euler != null)
-                data.euler = math.pool.clone_vector3(euler);
-            else
-                data.initAttribute("euler");
-
-            let scale = this.getFrameVal(AttributeType.ScaleType);
-            if (scale != null)
-                data.scale = math.pool.clone_vector3(scale);
-            else
-                data.initAttribute("scale");
-
-            let color = this.getFrameVal(AttributeType.ColorType);
-            if (color != null)
-                data.color = math.pool.clone_vector3(color);
-            else
-                data.initAttribute("color");
-
-            let tilling = this.getFrameVal(AttributeType.TillingType);
-            if (tilling != null)
-                data.tilling = math.pool.clone_vector3(tilling);
-            else
-                data.initAttribute("tilling");
-
-            let colorRate = this.getFrameVal(AttributeType.ColorRateType);
-            if (colorRate != null)
-                data.colorRate = colorRate;
-            else
-                data.initAttribute("colorRate");
-
-            if (this.uv != undefined)
-                data.uv = math.pool.clone_vector2(this.uv);
-            else
-                data.initAttribute("uv");
-
-            // if (this.mat != undefined)
-            //     data.mat = this.mat.clone();
-
-            if (this.rotationByEuler != undefined)
-                data.rotationByEuler = math.pool.clone_quaternion(this.rotationByEuler);
-            if (this.localRotation != undefined)
-                data.localRotation = math.pool.clone_quaternion(this.localRotation);
-            // if (this.meshdataVbo != undefined)
-            //     data.meshdataVbo = this.meshdataVbo;//这个数组不会被改变，可以直接引用
-
-            data.alpha = this.getFrameVal(AttributeType.AlphaType);
-            data.renderModel = this.renderModel;
-            data.mesh = this.mesh;
-            return data;
-        }
-
         update()
         {
-            if (this.curAttrData == undefined || this.curAttrData == null)
-                return;
             if (this.active)
             {
-                // if (this.curAttrData.startEuler)
-                // {
-                //     gd3d.math.quatFromEulerAngles(this.curAttrData.startEuler.x, this.curAttrData.startEuler.y, this.curAttrData.startEuler.z, this.curAttrData.startRotation);
-                // }
                 if (this.curAttrData.euler != undefined)
                 {
                     // console.log("euler:" + this.curAttrData.euler.toString());
@@ -310,17 +177,12 @@ namespace gd3d.framework
 
                 gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.curAttrData.localRotation);
 
-                // gd3d.math.quatMultiply(invTransformRotation, worldRotation, localRotation);
-                // gd3d.math.quatMultiply(this.curAttrData.startRotation, localRotation, this.curAttrData.localRotation);
-
                 gd3d.math.pool.delete_vector3(translation);
                 gd3d.math.pool.delete_vector3(worldTranslation);
                 gd3d.math.pool.delete_quaternion(invTransformRotation);
             } else
             {
                 gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, this.curAttrData.localRotation);
-                // gd3d.math.quatMultiply(worldRotation, this.curAttrData.rotationByEuler, localRotation);
-                // gd3d.math.quatMultiply(localRotation, this.curAttrData.startRotation, this.curAttrData.localRotation);
             }
 
             gd3d.math.pool.delete_quaternion(localRotation);
@@ -330,82 +192,6 @@ namespace gd3d.framework
         dispose()
         {
 
-        }
-        /**
-         * 当前帧的数据是否有变化，有变化才需要去刷新batcher，否则直接用当前batcher中的数据去提交渲染即可。
-         * 在以下三种情况下，数据都是变化的，都需要刷新bacther：
-         * 1、timeline中有当前帧
-         * 2、renderModel不是none
-         * 3、有action在刷新
-         * @param frameIndex 
-         */
-        isCurFrameNeedRefresh(frameIndex: number): boolean
-        {
-            for (let index in this.timelineFrames)
-            {
-                if (this.timelineFrames[index][frameIndex] != undefined)
-                    return true;
-            }
-            if (this.curAttrData != undefined && this.curAttrData.renderModel != RenderModel.None)
-            {
-                return true;
-            }
-            return this.actionActive;
-        }
-        /**
-         * 一次lerp一个属性。所有要修改的属性都实现IAttributeData接口
-         * @param data 
-         */
-        private recordElementLerpAttributes(data: IAttributeData)
-        {
-            if (data.data != undefined)
-            {
-                if (data.frameIndexs.length == 1)
-                {
-
-                } else
-                {
-                    for (let i = 0; i < data.frameIndexs.length - 1; i++)
-                    {
-                        let fromFrameId = data.frameIndexs[i];
-                        let toFrameId = data.frameIndexs[i + 1];
-
-                        let fromFrameData: FrameKeyPointData = data.data[fromFrameId];
-                        let toFrameData: FrameKeyPointData = data.data[toFrameId];
-                        let timeLine: { [frameIndex: number]: any } = this.timelineFrames[data.attributeType]
-                        if (fromFrameData.actions == null)
-                        {
-                            //lerp操作
-                            this.lerp(fromFrameId, toFrameId, fromFrameData.val, toFrameData.val, timeLine);
-                        } else
-                        {
-                            //记录action
-                        }
-                    }
-                }
-            }
-        }
-
-        private lerp(fromFrameId: number, toFrameId: number, fromFrameVal: any, toFrameVal: any, timeLine: { [frameIndex: number]: any })
-        {
-            for (let i = fromFrameId; i <= toFrameId; i++)
-            {
-                let outVal;
-                if (fromFrameVal instanceof gd3d.math.vector3)
-                {
-                    outVal = new gd3d.math.vector3();
-                    gd3d.math.vec3SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
-                }
-                else if (fromFrameVal instanceof gd3d.math.vector2)
-                {
-                    outVal = new gd3d.math.vector2();
-                    gd3d.math.vec2SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
-                } else if (typeof (fromFrameVal) === 'number')
-                {
-                    outVal = gd3d.math.numberLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId));
-                }
-                timeLine[i] = outVal;
-            }
         }
     }
 }

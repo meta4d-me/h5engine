@@ -112,17 +112,15 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            application.prototype.start = function (div, type, val, webglDebug) {
+            application.prototype.start = function (div, type, val) {
                 if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
                 if (val === void 0) { val = 1200; }
-                if (webglDebug === void 0) { webglDebug = false; }
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
                 this._timeScale = 1;
                 this.container = div;
                 var canvas = document.createElement("canvas");
                 if (canvas == null) {
-                    alert("Failed to create canvas at the application.start()");
                     throw Error("Failed to create canvas at the application.start()");
                 }
                 canvas.className = "full";
@@ -132,18 +130,8 @@ var gd3d;
                 canvas.style.backgroundColor = "#1e1e1e";
                 canvas.setAttribute("tabindex", "1");
                 div.appendChild(canvas);
-                var tempWebGlUtil = new framework.WebGLUtils();
-                this.webgl = tempWebGlUtil.setupWebGL(canvas);
-                console.error(" i am ---tempWebGlUtil-" + webglDebug);
-                if (this.webgl == null) {
-                    alert("Failed to get webgl at the application.start()");
-                    throw Error("Failed to get webgl at the application.start()");
-                }
-                if (webglDebug) {
-                    var tempWebGLDebugUtils = new framework.WebGLDebugUtils();
-                    this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
-                    console.error(" i am ---webglDebug-");
-                }
+                this.webgl = canvas.getContext('webgl') ||
+                    canvas.getContext("experimental-webgl");
                 switch (type) {
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
@@ -9380,7 +9368,6 @@ var gd3d;
             effectSystem.prototype.setJsonDataStr = function (_jsonStr) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
-                this.init();
             };
             effectSystem.prototype.updateJsonData = function (_jsonData) {
                 this.jsonData = _jsonData;
@@ -9390,7 +9377,6 @@ var gd3d;
                 this.remove();
                 this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
                 console.warn("开始解析特效");
-                this.init();
             };
             Object.defineProperty(effectSystem.prototype, "data", {
                 get: function () {
@@ -9415,6 +9401,7 @@ var gd3d;
                 configurable: true
             });
             effectSystem.prototype.start = function () {
+                this.init();
             };
             effectSystem.prototype.update = function (delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
@@ -9882,483 +9869,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var effectSystemNew = (function () {
-            function effectSystemNew() {
-                this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
-                this.queue = 0;
-                this.autoplay = true;
-                this.state = framework.EffectPlayStateEnum.None;
-                this.curFrameId = -1;
-                this.playTimer = 0;
-                this.speed = 1;
-                this.parser = new gd3d.framework.EffectParser();
-                this.vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
-                this.effectBatchers = [];
-                this.matDataGroups = [];
-                this.particleElementDic = {};
-                this.delayElements = [];
-                this.refElements = [];
-                this.beExecuteNextFrame = true;
-            }
-            effectSystemNew.prototype.setJsonData = function (_jsonData) {
-                this.webgl = gd3d.framework.sceneMgr.app.webgl;
-                this.jsonData = _jsonData;
-                this.data = this.parser.Parse(this.jsonData.content, gd3d.framework.sceneMgr.app.getAssetMgr());
-            };
-            Object.defineProperty(effectSystemNew.prototype, "data", {
-                get: function () {
-                    return this._data;
-                },
-                set: function (value) {
-                    this._data = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            effectSystemNew.prototype.init = function () {
-            };
-            Object.defineProperty(effectSystemNew.prototype, "totalFrameCount", {
-                get: function () {
-                    return this.data.life * framework.effectSystem.fps;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            effectSystemNew.prototype.start = function () {
-                this.init();
-            };
-            effectSystemNew.prototype.update = function (delta) {
-                if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
-                    return;
-                if (this.state == framework.EffectPlayStateEnum.Play || this.state == framework.EffectPlayStateEnum.Pause) {
-                    if (this.state == framework.EffectPlayStateEnum.Play)
-                        this.playTimer += delta * this.speed;
-                    if (!this.beLoop) {
-                        if (this.playTimer >= this.data.life) {
-                            this.stop();
-                        }
-                    }
-                    this._update(delta);
-                }
-                else if (this.state == framework.EffectPlayStateEnum.BeReady) {
-                    if (this.autoplay) {
-                        this.play();
-                        this._update(delta);
-                    }
-                    else {
-                        this.gameObject.visible = false;
-                        this.gameObject.transform.markDirty();
-                    }
-                }
-            };
-            effectSystemNew.prototype._update = function (delta) {
-                if (this.checkFrameId()) {
-                    for (var i in this.effectBatchers) {
-                        var subEffectBatcher = this.effectBatchers[i];
-                        for (var key in subEffectBatcher.effectElements) {
-                            var element = subEffectBatcher.effectElements[key];
-                            if (element.delayTime == undefined || element.delayTime <= this.playTimer) {
-                                subEffectBatcher.mesh.submesh[0].size = element.endEboIndex;
-                            }
-                            else {
-                                if (subEffectBatcher.mesh.submesh[0].size > element.startEboIndex)
-                                    subEffectBatcher.mesh.submesh[0].size = element.startEboIndex;
-                            }
-                            var frameId = (this.curFrameId - this.getDelayFrameCount(element.delayTime)) % element.loopFrame;
-                            if (element.active) {
-                                element.actionActive = false;
-                                this.mergeLerpAttribData(element.curAttrData, element, frameId);
-                                if (element.actions != undefined) {
-                                    element.actionActive = true;
-                                    for (var j in element.actions) {
-                                        element.actions[j].update(frameId);
-                                    }
-                                }
-                            }
-                            element.update();
-                            if (element.isCurFrameNeedRefresh(frameId)) {
-                                this.updateEffectBatcher(element.effectBatcher, element.curAttrData, element.mesh, element.startVboIndex);
-                            }
-                        }
-                    }
-                }
-            };
-            effectSystemNew.prototype.mergeLerpAttribData = function (realUseCurFrameData, effect, frameId) {
-                var timeLinePos = effect.timelineFrames[framework.AttributeType.PositionType];
-                if (timeLinePos[frameId] != undefined)
-                    realUseCurFrameData.pos = timeLinePos[frameId];
-                var timeLineEuler = effect.timelineFrames[framework.AttributeType.EulerType];
-                if (timeLineEuler[frameId] != undefined)
-                    realUseCurFrameData.euler = timeLineEuler[frameId];
-                var timeLineScale = effect.timelineFrames[framework.AttributeType.ScaleType];
-                if (timeLineScale[frameId] != undefined)
-                    realUseCurFrameData.scale = timeLineScale[frameId];
-                var timeLineColor = effect.timelineFrames[framework.AttributeType.ColorType];
-                if (timeLineColor[frameId] != undefined)
-                    realUseCurFrameData.color = timeLineColor[frameId];
-                var timeLineAlpha = effect.timelineFrames[framework.AttributeType.AlphaType];
-                if (timeLineAlpha[frameId] != undefined)
-                    realUseCurFrameData.alpha = timeLineAlpha[frameId];
-                var timeLineTilling = effect.timelineFrames[framework.AttributeType.TillingType];
-                if (timeLineTilling[frameId] != undefined)
-                    realUseCurFrameData.tilling = timeLineTilling[frameId];
-            };
-            effectSystemNew.prototype.updateEffectBatcher = function (effectBatcher, curAttrsData, mesh, vertexStartIndex) {
-                if (mesh == undefined)
-                    return;
-                if (curAttrsData.meshdataVbo == undefined) {
-                    curAttrsData.meshdataVbo = mesh.data.genVertexDataArray(this.vf);
-                }
-                var vertexCount = mesh.data.pos.length;
-                var vertexArr = curAttrsData.meshdataVbo;
-                var vertexSize = effectBatcher.vertexSize;
-                for (var i = 0; i < vertexCount; i++) {
-                    {
-                        var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i * vertexSize + 0];
-                        vertex.y = vertexArr[i * vertexSize + 1];
-                        vertex.z = vertexArr[i * vertexSize + 2];
-                        gd3d.math.matrixTransformVector3(vertex, curAttrsData.matrix, vertex);
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 0] = vertex.x;
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 1] = vertex.y;
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 2] = vertex.z;
-                        gd3d.math.pool.delete_vector3(vertex);
-                    }
-                    {
-                        var r = vertexArr[i * vertexSize + 9];
-                        var g = vertexArr[i * vertexSize + 10];
-                        var b = vertexArr[i * vertexSize + 11];
-                        var a = vertexArr[i * vertexSize + 12];
-                        if (curAttrsData.color != undefined) {
-                            r = curAttrsData.color.x;
-                            g = curAttrsData.color.y;
-                            b = curAttrsData.color.z;
-                        }
-                        if (curAttrsData.alpha != undefined)
-                            a = a * curAttrsData.alpha;
-                        if (curAttrsData.colorRate != undefined) {
-                            r *= curAttrsData.colorRate;
-                            g *= curAttrsData.colorRate;
-                            b *= curAttrsData.colorRate;
-                            a *= curAttrsData.colorRate;
-                        }
-                        r = gd3d.math.floatClamp(r, 0, 3);
-                        g = gd3d.math.floatClamp(g, 0, 3);
-                        b = gd3d.math.floatClamp(b, 0, 3);
-                        a = gd3d.math.floatClamp(a, 0, 3);
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 9] = r;
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 10] = g;
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 11] = b;
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * 15 + 12] = a;
-                    }
-                    {
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 13] = vertexArr[i * vertexSize + 13] * curAttrsData.tilling.x + curAttrsData.uv.x;
-                        effectBatcher.dataForVbo[(vertexStartIndex + i) * vertexSize + 14] = vertexArr[i * vertexSize + 14] * curAttrsData.tilling.y + curAttrsData.uv.y;
-                    }
-                }
-            };
-            effectSystemNew.prototype.render = function (context, assetmgr, camera) {
-                if (!(camera.CullingMask & this.renderLayer))
-                    return;
-                if (this.state == framework.EffectPlayStateEnum.Play) {
-                    context.updateModel(this.gameObject.transform);
-                    for (var i in this.effectBatchers) {
-                        var subEffectBatcher = this.effectBatchers[i];
-                        var mesh_3 = subEffectBatcher.mesh;
-                        if (subEffectBatcher.state === framework.EffectBatcherState.NotInitedStateType) {
-                            mesh_3.glMesh.initBuffer(context.webgl, this.vf, subEffectBatcher.curTotalVertexCount);
-                            if (mesh_3.glMesh.ebos.length == 0) {
-                                mesh_3.glMesh.addIndex(context.webgl, subEffectBatcher.dataForEbo.length);
-                            }
-                            else {
-                                mesh_3.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
-                            }
-                            mesh_3.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
-                            mesh_3.submesh[0].size = subEffectBatcher.dataForEbo.length;
-                            subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
-                        }
-                        else if (subEffectBatcher.state === framework.EffectBatcherState.ResizeCapacityStateType) {
-                            mesh_3.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
-                            mesh_3.submesh[0].size = subEffectBatcher.dataForEbo.length;
-                            mesh_3.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
-                            mesh_3.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);
-                            subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
-                        }
-                        mesh_3.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
-                        if (this.gameObject.getScene().fog) {
-                            context.fog = this.gameObject.getScene().fog;
-                            subEffectBatcher.mat.draw(context, mesh_3, mesh_3.submesh[0], "base_fog");
-                        }
-                        else {
-                            subEffectBatcher.mat.draw(context, mesh_3, mesh_3.submesh[0], "base");
-                        }
-                    }
-                    if (this.particles != undefined) {
-                        this.particles.render(context, assetmgr, camera);
-                    }
-                }
-            };
-            effectSystemNew.prototype.clone = function () {
-                var effect = new framework.effectSystem();
-                effect.data = this.data.clone();
-                return effect;
-            };
-            effectSystemNew.prototype.play = function (speed) {
-                if (speed === void 0) { speed = 1; }
-                this.speed = speed;
-                this.state = framework.EffectPlayStateEnum.Play;
-                this.gameObject.visible = true;
-                this.gameObject.transform.markDirty();
-            };
-            effectSystemNew.prototype.pause = function () {
-                this.state = framework.EffectPlayStateEnum.Pause;
-            };
-            effectSystemNew.prototype.stop = function () {
-                this.reset();
-                this.state = framework.EffectPlayStateEnum.Stop;
-            };
-            effectSystemNew.prototype.reset = function (restSinglemesh, resetParticle) {
-                if (restSinglemesh === void 0) { restSinglemesh = true; }
-                if (resetParticle === void 0) { resetParticle = true; }
-                this.state = framework.EffectPlayStateEnum.BeReady;
-                this.gameObject.visible = false;
-                this.playTimer = 0;
-                this.resetSingleMesh();
-            };
-            effectSystemNew.prototype.resetSingleMesh = function () {
-            };
-            effectSystemNew.prototype.setFrameId = function (id) {
-                if (this.state == framework.EffectPlayStateEnum.Pause && id >= 0 && id < this.totalFrameCount)
-                    this.curFrameId = id;
-            };
-            effectSystemNew.prototype.getDelayFrameCount = function (delayTime) {
-                return delayTime * framework.effectSystem.fps;
-            };
-            effectSystemNew.prototype.checkFrameId = function () {
-                var curid = (framework.effectSystem.fps * this.playTimer) | 0;
-                if (curid != this.curFrameId) {
-                    if (this.state == framework.EffectPlayStateEnum.Play)
-                        this.curFrameId = curid;
-                    this.beExecuteNextFrame = true;
-                    return true;
-                }
-                return false;
-            };
-            effectSystemNew.prototype.remove = function () {
-                this.state = framework.EffectPlayStateEnum.Dispose;
-                if (this.data)
-                    this.data.dispose();
-                for (var key in this.effectBatchers) {
-                    this.effectBatchers[key].dispose();
-                }
-                if (this.particles)
-                    this.particles.dispose();
-            };
-            Object.defineProperty(effectSystemNew.prototype, "leftLifeTime", {
-                get: function () {
-                    if (this.data != null) {
-                        return this.data.life - this.playTimer;
-                    }
-                    else
-                        return 9999999999;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            effectSystemNew.prototype.addEffectElement = function (type) {
-                if (this.effectElements == undefined)
-                    this.effectElements = [];
-                var effe;
-                if (type == gd3d.framework.EffectElementTypeEnum.SingleMeshType) {
-                    effe = new gd3d.framework.EffectElementSingleMesh(this.gameObject.getScene().app.getAssetMgr(), this);
-                    effe.name = "singlemesh" + this.effectElements.length;
-                    var singleMeshElement = effe;
-                    singleMeshElement.transform = this.gameObject.transform;
-                    this.addInitFrameNew(singleMeshElement);
-                    this.state = framework.EffectPlayStateEnum.BeReady;
-                }
-                else if (type == gd3d.framework.EffectElementTypeEnum.EmissionType) {
-                    effe.name = "emission" + this.effectElements.length;
-                }
-                this.effectElements.push(effe);
-                return effe;
-            };
-            effectSystemNew.prototype.addInitFrameNew = function (effect) {
-                if (effect == undefined || effect.mesh == undefined || effect.mat == undefined)
-                    return;
-                var vertexStartIndex = 0;
-                var vertexCount = effect.mesh.data.pos.length;
-                var indexCount = effect.mesh.data.genIndexDataArray();
-                var subEffectBatcher = new EffectBatcherNew(this.vf);
-                subEffectBatcher.curTotalVertexCount = vertexCount;
-                subEffectBatcher.mesh = new framework.mesh();
-                subEffectBatcher.mesh.data = new gd3d.render.meshData();
-                subEffectBatcher.mesh.glMesh = new gd3d.render.glMesh();
-                subEffectBatcher.mat = new framework.material();
-                subEffectBatcher.mesh.submesh = [];
-                {
-                    var sm = new framework.subMeshInfo();
-                    sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
-                    sm.start = 0;
-                    sm.size = 0;
-                    sm.line = false;
-                    subEffectBatcher.mesh.submesh.push(sm);
-                }
-                vertexStartIndex = 0;
-                this.effectBatchers.push(subEffectBatcher);
-                effect.effectBatcher = subEffectBatcher;
-                effect.startVboIndex = vertexStartIndex;
-                var vertexSize = subEffectBatcher.vertexSize;
-                var vertexArr = effect.mesh.data.genVertexDataArray(this.vf);
-                effect.curAttrData = effect.copyandinit();
-                effect.update();
-                subEffectBatcher.effectElements.push(effect);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
-                    {
-                        var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
-                        gd3d.math.matrixTransformVector3(vertex, effect.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
-                        gd3d.math.pool.delete_vector3(vertex);
-                    }
-                    {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
-                    }
-                    {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
-                    }
-                    {
-                        var color = effect.getFrameVal(framework.AttributeType.ColorType, 0);
-                        var r = gd3d.math.floatClamp(color.x, 0, 1);
-                        var g = gd3d.math.floatClamp(color.y, 0, 1);
-                        var b = gd3d.math.floatClamp(color.z, 0, 1);
-                        var alpha = effect.getFrameVal(framework.AttributeType.AlphaType, 0);
-                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
-                    }
-                    {
-                        var tilling = effect.getFrameVal(framework.AttributeType.TillingType, 0);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * tilling.y;
-                    }
-                }
-                var indexArray = effect.mesh.data.genIndexDataArray();
-                var _startIndex = subEffectBatcher.indexStartIndex;
-                effect.startEboIndex = _startIndex;
-                subEffectBatcher.indexStartIndex += indexArray.length;
-                effect.endEboIndex = subEffectBatcher.indexStartIndex;
-                for (var i = 0; i < indexArray.length; i++) {
-                    subEffectBatcher.dataForEbo[_startIndex + i] = indexArray[i] + vertexStartIndex;
-                }
-            };
-            effectSystemNew.fps = 30;
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], effectSystemNew.prototype, "autoplay", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], effectSystemNew.prototype, "beLoop", void 0);
-            __decorate([
-                gd3d.reflect.Field("textasset"),
-                __metadata("design:type", framework.textasset)
-            ], effectSystemNew.prototype, "jsonData", void 0);
-            __decorate([
-                gd3d.reflect.Field("IEffectElement[]"),
-                __metadata("design:type", Array)
-            ], effectSystemNew.prototype, "effectElements", void 0);
-            effectSystemNew = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.selfClone
-            ], effectSystemNew);
-            return effectSystemNew;
-        }());
-        framework.effectSystemNew = effectSystemNew;
-        var EffectBatcherNew = (function () {
-            function EffectBatcherNew(formate) {
-                this.state = framework.EffectBatcherState.NotInitedStateType;
-                this.effectElements = [];
-                this._totalVertexCount = 0;
-                this._indexStartIndex = 0;
-                this._vbosize = 0;
-                this.vertexSize = 0;
-                this.vertexSize = gd3d.render.meshData.calcByteSize(formate) / 4;
-            }
-            Object.defineProperty(EffectBatcherNew.prototype, "curTotalVertexCount", {
-                get: function () {
-                    return this._totalVertexCount;
-                },
-                set: function (val) {
-                    this._totalVertexCount = val;
-                    this.resizeVboSize(this._totalVertexCount * this.vertexSize);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(EffectBatcherNew.prototype, "indexStartIndex", {
-                get: function () {
-                    return this._indexStartIndex;
-                },
-                set: function (value) {
-                    this._indexStartIndex = value;
-                    if (this.dataForEbo != null) {
-                        var ebo = new Uint16Array(this._indexStartIndex);
-                        ebo.set(this.dataForEbo, 0);
-                        this.dataForEbo = ebo;
-                    }
-                    else {
-                        this.dataForEbo = new Uint16Array(this._indexStartIndex);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            EffectBatcherNew.prototype.resizeVboSize = function (value) {
-                if (this._vbosize > value)
-                    return;
-                this._vbosize = value;
-                if (this.dataForVbo != null) {
-                    var vbo = new Float32Array(this._vbosize);
-                    vbo.set(this.dataForVbo, 0);
-                    this.dataForVbo = vbo;
-                }
-                else {
-                    this.dataForVbo = new Float32Array(this._vbosize);
-                }
-            };
-            EffectBatcherNew.prototype.dispose = function () {
-                this.mesh.dispose();
-                this.mat.dispose();
-                this.dataForVbo = null;
-                this.dataForEbo = null;
-                for (var key in this.effectElements) {
-                    this.effectElements[key].dispose();
-                }
-            };
-            return EffectBatcherNew;
-        }());
-        framework.EffectBatcherNew = EffectBatcherNew;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var TestEffectSystem = (function () {
             function TestEffectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
@@ -10436,11 +9946,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_5 = this.delayElements.length - 1; i_5 >= 0; i_5--) {
+                        var data = this.delayElements[i_5];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_5]);
+                            this.delayElements.splice(i_5, 1);
                         }
                     }
                 }
@@ -11278,24 +10788,24 @@ var gd3d;
                 if (this.player != null) {
                     context.updateModel(this.player.gameObject.transform);
                 }
-                for (var i_7 = 0; i_7 < this.materials.length; i_7++) {
-                    if (this.materials[i_7] == null)
+                for (var i_6 = 0; i_6 < this.materials.length; i_6++) {
+                    if (this.materials[i_6] == null)
                         continue;
                     if (this.cacheData != null && this._skintype > 0) {
                         if (this._efficient) {
-                            this.materials[i_7].setVector4v("glstate_vec4_bones", this.cacheData);
+                            this.materials[i_6].setVector4v("glstate_vec4_bones", this.cacheData);
                         }
                         else {
-                            this.materials[i_7].setMatrixv("glstate_matrix_bones", this.cacheData);
+                            this.materials[i_6].setMatrixv("glstate_matrix_bones", this.cacheData);
                         }
                         continue;
                     }
                     if (this._skeletonMatrixData != null && this._skintype > 0) {
                         if (this._efficient) {
-                            this.materials[i_7].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
+                            this.materials[i_6].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
                         }
                         else {
-                            this.materials[i_7].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
+                            this.materials[i_6].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
                         }
                     }
                 }
@@ -17248,124 +16758,42 @@ var gd3d;
             AttributeType[AttributeType["TillingType"] = 7] = "TillingType";
         })(AttributeType = framework.AttributeType || (framework.AttributeType = {}));
         var EffectElementSingleMesh = (function () {
-            function EffectElementSingleMesh(assetMgr, effectIns) {
+            function EffectElementSingleMesh(sys, data) {
+                if (data === void 0) { data = null; }
                 this.elementType = gd3d.framework.EffectElementTypeEnum.SingleMeshType;
                 this.beloop = false;
                 this.delayTime = 0;
                 this.life = 5;
-                this.mat = new gd3d.framework.material();
-                this.mesh = new gd3d.framework.mesh();
-                this.position = new framework.Vector3AttributeData();
-                this.euler = new framework.Vector3AttributeData();
-                this.scale = new framework.Vector3AttributeData();
-                this.color = new framework.Vector3AttributeData();
-                this.alpha = new framework.NumberAttributeData();
-                this.tilling = new framework.Vector2AttributeData();
-                this.colorRate = new framework.NumberAttributeData();
-                this.uv = new gd3d.math.vector2();
-                this.renderModel = gd3d.framework.RenderModel.None;
-                this.timelineFrames = {};
-                this.startVboIndex = 0;
-                this.startEboIndex = 0;
-                this.endEboIndex = 0;
-                this.actionActive = false;
+                this.colorRate = 1;
+                this.renderModel = gd3d.framework.RenderModel.Mesh;
+                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
+                this.position = [];
+                this.euler = [];
+                this.scale = [];
+                this.color = [];
+                this.alpha = [];
                 this.loopFrame = Number.MAX_VALUE;
                 this.active = true;
                 this.rotationByEuler = new gd3d.math.quaternion();
                 this.localRotation = new gd3d.math.quaternion();
-                this.mgr = assetMgr;
-                this.effectIns = effectIns;
-                this.mesh = this.mgr.getDefaultMesh("quad");
-                this.shader = this.mgr.getShader("diffuse.shader.json");
-                this.mat.setShader(this.shader);
-                this.initData();
+                this.effectSys = sys;
+                if (data != null) {
+                    this.initByElementdata(data);
+                }
+                else {
+                    this.initByDefData();
+                }
             }
-            ;
-            ;
-            ;
-            EffectElementSingleMesh.prototype.initData = function () {
-                this.actions = [];
-                this.timelineFrames = {};
-                this.timelineFrames[AttributeType.PositionType] = {};
-                this.timelineFrames[AttributeType.EulerType] = {};
-                this.timelineFrames[AttributeType.ScaleType] = {};
-                this.timelineFrames[AttributeType.ColorType] = {};
-                this.timelineFrames[AttributeType.ColorRateType] = {};
-                this.timelineFrames[AttributeType.AlphaType] = {};
-                this.timelineFrames[AttributeType.TillingType] = {};
-                this.position.attributeType = AttributeType.PositionType;
-                this.euler.attributeType = AttributeType.EulerType;
-                this.scale.attributeType = AttributeType.ScaleType;
-                this.color.attributeType = AttributeType.ColorType;
-                this.colorRate.attributeType = AttributeType.ColorRateType;
-                this.alpha.attributeType = AttributeType.AlphaType;
-                this.tilling.attributeType = AttributeType.TillingType;
-                this.position.addFramePoint(new framework.FrameKeyPointData(60, new gd3d.math.vector3(3, 3, 3)));
-                this.recordElementLerpAttributes(this.position);
-                this.recordElementLerpAttributes(this.euler);
-                this.recordElementLerpAttributes(this.scale);
-                this.recordElementLerpAttributes(this.color);
-                this.recordElementLerpAttributes(this.colorRate);
-                this.recordElementLerpAttributes(this.alpha);
-                this.recordElementLerpAttributes(this.tilling);
+            EffectElementSingleMesh.prototype.initByElementdata = function (data) {
             };
-            EffectElementSingleMesh.prototype.getFrameVal = function (attributeType, frameIndex) {
-                if (frameIndex === void 0) { frameIndex = 0; }
-                var timeLine = this.timelineFrames[attributeType];
-                if (timeLine[frameIndex] != undefined)
-                    return timeLine[frameIndex];
-                return null;
+            EffectElementSingleMesh.prototype.initByDefData = function () {
+                this.mesh = this.mgr.getDefaultMesh("quad");
+                var shader = this.mgr.getShader("diffuse.shader.json");
+                this.mat.setShader(shader);
             };
             EffectElementSingleMesh.prototype.writeToJson = function (obj) {
             };
-            EffectElementSingleMesh.prototype.copyandinit = function () {
-                var data = new framework.EffectAttrsData();
-                var pos = this.getFrameVal(AttributeType.PositionType);
-                if (pos != null)
-                    data.pos = gd3d.math.pool.clone_vector3(pos);
-                else
-                    data.initAttribute("pos");
-                var euler = this.getFrameVal(AttributeType.EulerType);
-                if (euler != null)
-                    data.euler = gd3d.math.pool.clone_vector3(euler);
-                else
-                    data.initAttribute("euler");
-                var scale = this.getFrameVal(AttributeType.ScaleType);
-                if (scale != null)
-                    data.scale = gd3d.math.pool.clone_vector3(scale);
-                else
-                    data.initAttribute("scale");
-                var color = this.getFrameVal(AttributeType.ColorType);
-                if (color != null)
-                    data.color = gd3d.math.pool.clone_vector3(color);
-                else
-                    data.initAttribute("color");
-                var tilling = this.getFrameVal(AttributeType.TillingType);
-                if (tilling != null)
-                    data.tilling = gd3d.math.pool.clone_vector3(tilling);
-                else
-                    data.initAttribute("tilling");
-                var colorRate = this.getFrameVal(AttributeType.ColorRateType);
-                if (colorRate != null)
-                    data.colorRate = colorRate;
-                else
-                    data.initAttribute("colorRate");
-                if (this.uv != undefined)
-                    data.uv = gd3d.math.pool.clone_vector2(this.uv);
-                else
-                    data.initAttribute("uv");
-                if (this.rotationByEuler != undefined)
-                    data.rotationByEuler = gd3d.math.pool.clone_quaternion(this.rotationByEuler);
-                if (this.localRotation != undefined)
-                    data.localRotation = gd3d.math.pool.clone_quaternion(this.localRotation);
-                data.alpha = this.getFrameVal(AttributeType.AlphaType);
-                data.renderModel = this.renderModel;
-                data.mesh = this.mesh;
-                return data;
-            };
             EffectElementSingleMesh.prototype.update = function () {
-                if (this.curAttrData == undefined || this.curAttrData == null)
-                    return;
                 if (this.active) {
                     if (this.curAttrData.euler != undefined) {
                         gd3d.math.quatFromEulerAngles(this.curAttrData.euler.x, this.curAttrData.euler.y, this.curAttrData.euler.z, this.curAttrData.rotationByEuler);
@@ -17443,116 +16871,9 @@ var gd3d;
             };
             EffectElementSingleMesh.prototype.dispose = function () {
             };
-            EffectElementSingleMesh.prototype.isCurFrameNeedRefresh = function (frameIndex) {
-                for (var index in this.timelineFrames) {
-                    if (this.timelineFrames[index][frameIndex] != undefined)
-                        return true;
-                }
-                if (this.curAttrData != undefined && this.curAttrData.renderModel != framework.RenderModel.None) {
-                    return true;
-                }
-                return this.actionActive;
-            };
-            EffectElementSingleMesh.prototype.recordElementLerpAttributes = function (data) {
-                if (data.data != undefined) {
-                    if (data.frameIndexs.length == 1) {
-                    }
-                    else {
-                        for (var i = 0; i < data.frameIndexs.length - 1; i++) {
-                            var fromFrameId = data.frameIndexs[i];
-                            var toFrameId = data.frameIndexs[i + 1];
-                            var fromFrameData = data.data[fromFrameId];
-                            var toFrameData = data.data[toFrameId];
-                            var timeLine = this.timelineFrames[data.attributeType];
-                            if (fromFrameData.actions == null) {
-                                this.lerp(fromFrameId, toFrameId, fromFrameData.val, toFrameData.val, timeLine);
-                            }
-                            else {
-                            }
-                        }
-                    }
-                }
-            };
-            EffectElementSingleMesh.prototype.lerp = function (fromFrameId, toFrameId, fromFrameVal, toFrameVal, timeLine) {
-                for (var i = fromFrameId; i <= toFrameId; i++) {
-                    var outVal = void 0;
-                    if (fromFrameVal instanceof gd3d.math.vector3) {
-                        outVal = new gd3d.math.vector3();
-                        gd3d.math.vec3SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
-                    }
-                    else if (fromFrameVal instanceof gd3d.math.vector2) {
-                        outVal = new gd3d.math.vector2();
-                        gd3d.math.vec2SLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId), outVal);
-                    }
-                    else if (typeof (fromFrameVal) === 'number') {
-                        outVal = gd3d.math.numberLerp(fromFrameVal, toFrameVal, (i - fromFrameId) / (toFrameId - fromFrameId));
-                    }
-                    timeLine[i] = outVal;
-                }
-            };
-            __decorate([
-                gd3d.reflect.Field("EffectElementTypeEnum"),
-                __metadata("design:type", Number)
-            ], EffectElementSingleMesh.prototype, "elementType", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], EffectElementSingleMesh.prototype, "beloop", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], EffectElementSingleMesh.prototype, "delayTime", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], EffectElementSingleMesh.prototype, "life", void 0);
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], EffectElementSingleMesh.prototype, "texturePath", void 0);
-            __decorate([
-                gd3d.reflect.Field("shader"),
-                __metadata("design:type", gd3d.framework.shader)
-            ], EffectElementSingleMesh.prototype, "shader", void 0);
-            __decorate([
-                gd3d.reflect.Field("mesh"),
-                __metadata("design:type", gd3d.framework.mesh)
-            ], EffectElementSingleMesh.prototype, "mesh", void 0);
-            __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
-            ], EffectElementSingleMesh.prototype, "position", void 0);
-            __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
-            ], EffectElementSingleMesh.prototype, "euler", void 0);
-            __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
-            ], EffectElementSingleMesh.prototype, "scale", void 0);
-            __decorate([
-                gd3d.reflect.Field("Vector3AttributeData"),
-                __metadata("design:type", framework.Vector3AttributeData)
-            ], EffectElementSingleMesh.prototype, "color", void 0);
-            __decorate([
-                gd3d.reflect.Field("NumberAttributeData"),
-                __metadata("design:type", framework.NumberAttributeData)
-            ], EffectElementSingleMesh.prototype, "alpha", void 0);
-            __decorate([
-                gd3d.reflect.Field("Vector2AttributeData"),
-                __metadata("design:type", framework.Vector2AttributeData)
-            ], EffectElementSingleMesh.prototype, "tilling", void 0);
-            __decorate([
-                gd3d.reflect.Field("NumberAttributeData"),
-                __metadata("design:type", framework.NumberAttributeData)
-            ], EffectElementSingleMesh.prototype, "colorRate", void 0);
-            __decorate([
-                gd3d.reflect.Field("RenderModel"),
-                __metadata("design:type", Number)
-            ], EffectElementSingleMesh.prototype, "renderModel", void 0);
             EffectElementSingleMesh = __decorate([
                 gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [gd3d.framework.assetMgr, framework.effectSystemNew])
+                __metadata("design:paramtypes", [framework.TestEffectSystem, framework.EffectElementData])
             ], EffectElementSingleMesh);
             return EffectElementSingleMesh;
         }());
@@ -17595,13 +16916,11 @@ var gd3d;
                 this.enableColorOverLifetime = false;
                 this.enableTexAnimation = false;
                 this.uvType = framework.UVTypeEnum.NONE;
-                this.needbeDelay = true;
-                this.isover = false;
+                this.beBurst = false;
+                this.beover = false;
                 this.worldRotation = new gd3d.math.quaternion();
                 this.matToObj = new gd3d.math.matrix();
                 this.matToWorld = new gd3d.math.matrix();
-                this.burstDelayTime = 0;
-                this.burstDelay = false;
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.effectSys = sys;
                 this.gameObject = sys.gameObject;
@@ -17652,7 +16971,7 @@ var gd3d;
                 return this.matToWorld;
             };
             EffectElementEmission.prototype.update = function (delta) {
-                this.updateEmission(delta);
+                this.updateLife(delta);
                 this.updateBatcher(delta);
             };
             EffectElementEmission.prototype.updateBatcher = function (delta) {
@@ -17660,50 +16979,39 @@ var gd3d;
                     this.emissionBatchers[key].update(delta);
                 }
             };
-            EffectElementEmission.prototype.updateEmission = function (delta) {
-                if (this.isover)
+            EffectElementEmission.prototype.updateLife = function (delta) {
+                if (this.beover)
                     return;
                 this.curTime += delta;
+                this.updateEmission();
+                if (this.curTime > this.lifeTime.getValue()) {
+                    if (this.beloop) {
+                        this.reInit();
+                    }
+                    else {
+                        this.beover = true;
+                    }
+                }
+            };
+            EffectElementEmission.prototype.reInit = function () {
+                this.beover = false;
+                this.curTime = 0;
+                this.beBurst = false;
+            };
+            EffectElementEmission.prototype.updateEmission = function () {
                 if (this.emissionType == framework.ParticleEmissionType.continue) {
-                    if (this.numcount == 0) {
+                    var rate = this.curTime / this.duration.getValue();
+                    rate = gd3d.math.floatClamp(rate, 0, 1);
+                    var needCount = Math.floor(rate * this.emissionCount.getValue());
+                    needCount = needCount - this.numcount;
+                    for (var i = 0; i < needCount; i++) {
                         this.addParticle();
                         this.numcount++;
                     }
-                    else {
-                        if (this.curTime > this._continueSpaceTime) {
-                            if (this.numcount < this.emissionCount.getValue()) {
-                                this.addParticle();
-                                this.curTime = 0;
-                                this.numcount++;
-                            }
-                            else {
-                                if (this.beloop) {
-                                    this.curTime = 0;
-                                    this.numcount = 0;
-                                    this.isover = false;
-                                }
-                                else {
-                                    this.isover = true;
-                                }
-                            }
-                        }
-                    }
                 }
-                else if (this.emissionType == framework.ParticleEmissionType.burst) {
-                    if (this.burstDelay) {
-                        if (this.curTime < this.burstDelayTime)
-                            return;
-                    }
+                else if (this.emissionType == framework.ParticleEmissionType.burst && !this.beBurst) {
                     this.addParticle(this.emissionCount.getValue());
-                    if (this.beloop) {
-                        this.curTime = 0;
-                        this.isover = false;
-                        this.burstDelayTime = this.duration.getValue();
-                        this.burstDelay = true;
-                    }
-                    else {
-                        this.isover = true;
-                    }
+                    this.beBurst = true;
                 }
             };
             EffectElementEmission.prototype.addParticle = function (count) {
@@ -17760,9 +17068,6 @@ var gd3d;
                     this.emissionBatchers[key].dispose();
                 }
                 this.emissionBatchers.length = 0;
-            };
-            EffectElementEmission.prototype.isOver = function () {
-                return this.isover;
             };
             EffectElementEmission.prototype.getMesh = function () {
                 if (this.rendermodel == framework.RenderModel.Mesh) {
@@ -17835,7 +17140,6 @@ var gd3d;
             EmissionBatcher_new.prototype.addParticle = function () {
                 this.refreshBuffer();
                 var p = new framework.Particle_new(this);
-                p.uploadData(this.dataForVbo);
                 for (var i = 0; i < p.dataForEbo.length; i++) {
                     this.dataForEbo[this.curIndexCount + i] = p.dataForEbo[i] + this.curVerCount;
                 }
@@ -17977,6 +17281,14 @@ var gd3d;
             return Vector3Key;
         }());
         framework.Vector3Key = Vector3Key;
+        var Vector2Key = (function () {
+            function Vector2Key(_key, _value) {
+                this.key = _key;
+                this.value = _value;
+            }
+            return Vector2Key;
+        }());
+        framework.Vector2Key = Vector2Key;
         var effTools = (function () {
             function effTools() {
             }
@@ -18291,10 +17603,10 @@ var gd3d;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        var r = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 3], 0, 1) * this.startColor.r;
-                        var g = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 4], 0, 1) * this.startColor.g;
-                        var b = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 5], 0, 1) * this.startColor.b;
-                        var a = gd3d.math.floatClamp(this.sourceVbo[i * vertexSize + 6], 0, 1) * this.startColor.a;
+                        var r = this.sourceVbo[i * vertexSize + 3] * this.startColor.r;
+                        var g = this.sourceVbo[i * vertexSize + 4] * this.startColor.g;
+                        var b = this.sourceVbo[i * vertexSize + 5] * this.startColor.b;
+                        var a = this.sourceVbo[i * vertexSize + 6] * this.startColor.a;
                         if (this.colorNodes != null) {
                             r = this.color.x;
                             g = this.color.y;
@@ -20638,8 +19950,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_8 = 0; obj.transform.children != undefined && i_8 < obj.transform.children.length; i_8++) {
-                    var _obj = obj.transform.children[i_8].gameObject;
+                for (var i_7 = 0; obj.transform.children != undefined && i_7 < obj.transform.children.length; i_7++) {
+                    var _obj = obj.transform.children[i_7].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };
@@ -22447,636 +21759,115 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    var framework;
-    (function (framework) {
-        var WebGLDebugUtils = (function () {
-            function WebGLDebugUtils() {
-                this.glEnums = null;
-            }
-            WebGLDebugUtils.prototype.log = function (msg) {
-                if (window.console && window.console.log) {
-                    window.console.log(msg);
-                }
-            };
-            WebGLDebugUtils.prototype.init = function (ctx) {
-                if (this.glEnums == null) {
-                    this.glEnums = {};
-                    for (var propertyName in ctx) {
-                        if (typeof ctx[propertyName] == 'number') {
-                            this.glEnums[ctx[propertyName]] = propertyName;
-                        }
-                    }
-                }
-            };
-            WebGLDebugUtils.prototype.checkInit = function () {
-                if (this.glEnums == null) {
-                    throw 'WebGLDebugUtils.init(ctx) not called';
-                }
-            };
-            WebGLDebugUtils.prototype.mightBeEnum = function (value) {
-                this.checkInit();
-                return (this.glEnums[value] !== undefined);
-            };
-            WebGLDebugUtils.prototype.glEnumToString = function (value) {
-                this.checkInit();
-                var name = this.glEnums[value];
-                return (name !== undefined) ? name :
-                    ("*UNKNOWN WebGL ENUM (0x" + value.toString(16) + ")");
-            };
-            WebGLDebugUtils.prototype.glFunctionArgToString = function (functionName, argumentIndex, value) {
-                var funcInfo = WebGLDebugUtils.glValidEnumContexts[functionName];
-                if (funcInfo !== undefined) {
-                    if (funcInfo[argumentIndex]) {
-                        return this.glEnumToString(value);
-                    }
-                }
-                return value.toString();
-            };
-            WebGLDebugUtils.prototype.makeDebugContext = function (ctx, opt_onErrorFunc) {
-                if (opt_onErrorFunc === void 0) { opt_onErrorFunc = null; }
-                this.init(ctx);
-                opt_onErrorFunc = opt_onErrorFunc || function (err, functionName, args) {
-                    var argStr = "";
-                    for (var ii = 0; ii < args.length; ++ii) {
-                        argStr += ((ii == 0) ? '' : ', ') +
-                            this.glFunctionArgToString(functionName, ii, args[ii]);
-                    }
-                    this.log("WebGL error " + this.glEnumToString(err) + " in " + functionName +
-                        "(" + argStr + ")");
-                };
-                var glErrorShadow = {};
-                function makeErrorWrapper(ctx, functionName) {
-                    return function () {
-                        var result = ctx[functionName].apply(ctx, arguments);
-                        var err = ctx.getError();
-                        if (err != 0) {
-                            glErrorShadow[err] = true;
-                            opt_onErrorFunc(err, functionName, arguments);
-                        }
-                        return result;
-                    };
-                }
-                var wrapper = {};
-                for (var propertyName in ctx) {
-                    if (typeof ctx[propertyName] == 'function') {
-                        wrapper[propertyName] = makeErrorWrapper(ctx, propertyName);
-                    }
-                    else {
-                        wrapper[propertyName] = ctx[propertyName];
-                    }
-                }
-                wrapper["getError"] = function () {
-                    for (var err in glErrorShadow) {
-                        if (glErrorShadow[err]) {
-                            glErrorShadow[err] = false;
-                            return err;
-                        }
-                    }
-                    return ctx.NO_ERROR;
-                };
-                console.error(" i am ---makeDebugContext-");
-                return wrapper;
-            };
-            WebGLDebugUtils.prototype.resetToInitialState = function (ctx) {
-                var numAttribs = ctx.getParameter(ctx.MAX_VERTEX_ATTRIBS);
-                var tmp = ctx.createBuffer();
-                ctx.bindBuffer(ctx.ARRAY_BUFFER, tmp);
-                for (var ii = 0; ii < numAttribs; ++ii) {
-                    ctx.disableVertexAttribArray(ii);
-                    ctx.vertexAttribPointer(ii, 4, ctx.FLOAT, false, 0, 0);
-                    ctx.vertexAttrib1f(ii, 0);
-                }
-                ctx.deleteBuffer(tmp);
-                var numTextureUnits = ctx.getParameter(ctx.MAX_TEXTURE_IMAGE_UNITS);
-                for (var ii = 0; ii < numTextureUnits; ++ii) {
-                    ctx.activeTexture(ctx.TEXTURE0 + ii);
-                    ctx.bindTexture(ctx.TEXTURE_CUBE_MAP, null);
-                    ctx.bindTexture(ctx.TEXTURE_2D, null);
-                }
-                ctx.activeTexture(ctx.TEXTURE0);
-                ctx.useProgram(null);
-                ctx.bindBuffer(ctx.ARRAY_BUFFER, null);
-                ctx.bindBuffer(ctx.ELEMENT_ARRAY_BUFFER, null);
-                ctx.bindFramebuffer(ctx.FRAMEBUFFER, null);
-                ctx.bindRenderbuffer(ctx.RENDERBUFFER, null);
-                ctx.disable(ctx.BLEND);
-                ctx.disable(ctx.CULL_FACE);
-                ctx.disable(ctx.DEPTH_TEST);
-                ctx.disable(ctx.DITHER);
-                ctx.disable(ctx.SCISSOR_TEST);
-                ctx.blendColor(0, 0, 0, 0);
-                ctx.blendEquation(ctx.FUNC_ADD);
-                ctx.blendFunc(ctx.ONE, ctx.ZERO);
-                ctx.clearColor(0, 0, 0, 0);
-                ctx.clearDepth(1);
-                ctx.clearStencil(-1);
-                ctx.colorMask(true, true, true, true);
-                ctx.cullFace(ctx.BACK);
-                ctx.depthFunc(ctx.LESS);
-                ctx.depthMask(true);
-                ctx.depthRange(0, 1);
-                ctx.frontFace(ctx.CCW);
-                ctx.hint(ctx.GENERATE_MIPMAP_HINT, ctx.DONT_CARE);
-                ctx.lineWidth(1);
-                ctx.pixelStorei(ctx.PACK_ALIGNMENT, 4);
-                ctx.pixelStorei(ctx.UNPACK_ALIGNMENT, 4);
-                ctx.pixelStorei(ctx.UNPACK_FLIP_Y_WEBGL, false);
-                ctx.pixelStorei(ctx.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                if (ctx.UNPACK_COLORSPACE_CONVERSION_WEBGL) {
-                    ctx.pixelStorei(ctx.UNPACK_COLORSPACE_CONVERSION_WEBGL, ctx.BROWSER_DEFAULT_WEBGL);
-                }
-                ctx.polygonOffset(0, 0);
-                ctx.sampleCoverage(1, false);
-                ctx.scissor(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.stencilFunc(ctx.ALWAYS, 0, 0xFFFFFFFF);
-                ctx.stencilMask(0xFFFFFFFF);
-                ctx.stencilOp(ctx.KEEP, ctx.KEEP, ctx.KEEP);
-                ctx.viewport(0, 0, ctx.canvas.clientWidth, ctx.canvas.clientHeight);
-                ctx.clear(ctx.COLOR_BUFFER_BIT | ctx.DEPTH_BUFFER_BIT | ctx.STENCIL_BUFFER_BIT);
-                while (ctx.getError())
-                    ;
-            };
-            WebGLDebugUtils.prototype.makeLostContextSimulatingContext = function (ctx) {
-                var wrapper_ = {};
-                var contextId_ = 1;
-                var contextLost_ = false;
-                var resourceId_ = 0;
-                var resourceDb_ = [];
-                var onLost_ = undefined;
-                var onRestored_ = undefined;
-                var nextOnRestored_ = undefined;
-                var glErrorShadow_ = {};
-                function isWebGLObject(obj) {
-                    return (obj instanceof WebGLBuffer ||
-                        obj instanceof WebGLFramebuffer ||
-                        obj instanceof WebGLProgram ||
-                        obj instanceof WebGLRenderbuffer ||
-                        obj instanceof WebGLShader ||
-                        obj instanceof WebGLTexture);
-                }
-                function checkResources(args) {
-                    for (var ii = 0; ii < args.length; ++ii) {
-                        var arg = args[ii];
-                        if (isWebGLObject(arg)) {
-                            return arg.__webglDebugContextLostId__ == contextId_;
-                        }
-                    }
-                    return true;
-                }
-                function clearErrors() {
-                    var k = Object.keys(glErrorShadow_);
-                    for (var ii = 0; ii < k.length; ++ii) {
-                        delete glErrorShadow_[k[ii]];
-                    }
-                }
-                function makeLostContextWrapper(ctx, functionName) {
-                    var f = ctx[functionName];
-                    return function () {
-                        if (!contextLost_) {
-                            if (!checkResources(arguments)) {
-                                glErrorShadow_[ctx.INVALID_OPERATION] = true;
-                                return;
-                            }
-                            var result = f.apply(ctx, arguments);
-                            return result;
-                        }
-                    };
-                }
-                for (var propertyName in ctx) {
-                    if (typeof ctx[propertyName] == 'function') {
-                        wrapper_[propertyName] = makeLostContextWrapper(ctx, propertyName);
-                    }
-                    else {
-                        wrapper_[propertyName] = ctx[propertyName];
-                    }
-                }
-                function makeWebGLContextEvent(statusMessage) {
-                    return { statusMessage: statusMessage };
-                }
-                function freeResources() {
-                    for (var ii = 0; ii < resourceDb_.length; ++ii) {
-                        var resource = resourceDb_[ii];
-                        if (resource instanceof WebGLBuffer) {
-                            ctx.deleteBuffer(resource);
-                        }
-                    }
-                }
-                wrapper_["loseContext"] = function () {
-                    if (!contextLost_) {
-                        contextLost_ = true;
-                        ++contextId_;
-                        while (ctx.getError())
-                            ;
-                        clearErrors();
-                        glErrorShadow_[ctx.CONTEXT_LOST_WEBGL] = true;
-                        setTimeout(function () {
-                            if (onLost_) {
-                                onLost_(makeWebGLContextEvent("context lost"));
-                            }
-                        }, 0);
-                    }
-                };
-                wrapper_["restoreContext"] = function () {
-                    if (contextLost_) {
-                        if (onRestored_) {
-                            setTimeout(function () {
-                                freeResources();
-                                this.resetToInitialState(ctx);
-                                contextLost_ = false;
-                                if (onRestored_) {
-                                    var callback = onRestored_;
-                                    onRestored_ = nextOnRestored_;
-                                    nextOnRestored_ = undefined;
-                                    callback(makeWebGLContextEvent("context restored"));
-                                }
-                            }, 0);
-                        }
-                        else {
-                            throw "You can not restore the context without a listener";
-                        }
-                    }
-                };
-                wrapper_["getError"] = function () {
-                    if (!contextLost_) {
-                        var err;
-                        while (err = ctx.getError()) {
-                            glErrorShadow_[err] = true;
-                        }
-                    }
-                    for (var key in glErrorShadow_) {
-                        if (glErrorShadow_[key]) {
-                            delete glErrorShadow_[key];
-                            return key;
-                        }
-                    }
-                    return ctx.NO_ERROR;
-                };
-                var creationFunctions = [
-                    "createBuffer",
-                    "createFramebuffer",
-                    "createProgram",
-                    "createRenderbuffer",
-                    "createShader",
-                    "createTexture"
-                ];
-                for (var ii = 0; ii < creationFunctions.length; ++ii) {
-                    var functionName = creationFunctions[ii];
-                    wrapper_[functionName] = function (f) {
-                        return function () {
-                            if (contextLost_) {
-                                return null;
-                            }
-                            var obj = f.apply(ctx, arguments);
-                            obj.__webglDebugContextLostId__ = contextId_;
-                            resourceDb_.push(obj);
-                            return obj;
-                        };
-                    }(ctx[functionName]);
-                }
-                var functionsThatShouldReturnNull = [
-                    "getActiveAttrib",
-                    "getActiveUniform",
-                    "getBufferParameter",
-                    "getContextAttributes",
-                    "getAttachedShaders",
-                    "getFramebufferAttachmentParameter",
-                    "getParameter",
-                    "getProgramParameter",
-                    "getProgramInfoLog",
-                    "getRenderbufferParameter",
-                    "getShaderParameter",
-                    "getShaderInfoLog",
-                    "getShaderSource",
-                    "getTexParameter",
-                    "getUniform",
-                    "getUniformLocation",
-                    "getVertexAttrib"
-                ];
-                for (var ii = 0; ii < functionsThatShouldReturnNull.length; ++ii) {
-                    var functionName = functionsThatShouldReturnNull[ii];
-                    wrapper_[functionName] = function (f) {
-                        return function () {
-                            if (contextLost_) {
-                                return null;
-                            }
-                            return f.apply(ctx, arguments);
-                        };
-                    }(wrapper_[functionName]);
-                }
-                var isFunctions = [
-                    "isBuffer",
-                    "isEnabled",
-                    "isFramebuffer",
-                    "isProgram",
-                    "isRenderbuffer",
-                    "isShader",
-                    "isTexture"
-                ];
-                for (var ii = 0; ii < isFunctions.length; ++ii) {
-                    var functionName = isFunctions[ii];
-                    wrapper_[functionName] = function (f) {
-                        return function () {
-                            if (contextLost_) {
-                                return false;
-                            }
-                            return f.apply(ctx, arguments);
-                        };
-                    }(wrapper_[functionName]);
-                }
-                wrapper_["checkFramebufferStatus"] = function (f) {
-                    return function () {
-                        if (contextLost_) {
-                            return ctx.FRAMEBUFFER_UNSUPPORTED;
-                        }
-                        return f.apply(ctx, arguments);
-                    };
-                }(wrapper_["checkFramebufferStatus"]);
-                wrapper_["getAttribLocation"] = function (f) {
-                    return function () {
-                        if (contextLost_) {
-                            return -1;
-                        }
-                        return f.apply(ctx, arguments);
-                    };
-                }(wrapper_["getAttribLocation"]);
-                wrapper_["getVertexAttribOffset"] = function (f) {
-                    return function () {
-                        if (contextLost_) {
-                            return 0;
-                        }
-                        return f.apply(ctx, arguments);
-                    };
-                }(wrapper_["getVertexAttribOffset"]);
-                wrapper_["isContextLost"] = function () {
-                    return contextLost_;
-                };
-                function wrapEvent(listener) {
-                    if (typeof (listener) == "function") {
-                        return listener;
-                    }
-                    else {
-                        return function (info) {
-                            listener.handleEvent(info);
-                        };
-                    }
-                }
-                wrapper_["registerOnContextLostListener"] = function (listener) {
-                    onLost_ = wrapEvent(listener);
-                };
-                wrapper_["registerOnContextRestoredListener"] = function (listener) {
-                    if (contextLost_) {
-                        nextOnRestored_ = wrapEvent(listener);
-                    }
-                    else {
-                        onRestored_ = wrapEvent(listener);
-                    }
-                };
-                return wrapper_;
-            };
-            WebGLDebugUtils.glValidEnumContexts = {
-                'enable': { 0: true },
-                'disable': { 0: true },
-                'getParameter': { 0: true },
-                'drawArrays': { 0: true },
-                'drawElements': { 0: true, 2: true },
-                'createShader': { 0: true },
-                'getShaderParameter': { 1: true },
-                'getProgramParameter': { 1: true },
-                'getVertexAttrib': { 1: true },
-                'vertexAttribPointer': { 2: true },
-                'bindTexture': { 0: true },
-                'activeTexture': { 0: true },
-                'getTexParameter': { 0: true, 1: true },
-                'texParameterf': { 0: true, 1: true },
-                'texParameteri': { 0: true, 1: true, 2: true },
-                'texImage2D': { 0: true, 2: true, 6: true, 7: true },
-                'texSubImage2D': { 0: true, 6: true, 7: true },
-                'copyTexImage2D': { 0: true, 2: true },
-                'copyTexSubImage2D': { 0: true },
-                'generateMipmap': { 0: true },
-                'bindBuffer': { 0: true },
-                'bufferData': { 0: true, 2: true },
-                'bufferSubData': { 0: true },
-                'getBufferParameter': { 0: true, 1: true },
-                'pixelStorei': { 0: true, 1: true },
-                'readPixels': { 4: true, 5: true },
-                'bindRenderbuffer': { 0: true },
-                'bindFramebuffer': { 0: true },
-                'checkFramebufferStatus': { 0: true },
-                'framebufferRenderbuffer': { 0: true, 1: true, 2: true },
-                'framebufferTexture2D': { 0: true, 1: true, 2: true },
-                'getFramebufferAttachmentParameter': { 0: true, 1: true, 2: true },
-                'getRenderbufferParameter': { 0: true, 1: true },
-                'renderbufferStorage': { 0: true, 1: true },
-                'clear': { 0: true },
-                'depthFunc': { 0: true },
-                'blendFunc': { 0: true, 1: true },
-                'blendFuncSeparate': { 0: true, 1: true, 2: true, 3: true },
-                'blendEquation': { 0: true },
-                'blendEquationSeparate': { 0: true, 1: true },
-                'stencilFunc': { 0: true },
-                'stencilFuncSeparate': { 0: true, 1: true },
-                'stencilMaskSeparate': { 0: true },
-                'stencilOp': { 0: true, 1: true, 2: true },
-                'stencilOpSeparate': { 0: true, 1: true, 2: true, 3: true },
-                'cullFace': { 0: true },
-                'frontFace': { 0: true },
-            };
-            return WebGLDebugUtils;
-        }());
-        framework.WebGLDebugUtils = WebGLDebugUtils;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var WebGLUtils = (function () {
-            function WebGLUtils() {
-                this.makeFailHTML = function (msg) {
-                    return '' +
-                        '<div style="margin: auto; width:500px;z-index:10000;margin-top:20em;text-align:center;">' + msg + '</div>';
-                };
-                this.GET_A_WEBGL_BROWSER = '' +
-                    'This page requires a browser that supports WebGL.<br/>' +
-                    '<a href="http://get.webgl.org">Click here to upgrade your browser.</a>';
-                this.OTHER_PROBLEM = '' +
-                    "It doesn't appear your computer can support WebGL.<br/>" +
-                    '<a href="http://get.webgl.org">Click here for more information.</a>';
-                if (!window.requestAnimationFrame) {
-                    var tempwin = window;
-                    window.requestAnimationFrame =
-                        tempwin.requestAnimationFrame ||
-                            tempwin.webkitRequestAnimationFrame ||
-                            tempwin.mozRequestAnimationFrame ||
-                            tempwin.oRequestAnimationFrame ||
-                            tempwin.msRequestAnimationFrame ||
-                            function (callback, element) {
-                                window.setTimeout(callback, 1000 / 60);
-                            };
-                }
-                if (!window.cancelAnimationFrame) {
-                    var tempwin = window;
-                    window.cancelAnimationFrame = (tempwin.cancelRequestAnimationFrame ||
-                        window.webkitCancelAnimationFrame || tempwin.webkitCancelRequestAnimationFrame ||
-                        tempwin.mozCancelAnimationFrame || tempwin.mozCancelRequestAnimationFrame ||
-                        tempwin.msCancelAnimationFrame || tempwin.msCancelRequestAnimationFrame ||
-                        tempwin.oCancelAnimationFrame || tempwin.oCancelRequestAnimationFrame ||
-                        window.clearTimeout);
-                }
-            }
-            WebGLUtils.prototype.setupWebGL = function (canvas, opt_attribs, opt_onError) {
-                if (opt_attribs === void 0) { opt_attribs = null; }
-                if (opt_onError === void 0) { opt_onError = null; }
-                function handleCreationError(msg) {
-                    var container = document.getElementsByTagName("body")[0];
-                    if (container) {
-                        var str = WebGLRenderingContext ?
-                            this.OTHER_PROBLEM :
-                            this.GET_A_WEBGL_BROWSER;
-                        if (msg) {
-                            str += "<br/><br/>Status: " + msg;
-                        }
-                        container.innerHTML = this.makeFailHTML(str);
-                    }
-                }
-                ;
-                opt_onError = opt_onError || handleCreationError;
-                if (canvas.addEventListener) {
-                    canvas.addEventListener("webglcontextcreationerror", function (event) {
-                        opt_onError(event.statusMessage);
-                    }, false);
-                }
-                var context = this.create3DContext(canvas, opt_attribs);
-                if (!context) {
-                    if (!WebGLRenderingContext) {
-                        opt_onError("");
-                    }
-                    else {
-                        opt_onError("");
-                    }
-                }
-                return context;
-            };
-            WebGLUtils.prototype.create3DContext = function (canvas, opt_attribs) {
-                var names = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
-                var context = null;
-                for (var ii = 0; ii < names.length; ++ii) {
-                    try {
-                        context = canvas.getContext(names[ii], opt_attribs);
-                    }
-                    catch (e) { }
-                    if (context) {
-                        break;
-                    }
-                }
-                return context;
-            };
-            return WebGLUtils;
-        }());
-        framework.WebGLUtils = WebGLUtils;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
     var io;
     (function (io) {
-        var loadRetryMgr = (function () {
-            function loadRetryMgr() {
-            }
-            return loadRetryMgr;
-        }());
-        function xhrLoad(url, fun, onprocess, responseType, loadedFun) {
+        function loadText(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
             var req = new XMLHttpRequest();
-            var isLoaded = false;
             req.open("GET", url);
-            req.responseType = responseType;
+            req.responseType = "text";
             req.onreadystatechange = function () {
                 if (req.readyState == 4) {
-                    if (req.status == 200) {
-                        loadedFun(req);
-                        isLoaded = true;
+                    if (req.status == 404) {
+                        fun(null, new Error("got a 404:" + url));
+                        return;
                     }
-                    else {
-                        switch (req.status) {
-                            case 404:
-                                fun(null, new Error("got a 404:" + url));
-                                break;
-                        }
-                    }
+                    fun(req.responseText, null);
                 }
             };
             req.onprogress = function (ev) {
-                if (onprocess)
+                if (onprocess) {
                     onprocess(ev.loaded, ev.total);
+                }
             };
             req.onerror = function () {
                 fun(null, new Error("onerr in req:"));
             };
-            req.onloadend = function () {
-                if (!isLoaded) {
-                    if (!loadRetryMgr.urlCaseDic)
-                        loadRetryMgr.urlCaseDic = {};
-                    var dic = loadRetryMgr.urlCaseDic;
-                    dic[url] = isNaN(dic[url]) || dic[url] < 0 ? 0 : dic[url];
-                    if (dic[url] >= 2) {
-                        dic[url] = 0;
-                        fun(null, new Error("load this url fail  ：" + url), true);
-                    }
-                    else {
-                        xhrLoad(url, fun, onprocess, responseType, loadedFun);
-                        dic[url]++;
-                    }
-                }
-            };
-            try {
-                req.send();
-            }
-            catch (err) {
-                fun(null, err);
-            }
-        }
-        function loadText(url, fun, onprocess) {
-            if (onprocess === void 0) { onprocess = null; }
-            xhrLoad(url, fun, onprocess, "text", function (req) {
-                fun(req.responseText, null);
-            });
+            req.send();
         }
         io.loadText = loadText;
         function loadArrayBuffer(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            xhrLoad(url, fun, onprocess, "arraybuffer", function (req) {
-                fun(req.response, null);
-            });
+            var req = new XMLHttpRequest();
+            req.open("GET", url);
+            req.responseType = "arraybuffer";
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    if (req.status == 404) {
+                        fun(null, new Error("got a 404:" + url));
+                        return;
+                    }
+                    fun(req.response, null);
+                }
+            };
+            req.onprogress = function (ev) {
+                if (onprocess) {
+                    onprocess(ev.loaded, ev.total);
+                }
+            };
+            req.onerror = function () {
+                fun(null, new Error("onerr in req:"));
+            };
+            req.send();
         }
         io.loadArrayBuffer = loadArrayBuffer;
         function loadBlob(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            xhrLoad(url, fun, onprocess, "blob", function (req) {
-                fun(req.response, null);
-            });
+            var req = new XMLHttpRequest();
+            req.open("GET", url);
+            req.responseType = "blob";
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    if (req.status == 404) {
+                        fun(null, new Error("got a 404:" + url));
+                        return;
+                    }
+                    fun(req.response, null);
+                }
+            };
+            req.onprogress = function (ev) {
+                if (onprocess) {
+                    onprocess(ev.loaded, ev.total);
+                }
+            };
+            req.onerror = function () {
+                fun(null, new Error("onerr in req:"));
+            };
+            req.send();
         }
         io.loadBlob = loadBlob;
         function loadImg(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            xhrLoad(url, fun, onprocess, "blob", function (req) {
-                var blob = req.response;
-                var img = document.createElement("img");
-                img.onload = function (e) {
-                    window.URL.revokeObjectURL(img.src);
-                    fun(img, null);
-                };
-                img.onerror = function (e) {
-                    fun(null, new Error("error when blob to img:" + url));
-                };
-                try {
+            var req = new XMLHttpRequest();
+            req.open("GET", url);
+            req.responseType = "blob";
+            req.onreadystatechange = function () {
+                if (req.readyState == 4) {
+                    if (req.status == 404) {
+                        fun(null, new Error("got a 404:" + url));
+                        return;
+                    }
+                    var blob = req.response;
+                    var img = document.createElement("img");
+                    img.onload = function (e) {
+                        window.URL.revokeObjectURL(img.src);
+                        fun(img, null);
+                    };
+                    img.onerror = function (e) {
+                        fun(null, new Error("error when blob to img:" + url));
+                    };
                     img.src = window.URL.createObjectURL(blob);
                 }
-                catch (e) {
-                    fun(null, e);
+            };
+            req.onprogress = function (ev) {
+                if (onprocess) {
+                    onprocess(ev.loaded, ev.total);
                 }
-            });
+            };
+            req.onerror = function () {
+                fun(null, new Error("onerr in req:"));
+            };
+            req.send();
         }
         io.loadImg = loadImg;
     })(io = gd3d.io || (gd3d.io = {}));

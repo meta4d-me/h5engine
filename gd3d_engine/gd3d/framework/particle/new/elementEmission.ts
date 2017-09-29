@@ -95,9 +95,9 @@ namespace gd3d.framework
         public deadParticles: Particle_new[];
 
         private curTime: number;
-        private needbeDelay:boolean=true;
+        private beBurst:boolean=false;
         private numcount: number;
-        private isover: boolean = false;
+        private beover: boolean = false;
         //-----------------------------------------------------------------
 
         constructor(sys: TestEffectSystem,data:EffectElementData=null)
@@ -176,7 +176,7 @@ namespace gd3d.framework
 
         public update(delta: number)
         {
-            this.updateEmission(delta);
+            this.updateLife(delta);
             this.updateBatcher(delta);
         }
 
@@ -187,76 +187,51 @@ namespace gd3d.framework
                 this.emissionBatchers[key].update(delta);
             }
         }
-        //burst的间隔为发射器的duration
-        private burstDelayTime:number=0;
-        private burstDelay:boolean=false;
-        private updateEmission(delta: number)
-        {
-            if (this.isover) return;
-            this.curTime += delta;
-            // if(this.needbeDelay)
-            // {
-            //     if(this.curTime<=this.delayTime)
-            //     {
-            //         return;
-            //     }
-            //     else
-            //     {
-            //         this.curTime=this.curTime-this.delayTime;
-            //         this.needbeDelay=false;
-            //     }
-            // }
 
+        private updateLife(delta: number)
+        {
+            if (this.beover) return;
+            this.curTime += delta;
+            //--------------update in Livelife-------------------
+            this.updateEmission();
+
+            if(this.curTime>this.lifeTime.getValue())
+            {
+                if(this.beloop)
+                {
+                    this.reInit();
+                }
+                else
+                {
+                    this.beover=true;
+                }
+            }
+        }
+        private reInit()
+        {
+            this.beover=false;
+            this.curTime=0;
+            this.beBurst=false;
+        }
+
+        private updateEmission()
+        {
             if (this.emissionType == ParticleEmissionType.continue)
             {
-                if (this.numcount == 0) 
+                var rate=this.curTime/this.duration.getValue();
+                rate=gd3d.math.floatClamp(rate,0,1);
+                var needCount=Math.floor(rate*this.emissionCount.getValue());
+                needCount=needCount-this.numcount;
+                for(var i=0;i<needCount;i++)
                 {
                     this.addParticle();
                     this.numcount++;
                 }
-                else
-                {
-                    if (this.curTime > this._continueSpaceTime)
-                    {
-                        if (this.numcount < this.emissionCount.getValue())
-                        {
-                            this.addParticle();
-                            this.curTime = 0;
-                            this.numcount++;
-                        }
-                        else
-                        {
-                            if (this.beloop)
-                            {
-                                this.curTime = 0;
-                                this.numcount = 0;
-                                this.isover = false;
-                            } else
-                            {
-                                this.isover = true;
-                            }
-                        }
-                    }
-                }
-
             }
-            else if (this.emissionType == ParticleEmissionType.burst)
+            else if (this.emissionType == ParticleEmissionType.burst&&!this.beBurst)
             {
-                if(this.burstDelay)
-                {
-                    if(this.curTime<this.burstDelayTime) return;
-                }
                 this.addParticle(this.emissionCount.getValue());
-                if (this.beloop)
-                {
-                    this.curTime = 0;
-                    this.isover = false;
-                    this.burstDelayTime=this.duration.getValue();
-                    this.burstDelay=true;
-                } else
-                {
-                    this.isover = true;
-                }
+                this.beBurst=true;
             }
         }
 
@@ -328,10 +303,6 @@ namespace gd3d.framework
             }
             this.emissionBatchers.length = 0;
         }
-        public isOver(): boolean
-        {
-            return this.isover;
-        }
 
         vbo:Float32Array;
         private ebo:Uint16Array;
@@ -364,9 +335,6 @@ namespace gd3d.framework
             }
             return new Uint16Array(this.ebo);
         }
-
-
-
 
         writeToJson(obj: any) {
             throw new Error("Method not implemented.");

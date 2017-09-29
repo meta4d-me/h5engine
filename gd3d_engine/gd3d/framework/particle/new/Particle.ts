@@ -351,10 +351,10 @@ namespace gd3d.framework
 
                 {//color
                     //处理一下颜色，以防灰度值 > 1
-                    let r = math.floatClamp(this.sourceVbo[i * vertexSize + 3], 0, 1)*this.startColor.r;
-                    let g = math.floatClamp(this.sourceVbo[i * vertexSize + 4], 0, 1)*this.startColor.g;
-                    let b = math.floatClamp(this.sourceVbo[i * vertexSize + 5], 0, 1)*this.startColor.b;
-                    let a = math.floatClamp(this.sourceVbo[i * vertexSize + 6], 0, 1)*this.startColor.a;
+                    let r = this.sourceVbo[i * vertexSize + 3]*this.startColor.r;
+                    let g = this.sourceVbo[i * vertexSize + 4]*this.startColor.g;
+                    let b = this.sourceVbo[i * vertexSize + 5]*this.startColor.b;
+                    let a = this.sourceVbo[i * vertexSize + 6]*this.startColor.a;
                     if (this.colorNodes!=null)
                     {
                         r = this.color.x;

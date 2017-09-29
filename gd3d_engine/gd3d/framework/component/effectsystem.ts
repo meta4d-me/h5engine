@@ -124,7 +124,7 @@ namespace gd3d.framework
         {
             this.webgl = gd3d.framework.sceneMgr.app.webgl;
             this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
-            this.init();
+            //this.init();
         }
 
         /**
@@ -141,7 +141,7 @@ namespace gd3d.framework
             this.remove();
             this.data = this.parser.Parse(_jsonStr, gd3d.framework.sceneMgr.app.getAssetMgr());
             console.warn("开始解析特效");
-            this.init();
+            //this.init();
         }
         /**
         * @private
@@ -178,7 +178,7 @@ namespace gd3d.framework
 
         start()
         {
-            // this.init();
+            this.init();
         }
         update(delta: number)
         {

@@ -52,7 +52,6 @@ namespace gd3d.framework
             {
                 return Math.floor(Math.random() * (max - min + 1) + min);
             }
-
             return Math.random() * (max - min) + min;
         }
     }
@@ -98,7 +97,16 @@ namespace gd3d.framework
             this.value=_value;
         }
     }
-    
+    export class Vector2Key
+    {
+        key:number;
+        value:math.vector2;
+        constructor(_key:number,_value:math.vector2)
+        {
+            this.key=_key;
+            this.value=_value;
+        }
+    }
     export class effTools
     {
         public static getRandomDirAndPosByZEmission(emission:EffectElementEmission,outDir:gd3d.math.vector3,outPos:gd3d.math.vector3)
