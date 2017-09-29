@@ -40,7 +40,7 @@ declare namespace gd3d.framework {
         readonly canvasClientWidth: number;
         readonly canvasClientHeight: number;
         scale: number;
-        start(div: HTMLDivElement, type?: CanvasFixedType, val?: number): void;
+        start(div: HTMLDivElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
         checkFilter(trans: any): boolean;
@@ -3840,11 +3840,212 @@ declare namespace gd3d.framework {
         private static create2D_button(btn, app);
     }
 }
+declare namespace gd3d.framework {
+    class WebGLDebugUtils {
+        private log(msg);
+        static readonly glValidEnumContexts: {
+            'enable': {
+                0: boolean;
+            };
+            'disable': {
+                0: boolean;
+            };
+            'getParameter': {
+                0: boolean;
+            };
+            'drawArrays': {
+                0: boolean;
+            };
+            'drawElements': {
+                0: boolean;
+                2: boolean;
+            };
+            'createShader': {
+                0: boolean;
+            };
+            'getShaderParameter': {
+                1: boolean;
+            };
+            'getProgramParameter': {
+                1: boolean;
+            };
+            'getVertexAttrib': {
+                1: boolean;
+            };
+            'vertexAttribPointer': {
+                2: boolean;
+            };
+            'bindTexture': {
+                0: boolean;
+            };
+            'activeTexture': {
+                0: boolean;
+            };
+            'getTexParameter': {
+                0: boolean;
+                1: boolean;
+            };
+            'texParameterf': {
+                0: boolean;
+                1: boolean;
+            };
+            'texParameteri': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            'texImage2D': {
+                0: boolean;
+                2: boolean;
+                6: boolean;
+                7: boolean;
+            };
+            'texSubImage2D': {
+                0: boolean;
+                6: boolean;
+                7: boolean;
+            };
+            'copyTexImage2D': {
+                0: boolean;
+                2: boolean;
+            };
+            'copyTexSubImage2D': {
+                0: boolean;
+            };
+            'generateMipmap': {
+                0: boolean;
+            };
+            'bindBuffer': {
+                0: boolean;
+            };
+            'bufferData': {
+                0: boolean;
+                2: boolean;
+            };
+            'bufferSubData': {
+                0: boolean;
+            };
+            'getBufferParameter': {
+                0: boolean;
+                1: boolean;
+            };
+            'pixelStorei': {
+                0: boolean;
+                1: boolean;
+            };
+            'readPixels': {
+                4: boolean;
+                5: boolean;
+            };
+            'bindRenderbuffer': {
+                0: boolean;
+            };
+            'bindFramebuffer': {
+                0: boolean;
+            };
+            'checkFramebufferStatus': {
+                0: boolean;
+            };
+            'framebufferRenderbuffer': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            'framebufferTexture2D': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            'getFramebufferAttachmentParameter': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            'getRenderbufferParameter': {
+                0: boolean;
+                1: boolean;
+            };
+            'renderbufferStorage': {
+                0: boolean;
+                1: boolean;
+            };
+            'clear': {
+                0: boolean;
+            };
+            'depthFunc': {
+                0: boolean;
+            };
+            'blendFunc': {
+                0: boolean;
+                1: boolean;
+            };
+            'blendFuncSeparate': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+                3: boolean;
+            };
+            'blendEquation': {
+                0: boolean;
+            };
+            'blendEquationSeparate': {
+                0: boolean;
+                1: boolean;
+            };
+            'stencilFunc': {
+                0: boolean;
+            };
+            'stencilFuncSeparate': {
+                0: boolean;
+                1: boolean;
+            };
+            'stencilMaskSeparate': {
+                0: boolean;
+            };
+            'stencilOp': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            'stencilOpSeparate': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+                3: boolean;
+            };
+            'cullFace': {
+                0: boolean;
+            };
+            'frontFace': {
+                0: boolean;
+            };
+        };
+        private glEnums;
+        private init(ctx);
+        private checkInit();
+        private mightBeEnum(value);
+        private glEnumToString(value);
+        private glFunctionArgToString(functionName, argumentIndex, value);
+        makeDebugContext(ctx: WebGLRenderingContext, opt_onErrorFunc?: (err, funcName, args) => void): WebGLRenderingContext;
+        private resetToInitialState(ctx);
+        private makeLostContextSimulatingContext(ctx);
+    }
+}
+declare namespace gd3d.framework {
+    class WebGLUtils {
+        private makeFailHTML;
+        private GET_A_WEBGL_BROWSER;
+        private OTHER_PROBLEM;
+        setupWebGL(canvas: Element, opt_attribs?: WebGLContextAttributes, opt_onError?: (msg: string) => void): any;
+        create3DContext(canvas: any, opt_attribs: any): any;
+        constructor();
+    }
+}
 declare namespace gd3d.io {
-    function loadText(url: string, fun: (_txt: string, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function loadBlob(url: string, fun: (_blob: Blob, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
 declare namespace gd3d.math {
     class pool {
