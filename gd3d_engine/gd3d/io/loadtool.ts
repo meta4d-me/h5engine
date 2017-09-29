@@ -4,7 +4,6 @@
         public static urlCaseDic:{[url:string]:number};
 
     }
-
     /**
      * 
      * @param url 加载路径
