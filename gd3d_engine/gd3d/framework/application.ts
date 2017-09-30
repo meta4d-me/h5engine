@@ -200,13 +200,6 @@ namespace gd3d.framework
                 throw Error("Failed to get webgl at the application.start()");
             }
 
-            //debug 
-            if (webglDebug) {
-                let tempWebGLDebugUtils = new WebGLDebugUtils();
-                this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
-                console.error(" i am ---webglDebug-");
-              }
-
             switch (type)
             {
                 case CanvasFixedType.FixedWidthType:
@@ -244,6 +237,13 @@ namespace gd3d.framework
             {
                 initovercallback(this);
             }
+
+            //debug 
+            if (webglDebug) {
+                let tempWebGLDebugUtils = new WebGLDebugUtils();
+                this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
+                console.error(" i am ---webglDebug-");
+              }
         }
 
         markNotify(trans: any, type: NotifyType)
