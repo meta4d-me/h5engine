@@ -50,6 +50,7 @@ namespace gd3d.framework
         webgl: WebGLRenderingContext;
         stats: Stats.Stats;
         container: HTMLDivElement;
+        outcontainer: HTMLDivElement;
         /**
          * @public
          * @language zh_CN
@@ -173,7 +174,18 @@ namespace gd3d.framework
 
             sceneMgr.app = this;
             this._timeScale = 1;
-            this.container = div;
+            this.outcontainer = div;
+            var rotateDiv = document.createElement("div");
+            rotateDiv.className = "full";
+            rotateDiv.style.position = "absolute";
+            rotateDiv.style.width = "100%";
+            rotateDiv.style.height = "100%";
+        
+            this.container = rotateDiv;
+            div.appendChild(rotateDiv);
+
+
+
             var canvas = document.createElement("canvas");
             if(canvas == null){
                 alert("Failed to create canvas at the application.start()");
@@ -185,7 +197,9 @@ namespace gd3d.framework
             canvas.style.height = "100%";
             canvas.style.backgroundColor = "#1e1e1e";
             canvas.setAttribute("tabindex", "1");
-            div.appendChild(canvas);
+            rotateDiv.appendChild(canvas);
+            
+            //this.updateOrientationMode();
 
             //init webgl;
 
@@ -214,7 +228,7 @@ namespace gd3d.framework
                 this.webgl.canvas.width = this._fixWidth;
                 this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
                 this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-            } 
+            }
             else if (this.beHeightSetted)
             {
                 this.webgl.canvas.height = this._fixHeight;
@@ -333,6 +347,11 @@ namespace gd3d.framework
         //delta 单位秒
         private update(delta: number)
         {
+            //if (this.outcontainer.clientWidth != this._canvasClientWidth || this.outcontainer.clientHeight != this._canvasClientHeight)
+            {
+                this.updateOrientationMode();
+            }
+
             if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight)
             {
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
@@ -341,12 +360,14 @@ namespace gd3d.framework
                 {
                     this.webgl.canvas.width = this._fixWidth;
                     this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 } else if (this.beHeightSetted)
                 {
                     this.webgl.canvas.height = this._fixHeight;
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
                     this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
+                console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
                 console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
                 console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
                 
@@ -711,6 +732,67 @@ namespace gd3d.framework
         {
             this._editorCodeNew.push(program);
         }
+
+        public orientation: string = OrientationMode.AUTO;//旋转角度
+        public shouldRotate = false; //需要旋转
+        private lastWidth = 0;
+        private lastHeight = 0;
+        private updateOrientationMode()
+        {
+            let screenRect = this.outcontainer.getBoundingClientRect();
+            
+            this.shouldRotate = false;
+            if (this.orientation != OrientationMode.AUTO)
+            {
+                this.shouldRotate = 
+                (this.orientation == OrientationMode.LANDSCAPE || this.orientation == OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width || 
+                this.orientation == OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
+            }
+            
+            let screenWidth = this.shouldRotate ? screenRect.height : screenRect.width;
+            let screenHeight = this.shouldRotate ? screenRect.width : screenRect.height;
+
+            if(this.lastWidth == screenWidth && this.lastHeight == screenHeight) return; //不再重复
+
+            this.lastWidth = screenWidth;
+            this.lastHeight = screenHeight;
+            // if (this.width !== screenWidth) {
+            //     this.width = screenWidth;
+            // }
+            // if (this.height !== screenHeight) {
+            //     this.height = screenHeight;
+            // }
+    
+            this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
+            this.container.style.width = screenWidth + "px";
+            this.container.style.height = screenHeight + "px";
+    
+    
+            let rotation = 0;
+            if (this.shouldRotate)
+            {
+                if (this.orientation == OrientationMode.LANDSCAPE)
+                {//
+                    rotation = 90;
+                    this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
+                    this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+                }
+                else
+                {
+                    rotation = -90;
+                    this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
+                    this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+                }
+            }
+            else
+            {
+                this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
+                this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
+            }
+    
+            let transform = `rotate(${rotation}deg)`;
+            this.container.style[getPrefixStyleName("transform")] = transform;
+        }
     }
     /**
      * @public
@@ -740,4 +822,84 @@ namespace gd3d.framework
         onUpdate(delta: number);
         isClosed(): boolean;
     }
+
+    export const OrientationMode = {
+    
+        /**
+         * 适配屏幕
+         */
+        AUTO: "auto",
+        /**
+         * 默认竖屏
+         */
+        PORTRAIT: "portrait",
+        /**
+         * 默认横屏，舞台顺时针旋转90度
+         */
+        LANDSCAPE: "landscape",
+        /**
+         * 默认横屏，舞台逆时针旋转90度
+         */
+        LANDSCAPE_FLIPPED: "landscapeFlipped"
+    }
+    
+    /**
+     * @private
+     */
+    let currentPrefix: string = null;
+    
+    /**
+     * @private
+     */
+    export function getPrefixStyleName(name: string, element?: any): string
+    {
+        let header: string = "";
+    
+        if (element != null)
+        {
+            header = getPrefix(name, element);
+        }
+        else
+        {
+            if (currentPrefix == null)
+            {
+                let tempStyle = document.createElement('div').style;
+                currentPrefix = getPrefix("transform", tempStyle);
+            }
+            header = currentPrefix;
+        }
+    
+        if (header == "")
+        {
+            return name;
+        }
+    
+        return header + name.charAt(0).toUpperCase() + name.substring(1, name.length);
+    }
+    
+    /**
+     * @private
+     */
+    export function getPrefix(name: string, element: any): string
+    {
+        if (name in element)
+        {
+            return "";
+        }
+    
+        name = name.charAt(0).toUpperCase() + name.substring(1, name.length);
+        let transArr: string[] = ["webkit", "ms", "Moz", "O"];
+        for (let i: number = 0; i < transArr.length; i++)
+        {
+            let tempStyle: string = transArr[i] + name;
+    
+            if (tempStyle in element)
+            {
+                return transArr[i];
+            }
+        }
+    
+        return "";
+    }
+    
 }
