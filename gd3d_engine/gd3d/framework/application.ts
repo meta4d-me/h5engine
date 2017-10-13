@@ -902,33 +902,4 @@ namespace gd3d.framework
         return "";
     }
     
-    export function getLocation(event: any,canvas:HTMLCanvasElement): any 
-    {
-        let result: any = {};
-
-        event.identifier = +event.identifier || 0;
-        let doc = document.documentElement;
-        let box = canvas.getBoundingClientRect();
-        let left = box.left + window.pageXOffset - doc.clientLeft;
-        let top = box.top + window.pageYOffset - doc.clientTop;
-
-        let newx = 0, newy = 0;
-        if (event.offsetX)
-        {
-            newx = event.offsetX;
-            newy = event.offsetY;
-        }
-        else
-        {
-            newx = event.pageX - left;
-            newy = event.pageY - top;
-        }
-       
-        let webglWidth: number = canvas.clientWidth;
-        let webglHeight: number = canvas.clientHeight;
-        
-        result.x = newx;
-        result.y = newy;
-        return result;
-    }
 }
