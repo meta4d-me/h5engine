@@ -737,8 +737,10 @@ namespace gd3d.framework
         public shouldRotate = false; //需要旋转
         private lastWidth = 0;
         private lastHeight = 0;
+        public OffOrientationUpdata = false;  //关闭更新
         private updateOrientationMode()
         {
+            if(this.OffOrientationUpdata)return;
             let screenRect = this.outcontainer.getBoundingClientRect();
             
             this.shouldRotate = false;
