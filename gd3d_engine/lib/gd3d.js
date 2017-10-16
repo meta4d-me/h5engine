@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000030";
+                this.build = "b000031";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -56,6 +56,11 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
+                this.orientation = framework.OrientationMode.AUTO;
+                this.shouldRotate = false;
+                this.lastWidth = 0;
+                this.lastHeight = 0;
+                this.OffOrientationUpdata = false;
             }
             Object.defineProperty(application.prototype, "timeScale", {
                 get: function () {
@@ -119,7 +124,14 @@ var gd3d;
                 console.log("version: " + this.version + "  build: " + this.build);
                 framework.sceneMgr.app = this;
                 this._timeScale = 1;
-                this.container = div;
+                this.outcontainer = div;
+                var rotateDiv = document.createElement("div");
+                rotateDiv.className = "full";
+                rotateDiv.style.position = "absolute";
+                rotateDiv.style.width = "100%";
+                rotateDiv.style.height = "100%";
+                this.container = rotateDiv;
+                div.appendChild(rotateDiv);
                 var canvas = document.createElement("canvas");
                 if (canvas == null) {
                     alert("Failed to create canvas at the application.start()");
@@ -131,7 +143,7 @@ var gd3d;
                 canvas.style.height = "100%";
                 canvas.style.backgroundColor = "#1e1e1e";
                 canvas.setAttribute("tabindex", "1");
-                div.appendChild(canvas);
+                rotateDiv.appendChild(canvas);
                 var tempWebGlUtil = new framework.WebGLUtils();
                 this.webgl = tempWebGlUtil.setupWebGL(canvas);
                 console.error(" i am ---tempWebGlUtil-" + webglDebug);
@@ -223,18 +235,23 @@ var gd3d;
                 }
             };
             application.prototype.update = function (delta) {
+                {
+                    this.updateOrientationMode();
+                }
                 if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
                     this._canvasClientWidth = this.webgl.canvas.clientWidth;
                     this._canvasClientHeight = this.webgl.canvas.clientHeight;
                     if (this.beWidthSetted) {
                         this.webgl.canvas.width = this._fixWidth;
                         this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                        this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
                     else if (this.beHeightSetted) {
                         this.webgl.canvas.height = this._fixHeight;
                         this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
                         this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
+                    console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
                     console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
                     console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
                 }
@@ -423,9 +440,88 @@ var gd3d;
             application.prototype.addEditorCodeDirect = function (program) {
                 this._editorCodeNew.push(program);
             };
+            application.prototype.updateOrientationMode = function () {
+                if (this.OffOrientationUpdata)
+                    return;
+                var screenRect = this.outcontainer.getBoundingClientRect();
+                this.shouldRotate = false;
+                if (this.orientation != framework.OrientationMode.AUTO) {
+                    this.shouldRotate =
+                        (this.orientation == framework.OrientationMode.LANDSCAPE || this.orientation == framework.OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width ||
+                            this.orientation == framework.OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
+                }
+                var screenWidth = this.shouldRotate ? screenRect.height : screenRect.width;
+                var screenHeight = this.shouldRotate ? screenRect.width : screenRect.height;
+                if (this.lastWidth == screenWidth && this.lastHeight == screenHeight)
+                    return;
+                this.lastWidth = screenWidth;
+                this.lastHeight = screenHeight;
+                this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
+                this.container.style.width = screenWidth + "px";
+                this.container.style.height = screenHeight + "px";
+                var rotation = 0;
+                if (this.shouldRotate) {
+                    if (this.orientation == framework.OrientationMode.LANDSCAPE) {
+                        rotation = 90;
+                        this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
+                        this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+                    }
+                    else {
+                        rotation = -90;
+                        this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
+                        this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+                    }
+                }
+                else {
+                    this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
+                    this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
+                }
+                var transform = "rotate(" + rotation + "deg)";
+                this.container.style[getPrefixStyleName("transform")] = transform;
+            };
             return application;
         }());
         framework.application = application;
+        framework.OrientationMode = {
+            AUTO: "auto",
+            PORTRAIT: "portrait",
+            LANDSCAPE: "landscape",
+            LANDSCAPE_FLIPPED: "landscapeFlipped"
+        };
+        var currentPrefix = null;
+        function getPrefixStyleName(name, element) {
+            var header = "";
+            if (element != null) {
+                header = getPrefix(name, element);
+            }
+            else {
+                if (currentPrefix == null) {
+                    var tempStyle = document.createElement('div').style;
+                    currentPrefix = getPrefix("transform", tempStyle);
+                }
+                header = currentPrefix;
+            }
+            if (header == "") {
+                return name;
+            }
+            return header + name.charAt(0).toUpperCase() + name.substring(1, name.length);
+        }
+        framework.getPrefixStyleName = getPrefixStyleName;
+        function getPrefix(name, element) {
+            if (name in element) {
+                return "";
+            }
+            name = name.charAt(0).toUpperCase() + name.substring(1, name.length);
+            var transArr = ["webkit", "ms", "Moz", "O"];
+            for (var i = 0; i < transArr.length; i++) {
+                var tempStyle = transArr[i] + name;
+                if (tempStyle in element) {
+                    return transArr[i];
+                }
+            }
+            return "";
+        }
+        framework.getPrefix = getPrefix;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -11580,9 +11676,13 @@ var gd3d;
                 this.point = new pointinfo();
                 this.touches = {};
                 this.keyboardMap = {};
+                this.rMtr_90 = new gd3d.math.matrix3x2();
+                this.rMtr_n90 = new gd3d.math.matrix3x2();
+                this.app = app;
+                gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
+                gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
                 app.webgl.canvas.addEventListener("touchstart", function (ev) {
-                    _this.point.x = ev.touches[0].clientX / app.scale;
-                    _this.point.y = ev.touches[0].clientY / app.scale;
+                    _this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
                     _this.point.touch = true;
                     for (var i = 0; i < ev.changedTouches.length; i++) {
                         var touch = ev.changedTouches[i];
@@ -11618,8 +11718,7 @@ var gd3d;
                             count++;
                         }
                     }
-                    _this.point.x = x / (count * app.scale);
-                    _this.point.y = y / (count * app.scale);
+                    _this.CalcuPoint(x / count, y / count);
                 });
                 app.webgl.canvas.addEventListener("touchend", function (ev) {
                     for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -11654,16 +11753,14 @@ var gd3d;
                     _this.point.touch = false;
                 });
                 app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.point.x = ev.clientX / app.scale;
-                    _this.point.y = ev.clientY / app.scale;
+                    _this.CalcuPoint(ev.clientX, ev.clientY);
                     _this.point.touch = true;
                 });
                 app.webgl.canvas.addEventListener("mouseup", function (ev) {
                     _this.point.touch = false;
                 });
                 app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.point.x = ev.clientX / app.scale;
-                    _this.point.y = ev.clientY / app.scale;
+                    _this.CalcuPoint(ev.clientX, ev.clientY);
                 });
                 app.webgl.canvas.addEventListener("keydown", function (ev) {
                     _this.keyboardMap[ev.keyCode] = true;
@@ -11672,6 +11769,40 @@ var gd3d;
                     _this.keyboardMap[ev.keyCode] = false;
                 }, false);
             }
+            inputMgr.prototype.CalcuPoint = function (clientX, clientY) {
+                if (!this.app || isNaN(clientX) || isNaN(clientY))
+                    return;
+                if (!this.tempV2_0)
+                    this.tempV2_0 = gd3d.math.pool.new_vector2();
+                if (!this.tempV2_1)
+                    this.tempV2_1 = gd3d.math.pool.new_vector2();
+                this.tempV2_0.x = clientX / this.app.scale;
+                this.tempV2_0.y = clientY / this.app.scale;
+                gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
+                if (this.app.shouldRotate) {
+                    switch (this.app.orientation) {
+                        case gd3d.framework.OrientationMode.PORTRAIT:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
+                            this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            this.point.y = this.tempV2_1.y;
+                            break;
+                        case gd3d.framework.OrientationMode.LANDSCAPE:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_n90, this.tempV2_0, this.tempV2_1);
+                            this.point.x = this.tempV2_1.x;
+                            this.point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
+                            break;
+                        case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
+                            this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            this.point.y = this.tempV2_1.y;
+                            break;
+                    }
+                }
+                else {
+                    this.point.x = this.tempV2_0.x;
+                    this.point.y = this.tempV2_0.y;
+                }
+            };
             return inputMgr;
         }());
         framework.inputMgr = inputMgr;

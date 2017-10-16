@@ -18,6 +18,7 @@ declare namespace gd3d.framework {
         webgl: WebGLRenderingContext;
         stats: Stats.Stats;
         container: HTMLDivElement;
+        outcontainer: HTMLDivElement;
         width: number;
         height: number;
         limitFrame: boolean;
@@ -89,6 +90,12 @@ declare namespace gd3d.framework {
         addUserCode(classname: string): void;
         addEditorCode(classname: string): void;
         addEditorCodeDirect(program: IEditorCode): void;
+        orientation: string;
+        shouldRotate: boolean;
+        private lastWidth;
+        private lastHeight;
+        OffOrientationUpdata: boolean;
+        private updateOrientationMode();
     }
     interface IUserCode {
         onStart(app: gd3d.framework.application): any;
@@ -100,6 +107,14 @@ declare namespace gd3d.framework {
         onUpdate(delta: number): any;
         isClosed(): boolean;
     }
+    const OrientationMode: {
+        AUTO: string;
+        PORTRAIT: string;
+        LANDSCAPE: string;
+        LANDSCAPE_FLIPPED: string;
+    };
+    function getPrefixStyleName(name: string, element?: any): string;
+    function getPrefix(name: string, element: any): string;
 }
 declare namespace gd3d.framework {
     class sceneMgr {
@@ -1964,6 +1979,7 @@ declare namespace gd3d.framework {
     }
     class inputMgr {
         private inputlast;
+        private app;
         point: pointinfo;
         touches: {
             [id: number]: pointinfo;
@@ -1971,7 +1987,12 @@ declare namespace gd3d.framework {
         keyboardMap: {
             [id: number]: boolean;
         };
+        private rMtr_90;
+        private rMtr_n90;
         constructor(app: application);
+        private tempV2_0;
+        private tempV2_1;
+        private CalcuPoint(clientX, clientY);
     }
 }
 declare namespace gd3d.io {

@@ -25,12 +25,19 @@ namespace gd3d.framework
     export class inputMgr
     {
         private inputlast: HTMLInputElement = null;
+        private app:gd3d.framework.application;
         point: pointinfo = new pointinfo();
         touches: { [id: number]: pointinfo } = {};
         keyboardMap: { [id: number]: boolean } = {};
 
+        private rMtr_90 =new gd3d.math.matrix3x2();
+        private rMtr_n90 =new gd3d.math.matrix3x2();
         constructor(app: application)
         {
+            this.app = app;
+            gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180,this.rMtr_90);
+            gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180,this.rMtr_n90);
+
             app.webgl.canvas.addEventListener("touchstart", (ev: TouchEvent) =>
             {
                 // console.log("引擎1111");
@@ -45,8 +52,7 @@ namespace gd3d.framework
                 //     ev.preventDefault();
                 //     // return;
                 // }
-                this.point.x = ev.touches[0].clientX / app.scale;
-                this.point.y = ev.touches[0].clientY / app.scale;
+                this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY);
                 this.point.touch = true;
 
                 for (var i = 0; i < ev.changedTouches.length; i++)
@@ -93,8 +99,9 @@ namespace gd3d.framework
                         count++;
                     }
                 }
-                this.point.x = x / (count * app.scale);
-                this.point.y = y / (count * app.scale);
+                // this.point.x = x / (count * app.scale);
+                // this.point.y = y / (count * app.scale);
+                this.CalcuPoint(x / count,y / count);
             }
             );
             app.webgl.canvas.addEventListener("touchend", (ev) =>
@@ -145,9 +152,9 @@ namespace gd3d.framework
             );
             app.webgl.canvas.addEventListener("mousedown", (ev) =>
             {
-                this.point.x = ev.clientX / app.scale;
-                this.point.y = ev.clientY / app.scale;
+                this.CalcuPoint(ev.clientX,ev.clientY);
                 this.point.touch = true;
+                
             }
             );
             app.webgl.canvas.addEventListener("mouseup", (ev) =>
@@ -158,8 +165,7 @@ namespace gd3d.framework
 
             app.webgl.canvas.addEventListener("mousemove", (ev) =>
             {
-                this.point.x = ev.clientX / app.scale;
-                this.point.y = ev.clientY / app.scale;
+                this.CalcuPoint(ev.clientX,ev.clientY);
             }
             );
 
@@ -172,6 +178,43 @@ namespace gd3d.framework
             {
                 this.keyboardMap[ev.keyCode] = false;
             }, false);
+        }
+
+        private tempV2_0:gd3d.math.vector2;
+        private tempV2_1:gd3d.math.vector2;
+        private CalcuPoint(clientX:number,clientY:number){
+            if(!this.app || isNaN(clientX) || isNaN(clientY)) return;
+            if(!this.tempV2_0) this.tempV2_0 = gd3d.math.pool.new_vector2();
+            if(!this.tempV2_1) this.tempV2_1 = gd3d.math.pool.new_vector2();
+
+            this.tempV2_0.x = clientX / this.app.scale;
+            this.tempV2_0.y = clientY / this.app.scale;
+            gd3d.math.vec2Clone(this.tempV2_0,this.tempV2_1);
+            
+            if(this.app.shouldRotate){
+                switch (this.app.orientation){
+                    case gd3d.framework.OrientationMode.PORTRAIT:
+                    gd3d.math.matrix3x2TransformVector2(this.rMtr_90,this.tempV2_0,this.tempV2_1);
+                    this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                    this.point.y = this.tempV2_1.y;
+                    break;
+                    case gd3d.framework.OrientationMode.LANDSCAPE:
+                    gd3d.math.matrix3x2TransformVector2(this.rMtr_n90,this.tempV2_0,this.tempV2_1);
+                    this.point.x = this.tempV2_1.x;
+                    this.point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
+                    break;
+                    case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
+                    gd3d.math.matrix3x2TransformVector2(this.rMtr_90,this.tempV2_0,this.tempV2_1);
+                    this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                    this.point.y = this.tempV2_1.y;
+                    break;
+                }
+            }else{
+                this.point.x = this.tempV2_0.x;
+                this.point.y = this.tempV2_0.y;
+            }
+            
+            //console.error(`x :${this.point.x}  y :${this.point.y}  w :${this.app.webgl.canvas.width}  h :${this.app.webgl.canvas.height}`);
         }
     }
 }
