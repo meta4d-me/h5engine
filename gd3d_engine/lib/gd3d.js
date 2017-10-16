@@ -139,11 +139,6 @@ var gd3d;
                     alert("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
                 }
-                if (webglDebug) {
-                    var tempWebGLDebugUtils = new framework.WebGLDebugUtils();
-                    this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
-                    console.error(" i am ---webglDebug-");
-                }
                 switch (type) {
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
@@ -174,6 +169,11 @@ var gd3d;
                 var initovercallback = window["initovercallback"];
                 if (initovercallback != null) {
                     initovercallback(this);
+                }
+                if (webglDebug) {
+                    var tempWebGLDebugUtils = new framework.WebGLDebugUtils();
+                    this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
+                    console.error(" i am ---webglDebug-");
                 }
             };
             application.prototype.markNotify = function (trans, type) {
@@ -10758,7 +10758,7 @@ var gd3d;
                         this._efficient = false;
                     }
                     else if (this._skintype == 2) {
-                        this.maxBoneCount = 40;
+                        this.maxBoneCount = 55;
                         this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                         this._efficient = true;
                     }
@@ -10778,7 +10778,7 @@ var gd3d;
                         if (!data) {
                             var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
                             if (_cachePlayer) {
-                                data = new Float32Array(8 * 40);
+                                data = new Float32Array(8 * 60);
                                 _cachePlayer.fillPoseData(data, this.bones, true);
                                 skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
                                 this.cacheData = data;

@@ -3843,8 +3843,8 @@ var test_multipleplayer_anim = (function () {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
-        this.camera.far = 199;
-        objCam.localTranslate = new gd3d.math.vector3(0, 86, 0);
+        this.camera.far = 399;
+        objCam.localTranslate = new gd3d.math.vector3(0, 286, 0);
         objCam.markDirty();
         var tipsLabel = document.createElement("label");
         tipsLabel.style.top = "300px";

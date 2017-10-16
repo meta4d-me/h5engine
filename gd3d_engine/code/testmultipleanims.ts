@@ -69,8 +69,8 @@ class test_multipleplayer_anim implements IState
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
-        this.camera.far = 199;
-        objCam.localTranslate = new gd3d.math.vector3(0, 86, 0);
+        this.camera.far = 399;
+        objCam.localTranslate = new gd3d.math.vector3(0, 286, 0);
         // objCam.lookat(baihu);
         objCam.markDirty();//标记为需要刷新
 
@@ -105,45 +105,6 @@ class test_multipleplayer_anim implements IState
     aniplayers:gd3d.framework.aniplayer[] = [];
     update(delta: number)
     {
-        // this.timer += delta;
-        // var x = Math.sin(this.timer * 0.5);
-        // var z = Math.cos(this.timer * 0.5);
-        // // var x2 = Math.sin(this.timer * 1.1);
-        // // var z2 = Math.cos(this.timer * 1.1);
-        // let objCam = this.camera.gameObject.transform;
-        // objCam.localTranslate = new gd3d.math.vector3(x * 86, 55, -z * 86);
-        // objCam.lookat(this.cube);
-        // objCam.markDirty();//标记为需要刷新
-        // objCam.updateWorldTran();
-        // for (var key in this.cubes)
-        // {
-        //     var ap = this.player.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
-        //     if (ap != null && ap.nowpose != null)
-        //     {
-        //         var p = ap.nowpose[key];
-        //         var t = ap.tpose[key];
 
-        //         if (p != undefined && t != undefined)
-        //         {
-        //             // var matt = new gd3d.math.matrix();
-        //             // var matb = new gd3d.math.matrix();
-        //             // gd3d.math.matrixMakeTransformRTS(t.t, new gd3d.math.vector3(1, 1, 1), t.r, matt);
-        //             // gd3d.math.matrixMakeTransformRTS(p.t, new gd3d.math.vector3(1, 1, 1), p.r, matb);
-        //             // let _matrix = new gd3d.math.matrix();
-        //             // gd3d.math.matrixMultiply(matb, matt, _matrix);
-
-        //             // let _newmatrix = new gd3d.math.matrix();
-        //             // gd3d.math.matrixMultiply(this.player.getWorldMatrix(), _matrix, _newmatrix);
-        //             // this.cubes[key].setWorldMatrix(_newmatrix);
-
-        //             let fmat = gd3d.framework.PoseBoneMatrix.sMultiply(p, t);
-
-        //             gd3d.math.vec3Clone(fmat.t, this.cubes[key].localTranslate);
-        //             gd3d.math.quatClone(fmat.r, this.cubes[key].localRotate);
-        //             this.cubes[key].markDirty();
-        //         }
-        //     }
-
-        // }
     }
 }
