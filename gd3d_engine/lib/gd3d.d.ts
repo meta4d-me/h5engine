@@ -94,7 +94,7 @@ declare namespace gd3d.framework {
         shouldRotate: boolean;
         private lastWidth;
         private lastHeight;
-        OffOrientationUpdata: boolean;
+        OffOrientationUpdate: boolean;
         private updateOrientationMode();
     }
     interface IUserCode {

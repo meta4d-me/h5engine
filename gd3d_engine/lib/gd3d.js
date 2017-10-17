@@ -60,7 +60,7 @@ var gd3d;
                 this.shouldRotate = false;
                 this.lastWidth = 0;
                 this.lastHeight = 0;
-                this.OffOrientationUpdata = false;
+                this.OffOrientationUpdate = false;
             }
             Object.defineProperty(application.prototype, "timeScale", {
                 get: function () {
@@ -441,7 +441,7 @@ var gd3d;
                 this._editorCodeNew.push(program);
             };
             application.prototype.updateOrientationMode = function () {
-                if (this.OffOrientationUpdata)
+                if (this.OffOrientationUpdate)
                     return;
                 var screenRect = this.outcontainer.getBoundingClientRect();
                 this.shouldRotate = false;
@@ -6898,7 +6898,11 @@ var gd3d;
             material.prototype.Parse = function (assetmgr, json, bundleName) {
                 if (bundleName === void 0) { bundleName = null; }
                 var shaderName = json["shader"];
-                this.setShader(assetmgr.getShader(shaderName));
+                var shader = assetmgr.getShader(shaderName);
+                if (shader == null) {
+                    console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
+                }
+                this.setShader(shader);
                 var mapUniform = json["mapUniform"];
                 for (var i in mapUniform) {
                     var jsonChild = mapUniform[i];

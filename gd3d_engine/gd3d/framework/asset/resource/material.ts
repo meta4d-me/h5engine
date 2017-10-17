@@ -690,7 +690,12 @@ namespace gd3d.framework
         Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
         {
             var shaderName = json["shader"];
-            this.setShader(assetmgr.getShader(shaderName) as gd3d.framework.shader);
+            var shader=assetmgr.getShader(shaderName) as gd3d.framework.shader;
+            if(shader==null)
+            {
+                console.error("shader 为空！shadername："+shaderName+" bundleName: "+bundleName);
+            }
+            this.setShader(shader);
             var mapUniform = json["mapUniform"];
             for (var i in mapUniform)
             {
