@@ -3652,11 +3652,14 @@ declare namespace gd3d.framework {
         checkImpact(): Array<transform>;
         private doImpact(tran, impacted);
         markDirty(): void;
+        markHaveComponent(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
         updateAABBChild(): void;
         private dirty;
         private dirtyChild;
+        hasComponent: boolean;
+        hasComponentChild: boolean;
         private dirtyWorldDecompose;
         localRotate: gd3d.math.quaternion;
         localTranslate: gd3d.math.vector3;

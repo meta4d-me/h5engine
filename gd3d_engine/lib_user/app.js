@@ -3819,8 +3819,9 @@ var test_multipleplayer_anim = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
                         var a = 10;
                         var b = 10;
-                        for (var i = -10; i <= 10; i++) {
-                            for (var j = -10; j <= 10; j++) {
+                        var count = 13;
+                        for (var i = -count; i <= count; i++) {
+                            for (var j = -count; j <= count; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);

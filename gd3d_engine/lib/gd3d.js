@@ -20016,6 +20016,7 @@ var gd3d;
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
+                this.transform.markHaveComponent();
                 if (comp.gameObject != null) {
                     throw new Error("this components has added to a  gameObject");
                 }
@@ -20433,6 +20434,8 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
+                if (node.hasComponent == false && node.hasComponentChild == false)
+                    return;
                 node.gameObject.init();
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
@@ -21194,6 +21197,8 @@ var gd3d;
                 this.aabbchilddirty = true;
                 this.dirty = true;
                 this.dirtyChild = true;
+                this.hasComponent = false;
+                this.hasComponentChild = false;
                 this.dirtyWorldDecompose = false;
                 this.localRotate = new gd3d.math.quaternion();
                 this.localTranslate = new gd3d.math.vector3(0, 0, 0);
@@ -21298,6 +21303,8 @@ var gd3d;
                 node.scene = this.scene;
                 node.parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                if (node.hasComponent || node.hasComponentChild)
+                    this.markHaveComponent();
             };
             transform.prototype.addChildAt = function (node, index) {
                 if (index < 0)
@@ -21311,6 +21318,8 @@ var gd3d;
                 node.scene = this.scene;
                 node.parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                if (node.hasComponent || node.hasComponentChild)
+                    this.markHaveComponent();
             };
             transform.prototype.removeAllChild = function () {
                 if (this.children == undefined)
@@ -21373,6 +21382,14 @@ var gd3d;
             };
             transform.prototype.markDirty = function () {
                 this.dirty = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p = p.parent;
+                }
+            };
+            transform.prototype.markHaveComponent = function () {
+                this.hasComponent = true;
                 var p = this.parent;
                 while (p != null) {
                     p.dirtyChild = true;

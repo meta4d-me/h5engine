@@ -276,6 +276,7 @@ namespace gd3d.framework
          */
         addComponentDirect(comp: INodeComponent): INodeComponent
         {
+            this.transform.markHaveComponent();
             if (comp.gameObject != null)
             {
                 throw new Error("this components has added to a  gameObject");

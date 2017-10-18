@@ -249,6 +249,8 @@ namespace gd3d.framework
             node.scene = this.scene;
             node.parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            if (node.hasComponent || node.hasComponentChild)
+                this.markHaveComponent();
         }
         /**
          * @public
@@ -274,6 +276,8 @@ namespace gd3d.framework
             node.scene = this.scene;
             node.parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            if (node.hasComponent || node.hasComponentChild)
+                this.markHaveComponent();
         }
         /**
          * @public
@@ -408,7 +412,16 @@ namespace gd3d.framework
                 p = p.parent;
             }
         }
-
+        markHaveComponent()
+        {
+            this.hasComponent = true;
+            var p = this.parent;
+            while (p != null)
+            {
+                p.dirtyChild = true;
+                p = p.parent;
+            }
+        }
         /**
          * @public
          * @language zh_CN
@@ -507,6 +520,9 @@ namespace gd3d.framework
 
         private dirty: boolean = true;//自己是否需要更新
         private dirtyChild: boolean = true;//子层是否需要更新
+
+        public hasComponent: boolean = false;
+        public hasComponentChild: boolean = false;
 
         private dirtyWorldDecompose: boolean = false;
         /**
