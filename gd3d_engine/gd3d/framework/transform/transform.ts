@@ -419,6 +419,7 @@ namespace gd3d.framework
             while (p != null)
             {
                 p.dirtyChild = true;
+				p.hasComponentChild = true;
                 p = p.parent;
             }
         }
