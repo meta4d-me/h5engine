@@ -3819,8 +3819,9 @@ var test_multipleplayer_anim = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(data_1.prefabName);
                         var a = 10;
                         var b = 10;
-                        for (var i = -10; i <= 10; i++) {
-                            for (var j = -10; j <= 10; j++) {
+                        var count = 13;
+                        for (var i = -count; i <= count; i++) {
+                            for (var j = -count; j <= count; j++) {
                                 var trans = _prefab.getCloneTrans();
                                 _this.scene.addChild(trans);
                                 trans.localScale = new gd3d.math.vector3(1, 1, 1);
@@ -3843,8 +3844,8 @@ var test_multipleplayer_anim = (function () {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
-        this.camera.far = 199;
-        objCam.localTranslate = new gd3d.math.vector3(0, 86, 0);
+        this.camera.far = 399;
+        objCam.localTranslate = new gd3d.math.vector3(0, 286, 0);
         objCam.markDirty();
         var tipsLabel = document.createElement("label");
         tipsLabel.style.top = "300px";

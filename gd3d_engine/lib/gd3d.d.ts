@@ -94,7 +94,7 @@ declare namespace gd3d.framework {
         shouldRotate: boolean;
         private lastWidth;
         private lastHeight;
-        OffOrientationUpdata: boolean;
+        OffOrientationUpdate: boolean;
         private updateOrientationMode();
     }
     interface IUserCode {
@@ -3652,11 +3652,14 @@ declare namespace gd3d.framework {
         checkImpact(): Array<transform>;
         private doImpact(tran, impacted);
         markDirty(): void;
+        markHaveComponent(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
         updateAABBChild(): void;
         private dirty;
         private dirtyChild;
+        hasComponent: boolean;
+        hasComponentChild: boolean;
         private dirtyWorldDecompose;
         localRotate: gd3d.math.quaternion;
         localTranslate: gd3d.math.vector3;

@@ -60,7 +60,7 @@ var gd3d;
                 this.shouldRotate = false;
                 this.lastWidth = 0;
                 this.lastHeight = 0;
-                this.OffOrientationUpdata = false;
+                this.OffOrientationUpdate = false;
             }
             Object.defineProperty(application.prototype, "timeScale", {
                 get: function () {
@@ -441,7 +441,7 @@ var gd3d;
                 this._editorCodeNew.push(program);
             };
             application.prototype.updateOrientationMode = function () {
-                if (this.OffOrientationUpdata)
+                if (this.OffOrientationUpdate)
                     return;
                 var screenRect = this.outcontainer.getBoundingClientRect();
                 this.shouldRotate = false;
@@ -6898,7 +6898,11 @@ var gd3d;
             material.prototype.Parse = function (assetmgr, json, bundleName) {
                 if (bundleName === void 0) { bundleName = null; }
                 var shaderName = json["shader"];
-                this.setShader(assetmgr.getShader(shaderName));
+                var shader = assetmgr.getShader(shaderName);
+                if (shader == null) {
+                    console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
+                }
+                this.setShader(shader);
                 var mapUniform = json["mapUniform"];
                 for (var i in mapUniform) {
                     var jsonChild = mapUniform[i];
@@ -10854,7 +10858,7 @@ var gd3d;
                         this._efficient = false;
                     }
                     else if (this._skintype == 2) {
-                        this.maxBoneCount = 40;
+                        this.maxBoneCount = 55;
                         this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                         this._efficient = true;
                     }
@@ -10874,7 +10878,7 @@ var gd3d;
                         if (!data) {
                             var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
                             if (_cachePlayer) {
-                                data = new Float32Array(8 * 40);
+                                data = new Float32Array(8 * 60);
                                 _cachePlayer.fillPoseData(data, this.bones, true);
                                 skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
                                 this.cacheData = data;
@@ -20012,6 +20016,7 @@ var gd3d;
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
+                this.transform.markHaveComponent();
                 if (comp.gameObject != null) {
                     throw new Error("this components has added to a  gameObject");
                 }
@@ -20429,6 +20434,8 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
+                if (node.hasComponent == false && node.hasComponentChild == false)
+                    return;
                 node.gameObject.init();
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
@@ -21190,6 +21197,8 @@ var gd3d;
                 this.aabbchilddirty = true;
                 this.dirty = true;
                 this.dirtyChild = true;
+                this.hasComponent = false;
+                this.hasComponentChild = false;
                 this.dirtyWorldDecompose = false;
                 this.localRotate = new gd3d.math.quaternion();
                 this.localTranslate = new gd3d.math.vector3(0, 0, 0);
@@ -21294,6 +21303,8 @@ var gd3d;
                 node.scene = this.scene;
                 node.parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                if (node.hasComponent || node.hasComponentChild)
+                    this.markHaveComponent();
             };
             transform.prototype.addChildAt = function (node, index) {
                 if (index < 0)
@@ -21307,6 +21318,8 @@ var gd3d;
                 node.scene = this.scene;
                 node.parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                if (node.hasComponent || node.hasComponentChild)
+                    this.markHaveComponent();
             };
             transform.prototype.removeAllChild = function () {
                 if (this.children == undefined)
@@ -21369,6 +21382,14 @@ var gd3d;
             };
             transform.prototype.markDirty = function () {
                 this.dirty = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p = p.parent;
+                }
+            };
+            transform.prototype.markHaveComponent = function () {
+                this.hasComponent = true;
                 var p = this.parent;
                 while (p != null) {
                     p.dirtyChild = true;

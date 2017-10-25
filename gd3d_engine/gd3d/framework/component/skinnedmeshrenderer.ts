@@ -373,7 +373,7 @@ namespace gd3d.framework
                 }
                 else if (this._skintype == 2)
                 {
-                    this.maxBoneCount = 40;
+                    this.maxBoneCount = 55;
                     this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                     this._efficient = true;
                 }
@@ -401,7 +401,7 @@ namespace gd3d.framework
                         let _cachePlayer = aniplayer.playerCaches[this.player.cacheKey];
                         if (_cachePlayer)
                         {
-                            data = new Float32Array(8 * 40);
+                            data = new Float32Array(8 * 60);
                             _cachePlayer.fillPoseData(data, this.bones, true);
                             skinnedMeshRenderer.dataCaches[cacheKey] = data;
                             this.cacheData = data;

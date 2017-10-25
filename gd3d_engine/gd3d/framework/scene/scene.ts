@@ -270,6 +270,8 @@ namespace gd3d.framework
         }
         private objupdate(node: transform, delta)//play状态下
         {
+            if (node.hasComponent == false && node.hasComponentChild == false)
+                return;
             node.gameObject.init();//组件还未初始化的初始化
             if (node.gameObject.components.length > 0)
             {
