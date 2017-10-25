@@ -33,7 +33,7 @@ namespace gd3d.framework
         ];
 
         private _sprite: sprite;
-
+        private needRefreshImg = false;
         /**
          * @public
          * @language zh_CN
@@ -129,6 +129,7 @@ namespace gd3d.framework
          */
         setTexture(texture: texture, border?: math.border, rect?: math.rect)
         {
+            this.needRefreshImg = true;
             var _sprite = new sprite();
             _sprite.texture = texture;
             if (border != null)
@@ -156,6 +157,7 @@ namespace gd3d.framework
          */
         public set sprite(_sprite: sprite)
         {
+            this.needRefreshImg = true;
             if(this._sprite)
             {
                 this._sprite.unuse();
@@ -177,8 +179,18 @@ namespace gd3d.framework
         {
             if (this.mat == null)
             {
-                this.mat = new material();
-                this.mat.setShader(canvas.assetmgr.getShader("shader/defui"));
+                let mat:material;
+                if (this._sprite  && this._sprite.texture ){
+                    mat = canvas.assetmgr.getMaterial(this._sprite.texture.getName());
+                    
+                    if(mat == null){
+                        mat = new material();
+                        mat.setShader(canvas.assetmgr.getShader("shader/defui"));
+                        canvas.assetmgr.mapMaterial[this._sprite.texture.getName()] = mat;
+                    }
+
+                    this.mat = mat;
+                }
             }
 
             var img = null;
@@ -192,9 +204,14 @@ namespace gd3d.framework
             //     var scene = this.transform.canvas.scene;
             //     img = scene.app.getAssetMgr().getDefaultTexture("grid");
             // }
+            if(img != null){
+                if(this.needRefreshImg){
+                    this.mat.setTexture("_MainTex", img);
+                    this.needRefreshImg = false;
+                }
+                canvas.pushRawData(this.mat, this.datar);
+            }
 
-            this.mat.setTexture("_MainTex", img);
-            canvas.pushRawData(this.mat, this.datar);
         }
 
         

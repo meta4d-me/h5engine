@@ -293,10 +293,22 @@
             webgl.bufferSubData(webgl.ARRAY_BUFFER, offset, varray);
         }
 
+        uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array)
+        {
+            webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
+            webgl.bufferData(webgl.ARRAY_BUFFER, varray,this.mode);
+        }
+
         uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset: number = 0)
         {
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
+        }
+
+        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array)
+        {
+            webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
+            webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data,this.mode);
         }
         //三角形应用vbo
         drawArrayTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1)
