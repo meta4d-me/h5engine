@@ -69,7 +69,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_shadowmap", () => new test_ShadowMap());
         this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
 
-        this.addBtn("testeff",()=>new db_test_newEff());
+        this.addBtn("test_UI效率问题",()=>new test_UIEffect());
 
     }
     private x: number = 0;

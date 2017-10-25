@@ -26,6 +26,7 @@ namespace gd3d.framework
         @gd3d.reflect.Field("texture")
         private _image: texture;
 
+        private needRefreshImg = false;
         /**
          * @public
          * @language zh_CN
@@ -39,6 +40,7 @@ namespace gd3d.framework
         }
         public set image(_image:texture)
         {
+            this.needRefreshImg = true;
             if(this._image)
             {
                 this._image.unuse();
@@ -74,24 +76,36 @@ namespace gd3d.framework
          */
         render(canvas: canvas)
         {
+            let img = this.image;
+
             if (this.mat == null)
             {
-                this.mat = new material();
-                this.mat.setShader(canvas.assetmgr.getShader("shader/defui"));
+                let mat:material;
+                if (img != null){
+                    mat = canvas.assetmgr.getMaterial(img.getName());
+                    
+                    if(mat == null){
+                        mat = new material();
+                        mat.setShader(canvas.assetmgr.getShader("shader/defui"));
+                        canvas.assetmgr.mapMaterial[img.getName()] = mat;
+                    }
+
+                    this.mat = mat;
+                }
             }
-            var img = this.image;
 
             // if (img == null)
             // {
             //     var scene = this.transform.canvas.scene;
             //     img = scene.app.getAssetMgr().getDefaultTexture("grid");
             // }
-            if (img != null)
-            {
-                this.mat.setTexture("_MainTex", img);
+            if(img != null){
+                if(this.needRefreshImg){
+                    this.mat.setTexture("_MainTex", img);
+                    this.needRefreshImg = false;
+                }
                 canvas.pushRawData(this.mat, this.datar);
             }
-            
         }
 
         /**

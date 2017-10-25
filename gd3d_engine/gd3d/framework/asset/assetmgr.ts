@@ -827,6 +827,7 @@ namespace gd3d.framework
             defShader.initDefaultShader(this);
             defMesh.initDefaultMesh(this);
             defTexture.initDefaultTexture(this);
+            defmaterial.initDefaultMaterial(this);
         }
         /**
          * @public
@@ -890,6 +891,28 @@ namespace gd3d.framework
         {
             return this.mapDefaultTexture[name];
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 默认材质资源
+         * @version egret-gd3d 1.0
+         */
+        mapMaterial: { [id: string]: material } = {};
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过name获取材质资源
+         * @param name
+         * @version egret-gd3d 1.0
+         */
+        getMaterial(name: string): material
+        {
+            return this.mapMaterial[name];
+        }
+
 
         /**
          * @public
