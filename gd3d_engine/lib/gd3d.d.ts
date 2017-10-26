@@ -503,6 +503,7 @@ declare namespace gd3d.framework {
         constructor();
         private datar;
         private _sprite;
+        private needRefreshImg;
         color: math.color;
         mat: material;
         private _imageType;
@@ -584,6 +585,7 @@ declare namespace gd3d.framework {
     class rawImage2D implements IRectRenderer {
         private datar;
         private _image;
+        private needRefreshImg;
         image: texture;
         color: math.color;
         mat: material;
@@ -732,6 +734,10 @@ declare namespace gd3d.framework {
             [id: string]: texture;
         };
         getDefaultTexture(name: string): texture;
+        mapMaterial: {
+            [id: string]: material;
+        };
+        getMaterial(name: string): material;
         mapBundle: {
             [id: string]: assetBundle;
         };
@@ -826,6 +832,11 @@ declare enum ChannelTypes {
     SignedFloat = 12,
     Float = 12,
     UnsignedFloat = 13,
+}
+declare namespace gd3d.framework {
+    class defmaterial {
+        static initDefaultMaterial(assetmgr: assetMgr): void;
+    }
 }
 declare namespace gd3d.framework {
     class defMesh {
@@ -4217,7 +4228,9 @@ declare namespace gd3d.render {
         vertexFormat: VertexFormatMask;
         bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo?: number): void;
         uploadVertexSubData(webgl: WebGLRenderingContext, varray: Float32Array, offset?: number): void;
+        uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
+        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array): void;
         drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number): void;
         drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number): void;
         drawElementTris(webgl: WebGLRenderingContext, start?: number, count?: number): void;

@@ -146,7 +146,6 @@ var gd3d;
                 rotateDiv.appendChild(canvas);
                 var tempWebGlUtil = new framework.WebGLUtils();
                 this.webgl = tempWebGlUtil.setupWebGL(canvas);
-                console.error(" i am ---tempWebGlUtil-" + webglDebug);
                 if (this.webgl == null) {
                     alert("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
@@ -1121,9 +1120,10 @@ var gd3d;
             batcher2D.prototype.end = function (webgl) {
                 if (this.vboCount == 0)
                     return;
-                this.mesh.uploadVertexSubData(webgl, this.dataForVbo.slice(0, this.vboCount), 0);
-                if (this.eboCount > 0)
-                    this.mesh.uploadIndexSubData(webgl, 0, this.dataForEbo.slice(0, this.eboCount), 0);
+                this.mesh.uploadVertexData(webgl, this.dataForVbo);
+                if (this.eboCount > 0) {
+                    this.mesh.uploadIndexData(webgl, 0, this.dataForEbo);
+                }
                 var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
                 this.curPass.use(webgl);
                 this.mesh.bind(webgl, this.curPass.program, (this.drawMode == gd3d.render.DrawModeEnum.EboLine || this.drawMode == gd3d.render.DrawModeEnum.EboTri) ? 0 : -1);
@@ -2415,6 +2415,7 @@ var gd3d;
                     0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
                 ];
+                this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
                 this._imageType = ImageType.Simple;
                 this._fillMethod = FillMethod.Horizontal;
@@ -2461,6 +2462,7 @@ var gd3d;
                 configurable: true
             });
             image2D.prototype.setTexture = function (texture, border, rect) {
+                this.needRefreshImg = true;
                 var _sprite = new framework.sprite();
                 _sprite.texture = texture;
                 if (border != null)
@@ -2481,6 +2483,7 @@ var gd3d;
                     return this._sprite;
                 },
                 set: function (_sprite) {
+                    this.needRefreshImg = true;
                     if (this._sprite) {
                         this._sprite.unuse();
                     }
@@ -2494,15 +2497,28 @@ var gd3d;
             });
             image2D.prototype.render = function (canvas) {
                 if (this.mat == null) {
-                    this.mat = new framework.material();
-                    this.mat.setShader(canvas.assetmgr.getShader("shader/defui"));
+                    var mat = void 0;
+                    if (this._sprite && this._sprite.texture) {
+                        mat = canvas.assetmgr.getMaterial(this._sprite.texture.getName());
+                        if (mat == null) {
+                            mat = new framework.material();
+                            mat.setShader(canvas.assetmgr.getShader("shader/defui"));
+                            canvas.assetmgr.mapMaterial[this._sprite.texture.getName()] = mat;
+                        }
+                        this.mat = mat;
+                    }
                 }
                 var img = null;
                 if (this._sprite != null && this._sprite.texture != null) {
                     img = this._sprite.texture;
                 }
-                this.mat.setTexture("_MainTex", img);
-                canvas.pushRawData(this.mat, this.datar);
+                if (img != null) {
+                    if (this.needRefreshImg) {
+                        this.mat.setTexture("_MainTex", img);
+                        this.needRefreshImg = false;
+                    }
+                    canvas.pushRawData(this.mat, this.datar);
+                }
             };
             image2D.prototype.start = function () {
             };
@@ -3591,6 +3607,7 @@ var gd3d;
                     0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
                 ];
+                this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
             }
             Object.defineProperty(rawImage2D.prototype, "image", {
@@ -3598,6 +3615,7 @@ var gd3d;
                     return this._image;
                 },
                 set: function (_image) {
+                    this.needRefreshImg = true;
                     if (this._image) {
                         this._image.unuse();
                     }
@@ -3608,13 +3626,24 @@ var gd3d;
                 configurable: true
             });
             rawImage2D.prototype.render = function (canvas) {
-                if (this.mat == null) {
-                    this.mat = new framework.material();
-                    this.mat.setShader(canvas.assetmgr.getShader("shader/defui"));
-                }
                 var img = this.image;
+                if (this.mat == null) {
+                    var mat = void 0;
+                    if (img != null) {
+                        mat = canvas.assetmgr.getMaterial(img.getName());
+                        if (mat == null) {
+                            mat = new framework.material();
+                            mat.setShader(canvas.assetmgr.getShader("shader/defui"));
+                            canvas.assetmgr.mapMaterial[img.getName()] = mat;
+                        }
+                        this.mat = mat;
+                    }
+                }
                 if (img != null) {
-                    this.mat.setTexture("_MainTex", img);
+                    if (this.needRefreshImg) {
+                        this.mat.setTexture("_MainTex", img);
+                        this.needRefreshImg = false;
+                    }
                     canvas.pushRawData(this.mat, this.datar);
                 }
             };
@@ -4144,6 +4173,7 @@ var gd3d;
                 this.mapShader = {};
                 this.mapDefaultMesh = {};
                 this.mapDefaultTexture = {};
+                this.mapMaterial = {};
                 this.mapBundle = {};
                 this.mapRes = {};
                 this.mapNamed = {};
@@ -4163,6 +4193,7 @@ var gd3d;
                 framework.defShader.initDefaultShader(this);
                 framework.defMesh.initDefaultMesh(this);
                 framework.defTexture.initDefaultTexture(this);
+                framework.defmaterial.initDefaultMaterial(this);
             };
             assetMgr.prototype.getShader = function (name) {
                 return this.mapShader[name];
@@ -4172,6 +4203,9 @@ var gd3d;
             };
             assetMgr.prototype.getDefaultTexture = function (name) {
                 return this.mapDefaultTexture[name];
+            };
+            assetMgr.prototype.getMaterial = function (name) {
+                return this.mapMaterial[name];
             };
             assetMgr.prototype.getAsset = function (id) {
                 var r = this.mapRes[id];
@@ -4917,6 +4951,26 @@ var ChannelTypes;
     ChannelTypes[ChannelTypes["Float"] = 12] = "Float";
     ChannelTypes[ChannelTypes["UnsignedFloat"] = 13] = "UnsignedFloat";
 })(ChannelTypes || (ChannelTypes = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var defmaterial = (function () {
+            function defmaterial() {
+            }
+            defmaterial.initDefaultMaterial = function (assetmgr) {
+                {
+                    var mat = new framework.material();
+                    var sh = assetmgr.getShader("shader/defui");
+                    mat.setShader(sh);
+                    assetmgr.mapMaterial[sh.getName()] = mat;
+                }
+            };
+            return defmaterial;
+        }());
+        framework.defmaterial = defmaterial;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -8630,6 +8684,7 @@ var gd3d;
                                 data[seek * 16 + j] = _mat.rawData[j];
                             }
                         }
+                        gd3d.math.pool.delete_matrix(_mat);
                     }
                     seek++;
                 }
@@ -10585,6 +10640,9 @@ var gd3d;
                         if (!this.issetq)
                             this._queue = _mat.getQueue();
                     }
+                }
+                if (this.filter == null) {
+                    this.filter = this.gameObject.getComponent("meshFilter");
                 }
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
@@ -21393,6 +21451,7 @@ var gd3d;
                 var p = this.parent;
                 while (p != null) {
                     p.dirtyChild = true;
+                    p.hasComponentChild = true;
                     p = p.parent;
                 }
             };
@@ -23601,10 +23660,18 @@ var gd3d;
                 webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 webgl.bufferSubData(webgl.ARRAY_BUFFER, offset, varray);
             };
+            glMesh.prototype.uploadVertexData = function (webgl, varray) {
+                webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
+                webgl.bufferData(webgl.ARRAY_BUFFER, varray, this.mode);
+            };
             glMesh.prototype.uploadIndexSubData = function (webgl, eboindex, data, offset) {
                 if (offset === void 0) { offset = 0; }
                 webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
                 webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
+            };
+            glMesh.prototype.uploadIndexData = function (webgl, eboindex, data) {
+                webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
+                webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data, this.mode);
             };
             glMesh.prototype.drawArrayTris = function (webgl, start, count) {
                 if (start === void 0) { start = 0; }

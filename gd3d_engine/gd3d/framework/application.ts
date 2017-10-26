@@ -208,7 +208,7 @@ namespace gd3d.framework
 
             let tempWebGlUtil = new WebGLUtils();
             this.webgl = tempWebGlUtil.setupWebGL(canvas);
-            console.error(" i am ---tempWebGlUtil-" + webglDebug);
+           // console.error(" i am ---tempWebGlUtil-" + webglDebug);
             if(this.webgl == null){
                     alert("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
