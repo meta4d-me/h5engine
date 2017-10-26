@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000031";
+                this.build = "b000033";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -23657,7 +23657,7 @@ var gd3d;
                 }
                 render.webglkit.SetMaxVertexAttribArray(webgl, channel);
             };
-            glMesh.prototype.uploadVertexsubData = function (webgl, varray, offset) {
+            glMesh.prototype.uploadVertexSubData = function (webgl, varray, offset) {
                 if (offset === void 0) { offset = 0; }
                 webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 webgl.bufferSubData(webgl.ARRAY_BUFFER, offset, varray);
@@ -23666,7 +23666,7 @@ var gd3d;
                 webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 webgl.bufferData(webgl.ARRAY_BUFFER, varray, this.mode);
             };
-            glMesh.prototype.uploadIndexsubData = function (webgl, eboindex, data, offset) {
+            glMesh.prototype.uploadIndexSubData = function (webgl, eboindex, data, offset) {
                 if (offset === void 0) { offset = 0; }
                 webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
                 webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);

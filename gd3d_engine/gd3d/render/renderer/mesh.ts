@@ -287,7 +287,7 @@
             webglkit.SetMaxVertexAttribArray(webgl, channel);
         }
 
-        uploadVertexsubData(webgl: WebGLRenderingContext, varray: Float32Array, offset: number = 0)
+        uploadVertexSubData(webgl: WebGLRenderingContext, varray: Float32Array, offset: number = 0)
         {
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
             webgl.bufferSubData(webgl.ARRAY_BUFFER, offset, varray);
@@ -299,7 +299,7 @@
             webgl.bufferData(webgl.ARRAY_BUFFER, varray,this.mode);
         }
 
-        uploadIndexsubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset: number = 0)
+        uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset: number = 0)
         {
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
