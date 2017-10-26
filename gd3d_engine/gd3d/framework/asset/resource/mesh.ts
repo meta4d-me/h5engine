@@ -355,9 +355,9 @@ namespace gd3d.framework
             var indices = this.data.genIndexDataArray();
 
             this.glMesh.initBuffer(webgl, vf, this.data.pos.length);
-            this.glMesh.uploadVertexSubData(webgl, vertexs);
+            this.glMesh.uploadVertexData(webgl, vertexs);
             this.glMesh.addIndex(webgl, indices.length);
-            this.glMesh.uploadIndexSubData(webgl, 0, indices);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
         }
 
         /**
@@ -555,9 +555,9 @@ namespace gd3d.framework
             var indices = _result.data.genIndexDataArray();
 
             _result.glMesh.initBuffer(sceneMgr.app.getAssetMgr().webgl, vf, this.data.pos.length);
-            _result.glMesh.uploadVertexSubData(sceneMgr.app.getAssetMgr().webgl, vertexs);
+            _result.glMesh.uploadVertexData(sceneMgr.app.getAssetMgr().webgl, vertexs);
             _result.glMesh.addIndex(sceneMgr.app.getAssetMgr().webgl, indices.length);
-            _result.glMesh.uploadIndexSubData(sceneMgr.app.getAssetMgr().webgl, 0, indices);
+            _result.glMesh.uploadIndexData(sceneMgr.app.getAssetMgr().webgl, 0, indices);
             return _result;
         }
     }

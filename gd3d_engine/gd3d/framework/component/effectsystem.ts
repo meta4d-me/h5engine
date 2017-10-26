@@ -438,7 +438,9 @@ namespace gd3d.framework
                         {
                             mesh.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                         }
-                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                        // mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                        mesh.glMesh.uploadIndexData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                        
                         mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
                         subEffectBatcher.state = EffectBatcherState.InitedStateType;
                     }
@@ -447,12 +449,17 @@ namespace gd3d.framework
 
                         mesh.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);//动态修正掉mesh中的ebo大小
                         mesh.submesh[0].size = subEffectBatcher.dataForEbo.length;
-                        mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                        //mesh.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                        mesh.glMesh.uploadIndexData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                        
+                        
                         mesh.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);//动态修正mesh中的vbo大小
                         subEffectBatcher.state = EffectBatcherState.InitedStateType;
                     }
 
-                    mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
+                    //mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
+                    mesh.glMesh.uploadVertexData(context.webgl, subEffectBatcher.dataForVbo);
+                    
                     if (this.gameObject.getScene().fog)
                     {
                         context.fog = this.gameObject.getScene().fog;

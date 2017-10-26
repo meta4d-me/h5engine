@@ -4227,9 +4227,9 @@ declare namespace gd3d.render {
         bindIndex: number;
         vertexFormat: VertexFormatMask;
         bind(webgl: WebGLRenderingContext, shadercode: glProgram, bindEbo?: number): void;
-        uploadVertexSubData(webgl: WebGLRenderingContext, varray: Float32Array, offset?: number): void;
+        uploadVertexsubData(webgl: WebGLRenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array): void;
-        uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
+        uploadIndexsubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
         uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array): void;
         drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number): void;
         drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number): void;

@@ -25,10 +25,10 @@ namespace gd3d.framework
 
             _mesh.glMesh = new gd3d.render.glMesh();
             _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-            _mesh.glMesh.uploadVertexSubData(webgl, v32);
+            _mesh.glMesh.uploadVertexData(webgl, v32);
 
             _mesh.glMesh.addIndex(webgl, i16.length);
-            _mesh.glMesh.uploadIndexSubData(webgl, 0, i16);
+            _mesh.glMesh.uploadIndexData(webgl, 0, i16);
             _mesh.submesh = [];
 
             {
