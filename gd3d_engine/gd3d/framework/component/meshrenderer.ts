@@ -102,7 +102,7 @@ namespace gd3d.framework
         start()
         {
             this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
-
+          
             this.refreshLayerAndQue();
 
             if(this.lightmapIndex ==-2)
@@ -137,10 +137,14 @@ namespace gd3d.framework
                         this._queue = _mat.getQueue();
                 }
             }
+            if(this.filter==null)
+            {
+                this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
+            }
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-                
+            
             context.updateModel(this.gameObject.transform);
             if (this.filter != null)
             {
@@ -188,6 +192,7 @@ namespace gd3d.framework
                     }
                 }
             }
+           
         }
          /**
          * @private
