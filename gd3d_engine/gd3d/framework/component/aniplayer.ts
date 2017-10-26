@@ -624,6 +624,7 @@ namespace gd3d.framework
                             data[seek * 16 + j] = _mat.rawData[j];
                         }
                     }
+                    math.pool.delete_matrix(_mat);
                 }
                 seek++;
             }
