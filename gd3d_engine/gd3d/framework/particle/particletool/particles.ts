@@ -263,6 +263,7 @@ namespace gd3d.framework
                 {
                     var particle = this.deadParticles.pop();
                     particle.initByData();
+                    particle.update(0);
                     particle.actived = true;
                 }
                 else

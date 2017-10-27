@@ -338,8 +338,8 @@ namespace gd3d.framework
             if (this.notRender) return;
 
             context.updateModeTrail();
-            this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-            this.mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
+            this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
+            this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
 
             this.mesh.submesh[0].size = (this.targetPath.length - 1) * 6;
 

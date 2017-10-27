@@ -401,8 +401,9 @@ namespace gd3d.framework
                         let _cachePlayer = aniplayer.playerCaches[this.player.cacheKey];
                         if (_cachePlayer)
                         {
-                            data = new Float32Array(8 * 60);
-                            _cachePlayer.fillPoseData(data, this.bones, true);
+                            let baseSize = this._efficient ?  8 : 16;
+                            data = new Float32Array(this.maxBoneCount * baseSize);
+                            _cachePlayer.fillPoseData(data, this.bones, this._efficient);
                             skinnedMeshRenderer.dataCaches[cacheKey] = data;
                             this.cacheData = data;
                             return;

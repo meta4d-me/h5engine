@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000031";
+                this.build = "b000033";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -4997,9 +4997,9 @@ var gd3d;
                 var i16 = _mesh.data.genIndexDataArray();
                 _mesh.glMesh = new gd3d.render.glMesh();
                 _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-                _mesh.glMesh.uploadVertexSubData(webgl, v32);
+                _mesh.glMesh.uploadVertexData(webgl, v32);
                 _mesh.glMesh.addIndex(webgl, i16.length);
-                _mesh.glMesh.uploadIndexSubData(webgl, 0, i16);
+                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
                 _mesh.submesh = [];
                 {
                     var sm = new framework.subMeshInfo();
@@ -7271,9 +7271,9 @@ var gd3d;
                 var vertexs = this.data.genVertexDataArray(vf);
                 var indices = this.data.genIndexDataArray();
                 this.glMesh.initBuffer(webgl, vf, this.data.pos.length);
-                this.glMesh.uploadVertexSubData(webgl, vertexs);
+                this.glMesh.uploadVertexData(webgl, vertexs);
                 this.glMesh.addIndex(webgl, indices.length);
-                this.glMesh.uploadIndexSubData(webgl, 0, indices);
+                this.glMesh.uploadIndexData(webgl, 0, indices);
             };
             mesh.prototype.intersects = function (ray, matrix) {
                 var pickinfo = null;
@@ -7416,9 +7416,9 @@ var gd3d;
                 var vertexs = _result.data.genVertexDataArray(vf);
                 var indices = _result.data.genIndexDataArray();
                 _result.glMesh.initBuffer(framework.sceneMgr.app.getAssetMgr().webgl, vf, this.data.pos.length);
-                _result.glMesh.uploadVertexSubData(framework.sceneMgr.app.getAssetMgr().webgl, vertexs);
+                _result.glMesh.uploadVertexData(framework.sceneMgr.app.getAssetMgr().webgl, vertexs);
                 _result.glMesh.addIndex(framework.sceneMgr.app.getAssetMgr().webgl, indices.length);
-                _result.glMesh.uploadIndexSubData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
+                _result.glMesh.uploadIndexData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
                 return _result;
             };
             mesh = mesh_1 = __decorate([
@@ -8995,9 +8995,9 @@ var gd3d;
                 var webgl = this.gameObject.getScene().webgl;
                 _mesh.glMesh = new gd3d.render.glMesh();
                 _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-                _mesh.glMesh.uploadVertexSubData(webgl, v32);
+                _mesh.glMesh.uploadVertexData(webgl, v32);
                 _mesh.glMesh.addIndex(webgl, i16.length);
-                _mesh.glMesh.uploadIndexSubData(webgl, 0, i16);
+                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
                 _mesh.submesh = [];
                 {
                     var sm = new framework.subMeshInfo();
@@ -9735,18 +9735,18 @@ var gd3d;
                             else {
                                 mesh_2.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                             }
-                            mesh_2.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_2.glMesh.uploadIndexData(context.webgl, 0, subEffectBatcher.dataForEbo);
                             mesh_2.submesh[0].size = subEffectBatcher.dataForEbo.length;
                             subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
                         }
                         else if (subEffectBatcher.state === framework.EffectBatcherState.ResizeCapacityStateType) {
                             mesh_2.glMesh.resetEboSize(context.webgl, 0, subEffectBatcher.dataForEbo.length);
                             mesh_2.submesh[0].size = subEffectBatcher.dataForEbo.length;
-                            mesh_2.glMesh.uploadIndexSubData(context.webgl, 0, subEffectBatcher.dataForEbo);
+                            mesh_2.glMesh.uploadIndexData(context.webgl, 0, subEffectBatcher.dataForEbo);
                             mesh_2.glMesh.resetVboSize(context.webgl, subEffectBatcher.curTotalVertexCount * subEffectBatcher.vertexSize);
                             subEffectBatcher.state = framework.EffectBatcherState.InitedStateType;
                         }
-                        mesh_2.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
+                        mesh_2.glMesh.uploadVertexData(context.webgl, subEffectBatcher.dataForVbo);
                         if (this.gameObject.getScene().fog) {
                             context.fog = this.gameObject.getScene().fog;
                             subEffectBatcher.mat.draw(context, mesh_2, mesh_2.submesh[0], "base_fog");
@@ -10508,9 +10508,9 @@ var gd3d;
                 var webgl = this.gameObject.getScene().webgl;
                 _mesh.glMesh = new gd3d.render.glMesh();
                 _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-                _mesh.glMesh.uploadVertexSubData(webgl, v32);
+                _mesh.glMesh.uploadVertexData(webgl, v32);
                 _mesh.glMesh.addIndex(webgl, i16.length);
-                _mesh.glMesh.uploadIndexSubData(webgl, 0, i16);
+                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
                 _mesh.submesh = [];
                 {
                     var sm = new framework.subMeshInfo();
@@ -11441,8 +11441,8 @@ var gd3d;
                 if (this.notRender)
                     return;
                 context.updateModeTrail();
-                this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-                this.mesh.glMesh.uploadIndexSubData(context.webgl, 0, this.dataForEbo);
+                this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
+                this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = (this.targetPath.length - 1) * 6;
                 if (this.gameObject.getScene().fog) {
                     context.fog = this.gameObject.getScene().fog;
@@ -11655,8 +11655,8 @@ var gd3d;
                     this.dataForEbo[k * 6 + 4] = (k + 1) * 2;
                     this.dataForEbo[k * 6 + 5] = (k + 1) * 2 + 1;
                 }
-                this.mesh.glMesh.uploadVertexSubData(this.webgl, this.dataForVbo);
-                this.mesh.glMesh.uploadIndexSubData(this.webgl, 0, this.dataForEbo);
+                this.mesh.glMesh.uploadVertexData(this.webgl, this.dataForVbo);
+                this.mesh.glMesh.uploadIndexData(this.webgl, 0, this.dataForEbo);
                 gd3d.math.pool.delete_vector3(updir);
                 gd3d.math.pool.delete_vector3(pos);
                 gd3d.math.pool.delete_vector3(uppos);
@@ -11693,7 +11693,7 @@ var gd3d;
                 if (!this.active)
                     return;
                 context.updateModeTrail();
-                this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+                this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 if (this.gameObject.getScene().fog) {
                     context.fog = this.gameObject.getScene().fog;
                     this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
@@ -17351,7 +17351,7 @@ var gd3d;
                 this.particles.push(p);
                 this.curVerCount += this.emission.perVertexCount;
                 this.curIndexCount += this.emission.perIndexxCount;
-                this.mesh.glMesh.uploadIndexSubData(this.webgl, 0, this.dataForEbo);
+                this.mesh.glMesh.uploadIndexData(this.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = this.curIndexCount;
             };
             EmissionBatcher_new.prototype.refreshBuffer = function () {
@@ -17380,7 +17380,7 @@ var gd3d;
             };
             EmissionBatcher_new.prototype.render = function (context, assetmgr, camera) {
                 var mesh = this.mesh;
-                mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+                mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 if (assetmgr.app.getScene().fog) {
                     context.fog = assetmgr.app.getScene().fog;
                     this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
@@ -19304,6 +19304,7 @@ var gd3d;
             EmissionBatcher.prototype.addParticle = function () {
                 this.refreshBuffer();
                 var p = new framework.Particle(this);
+                p.update(0);
                 p.uploadData(this.dataForVbo);
                 for (var i = 0; i < p.dataForEbo.length; i++) {
                     this.dataForEbo[this.curIndexCount + i] = p.dataForEbo[i] + this.curVerCount;
@@ -19311,7 +19312,7 @@ var gd3d;
                 this.particles.push(p);
                 this.curVerCount += this.emissionElement.perVertexCount;
                 this.curIndexCount += this.emissionElement.perIndexxCount;
-                this.mesh.glMesh.uploadIndexSubData(this.webgl, 0, this.dataForEbo);
+                this.mesh.glMesh.uploadIndexData(this.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = this.curIndexCount;
             };
             EmissionBatcher.prototype.refreshBuffer = function () {
@@ -19340,7 +19341,7 @@ var gd3d;
             };
             EmissionBatcher.prototype.render = function (context, assetmgr, camera) {
                 var mesh = this.mesh;
-                mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+                mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 if (assetmgr.app.getScene().fog) {
                     context.fog = assetmgr.app.getScene().fog;
                     this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
@@ -19940,6 +19941,7 @@ var gd3d;
                     if (this.deadParticles.length > 0) {
                         var particle = this.deadParticles.pop();
                         particle.initByData();
+                        particle.update(0);
                         particle.actived = true;
                     }
                     else {
@@ -24605,9 +24607,9 @@ var gd3d;
             batchRenderer.prototype.end = function (webgl) {
                 if (this.vboCount == 0)
                     return;
-                this.mesh.uploadVertexSubData(webgl, this.dataForVbo.slice(0, this.vboCount), 0);
+                this.mesh.uploadVertexData(webgl, this.dataForVbo.slice(0, this.vboCount));
                 if (this.eboCount > 0)
-                    this.mesh.uploadIndexSubData(webgl, 0, this.dataForEbo.slice(0, this.eboCount), 0);
+                    this.mesh.uploadIndexData(webgl, 0, this.dataForEbo.slice(0, this.eboCount));
                 var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
                 this.curmaterial.use(webgl);
                 this.mesh.bind(webgl, this.curmaterial.program, (this.drawMode == render.DrawModeEnum.EboLine || this.drawMode == render.DrawModeEnum.EboTri) ? 0 : -1);

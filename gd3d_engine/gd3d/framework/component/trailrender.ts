@@ -356,8 +356,8 @@ namespace gd3d.framework
                 this.dataForEbo[k * 6 + 4] = (k + 1) * 2;
                 this.dataForEbo[k * 6 + 5] = (k + 1) * 2 + 1;
             }
-            this.mesh.glMesh.uploadVertexSubData(this.webgl, this.dataForVbo);
-            this.mesh.glMesh.uploadIndexSubData(this.webgl, 0, this.dataForEbo);
+            this.mesh.glMesh.uploadVertexData(this.webgl, this.dataForVbo);
+            this.mesh.glMesh.uploadIndexData(this.webgl, 0, this.dataForEbo);
 
             gd3d.math.pool.delete_vector3(updir);
             gd3d.math.pool.delete_vector3(pos);
@@ -414,7 +414,7 @@ namespace gd3d.framework
         {
             if (!this.active) return;
             context.updateModeTrail();
-            this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+            this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
             //--------------------------render-------------------------------------------
             if (this.gameObject.getScene().fog)
             {

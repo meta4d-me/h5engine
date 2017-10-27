@@ -76,6 +76,7 @@ namespace gd3d.framework
             this.refreshBuffer();
 
             let p = new Particle(this);
+            p.update(0);
             p.uploadData(this.dataForVbo);
             for (let i = 0; i < p.dataForEbo.length; i++)
             {
@@ -87,7 +88,8 @@ namespace gd3d.framework
             this.curIndexCount += this.emissionElement.perIndexxCount;
 
             // this.mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
-            this.mesh.glMesh.uploadIndexSubData(this.webgl, 0, this.dataForEbo);
+            //this.mesh.glMesh.uploadIndexSubData(this.webgl, 0, this.dataForEbo);
+            this.mesh.glMesh.uploadIndexData(this.webgl,0,this.dataForEbo);
             this.mesh.submesh[0].size = this.curIndexCount;
         }
 
@@ -127,7 +129,8 @@ namespace gd3d.framework
         {
             let mesh = this.mesh;
 
-            mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+            //mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
+            mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
             if (assetmgr.app.getScene().fog)
             {
                 context.fog = assetmgr.app.getScene().fog;

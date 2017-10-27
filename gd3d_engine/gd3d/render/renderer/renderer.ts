@@ -119,9 +119,9 @@
         end(webgl: WebGLRenderingContext)
         {
             if (this.vboCount == 0) return;
-            this.mesh.uploadVertexSubData(webgl, this.dataForVbo.slice(0, this.vboCount), 0);
+            this.mesh.uploadVertexData(webgl, this.dataForVbo.slice(0, this.vboCount));
             if (this.eboCount > 0)
-                this.mesh.uploadIndexSubData(webgl, 0, this.dataForEbo.slice(0, this.eboCount), 0);
+                this.mesh.uploadIndexData(webgl, 0, this.dataForEbo.slice(0, this.eboCount));
 
             var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
             this.curmaterial.use(webgl);
