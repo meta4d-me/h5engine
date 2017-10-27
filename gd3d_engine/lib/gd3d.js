@@ -12934,7 +12934,7 @@ var gd3d;
                 if (instanceObj[key]["__gdmeta__"]) {
                     serializeOtherTypeForInspector(instanceObj, serializedObj, key, beComponent);
                 }
-                else if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"]) {
+                else if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"]) {
                     var isArray_4 = instanceObj[key] instanceof Array;
                     if (isArray_4)
                         serializedObj[key] = new inspectorValueInfo([], instanceObj["__gdmeta__"][key]["custom"]["valueType"]);
@@ -12974,8 +12974,8 @@ var gd3d;
             }
             else {
                 var isArray_5 = instanceObj instanceof Array;
-                if (instanceObj["__gdmeta__"][key]) {
-                    if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"]) {
+                if (instanceObj["__gdmeta__"]) {
+                    if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"]) {
                         var custom = instanceObj["__gdmeta__"][key]["custom"];
                         var info = new inspectorValueInfo(null, custom["valueType"]);
                         if (custom["FieldUIStyle"])

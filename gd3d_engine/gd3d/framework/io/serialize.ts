@@ -168,7 +168,7 @@ namespace gd3d.io
             {
                 serializeOtherTypeForInspector(instanceObj, serializedObj, key, beComponent);
             }
-            else if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"])
+            else if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"])
             {
                 let isArray: boolean = instanceObj[key] instanceof Array;
                 if (isArray)
@@ -222,9 +222,9 @@ namespace gd3d.io
         } else
         {
             let isArray: boolean = instanceObj instanceof Array;
-            if (instanceObj["__gdmeta__"][key])
+            if (instanceObj["__gdmeta__"])
             {
-                if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"])//&& instanceObj["__gdmeta__"][key]["custom"]["FieldUIStyle"]
+                if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"])//&& instanceObj["__gdmeta__"][key]["custom"]["FieldUIStyle"]
                 {
                     let custom = instanceObj["__gdmeta__"][key]["custom"];
                     var info = new inspectorValueInfo(null, custom["valueType"]);
