@@ -3664,6 +3664,7 @@ declare namespace gd3d.framework {
         private doImpact(tran, impacted);
         markDirty(): void;
         markHaveComponent(): void;
+        markHaveRendererComp(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
         updateAABBChild(): void;
@@ -3671,6 +3672,8 @@ declare namespace gd3d.framework {
         private dirtyChild;
         hasComponent: boolean;
         hasComponentChild: boolean;
+        hasRendererComp: boolean;
+        hasRendererCompChild: boolean;
         private dirtyWorldDecompose;
         localRotate: gd3d.math.quaternion;
         localTranslate: gd3d.math.vector3;
