@@ -1,5 +1,61 @@
 /// <reference path="../lib/gd3d.d.ts" />
 /// <reference path="../lib/htmlui.d.ts" />
+declare class James_Tank implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    postQuad: gd3d.framework.cameraPostQueue_Quad;
+    light: gd3d.framework.light;
+    heroTank: gd3d.framework.transform;
+    heroGun: gd3d.framework.transform;
+    heroSlot: gd3d.framework.transform;
+    enemyTank: gd3d.framework.transform;
+    enemyGun: gd3d.framework.transform;
+    enemySlot: gd3d.framework.transform;
+    ground: gd3d.framework.transform;
+    cubes: gd3d.framework.transform[];
+    walls: gd3d.framework.transform[];
+    overlay2d: gd3d.framework.overlay2D;
+    joystick: Joystick;
+    taskmgr: gd3d.framework.taskMgr;
+    tankMoveSpeed: number;
+    tankRotateSpeed: gd3d.math.vector3;
+    gunRotateSpeed: gd3d.math.vector3;
+    angleLimit: number;
+    colVisible: boolean;
+    private label;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private loadHeroPrefab(laststate, state);
+    private loadEnemyPrefab(laststate, state);
+    private loadScene(laststate, state);
+    private cameraShock;
+    private addCameraAndLight(laststate, state);
+    private addJoystick(laststate, state);
+    private addObject(laststate, state);
+    private keyMap;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+    testTankCol(tran: gd3d.framework.transform): boolean;
+    tempTran: gd3d.framework.transform;
+    tankControl(delta: number): void;
+    bulletId: number;
+    bulletList: any[];
+    bulletSpeed: number;
+    fireStep: number;
+    fireTick: number;
+    private fire();
+    private updateBullet(delta);
+}
+declare class example implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    isCube: boolean;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare namespace t {
     class light_d1 implements IState {
         app: gd3d.framework.application;
@@ -68,6 +124,36 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_ChangeMaterial implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    isCube: boolean;
+    timer: number;
+    material1: gd3d.framework.material;
+    material2: gd3d.framework.material;
+    taskmgr: gd3d.framework.taskMgr;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private addCam(laststate, state);
+    private addCube(laststate, state);
+    isMaterial1: boolean;
+    private addBtn();
+    private setMaterial(laststate, state);
+    start(app: gd3d.framework.application): void;
+    zeroPoint: gd3d.math.vector3;
+    update(delta: number): void;
+}
+declare class test_ChangeMesh implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    isCube: boolean;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare class test_fakepbr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -117,6 +203,21 @@ declare namespace demo {
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
     }
+}
+declare class test_NewGameObject implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class test_NewScene implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
 }
 declare enum ShockType {
     Vertical = 0,
@@ -242,6 +343,23 @@ declare namespace t {
         private zeroPoint;
         update(delta: number): void;
     }
+}
+declare class test_UIEffect implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    img_3: gd3d.framework.image2D;
+    img_4: gd3d.framework.image2D;
+    img_5: gd3d.framework.image2D;
+    img_7: gd3d.framework.image2D;
+    img_8: gd3d.framework.image2D;
+    amount: number;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    timer: number;
+    bere: boolean;
+    bere1: boolean;
+    update(delta: number): void;
 }
 declare class test_uimove implements IState {
     app: gd3d.framework.application;
@@ -734,6 +852,15 @@ declare class test_loadprefab implements IState {
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;
     timer: number;
+    update(delta: number): void;
+}
+declare class testqing implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    mesh: gd3d.framework.meshFilter;
+    start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
 declare class testReload implements IState {

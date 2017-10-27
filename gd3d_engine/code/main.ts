@@ -69,6 +69,11 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_shadowmap", () => new test_ShadowMap());
         this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
 
+        this.addBtn("Test_NewScene",()=>new test_NewScene());
+        this.addBtn("Test_GameObject",()=> new test_NewGameObject());
+        this.addBtn("Test_ChangeMesh",()=> new test_ChangeMesh());
+        this.addBtn("Test_ChangeMaterial",()=> new test_ChangeMaterial());
+
     }
     private x: number = 0;
     private y: number = 100;

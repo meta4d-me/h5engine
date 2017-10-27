@@ -8,6 +8,8 @@ class test_loadprefab implements IState
     {
         let meshrenderer = tran.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
         let skinnmeshrenderer = tran.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
+        this.renderer=meshrenderer;
+        this.skinRenders=skinnmeshrenderer;
         for(let i=0; i<meshrenderer.length; i++)
         {
             let v = meshrenderer[i];
@@ -103,6 +105,8 @@ class test_loadprefab implements IState
                 });
             }
         });
+
+        this.changeShader();
         // name="elong";
         // let isloaded= false;
         // this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>

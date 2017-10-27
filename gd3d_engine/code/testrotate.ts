@@ -13,13 +13,18 @@
         taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
         count: number = 0;
         counttimer: number = 0;
-        name: string = "10004_grass.pvr";
+        name: string = "rock256.png";
 
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
             {
-                state.finish = true;
+                //state.finish = true;
+              
+                if(_state.isfinish)
+                {
+                    state.finish = true;
+                }
             }
             );
         }
@@ -114,22 +119,26 @@
                     mesh.mesh = (smesh);
                     var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
                     let cuber = renderer;
-
+                    // "rock256.png"
                     var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
                     if (sh != null)
                     {
+                        console.log("sh 不是空的");
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
                         cuber.materials[0].setShader(sh);//----------------使用shader
-                        let texture = this.app.getAssetMgr().getAssetByName(this.name) as gd3d.framework.texture;
+                        let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
                         if (texture == null)
                             console.error("为什么他是空的呀");
                         else
+                        {
+                            console.log("texture 不是空的");
                             cuber.materials[0].setTexture("_MainTex", texture);
-
+                        }                           
                     }
                     this.cube = cube;
                 }
+
                 {
                     let ref_cube = new gd3d.framework.transform();
                     ref_cube.name = "ref_cube";
@@ -146,11 +155,11 @@
                     var sh = this.app.getAssetMgr().getShader("shader/def");
                     if (sh != null)
                     {
-                        cuber.materials = [];
-                        cuber.materials.push(new gd3d.framework.material());
-                        cuber.materials[0].setShader(sh);//----------------使用shader
-                        let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
-                        cuber.materials[0].setTexture("_MainTex", texture);
+                        renderer.materials = [];
+                        renderer.materials.push(new gd3d.framework.material());
+                        renderer.materials[0].setShader(sh);//----------------使用shader
+                        let texture = this.app.getAssetMgr().getAssetByName(this.name) as gd3d.framework.texture;
+                        renderer.materials[0].setTexture("_MainTex", texture);
 
                     }
                     this.cube2 = ref_cube;
@@ -181,7 +190,7 @@
             //任务排队执行系统
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
-            // this.taskmgr.addTaskCall(this.loadPvr.bind(this));
+            this.taskmgr.addTaskCall(this.loadPvr.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this))
             this.taskmgr.addTaskCall(this.addcam.bind(this));
             this.changeShader();
