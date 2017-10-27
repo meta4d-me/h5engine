@@ -620,6 +620,8 @@ namespace gd3d.framework
         }
         private _fillRenderer(scene: scene, node: transform)
         {
+            if(node.hasRendererComp == false && node.hasRendererCompChild == false) return;  //自己没有渲染组件 且 子物体也没有 return
+
             if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node)) return;//视锥测试不通过 直接return
             if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
             {

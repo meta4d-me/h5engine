@@ -251,6 +251,9 @@ namespace gd3d.framework
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
             if (node.hasComponent || node.hasComponentChild)
                 this.markHaveComponent();
+
+            if(node.hasRendererComp || node.hasRendererCompChild)
+                this.markHaveRendererComp();
         }
         /**
          * @public
@@ -278,6 +281,9 @@ namespace gd3d.framework
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
             if (node.hasComponent || node.hasComponentChild)
                 this.markHaveComponent();
+
+            if(node.hasRendererComp || node.hasRendererCompChild)
+                this.markHaveRendererComp();
         }
         /**
          * @public
@@ -423,6 +429,16 @@ namespace gd3d.framework
                 p = p.parent;
             }
         }
+        markHaveRendererComp(){
+            this.hasRendererComp = true;
+            var p = this.parent;
+            while (p != null)
+            {
+                p.dirtyChild = true;
+				p.hasRendererCompChild = true;
+                p = p.parent;
+            }
+        }
         /**
          * @public
          * @language zh_CN
@@ -522,8 +538,11 @@ namespace gd3d.framework
         private dirty: boolean = true;//自己是否需要更新
         private dirtyChild: boolean = true;//子层是否需要更新
 
-        public hasComponent: boolean = false;
-        public hasComponentChild: boolean = false;
+        public hasComponent: boolean = false; //自己是否有组件
+        public hasComponentChild: boolean = false;  //子对象是否有组件
+
+        public hasRendererComp:boolean = false; //自己是否有渲染器组件
+        public hasRendererCompChild:boolean = false; //子对象是否有渲染器组件
 
         private dirtyWorldDecompose: boolean = false;
         /**
