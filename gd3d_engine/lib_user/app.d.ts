@@ -500,6 +500,14 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_LiLoadScene implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    timer: number;
+    update(delta: number): void;
+}
 declare class testloadImmediate implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

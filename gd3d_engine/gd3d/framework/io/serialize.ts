@@ -154,6 +154,14 @@ namespace gd3d.io
      */
     export function serializeOtherTypeOrArrayForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean)
     {
+        if (instanceObj == undefined || instanceObj == null){
+            console.error("instanceObj is null");
+            return;
+        }
+        if (serializedObj == undefined || serializedObj == null){
+            console.error("serializedObj is null");
+            return;
+        }
         if (instanceObj[key])
         {
             if (instanceObj[key]["__gdmeta__"])

@@ -12922,6 +12922,14 @@ var gd3d;
         }
         io.serializeObjForInspector = serializeObjForInspector;
         function serializeOtherTypeOrArrayForInspector(instanceObj, serializedObj, key, beComponent) {
+            if (instanceObj == undefined || instanceObj == null) {
+                console.error("instanceObj is null");
+                return;
+            }
+            if (serializedObj == undefined || serializedObj == null) {
+                console.error("serializedObj is null");
+                return;
+            }
             if (instanceObj[key]) {
                 if (instanceObj[key]["__gdmeta__"]) {
                     serializeOtherTypeForInspector(instanceObj, serializedObj, key, beComponent);

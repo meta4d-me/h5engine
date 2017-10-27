@@ -10,19 +10,19 @@ class test_loadScene implements IState
 
         let names: string[] = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         let name = names[0];
-        // name="MainCity";
+        name="1031_gonghuichuangguan_01_128";
         let isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load("res/scenes/citycompress/index.json.txt",gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
+                this.app.getAssetMgr().load("res/scenes/1031_gonghuichuangguan_01_128/index.json.txt",gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
                     if(s1.isfinish)
                     {   
                         let index = JSON.parse((this.app.getAssetMgr().getAssetByName("index.json.txt") as gd3d.framework.textasset).content);
                         let totalLength = index[name + ".assetbundle.json"];
 
-                        this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json",
+                        this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json",
                         // this.app.getAssetMgr().load("res/scenes/city/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                         (s) =>
                         {

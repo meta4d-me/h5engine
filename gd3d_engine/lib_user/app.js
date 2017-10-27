@@ -359,10 +359,8 @@ var main = (function () {
         this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
         this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
-        this.addBtn("Test_NewScene", function () { return new test_NewScene(); });
-        this.addBtn("Test_GameObject", function () { return new test_NewGameObject(); });
-        this.addBtn("Test_ChangeMesh", function () { return new test_ChangeMesh(); });
-        this.addBtn("Test_ChangeMaterial", function () { return new test_ChangeMaterial(); });
+        this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
+        this.addBtn("test_eff", function () { return new dome.db_test_eff(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -3381,6 +3379,63 @@ var t;
     }());
     t.test_light1 = test_light1;
 })(t || (t = {}));
+var test_LiLoadScene = (function () {
+    function test_LiLoadScene() {
+        this.timer = 0;
+    }
+    test_LiLoadScene.prototype.start = function (app) {
+        var _this = this;
+        console.log("i see you are a dog!");
+        this.app = app;
+        this.scene = this.app.getScene();
+        var name = "1031_gonghuichuangguan_01_128";
+        var isloaded = false;
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.app.getAssetMgr().load("res/scenes/" + name + "/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
+                        var totalLength = index[name + ".assetbundle.json"];
+                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json", function (s) {
+                            if (s.isfinish) {
+                                isloaded = true;
+                                console.error(s.isfinish);
+                                var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                                var _root = _scene.getSceneRoot();
+                                _this.scene.addChild(_root);
+                                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                                _root.markDirty();
+                                _this.app.getScene().lightmaps = [];
+                                _scene.useLightMap(_this.app.getScene());
+                                _scene.useFog(_this.app.getScene());
+                            }
+                        });
+                    }
+                });
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+    };
+    test_LiLoadScene.prototype.update = function (delta) {
+        this.timer += delta;
+        CameraController.instance().update(delta);
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.5);
+        var z2 = Math.cos(this.timer * 0.5);
+        var objCam = this.camera.gameObject.transform;
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
+        objCam.markDirty();
+    };
+    return test_LiLoadScene;
+}());
 var testloadImmediate = (function () {
     function testloadImmediate() {
         this.timer = 0;
@@ -3560,14 +3615,15 @@ var test_loadScene = (function () {
         this.scene = this.app.getScene();
         var names = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[0];
+        name = "1031_gonghuichuangguan_01_128";
         var isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/citycompress/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                _this.app.getAssetMgr().load("res/scenes/1031_gonghuichuangguan_01_128/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
                     if (s1.isfinish) {
                         var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
                         var totalLength_1 = index[name + ".assetbundle.json"];
-                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/citycompress/" + name + ".assetbundle.json", function (s) {
+                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json", function (s) {
                             console.log(s.curtask + "/" + s.totaltask);
                             console.log(s.curByteLength + "/" + totalLength_1);
                             console.log(s.bundleLoadState);
