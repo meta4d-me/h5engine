@@ -127,9 +127,7 @@ var gd3d;
                 this.outcontainer = div;
                 var rotateDiv = document.createElement("div");
                 rotateDiv.className = "full";
-                rotateDiv.style.position = "absolute";
-                rotateDiv.style.width = "100%";
-                rotateDiv.style.height = "100%";
+                rotateDiv.setAttribute("style", "\n                position:absolute;\n                width:100%;\n                height:100%;\n            ");
                 this.container = rotateDiv;
                 div.appendChild(rotateDiv);
                 var canvas = document.createElement("canvas");
@@ -7266,6 +7264,7 @@ var gd3d;
                     }
                 }
                 buf = null;
+                data.originVF = vf;
                 this.data = data;
                 this.glMesh = new gd3d.render.glMesh();
                 var vertexs = this.data.genVertexDataArray(vf);

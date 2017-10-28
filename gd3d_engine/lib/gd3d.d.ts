@@ -4239,6 +4239,7 @@ declare namespace gd3d.render {
 }
 declare namespace gd3d.render {
     class meshData {
+        originVF: number;
         pos: gd3d.math.vector3[];
         color: gd3d.math.color[];
         colorex: gd3d.math.color[];
