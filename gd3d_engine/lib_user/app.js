@@ -359,6 +359,10 @@ var main = (function () {
         this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
         this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
+        this.addBtn("example_newScene", function () { return new test_NewScene(); });
+        this.addBtn("example_newObject", function () { return new test_NewGameObject; });
+        this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
+        this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
         this.addBtn("test_eff", function () { return new dome.db_test_eff(); });
     };
