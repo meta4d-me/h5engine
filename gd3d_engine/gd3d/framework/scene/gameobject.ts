@@ -297,6 +297,7 @@ namespace gd3d.framework
                 {
                     this.renderer = comp as any;
                     // console.warn("add renderer:" + this.transform.name);
+                    this.transform.markHaveRendererComp();
                 }
                 else
                 {

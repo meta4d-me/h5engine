@@ -109,6 +109,7 @@ namespace gd3d.reflect
      */
     export function getPrototypes(): { [id: string]: any }
     {
+
         return document["__gdmeta__"];
     }
     /**

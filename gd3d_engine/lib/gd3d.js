@@ -9332,6 +9332,8 @@ var gd3d;
                 this._fillRenderer(scene, scene.getRoot());
             };
             camera.prototype._fillRenderer = function (scene, node) {
+                if (node.hasRendererComp == false && node.hasRendererCompChild == false)
+                    return;
                 if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))
                     return;
                 if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible) {
@@ -10935,8 +10937,9 @@ var gd3d;
                         if (!data) {
                             var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
                             if (_cachePlayer) {
-                                data = new Float32Array(8 * 60);
-                                _cachePlayer.fillPoseData(data, this.bones, true);
+                                var baseSize = this._efficient ? 8 : 16;
+                                data = new Float32Array(this.maxBoneCount * baseSize);
+                                _cachePlayer.fillPoseData(data, this.bones, this._efficient);
                                 skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
                                 this.cacheData = data;
                                 return;
@@ -12918,11 +12921,19 @@ var gd3d;
         }
         io.serializeObjForInspector = serializeObjForInspector;
         function serializeOtherTypeOrArrayForInspector(instanceObj, serializedObj, key, beComponent) {
+            if (instanceObj == undefined || instanceObj == null) {
+                console.error("instanceObj is null");
+                return;
+            }
+            if (serializedObj == undefined || serializedObj == null) {
+                console.error("serializedObj is null");
+                return;
+            }
             if (instanceObj[key]) {
                 if (instanceObj[key]["__gdmeta__"]) {
                     serializeOtherTypeForInspector(instanceObj, serializedObj, key, beComponent);
                 }
-                else if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"]) {
+                else if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"]) {
                     var isArray_4 = instanceObj[key] instanceof Array;
                     if (isArray_4)
                         serializedObj[key] = new inspectorValueInfo([], instanceObj["__gdmeta__"][key]["custom"]["valueType"]);
@@ -12962,8 +12973,8 @@ var gd3d;
             }
             else {
                 var isArray_5 = instanceObj instanceof Array;
-                if (instanceObj["__gdmeta__"][key]) {
-                    if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"]) {
+                if (instanceObj["__gdmeta__"]) {
+                    if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"]) {
                         var custom = instanceObj["__gdmeta__"][key]["custom"];
                         var info = new inspectorValueInfo(null, custom["valueType"]);
                         if (custom["FieldUIStyle"])
@@ -20085,6 +20096,7 @@ var gd3d;
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "effectbatcher") == "1") {
                     if (this.renderer == null) {
                         this.renderer = comp;
+                        this.transform.markHaveRendererComp();
                     }
                     else {
                         add = false;
@@ -21258,6 +21270,8 @@ var gd3d;
                 this.dirtyChild = true;
                 this.hasComponent = false;
                 this.hasComponentChild = false;
+                this.hasRendererComp = false;
+                this.hasRendererCompChild = false;
                 this.dirtyWorldDecompose = false;
                 this.localRotate = new gd3d.math.quaternion();
                 this.localTranslate = new gd3d.math.vector3(0, 0, 0);
@@ -21364,6 +21378,8 @@ var gd3d;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
                 if (node.hasComponent || node.hasComponentChild)
                     this.markHaveComponent();
+                if (node.hasRendererComp || node.hasRendererCompChild)
+                    this.markHaveRendererComp();
             };
             transform.prototype.addChildAt = function (node, index) {
                 if (index < 0)
@@ -21379,6 +21395,8 @@ var gd3d;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
                 if (node.hasComponent || node.hasComponentChild)
                     this.markHaveComponent();
+                if (node.hasRendererComp || node.hasRendererCompChild)
+                    this.markHaveRendererComp();
             };
             transform.prototype.removeAllChild = function () {
                 if (this.children == undefined)
@@ -21453,6 +21471,15 @@ var gd3d;
                 while (p != null) {
                     p.dirtyChild = true;
                     p.hasComponentChild = true;
+                    p = p.parent;
+                }
+            };
+            transform.prototype.markHaveRendererComp = function () {
+                this.hasRendererComp = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p.hasRendererCompChild = true;
                     p = p.parent;
                 }
             };

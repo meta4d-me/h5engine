@@ -110,7 +110,18 @@ namespace gd3d.framework
                 this.useGlobalLightMap=false;
             }
         }
-
+        // material(mat:material|material[])
+        // {
+        //     if(mat==null) this.materials.length=0;
+        //     if(mat instanceof material)
+        //     {
+        //         this.materials[0]=mat;
+        //     }else
+        //     {
+        //         this.materials=mat;
+        //     }
+        //     this.refreshLayerAndQue();
+        // }
         private refreshLayerAndQue()
         {
             if (this.materials == null || this.materials.length == 0)
