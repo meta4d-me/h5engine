@@ -5000,6 +5000,7 @@ var gd3d;
                 _mesh.defaultAsset = true;
                 _mesh.data = meshData;
                 var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                _mesh.data.originVF = vf;
                 var v32 = _mesh.data.genVertexDataArray(vf);
                 var i16 = _mesh.data.genIndexDataArray();
                 _mesh.glMesh = new gd3d.render.glMesh();
@@ -6914,9 +6915,9 @@ var gd3d;
                                 this.setVector4(key, context.eyePos);
                                 break;
                             case "_LightmapTex":
-                                if (!useGLobalLightMap)
-                                    break;
-                                this.setTexture(key, context.lightmap);
+                                if (useGLobalLightMap) {
+                                    this.setTexture(key, context.lightmap);
+                                }
                                 break;
                             case "glstate_lightmapOffset":
                                 this.setVector4(key, context.lightmapOffset);
