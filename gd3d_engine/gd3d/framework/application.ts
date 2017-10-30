@@ -172,6 +172,15 @@ namespace gd3d.framework
             //     meta = metas[0];
             // meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=1, minimum-scale=0.5, maximum-scale=0.5";
 
+            if(div == null){
+                console.error("root div does Null at application start ");
+                return;
+            }
+
+            div.style.position = "absolute";
+            div.style.width = "100%";
+            div.style.height = "100%";
+
             sceneMgr.app = this;
             this._timeScale = 1;
             this.outcontainer = div;

@@ -122,6 +122,13 @@ var gd3d;
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
                 console.log("version: " + this.version + "  build: " + this.build);
+                if (div == null) {
+                    console.error("root div does Null at application start ");
+                    return;
+                }
+                div.style.position = "absolute";
+                div.style.width = "100%";
+                div.style.height = "100%";
                 framework.sceneMgr.app = this;
                 this._timeScale = 1;
                 this.outcontainer = div;
