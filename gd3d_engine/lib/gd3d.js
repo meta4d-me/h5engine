@@ -4571,7 +4571,7 @@ var gd3d;
                 gd3d.io.SerializeDependent.resourseDatas = [];
                 var info = new SaveInfo();
                 var _scene = {};
-                var _rootNode = gd3d.io.serializeObj(this.app.getScene().getRoot(), this);
+                var _rootNode = gd3d.io.serializeObj(this.app.getScene().getRoot(), null, this);
                 var _lightmaps = [];
                 var lightmaps = this.app.getScene().lightmaps;
                 for (var str in lightmaps) {
