@@ -288,6 +288,18 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_UI_Component implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    rooto2d: gd3d.framework.overlay2D;
+    start(app: gd3d.framework.application): void;
+    private createUI(astState, state);
+    private loadTexture(lastState, state);
+    update(delta: number): void;
+}
 declare class test_UIEffect implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -727,6 +739,21 @@ declare namespace t {
     }
     function DBgetAtrans(mat: gd3d.framework.material, meshname?: string): gd3d.framework.transform;
     function DBgetMat(texname?: string, shaderstring?: string): gd3d.framework.material;
+}
+declare class test_pick_4p implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    cube4: gd3d.framework.transform;
+    timer: number;
+    movetarget: gd3d.math.vector3;
+    inputMgr: gd3d.framework.inputMgr;
+    pointDown: boolean;
+    update(delta: number): void;
 }
 declare class test_pick implements IState {
     app: gd3d.framework.application;

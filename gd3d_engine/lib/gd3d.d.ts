@@ -511,7 +511,7 @@ declare namespace gd3d.framework {
         private _fillMethod;
         fillMethod: FillMethod;
         private _fillAmmount;
-        fillAmmount: FillMethod;
+        fillAmmount: number;
         setTexture(texture: texture, border?: math.border, rect?: math.rect): void;
         sprite: sprite;
         render(canvas: canvas): void;
