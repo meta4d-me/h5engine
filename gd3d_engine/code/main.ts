@@ -75,8 +75,9 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
         this.addBtn("test_liloadscene", () => new test_LiLoadScene());
 
-        this.addBtn("test_eff",()=>new dome.db_test_eff());
-
+        this.addBtn("test_UI_component", () => new test_UI_Component());
+        this.addBtn("test_四分屏", () => new test_pick_4p());
+        
     }
     private x: number = 0;
     private y: number = 100;
