@@ -110,7 +110,7 @@ namespace gd3d.framework
         {
             return this._fillAmmount;
         }
-        set fillAmmount(ammount: FillMethod)
+        set fillAmmount(ammount: number)
         {
             this._fillAmmount = ammount;
             if (this.transform != null)

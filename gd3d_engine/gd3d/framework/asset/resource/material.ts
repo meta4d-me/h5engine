@@ -628,8 +628,10 @@ namespace gd3d.framework
                             this.setVector4(key, context.eyePos);
                             break;
                         case "_LightmapTex":
-                            if (!useGLobalLightMap) break;
-                            this.setTexture(key, context.lightmap);
+                            if (useGLobalLightMap)
+                            {
+                                this.setTexture(key, context.lightmap);
+                            }
                             break;
                         case "glstate_lightmapOffset":
                             this.setVector4(key, context.lightmapOffset);

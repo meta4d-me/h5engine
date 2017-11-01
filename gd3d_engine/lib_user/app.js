@@ -579,7 +579,8 @@ var main = (function () {
         this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
         this.addBtn("demo_ScreenRange", function () { return new demo_ScreenRange(); });
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
-        this.addBtn("test_eff", function () { return new dome.db_test_eff(); });
+        this.addBtn("test_UI_component", function () { return new test_UI_Component(); });
+        this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -2659,6 +2660,118 @@ var t;
     }());
     t.test_three_leaved_rose_curve = test_three_leaved_rose_curve;
 })(t || (t = {}));
+var test_UI_Component = (function () {
+    function test_UI_Component() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+    }
+    test_UI_Component.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.assetMgr = this.app.getAssetMgr();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 10;
+        this.rooto2d = new gd3d.framework.overlay2D();
+        this.camera.addOverLay(this.rooto2d);
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.createUI.bind(this));
+    };
+    test_UI_Component.prototype.createUI = function (astState, state) {
+        var bg_t = new gd3d.framework.transform2D;
+        bg_t.width = 400;
+        bg_t.height = 260;
+        bg_t.pivot.x = 0;
+        bg_t.pivot.y = 0;
+        bg_t.localTranslate.x = 100;
+        bg_t.localTranslate.y = 100;
+        this.rooto2d.addChild(bg_t);
+        var bg_i = bg_t.addComponent("image2D");
+        bg_i.imageType = gd3d.framework.ImageType.Sliced;
+        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
+        bg_i.sprite = atlasComp.sprites["bg"];
+        bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        var lab_t = new gd3d.framework.transform2D;
+        lab_t.width = 120;
+        lab_t.height = 30;
+        lab_t.localTranslate.x = 10;
+        lab_t.localTranslate.y = 30;
+        bg_t.addChild(lab_t);
+        var lab_l = lab_t.addComponent("label");
+        lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        lab_l.fontsize = 24;
+        lab_l.text = "我是段文本";
+        lab_l.color = new gd3d.math.color(0.2, 0.2, 0.2, 1);
+        var btn_t = new gd3d.framework.transform2D;
+        btn_t.width = 100;
+        btn_t.height = 36;
+        btn_t.pivot.x = 0;
+        btn_t.pivot.y = 0;
+        btn_t.localTranslate.x = 10;
+        btn_t.localTranslate.y = 70;
+        bg_t.addChild(btn_t);
+        var btn_b = btn_t.addComponent("button");
+        btn_b.targetImage = btn_t.addComponent("image2D");
+        btn_b.targetImage.sprite = atlasComp.sprites["ui_public_button_hits"];
+        btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
+        btn_b.pressedColor = new gd3d.math.color(1, 1, 1, 1);
+        btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        var close_bt = new gd3d.framework.transform2D;
+        close_bt.width = 25;
+        close_bt.height = 25;
+        close_bt.pivot.x = 0;
+        close_bt.pivot.y = 0;
+        close_bt.localTranslate.x = 370;
+        close_bt.localTranslate.y = 2;
+        bg_t.addChild(close_bt);
+        var close_b = close_bt.addComponent("button");
+        close_b.targetImage = close_bt.addComponent("image2D");
+        close_b.targetImage.sprite = atlasComp.sprites["ui_boundary_close_in"];
+        close_b.pressedGraphic = atlasComp.sprites["ui_boundary_close"];
+        close_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        var nums = "45789";
+        var scale = 0.6;
+        for (var i = 0; i < nums.length; i++) {
+            var spt_t = new gd3d.framework.transform2D;
+            spt_t.width = 32 * scale;
+            spt_t.height = 42 * scale;
+            spt_t.pivot.x = 0;
+            spt_t.pivot.y = 0;
+            spt_t.localTranslate.x = spt_t.width * i + 10;
+            spt_t.localTranslate.y = 120;
+            bg_t.addChild(spt_t);
+            var spt = spt_t.addComponent("image2D");
+            spt.sprite = atlasComp.sprites["ui_lianji_" + nums[i]];
+        }
+        state.finish = true;
+    };
+    test_UI_Component.prototype.loadTexture = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    if (s.isfinish) {
+                                        state.finish = true;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_UI_Component.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return test_UI_Component;
+}());
 var test_UIEffect = (function () {
     function test_UIEffect() {
         this.amount = 1;
@@ -3838,6 +3951,26 @@ var test_LiLoadScene = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         var name = "1031_gonghuichuangguan_01_128";
+        this.app.getAssetMgr().load("res/scenes/" + name + "/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+            if (s1.isfinish) {
+                var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
+                var totalLength = index[name + ".assetbundle.json"];
+                _this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json", function (s) {
+                    if (s.isfinish) {
+                        isloaded = true;
+                        console.error(s.isfinish);
+                        var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                        var _root = _scene.getSceneRoot();
+                        _this.scene.addChild(_root);
+                        _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                        _root.markDirty();
+                        _this.app.getScene().lightmaps = [];
+                        _scene.useLightMap(_this.app.getScene());
+                        _scene.useFog(_this.app.getScene());
+                    }
+                });
+            }
+        });
         var isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -4675,12 +4808,17 @@ var test_multipleplayer_anim = (function () {
 var test_navmesh = (function () {
     function test_navmesh() {
         this.timer = 0;
+        this.movetarget = new gd3d.math.vector3();
+        this.pointDown = false;
+        this.pos = [];
     }
     test_navmesh.prototype.start = function (app) {
         var _this = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.navMeshLoader = gd3d.framework.NavMeshLoadManager.Instance;
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
@@ -4688,440 +4826,57 @@ var test_navmesh = (function () {
         this.camera.near = 0.01;
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        gd3d.io.loadText("res/navinfo.json", function (text, error) {
-            _this.navmeshLoaded(text);
-            objCam.lookat(_this.navObj);
+        this.navMeshLoader.loadNavMesh("res/navinfo.json", app, function (s) {
+            objCam.lookat(_this.navMeshLoader.navTrans);
             objCam.markDirty();
         });
-    };
-    test_navmesh.prototype.navmeshLoaded = function (dataStr) {
-        console.warn("navmeshLoaded");
-        this.navObj = new gd3d.framework.transform();
-        this.navObj.name = "navMesh";
-        var meshD = new gd3d.render.meshData();
-        meshD.pos = [];
-        meshD.trisindex = [];
-        var navinfo = lighttool.NavMesh.navMeshInfo.LoadMeshInfo(dataStr);
-        for (var i = 0; i < navinfo.vecs.length; i++) {
-            var v = navinfo.vecs[i];
-            meshD.pos[i] = new gd3d.math.vector3(v.x, v.y, v.z);
-        }
-        var navindexmap = {};
-        var indexDatas = [];
-        for (var i = 0; i < navinfo.nodes.length; i++) {
-            var poly = navinfo.nodes[i].poly;
-            for (var fc = 0; fc < poly.length - 2; fc++) {
-                var sindex = indexDatas.length / 3;
-                navindexmap[sindex] = i;
-                indexDatas.push(poly[0]);
-                indexDatas.push(poly[fc + 2]);
-                indexDatas.push(poly[fc + 1]);
-            }
-        }
-        meshD.trisindex = indexDatas;
-        var meshFiter = this.navObj.gameObject.addComponent("meshFilter");
-        var mesh = this.createMesh(meshD, this.app.webgl);
-        meshFiter.mesh = mesh;
-        var renderer = this.navObj.gameObject.addComponent("meshRenderer");
-        this.app.getScene().addChild(this.navObj);
-        this.navObj.markDirty();
-    };
-    test_navmesh.prototype.createMesh = function (meshData, webgl) {
-        var _mesh = new gd3d.framework.mesh("NavMesh" + ".mesh.bin");
-        _mesh.data = meshData;
-        var vf = gd3d.render.VertexFormatMask.Position;
-        var v32 = _mesh.data.genVertexDataArray(vf);
-        var i16 = _mesh.data.genIndexDataArray();
-        _mesh.glMesh = new gd3d.render.glMesh();
-        _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-        _mesh.glMesh.uploadVertexData(webgl, v32);
-        _mesh.glMesh.addIndex(webgl, i16.length);
-        _mesh.glMesh.uploadIndexData(webgl, 0, i16);
-        _mesh.submesh = [];
-        {
-            var sm = new gd3d.framework.subMeshInfo();
-            sm.matIndex = 0;
-            sm.useVertexIndex = 0;
-            sm.start = 0;
-            sm.size = i16.length;
-            sm.line = false;
-            _mesh.submesh.push(sm);
-        }
-        return _mesh;
+        var array = this.navMeshLoader.moveToPoints(new gd3d.math.vector3(-2.635004384225666, 0.033333320000000555, 2.331812147285282), new gd3d.math.vector3(3.2923403637954975, 0.03333331999999878, -1.158075981081689));
+        console.error(JSON.stringify(array));
+        var cuber;
+        this.cube = new gd3d.framework.transform();
+        this.cube.name = "cube";
+        this.cube.localScale.x = 1;
+        this.cube.localScale.y = 1;
+        this.cube.localScale.z = 1;
+        this.scene.addChild(this.cube);
+        var mesh = this.cube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("pyramid");
+        mesh.mesh = (this.app.getAssetMgr().getDefaultMesh("cube"));
+        var renderer = this.cube.gameObject.addComponent("meshRenderer");
+        var col = this.cube.gameObject.addComponent("boxcollider");
+        col.colliderVisible = true;
+        this.cube.markDirty();
+        cuber = renderer;
+        this.scene.addChild(this.cube);
+        var array = this.navMeshLoader.moveToPoints(new gd3d.math.vector3(-2.635004384225666, 0.033333320000000555, 2.331812147285282), new gd3d.math.vector3(3.2923403637954975, 0.03333331999999878, -1.158075981081689));
+        console.error(JSON.stringify(array));
     };
     test_navmesh.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            this.pickDown();
+        }
+        this.pointDown = this.inputMgr.point.touch;
+    };
+    test_navmesh.prototype.pickDown = function () {
+        var navTrans = this.navMeshLoader.navTrans;
+        var navmesh = this.navMeshLoader.navMesh;
+        if (navmesh == null)
+            return;
+        var inputMgr = this.app.getInputMgr();
+        var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
+        var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
+        if (!pickinfo)
+            return;
+        var endPos = pickinfo.hitposition;
+        console.error(endPos);
+        this.pos.push(endPos);
+        if (this.pos.length > 1) {
+            var a = this.navMeshLoader.moveToPoints(this.pos.pop(), this.pos.pop());
+            console.error(a);
+        }
     };
     return test_navmesh;
 }());
-var lighttool;
-(function (lighttool) {
-    var NavMesh;
-    (function (NavMesh) {
-        var navVec3 = (function () {
-            function navVec3() {
-                this.x = 0;
-                this.y = 0;
-                this.z = 0;
-            }
-            navVec3.prototype.clone = function () {
-                var navVec = new navVec3();
-                navVec.x = this.x;
-                navVec.y = this.y;
-                navVec.z = this.z;
-                return navVec;
-            };
-            navVec3.DistAZ = function (start, end) {
-                var num = end.x - start.x;
-                var num2 = end.z - start.z;
-                return Math.sqrt(num * num + num2 * num2);
-            };
-            navVec3.NormalAZ = function (start, end) {
-                var num = end.x - start.x;
-                var num2 = end.z - start.z;
-                var num3 = Math.sqrt(num * num + num2 * num2);
-                var navVec = new navVec3();
-                navVec.x = num / num3;
-                navVec.y = 0.0;
-                navVec.z = num2 / num3;
-                return navVec;
-            };
-            navVec3.Cross = function (start, end) {
-                var navVec = new navVec3();
-                navVec.x = start.y * end.z - start.z * end.y;
-                navVec.y = start.z * end.x - start.x * end.z;
-                navVec.z = start.x * end.y - start.y * end.x;
-                return navVec;
-            };
-            navVec3.DotAZ = function (start, end) {
-                return start.x * end.x + start.z * end.z;
-            };
-            navVec3.Angle = function (start, end) {
-                var d = start.x * end.x + start.z * end.z;
-                var navVec = navVec3.Cross(start, end);
-                var num = Math.acos(d);
-                var flag = navVec.y < 0.0;
-                if (flag) {
-                    num = -num;
-                }
-                return num;
-            };
-            navVec3.Border = function (start, end, dist) {
-                var navVec = navVec3.NormalAZ(start, end);
-                var navVec2 = new navVec3();
-                navVec2.x = start.x + navVec.x * dist;
-                navVec2.y = start.y + navVec.y * dist;
-                navVec2.z = start.z + navVec.z * dist;
-                return navVec2;
-            };
-            return navVec3;
-        }());
-        NavMesh.navVec3 = navVec3;
-        var navNode = (function () {
-            function navNode() {
-                this.nodeID = 0;
-                this.poly = null;
-                this.borderByPoly = null;
-                this.borderByPoint = null;
-                this.center = null;
-            }
-            navNode.prototype.genBorder = function () {
-                var list = [];
-                for (var i = 0; i < this.poly.length; i = i + 1) {
-                    var num = i;
-                    var num2 = i + 1;
-                    var flag = num2 >= this.poly.length;
-                    if (flag) {
-                        num2 = 0;
-                    }
-                    var num3 = this.poly[num];
-                    var num4 = this.poly[num2];
-                    var flag2 = num3 < num4;
-                    if (flag2) {
-                        list.push(num3 + "-" + num4);
-                    }
-                    else {
-                        list.push(num4 + "-" + num3);
-                    }
-                }
-                this.borderByPoint = list;
-            };
-            navNode.prototype.isLinkTo = function (info, nid) {
-                var flag = this.nodeID === nid;
-                var result;
-                if (flag) {
-                    result = null;
-                }
-                else {
-                    var flag2 = nid < 0;
-                    if (flag2) {
-                        result = null;
-                    }
-                    else {
-                        var array = this.borderByPoly;
-                        for (var i = 0; i < array.length; i = i + 1) {
-                            var text = array[i];
-                            var flag3 = (info.borders[text] == undefined);
-                            if (!flag3) {
-                                var flag4 = info.borders[text].nodeA === nid || info.borders[text].nodeB === nid;
-                                if (flag4) {
-                                    result = text;
-                                    return result;
-                                }
-                            }
-                        }
-                        result = null;
-                    }
-                }
-                return result;
-            };
-            navNode.prototype.getLinked = function (info) {
-                var list = [];
-                var array = this.borderByPoly;
-                for (var i = 0; i < array.length; i = i + 1) {
-                    var key = array[i];
-                    var flag = (info.borders[key] == undefined);
-                    if (!flag) {
-                        var flag2 = info.borders[key].nodeA === this.nodeID;
-                        var num;
-                        if (flag2) {
-                            num = info.borders[key].nodeB;
-                        }
-                        else {
-                            num = info.borders[key].nodeA;
-                        }
-                        var flag3 = num >= 0;
-                        if (flag3) {
-                            list.push(num);
-                        }
-                    }
-                }
-                return list;
-            };
-            navNode.prototype.genCenter = function (info) {
-                this.center = new navVec3();
-                this.center.x = 0.0;
-                this.center.y = 0.0;
-                this.center.z = 0.0;
-                var array = this.poly;
-                for (var i = 0; i < array.length; i = i + 1) {
-                    var num = array[i];
-                    this.center.x += info.vecs[num].x;
-                    this.center.y += info.vecs[num].y;
-                    this.center.z += info.vecs[num].z;
-                }
-                this.center.x /= this.poly.length;
-                this.center.y /= this.poly.length;
-                this.center.z /= this.poly.length;
-            };
-            return navNode;
-        }());
-        NavMesh.navNode = navNode;
-        var navBorder = (function () {
-            function navBorder() {
-                this.borderName = null;
-                this.nodeA = 0;
-                this.nodeB = 0;
-                this.pointA = 0;
-                this.pointB = 0;
-                this.length = 0;
-                this.center = null;
-            }
-            return navBorder;
-        }());
-        NavMesh.navBorder = navBorder;
-        var navMeshInfo = (function () {
-            function navMeshInfo() {
-                this.vecs = null;
-                this.nodes = null;
-                this.borders = null;
-                this.min = null;
-                this.max = null;
-            }
-            navMeshInfo.prototype.calcBound = function () {
-                this.min = new navVec3();
-                this.max = new navVec3();
-                this.min.x = 1.7976931348623157E+308;
-                this.min.y = 1.7976931348623157E+308;
-                this.min.z = 1.7976931348623157E+308;
-                this.max.x = -1.7976931348623157E+308;
-                this.max.y = -1.7976931348623157E+308;
-                this.max.z = -1.7976931348623157E+308;
-                for (var i = 0; i < this.vecs.length; i = i + 1) {
-                    var flag = this.vecs[i].x < this.min.x;
-                    if (flag) {
-                        this.min.x = this.vecs[i].x;
-                    }
-                    var flag2 = this.vecs[i].y < this.min.y;
-                    if (flag2) {
-                        this.min.y = this.vecs[i].y;
-                    }
-                    var flag3 = this.vecs[i].z < this.min.z;
-                    if (flag3) {
-                        this.min.z = this.vecs[i].z;
-                    }
-                    var flag4 = this.vecs[i].x > this.max.x;
-                    if (flag4) {
-                        this.max.x = this.vecs[i].x;
-                    }
-                    var flag5 = this.vecs[i].y > this.max.y;
-                    if (flag5) {
-                        this.max.y = this.vecs[i].y;
-                    }
-                    var flag6 = this.vecs[i].z > this.max.z;
-                    if (flag6) {
-                        this.max.z = this.vecs[i].z;
-                    }
-                }
-            };
-            navMeshInfo.cross = function (p0, p1, p2) {
-                return (p1.x - p0.x) * (p2.z - p0.z) - (p2.x - p0.x) * (p1.z - p0.z);
-            };
-            navMeshInfo.prototype.inPoly = function (p, poly) {
-                var num = 0;
-                var flag = poly.length < 3;
-                var result;
-                if (flag) {
-                    result = false;
-                }
-                else {
-                    var flag2 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[1]]) < (-num);
-                    if (flag2) {
-                        result = false;
-                    }
-                    else {
-                        var flag3 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[poly.length - 1]]) > num;
-                        if (flag3) {
-                            result = false;
-                        }
-                        else {
-                            var i = 2;
-                            var num2 = poly.length - 1;
-                            var num3 = -1;
-                            while (i <= num2) {
-                                var num4 = i + num2 >> 1;
-                                var flag4 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[num4]]) < (-num);
-                                if (flag4) {
-                                    num3 = num4;
-                                    num2 = num4 - 1;
-                                }
-                                else {
-                                    i = num4 + 1;
-                                }
-                            }
-                            var num5 = navMeshInfo.cross(this.vecs[poly[num3 - 1]], p, this.vecs[poly[num3]]);
-                            result = (num5 > num);
-                        }
-                    }
-                }
-                return result;
-            };
-            navMeshInfo.prototype.genBorder = function () {
-                var __border = {};
-                for (var i0 = 0; i0 < this.nodes.length; i0 = i0 + 1) {
-                    var n = this.nodes[i0];
-                    for (var i1 = 0; i1 < n.borderByPoint.length; i1 = i1 + 1) {
-                        var b = n.borderByPoint[i1];
-                        if (__border[b] == undefined) {
-                            __border[b] = new navBorder();
-                            __border[b].borderName = b;
-                            __border[b].nodeA = n.nodeID;
-                            __border[b].nodeB = -1;
-                            __border[b].pointA = -1;
-                        }
-                        else {
-                            __border[b].nodeB = n.nodeID;
-                            if (__border[b].nodeA > __border[b].nodeB) {
-                                __border[b].nodeB = __border[b].nodeA;
-                                __border[b].nodeB = n.nodeID;
-                            }
-                            var na = this.nodes[__border[b].nodeA];
-                            var nb = this.nodes[__border[b].nodeB];
-                            for (var i2 = 0; i2 < na.poly.length; i2 = i2 + 1) {
-                                var i = na.poly[i2];
-                                if (nb.poly.indexOf(i) >= 0) {
-                                    if (__border[b].pointA == -1)
-                                        __border[b].pointA = i;
-                                    else
-                                        __border[b].pointB = i;
-                                }
-                            }
-                            var left = __border[b].pointA;
-                            var right = __border[b].pointB;
-                            var xd = this.vecs[left].x - this.vecs[right].x;
-                            var yd = this.vecs[left].y - this.vecs[right].y;
-                            var zd = this.vecs[left].z - this.vecs[right].z;
-                            __border[b].length = Math.sqrt(xd * xd + yd * yd + zd * zd);
-                            __border[b].center = new navVec3();
-                            __border[b].center.x = this.vecs[left].x * 0.5 + this.vecs[right].x * 0.5;
-                            __border[b].center.y = this.vecs[left].y * 0.5 + this.vecs[right].y * 0.5;
-                            __border[b].center.z = this.vecs[left].z * 0.5 + this.vecs[right].z * 0.5;
-                            __border[b].borderName = __border[b].nodeA + "-" + __border[b].nodeB;
-                        }
-                    }
-                }
-                var namechange = {};
-                for (var key in __border) {
-                    if (__border[key].nodeB < 0) {
-                    }
-                    else {
-                        namechange[key] = __border[key].borderName;
-                    }
-                }
-                this.borders = {};
-                for (var key in __border) {
-                    if (namechange[key] != undefined) {
-                        this.borders[namechange[key]] = __border[key];
-                    }
-                }
-                for (var m = 0; m < this.nodes.length; m = m + 1) {
-                    var v = this.nodes[m];
-                    var newborder = [];
-                    for (var nnn = 0; nnn < v.borderByPoint.length; nnn = nnn + 1) {
-                        var b = v.borderByPoint[nnn];
-                        if (namechange[b] != undefined) {
-                            newborder.push(namechange[b]);
-                        }
-                    }
-                    v.borderByPoly = newborder;
-                }
-            };
-            navMeshInfo.LoadMeshInfo = function (s) {
-                var j = JSON.parse(s);
-                var info = new navMeshInfo();
-                var listVec = [];
-                for (var jsonid in j["v"]) {
-                    var v3 = new navVec3();
-                    v3.x = j["v"][jsonid][0];
-                    v3.y = j["v"][jsonid][1];
-                    v3.z = j["v"][jsonid][2];
-                    listVec.push(v3);
-                }
-                info.vecs = listVec;
-                var polys = [];
-                var list = j["p"];
-                for (var i = 0; i < list.length; i++) {
-                    var json = list[i];
-                    var node = new navNode();
-                    node.nodeID = i;
-                    var poly = [];
-                    for (var tt in json) {
-                        poly.push(json[tt]);
-                    }
-                    node.poly = poly;
-                    node.genBorder();
-                    node.genCenter(info);
-                    polys.push(node);
-                }
-                info.nodes = polys;
-                info.calcBound();
-                info.genBorder();
-                return info;
-            };
-            return navMeshInfo;
-        }());
-        NavMesh.navMeshInfo = navMeshInfo;
-    })(NavMesh = lighttool.NavMesh || (lighttool.NavMesh = {}));
-})(lighttool || (lighttool = {}));
 var t;
 (function (t) {
     var Test_NormalMap = (function () {
@@ -5528,6 +5283,148 @@ var t;
     }
     t.DBgetMat = DBgetMat;
 })(t || (t = {}));
+var test_pick_4p = (function () {
+    function test_pick_4p() {
+        this.timer = 0;
+        this.movetarget = new gd3d.math.vector3();
+        this.pointDown = false;
+    }
+    test_pick_4p.prototype.start = function (app) {
+        console.log("i am here.");
+        this.app = app;
+        this.inputMgr = this.app.getInputMgr();
+        this.scene = this.app.getScene();
+        var cuber;
+        console.warn("Finish it.");
+        var cube = new gd3d.framework.transform();
+        cube.name = "cube";
+        cube.localScale.x = 10;
+        cube.localScale.y = 0.1;
+        cube.localScale.z = 10;
+        this.scene.addChild(cube);
+        var mesh = cube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("pyramid");
+        mesh.mesh = (this.app.getAssetMgr().getDefaultMesh("cube"));
+        var renderer = cube.gameObject.addComponent("meshRenderer");
+        cube.gameObject.addComponent("boxcollider");
+        cube.markDirty();
+        cuber = renderer;
+        this.cube = cube;
+        {
+            this.cube2 = new gd3d.framework.transform();
+            this.cube2.name = "cube2";
+            this.scene.addChild(this.cube2);
+            this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 1;
+            this.cube2.localTranslate.x = -5;
+            this.cube2.markDirty();
+            var mesh = this.cube2.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube2.gameObject.addComponent("meshRenderer");
+            var coll = this.cube2.gameObject.addComponent("spherecollider");
+            coll.center = new gd3d.math.vector3(0, 1, 0);
+            coll.radius = 1;
+        }
+        this.cube3 = this.cube2.clone();
+        this.scene.addChild(this.cube3);
+        {
+            this.cube3 = new gd3d.framework.transform();
+            this.cube3.name = "cube3";
+            this.scene.addChild(this.cube3);
+            this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
+            this.cube3.localTranslate.x = -5;
+            this.cube3.markDirty();
+            var mesh = this.cube3.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube3.gameObject.addComponent("meshRenderer");
+            var coll = this.cube3.gameObject.addComponent("boxcollider");
+            coll.colliderVisible = true;
+        }
+        {
+            this.cube4 = new gd3d.framework.transform();
+            this.cube4.name = "cube4";
+            this.scene.addChild(this.cube4);
+            this.cube4.localScale.x = this.cube4.localScale.y = this.cube4.localScale.z = 1;
+            this.cube4.localTranslate.x = 5;
+            this.cube4.markDirty();
+            var mesh = this.cube4.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube4.gameObject.addComponent("meshRenderer");
+            var coll = this.cube4.gameObject.addComponent("boxcollider");
+            coll.colliderVisible = true;
+        }
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.lookat(this.cube);
+        this.camera.viewport = new gd3d.math.rect(0, 0, 0.5, 0.5);
+        objCam.markDirty();
+        {
+            var objCam2 = new gd3d.framework.transform();
+            objCam2.name = "sth2.";
+            this.scene.addChild(objCam2);
+            var _camera = objCam2.gameObject.addComponent("camera");
+            _camera.near = 0.01;
+            _camera.far = 100;
+            _camera.clearOption_Color = false;
+            objCam2.localTranslate = new gd3d.math.vector3(0, 5, -10);
+            objCam2.lookat(this.cube);
+            _camera.viewport = new gd3d.math.rect(0.5, 0.5, 0.5, 0.5);
+            objCam2.markDirty();
+        }
+        {
+            var objCam2 = new gd3d.framework.transform();
+            objCam2.name = "sth2.";
+            this.scene.addChild(objCam2);
+            var _camera = objCam2.gameObject.addComponent("camera");
+            _camera.near = 0.01;
+            _camera.far = 100;
+            _camera.clearOption_Color = false;
+            objCam2.localTranslate = new gd3d.math.vector3(0, 8, -10);
+            objCam2.lookat(this.cube);
+            _camera.viewport = new gd3d.math.rect(0.5, 0, 0.5, 0.5);
+            objCam2.markDirty();
+        }
+        {
+            var objCam2 = new gd3d.framework.transform();
+            objCam2.name = "sth2.";
+            this.scene.addChild(objCam2);
+            var _camera = objCam2.gameObject.addComponent("camera");
+            _camera.near = 0.01;
+            _camera.far = 100;
+            _camera.clearOption_Color = false;
+            objCam2.localTranslate = new gd3d.math.vector3(0, 8, -10);
+            objCam2.lookat(this.cube);
+            _camera.viewport = new gd3d.math.rect(0, 0.5, 0.5, 0.5);
+            objCam2.markDirty();
+        }
+    };
+    test_pick_4p.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
+            var pickinfo = this.scene.pick(ray);
+            if (pickinfo != null) {
+                this.movetarget = pickinfo.hitposition;
+                this.timer = 0;
+            }
+        }
+        this.pointDown = this.inputMgr.point.touch;
+        if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
+            return;
+        }
+        this.timer += delta;
+        this.cube3.localTranslate.x += delta;
+        this.cube3.markDirty();
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.1);
+        var z2 = Math.cos(this.timer * 0.1);
+    };
+    return test_pick_4p;
+}());
 var test_pick = (function () {
     function test_pick() {
         this.timer = 0;
@@ -8576,171 +8473,6 @@ var test_effecteditor = (function () {
         this.gui = new lighttool.htmlui.gui(div);
         lighttool.htmlui.panelMgr.instance().init(div);
         this.gui.onchange = function () {
-            if (_this.gui.add_Button("new particle")) {
-                _this.transformRoot = new gd3d.framework.transform();
-                _this.effectSystem = _this.transformRoot.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                _this.effectSysData = new gd3d.framework.EffectSystemData();
-                _this.effectSysData.beLoop = false;
-                _this.effectSysData.life = 0;
-                _this.effectSysData.elements = [];
-            }
-            if (_this.effectSystem != undefined) {
-                if (_this.gui.add_Button("add element")) {
-                    _this.addElement();
-                }
-                if (_this.effectSysData.elements.length > 0) {
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("life:");
-                    _this.setVal(_this.gui.add_Textbox("5"), "life", _this.effectSysData);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Position:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("0"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("0"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("0"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.pos);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Euler:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("0"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("0"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("0"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.euler);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Scale:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("1"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("1"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("1"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.scale);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("Color:");
-                    _this.gui.add_A(" x");
-                    _this.setVal(_this.gui.add_Textbox("1"), "x", _this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    _this.gui.add_A(" y");
-                    _this.setVal(_this.gui.add_Textbox("1"), "y", _this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    _this.gui.add_A(" z");
-                    _this.setVal(_this.gui.add_Textbox("1"), "z", _this.effectSysData.elements[0].initFrameData.attrsData.color);
-                    _this.gui.endLayout();
-                    _this.gui.beginLayout_H();
-                    _this.gui.add_A("拖拽选择mesh文件");
-                    var fileList = _this.gui.add_DragFile();
-                    if (fileList != null && fileList.length > 0) {
-                        var file = fileList[0];
-                        _this.effectSysData.elements[0].initFrameData.attrsData.mesh = _this.app.getAssetMgr().getAssetByName(file.name);
-                        console.log(file.name);
-                    }
-                    if (_this.effectSysData.elements[0].initFrameData.attrsData.mesh != null)
-                        _this.gui.add_A(_this.effectSysData.elements[0].initFrameData.attrsData.mesh.getName());
-                    _this.gui.endLayout();
-                    if (_this.gui.add_Button("创建材质")) {
-                        var matData = new gd3d.framework.EffectMatData();
-                        _this.effectSysData.elements[0].initFrameData.attrsData.mat = matData;
-                    }
-                    if (_this.effectSysData.elements[0].initFrameData.attrsData.mat != undefined) {
-                        _this.gui.beginLayout_H();
-                        _this.gui.add_A("拖拽选择shader");
-                        var fileList_1 = _this.gui.add_DragFile();
-                        if (fileList_1 != null && fileList_1.length > 0) {
-                            var file = fileList_1[0];
-                            _this.effectSysData.elements[0].initFrameData.attrsData.mat.shader = _this.app.getAssetMgr().getShader(file.name);
-                            console.log(file.name);
-                        }
-                        if (_this.effectSysData.elements[0].initFrameData.attrsData.mat.shader != null)
-                            _this.gui.add_A(_this.effectSysData.elements[0].initFrameData.attrsData.mat.shader.getName());
-                        _this.gui.endLayout();
-                        _this.gui.beginLayout_H();
-                        _this.gui.add_A("拖拽选择贴图");
-                        fileList_1 = _this.gui.add_DragFile();
-                        if (fileList_1 != null && fileList_1.length > 0) {
-                            var file = fileList_1[0];
-                            _this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture = _this.app.getAssetMgr().getAssetByName(file.name);
-                            console.log(file.name);
-                        }
-                        if (_this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture != null)
-                            _this.gui.add_A(_this.effectSysData.elements[0].initFrameData.attrsData.mat.diffuseTexture.getName());
-                        _this.gui.endLayout();
-                    }
-                    _this.gui.add_A("TimeLine:");
-                    _this.gui.beginLayout_V();
-                    _this.gui.add_A("frameIndex:");
-                    var val = _this.gui.add_Textbox("30");
-                    if (_this.gui.add_Button("Add Breath Action")) {
-                        if (val != "") {
-                            try {
-                                var v = parseFloat(val);
-                                if (_this.effectSysData.elements[0].timelineFrame == undefined)
-                                    _this.effectSysData.elements[0].timelineFrame = {};
-                                if (_this.effectSysData.elements[0].timelineFrame[v] == undefined)
-                                    _this.effectSysData.elements[0].timelineFrame[v] = new gd3d.framework.EffectFrameData();
-                                _this.effectSysData.elements[0].timelineFrame[v].frameIndex = v;
-                                var action = new gd3d.framework.EffectActionData();
-                                action.actionType = "breath";
-                                action.startFrame = v;
-                                _this.effectSysData.elements[0].actionData = [];
-                                _this.effectSysData.elements[0].actionData.push(action);
-                            }
-                            catch (e) {
-                            }
-                        }
-                    }
-                    if (_this.effectSysData.elements[0].actionData != undefined && _this.effectSysData.elements[0].actionData.length > 0) {
-                        _this.scaleChecked = _this.gui.add_Checkbox("scale", _this.scaleChecked);
-                        if (_this.scaleChecked) {
-                            _this.positionChecked = false;
-                            _this.eulerChecked = false;
-                        }
-                        _this.positionChecked = _this.gui.add_Checkbox("position", _this.positionChecked);
-                        if (_this.positionChecked) {
-                            _this.scaleChecked = false;
-                            _this.eulerChecked = false;
-                        }
-                        _this.eulerChecked = _this.gui.add_Checkbox("euler", _this.eulerChecked);
-                        if (_this.eulerChecked) {
-                            _this.positionChecked = false;
-                            _this.scaleChecked = false;
-                        }
-                        if (_this.scaleChecked) {
-                            if (_this.effectSysData.elements[0].actionData[0].params == undefined)
-                                _this.effectSysData.elements[0].actionData[0].params = {};
-                            _this.effectSysData.elements[0].actionData[0].params["name"] = "scale";
-                            _this.gui.beginLayout_H();
-                            _this.gui.add_A("startvalue:");
-                            _this.gui.add_A(" x");
-                            _this.setVal(_this.gui.add_Textbox("2"), "x", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            _this.gui.add_A(" y");
-                            _this.setVal(_this.gui.add_Textbox("2"), "y", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            _this.gui.add_A(" z");
-                            _this.setVal(_this.gui.add_Textbox("2"), "z", _this.effectSysData.elements[0].actionData[0].params["startvalue"]);
-                            _this.gui.endLayout();
-                            _this.gui.beginLayout_H();
-                            _this.gui.add_A("targetvalue:");
-                            _this.gui.add_A(" x");
-                            _this.setVal(_this.gui.add_Textbox("2"), "x", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            _this.gui.add_A(" y");
-                            _this.setVal(_this.gui.add_Textbox("2"), "y", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            _this.gui.add_A(" z");
-                            _this.setVal(_this.gui.add_Textbox("4"), "z", _this.effectSysData.elements[0].actionData[0].params["targetvalue"]);
-                            _this.gui.endLayout();
-                        }
-                        _this.gui.beginLayout_H();
-                        _this.gui.add_A("loopframe:");
-                        _this.setVal(_this.gui.add_Textbox("60"), "loopframe", _this.effectSysData.elements[0].actionData[0].params);
-                        _this.gui.endLayout();
-                    }
-                    _this.gui.endLayout();
-                }
-            }
-            if (_this.gui.add_Button("Play")) {
-                _this.play();
-            }
         };
         setInterval(function () {
             _this.gui.update();

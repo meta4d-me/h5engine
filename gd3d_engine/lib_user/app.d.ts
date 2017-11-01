@@ -339,6 +339,18 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_UI_Component implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    rooto2d: gd3d.framework.overlay2D;
+    start(app: gd3d.framework.application): void;
+    private createUI(astState, state);
+    private loadTexture(lastState, state);
+    update(delta: number): void;
+}
 declare class test_UIEffect implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -676,61 +688,17 @@ declare class test_multipleplayer_anim implements IState {
 declare class test_navmesh implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    private navmeshLoaded(dataStr);
-    private createMesh(meshData, webgl);
+    navMeshLoader: gd3d.framework.NavMeshLoadManager;
     camera: gd3d.framework.camera;
-    navObj: gd3d.framework.transform;
+    cube: gd3d.framework.transform;
+    start(app: gd3d.framework.application): void;
     timer: number;
+    movetarget: gd3d.math.vector3;
+    inputMgr: gd3d.framework.inputMgr;
+    pointDown: boolean;
     update(delta: number): void;
-}
-declare namespace lighttool.NavMesh {
-    class navVec3 {
-        x: number;
-        y: number;
-        z: number;
-        clone(): navVec3;
-        static DistAZ(start: navVec3, end: navVec3): number;
-        static NormalAZ(start: navVec3, end: navVec3): navVec3;
-        static Cross(start: navVec3, end: navVec3): navVec3;
-        static DotAZ(start: navVec3, end: navVec3): number;
-        static Angle(start: navVec3, end: navVec3): number;
-        static Border(start: navVec3, end: navVec3, dist: number): navVec3;
-    }
-    class navNode {
-        nodeID: number;
-        poly: number[];
-        borderByPoly: string[];
-        borderByPoint: string[];
-        center: navVec3;
-        genBorder(): void;
-        isLinkTo(info: navMeshInfo, nid: number): string;
-        getLinked(info: navMeshInfo): number[];
-        genCenter(info: navMeshInfo): void;
-    }
-    class navBorder {
-        borderName: string;
-        nodeA: number;
-        nodeB: number;
-        pointA: number;
-        pointB: number;
-        length: number;
-        center: navVec3;
-    }
-    class navMeshInfo {
-        vecs: navVec3[];
-        nodes: navNode[];
-        borders: {
-            [id: string]: navBorder;
-        };
-        min: navVec3;
-        max: navVec3;
-        calcBound(): void;
-        private static cross(p0, p1, p2);
-        inPoly(p: navVec3, poly: number[]): boolean;
-        genBorder(): void;
-        static LoadMeshInfo(s: string): navMeshInfo;
-    }
+    pos: any[];
+    pickDown(): void;
 }
 declare namespace t {
     class Test_NormalMap implements IState {
@@ -778,6 +746,21 @@ declare namespace t {
     }
     function DBgetAtrans(mat: gd3d.framework.material, meshname?: string): gd3d.framework.transform;
     function DBgetMat(texname?: string, shaderstring?: string): gd3d.framework.material;
+}
+declare class test_pick_4p implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    cube4: gd3d.framework.transform;
+    timer: number;
+    movetarget: gd3d.math.vector3;
+    inputMgr: gd3d.framework.inputMgr;
+    pointDown: boolean;
+    update(delta: number): void;
 }
 declare class test_pick implements IState {
     app: gd3d.framework.application;

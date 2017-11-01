@@ -1560,7 +1560,7 @@ namespace gd3d.framework
 
             let info: SaveInfo = new SaveInfo();
             let _scene = {};
-            let _rootNode = io.serializeObj(this.app.getScene().getRoot(), this);
+            let _rootNode = io.serializeObj(this.app.getScene().getRoot(), null, this);
 
             let _lightmaps = [];
             let lightmaps = this.app.getScene().lightmaps;
