@@ -49,6 +49,14 @@ namespace gd3d.framework
                         onended();
                 }
             }
+            // //郭加的
+            // if(this.beLoop)
+            // {   
+            //     c.source.onended=()=>
+            //     {
+            //         this.play(buffer, beLoop, volume);
+            //     }
+            // }
         }
         /**
         * @public
