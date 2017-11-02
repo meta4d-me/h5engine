@@ -2273,9 +2273,10 @@ var test_UI_Component = (function () {
         btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
         btn_b.pressedColor = new gd3d.math.color(1, 1, 1, 1);
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        var closeSce = 0.8;
         var close_bt = new gd3d.framework.transform2D;
-        close_bt.width = 25;
-        close_bt.height = 25;
+        close_bt.width = 25 * closeSce;
+        close_bt.height = 25 * closeSce;
         close_bt.pivot.x = 0;
         close_bt.pivot.y = 0;
         close_bt.localTranslate.x = 370;
@@ -2288,6 +2289,7 @@ var test_UI_Component = (function () {
         close_b.transition = gd3d.framework.TransitionType.SpriteSwap;
         var nums = "45789";
         var scale = 0.6;
+        var numIconarr = [];
         for (var i = 0; i < nums.length; i++) {
             var spt_t = new gd3d.framework.transform2D;
             spt_t.width = 32 * scale;
@@ -2299,7 +2301,20 @@ var test_UI_Component = (function () {
             bg_t.addChild(spt_t);
             var spt = spt_t.addComponent("image2D");
             spt.sprite = atlasComp.sprites["ui_lianji_" + nums[i]];
+            numIconarr.push(spt);
         }
+        btn_b.onClick.addListener(function () {
+            var temp = "";
+            for (var i = 0; i < nums.length; i++) {
+                var num = Number(nums[i]);
+                num++;
+                num = num % 10;
+                numIconarr[i].sprite = atlasComp.sprites["ui_lianji_" + num];
+                numIconarr[i].transform.markDirty();
+                temp += num.toString();
+            }
+            nums = temp;
+        });
         state.finish = true;
     };
     test_UI_Component.prototype.loadTexture = function (lastState, state) {

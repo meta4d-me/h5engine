@@ -2470,6 +2470,9 @@ var gd3d;
             });
             image2D.prototype.setTexture = function (texture, border, rect) {
                 this.needRefreshImg = true;
+                if (this.sprite) {
+                    this.sprite.unuse();
+                }
                 var _sprite = new framework.sprite();
                 _sprite.texture = texture;
                 if (border != null)
@@ -2481,9 +2484,12 @@ var gd3d;
                 else
                     _sprite.rect = new gd3d.math.rect(0, 0, texture.glTexture.width, texture.glTexture.height);
                 this.sprite = _sprite;
+                this.sprite.use();
                 this.prepareData();
-                if (this.transform != null)
+                if (this.transform != null) {
                     this.transform.markDirty();
+                    this.updateTran();
+                }
             };
             Object.defineProperty(image2D.prototype, "sprite", {
                 get: function () {
@@ -2498,6 +2504,7 @@ var gd3d;
                     this._sprite.use();
                     this.prepareData();
                     this.transform.markDirty();
+                    this.updateTran();
                 },
                 enumerable: true,
                 configurable: true

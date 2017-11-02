@@ -76,9 +76,10 @@ class test_UI_Component implements IState {
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
 
         //关闭按钮
+        let closeSce = 0.8;
         let close_bt = new gd3d.framework.transform2D;
-        close_bt.width = 25;
-        close_bt.height = 25;
+        close_bt.width = 25 * closeSce;
+        close_bt.height = 25 * closeSce;
         close_bt.pivot.x = 0;
         close_bt.pivot.y = 0;
         close_bt.localTranslate.x = 370;
@@ -93,6 +94,7 @@ class test_UI_Component implements IState {
         //精灵图 数字
         let nums = "45789";
         let scale = 0.6;
+        let numIconarr:gd3d.framework.image2D[] = [];
         for(var i =0 ;i<nums.length ;i++){
             let spt_t = new gd3d.framework.transform2D;
             spt_t.width = 32 * scale;
@@ -104,8 +106,22 @@ class test_UI_Component implements IState {
             bg_t.addChild(spt_t);
             let spt = spt_t.addComponent("image2D") as gd3d.framework.image2D;
             spt.sprite = atlasComp.sprites["ui_lianji_"+ nums[i]];
+            numIconarr.push(spt);
         }
         
+        btn_b.onClick.addListener(()=>{
+            let temp = "";
+            for(var i=0;i<nums.length;i++){
+                let num = Number(nums[i]);
+                num ++;
+                num = num%10;
+                numIconarr[i].sprite = atlasComp.sprites["ui_lianji_"+ num];
+                numIconarr[i].transform.markDirty();
+                temp += num.toString();
+            }
+            nums = temp;
+        });
+
 
         state.finish = true;
 
