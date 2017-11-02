@@ -20,6 +20,7 @@ namespace gd3d.framework
             _mesh.defaultAsset = true;
             _mesh.data = meshData;
             var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal| gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+            _mesh.data.originVF=vf;
             var v32 = _mesh.data.genVertexDataArray(vf);
             var i16 = _mesh.data.genIndexDataArray();
 

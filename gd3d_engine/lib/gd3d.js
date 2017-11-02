@@ -4578,7 +4578,7 @@ var gd3d;
                 gd3d.io.SerializeDependent.resourseDatas = [];
                 var info = new SaveInfo();
                 var _scene = {};
-                var _rootNode = gd3d.io.serializeObj(this.app.getScene().getRoot(), this);
+                var _rootNode = gd3d.io.serializeObj(this.app.getScene().getRoot(), null, this);
                 var _lightmaps = [];
                 var lightmaps = this.app.getScene().lightmaps;
                 for (var str in lightmaps) {
@@ -5007,6 +5007,7 @@ var gd3d;
                 _mesh.defaultAsset = true;
                 _mesh.data = meshData;
                 var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                _mesh.data.originVF = vf;
                 var v32 = _mesh.data.genVertexDataArray(vf);
                 var i16 = _mesh.data.genIndexDataArray();
                 _mesh.glMesh = new gd3d.render.glMesh();
@@ -6921,9 +6922,9 @@ var gd3d;
                                 this.setVector4(key, context.eyePos);
                                 break;
                             case "_LightmapTex":
-                                if (!useGLobalLightMap)
-                                    break;
-                                this.setTexture(key, context.lightmap);
+                                if (useGLobalLightMap) {
+                                    this.setTexture(key, context.lightmap);
+                                }
                                 break;
                             case "glstate_lightmapOffset":
                                 this.setVector4(key, context.lightmapOffset);
@@ -12886,10 +12887,13 @@ var gd3d;
             if (serializedObj === void 0) { serializedObj = undefined; }
             var _flag = gd3d.framework.HideFlags.None;
             var _type;
+            if (boolInNull(instanceObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"]) {
                 _type = gd3d.reflect.getClassName(instanceObj);
             }
-            if (_type == "transform") {
+            if (_type == "transform" && instanceObj["gameObject"]) {
                 _flag = instanceObj["gameObject"].hideFlags;
             }
             else if (_type == "transform2D") {
@@ -12905,6 +12909,9 @@ var gd3d;
                 if (key == "children")
                     continue;
                 var t = instanceObj["__gdmeta__"][key];
+                if (boolInNull(t)) {
+                    continue;
+                }
                 if (t["custom"] == null)
                     continue;
                 if (t["custom"]["SerializeField"] == null && t["custom"]["nodecomp"] == null && t["custom"]["2dcomp"] == null)
@@ -12937,13 +12944,11 @@ var gd3d;
         }
         io.serializeObjForInspector = serializeObjForInspector;
         function serializeOtherTypeOrArrayForInspector(instanceObj, serializedObj, key, beComponent) {
-            if (instanceObj == undefined || instanceObj == null) {
-                console.error("instanceObj is null");
-                return;
+            if (boolInNull(instanceObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
             }
-            if (serializedObj == undefined || serializedObj == null) {
-                console.error("serializedObj is null");
-                return;
+            if (boolInNull(serializedObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
             }
             if (instanceObj[key]) {
                 if (instanceObj[key]["__gdmeta__"]) {
@@ -12956,6 +12961,9 @@ var gd3d;
                     else
                         serializedObj[key] = new inspectorValueInfo({}, instanceObj["__gdmeta__"][key]["custom"]["valueType"]);
                     for (var newkey in instanceObj[key]) {
+                        if (instanceObj[key][newkey] == null || instanceObj[key][newkey] == undefined) {
+                            continue;
+                        }
                         if (instanceObj[key][newkey]["__gdmeta__"]) {
                             var _meta = instanceObj[key][newkey]["__gdmeta__"];
                             if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && instanceObj[key][newkey].type == 3) {
@@ -12971,6 +12979,9 @@ var gd3d;
                                     case "number":
                                     case "string":
                                     case "boolean":
+                                        if (boolInNull(serializedObj[key]["value"])) {
+                                            continue;
+                                        }
                                         var info_1 = new inspectorValueInfo(instanceObj[key][newkey], baseType);
                                         if (isArray_4) {
                                             serializedObj[key]["value"].push(info_1);
@@ -12992,20 +13003,22 @@ var gd3d;
                 if (instanceObj["__gdmeta__"]) {
                     if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"]) {
                         var custom = instanceObj["__gdmeta__"][key]["custom"];
-                        var info = new inspectorValueInfo(null, custom["valueType"]);
-                        if (custom["FieldUIStyle"])
-                            info.UIStyle = custom["FieldUIStyle"];
-                        if (custom["defvalue"])
-                            info.defvalue = custom;
-                        if (custom["min"])
-                            info.min = custom["min"];
-                        if (custom["max"])
-                            info.max = custom["max"];
-                        if (isArray_5) {
-                            serializedObj.push(info);
-                        }
-                        else {
-                            serializedObj[key] = info;
+                        if (custom["valueType"]) {
+                            var info = new inspectorValueInfo(null, custom["valueType"]);
+                            if (custom["FieldUIStyle"])
+                                info.UIStyle = custom["FieldUIStyle"];
+                            if (custom["defvalue"])
+                                info.defvalue = custom["defvalue"];
+                            if (custom["min"])
+                                info.min = custom["min"];
+                            if (custom["max"])
+                                info.max = custom["max"];
+                            if (isArray_5) {
+                                serializedObj.push(info);
+                            }
+                            else {
+                                serializedObj[key] = info;
+                            }
                         }
                     }
                 }
@@ -13014,6 +13027,15 @@ var gd3d;
         io.serializeOtherTypeOrArrayForInspector = serializeOtherTypeOrArrayForInspector;
         function serializeOtherTypeForInspector(instanceObj, serializedObj, key, beComponent, arrayInst) {
             if (arrayInst === void 0) { arrayInst = null; }
+            if (boolInNull(instanceObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
+            if (boolInNull(serializedObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
+            if (boolInNull(instanceObj[key]) || boolInNull(instanceObj[key]["__gdmeta__"])) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             var _meta = instanceObj[key]["__gdmeta__"];
             if (_meta["class"] && _meta["class"]["custom"] && (_meta["class"]["custom"]["SerializeType"] || _meta["class"]["custom"]["nodecomp"] || _meta["class"]["custom"]["2dcomp"])) {
                 var isArray_6 = instanceObj instanceof Array;
@@ -13111,6 +13133,9 @@ var gd3d;
         function serializeObj(instanceObj, serializedObj, assetMgr) {
             if (serializedObj === void 0) { serializedObj = undefined; }
             if (assetMgr === void 0) { assetMgr = null; }
+            if (boolInNull(instanceObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             var _flag = gd3d.framework.HideFlags.None;
             var _type;
             if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"]) {
@@ -13133,6 +13158,9 @@ var gd3d;
             }
             for (var key in instanceObj["__gdmeta__"]) {
                 var t = instanceObj["__gdmeta__"][key];
+                if (t == null) {
+                    continue;
+                }
                 if (t["custom"] == null)
                     continue;
                 if (t["custom"]["SerializeField"] == null && t["custom"]["nodecomp"] == null && t["custom"]["2dcomp"] == null)
@@ -13158,18 +13186,24 @@ var gd3d;
         io.serializeObj = serializeObj;
         function serializeOtherTypeOrArray(instanceObj, serializedObj, key, assetMgr) {
             if (assetMgr === void 0) { assetMgr = null; }
+            if (boolInNull(instanceObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
+            if (boolInNull(serializedObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             if (instanceObj[key]) {
                 if (instanceObj[key]["__gdmeta__"]) {
                     serializeOtherType(instanceObj, serializedObj, key, null, assetMgr);
                 }
-                else if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"]) {
+                else if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"] && instanceObj["__gdmeta__"][key]["custom"]["valueType"]) {
                     var isArray_7 = instanceObj[key] instanceof Array;
                     if (isArray_7)
                         serializedObj[key] = new valueInfo([], instanceObj["__gdmeta__"][key]["custom"]["valueType"]);
                     else
                         serializedObj[key] = new valueInfo({}, instanceObj["__gdmeta__"][key]["custom"]["valueType"]);
                     for (var newkey in instanceObj[key]) {
-                        if (instanceObj[key][newkey]["__gdmeta__"]) {
+                        if (instanceObj[key][newkey] && instanceObj[key][newkey]["__gdmeta__"]) {
                             var _meta = instanceObj[key][newkey]["__gdmeta__"];
                             if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && instanceObj[key][newkey].type == 3) {
                             }
@@ -13179,17 +13213,22 @@ var gd3d;
                         }
                         else {
                             if (!instanceObj[key]["__gdmeta__"]) {
+                                if (instanceObj[key][newkey] == null || instanceObj[key][newkey] == undefined) {
+                                    continue;
+                                }
                                 var baseType = typeof (instanceObj[key][newkey]);
                                 switch (baseType.toLowerCase()) {
                                     case "number":
                                     case "string":
                                     case "boolean":
                                         var info = new valueInfo(instanceObj[key][newkey], baseType);
-                                        if (isArray_7) {
-                                            serializedObj[key]["value"].push(info);
-                                        }
-                                        else {
-                                            serializedObj[key]["value"][newkey] = info;
+                                        if (serializedObj[key]["value"]) {
+                                            if (isArray_7) {
+                                                serializedObj[key]["value"].push(info);
+                                            }
+                                            else {
+                                                serializedObj[key]["value"][newkey] = info;
+                                            }
                                         }
                                         break;
                                     default:
@@ -13205,6 +13244,12 @@ var gd3d;
         function serializeOtherType(instanceObj, serializedObj, key, arrayInst, assetMgr) {
             if (arrayInst === void 0) { arrayInst = null; }
             if (assetMgr === void 0) { assetMgr = null; }
+            if (boolInNull(instanceObj || boolInNull(serializedObj))) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
+            if (boolInNull(instanceObj[key]) || boolInNull(instanceObj[key]["__gdmeta__"])) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             var _meta = instanceObj[key]["__gdmeta__"];
             if (_meta["class"] && _meta["class"]["custom"] && (_meta["class"]["custom"]["SerializeType"] || _meta["class"]["custom"]["nodecomp"] || _meta["class"]["custom"]["2dcomp"])) {
                 var isArray_8 = instanceObj instanceof Array;
@@ -13272,6 +13317,9 @@ var gd3d;
         io.serializeOtherType = serializeOtherType;
         function deSerialize(serializedObj, instanceObj, assetMgr, bundlename) {
             if (bundlename === void 0) { bundlename = null; }
+            if (boolInNull(serializedObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             referenceInfo.oldmap = {};
             deSerializeObj(serializedObj["value"], instanceObj, assetMgr, bundlename);
             referenceInfo.oldmap[serializedObj["insid"]] = instanceObj;
@@ -13279,8 +13327,14 @@ var gd3d;
         }
         io.deSerialize = deSerialize;
         function fillReference(serializedObj, instanceObj) {
+            if (boolInNull(instanceObj) || boolInNull(instanceObj["__gdmeta__"])) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             for (var key in instanceObj["__gdmeta__"]) {
                 var t = instanceObj["__gdmeta__"][key];
+                if (boolInNull(t)) {
+                    continue;
+                }
                 if (t["custom"] == null)
                     continue;
                 if (t["custom"]["SerializeField"] == null && t["custom"]["nodecomp"] == null && t["custom"]["2dcomp"] == null)
@@ -13302,6 +13356,9 @@ var gd3d;
         }
         io.fillReference = fillReference;
         function dofillReferenceOrArray(serializedObj, instanceObj, key) {
+            if (boolInNull(serializedObj) || boolInNull(instanceObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             if (serializedObj[key]) {
                 var type = serializedObj[key].type;
                 if (isArrayOrDic(type.toLowerCase())) {
@@ -13313,11 +13370,15 @@ var gd3d;
                             instanceObj[key] = {};
                     }
                     var arrayObj = null;
-                    if (instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type) {
+                    if (boolInNull(instanceObj["__gdmeta__"]) && boolInNull(instanceObj["__gdmeta__"][key]) && boolInNull(instanceObj["__gdmeta__"][key]["custom"])
+                        && instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type) {
                         throw new Error("反序列化失败，类型不匹配：" + instanceObj["__gdmeta__"][key]["custom"]["valueType"] + " as " + serializedObj[key].type);
                     }
                     arrayObj = serializedObj[key].value;
                     for (var newkey in arrayObj) {
+                        if (boolInNull(arrayObj[newkey])) {
+                            continue;
+                        }
                         var baseType = arrayObj[newkey].type;
                         switch (baseType.toLowerCase()) {
                             case "number":
@@ -13337,6 +13398,9 @@ var gd3d;
         }
         io.dofillReferenceOrArray = dofillReferenceOrArray;
         function dofillReference(serializedObj, instanceObj, key) {
+            if (boolInNull(instanceObj) || boolInNull(serializedObj) || boolInNull(serializedObj[key])) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             var _isArray = instanceObj instanceof Array;
             var type = serializedObj[key].type;
             var _parentType = typeof (instanceObj);
@@ -13373,8 +13437,14 @@ var gd3d;
             if (instanceObj == undefined) {
                 throw new Error("必须传入一个实例，用来赋值");
             }
+            if (boolInNull(instanceObj["__gdmeta__"])) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             for (var key in instanceObj["__gdmeta__"]) {
                 var t = instanceObj["__gdmeta__"][key];
+                if (boolInNull(t)) {
+                    continue;
+                }
                 if (t["custom"] == null)
                     continue;
                 if (t["custom"]["SerializeField"] == null && t["custom"]["nodecomp"] == null && t["custom"]["2dcomp"] == null)
@@ -13403,8 +13473,14 @@ var gd3d;
         io.deSerializeObj = deSerializeObj;
         function deSerializeOtherTypeOrArray(serializedObj, instanceObj, key, assetMgr, bundlename) {
             if (bundlename === void 0) { bundlename = null; }
+            if (boolInNull(serializedObj) || boolInNull(instanceObj)) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             if (serializedObj[key]) {
                 var type = serializedObj[key].type;
+                if (type == null) {
+                    throw new Error("必须传入一个实例，用来赋值");
+                }
                 if (isArrayOrDic(type.toLowerCase())) {
                     var _isArray = serializedObj[key].value instanceof Array;
                     if (!instanceObj[key]) {
@@ -13414,7 +13490,8 @@ var gd3d;
                             instanceObj[key] = {};
                     }
                     var arrayObj = null;
-                    if (instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type) {
+                    if (boolInNull(instanceObj["__gdmeta__"]) && boolInNull(instanceObj["__gdmeta__"][key]) && boolInNull(instanceObj["__gdmeta__"][key]["custom"])
+                        && instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type) {
                         throw new Error("反序列化失败，类型不匹配：" + instanceObj["__gdmeta__"][key]["custom"]["valueType"] + " as " + serializedObj[key].type);
                     }
                     arrayObj = serializedObj[key].value;
@@ -13470,6 +13547,9 @@ var gd3d;
         io.deSerializeOtherTypeOrArray = deSerializeOtherTypeOrArray;
         function deSerializeOtherType(serializedObj, instanceObj, key, assetMgr, bundlename) {
             if (bundlename === void 0) { bundlename = null; }
+            if (boolInNull(serializedObj) || boolInNull(instanceObj) || boolInNull(serializedObj[key])) {
+                throw new Error("必须传入一个实例，用来赋值");
+            }
             var _isArray = instanceObj instanceof Array;
             var type = serializedObj[key].type;
             var _parentType = typeof (instanceObj);
@@ -13617,6 +13697,12 @@ var gd3d;
             return enumMgr;
         }());
         io.enumMgr = enumMgr;
+        function boolInNull(obj) {
+            if (obj == null || obj == undefined) {
+                return true;
+            }
+            return false;
+        }
     })(io = gd3d.io || (gd3d.io = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -15538,6 +15624,896 @@ var gd3d;
         }
         math.vec3Equal = vec3Equal;
     })(math = gd3d.math || (gd3d.math = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var navVec3 = (function () {
+            function navVec3() {
+                this.x = 0;
+                this.y = 0;
+                this.z = 0;
+            }
+            navVec3.prototype.clone = function () {
+                var navVec = new navVec3();
+                navVec.x = this.x;
+                navVec.y = this.y;
+                navVec.z = this.z;
+                return navVec;
+            };
+            navVec3.DistAZ = function (start, end) {
+                var num = end.x - start.x;
+                var num2 = end.z - start.z;
+                return Math.sqrt(num * num + num2 * num2);
+            };
+            navVec3.NormalAZ = function (start, end) {
+                var num = end.x - start.x;
+                var num2 = end.z - start.z;
+                var num3 = Math.sqrt(num * num + num2 * num2);
+                var navVec = new navVec3();
+                navVec.x = num / num3;
+                navVec.y = 0.0;
+                navVec.z = num2 / num3;
+                return navVec;
+            };
+            navVec3.Cross = function (start, end) {
+                var navVec = new navVec3();
+                navVec.x = start.y * end.z - start.z * end.y;
+                navVec.y = start.z * end.x - start.x * end.z;
+                navVec.z = start.x * end.y - start.y * end.x;
+                return navVec;
+            };
+            navVec3.DotAZ = function (start, end) {
+                return start.x * end.x + start.z * end.z;
+            };
+            navVec3.Angle = function (start, end) {
+                var d = start.x * end.x + start.z * end.z;
+                var navVec = navVec3.Cross(start, end);
+                var num = Math.acos(d);
+                var flag = navVec.y < 0.0;
+                if (flag) {
+                    num = -num;
+                }
+                return num;
+            };
+            navVec3.Border = function (start, end, dist) {
+                var navVec = navVec3.NormalAZ(start, end);
+                var navVec2 = new navVec3();
+                navVec2.x = start.x + navVec.x * dist;
+                navVec2.y = start.y + navVec.y * dist;
+                navVec2.z = start.z + navVec.z * dist;
+                return navVec2;
+            };
+            return navVec3;
+        }());
+        framework.navVec3 = navVec3;
+        var navNode = (function () {
+            function navNode() {
+                this.nodeID = 0;
+                this.poly = null;
+                this.borderByPoly = null;
+                this.borderByPoint = null;
+                this.center = null;
+            }
+            navNode.prototype.genBorder = function () {
+                var list = [];
+                for (var i = 0; i < this.poly.length; i = i + 1) {
+                    var num = i;
+                    var num2 = i + 1;
+                    var flag = num2 >= this.poly.length;
+                    if (flag) {
+                        num2 = 0;
+                    }
+                    var num3 = this.poly[num];
+                    var num4 = this.poly[num2];
+                    var flag2 = num3 < num4;
+                    if (flag2) {
+                        list.push(num3 + "-" + num4);
+                    }
+                    else {
+                        list.push(num4 + "-" + num3);
+                    }
+                }
+                this.borderByPoint = list;
+            };
+            navNode.prototype.isLinkTo = function (info, nid) {
+                var flag = this.nodeID === nid;
+                var result;
+                if (flag) {
+                    result = null;
+                }
+                else {
+                    var flag2 = nid < 0;
+                    if (flag2) {
+                        result = null;
+                    }
+                    else {
+                        var array = this.borderByPoly;
+                        for (var i = 0; i < array.length; i = i + 1) {
+                            var text = array[i];
+                            var flag3 = (info.borders[text] == undefined);
+                            if (!flag3) {
+                                var flag4 = info.borders[text].nodeA === nid || info.borders[text].nodeB === nid;
+                                if (flag4) {
+                                    result = text;
+                                    return result;
+                                }
+                            }
+                        }
+                        result = null;
+                    }
+                }
+                return result;
+            };
+            navNode.prototype.getLinked = function (info) {
+                var list = [];
+                var array = this.borderByPoly;
+                for (var i = 0; i < array.length; i = i + 1) {
+                    var key = array[i];
+                    var flag = (info.borders[key] == undefined);
+                    if (!flag) {
+                        var flag2 = info.borders[key].nodeA === this.nodeID;
+                        var num;
+                        if (flag2) {
+                            num = info.borders[key].nodeB;
+                        }
+                        else {
+                            num = info.borders[key].nodeA;
+                        }
+                        var flag3 = num >= 0;
+                        if (flag3) {
+                            list.push(num);
+                        }
+                    }
+                }
+                return list;
+            };
+            navNode.prototype.genCenter = function (info) {
+                this.center = new navVec3();
+                this.center.x = 0.0;
+                this.center.y = 0.0;
+                this.center.z = 0.0;
+                var array = this.poly;
+                for (var i = 0; i < array.length; i = i + 1) {
+                    var num = array[i];
+                    this.center.x += info.vecs[num].x;
+                    this.center.y += info.vecs[num].y;
+                    this.center.z += info.vecs[num].z;
+                }
+                this.center.x /= this.poly.length;
+                this.center.y /= this.poly.length;
+                this.center.z /= this.poly.length;
+            };
+            return navNode;
+        }());
+        framework.navNode = navNode;
+        var navBorder = (function () {
+            function navBorder() {
+                this.borderName = null;
+                this.nodeA = 0;
+                this.nodeB = 0;
+                this.pointA = 0;
+                this.pointB = 0;
+                this.length = 0;
+                this.center = null;
+            }
+            return navBorder;
+        }());
+        framework.navBorder = navBorder;
+        var navMeshInfo = (function () {
+            function navMeshInfo() {
+                this.vecs = null;
+                this.nodes = null;
+                this.borders = null;
+                this.min = null;
+                this.max = null;
+            }
+            navMeshInfo.prototype.calcBound = function () {
+                this.min = new navVec3();
+                this.max = new navVec3();
+                this.min.x = 1.7976931348623157E+308;
+                this.min.y = 1.7976931348623157E+308;
+                this.min.z = 1.7976931348623157E+308;
+                this.max.x = -1.7976931348623157E+308;
+                this.max.y = -1.7976931348623157E+308;
+                this.max.z = -1.7976931348623157E+308;
+                for (var i = 0; i < this.vecs.length; i = i + 1) {
+                    var flag = this.vecs[i].x < this.min.x;
+                    if (flag) {
+                        this.min.x = this.vecs[i].x;
+                    }
+                    var flag2 = this.vecs[i].y < this.min.y;
+                    if (flag2) {
+                        this.min.y = this.vecs[i].y;
+                    }
+                    var flag3 = this.vecs[i].z < this.min.z;
+                    if (flag3) {
+                        this.min.z = this.vecs[i].z;
+                    }
+                    var flag4 = this.vecs[i].x > this.max.x;
+                    if (flag4) {
+                        this.max.x = this.vecs[i].x;
+                    }
+                    var flag5 = this.vecs[i].y > this.max.y;
+                    if (flag5) {
+                        this.max.y = this.vecs[i].y;
+                    }
+                    var flag6 = this.vecs[i].z > this.max.z;
+                    if (flag6) {
+                        this.max.z = this.vecs[i].z;
+                    }
+                }
+            };
+            navMeshInfo.cross = function (p0, p1, p2) {
+                return (p1.x - p0.x) * (p2.z - p0.z) - (p2.x - p0.x) * (p1.z - p0.z);
+            };
+            navMeshInfo.prototype.inPoly = function (p, poly) {
+                var num = 0;
+                var flag = poly.length < 3;
+                var result;
+                if (flag) {
+                    result = false;
+                }
+                else {
+                    var flag2 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[1]]) < (-num);
+                    if (flag2) {
+                        result = false;
+                    }
+                    else {
+                        var flag3 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[poly.length - 1]]) > num;
+                        if (flag3) {
+                            result = false;
+                        }
+                        else {
+                            var i = 2;
+                            var num2 = poly.length - 1;
+                            var num3 = -1;
+                            while (i <= num2) {
+                                var num4 = i + num2 >> 1;
+                                var flag4 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[num4]]) < (-num);
+                                if (flag4) {
+                                    num3 = num4;
+                                    num2 = num4 - 1;
+                                }
+                                else {
+                                    i = num4 + 1;
+                                }
+                            }
+                            var num5 = navMeshInfo.cross(this.vecs[poly[num3 - 1]], p, this.vecs[poly[num3]]);
+                            result = (num5 > num);
+                        }
+                    }
+                }
+                return result;
+            };
+            navMeshInfo.prototype.genBorder = function () {
+                var __border = {};
+                for (var i0 = 0; i0 < this.nodes.length; i0 = i0 + 1) {
+                    var n = this.nodes[i0];
+                    for (var i1 = 0; i1 < n.borderByPoint.length; i1 = i1 + 1) {
+                        var b = n.borderByPoint[i1];
+                        if (__border[b] == undefined) {
+                            __border[b] = new navBorder();
+                            __border[b].borderName = b;
+                            __border[b].nodeA = n.nodeID;
+                            __border[b].nodeB = -1;
+                            __border[b].pointA = -1;
+                        }
+                        else {
+                            __border[b].nodeB = n.nodeID;
+                            if (__border[b].nodeA > __border[b].nodeB) {
+                                __border[b].nodeB = __border[b].nodeA;
+                                __border[b].nodeB = n.nodeID;
+                            }
+                            var na = this.nodes[__border[b].nodeA];
+                            var nb = this.nodes[__border[b].nodeB];
+                            for (var i2 = 0; i2 < na.poly.length; i2 = i2 + 1) {
+                                var i = na.poly[i2];
+                                if (nb.poly.indexOf(i) >= 0) {
+                                    if (__border[b].pointA == -1)
+                                        __border[b].pointA = i;
+                                    else
+                                        __border[b].pointB = i;
+                                }
+                            }
+                            var left = __border[b].pointA;
+                            var right = __border[b].pointB;
+                            var xd = this.vecs[left].x - this.vecs[right].x;
+                            var yd = this.vecs[left].y - this.vecs[right].y;
+                            var zd = this.vecs[left].z - this.vecs[right].z;
+                            __border[b].length = Math.sqrt(xd * xd + yd * yd + zd * zd);
+                            __border[b].center = new navVec3();
+                            __border[b].center.x = this.vecs[left].x * 0.5 + this.vecs[right].x * 0.5;
+                            __border[b].center.y = this.vecs[left].y * 0.5 + this.vecs[right].y * 0.5;
+                            __border[b].center.z = this.vecs[left].z * 0.5 + this.vecs[right].z * 0.5;
+                            __border[b].borderName = __border[b].nodeA + "-" + __border[b].nodeB;
+                        }
+                    }
+                }
+                var namechange = {};
+                for (var key in __border) {
+                    if (__border[key].nodeB < 0) {
+                    }
+                    else {
+                        namechange[key] = __border[key].borderName;
+                    }
+                }
+                this.borders = {};
+                for (var key in __border) {
+                    if (namechange[key] != undefined) {
+                        this.borders[namechange[key]] = __border[key];
+                    }
+                }
+                for (var m = 0; m < this.nodes.length; m = m + 1) {
+                    var v = this.nodes[m];
+                    var newborder = [];
+                    for (var nnn = 0; nnn < v.borderByPoint.length; nnn = nnn + 1) {
+                        var b = v.borderByPoint[nnn];
+                        if (namechange[b] != undefined) {
+                            newborder.push(namechange[b]);
+                        }
+                    }
+                    v.borderByPoly = newborder;
+                }
+            };
+            navMeshInfo.LoadMeshInfo = function (s) {
+                var j = JSON.parse(s);
+                var info = new navMeshInfo();
+                var listVec = [];
+                for (var jsonid in j["v"]) {
+                    var v3 = new navVec3();
+                    v3.x = j["v"][jsonid][0];
+                    v3.y = j["v"][jsonid][1];
+                    v3.z = j["v"][jsonid][2];
+                    listVec.push(v3);
+                }
+                info.vecs = listVec;
+                var polys = [];
+                var list = j["p"];
+                for (var i = 0; i < list.length; i++) {
+                    var json = list[i];
+                    var node = new navNode();
+                    node.nodeID = i;
+                    var poly = [];
+                    for (var tt in json) {
+                        poly.push(json[tt]);
+                    }
+                    node.poly = poly;
+                    node.genBorder();
+                    node.genCenter(info);
+                    polys.push(node);
+                }
+                info.nodes = polys;
+                info.calcBound();
+                info.genBorder();
+                return info;
+            };
+            return navMeshInfo;
+        }());
+        framework.navMeshInfo = navMeshInfo;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Navigate = (function () {
+            function Navigate(navinfo, navindexmap) {
+                this.navinfo = navinfo;
+                this.navindexmap = navindexmap;
+            }
+            Navigate.prototype.pathPoints = function (start, end, startIndex, endIndex) {
+                var startVec = new framework.navVec3();
+                startVec.x = start.x;
+                startVec.y = start.y;
+                startVec.z = start.z;
+                var endVec = new framework.navVec3();
+                endVec.x = end.x;
+                endVec.y = end.y;
+                endVec.z = end.z;
+                var startPoly = this.navindexmap[startIndex];
+                var endPoly = this.navindexmap[endIndex];
+                if (startPoly >= 0 && endPoly >= 0) {
+                    var polyPath = gd3d.framework.pathFinding.calcAStarPolyPath(this.navinfo, startPoly, endPoly, endVec, 0.3);
+                }
+                if (polyPath) {
+                    var wayPoints = gd3d.framework.pathFinding.calcWayPoints(this.navinfo, startVec, endVec, polyPath);
+                    var navmeshWayPoints = [];
+                    for (var i = 0; i < wayPoints.length; i++) {
+                        navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].y, wayPoints[i].z);
+                    }
+                    return navmeshWayPoints;
+                }
+                else {
+                    return null;
+                }
+            };
+            Navigate.prototype.dispose = function () {
+                this.navinfo = null;
+                this.navindexmap = null;
+            };
+            return Navigate;
+        }());
+        framework.Navigate = Navigate;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var NavMeshLoadManager = (function () {
+            function NavMeshLoadManager() {
+                this.navMeshVertexOffset = new gd3d.math.vector3(0, 0, 0);
+            }
+            NavMeshLoadManager.prototype.loadNavMesh = function (navMeshUrl, app, onstate) {
+                var _this = this;
+                if (!app)
+                    return;
+                this.app = app;
+                if (this.navTrans)
+                    this.navTrans.parent.removeChild(this.navTrans);
+                app.getAssetMgr().load(navMeshUrl, gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        var data = app.getAssetMgr().getAssetByName(navMeshUrl.substring(navMeshUrl.lastIndexOf("/") + 1));
+                        _this.navmeshLoaded(data.content, function () {
+                            onstate(s);
+                        });
+                    }
+                    else if (s.iserror) {
+                        onstate(s);
+                    }
+                });
+            };
+            NavMeshLoadManager.prototype.navmeshLoaded = function (dataStr, callback) {
+                console.warn("navmeshLoaded");
+                if (this.navMesh != null) {
+                }
+                this.navTrans = new gd3d.framework.transform();
+                this.navTrans.name = "navMesh";
+                var meshD = new gd3d.render.meshData();
+                meshD.pos = [];
+                meshD.trisindex = [];
+                var navinfo = gd3d.framework.navMeshInfo.LoadMeshInfo(dataStr);
+                for (var i = 0; i < navinfo.vecs.length; i++) {
+                    var v = navinfo.vecs[i];
+                    var X = v.x - this.navMeshVertexOffset.x;
+                    var Y = v.y - this.navMeshVertexOffset.y;
+                    var Z = v.z - this.navMeshVertexOffset.z;
+                    meshD.pos[i] = new gd3d.math.vector3(X, Y, Z);
+                }
+                var navindexmap = {};
+                var indexDatas = [];
+                for (var i = 0; i < navinfo.nodes.length; i++) {
+                    var poly = navinfo.nodes[i].poly;
+                    for (var fc = 0; fc < poly.length - 2; fc++) {
+                        var sindex = indexDatas.length / 3;
+                        navindexmap[sindex] = i;
+                        indexDatas.push(poly[0]);
+                        indexDatas.push(poly[fc + 2]);
+                        indexDatas.push(poly[fc + 1]);
+                    }
+                }
+                meshD.trisindex = indexDatas;
+                var meshFiter = this.navTrans.gameObject.addComponent("meshFilter");
+                this.navMesh = this.createMesh(meshD, this.app.webgl);
+                meshFiter.mesh = this.navMesh;
+                this.app.getScene().addChild(this.navTrans);
+                this.navTrans.markDirty();
+                this.navigate = new gd3d.framework.Navigate(navinfo, navindexmap);
+                callback();
+            };
+            NavMeshLoadManager.prototype.createMesh = function (meshData, webgl) {
+                var _mesh = new gd3d.framework.mesh();
+                _mesh.data = meshData;
+                var vf = gd3d.render.VertexFormatMask.Position;
+                var v32 = _mesh.data.genVertexDataArray(vf);
+                var i16 = _mesh.data.genIndexDataArray();
+                _mesh.glMesh = new gd3d.render.glMesh();
+                _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
+                _mesh.glMesh.uploadVertexSubData(webgl, v32);
+                _mesh.glMesh.addIndex(webgl, i16.length);
+                _mesh.glMesh.uploadIndexSubData(webgl, 0, i16);
+                _mesh.submesh = [];
+                {
+                    var sm = new gd3d.framework.subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = i16.length;
+                    sm.line = false;
+                    _mesh.submesh.push(sm);
+                }
+                return _mesh;
+            };
+            NavMeshLoadManager.prototype.showNavmesh = function (isshow) {
+                if (this.navTrans) {
+                    if (!isshow) {
+                        this.navTrans.gameObject.visible = isshow;
+                        this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        this.navTrans.markDirty();
+                        return;
+                    }
+                    var compent = this.navTrans.gameObject.getComponent("meshRenderer");
+                    if (compent == null)
+                        compent = this.navTrans.gameObject.addComponent("meshRenderer");
+                    this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                    this.navTrans.markDirty();
+                }
+            };
+            NavMeshLoadManager.prototype.dispose = function () {
+                if (this.navTrans) {
+                    this.navTrans.parent.removeChild(this.navTrans);
+                    this.navTrans.dispose();
+                    this.navTrans = null;
+                    this.navMesh.dispose();
+                    this.navMesh = null;
+                    this.navigate.dispose();
+                    this.navigate = null;
+                }
+            };
+            Object.defineProperty(NavMeshLoadManager, "Instance", {
+                get: function () {
+                    if (NavMeshLoadManager._instance == null)
+                        NavMeshLoadManager._instance = new NavMeshLoadManager();
+                    return NavMeshLoadManager._instance;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            NavMeshLoadManager.prototype.moveToPoints = function (startPos, endPos) {
+                var navTrans = NavMeshLoadManager.Instance.navTrans;
+                var nav = NavMeshLoadManager.Instance.navigate;
+                if (!nav)
+                    return;
+                var StratIndex = NavMeshLoadManager.findtriIndex(startPos, navTrans);
+                if (StratIndex == undefined) {
+                    var dir = new gd3d.math.vector3();
+                    var direc = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(endPos, startPos, dir);
+                    gd3d.math.vec3Normalize(dir, dir);
+                    for (var i = 0; i < 5; i++) {
+                        gd3d.math.vec3Clone(dir, direc);
+                        gd3d.math.vec3ScaleByNum(direc, (i + 1) * 2, direc);
+                        var pos = new gd3d.math.vector3();
+                        gd3d.math.vec3Add(startPos, direc, pos);
+                        StratIndex = NavMeshLoadManager.findtriIndex(pos, navTrans);
+                        if (StratIndex != undefined)
+                            break;
+                    }
+                }
+                var endIndex = NavMeshLoadManager.findtriIndex(endPos, navTrans);
+                var points = nav.pathPoints(startPos, endPos, StratIndex, endIndex);
+                return points;
+            };
+            NavMeshLoadManager.findtriIndex = function (point, trans) {
+                var pickinfo;
+                var ray = new gd3d.framework.ray(new gd3d.math.vector3(point.x, point.y + 500, point.z), new gd3d.math.vector3(0, -1, 0));
+                var mesh;
+                var meshFilter = trans.gameObject.getComponent("meshFilter");
+                if (meshFilter != null) {
+                    mesh = meshFilter.getMeshOutput();
+                }
+                if (!mesh)
+                    return;
+                pickinfo = mesh.intersects(ray, trans.getWorldMatrix());
+                if (!pickinfo)
+                    return;
+                return pickinfo.faceId;
+            };
+            return NavMeshLoadManager;
+        }());
+        framework.NavMeshLoadManager = NavMeshLoadManager;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var FindNode = (function () {
+            function FindNode() {
+                this.nodeid = 0;
+                this.pathSessionId = 0;
+                this.ParentID = -1;
+                this.Open = false;
+                this.HValue = 0;
+                this.GValue = 0;
+                this.ArrivalWall = 0;
+            }
+            FindNode.prototype.CalcHeuristic = function (info, endPos) {
+                var center = info.nodes[this.nodeid].center;
+                var num = Math.abs(center.x - endPos.x);
+                var num2 = Math.abs(center.z - endPos.z);
+                this.HValue = Math.sqrt(num * num + num2 * num2);
+            };
+            FindNode.prototype.GetCost = function (info, neighborID) {
+                var bc = info.nodes[neighborID].center;
+                var nc = info.nodes[this.nodeid].center;
+                var xd = bc.x - nc.x;
+                var yd = bc.y - nc.y;
+                var zd = bc.z - nc.z;
+                var d = Math.sqrt(xd * xd + yd * yd + zd * zd);
+                return d;
+            };
+            return FindNode;
+        }());
+        var pathFinding = (function () {
+            function pathFinding() {
+            }
+            pathFinding.calcAStarPolyPath = function (info, startPoly, endPoly, endPos, offset) {
+                if (endPos === void 0) { endPos = null; }
+                if (offset === void 0) { offset = 0.1; }
+                var nodeFind = [];
+                var nodes = info.nodes;
+                for (var i = 0; i < nodes.length; i = i + 1) {
+                    var navNode = nodes[i];
+                    var findNode = new FindNode();
+                    findNode.nodeid = navNode.nodeID;
+                    nodeFind.push(findNode);
+                }
+                var flag = endPos === null;
+                if (flag) {
+                    endPos = info.nodes[endPoly].center.clone();
+                }
+                var findNode2 = nodeFind[startPoly];
+                findNode2.nodeid = startPoly;
+                var num = 1;
+                var flag2 = false;
+                var openList = [];
+                var list2 = [];
+                findNode2.pathSessionId = num;
+                openList.push(startPoly);
+                var sortfun = function (x, y) {
+                    var xFvalue = nodeFind[x].HValue + nodeFind[x].GValue;
+                    var yFvalue = nodeFind[y].HValue + nodeFind[y].GValue;
+                    if (xFvalue < yFvalue - 0.001)
+                        return 1;
+                    if (xFvalue > yFvalue + 0.001)
+                        return -1;
+                    return 0;
+                };
+                while (openList.length > 0) {
+                    var findNode3 = nodeFind[openList[openList.length - 1]];
+                    openList.splice(openList.length - 1, 1);
+                    list2.push(findNode3.nodeid);
+                    var flag3 = findNode3.nodeid === endPoly;
+                    if (flag3) {
+                        flag2 = true;
+                        break;
+                    }
+                    var linked = info.nodes[findNode3.nodeid].getLinked(info);
+                    for (var j = 0; j < linked.length; j = j + 1) {
+                        var num2 = linked[j];
+                        var flag4 = num2 < 0;
+                        if (!flag4) {
+                            var findNode4 = nodeFind[num2];
+                            var flag5 = findNode4 === null || findNode4.nodeid !== num2;
+                            if (flag5) {
+                                return null;
+                            }
+                            var flag6 = findNode4.pathSessionId !== num;
+                            if (flag6) {
+                                var text = info.nodes[findNode4.nodeid].isLinkTo(info, findNode3.nodeid);
+                                var flag7 = text !== null && info.borders[text].length >= offset * 2;
+                                if (flag7) {
+                                    findNode4.pathSessionId = num;
+                                    findNode4.ParentID = findNode3.nodeid;
+                                    findNode4.Open = true;
+                                    findNode4.CalcHeuristic(info, endPos);
+                                    findNode4.GValue = findNode3.GValue + findNode3.GetCost(info, findNode4.nodeid);
+                                    openList.push(findNode4.nodeid);
+                                    openList.sort(sortfun);
+                                    findNode4.ArrivalWall = findNode3.nodeid;
+                                }
+                            }
+                            else {
+                                var open = findNode4.Open;
+                                if (open) {
+                                    var flag8 = findNode4.GValue + findNode4.GetCost(info, findNode3.nodeid) < findNode3.GValue;
+                                    if (flag8) {
+                                        findNode3.GValue = findNode4.GValue + findNode4.GetCost(info, findNode3.nodeid);
+                                        findNode3.ParentID = findNode4.nodeid;
+                                        findNode3.ArrivalWall = findNode4.nodeid;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                var list3 = [];
+                var flag9 = list2.length > 0;
+                if (flag9) {
+                    var findNode5 = nodeFind[list2[list2.length - 1]];
+                    list3.push(findNode5.nodeid);
+                    while (findNode5.ParentID !== -1) {
+                        list3.push(findNode5.ParentID);
+                        findNode5 = nodeFind[findNode5.ParentID];
+                    }
+                }
+                return list3;
+            };
+            pathFinding.NearAngle = function (a, b) {
+                var num = a;
+                var flag = a >= 180.0;
+                if (flag) {
+                    num = 360.0 - a;
+                }
+                var num2 = b;
+                var flag2 = b >= 180.0;
+                if (flag2) {
+                    num2 = 360.0 - b;
+                }
+                var flag3 = num < num2;
+                var result;
+                if (flag3) {
+                    result = a;
+                }
+                else {
+                    result = b;
+                }
+                return result;
+            };
+            pathFinding.FindPath = function (info, startPos, endPos, offset) {
+                if (offset === void 0) { offset = 0.1; }
+                var startPoly = -1;
+                var endPoly = -1;
+                for (var i = 0; i < info.nodes.length; i = i + 1) {
+                    var flag = info.inPoly(startPos, info.nodes[i].poly);
+                    if (flag) {
+                        startPoly = i;
+                    }
+                    var flag2 = info.inPoly(startPos, info.nodes[i].poly);
+                    if (flag2) {
+                        endPoly = i;
+                    }
+                }
+                var polyPath = pathFinding.calcAStarPolyPath(info, startPoly, endPoly, endPos, offset);
+                return pathFinding.calcWayPoints(info, startPos, endPos, polyPath, offset);
+            };
+            pathFinding.calcWayPoints = function (info, startPos, endPos, polyPath, offset) {
+                if (offset === void 0) { offset = 0.1; }
+                var wayPoints = [];
+                if (polyPath.length == 0 || startPos == null || endPos == null) {
+                    return null;
+                }
+                var triPathList = polyPath.reverse();
+                wayPoints.push(startPos);
+                var ipoly = 0;
+                var dirLeft = null;
+                var ipolyLeft = -1;
+                var dirRight = null;
+                var ipolyRight = -1;
+                var breakDir = 0;
+                var posLeft = null;
+                var posRight = null;
+                var posNow = startPos.clone();
+                for (var c = 0; c < 100; c++) {
+                    for (var i = ipoly; i < triPathList.length; i++) {
+                        if (i === triPathList.length - 1) {
+                            if (dirLeft == null || dirRight == null) {
+                                breakDir = 0;
+                                break;
+                            }
+                            else {
+                                var dirFinal = gd3d.framework.navVec3.NormalAZ(posNow, endPos);
+                                var a1 = gd3d.framework.navVec3.Angle(dirLeft, dirFinal);
+                                var b1 = gd3d.framework.navVec3.Angle(dirRight, dirFinal);
+                                var flag4 = a1 * b1 > 0.0;
+                                if (a1 * b1 > 0.0) {
+                                    if (a1 > 0.0) {
+                                        breakDir = 1;
+                                    }
+                                    else {
+                                        breakDir = -1;
+                                    }
+                                }
+                                else {
+                                    breakDir = 0;
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            var n1 = triPathList[i];
+                            var n2 = triPathList[i + 1];
+                            var bname = n1 + "-" + n2;
+                            if (n2 < n1) {
+                                bname = n2 + "-" + n1;
+                            }
+                            var border = info.borders[bname];
+                            var pointA = gd3d.framework.navVec3.Border(info.vecs[border.pointA], info.vecs[border.pointB], offset);
+                            var pointB = gd3d.framework.navVec3.Border(info.vecs[border.pointB], info.vecs[border.pointA], offset);
+                            var dist1 = gd3d.framework.navVec3.DistAZ(posNow, pointA);
+                            var dist2 = gd3d.framework.navVec3.DistAZ(posNow, pointB);
+                            if (dist1 < 0.001 || dist2 < 0.001) {
+                                continue;
+                            }
+                            if (dirLeft == null) {
+                                dirLeft = gd3d.framework.navVec3.NormalAZ(posNow, pointA);
+                                posLeft = pointA.clone();
+                                ipolyLeft = i;
+                            }
+                            if (dirRight == null) {
+                                dirRight = gd3d.framework.navVec3.NormalAZ(posNow, pointB);
+                                posRight = pointB.clone();
+                                ipolyRight = i;
+                            }
+                            var adir = gd3d.framework.navVec3.Angle(dirLeft, dirRight);
+                            if (adir < 0.0) {
+                                var navVec7 = dirLeft;
+                                var navVec8 = posLeft;
+                                var num12 = ipolyLeft;
+                                dirLeft = dirRight;
+                                posLeft = posRight;
+                                ipolyLeft = ipolyRight;
+                                dirRight = navVec7;
+                                posRight = navVec8;
+                                ipolyRight = num12;
+                            }
+                            if (ipolyLeft != i || ipolyRight != i) {
+                                var ndirLeft = gd3d.framework.navVec3.NormalAZ(posNow, pointA);
+                                var ndirRight = gd3d.framework.navVec3.NormalAZ(posNow, pointB);
+                                var nadir = gd3d.framework.navVec3.Angle(ndirLeft, ndirRight);
+                                if (nadir < 0.0) {
+                                    var navVec11 = ndirLeft;
+                                    var navVec12 = pointA;
+                                    ndirLeft = ndirRight;
+                                    pointA = pointB;
+                                    ndirRight = navVec11;
+                                    pointB = navVec12;
+                                }
+                                var aLL = gd3d.framework.navVec3.Angle(dirLeft, ndirLeft);
+                                var aRL = gd3d.framework.navVec3.Angle(dirRight, ndirLeft);
+                                var aLR = gd3d.framework.navVec3.Angle(dirLeft, ndirRight);
+                                var aRR = gd3d.framework.navVec3.Angle(dirRight, ndirRight);
+                                if ((aLL < 0 && aLR < 0)) {
+                                    breakDir = -1;
+                                    break;
+                                }
+                                if (aRL > 0.0 && aRR > 0.0) {
+                                    breakDir = 1;
+                                    break;
+                                }
+                                if (aLL > 0.0 && aRL < 0.0) {
+                                    dirLeft = ndirLeft;
+                                    posLeft = pointA;
+                                    ipolyLeft = i;
+                                }
+                                if (aLR > 0.0 && aRR < 0.0) {
+                                    dirRight = ndirRight;
+                                    posRight = pointB;
+                                    ipolyRight = i;
+                                }
+                            }
+                        }
+                    }
+                    if (breakDir == 0) {
+                        break;
+                    }
+                    else {
+                        if (breakDir == -1) {
+                            wayPoints.push(posLeft.clone());
+                            posNow = posLeft;
+                            ipoly = ipolyLeft;
+                        }
+                        else {
+                            wayPoints.push(posRight.clone());
+                            posNow = posRight;
+                            ipoly = ipolyRight;
+                        }
+                        dirLeft = null;
+                        dirRight = null;
+                        ipolyLeft = -1;
+                        ipolyRight = -1;
+                    }
+                }
+                wayPoints.push(endPos);
+                return wayPoints;
+            };
+            return pathFinding;
+        }());
+        framework.pathFinding = pathFinding;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {

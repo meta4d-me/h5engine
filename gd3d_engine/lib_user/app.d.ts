@@ -1,5 +1,26 @@
 /// <reference path="../lib/gd3d.d.ts" />
 /// <reference path="../lib/htmlui.d.ts" />
+declare class demo_ScreenRange implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cameraCount: number;
+    windowRate: number;
+    windowHorizon: boolean;
+    outcontainer: HTMLDivElement;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    camera1: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    cube4: gd3d.framework.transform;
+    timer: number;
+    movetarget: gd3d.math.vector3;
+    targetCamera: gd3d.framework.camera;
+    inputMgr: gd3d.framework.inputMgr;
+    pointDown: boolean;
+    update(delta: number): void;
+}
 declare namespace t {
     class light_d1 implements IState {
         app: gd3d.framework.application;
@@ -160,6 +181,36 @@ declare class test_NewScene implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class test_RangeScreen implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    cube4: gd3d.framework.transform;
+    timer: number;
+    movetarget: gd3d.math.vector3;
+    inputMgr: gd3d.framework.inputMgr;
+    pointDown: boolean;
+    update(delta: number): void;
+}
+declare class test_Sound implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    taskmgr: gd3d.framework.taskMgr;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    time: number;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private addCam(laststate, state);
+    private addCube(laststate, state);
+    private addBtnLoadSound(laststate, state);
     start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
@@ -637,61 +688,17 @@ declare class test_multipleplayer_anim implements IState {
 declare class test_navmesh implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    private navmeshLoaded(dataStr);
-    private createMesh(meshData, webgl);
+    navMeshLoader: gd3d.framework.NavMeshLoadManager;
     camera: gd3d.framework.camera;
-    navObj: gd3d.framework.transform;
+    cube: gd3d.framework.transform;
+    start(app: gd3d.framework.application): void;
     timer: number;
+    movetarget: gd3d.math.vector3;
+    inputMgr: gd3d.framework.inputMgr;
+    pointDown: boolean;
     update(delta: number): void;
-}
-declare namespace lighttool.NavMesh {
-    class navVec3 {
-        x: number;
-        y: number;
-        z: number;
-        clone(): navVec3;
-        static DistAZ(start: navVec3, end: navVec3): number;
-        static NormalAZ(start: navVec3, end: navVec3): navVec3;
-        static Cross(start: navVec3, end: navVec3): navVec3;
-        static DotAZ(start: navVec3, end: navVec3): number;
-        static Angle(start: navVec3, end: navVec3): number;
-        static Border(start: navVec3, end: navVec3, dist: number): navVec3;
-    }
-    class navNode {
-        nodeID: number;
-        poly: number[];
-        borderByPoly: string[];
-        borderByPoint: string[];
-        center: navVec3;
-        genBorder(): void;
-        isLinkTo(info: navMeshInfo, nid: number): string;
-        getLinked(info: navMeshInfo): number[];
-        genCenter(info: navMeshInfo): void;
-    }
-    class navBorder {
-        borderName: string;
-        nodeA: number;
-        nodeB: number;
-        pointA: number;
-        pointB: number;
-        length: number;
-        center: navVec3;
-    }
-    class navMeshInfo {
-        vecs: navVec3[];
-        nodes: navNode[];
-        borders: {
-            [id: string]: navBorder;
-        };
-        min: navVec3;
-        max: navVec3;
-        calcBound(): void;
-        private static cross(p0, p1, p2);
-        inPoly(p: navVec3, poly: number[]): boolean;
-        genBorder(): void;
-        static LoadMeshInfo(s: string): navMeshInfo;
-    }
+    pos: any[];
+    pickDown(): void;
 }
 declare namespace t {
     class Test_NormalMap implements IState {
@@ -1102,6 +1109,35 @@ declare class CameraController {
     rotAngle: gd3d.math.vector3;
     isInit: boolean;
     init(app: gd3d.framework.application, target: gd3d.framework.camera): void;
+    private moveVector;
+    doMove(delta: number): void;
+    doRotate(rotateX: number, rotateY: number): void;
+    lookat(trans: gd3d.framework.transform): void;
+    checkOnRightClick(mouseEvent: MouseEvent): boolean;
+    private doMouseWheel(ev, isFirefox);
+    remove(): void;
+}
+declare class Test_CameraController {
+    private static g_this;
+    static instance(): Test_CameraController;
+    gameObject: gd3d.framework.gameObject;
+    app: gd3d.framework.application;
+    target: gd3d.framework.camera;
+    moveSpeed: number;
+    movemul: number;
+    wheelSpeed: number;
+    rotateSpeed: number;
+    keyMap: {
+        [id: number]: boolean;
+    };
+    beRightClick: boolean;
+    update(delta: number): void;
+    cameras: gd3d.framework.camera[];
+    add(camera: gd3d.framework.camera): void;
+    rotAngle: gd3d.math.vector3;
+    isInit: boolean;
+    decideCam(target: gd3d.framework.camera): void;
+    init(app: gd3d.framework.application): void;
     private moveVector;
     doMove(delta: number): void;
     doRotate(rotateX: number, rotateY: number): void;

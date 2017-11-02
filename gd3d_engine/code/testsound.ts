@@ -23,7 +23,14 @@ namespace t
         {
             this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
             {
-                state.finish = true;
+                if(_state.isfinish)
+                {
+                    state.finish=true;
+                }    
+                else
+                {
+                    state.error=true;
+                }         
             }
             );
         }
@@ -91,8 +98,6 @@ namespace t
 
                     }
                     this.cube = cube;
-
-
                 }
             }
             state.finish = true;
@@ -108,7 +113,8 @@ namespace t
                 let tr = new gd3d.framework.transform();
                 let player: gd3d.framework.AudioPlayer = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER) as gd3d.framework.AudioPlayer;
                 player.be3DSound = false;
-                this.app.getScene().addChild(tr);
+               // this.app.getScene().addChild(tr);
+                this.scene.addChild(tr);
                 tr.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 {
                     var button = document.createElement("button");
@@ -135,7 +141,7 @@ namespace t
                         gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", (buf, err) =>
                         {
                             this.once2 = buf;
-                            player.play(this.once2, false, 1);
+                            player.play(this.once2, true, 1);
                         });
                     };
                     button.style.top = "130px";
@@ -144,7 +150,7 @@ namespace t
                     this.app.container.appendChild(button);
                 }
 
-                {
+                { 
                     var button = document.createElement("button");
                     button.textContent = "play loop";
                     button.onclick = () =>
@@ -174,7 +180,7 @@ namespace t
                     this.app.container.appendChild(button);
                 }
                 {
-                    document.body.appendChild(document.createElement("p"));
+                    document.body.appendChild(document.createElement("p"));//这句话的作用？
                     var input = document.createElement("input");
                     input.type = "range";
                     input.valueAsNumber = 5;
@@ -233,7 +239,7 @@ namespace t
                 //gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(0, 1, 0), this.timer, rotateVelocity);
 
                 gd3d.math.quatMultiply(rotateVelocity, cubeTransform.localRotate, cubeTransform.localRotate);
-                cubeTransform.markDirty();
+                cubeTransform.markDirty() ;
             }
         }
     }

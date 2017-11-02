@@ -73,6 +73,9 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("example_newObject",()=>new test_NewGameObject);
         this.addBtn("example_changeMesh",()=>new test_ChangeMesh());
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
+        this.addBtn("example_Sound",()=>new test_Sound());
+        this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
+        this.addBtn("demo_ScreenRange",()=>new demo_ScreenRange());
         this.addBtn("test_liloadscene", () => new test_LiLoadScene());
 
         this.addBtn("test_UI_component", () => new test_UI_Component());
