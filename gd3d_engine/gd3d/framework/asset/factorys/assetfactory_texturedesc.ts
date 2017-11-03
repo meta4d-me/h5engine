@@ -80,11 +80,6 @@ namespace gd3d.framework
                                 _texture.glTexture = t2d;
 
                                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-
-                                if(url == "res/scenes/test_Terrain/resources/lvyexianzong.imgdesc.json"){
-                                    document["he"] = t2d;
-                                    t2d.getReader();
-                                }
                             },
                             (loadedLength, totalLength) =>
                             {

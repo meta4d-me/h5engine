@@ -74,6 +74,7 @@ class test_UI_Component implements IState {
         btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
         btn_b.pressedColor = new gd3d.math.color(1,1,1,1);
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        btn_t.visible = false;
 
         //关闭按钮
         let closeSce = 0.8;

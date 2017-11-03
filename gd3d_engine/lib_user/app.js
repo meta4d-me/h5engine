@@ -2718,6 +2718,7 @@ var test_UI_Component = (function () {
         btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
         btn_b.pressedColor = new gd3d.math.color(1, 1, 1, 1);
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        btn_t.visible = false;
         var closeSce = 0.8;
         var close_bt = new gd3d.framework.transform2D;
         close_bt.width = 25 * closeSce;

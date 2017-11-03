@@ -1027,6 +1027,8 @@ var gd3d;
                 this.batcher.push(this.webgl, data, null);
             };
             canvas.prototype.drawScene = function (node, context, assetmgr) {
+                if (!node.visible)
+                    return;
                 if (node.renderer != null) {
                     node.renderer.render(this);
                 }
@@ -6008,10 +6010,6 @@ var gd3d;
                             t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
                             _texture.glTexture = t2d;
                             framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-                            if (url == "res/scenes/test_Terrain/resources/lvyexianzong.imgdesc.json") {
-                                document["he"] = t2d;
-                                t2d.getReader();
-                            }
                         }, function (loadedLength, totalLength) {
                             framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                         });
