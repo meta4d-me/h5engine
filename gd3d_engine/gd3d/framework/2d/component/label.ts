@@ -28,12 +28,13 @@ namespace gd3d.framework
         }
         set text(text: string)
         {
+            text = text == null? "": text;
             this._text = text;
             //设置缓存长度
             var cachelen = 6 * 13 * this._text.length;
             this.datar.splice(0, this.datar.length);
             while (this.datar.length < cachelen)
-            {
+            {   // {pos,color1,uv,color2}
                 this.datar.push(
                     0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
@@ -107,7 +108,7 @@ namespace gd3d.framework
          * 水平排列方式
          * @version egret-gd3d 1.0
          */
-        horizontalType: HorizontalType = HorizontalType.Center;
+        horizontalType: HorizontalType = HorizontalType.Left;
 
         /**
          * @public
@@ -136,8 +137,8 @@ namespace gd3d.framework
             var m21 = m.rawData[1];
             var m22 = m.rawData[3];
 
-            var bx = this.data_begin.x;
-            var by = this.data_begin.y;
+            var bx = this.data_begin.x ;
+            var by = this.data_begin.y ;
 
             //计算出排列数据
             var txadd = 0;
@@ -145,6 +146,7 @@ namespace gd3d.framework
             this.indexarr = [];
             this.remainarrx = [];
             var remainy = 0;
+            tyadd += this._fontsize * this.linespace;
             for (var i = 0; i < this._text.length; i++)
             {
                 let c = this._text.charAt(i);
@@ -192,7 +194,7 @@ namespace gd3d.framework
                 {
                     xadd += this.remainarrx[arri] / 2;
                 }
-                else if (this.horizontalType = HorizontalType.Right)
+                else if (this.horizontalType == HorizontalType.Right)
                 {
                     xadd += this.remainarrx[arri];
                 }
@@ -401,7 +403,7 @@ namespace gd3d.framework
         {
             if (this._font != null)
             {
-                if (this.dirtyData = true)
+                if (this.dirtyData == true)
                 {
                     this.updateData(this._font);
                     this.dirtyData = false;
@@ -444,7 +446,7 @@ namespace gd3d.framework
             this.data_begin.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
             this.data_begin.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
             //只把左上角算出来
-            //this.dirtyData = true;
+            this.dirtyData = true;
         }
 
         /**

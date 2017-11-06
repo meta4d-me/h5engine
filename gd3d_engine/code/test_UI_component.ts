@@ -6,6 +6,7 @@ class test_UI_Component implements IState {
     taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
     assetMgr: gd3d.framework.assetMgr;
     rooto2d: gd3d.framework.overlay2D;
+    static temp:gd3d.framework.transform2D;
     start(app: gd3d.framework.application) {
 
         this.app = app;
@@ -49,7 +50,7 @@ class test_UI_Component implements IState {
         //文本
         let lab_t = new gd3d.framework.transform2D;
         lab_t.width = 120;
-        lab_t.height = 30;
+        lab_t.height = 24;
         lab_t.localTranslate.x = 10;
         lab_t.localTranslate.y = 30;
         bg_t.addChild(lab_t);
@@ -124,9 +125,61 @@ class test_UI_Component implements IState {
         });
 
 
+        //一个输入框
+        let iptFrame_t = new gd3d.framework.transform2D;
+        iptFrame_t.width = 120;
+        iptFrame_t.height = 30;
+        iptFrame_t.pivot.x = 0;
+        iptFrame_t.pivot.y = 0;
+        iptFrame_t.localTranslate.x = 10;
+        iptFrame_t.localTranslate.y = 160;
+        bg_t.addChild(iptFrame_t);
+        let ipt = iptFrame_t.addComponent("inputField") as gd3d.framework.inputField;
+
+        let img_t = new gd3d.framework.transform2D;
+        img_t.width = iptFrame_t.width;
+        img_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(img_t);
+        ipt.frameImage = img_t.addComponent("image2D") as gd3d.framework.image2D;
+        ipt.frameImage.sprite = atlasComp.sprites["ui_public_input"];
+        ipt.frameImage.imageType = gd3d.framework.ImageType.Sliced;
+        ipt.frameImage.sprite.border = new gd3d.math.border(16,14,16,14);
+
+        let text_t = new gd3d.framework.transform2D;
+        text_t.width = iptFrame_t.width;
+        text_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(text_t);
+        ipt.TextLabel = text_t.addComponent("label") as gd3d.framework.label;
+        ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+        ipt.TextLabel.fontsize = 24
+        ipt.TextLabel.color =new gd3d.math.color(1,1,1,1);
+
+        let p_t = new gd3d.framework.transform2D;
+        p_t.width = iptFrame_t.width;
+        p_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(p_t);
+        ipt.PlaceholderLabel = p_t.addComponent("label") as gd3d.framework.label;
+        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+        ipt.PlaceholderLabel.fontsize = 24
+        ipt.PlaceholderLabel.color =new gd3d.math.color(0.6,0.6,0.6,1);
+
+
+        test_UI_Component.temp = iptFrame_t;
+
+
+        //key dwon test
+        let inputMgr = this.app.getInputMgr();
+
+        this.app.webgl.canvas.addEventListener("keydown", (ev: KeyboardEvent) =>
+        {
+            if(ev.keyCode == 81){
+               
+            }
+        }, false);
+
+
+
         state.finish = true;
-
-
     }
 
     private loadTexture(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {

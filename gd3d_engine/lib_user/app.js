@@ -2695,7 +2695,7 @@ var test_UI_Component = (function () {
         bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
         var lab_t = new gd3d.framework.transform2D;
         lab_t.width = 120;
-        lab_t.height = 30;
+        lab_t.height = 24;
         lab_t.localTranslate.x = 10;
         lab_t.localTranslate.y = 30;
         bg_t.addChild(lab_t);
@@ -2761,6 +2761,45 @@ var test_UI_Component = (function () {
             }
             nums = temp;
         });
+        var iptFrame_t = new gd3d.framework.transform2D;
+        iptFrame_t.width = 120;
+        iptFrame_t.height = 30;
+        iptFrame_t.pivot.x = 0;
+        iptFrame_t.pivot.y = 0;
+        iptFrame_t.localTranslate.x = 10;
+        iptFrame_t.localTranslate.y = 160;
+        bg_t.addChild(iptFrame_t);
+        var ipt = iptFrame_t.addComponent("inputField");
+        var img_t = new gd3d.framework.transform2D;
+        img_t.width = iptFrame_t.width;
+        img_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(img_t);
+        ipt.frameImage = img_t.addComponent("image2D");
+        ipt.frameImage.sprite = atlasComp.sprites["ui_public_input"];
+        ipt.frameImage.imageType = gd3d.framework.ImageType.Sliced;
+        ipt.frameImage.sprite.border = new gd3d.math.border(16, 14, 16, 14);
+        var text_t = new gd3d.framework.transform2D;
+        text_t.width = iptFrame_t.width;
+        text_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(text_t);
+        ipt.TextLabel = text_t.addComponent("label");
+        ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.TextLabel.fontsize = 24;
+        ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
+        var p_t = new gd3d.framework.transform2D;
+        p_t.width = iptFrame_t.width;
+        p_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(p_t);
+        ipt.PlaceholderLabel = p_t.addComponent("label");
+        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.PlaceholderLabel.fontsize = 24;
+        ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
+        test_UI_Component.temp = iptFrame_t;
+        var inputMgr = this.app.getInputMgr();
+        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
+            if (ev.keyCode == 81) {
+            }
+        }, false);
         state.finish = true;
     };
     test_UI_Component.prototype.loadTexture = function (lastState, state) {

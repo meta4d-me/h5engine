@@ -1875,6 +1875,9 @@ var gd3d;
             transform2D.prototype.updateTran = function (parentChange) {
                 if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                     return;
+                if (this.localTranslate.x == 10 && this.localTranslate.y == 200) {
+                    this;
+                }
                 if (this.dirty) {
                     gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
@@ -1910,25 +1913,36 @@ var gd3d;
                 var top = dirtylist.pop();
                 top.updateTran(false);
             };
-            transform2D.prototype.getWorldTranslate = function () {
+            transform2D.prototype.decomposeWorldMatrix = function () {
                 if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    var reCanvsMtx = gd3d.math.pool.new_matrix3x2();
+                    var tsca = gd3d.math.pool.new_vector2();
+                    var ttran = gd3d.math.pool.new_vector2();
+                    tsca.x = this.canvas.pixelWidth / 2;
+                    tsca.y = -this.canvas.pixelHeight / 2;
+                    ttran.x = this.canvas.pixelWidth / 2;
+                    ttran.y = this.canvas.pixelHeight / 2;
+                    gd3d.math.matrix3x2MakeTransformRTS(ttran, tsca, 0, reCanvsMtx);
+                    var outMatrix = gd3d.math.pool.new_matrix3x2();
+                    gd3d.math.matrix3x2Multiply(reCanvsMtx, this.worldMatrix, outMatrix);
+                    gd3d.math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    gd3d.math.pool.delete_vector2(tsca);
+                    gd3d.math.pool.delete_vector2(ttran);
+                    gd3d.math.pool.delete_matrix3x2(reCanvsMtx);
+                    gd3d.math.pool.delete_matrix3x2(outMatrix);
                     this.dirtyWorldDecompose = false;
                 }
+            };
+            transform2D.prototype.getWorldTranslate = function () {
+                this.decomposeWorldMatrix();
                 return this.worldTranslate;
             };
             transform2D.prototype.getWorldScale = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
+                this.decomposeWorldMatrix();
                 return this.worldScale;
             };
             transform2D.prototype.getWorldRotate = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
+                this.decomposeWorldMatrix();
                 return this.worldRotate;
             };
             transform2D.prototype.getLocalMatrix = function () {
@@ -2117,7 +2131,7 @@ var gd3d;
                     if (this.children != null) {
                         for (var i = 0; i <= this.children.length; i++) {
                             var c = this.children[i];
-                            if (c != null)
+                            if (c != null && c.visible)
                                 c.onCapturePointEvent(canvas, ev);
                         }
                     }
@@ -2139,7 +2153,7 @@ var gd3d;
                     for (var i = this.children.length - 1; i >= 0; i--) {
                         if (ev.eated == false) {
                             var c = this.children[i];
-                            if (c != null)
+                            if (c != null && c.visible)
                                 c.onPointEvent(canvas, ev);
                         }
                     }
@@ -3356,11 +3370,236 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var inputField = (function () {
+            function inputField() {
+                this.customRegexStr = "";
+                this.beFocus = false;
+                this._text = "";
+                this.myLineType = lineType.SingleLine;
+                this.myContentType = contentType.None;
+            }
+            Object.defineProperty(inputField.prototype, "frameImage", {
+                get: function () {
+                    return this._frameImage;
+                },
+                set: function (frameImg) {
+                    this._frameImage = frameImg;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "text", {
+                get: function () {
+                    return this._text;
+                },
+                set: function (text) {
+                    if (this._textLable) {
+                        this._textLable.text = text;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "TextLabel", {
+                get: function () {
+                    return this._textLable;
+                },
+                set: function (textLabel) {
+                    textLabel.text = this._text;
+                    this._textLable = textLabel;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "PlaceholderLabel", {
+                get: function () {
+                    return this._placeholderLabel;
+                },
+                set: function (placeholderLabel) {
+                    if (placeholderLabel.text == null || placeholderLabel.text == "")
+                        placeholderLabel.text = "Enter Text...";
+                    this._placeholderLabel = placeholderLabel;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            inputField.prototype.updateData = function (_font) {
+            };
+            inputField.prototype.render = function (canvas) {
+            };
+            inputField.prototype.updateTran = function () {
+                this.inputElmLayout();
+                if (this._placeholderLabel) {
+                    if (this._placeholderLabel.transform.width != this.transform.width)
+                        this._placeholderLabel.transform.width = this.transform.width;
+                    if (this._placeholderLabel.transform.height != this.transform.height)
+                        this._placeholderLabel.transform.height = this.transform.height;
+                }
+                if (this._textLable) {
+                    if (this._textLable.transform.width != this.transform.width)
+                        this._textLable.transform.width = this.transform.width;
+                    if (this._textLable.transform.height != this.transform.height)
+                        this._textLable.transform.height = this.transform.height;
+                }
+            };
+            inputField.prototype.start = function () {
+                var _this = this;
+                this.inputElement = document.createElement("Input");
+                this.inputElement.style.opacity = "0";
+                this.inputElement.style.visibility = "hidden";
+                if (this.transform.canvas.webgl)
+                    this.transform.canvas.webgl.canvas.parentElement.appendChild(this.inputElement);
+                this.inputElement.onblur = function (e) {
+                    _this.beFocus = false;
+                };
+                this.inputElement.onfocus = function (e) {
+                    _this.beFocus = true;
+                };
+                this.inputElmLayout();
+            };
+            inputField.prototype.inputElmLayout = function () {
+                if (this.inputElement == null)
+                    return;
+                var pos = this.transform.getWorldTranslate();
+                this.transform.localTranslate;
+                var cssStyle = this.inputElement.style;
+                if (pos.x + "px" == cssStyle.left && pos.y + "px" == cssStyle.top && this.transform.width + "px" == cssStyle.width && this.transform.height + "px" == cssStyle.height)
+                    return;
+                var scale = this.transform.canvas.scene.app.canvasClientHeight / this.transform.canvas.pixelHeight;
+                cssStyle.position = "absolute";
+                cssStyle.left = pos.x * scale + "px";
+                cssStyle.top = pos.y * scale + "px";
+                cssStyle.width = this.transform.width * scale + "px";
+                cssStyle.height = this.transform.height * scale + "px";
+            };
+            inputField.prototype.textRefresh = function () {
+                if (!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value)
+                    return;
+                this._text = this.inputElement.value;
+                if (this.myContentType == contentType.Custom) {
+                    if (this.customRegexStr != null && this.customRegexStr != "")
+                        this._text = this._text.replace(this.customRegexStr, '');
+                }
+                else {
+                    if (this.myContentType == contentType.None) {
+                    }
+                    else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word) && (this.myContentType & contentType.ChineseCharacter) && (this.myContentType & contentType.Underline)) {
+                        this._text = this._text.replace(/^[\u4E00-\u9FA5a-zA-Z0-9_]{3,20}$/ig, '');
+                    }
+                    else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word) && (this.myContentType & contentType.Underline)) {
+                        this._text = this._text.replace(/[^\w\.\/]/ig, '');
+                    }
+                    else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word)) {
+                        this._text = this._text.replace(/[^(A-Za-z0-9)]/ig, '');
+                    }
+                    else if (this.myContentType == contentType.Number) {
+                        this._text = this._text.replace(/\D+/g, '');
+                    }
+                    else if (this.myContentType == contentType.ChineseCharacter) {
+                        this._text = this._text.replace(/[^\u4E00-\u9FA5]/g, '');
+                    }
+                }
+                this.inputElement.value = this._text;
+                this.text = this._text;
+                if (this._text == "") {
+                    this._placeholderLabel.transform.visible = true;
+                    this._textLable.transform.visible = false;
+                }
+                else {
+                    this._placeholderLabel.transform.visible = false;
+                    this._textLable.transform.visible = true;
+                }
+            };
+            inputField.prototype.update = function (delta) {
+                this.textRefresh();
+            };
+            inputField.prototype.remove = function () {
+                this.inputElement.disabled = false;
+                this.inputElement.value = "";
+                this.inputElement.style.visibility = "hidden";
+                this.inputElement = null;
+            };
+            inputField.prototype.onPointEvent = function (canvas, ev, oncap) {
+                if (oncap == false) {
+                    if (ev.type != framework.PointEventEnum.PointDown)
+                        return;
+                    var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
+                    if (b) {
+                        this.inputElement.style.visibility = "visible";
+                        this.inputElement.focus();
+                    }
+                    else {
+                        if (this.beFocus)
+                            this.inputElement.blur();
+                        if (this.inputElement.style.visibility != "hidden")
+                            this.inputElement.style.visibility = "hidden";
+                    }
+                }
+            };
+            __decorate([
+                gd3d.reflect.Field("image2D"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.image2D])
+            ], inputField.prototype, "frameImage", null);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String),
+                __metadata("design:paramtypes", [String])
+            ], inputField.prototype, "text", null);
+            __decorate([
+                gd3d.reflect.Field("lineType"),
+                __metadata("design:type", Number)
+            ], inputField.prototype, "myLineType", void 0);
+            __decorate([
+                gd3d.reflect.Field("contentType"),
+                __metadata("design:type", Number)
+            ], inputField.prototype, "myContentType", void 0);
+            __decorate([
+                gd3d.reflect.Field("label"),
+                __metadata("design:type", framework.label),
+                __metadata("design:paramtypes", [framework.label])
+            ], inputField.prototype, "TextLabel", null);
+            __decorate([
+                gd3d.reflect.Field("label"),
+                __metadata("design:type", framework.label),
+                __metadata("design:paramtypes", [framework.label])
+            ], inputField.prototype, "PlaceholderLabel", null);
+            inputField = __decorate([
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.nodeRender
+            ], inputField);
+            return inputField;
+        }());
+        framework.inputField = inputField;
+        var lineType;
+        (function (lineType) {
+            lineType[lineType["SingleLine"] = 0] = "SingleLine";
+            lineType[lineType["MultiLineSubmit"] = 1] = "MultiLineSubmit";
+            lineType[lineType["MultiLineNewline"] = 2] = "MultiLineNewline";
+        })(lineType = framework.lineType || (framework.lineType = {}));
+        var contentType;
+        (function (contentType) {
+            contentType[contentType["None"] = 0] = "None";
+            contentType[contentType["Number"] = 1] = "Number";
+            contentType[contentType["Word"] = 2] = "Word";
+            contentType[contentType["Underline"] = 4] = "Underline";
+            contentType[contentType["ChineseCharacter"] = 8] = "ChineseCharacter";
+            contentType[contentType["NoneChineseCharacter"] = 16] = "NoneChineseCharacter";
+            contentType[contentType["Email"] = 32] = "Email";
+            contentType[contentType["PassWord"] = 64] = "PassWord";
+            contentType[contentType["Custom"] = 128] = "Custom";
+        })(contentType = framework.contentType || (framework.contentType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var label = (function () {
             function label() {
                 this._fontsize = 14;
                 this.linespace = 1;
-                this.horizontalType = HorizontalType.Center;
+                this.horizontalType = HorizontalType.Left;
                 this.verticalType = VerticalType.Center;
                 this.indexarr = [];
                 this.remainarrx = [];
@@ -3375,6 +3614,7 @@ var gd3d;
                     return this._text;
                 },
                 set: function (text) {
+                    text = text == null ? "" : text;
                     this._text = text;
                     var cachelen = 6 * 13 * this._text.length;
                     this.datar.splice(0, this.datar.length);
@@ -3428,6 +3668,7 @@ var gd3d;
                 this.indexarr = [];
                 this.remainarrx = [];
                 var remainy = 0;
+                tyadd += this._fontsize * this.linespace;
                 for (var i = 0; i < this._text.length; i++) {
                     var c = this._text.charAt(i);
                     var cinfo = _font.cmap[c];
@@ -3464,7 +3705,7 @@ var gd3d;
                     if (this.horizontalType == HorizontalType.Center) {
                         xadd += this.remainarrx[arri] / 2;
                     }
-                    else if (this.horizontalType = HorizontalType.Right) {
+                    else if (this.horizontalType == HorizontalType.Right) {
                         xadd += this.remainarrx[arri];
                     }
                     for (; i < this.indexarr[arri]; i++) {
@@ -3532,7 +3773,7 @@ var gd3d;
             };
             label.prototype.render = function (canvas) {
                 if (this._font != null) {
-                    if (this.dirtyData = true) {
+                    if (this.dirtyData == true) {
                         this.updateData(this._font);
                         this.dirtyData = false;
                     }
@@ -3560,6 +3801,7 @@ var gd3d;
                 var t = -this.transform.pivot.y * this.transform.height;
                 this.data_begin.x = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
                 this.data_begin.y = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
+                this.dirtyData = true;
             };
             label.prototype.start = function () {
             };
@@ -11846,6 +12088,9 @@ var gd3d;
                 }, false);
                 app.webgl.canvas.addEventListener("keyup", function (ev) {
                     _this.keyboardMap[ev.keyCode] = false;
+                }, false);
+                app.webgl.canvas.addEventListener("blur", function (ev) {
+                    _this.point.touch = false;
                 }, false);
             }
             inputMgr.prototype.CalcuPoint = function (clientX, clientY) {

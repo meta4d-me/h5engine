@@ -428,6 +428,7 @@ declare namespace gd3d.framework {
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
+        private decomposeWorldMatrix();
         getWorldTranslate(): math.vector2;
         getWorldScale(): math.vector2;
         getWorldRotate(): math.angelref;
@@ -540,6 +541,49 @@ declare namespace gd3d.framework {
         Radial_90 = 2,
         Radial_180 = 3,
         Radial_360 = 4,
+    }
+}
+declare namespace gd3d.framework {
+    class inputField implements IRectRenderer {
+        transform: transform2D;
+        private _frameImage;
+        frameImage: image2D;
+        private customRegexStr;
+        private beFocus;
+        private inputElement;
+        private _text;
+        text: string;
+        myLineType: lineType;
+        myContentType: contentType;
+        private _textLable;
+        TextLabel: label;
+        private _placeholderLabel;
+        PlaceholderLabel: label;
+        updateData(_font: gd3d.framework.font): void;
+        render(canvas: canvas): void;
+        updateTran(): void;
+        start(): void;
+        private inputElmLayout();
+        private textRefresh();
+        update(delta: number): void;
+        remove(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+    enum lineType {
+        SingleLine = 0,
+        MultiLineSubmit = 1,
+        MultiLineNewline = 2,
+    }
+    enum contentType {
+        None = 0,
+        Number = 1,
+        Word = 2,
+        Underline = 4,
+        ChineseCharacter = 8,
+        NoneChineseCharacter = 16,
+        Email = 32,
+        PassWord = 64,
+        Custom = 128,
     }
 }
 declare namespace gd3d.framework {

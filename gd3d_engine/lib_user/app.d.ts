@@ -346,6 +346,7 @@ declare class test_UI_Component implements IState {
     taskmgr: gd3d.framework.taskMgr;
     assetMgr: gd3d.framework.assetMgr;
     rooto2d: gd3d.framework.overlay2D;
+    static temp: gd3d.framework.transform2D;
     start(app: gd3d.framework.application): void;
     private createUI(astState, state);
     private loadTexture(lastState, state);
