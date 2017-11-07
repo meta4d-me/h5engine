@@ -399,6 +399,7 @@ namespace gd3d.framework
         }
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr)
         {
+            state.totalByteLength = this.totalLength;
             gd3d.io.loadText(url, (txt, err) =>
             {
                 if (err != null)
@@ -449,11 +450,12 @@ namespace gd3d.framework
                 {
                     this.packages.push(packes[i]);
                 }
-            }
-            if (json["totalLength"] != undefined)
-            {
-                this.totalLength = json["totalLength"];
-            }
+            }else {
+                if (json["totalLength"] != undefined)
+                {
+                    this.totalLength = json["totalLength"];
+                }
+            }            
         }
         /**
          * @public
@@ -1363,13 +1365,27 @@ namespace gd3d.framework
             }
             else if (type == AssetTypeEnum.CompressBundle)
             {
-                //压缩的bundle在packs.txt中
-                let loadurl = url.replace(".assetbundle.json", ".packs.txt");
-                let filename = this.getFileName(url);
+                gd3d.io.loadText(url, (txt, err) =>
+                {
+                    if (err != null)
+                    {
+                        curloadinfo.state.iserror = true;
+                        curloadinfo.state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
 
-                var ab = new assetBundle(url);
-                ab.name = filename;
-                ab.loadCompressBundle(loadurl, onstate, state, this);
+                    //压缩的bundle在packs.txt中
+                    let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                    let filename = this.getFileName(url);
+                    let json = JSON.parse(txt);
+
+                    var ab = new assetBundle(url);
+                    ab.name = filename;
+                    ab.totalLength = json["totalLength"];
+                    ab.loadCompressBundle(loadurl, onstate, state, this);
+                });
+                
             }
             else
             {
@@ -1560,7 +1576,7 @@ namespace gd3d.framework
 
             let info: SaveInfo = new SaveInfo();
             let _scene = {};
-            let _rootNode = io.serializeObj(this.app.getScene().getRoot(), this);
+            let _rootNode = io.serializeObj(this.app.getScene().getRoot(), null, this);
 
             let _lightmaps = [];
             let lightmaps = this.app.getScene().lightmaps;

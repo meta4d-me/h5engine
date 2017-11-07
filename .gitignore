@@ -2,3 +2,6 @@
 /gd3d_engine/gd3d_engine/bin
 /gd3d_engine/gd3d_engine/gd3d_engine.csproj.user
 /gd3d_engine/gd3d_engine/lib_launcher
+/gd3d_engine/gd3d/tools/
+/gd3d_engine/gd3d/build.js
+/gd3d_engine/gd3d/.vscode/launch.json

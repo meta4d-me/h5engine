@@ -376,6 +376,10 @@ namespace gd3d.framework
             if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                 return;
 
+                if(this.localTranslate.x == 10 && this.localTranslate.y == 200){
+                    this;
+                }
+
             if (this.dirty)
             {
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
@@ -432,6 +436,36 @@ namespace gd3d.framework
         }
 
         /**
+         * @private
+         * 转换并拆解canvas坐标空间 RTS
+         */
+        private decomposeWorldMatrix(){
+            if(this.dirtyWorldDecompose){
+                let reCanvsMtx = gd3d.math.pool.new_matrix3x2();
+                let tsca = gd3d.math.pool.new_vector2();
+                let ttran = gd3d.math.pool.new_vector2();
+                tsca.x = this.canvas.pixelWidth/2;
+                tsca.y = - this.canvas.pixelHeight/2;
+                ttran.x = this.canvas.pixelWidth/2;
+                ttran.y = this.canvas.pixelHeight/2;
+            
+                math.matrix3x2MakeTransformRTS(ttran,tsca,0,reCanvsMtx);
+
+                let outMatrix = gd3d.math.pool.new_matrix3x2();
+                math.matrix3x2Multiply(reCanvsMtx,this.worldMatrix,outMatrix);
+                
+                math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+
+                math.pool.delete_vector2(tsca);
+                math.pool.delete_vector2(ttran);
+                math.pool.delete_matrix3x2(reCanvsMtx);
+                math.pool.delete_matrix3x2(outMatrix);
+
+                this.dirtyWorldDecompose = false;
+            }
+        }
+
+        /**
          * @public
          * @language zh_CN
          * @classdesc
@@ -440,11 +474,7 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if (this.dirtyWorldDecompose)
-            {
-                math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.dirtyWorldDecompose = false;
-            }
+            this.decomposeWorldMatrix();
             return this.worldTranslate;
         }
 
@@ -457,11 +487,7 @@ namespace gd3d.framework
          */
         getWorldScale()
         {
-            if (this.dirtyWorldDecompose)
-            {
-                math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.dirtyWorldDecompose = false;
-            }
+            this.decomposeWorldMatrix();
             return this.worldScale;
         }
 
@@ -474,11 +500,7 @@ namespace gd3d.framework
          */
         getWorldRotate()
         {
-            if (this.dirtyWorldDecompose)
-            {
-                math.matrix3x2Decompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.dirtyWorldDecompose = false;
-            }
+            this.decomposeWorldMatrix();
             return this.worldRotate;
         }
 
@@ -892,7 +914,7 @@ namespace gd3d.framework
                     for (var i = 0; i <= this.children.length; i++)
                     {
                         var c = this.children[i];
-                        if (c != null)
+                        if (c != null && c.visible)
                             c.onCapturePointEvent(canvas, ev);
                     }
                 }
@@ -947,7 +969,7 @@ namespace gd3d.framework
                     if (ev.eated == false)
                     {
                         var c = this.children[i];
-                        if (c != null)
+                        if (c != null && c.visible )
                             c.onPointEvent(canvas, ev);
                         // if (ev.eated)
                         // {//事件刚刚被吃掉，

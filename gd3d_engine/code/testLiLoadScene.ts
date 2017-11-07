@@ -2,11 +2,36 @@ class test_LiLoadScene implements IState{
 
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application) {
+    start(app: gd3d.framework.application) {       
         console.log("i see you are a dog!");
         this.app = app;
         this.scene = this.app.getScene();
         let name = "1031_gonghuichuangguan_01_128";
+        this.app.getAssetMgr().load("res/scenes/" + name + "/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, (s1)=>{
+            if (s1.isfinish){
+                let index = JSON.parse((this.app.getAssetMgr().getAssetByName("index.json.txt") as gd3d.framework.textasset).content);
+                let totalLength = index[name + ".assetbundle.json"];
+
+                this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json",
+                (s)=>{
+                    if (s.isfinish){
+                    // if(s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded){
+                        isloaded = true;
+                        console.error(s.isfinish);
+
+                        var _scene:gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
+                        var _root = _scene.getSceneRoot();
+                        this.scene.addChild(_root);
+                        // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
+                        _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
+                        _root.markDirty();
+                        this.app.getScene().lightmaps = [];
+                        _scene.useLightMap(this.app.getScene());
+                        _scene.useFog(this.app.getScene());
+                    }
+                });
+            }
+        })
         let isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state)=>{
             if (state.isfinish){
