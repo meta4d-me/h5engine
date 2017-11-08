@@ -4151,6 +4151,7 @@ var gd3d;
             }
             assetBundle.prototype.loadCompressBundle = function (url, onstate, state, assetmgr) {
                 var _this = this;
+                state.totalByteLength = this.totalLength;
                 gd3d.io.loadText(url, function (txt, err) {
                     if (err != null) {
                         state.iserror = true;
@@ -4183,8 +4184,10 @@ var gd3d;
                         this.packages.push(packes[i]);
                     }
                 }
-                if (json["totalLength"] != undefined) {
-                    this.totalLength = json["totalLength"];
+                else {
+                    if (json["totalLength"] != undefined) {
+                        this.totalLength = json["totalLength"];
+                    }
                 }
             };
             assetBundle.prototype.unload = function () {
@@ -4708,11 +4711,21 @@ var gd3d;
                     });
                 }
                 else if (type == AssetTypeEnum.CompressBundle) {
-                    var loadurl = url.replace(".assetbundle.json", ".packs.txt");
-                    var filename = this.getFileName(url);
-                    var ab = new assetBundle(url);
-                    ab.name = filename;
-                    ab.loadCompressBundle(loadurl, onstate, state, this);
+                    gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            curloadinfo.state.iserror = true;
+                            curloadinfo.state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
+                        var loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                        var filename = _this.getFileName(url);
+                        var json = JSON.parse(txt);
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        ab.totalLength = json["totalLength"];
+                        ab.loadCompressBundle(loadurl, onstate, state, _this);
+                    });
                 }
                 else {
                     state.totaltask = 1;
