@@ -18,7 +18,7 @@ varying mediump vec2 _mask_uv;
 varying lowp vec4 v_color;
 void main()
 {
-	lowp vec2 _speed= vec2(_speedu,_speedv);
+	lowp vec2 _speed= vec2(_speedu,-_speedv);
     _maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw + _speed * glstate_timer;
 
     _mask_uv = _glesMultiTexCoord0.xy * _Mask_ST.xy + _Mask_ST.zw;

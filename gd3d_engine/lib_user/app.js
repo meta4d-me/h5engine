@@ -6693,7 +6693,7 @@ var t;
                         }
                     }
                     this.cube = cube;
-                    var tt = new gd3d.framework.transform();
+                    var tt = dome.addcube(this.app.getAssetMgr());
                     this.cube.addChild(tt);
                     tt.localTranslate.z = 1;
                     tt.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
