@@ -26,7 +26,7 @@ void main()
     lowp vec3 specColor=basecolor*_speculerRate*asmcolor.g;
 
     lowp vec2 streamligtuv=normalDir.xy*0.5+_light_uv;
-    lowp vec3 lightcolor=texture2D(_MainTex,streamligtuv).rgb;
+    lowp vec3 lightcolor=texture2D(_streamLight,streamligtuv).rgb;
     lightcolor=min(lightcolor,vec3(asmcolor.b))*_LightColor.rgb*_LightRate;
     
     gl_FragData[0]=vec4(mainTexcolor+specColor+lightcolor,1.0);
