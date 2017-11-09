@@ -218,7 +218,7 @@ namespace gd3d.framework
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
                 var outb = this.nowpose[bone];
                 var tpose = this.tpose[bone];
-                if (outb != undefined)
+                if (outb != undefined || frame == null)
                 {
                     if (this.mix)
                     {

@@ -932,54 +932,6 @@ var test_ChangeMesh = (function () {
     };
     return test_ChangeMesh;
 }());
-var test_drawMesh = (function () {
-    function test_drawMesh() {
-        this.timer = 0;
-    }
-    test_drawMesh.prototype.start = function (app) {
-        var _this = this;
-        console.log("i see you are a dog!");
-        this.app = app;
-        this.scene = this.app.getScene();
-        var name = "0000_fs_female_512";
-        var isloaded = false;
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-            if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        isloaded = true;
-                        console.error(s.isfinish);
-                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                        var _root = _prefab.getCloneTrans();
-                        _this.scene.addChild(_root);
-                        _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                        _root.markDirty();
-                        _this.app.getScene().lightmaps = [];
-                    }
-                });
-            }
-        });
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        objCam.markDirty();
-        CameraController.instance().init(this.app, this.camera);
-    };
-    test_drawMesh.prototype.update = function (delta) {
-        this.timer += delta;
-        CameraController.instance().update(delta);
-        var x = Math.sin(this.timer);
-        var z = Math.cos(this.timer);
-        var x2 = Math.sin(this.timer * 0.5);
-        var z2 = Math.cos(this.timer * 0.5);
-        var objCam = this.camera.gameObject.transform;
-        objCam.markDirty();
-    };
-    return test_drawMesh;
-}());
 var test_fakepbr = (function () {
     function test_fakepbr() {
         this.timer = 0;
