@@ -697,7 +697,8 @@ declare namespace gd3d.framework {
         PackBin = 17,
         PackTxt = 18,
         PathAsset = 19,
-        PVR = 20,
+        KeyFrameAnimaionAsset = 20,
+        PVR = 21,
     }
     enum AssetBundleLoadState {
         None = 0,
@@ -964,6 +965,13 @@ declare namespace gd3d.framework {
     function getFileName(url: string): string;
 }
 declare namespace gd3d.framework {
+    class AssetFactory_KeyframeAnimationPathAsset implements IAssetFactory {
+        newAsset(): keyframeAnimationPathAsset;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyframeAnimationPathAsset): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyframeAnimationPathAsset): void;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_Material implements IAssetFactory {
         newAsset(filename?: string): material;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: material): void;
@@ -1140,6 +1148,33 @@ declare namespace gd3d.framework {
         yOffset: number;
         xAddvance: number;
         static caclByteLength(): number;
+    }
+}
+declare namespace gd3d.framework {
+    class keyframeAnimationPathAsset implements IAsset {
+        private name;
+        private id;
+        defaultAsset: boolean;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        use(): void;
+        beloop: boolean;
+        timeLength: number;
+        positionitems: keyframepathpositionitem[];
+        rotationitmes: keyframepathrotationitem[];
+        Parse(json: JSON): void;
+        unuse(): void;
+        dispose(): void;
+        caclByteLength(): number;
+    }
+    class keyframepathpositionitem {
+        position: gd3d.math.vector3;
+        time: number;
+    }
+    class keyframepathrotationitem {
+        rotation: gd3d.math.quaternion;
+        time: number;
     }
 }
 declare namespace gd3d.framework {
@@ -1793,6 +1828,32 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         remove(): void;
         clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class keyframeanimation implements INodeComponent {
+        private _keyframeasset;
+        private positions;
+        private rotations;
+        private timelength;
+        private beloop;
+        playingtime: number;
+        keyframeasset: keyframeAnimationPathAsset;
+        setkeyframeanimationasst(keyframeanimationpathasset: keyframeAnimationPathAsset): void;
+        isactived: boolean;
+        start(): void;
+        update(delta: number): void;
+        lastpositionindex: number;
+        lastrotationindex: number;
+        private followmove(delta);
+        gameObject: gameObject;
+        private mystrans;
+        remove(): void;
+        clone(): void;
+        play(): void;
+        pause(): void;
+        stop(): void;
+        replay(): void;
     }
 }
 declare namespace gd3d.framework {

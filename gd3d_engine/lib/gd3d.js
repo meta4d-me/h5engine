@@ -4056,7 +4056,8 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["PackBin"] = 17] = "PackBin";
             AssetTypeEnum[AssetTypeEnum["PackTxt"] = 18] = "PackTxt";
             AssetTypeEnum[AssetTypeEnum["PathAsset"] = 19] = "PathAsset";
-            AssetTypeEnum[AssetTypeEnum["PVR"] = 20] = "PVR";
+            AssetTypeEnum[AssetTypeEnum["KeyFrameAnimaionAsset"] = 20] = "KeyFrameAnimaionAsset";
+            AssetTypeEnum[AssetTypeEnum["PVR"] = 21] = "PVR";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var AssetBundleLoadState;
         (function (AssetBundleLoadState) {
@@ -4151,6 +4152,7 @@ var gd3d;
             }
             assetBundle.prototype.loadCompressBundle = function (url, onstate, state, assetmgr) {
                 var _this = this;
+                state.totalByteLength = this.totalLength;
                 gd3d.io.loadText(url, function (txt, err) {
                     if (err != null) {
                         state.iserror = true;
@@ -4183,8 +4185,10 @@ var gd3d;
                         this.packages.push(packes[i]);
                     }
                 }
-                if (json["totalLength"] != undefined) {
-                    this.totalLength = json["totalLength"];
+                else {
+                    if (json["totalLength"] != undefined) {
+                        this.totalLength = json["totalLength"];
+                    }
                 }
             };
             assetBundle.prototype.unload = function () {
@@ -4634,6 +4638,7 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.TextAsset, new framework.AssetFactory_TextAsset());
                 this.regAssetFactory(AssetTypeEnum.PathAsset, new framework.AssetFactory_PathAsset());
                 this.regAssetFactory(AssetTypeEnum.PVR, new framework.AssetFactory_PVR());
+                this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new framework.AssetFactory_KeyframeAnimationPathAsset());
             };
             assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
                 if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1) {
@@ -4708,11 +4713,21 @@ var gd3d;
                     });
                 }
                 else if (type == AssetTypeEnum.CompressBundle) {
-                    var loadurl = url.replace(".assetbundle.json", ".packs.txt");
-                    var filename = this.getFileName(url);
-                    var ab = new assetBundle(url);
-                    ab.name = filename;
-                    ab.loadCompressBundle(loadurl, onstate, state, this);
+                    gd3d.io.loadText(url, function (txt, err) {
+                        if (err != null) {
+                            curloadinfo.state.iserror = true;
+                            curloadinfo.state.errs.push(new Error(err.message));
+                            onstate(state);
+                            return;
+                        }
+                        var loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                        var filename = _this.getFileName(url);
+                        var json = JSON.parse(txt);
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        ab.totalLength = json["totalLength"];
+                        ab.loadCompressBundle(loadurl, onstate, state, _this);
+                    });
                 }
                 else {
                     state.totaltask = 1;
@@ -5011,6 +5026,9 @@ var gd3d;
                     }
                     else if (extname == ".path.json") {
                         return AssetTypeEnum.PathAsset;
+                    }
+                    else if (extname == ".keyFrameAnimationPath.json") {
+                        return AssetTypeEnum.KeyFrameAnimaionAsset;
                     }
                     i = file.indexOf(".", i + 1);
                 }
@@ -5845,6 +5863,42 @@ var gd3d;
             return file;
         }
         framework.getFileName = getFileName;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_KeyframeAnimationPathAsset = (function () {
+            function AssetFactory_KeyframeAnimationPathAsset() {
+            }
+            AssetFactory_KeyframeAnimationPathAsset.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_KeyframeAnimationPathAsset.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _keyframepath = asset ? asset : new framework.keyframeAnimationPathAsset(filename);
+                    _keyframepath.Parse(JSON.parse(txt));
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _keyframepath, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_KeyframeAnimationPathAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var txt = respack[filename];
+                var _keyframepath = asset ? asset : new framework.keyframeAnimationPathAsset(filename);
+                _keyframepath.Parse(JSON.parse(txt));
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _keyframepath, url);
+            };
+            return AssetFactory_KeyframeAnimationPathAsset;
+        }());
+        framework.AssetFactory_KeyframeAnimationPathAsset = AssetFactory_KeyframeAnimationPathAsset;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6760,6 +6814,104 @@ var gd3d;
             return charinfo;
         }());
         framework.charinfo = charinfo;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var keyframeAnimationPathAsset = (function () {
+            function keyframeAnimationPathAsset(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                this.beloop = false;
+                this.positionitems = [];
+                this.rotationitmes = [];
+                if (!assetName) {
+                    assetName = "keyframepath_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            keyframeAnimationPathAsset.prototype.getName = function () {
+                return this.name.getText();
+            };
+            keyframeAnimationPathAsset.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            keyframeAnimationPathAsset.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            keyframeAnimationPathAsset.prototype.Parse = function (json) {
+                var isloop = json["isLoop"];
+                if (isloop == "True") {
+                    this.beloop = true;
+                }
+                else {
+                    this.beloop = false;
+                }
+                this.timeLength = json["timeLength"];
+                var position = json["position"];
+                for (var key in position) {
+                    var item = new keyframepathpositionitem();
+                    var pointnode = position[key];
+                    item.time = pointnode["time"];
+                    var itemposition = pointnode["position"];
+                    var arr = itemposition.split(",");
+                    item.position = new gd3d.math.vector3(parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]));
+                    this.positionitems.push(item);
+                }
+                var rotation = json["rotation"];
+                for (var key in rotation) {
+                    var item1 = new keyframepathrotationitem();
+                    var rotationnode = rotation[key];
+                    item1.time = rotationnode["time"];
+                    var itemrotation = rotationnode["rotation"];
+                    var arr1 = itemrotation.split(",");
+                    item1.rotation = new gd3d.math.quaternion(parseFloat(arr1[0]), parseFloat(arr1[1]), parseFloat(arr1[2]), parseFloat(arr1[3]));
+                    this.rotationitmes.push(item1);
+                }
+            };
+            keyframeAnimationPathAsset.prototype.unuse = function () {
+                framework.sceneMgr.app.getAssetMgr().unuse(this);
+            };
+            keyframeAnimationPathAsset.prototype.dispose = function () {
+                this.positionitems.length = 0;
+                this.rotationitmes.length = 0;
+            };
+            keyframeAnimationPathAsset.prototype.caclByteLength = function () {
+                var number = 0;
+                if (this.positionitems) {
+                    number += this.positionitems.length * 16;
+                }
+                if (this.rotationitmes) {
+                    number += this.rotationitmes.length * 20;
+                }
+                return number;
+            };
+            __decorate([
+                gd3d.reflect.Field("ConstText"),
+                __metadata("design:type", framework.constText)
+            ], keyframeAnimationPathAsset.prototype, "name", void 0);
+            keyframeAnimationPathAsset = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], keyframeAnimationPathAsset);
+            return keyframeAnimationPathAsset;
+        }());
+        framework.keyframeAnimationPathAsset = keyframeAnimationPathAsset;
+        var keyframepathpositionitem = (function () {
+            function keyframepathpositionitem() {
+            }
+            return keyframepathpositionitem;
+        }());
+        framework.keyframepathpositionitem = keyframepathpositionitem;
+        var keyframepathrotationitem = (function () {
+            function keyframepathrotationitem() {
+            }
+            return keyframepathrotationitem;
+        }());
+        framework.keyframepathrotationitem = keyframepathrotationitem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -10675,6 +10827,163 @@ var gd3d;
             return guidpath;
         }());
         framework.guidpath = guidpath;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var keyframeanimation = (function () {
+            function keyframeanimation() {
+                this.timelength = 0;
+                this.beloop = false;
+                this.playingtime = 0;
+                this.isactived = false;
+                this.lastpositionindex = 0;
+                this.lastrotationindex = 0;
+            }
+            Object.defineProperty(keyframeanimation.prototype, "keyframeasset", {
+                get: function () {
+                    return this._keyframeasset;
+                },
+                set: function (keyframeasset) {
+                    if (this._keyframeasset) {
+                        this._keyframeasset.unuse();
+                    }
+                    this._keyframeasset = keyframeasset;
+                    if (this._keyframeasset) {
+                        this._keyframeasset.use();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            keyframeanimation.prototype.setkeyframeanimationasst = function (keyframeanimationpathasset) {
+                this._keyframeasset = keyframeanimationpathasset;
+                if (keyframeanimationpathasset == null) {
+                    console.log(this.gameObject.getName().toString() + ":are you set the right keyframeanimationasset(error:null)?");
+                    return;
+                }
+                this.positions = keyframeanimationpathasset.positionitems;
+                this.rotations = keyframeanimationpathasset.rotationitmes;
+                this.timelength = keyframeanimationpathasset.timeLength;
+                this.beloop = keyframeanimationpathasset.beloop;
+                if (this.positions[0] != null) {
+                    gd3d.math.vec3Clone(this.positions[0].position, this.gameObject.transform.localTranslate);
+                }
+                if (this.rotations[0] != null) {
+                    gd3d.math.quatClone(this.rotations[0].rotation, this.gameObject.transform.localRotate);
+                }
+                this.mystrans = this.gameObject.transform;
+                this.mystrans.markDirty();
+            };
+            keyframeanimation.prototype.start = function () {
+            };
+            keyframeanimation.prototype.update = function (delta) {
+                if (!this.isactived)
+                    return;
+                this.followmove(delta);
+            };
+            keyframeanimation.prototype.followmove = function (delta) {
+                this.playingtime += delta;
+                var lastpositionindex = this.lastpositionindex;
+                var lastrotationindex = this.lastrotationindex;
+                if (this.positions[0] != null) {
+                    if (this.playingtime >= this.positions[this.positions.length - 1].time) {
+                        if (!this.beloop) {
+                            this.isactived = false;
+                        }
+                        else {
+                            this.replay();
+                        }
+                    }
+                    if (lastpositionindex < this.positions.length - 1) {
+                        while (this.playingtime > this.positions[lastpositionindex].time) {
+                            lastpositionindex++;
+                            if (lastpositionindex == this.positions.length - 1)
+                                break;
+                        }
+                    }
+                    if (this.positions[lastpositionindex].time - this.playingtime < 0.016) {
+                        this.mystrans.localTranslate.x = this.positions[lastpositionindex].position.x;
+                        this.mystrans.localTranslate.y = this.positions[lastpositionindex].position.y;
+                        this.mystrans.localTranslate.z = this.positions[lastpositionindex].position.z;
+                        this.mystrans.markDirty();
+                        this.playingtime = this.positions[lastpositionindex].time;
+                    }
+                    else {
+                        var positionlerp = delta / (this.positions[lastpositionindex].time - (this.playingtime - delta));
+                        gd3d.math.vec3SLerp(this.mystrans.localTranslate, this.positions[lastpositionindex].position, positionlerp, this.mystrans.localTranslate);
+                        this.mystrans.markDirty();
+                    }
+                }
+                if (this.rotations[0] != null) {
+                    if (this.playingtime >= this.rotations[this.rotations.length - 1].time) {
+                        if (!this.beloop) {
+                            this.isactived = false;
+                        }
+                        else {
+                            this.replay();
+                        }
+                    }
+                    if (lastrotationindex < this.rotations.length - 1) {
+                        while (this.playingtime > this.rotations[lastrotationindex].time) {
+                            lastrotationindex++;
+                            if (lastrotationindex == this.rotations.length - 1)
+                                break;
+                        }
+                    }
+                    if (this.rotations[lastrotationindex].time - this.playingtime < 0.01) {
+                        this.mystrans.localRotate.x = this.rotations[lastrotationindex].rotation.x;
+                        this.mystrans.localRotate.y = this.rotations[lastrotationindex].rotation.y;
+                        this.mystrans.localRotate.z = this.rotations[lastrotationindex].rotation.z;
+                        this.mystrans.localRotate.w = this.rotations[lastrotationindex].rotation.w;
+                        this.mystrans.markDirty();
+                        this.playingtime = this.rotations[lastrotationindex].time;
+                    }
+                    else {
+                        var rotationlerp = delta / (this.rotations[lastrotationindex].time - (this.playingtime - delta));
+                        gd3d.math.quatLerp(this.mystrans.localRotate, this.rotations[lastrotationindex].rotation, this.mystrans.localRotate, rotationlerp);
+                        this.mystrans.markDirty();
+                    }
+                }
+                this.lastpositionindex = lastpositionindex;
+                this.lastrotationindex = lastrotationindex;
+            };
+            keyframeanimation.prototype.remove = function () {
+                if (this._keyframeasset) {
+                    this._keyframeasset.unuse();
+                }
+            };
+            keyframeanimation.prototype.clone = function () {
+            };
+            keyframeanimation.prototype.play = function () {
+                this.isactived = true;
+            };
+            keyframeanimation.prototype.pause = function () {
+                this.isactived = false;
+            };
+            keyframeanimation.prototype.stop = function () {
+                this.isactived = false;
+            };
+            keyframeanimation.prototype.replay = function () {
+                this.playingtime = 0;
+                this.lastpositionindex = 0;
+                this.lastrotationindex = 0;
+                if (this.positions[0] != null) {
+                    this.mystrans.localTranslate = this.positions[0].position;
+                }
+                if (this.rotations[0] != null) {
+                    this.mystrans.localRotate = this.rotations[0].rotation;
+                }
+                this.isactived = true;
+            };
+            keyframeanimation = __decorate([
+                gd3d.reflect.nodeComponent
+            ], keyframeanimation);
+            return keyframeanimation;
+        }());
+        framework.keyframeanimation = keyframeanimation;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

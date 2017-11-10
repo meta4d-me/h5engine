@@ -143,6 +143,13 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         PathAsset,
+         /**
+         * @public
+         * @language zh_CN
+         * 路径动画
+         * @version egret-gd3d 1.0
+         */
+        KeyFrameAnimaionAsset,        
         /**
          * @public
          * @language zh_CN
@@ -1246,6 +1253,7 @@ namespace gd3d.framework
             // this.regAssetFactory(AssetTypeEnum.PackTxt,new AssetFactory_PackTxt());
             this.regAssetFactory(AssetTypeEnum.PathAsset, new AssetFactory_PathAsset());
             this.regAssetFactory(AssetTypeEnum.PVR, new AssetFactory_PVR());
+            this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset,new AssetFactory_KeyframeAnimationPathAsset());
         }
 
 
@@ -1888,6 +1896,11 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.PathAsset;
                 }
+                else if (extname==".keyFrameAnimationPath.json")
+                {
+                    return AssetTypeEnum.KeyFrameAnimaionAsset;
+                }
+
                 i = file.indexOf(".", i + 1);
             }
             return AssetTypeEnum.Unknown;
