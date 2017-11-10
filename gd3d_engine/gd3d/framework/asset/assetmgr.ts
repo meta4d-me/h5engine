@@ -1569,6 +1569,9 @@ namespace gd3d.framework
                 let _lightmap = {};
                 _lightmap["name"] = lightmaps[str].getName();
                 _lightmaps.push(_lightmap);
+
+                let lightMapUrl = this.getAssetUrl(lightmaps[str]);
+                io.SerializeDependent.resourseDatas.push({ "url": lightMapUrl, "type": io.SaveAssetType.FullUrl });
             }
 
             _scene["rootNode"] = _rootNode;
