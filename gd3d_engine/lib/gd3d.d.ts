@@ -428,6 +428,7 @@ declare namespace gd3d.framework {
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
+        private decomposeWorldMatrix();
         getWorldTranslate(): math.vector2;
         getWorldScale(): math.vector2;
         getWorldRotate(): math.angelref;
@@ -540,6 +541,49 @@ declare namespace gd3d.framework {
         Radial_90 = 2,
         Radial_180 = 3,
         Radial_360 = 4,
+    }
+}
+declare namespace gd3d.framework {
+    class inputField implements IRectRenderer {
+        transform: transform2D;
+        private _frameImage;
+        frameImage: image2D;
+        private customRegexStr;
+        private beFocus;
+        private inputElement;
+        private _text;
+        text: string;
+        myLineType: lineType;
+        myContentType: contentType;
+        private _textLable;
+        TextLabel: label;
+        private _placeholderLabel;
+        PlaceholderLabel: label;
+        updateData(_font: gd3d.framework.font): void;
+        render(canvas: canvas): void;
+        updateTran(): void;
+        start(): void;
+        private inputElmLayout();
+        private textRefresh();
+        update(delta: number): void;
+        remove(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+    enum lineType {
+        SingleLine = 0,
+        MultiLineSubmit = 1,
+        MultiLineNewline = 2,
+    }
+    enum contentType {
+        None = 0,
+        Number = 1,
+        Word = 2,
+        Underline = 4,
+        ChineseCharacter = 8,
+        NoneChineseCharacter = 16,
+        Email = 32,
+        PassWord = 64,
+        Custom = 128,
     }
 }
 declare namespace gd3d.framework {
@@ -1122,6 +1166,7 @@ declare namespace gd3d.framework {
         private _changeShaderMap;
         changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
+        private queue;
         getQueue(): number;
         getShader(): shader;
         private shader;
@@ -2389,6 +2434,92 @@ declare namespace gd3d.math {
     function quaternionFormat(vector: quaternion, maxDot: number, out: quaternion): void;
     function floatFormat(num: number, maxDot: number): number;
     function vec3Equal(vector: vector3, vector2: vector3, threshold?: number): boolean;
+}
+declare namespace gd3d.framework {
+    class navVec3 {
+        x: number;
+        y: number;
+        z: number;
+        clone(): navVec3;
+        static DistAZ(start: navVec3, end: navVec3): number;
+        static NormalAZ(start: navVec3, end: navVec3): navVec3;
+        static Cross(start: navVec3, end: navVec3): navVec3;
+        static DotAZ(start: navVec3, end: navVec3): number;
+        static Angle(start: navVec3, end: navVec3): number;
+        static Border(start: navVec3, end: navVec3, dist: number): navVec3;
+    }
+    class navNode {
+        nodeID: number;
+        poly: number[];
+        borderByPoly: string[];
+        borderByPoint: string[];
+        center: navVec3;
+        genBorder(): void;
+        isLinkTo(info: navMeshInfo, nid: number): string;
+        getLinked(info: navMeshInfo): number[];
+        genCenter(info: navMeshInfo): void;
+    }
+    class navBorder {
+        borderName: string;
+        nodeA: number;
+        nodeB: number;
+        pointA: number;
+        pointB: number;
+        length: number;
+        center: navVec3;
+    }
+    class navMeshInfo {
+        vecs: navVec3[];
+        nodes: navNode[];
+        borders: {
+            [id: string]: navBorder;
+        };
+        min: navVec3;
+        max: navVec3;
+        calcBound(): void;
+        private static cross(p0, p1, p2);
+        inPoly(p: navVec3, poly: number[]): boolean;
+        genBorder(): void;
+        static LoadMeshInfo(s: string): navMeshInfo;
+    }
+}
+declare namespace gd3d.framework {
+    class Navigate {
+        navindexmap: {
+            [id: number]: number;
+        };
+        navinfo: navMeshInfo;
+        constructor(navinfo: gd3d.framework.navMeshInfo, navindexmap: any);
+        pathPoints(start: gd3d.math.vector3, end: gd3d.math.vector3, startIndex: number, endIndex: number): Array<gd3d.math.vector3>;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class NavMeshLoadManager {
+        private static _instance;
+        private navMeshVertexOffset;
+        navMesh: gd3d.framework.mesh;
+        private app;
+        navigate: gd3d.framework.Navigate;
+        navTrans: gd3d.framework.transform;
+        constructor();
+        loadNavMesh(navMeshUrl: string, app: gd3d.framework.application, onstate?: (state: stateLoad) => void): void;
+        private navmeshLoaded(dataStr, callback);
+        private createMesh(meshData, webgl);
+        showNavmesh(isshow: boolean): void;
+        dispose(): void;
+        static readonly Instance: NavMeshLoadManager;
+        moveToPoints(startPos: gd3d.math.vector3, endPos: gd3d.math.vector3): Array<gd3d.math.vector3>;
+        static findtriIndex(point: gd3d.math.vector3, trans: gd3d.framework.transform): number;
+    }
+}
+declare namespace gd3d.framework {
+    class pathFinding {
+        static calcAStarPolyPath(info: navMeshInfo, startPoly: number, endPoly: number, endPos?: navVec3, offset?: number): number[];
+        private static NearAngle(a, b);
+        static FindPath(info: navMeshInfo, startPos: navVec3, endPos: navVec3, offset?: number): navVec3[];
+        static calcWayPoints(info: navMeshInfo, startPos: navVec3, endPos: navVec3, polyPath: number[], offset?: number): navVec3[];
+    }
 }
 declare namespace gd3d.framework {
     class EffectSystemData {

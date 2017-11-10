@@ -178,6 +178,9 @@ namespace gd3d.framework
             {
                 this.keyboardMap[ev.keyCode] = false;
             }, false);
+            app.webgl.canvas.addEventListener("blur",(ev:KeyboardEvent)=>{
+                this.point.touch = false;
+            },false);
         }
 
         private tempV2_0:gd3d.math.vector2;

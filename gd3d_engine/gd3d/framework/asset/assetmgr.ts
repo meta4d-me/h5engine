@@ -399,6 +399,7 @@ namespace gd3d.framework
         }
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr)
         {
+            state.totalByteLength = this.totalLength;
             gd3d.io.loadText(url, (txt, err) =>
             {
                 if (err != null)
@@ -449,11 +450,12 @@ namespace gd3d.framework
                 {
                     this.packages.push(packes[i]);
                 }
-            }
-            if (json["totalLength"] != undefined)
-            {
-                this.totalLength = json["totalLength"];
-            }
+            }else {
+                if (json["totalLength"] != undefined)
+                {
+                    this.totalLength = json["totalLength"];
+                }
+            }            
         }
         /**
          * @public
@@ -1351,25 +1353,52 @@ namespace gd3d.framework
                         onstate(state);
                         return;
                     }
-                    let filename = this.getFileName(url);
-
-                    var ab = new assetBundle(url);
-                    ab.name = filename;
-                    ab.parse(JSON.parse(txt));
-                    ab.load(this, onstate, state);
+                    let json = JSON.parse(txt);
+                    let filename = "";
+                    if (json["files"]){
+                        filename = this.getFileName(url);
+                        
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        ab.parse(JSON.parse(txt));
+                        ab.load(this, onstate, state);
+                    }else{
+                        let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                        filename = this.getFileName(url);
+    
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        ab.totalLength = json["totalLength"];
+                        ab.loadCompressBundle(loadurl, onstate, state, this);
+                    }
+                  
 
                     this.mapBundle[filename] = ab;
                 });
             }
             else if (type == AssetTypeEnum.CompressBundle)
             {
-                //压缩的bundle在packs.txt中
-                let loadurl = url.replace(".assetbundle.json", ".packs.txt");
-                let filename = this.getFileName(url);
+                gd3d.io.loadText(url, (txt, err) =>
+                {
+                    if (err != null)
+                    {
+                        curloadinfo.state.iserror = true;
+                        curloadinfo.state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
 
-                var ab = new assetBundle(url);
-                ab.name = filename;
-                ab.loadCompressBundle(loadurl, onstate, state, this);
+                    //压缩的bundle在packs.txt中
+                    let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                    let filename = this.getFileName(url);
+                    let json = JSON.parse(txt);
+
+                    var ab = new assetBundle(url);
+                    ab.name = filename;
+                    ab.totalLength = json["totalLength"];
+                    ab.loadCompressBundle(loadurl, onstate, state, this);
+                });
+                
             }
             else
             {

@@ -14,6 +14,218 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var demo_ScreenRange = (function () {
+    function demo_ScreenRange() {
+        this.cameraCount = 0;
+        this.windowRate = 0.5;
+        this.windowHorizon = true;
+        this.timer = 0;
+        this.movetarget = new gd3d.math.vector3();
+        this.pointDown = false;
+    }
+    demo_ScreenRange.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.inputMgr = this.app.getInputMgr();
+        this.scene = this.app.getScene();
+        Test_CameraController.instance().init(this.app);
+        this.outcontainer = document.getElementById("drawarea");
+        var cuber;
+        console.warn("Finish it.");
+        var cube = new gd3d.framework.transform();
+        cube.name = "cube";
+        cube.localScale.x = 10;
+        cube.localScale.y = 0.1;
+        cube.localScale.z = 10;
+        this.scene.addChild(cube);
+        var mesh = cube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("pyramid");
+        mesh.mesh = (this.app.getAssetMgr().getDefaultMesh("cube"));
+        var renderer = cube.gameObject.addComponent("meshRenderer");
+        cube.gameObject.addComponent("boxcollider");
+        cube.markDirty();
+        cuber = renderer;
+        this.cube = cube;
+        {
+            this.cube2 = new gd3d.framework.transform();
+            this.cube2.name = "cube2";
+            this.scene.addChild(this.cube2);
+            this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 1;
+            this.cube2.localTranslate.x = -5;
+            this.cube2.markDirty();
+            var mesh = this.cube2.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube2.gameObject.addComponent("meshRenderer");
+            var coll = this.cube2.gameObject.addComponent("spherecollider");
+            coll.center = new gd3d.math.vector3(0, 1, 0);
+            coll.radius = 1;
+        }
+        this.cube3 = this.cube2.clone();
+        this.scene.addChild(this.cube3);
+        {
+            this.cube3 = new gd3d.framework.transform();
+            this.cube3.name = "cube3";
+            this.scene.addChild(this.cube3);
+            this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
+            this.cube3.localTranslate.x = -5;
+            this.cube3.markDirty();
+            var mesh = this.cube3.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube3.gameObject.addComponent("meshRenderer");
+            var coll = this.cube3.gameObject.addComponent("boxcollider");
+            coll.colliderVisible = true;
+        }
+        {
+            this.cube4 = new gd3d.framework.transform();
+            this.cube4.name = "cube4";
+            this.scene.addChild(this.cube4);
+            this.cube4.localScale.x = this.cube4.localScale.y = this.cube4.localScale.z = 1;
+            this.cube4.localTranslate.x = 5;
+            this.cube4.markDirty();
+            var mesh = this.cube4.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube4.gameObject.addComponent("meshRenderer");
+            var coll = this.cube4.gameObject.addComponent("boxcollider");
+            coll.colliderVisible = true;
+        }
+        {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera");
+            this.camera.near = 0.01;
+            this.camera.far = 100;
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+            objCam.lookat(this.cube);
+            this.camera.viewport = new gd3d.math.rect(0, 0, 0.5, 1);
+            console.log("this camera: " + this.camera.viewport);
+            objCam.markDirty();
+        }
+        {
+            var objCam2 = new gd3d.framework.transform();
+            objCam2.name = "sth2.";
+            this.scene.addChild(objCam2);
+            var _camera = objCam2.gameObject.addComponent("camera");
+            _camera.near = 0.01;
+            _camera.far = 100;
+            _camera.clearOption_Color = false;
+            _camera.order = 2;
+            objCam2.localTranslate = new gd3d.math.vector3(0, 10, -10);
+            objCam2.lookat(this.cube);
+            _camera.viewport = new gd3d.math.rect(0.5, 0, 0.5, 1);
+            objCam2.markDirty();
+            this.camera1 = _camera;
+            this.app.webgl.canvas.addEventListener("mousemove", function (ev) {
+                var screenRect = _this.outcontainer.getBoundingClientRect();
+                var xRate = ev.clientX / screenRect.width;
+                var yRate = 1 - ev.clientY / screenRect.height;
+                if (_this.windowHorizon) {
+                    if (xRate < _this.windowRate) {
+                        _this.targetCamera = _this.camera;
+                        _this.cameraCount = 0;
+                    }
+                    else {
+                        _this.targetCamera = _camera;
+                        _this.cameraCount = 1;
+                    }
+                }
+                else {
+                    if (yRate < _this.windowRate) {
+                        _this.targetCamera = _this.camera;
+                        _this.cameraCount = 0;
+                    }
+                    else {
+                        _this.targetCamera = _camera;
+                        _this.cameraCount = 1;
+                    }
+                }
+                Test_CameraController.instance().decideCam(_this.targetCamera);
+            });
+        }
+        {
+            var button1 = document.createElement("button");
+            button1.textContent = "横屏/竖屏";
+            button1.onclick = function () {
+                _this.windowHorizon = _this.windowHorizon ? false : true;
+                if (_this.windowHorizon) {
+                    _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
+                    _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
+                }
+                else {
+                    _this.camera.viewport = new gd3d.math.rect(0, 0, 1, _this.windowRate);
+                    _this.camera1.viewport = new gd3d.math.rect(0, _this.windowRate, 1, 1 - _this.windowRate);
+                }
+            };
+            button1.style.top = "130px";
+            button1.style.position = "absolute";
+            this.app.container.appendChild(button1);
+            var input = document.createElement("input");
+            input.type = "range";
+            input.valueAsNumber = this.windowRate * 100;
+            input.oninput = function (e) {
+                _this.windowRate = input.valueAsNumber / 100;
+                if (_this.windowHorizon) {
+                    _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
+                    _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
+                }
+                else {
+                    _this.camera.viewport = new gd3d.math.rect(0, 0, 1, _this.windowRate);
+                    _this.camera1.viewport = new gd3d.math.rect(0, _this.windowRate, 1, 1 - _this.windowRate);
+                }
+            };
+            input.style.top = "190px";
+            input.style.position = "absolute";
+            this.app.container.appendChild(input);
+        }
+    };
+    demo_ScreenRange.prototype.update = function (delta) {
+        Test_CameraController.instance().update(delta);
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            var ray;
+            if (this.windowHorizon) {
+                if (this.cameraCount == 0) {
+                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
+                }
+                else if (this.cameraCount == 1) {
+                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x - this.app.webgl.canvas.width * this.windowRate, this.inputMgr.point.y), this.app);
+                }
+            }
+            else {
+                if (this.cameraCount == 0) {
+                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y - this.app.webgl.canvas.height * (1 - this.windowRate)), this.app);
+                }
+                else if (this.cameraCount == 1) {
+                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
+                }
+            }
+            console.log("inputMgr.point: " + new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y));
+            var pickinfo = this.scene.pick(ray);
+            if (pickinfo != null) {
+                this.movetarget = pickinfo.hitposition;
+                this.timer = 0;
+            }
+        }
+        this.pointDown = this.inputMgr.point.touch;
+        var tv = new gd3d.math.vector3();
+        this.cube2.localTranslate = this.movetarget;
+        this.cube2.markDirty();
+        if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
+            return;
+        }
+        this.timer += delta;
+        this.cube3.localTranslate.x += delta;
+        this.cube3.markDirty();
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.1);
+        var z2 = Math.cos(this.timer * 0.1);
+        var tv = new gd3d.math.vector3();
+        gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
+        this.cube2.markDirty();
+    };
+    return demo_ScreenRange;
+}());
 var t;
 (function (t) {
     var light_d1 = (function () {
@@ -363,9 +575,14 @@ var main = (function () {
         this.addBtn("example_newObject", function () { return new test_NewGameObject; });
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
+        this.addBtn("example_Sound", function () { return new test_Sound(); });
+        this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
+        this.addBtn("demo_ScreenRange", function () { return new demo_ScreenRange(); });
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
         this.addBtn("test_UI_component", function () { return new test_UI_Component(); });
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
+        this.addBtn("cj_zs", function () { return new dome.testCJ(); });
+        this.addBtn("cj_zs_effect", function () { return new dome.db_test_eff(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -937,6 +1154,32 @@ var t;
     }());
     t.test_rendertexture = test_rendertexture;
 })(t || (t = {}));
+var test_loadCompressUseAssetbundle = (function () {
+    function test_loadCompressUseAssetbundle() {
+    }
+    test_loadCompressUseAssetbundle.prototype.start = function (app) {
+        var _this = this;
+        console.log("i see you are a dog!");
+        this.app = app;
+        this.scene = this.app.getScene();
+        var url = "res/prefabs/0001_ss_female/";
+        var name = "0001_ss_female";
+        var end = ".assetbundle.json";
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.app.getAssetMgr().loadCompressBundle(url + name + end, function (s) {
+                    console.error("compressTextLoaded = " + s.compressTextLoaded);
+                    console.error("progress = " + s.progress);
+                    console.error("totalByteLength = " + s.totalByteLength);
+                    console.error("curByteLength = " + s.curByteLength);
+                });
+            }
+        });
+    };
+    test_loadCompressUseAssetbundle.prototype.update = function (delta) {
+    };
+    return test_loadCompressUseAssetbundle;
+}());
 var demo;
 (function (demo) {
     var DragonTest = (function () {
@@ -1074,6 +1317,236 @@ var test_NewScene = (function () {
     test_NewScene.prototype.update = function (delta) {
     };
     return test_NewScene;
+}());
+var test_RangeScreen = (function () {
+    function test_RangeScreen() {
+        this.timer = 0;
+        this.movetarget = new gd3d.math.vector3();
+        this.pointDown = false;
+    }
+    test_RangeScreen.prototype.start = function (app) {
+        console.log("i am here.");
+        this.app = app;
+        this.inputMgr = this.app.getInputMgr();
+        this.scene = this.app.getScene();
+        var cuber;
+        console.warn("Finish it.");
+        var cube = new gd3d.framework.transform();
+        cube.name = "cube";
+        cube.localScale.x = 10;
+        cube.localScale.y = 0.1;
+        cube.localScale.z = 10;
+        this.scene.addChild(cube);
+        var mesh = cube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("pyramid");
+        mesh.mesh = (this.app.getAssetMgr().getDefaultMesh("cube"));
+        var renderer = cube.gameObject.addComponent("meshRenderer");
+        cube.gameObject.addComponent("boxcollider");
+        cube.markDirty();
+        cuber = renderer;
+        this.cube = cube;
+        {
+            this.cube2 = new gd3d.framework.transform();
+            this.cube2.name = "cube2";
+            this.scene.addChild(this.cube2);
+            this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 1;
+            this.cube2.localTranslate.x = -5;
+            this.cube2.markDirty();
+            var mesh = this.cube2.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube2.gameObject.addComponent("meshRenderer");
+            var coll = this.cube2.gameObject.addComponent("spherecollider");
+            coll.center = new gd3d.math.vector3(0, 1, 0);
+            coll.radius = 1;
+        }
+        this.cube3 = this.cube2.clone();
+        this.scene.addChild(this.cube3);
+        {
+            this.cube3 = new gd3d.framework.transform();
+            this.cube3.name = "cube3";
+            this.scene.addChild(this.cube3);
+            this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
+            this.cube3.localTranslate.x = -5;
+            this.cube3.markDirty();
+            var mesh = this.cube3.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube3.gameObject.addComponent("meshRenderer");
+            var coll = this.cube3.gameObject.addComponent("boxcollider");
+            coll.colliderVisible = true;
+        }
+        {
+            this.cube4 = new gd3d.framework.transform();
+            this.cube4.name = "cube4";
+            this.scene.addChild(this.cube4);
+            this.cube4.localScale.x = this.cube4.localScale.y = this.cube4.localScale.z = 1;
+            this.cube4.localTranslate.x = 5;
+            this.cube4.markDirty();
+            var mesh = this.cube4.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = this.cube4.gameObject.addComponent("meshRenderer");
+            var coll = this.cube4.gameObject.addComponent("boxcollider");
+            coll.colliderVisible = true;
+        }
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.lookat(this.cube);
+        this.camera.viewport = new gd3d.math.rect(0, 0, 0.5, 0.5);
+        console.log("this camera: " + this.camera.viewport);
+        objCam.markDirty();
+        {
+            var objCam2 = new gd3d.framework.transform();
+            objCam2.name = "sth2.";
+            this.scene.addChild(objCam2);
+            var _camera = objCam2.gameObject.addComponent("camera");
+            _camera.near = 0.01;
+            _camera.far = 100;
+            _camera.clearOption_Color = false;
+            _camera.order = 2;
+            objCam2.localTranslate = new gd3d.math.vector3(0, 5, -10);
+            objCam2.lookat(this.cube);
+            _camera.viewport = new gd3d.math.rect(0.5, 0.5, 0.5, 0.5);
+            objCam2.markDirty();
+        }
+        {
+            var objCam2 = new gd3d.framework.transform();
+            objCam2.name = "sth2.";
+            this.scene.addChild(objCam2);
+            var _camera = objCam2.gameObject.addComponent("camera");
+            _camera.near = 0.01;
+            _camera.far = 100;
+            _camera.clearOption_Color = false;
+            _camera.order = 3;
+            objCam2.localTranslate = new gd3d.math.vector3(0, 8, -10);
+            objCam2.lookat(this.cube);
+            _camera.viewport = new gd3d.math.rect(0.5, 0, 0.5, 0.5);
+            objCam2.markDirty();
+        }
+        {
+            var objCam2 = new gd3d.framework.transform();
+            objCam2.name = "sth2.";
+            this.scene.addChild(objCam2);
+            var _camera = objCam2.gameObject.addComponent("camera");
+            _camera.near = 0.01;
+            _camera.far = 100;
+            _camera.clearOption_Color = false;
+            _camera.order = 4;
+            objCam2.localTranslate = new gd3d.math.vector3(0, 8, -10);
+            objCam2.lookat(this.cube);
+            _camera.viewport = new gd3d.math.rect(0, 0.5, 0.5, 0.5);
+            objCam2.markDirty();
+        }
+    };
+    test_RangeScreen.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
+            var pickinfo = this.scene.pick(ray);
+            if (pickinfo != null) {
+                this.movetarget = pickinfo.hitposition;
+                this.timer = 0;
+            }
+        }
+        this.pointDown = this.inputMgr.point.touch;
+        if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
+            return;
+        }
+        this.timer += delta;
+        this.cube3.localTranslate.x += delta;
+        this.cube3.markDirty();
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        var x2 = Math.sin(this.timer * 0.1);
+        var z2 = Math.cos(this.timer * 0.1);
+    };
+    return test_RangeScreen;
+}());
+var test_Sound = (function () {
+    function test_Sound() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.time = 0;
+    }
+    test_Sound.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_Sound.prototype.loadTexture = function (laststate, state) {
+        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_Sound.prototype.addCam = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "Main Camera";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    test_Sound.prototype.addCube = function (laststate, state) {
+        var objCube = new gd3d.framework.transform();
+        objCube.name = "Cube";
+        this.scene.addChild(objCube);
+        objCube.localScale.x = objCube.localScale.y = objCube.localScale.z = 1;
+        objCube.localTranslate = new gd3d.math.vector3(0, 0, 0);
+        var mesh = objCube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        mesh.mesh = (smesh);
+        var render = objCube.gameObject.addComponent("meshRenderer");
+        var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+        if (sh != null) {
+            render.materials = [];
+            render.materials.push(new gd3d.framework.material());
+            render.materials[0].setShader(sh);
+            var texture0 = this.app.getAssetMgr().getAssetByName("zg256.png");
+            render.materials[0].setTexture("_MainTex", texture0);
+        }
+        this.cube = objCube;
+        this.cube.markDirty();
+        state.finish = true;
+    };
+    test_Sound.prototype.addBtnLoadSound = function (laststate, state) {
+    };
+    test_Sound.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.addCam.bind(this));
+        this.taskmgr.addTaskCall(this.addCube.bind(this));
+    };
+    test_Sound.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+        this.time += delta;
+        if (this.cube != null) {
+            var cubeTrans = this.cube.gameObject.transform;
+            var yRoate = (this.time * 30) % 360;
+            var yQuaternion = gd3d.math.pool.new_quaternion();
+            gd3d.math.quatFromEulerAngles(0, yRoate, 0, yQuaternion);
+            cubeTrans.localRotate = yQuaternion;
+            cubeTrans.markDirty();
+            console.log(this.time);
+        }
+    };
+    return test_Sound;
 }());
 var ShockType;
 (function (ShockType) {
@@ -2250,7 +2723,7 @@ var test_UI_Component = (function () {
         bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
         var lab_t = new gd3d.framework.transform2D;
         lab_t.width = 120;
-        lab_t.height = 30;
+        lab_t.height = 24;
         lab_t.localTranslate.x = 10;
         lab_t.localTranslate.y = 30;
         bg_t.addChild(lab_t);
@@ -2273,9 +2746,11 @@ var test_UI_Component = (function () {
         btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
         btn_b.pressedColor = new gd3d.math.color(1, 1, 1, 1);
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        btn_t.visible = false;
+        var closeSce = 0.8;
         var close_bt = new gd3d.framework.transform2D;
-        close_bt.width = 25;
-        close_bt.height = 25;
+        close_bt.width = 25 * closeSce;
+        close_bt.height = 25 * closeSce;
         close_bt.pivot.x = 0;
         close_bt.pivot.y = 0;
         close_bt.localTranslate.x = 370;
@@ -2288,6 +2763,7 @@ var test_UI_Component = (function () {
         close_b.transition = gd3d.framework.TransitionType.SpriteSwap;
         var nums = "45789";
         var scale = 0.6;
+        var numIconarr = [];
         for (var i = 0; i < nums.length; i++) {
             var spt_t = new gd3d.framework.transform2D;
             spt_t.width = 32 * scale;
@@ -2299,7 +2775,59 @@ var test_UI_Component = (function () {
             bg_t.addChild(spt_t);
             var spt = spt_t.addComponent("image2D");
             spt.sprite = atlasComp.sprites["ui_lianji_" + nums[i]];
+            numIconarr.push(spt);
         }
+        btn_b.onClick.addListener(function () {
+            var temp = "";
+            for (var i = 0; i < nums.length; i++) {
+                var num = Number(nums[i]);
+                num++;
+                num = num % 10;
+                numIconarr[i].sprite = atlasComp.sprites["ui_lianji_" + num];
+                numIconarr[i].transform.markDirty();
+                temp += num.toString();
+            }
+            nums = temp;
+        });
+        var iptFrame_t = new gd3d.framework.transform2D;
+        iptFrame_t.width = 120;
+        iptFrame_t.height = 30;
+        iptFrame_t.pivot.x = 0;
+        iptFrame_t.pivot.y = 0;
+        iptFrame_t.localTranslate.x = 10;
+        iptFrame_t.localTranslate.y = 160;
+        bg_t.addChild(iptFrame_t);
+        var ipt = iptFrame_t.addComponent("inputField");
+        var img_t = new gd3d.framework.transform2D;
+        img_t.width = iptFrame_t.width;
+        img_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(img_t);
+        ipt.frameImage = img_t.addComponent("image2D");
+        ipt.frameImage.sprite = atlasComp.sprites["ui_public_input"];
+        ipt.frameImage.imageType = gd3d.framework.ImageType.Sliced;
+        ipt.frameImage.sprite.border = new gd3d.math.border(16, 14, 16, 14);
+        var text_t = new gd3d.framework.transform2D;
+        text_t.width = iptFrame_t.width;
+        text_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(text_t);
+        ipt.TextLabel = text_t.addComponent("label");
+        ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.TextLabel.fontsize = 24;
+        ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
+        var p_t = new gd3d.framework.transform2D;
+        p_t.width = iptFrame_t.width;
+        p_t.height = iptFrame_t.height;
+        iptFrame_t.addChild(p_t);
+        ipt.PlaceholderLabel = p_t.addComponent("label");
+        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.PlaceholderLabel.fontsize = 24;
+        ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
+        test_UI_Component.temp = iptFrame_t;
+        var inputMgr = this.app.getInputMgr();
+        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
+            if (ev.keyCode == 81) {
+            }
+        }, false);
         state.finish = true;
     };
     test_UI_Component.prototype.loadTexture = function (lastState, state) {
@@ -3505,28 +4033,22 @@ var test_LiLoadScene = (function () {
         console.log("i see you are a dog!");
         this.app = app;
         this.scene = this.app.getScene();
-        var name = "1031_gonghuichuangguan_01_128";
+        var name = "yongzhedalu_02_1024";
         var isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/" + name + "/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                    if (s1.isfinish) {
-                        var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
-                        var totalLength = index[name + ".assetbundle.json"];
-                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json", function (s) {
-                            if (s.isfinish) {
-                                isloaded = true;
-                                console.error(s.isfinish);
-                                var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
-                                var _root = _scene.getSceneRoot();
-                                _this.scene.addChild(_root);
-                                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                                _root.markDirty();
-                                _this.app.getScene().lightmaps = [];
-                                _scene.useLightMap(_this.app.getScene());
-                                _scene.useFog(_this.app.getScene());
-                            }
-                        });
+                _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        isloaded = true;
+                        console.error(s.isfinish);
+                        var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                        var _root = _scene.getSceneRoot();
+                        _this.scene.addChild(_root);
+                        _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                        _root.markDirty();
+                        _this.app.getScene().lightmaps = [];
+                        _scene.useLightMap(_this.app.getScene());
+                        _scene.useFog(_this.app.getScene());
                     }
                 });
             }
@@ -3535,8 +4057,8 @@ var test_LiLoadScene = (function () {
         objCam.name = "sth.";
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
-        objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.localTranslate = new gd3d.math.vector3(105, 53, 57);
+        objCam.lookatPoint(new gd3d.math.vector3(105, 53, 70));
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
     };
@@ -3548,7 +4070,6 @@ var test_LiLoadScene = (function () {
         var x2 = Math.sin(this.timer * 0.5);
         var z2 = Math.cos(this.timer * 0.5);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
         objCam.markDirty();
     };
     return test_LiLoadScene;
@@ -4343,12 +4864,17 @@ var test_multipleplayer_anim = (function () {
 var test_navmesh = (function () {
     function test_navmesh() {
         this.timer = 0;
+        this.movetarget = new gd3d.math.vector3();
+        this.pointDown = false;
+        this.pos = [];
     }
     test_navmesh.prototype.start = function (app) {
         var _this = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.navMeshLoader = gd3d.framework.NavMeshLoadManager.Instance;
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
@@ -4356,440 +4882,57 @@ var test_navmesh = (function () {
         this.camera.near = 0.01;
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        gd3d.io.loadText("res/navinfo.json", function (text, error) {
-            _this.navmeshLoaded(text);
-            objCam.lookat(_this.navObj);
+        this.navMeshLoader.loadNavMesh("res/navinfo.json", app, function (s) {
+            objCam.lookat(_this.navMeshLoader.navTrans);
             objCam.markDirty();
         });
-    };
-    test_navmesh.prototype.navmeshLoaded = function (dataStr) {
-        console.warn("navmeshLoaded");
-        this.navObj = new gd3d.framework.transform();
-        this.navObj.name = "navMesh";
-        var meshD = new gd3d.render.meshData();
-        meshD.pos = [];
-        meshD.trisindex = [];
-        var navinfo = lighttool.NavMesh.navMeshInfo.LoadMeshInfo(dataStr);
-        for (var i = 0; i < navinfo.vecs.length; i++) {
-            var v = navinfo.vecs[i];
-            meshD.pos[i] = new gd3d.math.vector3(v.x, v.y, v.z);
-        }
-        var navindexmap = {};
-        var indexDatas = [];
-        for (var i = 0; i < navinfo.nodes.length; i++) {
-            var poly = navinfo.nodes[i].poly;
-            for (var fc = 0; fc < poly.length - 2; fc++) {
-                var sindex = indexDatas.length / 3;
-                navindexmap[sindex] = i;
-                indexDatas.push(poly[0]);
-                indexDatas.push(poly[fc + 2]);
-                indexDatas.push(poly[fc + 1]);
-            }
-        }
-        meshD.trisindex = indexDatas;
-        var meshFiter = this.navObj.gameObject.addComponent("meshFilter");
-        var mesh = this.createMesh(meshD, this.app.webgl);
-        meshFiter.mesh = mesh;
-        var renderer = this.navObj.gameObject.addComponent("meshRenderer");
-        this.app.getScene().addChild(this.navObj);
-        this.navObj.markDirty();
-    };
-    test_navmesh.prototype.createMesh = function (meshData, webgl) {
-        var _mesh = new gd3d.framework.mesh("NavMesh" + ".mesh.bin");
-        _mesh.data = meshData;
-        var vf = gd3d.render.VertexFormatMask.Position;
-        var v32 = _mesh.data.genVertexDataArray(vf);
-        var i16 = _mesh.data.genIndexDataArray();
-        _mesh.glMesh = new gd3d.render.glMesh();
-        _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-        _mesh.glMesh.uploadVertexData(webgl, v32);
-        _mesh.glMesh.addIndex(webgl, i16.length);
-        _mesh.glMesh.uploadIndexData(webgl, 0, i16);
-        _mesh.submesh = [];
-        {
-            var sm = new gd3d.framework.subMeshInfo();
-            sm.matIndex = 0;
-            sm.useVertexIndex = 0;
-            sm.start = 0;
-            sm.size = i16.length;
-            sm.line = false;
-            _mesh.submesh.push(sm);
-        }
-        return _mesh;
+        var array = this.navMeshLoader.moveToPoints(new gd3d.math.vector3(-2.635004384225666, 0.033333320000000555, 2.331812147285282), new gd3d.math.vector3(3.2923403637954975, 0.03333331999999878, -1.158075981081689));
+        console.error(JSON.stringify(array));
+        var cuber;
+        this.cube = new gd3d.framework.transform();
+        this.cube.name = "cube";
+        this.cube.localScale.x = 1;
+        this.cube.localScale.y = 1;
+        this.cube.localScale.z = 1;
+        this.scene.addChild(this.cube);
+        var mesh = this.cube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("pyramid");
+        mesh.mesh = (this.app.getAssetMgr().getDefaultMesh("cube"));
+        var renderer = this.cube.gameObject.addComponent("meshRenderer");
+        var col = this.cube.gameObject.addComponent("boxcollider");
+        col.colliderVisible = true;
+        this.cube.markDirty();
+        cuber = renderer;
+        this.scene.addChild(this.cube);
+        var array = this.navMeshLoader.moveToPoints(new gd3d.math.vector3(-2.635004384225666, 0.033333320000000555, 2.331812147285282), new gd3d.math.vector3(3.2923403637954975, 0.03333331999999878, -1.158075981081689));
+        console.error(JSON.stringify(array));
     };
     test_navmesh.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            this.pickDown();
+        }
+        this.pointDown = this.inputMgr.point.touch;
+    };
+    test_navmesh.prototype.pickDown = function () {
+        var navTrans = this.navMeshLoader.navTrans;
+        var navmesh = this.navMeshLoader.navMesh;
+        if (navmesh == null)
+            return;
+        var inputMgr = this.app.getInputMgr();
+        var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
+        var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
+        if (!pickinfo)
+            return;
+        var endPos = pickinfo.hitposition;
+        console.error(endPos);
+        this.pos.push(endPos);
+        if (this.pos.length > 1) {
+            var a = this.navMeshLoader.moveToPoints(this.pos.pop(), this.pos.pop());
+            console.error(a);
+        }
     };
     return test_navmesh;
 }());
-var lighttool;
-(function (lighttool) {
-    var NavMesh;
-    (function (NavMesh) {
-        var navVec3 = (function () {
-            function navVec3() {
-                this.x = 0;
-                this.y = 0;
-                this.z = 0;
-            }
-            navVec3.prototype.clone = function () {
-                var navVec = new navVec3();
-                navVec.x = this.x;
-                navVec.y = this.y;
-                navVec.z = this.z;
-                return navVec;
-            };
-            navVec3.DistAZ = function (start, end) {
-                var num = end.x - start.x;
-                var num2 = end.z - start.z;
-                return Math.sqrt(num * num + num2 * num2);
-            };
-            navVec3.NormalAZ = function (start, end) {
-                var num = end.x - start.x;
-                var num2 = end.z - start.z;
-                var num3 = Math.sqrt(num * num + num2 * num2);
-                var navVec = new navVec3();
-                navVec.x = num / num3;
-                navVec.y = 0.0;
-                navVec.z = num2 / num3;
-                return navVec;
-            };
-            navVec3.Cross = function (start, end) {
-                var navVec = new navVec3();
-                navVec.x = start.y * end.z - start.z * end.y;
-                navVec.y = start.z * end.x - start.x * end.z;
-                navVec.z = start.x * end.y - start.y * end.x;
-                return navVec;
-            };
-            navVec3.DotAZ = function (start, end) {
-                return start.x * end.x + start.z * end.z;
-            };
-            navVec3.Angle = function (start, end) {
-                var d = start.x * end.x + start.z * end.z;
-                var navVec = navVec3.Cross(start, end);
-                var num = Math.acos(d);
-                var flag = navVec.y < 0.0;
-                if (flag) {
-                    num = -num;
-                }
-                return num;
-            };
-            navVec3.Border = function (start, end, dist) {
-                var navVec = navVec3.NormalAZ(start, end);
-                var navVec2 = new navVec3();
-                navVec2.x = start.x + navVec.x * dist;
-                navVec2.y = start.y + navVec.y * dist;
-                navVec2.z = start.z + navVec.z * dist;
-                return navVec2;
-            };
-            return navVec3;
-        }());
-        NavMesh.navVec3 = navVec3;
-        var navNode = (function () {
-            function navNode() {
-                this.nodeID = 0;
-                this.poly = null;
-                this.borderByPoly = null;
-                this.borderByPoint = null;
-                this.center = null;
-            }
-            navNode.prototype.genBorder = function () {
-                var list = [];
-                for (var i = 0; i < this.poly.length; i = i + 1) {
-                    var num = i;
-                    var num2 = i + 1;
-                    var flag = num2 >= this.poly.length;
-                    if (flag) {
-                        num2 = 0;
-                    }
-                    var num3 = this.poly[num];
-                    var num4 = this.poly[num2];
-                    var flag2 = num3 < num4;
-                    if (flag2) {
-                        list.push(num3 + "-" + num4);
-                    }
-                    else {
-                        list.push(num4 + "-" + num3);
-                    }
-                }
-                this.borderByPoint = list;
-            };
-            navNode.prototype.isLinkTo = function (info, nid) {
-                var flag = this.nodeID === nid;
-                var result;
-                if (flag) {
-                    result = null;
-                }
-                else {
-                    var flag2 = nid < 0;
-                    if (flag2) {
-                        result = null;
-                    }
-                    else {
-                        var array = this.borderByPoly;
-                        for (var i = 0; i < array.length; i = i + 1) {
-                            var text = array[i];
-                            var flag3 = (info.borders[text] == undefined);
-                            if (!flag3) {
-                                var flag4 = info.borders[text].nodeA === nid || info.borders[text].nodeB === nid;
-                                if (flag4) {
-                                    result = text;
-                                    return result;
-                                }
-                            }
-                        }
-                        result = null;
-                    }
-                }
-                return result;
-            };
-            navNode.prototype.getLinked = function (info) {
-                var list = [];
-                var array = this.borderByPoly;
-                for (var i = 0; i < array.length; i = i + 1) {
-                    var key = array[i];
-                    var flag = (info.borders[key] == undefined);
-                    if (!flag) {
-                        var flag2 = info.borders[key].nodeA === this.nodeID;
-                        var num;
-                        if (flag2) {
-                            num = info.borders[key].nodeB;
-                        }
-                        else {
-                            num = info.borders[key].nodeA;
-                        }
-                        var flag3 = num >= 0;
-                        if (flag3) {
-                            list.push(num);
-                        }
-                    }
-                }
-                return list;
-            };
-            navNode.prototype.genCenter = function (info) {
-                this.center = new navVec3();
-                this.center.x = 0.0;
-                this.center.y = 0.0;
-                this.center.z = 0.0;
-                var array = this.poly;
-                for (var i = 0; i < array.length; i = i + 1) {
-                    var num = array[i];
-                    this.center.x += info.vecs[num].x;
-                    this.center.y += info.vecs[num].y;
-                    this.center.z += info.vecs[num].z;
-                }
-                this.center.x /= this.poly.length;
-                this.center.y /= this.poly.length;
-                this.center.z /= this.poly.length;
-            };
-            return navNode;
-        }());
-        NavMesh.navNode = navNode;
-        var navBorder = (function () {
-            function navBorder() {
-                this.borderName = null;
-                this.nodeA = 0;
-                this.nodeB = 0;
-                this.pointA = 0;
-                this.pointB = 0;
-                this.length = 0;
-                this.center = null;
-            }
-            return navBorder;
-        }());
-        NavMesh.navBorder = navBorder;
-        var navMeshInfo = (function () {
-            function navMeshInfo() {
-                this.vecs = null;
-                this.nodes = null;
-                this.borders = null;
-                this.min = null;
-                this.max = null;
-            }
-            navMeshInfo.prototype.calcBound = function () {
-                this.min = new navVec3();
-                this.max = new navVec3();
-                this.min.x = 1.7976931348623157E+308;
-                this.min.y = 1.7976931348623157E+308;
-                this.min.z = 1.7976931348623157E+308;
-                this.max.x = -1.7976931348623157E+308;
-                this.max.y = -1.7976931348623157E+308;
-                this.max.z = -1.7976931348623157E+308;
-                for (var i = 0; i < this.vecs.length; i = i + 1) {
-                    var flag = this.vecs[i].x < this.min.x;
-                    if (flag) {
-                        this.min.x = this.vecs[i].x;
-                    }
-                    var flag2 = this.vecs[i].y < this.min.y;
-                    if (flag2) {
-                        this.min.y = this.vecs[i].y;
-                    }
-                    var flag3 = this.vecs[i].z < this.min.z;
-                    if (flag3) {
-                        this.min.z = this.vecs[i].z;
-                    }
-                    var flag4 = this.vecs[i].x > this.max.x;
-                    if (flag4) {
-                        this.max.x = this.vecs[i].x;
-                    }
-                    var flag5 = this.vecs[i].y > this.max.y;
-                    if (flag5) {
-                        this.max.y = this.vecs[i].y;
-                    }
-                    var flag6 = this.vecs[i].z > this.max.z;
-                    if (flag6) {
-                        this.max.z = this.vecs[i].z;
-                    }
-                }
-            };
-            navMeshInfo.cross = function (p0, p1, p2) {
-                return (p1.x - p0.x) * (p2.z - p0.z) - (p2.x - p0.x) * (p1.z - p0.z);
-            };
-            navMeshInfo.prototype.inPoly = function (p, poly) {
-                var num = 0;
-                var flag = poly.length < 3;
-                var result;
-                if (flag) {
-                    result = false;
-                }
-                else {
-                    var flag2 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[1]]) < (-num);
-                    if (flag2) {
-                        result = false;
-                    }
-                    else {
-                        var flag3 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[poly.length - 1]]) > num;
-                        if (flag3) {
-                            result = false;
-                        }
-                        else {
-                            var i = 2;
-                            var num2 = poly.length - 1;
-                            var num3 = -1;
-                            while (i <= num2) {
-                                var num4 = i + num2 >> 1;
-                                var flag4 = navMeshInfo.cross(this.vecs[poly[0]], p, this.vecs[poly[num4]]) < (-num);
-                                if (flag4) {
-                                    num3 = num4;
-                                    num2 = num4 - 1;
-                                }
-                                else {
-                                    i = num4 + 1;
-                                }
-                            }
-                            var num5 = navMeshInfo.cross(this.vecs[poly[num3 - 1]], p, this.vecs[poly[num3]]);
-                            result = (num5 > num);
-                        }
-                    }
-                }
-                return result;
-            };
-            navMeshInfo.prototype.genBorder = function () {
-                var __border = {};
-                for (var i0 = 0; i0 < this.nodes.length; i0 = i0 + 1) {
-                    var n = this.nodes[i0];
-                    for (var i1 = 0; i1 < n.borderByPoint.length; i1 = i1 + 1) {
-                        var b = n.borderByPoint[i1];
-                        if (__border[b] == undefined) {
-                            __border[b] = new navBorder();
-                            __border[b].borderName = b;
-                            __border[b].nodeA = n.nodeID;
-                            __border[b].nodeB = -1;
-                            __border[b].pointA = -1;
-                        }
-                        else {
-                            __border[b].nodeB = n.nodeID;
-                            if (__border[b].nodeA > __border[b].nodeB) {
-                                __border[b].nodeB = __border[b].nodeA;
-                                __border[b].nodeB = n.nodeID;
-                            }
-                            var na = this.nodes[__border[b].nodeA];
-                            var nb = this.nodes[__border[b].nodeB];
-                            for (var i2 = 0; i2 < na.poly.length; i2 = i2 + 1) {
-                                var i = na.poly[i2];
-                                if (nb.poly.indexOf(i) >= 0) {
-                                    if (__border[b].pointA == -1)
-                                        __border[b].pointA = i;
-                                    else
-                                        __border[b].pointB = i;
-                                }
-                            }
-                            var left = __border[b].pointA;
-                            var right = __border[b].pointB;
-                            var xd = this.vecs[left].x - this.vecs[right].x;
-                            var yd = this.vecs[left].y - this.vecs[right].y;
-                            var zd = this.vecs[left].z - this.vecs[right].z;
-                            __border[b].length = Math.sqrt(xd * xd + yd * yd + zd * zd);
-                            __border[b].center = new navVec3();
-                            __border[b].center.x = this.vecs[left].x * 0.5 + this.vecs[right].x * 0.5;
-                            __border[b].center.y = this.vecs[left].y * 0.5 + this.vecs[right].y * 0.5;
-                            __border[b].center.z = this.vecs[left].z * 0.5 + this.vecs[right].z * 0.5;
-                            __border[b].borderName = __border[b].nodeA + "-" + __border[b].nodeB;
-                        }
-                    }
-                }
-                var namechange = {};
-                for (var key in __border) {
-                    if (__border[key].nodeB < 0) {
-                    }
-                    else {
-                        namechange[key] = __border[key].borderName;
-                    }
-                }
-                this.borders = {};
-                for (var key in __border) {
-                    if (namechange[key] != undefined) {
-                        this.borders[namechange[key]] = __border[key];
-                    }
-                }
-                for (var m = 0; m < this.nodes.length; m = m + 1) {
-                    var v = this.nodes[m];
-                    var newborder = [];
-                    for (var nnn = 0; nnn < v.borderByPoint.length; nnn = nnn + 1) {
-                        var b = v.borderByPoint[nnn];
-                        if (namechange[b] != undefined) {
-                            newborder.push(namechange[b]);
-                        }
-                    }
-                    v.borderByPoly = newborder;
-                }
-            };
-            navMeshInfo.LoadMeshInfo = function (s) {
-                var j = JSON.parse(s);
-                var info = new navMeshInfo();
-                var listVec = [];
-                for (var jsonid in j["v"]) {
-                    var v3 = new navVec3();
-                    v3.x = j["v"][jsonid][0];
-                    v3.y = j["v"][jsonid][1];
-                    v3.z = j["v"][jsonid][2];
-                    listVec.push(v3);
-                }
-                info.vecs = listVec;
-                var polys = [];
-                var list = j["p"];
-                for (var i = 0; i < list.length; i++) {
-                    var json = list[i];
-                    var node = new navNode();
-                    node.nodeID = i;
-                    var poly = [];
-                    for (var tt in json) {
-                        poly.push(json[tt]);
-                    }
-                    node.poly = poly;
-                    node.genBorder();
-                    node.genCenter(info);
-                    polys.push(node);
-                }
-                info.nodes = polys;
-                info.calcBound();
-                info.genBorder();
-                return info;
-            };
-            return navMeshInfo;
-        }());
-        NavMesh.navMeshInfo = navMeshInfo;
-    })(NavMesh = lighttool.NavMesh || (lighttool.NavMesh = {}));
-})(lighttool || (lighttool = {}));
 var t;
 (function (t) {
     var Test_NormalMap = (function () {
@@ -5375,9 +5518,8 @@ var test_pick = (function () {
             var mesh = this.cube2.gameObject.addComponent("meshFilter");
             mesh.mesh = (smesh);
             var renderer = this.cube2.gameObject.addComponent("meshRenderer");
-            var coll = this.cube2.gameObject.addComponent("spherecollider");
-            coll.center = new gd3d.math.vector3(0, 1, 0);
-            coll.radius = 1;
+            var coll = this.cube2.gameObject.addComponent("boxcollider");
+            coll.colliderVisible = true;
         }
         this.cube3 = this.cube2.clone();
         this.scene.addChild(this.cube3);
@@ -5416,8 +5558,10 @@ var test_pick = (function () {
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
         objCam.lookat(this.cube);
         objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
     };
     test_pick.prototype.update = function (delta) {
+        CameraController.instance().update(delta);
         if (this.pointDown == false && this.inputMgr.point.touch == true) {
             var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
             var pickinfo = this.scene.pick(ray);
@@ -5430,6 +5574,9 @@ var test_pick = (function () {
         if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
             return;
         }
+        if (this.cube2.gameObject.getComponent("boxcollider").intersectsTransform(this.cube3)) {
+            return;
+        }
         this.timer += delta;
         this.cube3.localTranslate.x += delta;
         this.cube3.markDirty();
@@ -5437,6 +5584,10 @@ var test_pick = (function () {
         var z = Math.cos(this.timer);
         var x2 = Math.sin(this.timer * 0.1);
         var z2 = Math.cos(this.timer * 0.1);
+        var tv = new gd3d.math.vector3();
+        gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
+        this.cube2.localTranslate = this.movetarget;
+        this.cube2.markDirty();
     };
     return test_pick;
 }());
@@ -6495,6 +6646,11 @@ var t;
                         }
                     }
                     this.cube = cube;
+                    var tt = dome.addcube(this.app.getAssetMgr());
+                    this.cube.addChild(tt);
+                    tt.localTranslate.z = 1;
+                    tt.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
+                    tt.markDirty();
                 }
                 {
                     var ref_cube = new gd3d.framework.transform();
@@ -6967,7 +7123,12 @@ var t;
         }
         test_sound.prototype.loadShader = function (laststate, state) {
             this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-                state.finish = true;
+                if (_state.isfinish) {
+                    state.finish = true;
+                }
+                else {
+                    state.error = true;
+                }
             });
         };
         test_sound.prototype.loadText = function (laststate, state) {
@@ -7026,7 +7187,7 @@ var t;
                 var tr = new gd3d.framework.transform();
                 var player_1 = tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_AUDIOPLAYER);
                 player_1.be3DSound = false;
-                this.app.getScene().addChild(tr);
+                this.scene.addChild(tr);
                 tr.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 {
                     var button = document.createElement("button");
@@ -7047,7 +7208,7 @@ var t;
                     button.onclick = function () {
                         gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/sound2.mp3", function (buf, err) {
                             _this.once2 = buf;
-                            player_1.play(_this.once2, false, 1);
+                            player_1.play(_this.once2, true, 1);
                         });
                     };
                     button.style.top = "130px";
@@ -8170,6 +8331,482 @@ var CameraController = (function () {
     };
     return CameraController;
 }());
+var Test_CameraController = (function () {
+    function Test_CameraController() {
+        this.moveSpeed = 10;
+        this.movemul = 5;
+        this.wheelSpeed = 1;
+        this.rotateSpeed = 0.1;
+        this.keyMap = {};
+        this.beRightClick = false;
+        this.cameras = [];
+        this.isInit = false;
+        this.moveVector = new gd3d.math.vector3(0, 0, 1);
+    }
+    Test_CameraController.instance = function () {
+        if (Test_CameraController.g_this == null) {
+            Test_CameraController.g_this = new Test_CameraController();
+        }
+        return Test_CameraController.g_this;
+    };
+    Test_CameraController.prototype.update = function (delta) {
+        if (this.beRightClick) {
+            this.doMove(delta);
+        }
+    };
+    Test_CameraController.prototype.add = function (camera) {
+        this.cameras.push(new gd3d.framework.camera());
+        this.cameras[this.cameras.length - 1] = camera;
+    };
+    Test_CameraController.prototype.decideCam = function (target) {
+        this.target = target;
+        this.rotAngle = new gd3d.math.vector3();
+        gd3d.math.quatToEulerAngles(this.target.gameObject.transform.localRotate, this.rotAngle);
+    };
+    Test_CameraController.prototype.init = function (app) {
+        var _this = this;
+        this.isInit = true;
+        this.app = app;
+        this.app.webgl.canvas.addEventListener("mousedown", function (ev) {
+            _this.checkOnRightClick(ev);
+        }, false);
+        this.app.webgl.canvas.addEventListener("mouseup", function (ev) {
+            _this.beRightClick = false;
+        }, false);
+        this.app.webgl.canvas.addEventListener("mousemove", function (ev) {
+            if (_this.beRightClick) {
+                _this.doRotate(ev.movementX, ev.movementY);
+            }
+        }, false);
+        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
+            _this.keyMap[ev.keyCode] = true;
+        }, false);
+        this.app.webgl.canvas.addEventListener("keyup", function (ev) {
+            _this.moveSpeed = 10;
+            _this.keyMap[ev.keyCode] = false;
+        }, false);
+        if (navigator.userAgent.indexOf('Firefox') >= 0) {
+            this.app.webgl.canvas.addEventListener("DOMMouseScroll", function (ev) {
+                _this.doMouseWheel(ev, true);
+            }, false);
+        }
+        else {
+            this.app.webgl.canvas.addEventListener("mousewheel", function (ev) {
+                _this.doMouseWheel(ev, false);
+            }, false);
+        }
+        this.app.webgl.canvas.addEventListener("mouseout", function (ev) {
+            _this.beRightClick = false;
+        }, false);
+        document.oncontextmenu = function (ev) {
+            ev.preventDefault();
+        };
+    };
+    Test_CameraController.prototype.doMove = function (delta) {
+        if (this.target == null)
+            return;
+        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_W] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_W])
+            || (this.keyMap[gd3d.framework.NumberUtil.KEY_w] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_w])) {
+            this.moveSpeed += this.movemul * delta;
+            this.target.gameObject.transform.getForwardInWorld(this.moveVector);
+            gd3d.math.vec3ScaleByNum(this.moveVector, this.moveSpeed * delta, this.moveVector);
+            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
+        }
+        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_S] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_S])
+            || (this.keyMap[gd3d.framework.NumberUtil.KEY_s] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_s])) {
+            this.moveSpeed += this.movemul * delta;
+            this.target.gameObject.transform.getForwardInWorld(this.moveVector);
+            gd3d.math.vec3ScaleByNum(this.moveVector, -this.moveSpeed * delta, this.moveVector);
+            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
+        }
+        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_A] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_A])
+            || (this.keyMap[gd3d.framework.NumberUtil.KEY_a] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_a])) {
+            this.moveSpeed += this.movemul * delta;
+            this.target.gameObject.transform.getRightInWorld(this.moveVector);
+            gd3d.math.vec3ScaleByNum(this.moveVector, -this.moveSpeed * delta, this.moveVector);
+            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
+        }
+        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_D] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_D])
+            || (this.keyMap[gd3d.framework.NumberUtil.KEY_d] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_d])) {
+            this.moveSpeed += this.movemul * delta;
+            this.target.gameObject.transform.getRightInWorld(this.moveVector);
+            gd3d.math.vec3ScaleByNum(this.moveVector, this.moveSpeed * delta, this.moveVector);
+            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
+        }
+        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_Q] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_Q])
+            || (this.keyMap[gd3d.framework.NumberUtil.KEY_q] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_q])) {
+            this.moveSpeed += this.movemul * delta;
+            this.target.gameObject.transform.getUpInWorld(this.moveVector);
+            gd3d.math.vec3ScaleByNum(this.moveVector, -this.moveSpeed * delta, this.moveVector);
+            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
+        }
+        if ((this.keyMap[gd3d.framework.NumberUtil.KEY_E] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_E])
+            || (this.keyMap[gd3d.framework.NumberUtil.KEY_e] != undefined && this.keyMap[gd3d.framework.NumberUtil.KEY_e])) {
+            this.moveSpeed += this.movemul * delta;
+            this.target.gameObject.transform.getUpInWorld(this.moveVector);
+            gd3d.math.vec3ScaleByNum(this.moveVector, this.moveSpeed * delta, this.moveVector);
+            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
+        }
+        this.target.gameObject.transform.markDirty();
+    };
+    Test_CameraController.prototype.doRotate = function (rotateX, rotateY) {
+        this.rotAngle.x += rotateY * this.rotateSpeed;
+        this.rotAngle.y += rotateX * this.rotateSpeed;
+        this.rotAngle.x %= 360;
+        this.rotAngle.y %= 360;
+        gd3d.math.quatFromEulerAngles(this.rotAngle.x, this.rotAngle.y, this.rotAngle.z, this.target.gameObject.transform.localRotate);
+    };
+    Test_CameraController.prototype.lookat = function (trans) {
+        this.target.gameObject.transform.lookat(trans);
+        this.target.gameObject.transform.markDirty();
+        gd3d.math.quatToEulerAngles(this.target.gameObject.transform.localRotate, this.rotAngle);
+    };
+    Test_CameraController.prototype.checkOnRightClick = function (mouseEvent) {
+        var value = mouseEvent.button;
+        if (value == 2) {
+            this.beRightClick = true;
+            return true;
+        }
+        else if (value == 0) {
+            this.beRightClick = false;
+            return false;
+        }
+    };
+    Test_CameraController.prototype.doMouseWheel = function (ev, isFirefox) {
+        if (!this.target)
+            return;
+        if (this.target.opvalue == 0) {
+        }
+        else {
+            this.target.gameObject.transform.getForwardInWorld(this.moveVector);
+            if (isFirefox) {
+                gd3d.math.vec3ScaleByNum(this.moveVector, this.wheelSpeed * (ev.detail * (-0.5)), this.moveVector);
+            }
+            else {
+                gd3d.math.vec3ScaleByNum(this.moveVector, this.wheelSpeed * ev.deltaY * (-0.01), this.moveVector);
+            }
+            gd3d.math.vec3Add(this.target.gameObject.transform.localTranslate, this.moveVector, this.target.gameObject.transform.localTranslate);
+            this.target.gameObject.transform.markDirty();
+        }
+    };
+    Test_CameraController.prototype.remove = function () {
+    };
+    return Test_CameraController;
+}());
+var dome;
+(function (dome) {
+    var db_test_eff = (function () {
+        function db_test_eff() {
+            this.timer = 0;
+            this.taskmgr = new gd3d.framework.taskMgr();
+        }
+        db_test_eff.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+                if (_state.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        db_test_eff.prototype.addcube = function (laststate, state) {
+            {
+                {
+                    var cube = new gd3d.framework.transform();
+                    cube.name = "cube";
+                    cube.localTranslate.x = 0;
+                    this.scene.addChild(cube);
+                    var mesh = cube.gameObject.addComponent("meshFilter");
+                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                    mesh.mesh = (smesh);
+                    var renderer = cube.gameObject.addComponent("meshRenderer");
+                    var cuber = renderer;
+                    var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+                    if (sh != null) {
+                        cuber.materials = [];
+                        cuber.materials.push(new gd3d.framework.material());
+                        cuber.materials[0].setShader(sh);
+                        var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
+                        cuber.materials[0].setTexture("_MainTex", texture);
+                    }
+                }
+            }
+            state.finish = true;
+        };
+        db_test_eff.prototype.start = function (app) {
+            console.log("i am here.");
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.addcam.bind(this));
+            this.taskmgr.addTaskCall(this.loadScene.bind(this));
+            this.taskmgr.addTaskCall(this.loadEffect.bind(this));
+        };
+        db_test_eff.prototype.loadEffect = function (laststate, state) {
+            var _this = this;
+            var names = ["0fx_boss_02", "fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
+            var name = names[2];
+            name = "0fx_cj_zs_03";
+            this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+                if (_state.isfinish) {
+                    _this.tr = new gd3d.framework.transform();
+                    _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
+                    _this.text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
+                    _this.effect.autoplay = false;
+                    _this.effect.setJsonData(_this.text);
+                    _this.scene.addChild(_this.tr);
+                    _this.tr.markDirty();
+                    state.finish = true;
+                    _this.addButton();
+                }
+            });
+        };
+        db_test_eff.prototype.loadScene = function (laststate, state) {
+            var _this = this;
+            var name = "chuangjue_1024";
+            this.app.getAssetMgr().load("res/scenes/chuangjue_1024/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                    var _root = _scene.getSceneRoot();
+                    _this.scene.addChild(_root);
+                    _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                    _root.markDirty();
+                    _this.app.getScene().lightmaps = [];
+                    _scene.useLightMap(_this.app.getScene());
+                    state.finish = true;
+                }
+            });
+        };
+        db_test_eff.prototype.addButton = function () {
+            var _this = this;
+            var btn = document.createElement("button");
+            btn.textContent = "Play";
+            btn.onclick = function () {
+                _this.effect.play();
+            };
+            btn.style.top = "160px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+        };
+        db_test_eff.prototype.addcam = function (laststate, state) {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera");
+            this.camera.near = 0.01;
+            this.camera.far = 200;
+            this.camera.fov = Math.PI * 0.3;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0, 20, 20);
+            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            objCam.markDirty();
+            state.finish = true;
+        };
+        db_test_eff.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+        };
+        return db_test_eff;
+    }());
+    dome.db_test_eff = db_test_eff;
+})(dome || (dome = {}));
+var dome;
+(function (dome) {
+    var testloadMesh = (function () {
+        function testloadMesh() {
+            this.transList = [];
+            this.time = 0;
+        }
+        testloadMesh.prototype.loadmesh = function () {
+            var _this = this;
+            var url = "res/resources/cube.mesh.bin";
+            this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state.isfinish) {
+                    url = "res/resources/sphere.mesh.bin";
+                    _this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                        if (state.isfinish) {
+                            _this.test();
+                        }
+                    });
+                }
+            });
+        };
+        testloadMesh.prototype.test = function () {
+            var quad = this.assetMgr.getDefaultMesh("quad");
+            var tran = new gd3d.framework.transform();
+            var meshf = tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+            meshf.mesh = quad;
+            var render = tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+            this.app.getScene().addChild(tran);
+            var tran2 = new gd3d.framework.transform();
+            var cam = tran2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_CAMERA);
+            this.app.getScene().addChild(tran2);
+            tran2.localTranslate.z = 10;
+            tran2.markDirty();
+            this.trans = tran;
+        };
+        testloadMesh.prototype.start = function (app) {
+            this.app = app;
+            this.assetMgr = this.app.getAssetMgr();
+            this.loadmesh();
+        };
+        testloadMesh.prototype.update = function (delta) {
+            this.time += delta;
+            for (var i = 0; i < this.transList.length; i++) {
+                var tran = this.transList[i];
+                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.time * 180 / Math.PI, tran.localRotate);
+                tran.markDirty();
+            }
+        };
+        return testloadMesh;
+    }());
+    dome.testloadMesh = testloadMesh;
+})(dome || (dome = {}));
+var dome;
+(function (dome) {
+    var testCJ = (function () {
+        function testCJ() {
+            this.time = 0;
+        }
+        testCJ.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        testCJ.prototype.loadmesh = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/prefabs/zs_chuangjue_01/zs_chuangjue_01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("zs_chuangjue_01.prefab.json");
+                    _this.dragon = _prefab.getCloneTrans();
+                    _this.dragon.localEulerAngles = new gd3d.math.vector3(0, -150, 0);
+                    _this.scene.addChild(_this.dragon);
+                    _this.dragon.markDirty();
+                    state.finish = true;
+                }
+            });
+        };
+        testCJ.prototype.loadweapon = function (laststate, state) {
+            var _this = this;
+            var name = "Quad";
+            this.app.getAssetMgr().load("res/prefabs/Quad/Quad.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("Quad.prefab.json");
+                    var pp = _prefab.getCloneTrans();
+                    pp.localTranslate = new gd3d.math.vector3();
+                    pp.localEulerAngles = new gd3d.math.vector3();
+                    _this.scene.addChild(pp);
+                    state.finish = true;
+                }
+            });
+        };
+        testCJ.prototype.test = function (laststate, state) {
+            this.dragon = new gd3d.framework.transform();
+            var mesh = this.assetMgr.getAssetByName("MU1.0----1.9_TeXiao_Guoyichen_Effect_Mesh_Plane_danxiangsuofang_01.FBX_Plane01.mesh.bin");
+            var mat = this.assetMgr.getAssetByName("WuQi_zhenhong_02.mat.json");
+            var shder = this.assetMgr.getAssetByName("diffuse_bothside.shader.json");
+            var mattt = new gd3d.framework.material();
+            mattt.setShader(shder);
+            var meshf = this.dragon.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+            meshf.mesh = mesh;
+            var meshr = this.dragon.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+            meshr.materials[0] = mat;
+            this.dragon.localScale = new gd3d.math.vector3(13, 41, 21);
+            this.dragon.markDirty();
+            this.scene.addChild(this.dragon);
+            state.finish = true;
+        };
+        testCJ.prototype.addCamera = function (laststate, state) {
+            var tranCam = new gd3d.framework.transform();
+            tranCam.name = "Cam";
+            this.scene.addChild(tranCam);
+            tranCam.localTranslate = new gd3d.math.vector3(0, 3, -10);
+            this.camera = tranCam.gameObject.addComponent("camera");
+            this.camera.near = 0.001;
+            this.camera.far = 1000;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            tranCam.lookatPoint(new gd3d.math.vector3());
+            tranCam.markDirty();
+            state.finish = true;
+        };
+        testCJ.prototype.start = function (app) {
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.assetMgr = this.app.getAssetMgr();
+            this.taskmgr = new gd3d.framework.taskMgr();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.addCamera.bind(this));
+            this.taskmgr.addTaskCall(this.loadmesh.bind(this));
+        };
+        testCJ.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+            if (this.dragon && this.camera) {
+                this.camera.gameObject.transform.lookat(this.dragon);
+            }
+        };
+        return testCJ;
+    }());
+    dome.testCJ = testCJ;
+})(dome || (dome = {}));
+var dome;
+(function (dome) {
+    var testMath = (function () {
+        function testMath() {
+            this.taskmgr = new gd3d.framework.taskMgr();
+        }
+        testMath.prototype.start = function (app) {
+            console.log("i am here.");
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.taskmgr.addTaskCall(this.addcam.bind(this));
+        };
+        testMath.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+        };
+        testMath.prototype.addcam = function (laststate, state) {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera");
+            this.camera.near = 0.01;
+            this.camera.far = 200;
+            this.camera.fov = Math.PI * 0.3;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, 20);
+            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            objCam.markDirty();
+            state.finish = true;
+            var dir = new gd3d.math.vector3();
+            objCam.getForwardInWorld(dir);
+            this.scene.addChild(addsphere(this.app.getAssetMgr()));
+            var cube = addcube(this.scene.app.getAssetMgr());
+            this.scene.addChild(cube);
+            var targetpos = gd3d.math.pool.new_vector3();
+            var screnpos = new gd3d.math.vector3(this.app.webgl.canvas.width * 0.5, this.app.webgl.canvas.height * 0.5, 0.999);
+            objCam.updateWorldTran();
+            this.camera.calcWorldPosFromScreenPos(this.app, screnpos, targetpos);
+            cube.localTranslate = targetpos;
+            cube.markDirty();
+        };
+        return testMath;
+    }());
+    dome.testMath = testMath;
+    function addcube(assetmgr) {
+        var trans = new gd3d.framework.transform();
+        var meshf = trans.gameObject.addComponent("meshFilter");
+        var meshr = trans.gameObject.addComponent("meshRenderer");
+        meshf.mesh = assetmgr.getDefaultMesh("cube");
+        return trans;
+    }
+    dome.addcube = addcube;
+    function addsphere(assetmgr) {
+        var trans = new gd3d.framework.transform();
+        var meshf = trans.gameObject.addComponent("meshFilter");
+        var meshr = trans.gameObject.addComponent("meshRenderer");
+        meshf.mesh = assetmgr.getDefaultMesh("sphere");
+        return trans;
+    }
+    dome.addsphere = addsphere;
+})(dome || (dome = {}));
 var EffectElement = (function (_super) {
     __extends(EffectElement, _super);
     function EffectElement() {
@@ -8363,4 +9000,986 @@ var test_effecteditor = (function () {
     };
     return test_effecteditor;
 }());
+var JoystickNew = (function () {
+    function JoystickNew() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.leftAxis = new gd3d.math.vector2(0, 0);
+        this.maxScale = 128;
+        this.touchLeft = 0;
+        this.mouseLeft = false;
+    }
+    JoystickNew.prototype.init = function (app, overlay2d) {
+        var _this = this;
+        this.app = app;
+        this.overlay2d = overlay2d;
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.addJoystick.bind(this));
+        this.app.webgl.canvas.addEventListener("mousedown", function (e) { _this.onMouseDown(e); e.preventDefault(); });
+        this.app.webgl.canvas.addEventListener("mouseup", function (e) { _this.onMouseUp(e); e.preventDefault(); });
+        this.app.webgl.canvas.addEventListener("mousemove", function (e) { _this.onMouseMove(e); e.preventDefault(); });
+        this.app.webgl.canvas.addEventListener("touchstart", function (e) { _this.onTouchStart(e); e.preventDefault(); });
+        this.app.webgl.canvas.addEventListener("touchend", function (e) { _this.onTouchEnd(e); e.preventDefault(); });
+        this.app.webgl.canvas.addEventListener("touchmove", function (e) { _this.onTouchMove(e); e.preventDefault(); });
+    };
+    JoystickNew.prototype.loadTexture = function (laststate, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/joystick0.png", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.app.getAssetMgr().load("res/joystick1.png", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        state.finish = true;
+                    }
+                    else {
+                        state.error = true;
+                    }
+                });
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    JoystickNew.prototype.addJoystick = function (laststate, state) {
+        var _this = this;
+        {
+            this.joystickLeft0 = new gd3d.framework.transform2D();
+            this.joystickLeft0.name = "left0";
+            this.joystickLeft0.width = 256;
+            this.joystickLeft0.height = 256;
+            this.joystickLeft0.pivot = new gd3d.math.vector2(0.5, 0.5);
+            this.joystickLeft0.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.16, window.innerHeight * 0.75);
+            var img0 = this.joystickLeft0.addComponent("rawImage2D");
+            var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
+            img0.image = tex0;
+            this.overlay2d.addChild(this.joystickLeft0);
+            this.joystickLeft0.markDirty();
+            this.joystickLeft1 = new gd3d.framework.transform2D();
+            this.joystickLeft1.name = "left1";
+            this.joystickLeft1.width = 256;
+            this.joystickLeft1.height = 256;
+            this.joystickLeft1.pivot = new gd3d.math.vector2(0.5, 0.5);
+            this.joystickLeft1.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.16, window.innerHeight * 0.75);
+            var img1 = this.joystickLeft1.addComponent("rawImage2D");
+            var tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png");
+            img1.image = tex1;
+            this.overlay2d.addChild(this.joystickLeft1);
+            this.joystickLeft1.markDirty();
+        }
+        {
+            this.joystickRight0 = new gd3d.framework.transform2D();
+            this.joystickRight0.name = "right0";
+            this.joystickRight0.width = 200;
+            this.joystickRight0.height = 200;
+            this.joystickRight0.pivot = new gd3d.math.vector2(0.5, 0.5);
+            this.joystickRight0.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.84, window.innerHeight * 0.8);
+            var btn0 = this.joystickRight0.addComponent("button");
+            var img0 = this.joystickRight0.addComponent("image2D");
+            var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
+            img0.setTexture(tex0);
+            btn0.targetImage = img0;
+            btn0.transition = gd3d.framework.TransitionType.ColorTint;
+            btn0.onClick.addListener(function () {
+                if (_this.callback0) {
+                    _this.callback0();
+                }
+            });
+            this.overlay2d.addChild(this.joystickRight0);
+            this.joystickRight0.markDirty();
+            this.joystickRight1 = new gd3d.framework.transform2D();
+            this.joystickRight1.name = "right1";
+            this.joystickRight1.width = 120;
+            this.joystickRight1.height = 120;
+            this.joystickRight1.pivot = new gd3d.math.vector2(0.5, 0.5);
+            this.joystickRight1.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.92, window.innerHeight * 0.6);
+            var btn1 = this.joystickRight1.addComponent("button");
+            var img1 = this.joystickRight1.addComponent("image2D");
+            var tex1 = this.app.getAssetMgr().getAssetByName("joystick0.png");
+            img1.setTexture(tex1);
+            btn1.targetImage = img1;
+            btn1.onClick.addListener(function () {
+                if (_this.callback1) {
+                    _this.callback1();
+                }
+            });
+            this.overlay2d.addChild(this.joystickRight1);
+            this.joystickRight1.markDirty();
+        }
+        state.finish = true;
+    };
+    JoystickNew.prototype.onMouseDown = function (e) {
+        if (e.clientX <= this.overlay2d.canvas.pixelWidth / 2) {
+            this.mouseLeft = true;
+            var v = new gd3d.math.vector2(e.clientX, e.clientY);
+            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
+            if (gd3d.math.vec2Length(v) > this.maxScale) {
+                gd3d.math.vec2Normalize(v, v);
+                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
+                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
+            }
+            else {
+                this.joystickLeft1.localTranslate.x = e.clientX;
+                this.joystickLeft1.localTranslate.y = e.clientY;
+            }
+            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
+            this.joystickLeft1.markDirty();
+        }
+    };
+    JoystickNew.prototype.onMouseUp = function (e) {
+        this.mouseLeft = false;
+        this.joystickLeft1.localTranslate.x = this.joystickLeft0.localTranslate.x;
+        this.joystickLeft1.localTranslate.y = this.joystickLeft0.localTranslate.y;
+        this.leftAxis = new gd3d.math.vector2(0, 0);
+        this.joystickLeft1.markDirty();
+    };
+    JoystickNew.prototype.onMouseMove = function (e) {
+        if (this.mouseLeft) {
+            var v = new gd3d.math.vector2(e.clientX, e.clientY);
+            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
+            if (gd3d.math.vec2Length(v) > this.maxScale) {
+                gd3d.math.vec2Normalize(v, v);
+                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
+                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
+            }
+            else {
+                this.joystickLeft1.localTranslate.x = e.clientX;
+                this.joystickLeft1.localTranslate.y = e.clientY;
+            }
+            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
+            this.joystickLeft1.markDirty();
+        }
+    };
+    JoystickNew.prototype.onTouchStart = function (e) {
+        if (e.touches[0].clientX <= this.overlay2d.canvas.pixelWidth / 2) {
+            this.touchLeft = e.touches[0].identifier;
+            var v = new gd3d.math.vector2(e.touches[0].clientX, e.touches[0].clientY);
+            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
+            if (gd3d.math.vec2Length(v) > this.maxScale) {
+                gd3d.math.vec2Normalize(v, v);
+                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
+                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
+            }
+            else {
+                this.joystickLeft1.localTranslate.x = e.touches[0].clientX;
+                this.joystickLeft1.localTranslate.y = e.touches[0].clientY;
+            }
+            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
+            this.joystickLeft1.markDirty();
+        }
+        if (e.touches[1] != null && e.touches[1].clientX <= this.overlay2d.canvas.pixelWidth / 2 && this.touchLeft == 0) {
+            this.touchLeft = e.touches[1].identifier;
+            var v = new gd3d.math.vector2(e.touches[1].clientX, e.touches[1].clientY);
+            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
+            if (gd3d.math.vec2Length(v) > this.maxScale) {
+                gd3d.math.vec2Normalize(v, v);
+                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
+                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
+            }
+            else {
+                this.joystickLeft1.localTranslate.x = e.touches[1].clientX;
+                this.joystickLeft1.localTranslate.y = e.touches[1].clientY;
+            }
+            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
+            this.joystickLeft1.markDirty();
+        }
+    };
+    JoystickNew.prototype.onTouchEnd = function (e) {
+        if (this.touchLeft) {
+            var flag = false;
+            for (var i = 0; i < e.touches.length; i++) {
+                if (this.touchLeft == e.touches[i].identifier) {
+                    flag = true;
+                }
+            }
+            if (!flag) {
+                this.touchLeft = 0;
+                this.joystickLeft1.localTranslate.x = this.joystickLeft0.localTranslate.x;
+                this.joystickLeft1.localTranslate.y = this.joystickLeft0.localTranslate.y;
+                this.leftAxis.x = 0;
+                this.leftAxis.y = 0;
+                this.joystickLeft1.markDirty();
+            }
+        }
+    };
+    JoystickNew.prototype.onTouchMove = function (e) {
+        if (this.touchLeft != 0) {
+            var index = -1;
+            if (this.touchLeft == e.touches[0].identifier) {
+                index = 0;
+            }
+            else if (e.touches[1] != null && this.touchLeft == e.touches[1].identifier) {
+                index = 1;
+            }
+            if (index != -1) {
+                var v = new gd3d.math.vector2(e.touches[index].clientX, e.touches[index].clientY);
+                gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
+                if (gd3d.math.vec2Length(v) > this.maxScale) {
+                    gd3d.math.vec2Normalize(v, v);
+                    gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
+                    gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
+                }
+                else {
+                    this.joystickLeft1.localTranslate.x = e.touches[index].clientX;
+                    this.joystickLeft1.localTranslate.y = e.touches[index].clientY;
+                }
+                gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
+                this.joystickLeft1.markDirty();
+            }
+        }
+    };
+    JoystickNew.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return JoystickNew;
+}());
+var Demo;
+(function (Demo) {
+    var TankNew = (function () {
+        function TankNew() {
+            this.cubes = [];
+            this.walls = [];
+            this.taskmgr = new gd3d.framework.taskMgr();
+            this.colVisible = false;
+            this.keyMap = {};
+            this.moveSpeed = 3;
+            this.rotateSpeed = 20;
+            this.bulletId = 0;
+            this.bulletList = [];
+            this.bulletSpeed = 200;
+            this.fireStep = 1;
+            this.fireTick = 0;
+        }
+        TankNew.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        TankNew.prototype.loadTexture = function (laststate, state) {
+            this.app.getAssetMgr().load("res/gd3d.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        TankNew.prototype.loadHeroPrefab = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/prefabs/tank01/tank01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank01.prefab.json");
+                    _this.heroTank = _prefab.getCloneTrans();
+                    _this.scene.addChild(_this.heroTank);
+                    _this.heroTank.localScale = new gd3d.math.vector3(4, 4, 4);
+                    _this.heroTank.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                    var col = _this.heroTank.gameObject.addComponent("boxcollider");
+                    col.center = new gd3d.math.vector3(0, 0.2, 0);
+                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
+                    col.colliderVisible = _this.colVisible;
+                    _this.heroGun = _this.heroTank.find("tank_up");
+                    _this.heroBase = _this.heroTank.find("tank_down");
+                    _this.heroSlot = _this.heroGun.find("slot");
+                    state.finish = true;
+                }
+            });
+        };
+        TankNew.prototype.loadEnemyPrefab = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/prefabs/tank02/tank02.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank02.prefab.json");
+                    _this.enemyTank = _prefab.getCloneTrans();
+                    _this.scene.addChild(_this.enemyTank);
+                    _this.enemyTank.localScale = new gd3d.math.vector3(4, 4, 4);
+                    _this.enemyTank.localTranslate = new gd3d.math.vector3(0, 0, -6);
+                    var col = _this.enemyTank.gameObject.addComponent("boxcollider");
+                    col.center = new gd3d.math.vector3(0, 0.2, 0);
+                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
+                    col.colliderVisible = _this.colVisible;
+                    _this.enemyGun = _this.enemyTank.find("tank_up");
+                    _this.enemySlot = _this.enemyGun.find("slot");
+                    state.finish = true;
+                }
+            });
+        };
+        TankNew.prototype.loadScene = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/scenes/test_scene/test_scene.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _scene = _this.app.getAssetMgr().getAssetByName("test_scene.scene.json");
+                    var _root = _scene.getSceneRoot();
+                    _this.scene.addChild(_root);
+                    _root.localTranslate.y = -0.1;
+                    for (var i = 0; i < 8; i++) {
+                        var tran = _root.find("wall" + i);
+                        var col = tran.gameObject.getComponent("boxcollider");
+                        col.colliderVisible = _this.colVisible;
+                        _this.walls.push(tran);
+                    }
+                    _this.app.getScene().lightmaps = [];
+                    _scene.useLightMap(_this.app.getScene());
+                    state.finish = true;
+                }
+            });
+        };
+        TankNew.prototype.addCamera = function (laststate, state) {
+            var tranCam = new gd3d.framework.transform();
+            tranCam.name = "Cam";
+            this.heroGun.addChild(tranCam);
+            this.camera = tranCam.gameObject.addComponent("camera");
+            this.camera.near = 0.1;
+            this.camera.far = 200;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            tranCam.markDirty();
+            this.switchCameraMode(true);
+            state.finish = true;
+        };
+        TankNew.prototype.addJoystick = function (laststate, state) {
+            var _this = this;
+            this.overlay2d = new gd3d.framework.overlay2D();
+            this.overlay2d.autoAsp = false;
+            this.overlay2d.canvas.pixelWidth = window.innerWidth;
+            this.overlay2d.canvas.pixelHeight = window.innerHeight;
+            this.camera.addOverLay(this.overlay2d);
+            this.joystick = new JoystickNew();
+            this.joystick.init(this.app, this.overlay2d);
+            this.joystick.callback0 = function () {
+                if (_this.fireTick >= _this.fireStep) {
+                    _this.fireTick = 0;
+                    _this.fire();
+                }
+            };
+            this.joystick.callback1 = function () {
+                _this.switchCameraMode(!_this.cameraFocus);
+            };
+            state.finish = true;
+        };
+        TankNew.prototype.addObject = function (laststate, state) {
+            {
+                var n = 2;
+                for (var i = 0; i < n; i++) {
+                    var cube = new gd3d.framework.transform();
+                    cube.name = "cube" + i;
+                    cube.localScale = new gd3d.math.vector3(3, 3, 3);
+                    cube.localTranslate = new gd3d.math.vector3(-2 * (n - 1) + i * 4, 2, 16);
+                    this.scene.addChild(cube);
+                    var filter = cube.gameObject.addComponent("meshFilter");
+                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                    filter.mesh = smesh;
+                    var renderer = cube.gameObject.addComponent("meshRenderer");
+                    var shader = this.app.getAssetMgr().getShader("diffuse.shader.json");
+                    if (shader != null) {
+                        renderer.materials = [];
+                        renderer.materials.push(new gd3d.framework.material());
+                        renderer.materials[0].setShader(shader);
+                        var texture = this.app.getAssetMgr().getAssetByName("gd3d.png");
+                        renderer.materials[0].setTexture("_MainTex", texture);
+                    }
+                    var col = cube.gameObject.addComponent("boxcollider");
+                    col.colliderVisible = this.colVisible;
+                    cube.markDirty();
+                    this.cubes.push(cube);
+                }
+            }
+            state.finish = true;
+        };
+        TankNew.prototype.start = function (app) {
+            var _this = this;
+            this.label = document.getElementById("Label");
+            this.app = app;
+            this.scene = app.getScene();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+            this.taskmgr.addTaskCall(this.loadHeroPrefab.bind(this));
+            this.taskmgr.addTaskCall(this.loadEnemyPrefab.bind(this));
+            this.taskmgr.addTaskCall(this.loadScene.bind(this));
+            this.taskmgr.addTaskCall(this.addCamera.bind(this));
+            this.taskmgr.addTaskCall(this.addObject.bind(this));
+            this.taskmgr.addTaskCall(this.addJoystick.bind(this));
+            document.addEventListener("keydown", function (e) { _this.keyMap[e.keyCode] = true; });
+        };
+        TankNew.prototype.switchCameraMode = function (mode) {
+            this.cameraFocus = mode;
+            if (this.cameraFocus) {
+                this.camera.fov = 0.82;
+                this.camera.gameObject.transform.localTranslate = new gd3d.math.vector3(0, 0.8, -2);
+                this.camera.gameObject.transform.localEulerAngles = new gd3d.math.vector3(5, 0, 0);
+                this.camera.gameObject.transform.markDirty();
+                this.camera.gameObject.transform.updateTran(false);
+                this.moveSpeed = 3;
+                this.rotateSpeed = 20;
+            }
+            else {
+                this.camera.fov = 0.41;
+                this.camera.gameObject.transform.localTranslate = new gd3d.math.vector3(0, 0.1, 0.2);
+                this.camera.gameObject.transform.localEulerAngles = new gd3d.math.vector3(2, 0, 0);
+                this.camera.gameObject.transform.markDirty();
+                this.camera.gameObject.transform.updateTran(false);
+                this.moveSpeed = 0.5;
+                this.rotateSpeed = 5;
+            }
+        };
+        TankNew.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+            if (this.joystick != null) {
+                this.joystick.update(delta);
+            }
+            this.tankControl(delta);
+            this.fireTick += delta;
+        };
+        TankNew.prototype.testTankCol = function (tran) {
+            var col = tran.gameObject.getComponent("boxcollider");
+            for (var i = 0; i < this.cubes.length; i++) {
+                var c_3 = this.cubes[i].gameObject.getComponent("boxcollider");
+                if (c_3 != null && col.obb.intersects(c_3.obb)) {
+                    return true;
+                }
+            }
+            for (var i = 0; i < this.walls.length; i++) {
+                var c_4 = this.walls[i].gameObject.getComponent("boxcollider");
+                if (col.obb.intersects(c_4.obb)) {
+                    return true;
+                }
+            }
+            var c = this.enemyTank.gameObject.getComponent("boxcollider");
+            if (col.obb.intersects(c.obb)) {
+                return true;
+            }
+            return false;
+        };
+        TankNew.prototype.tankControl = function (delta) {
+            if (this.joystick != null) {
+                var targetAngle = new gd3d.math.vector3();
+                if (gd3d.math.vec2Length(this.joystick.leftAxis) > 0.05) {
+                    var axis = new gd3d.math.vector2(this.joystick.leftAxis.x, -this.joystick.leftAxis.y);
+                    gd3d.math.vec2Normalize(axis, axis);
+                    if (axis.x < -0.3827) {
+                        var vec = this.heroGun.localEulerAngles;
+                        vec.y += this.rotateSpeed * delta * this.joystick.leftAxis.x;
+                        this.heroGun.localEulerAngles = vec;
+                        this.heroGun.markDirty();
+                        this.heroGun.updateTran(false);
+                    }
+                    else if (axis.x > 0.3827) {
+                        var vec = this.heroGun.localEulerAngles;
+                        vec.y += this.rotateSpeed * delta * this.joystick.leftAxis.x;
+                        this.heroGun.localEulerAngles = vec;
+                        this.heroGun.markDirty();
+                        this.heroGun.updateTran(false);
+                    }
+                    if (axis.y > 0.3827) {
+                        var vec = gd3d.math.pool.new_vector3();
+                        this.heroGun.getForwardInWorld(vec);
+                        gd3d.math.vec3ScaleByNum(vec, this.moveSpeed * delta, vec);
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, vec, this.heroTank.localTranslate);
+                        this.heroTank.markDirty();
+                        gd3d.math.pool.delete_vector3(vec);
+                        gd3d.math.vec3Clone(this.heroGun.localEulerAngles, targetAngle);
+                        var rotate = new gd3d.math.vector3(0, 2 * this.rotateSpeed * delta, 0);
+                        var d = Math.abs(this.heroBase.localEulerAngles.y - targetAngle.y);
+                        if (d > 180) {
+                            d = 360 - d;
+                        }
+                        if (d > 90) {
+                            if (targetAngle.y > 0) {
+                                targetAngle.y -= 180;
+                            }
+                            else {
+                                targetAngle.y += 180;
+                            }
+                        }
+                        if (d > rotate.y) {
+                            var vec_1 = new gd3d.math.vector3();
+                            if (this.heroBase.localEulerAngles.y > targetAngle.y && this.heroBase.localEulerAngles.y - targetAngle.y < 180
+                                || targetAngle.y > this.heroBase.localEulerAngles.y && targetAngle.y - this.heroBase.localEulerAngles.y >= 180) {
+                                gd3d.math.vec3Subtract(this.heroBase.localEulerAngles, rotate, vec_1);
+                            }
+                            else {
+                                gd3d.math.vec3Add(this.heroBase.localEulerAngles, rotate, vec_1);
+                            }
+                            this.heroBase.localEulerAngles = vec_1;
+                        }
+                        else {
+                            this.heroBase.localEulerAngles = targetAngle;
+                        }
+                        this.heroBase.markDirty();
+                    }
+                    else if (axis.y < -0.3827) {
+                        var vec = gd3d.math.pool.new_vector3();
+                        this.heroGun.getForwardInWorld(vec);
+                        gd3d.math.vec3ScaleByNum(vec, -this.moveSpeed * delta, vec);
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, vec, this.heroTank.localTranslate);
+                        this.heroTank.markDirty();
+                        gd3d.math.pool.delete_vector3(vec);
+                        gd3d.math.vec3Clone(this.heroGun.localEulerAngles, targetAngle);
+                        var rotate = new gd3d.math.vector3(0, 2 * this.rotateSpeed * delta, 0);
+                        var d = Math.abs(this.heroBase.localEulerAngles.y - targetAngle.y);
+                        if (d > 180) {
+                            d = 360 - d;
+                        }
+                        if (d > 90) {
+                            if (targetAngle.y > 0) {
+                                targetAngle.y -= 180;
+                            }
+                            else {
+                                targetAngle.y += 180;
+                            }
+                        }
+                        if (d > rotate.y) {
+                            var vec_2 = new gd3d.math.vector3();
+                            if (this.heroBase.localEulerAngles.y > targetAngle.y && this.heroBase.localEulerAngles.y - targetAngle.y < 180
+                                || targetAngle.y > this.heroBase.localEulerAngles.y && targetAngle.y - this.heroBase.localEulerAngles.y >= 180) {
+                                gd3d.math.vec3Subtract(this.heroBase.localEulerAngles, rotate, vec_2);
+                            }
+                            else {
+                                gd3d.math.vec3Add(this.heroBase.localEulerAngles, rotate, vec_2);
+                            }
+                            this.heroBase.localEulerAngles = vec_2;
+                        }
+                        else {
+                            this.heroBase.localEulerAngles = targetAngle;
+                        }
+                        this.heroBase.markDirty();
+                    }
+                }
+            }
+        };
+        TankNew.prototype.fire = function () {
+            var tran = new gd3d.framework.transform();
+            tran.name = "bullet" + this.bulletId;
+            tran.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
+            tran.setWorldPosition(new gd3d.math.vector3(0, 9999, 0));
+            this.scene.addChild(tran);
+            var filter = tran.gameObject.addComponent("meshFilter");
+            var smesh = this.app.getAssetMgr().getDefaultMesh("sphere");
+            filter.mesh = smesh;
+            var renderer = tran.gameObject.addComponent("meshRenderer");
+            var shader = this.app.getAssetMgr().getShader("diffuse.shader.json");
+            if (shader != null) {
+                renderer.materials = [];
+                renderer.materials.push(new gd3d.framework.material());
+                renderer.materials[0].setShader(shader);
+                var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
+                renderer.materials[0].setTexture("_MainTex", texture);
+            }
+            tran.markDirty();
+            var explodePos;
+            var delay = 0;
+            var dir = gd3d.math.pool.new_vector3();
+            this.heroGun.getForwardInWorld(dir);
+            var ray = new gd3d.framework.ray(this.heroSlot.getWorldTranslate(), dir);
+            gd3d.math.pool.delete_vector3(dir);
+            for (var i = 0; i < this.cubes.length; i++) {
+                var pickinfo = ray.intersectCollider(this.cubes[i]);
+                if (pickinfo != null) {
+                    explodePos = pickinfo.hitposition;
+                    var l = gd3d.math.vec3Distance(this.heroSlot.getWorldTranslate(), explodePos);
+                    delay = l / this.bulletSpeed;
+                    break;
+                }
+            }
+            var bullet = {
+                id: this.bulletId++,
+                transform: tran,
+                explodePos: explodePos,
+                delay: delay
+            };
+            this.bulletList.push(bullet);
+        };
+        return TankNew;
+    }());
+    Demo.TankNew = TankNew;
+})(Demo || (Demo = {}));
+var Demo;
+(function (Demo) {
+    var TankGame = (function () {
+        function TankGame() {
+            this.cubes = [];
+            this.walls = [];
+            this.taskmgr = new gd3d.framework.taskMgr();
+            this.tankMoveSpeed = 4;
+            this.tankRotateSpeed = new gd3d.math.vector3(0, 72, 0);
+            this.gunRotateSpeed = new gd3d.math.vector3(0, 150, 0);
+            this.angleLimit = 5;
+            this.colVisible = false;
+            this.keyMap = {};
+            this.bulletId = 0;
+            this.bulletList = [];
+            this.bulletSpeed = 30;
+            this.fireStep = 0.5;
+            this.fireTick = 0;
+        }
+        TankGame.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        TankGame.prototype.loadTexture = function (laststate, state) {
+            this.app.getAssetMgr().load("res/gd3d.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        TankGame.prototype.loadHeroPrefab = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/prefabs/tank01/tank01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank01.prefab.json");
+                    _this.heroTank = _prefab.getCloneTrans();
+                    _this.scene.addChild(_this.heroTank);
+                    _this.heroTank.localScale = new gd3d.math.vector3(4, 4, 4);
+                    _this.heroTank.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                    var col = _this.heroTank.gameObject.addComponent("boxcollider");
+                    col.center = new gd3d.math.vector3(0, 0.2, 0);
+                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
+                    col.colliderVisible = _this.colVisible;
+                    _this.heroGun = _this.heroTank.find("tank_up");
+                    _this.heroSlot = _this.heroGun.find("slot");
+                    state.finish = true;
+                }
+            });
+        };
+        TankGame.prototype.loadEnemyPrefab = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/prefabs/tank02/tank02.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank02.prefab.json");
+                    _this.enemyTank = _prefab.getCloneTrans();
+                    _this.scene.addChild(_this.enemyTank);
+                    _this.enemyTank.localScale = new gd3d.math.vector3(4, 4, 4);
+                    _this.enemyTank.localTranslate = new gd3d.math.vector3(0, 0, -6);
+                    var col = _this.enemyTank.gameObject.addComponent("boxcollider");
+                    col.center = new gd3d.math.vector3(0, 0.2, 0);
+                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
+                    col.colliderVisible = _this.colVisible;
+                    _this.enemyGun = _this.enemyTank.find("tank_up");
+                    _this.enemySlot = _this.enemyGun.find("slot");
+                    state.finish = true;
+                }
+            });
+        };
+        TankGame.prototype.loadScene = function (laststate, state) {
+            var _this = this;
+            this.app.getAssetMgr().load("res/scenes/test_scene/test_scene.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _scene = _this.app.getAssetMgr().getAssetByName("test_scene.scene.json");
+                    var _root = _scene.getSceneRoot();
+                    _this.scene.addChild(_root);
+                    _root.localTranslate.y = -0.1;
+                    for (var i = 0; i < 8; i++) {
+                        var tran = _root.find("wall" + i);
+                        var col = tran.gameObject.getComponent("boxcollider");
+                        col.colliderVisible = _this.colVisible;
+                        _this.walls.push(tran);
+                    }
+                    _this.app.getScene().lightmaps = [];
+                    _scene.useLightMap(_this.app.getScene());
+                    state.finish = true;
+                }
+            });
+        };
+        TankGame.prototype.addCamera = function (laststate, state) {
+            var tranCam = new gd3d.framework.transform();
+            tranCam.name = "Cam";
+            this.scene.addChild(tranCam);
+            this.camera = tranCam.gameObject.addComponent("camera");
+            this.camera.near = 0.1;
+            this.camera.far = 200;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            this.cameraShock = tranCam.gameObject.addComponent("CameraShock");
+            tranCam.localTranslate = new gd3d.math.vector3(0, 20, -16);
+            tranCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            tranCam.markDirty();
+            state.finish = true;
+        };
+        TankGame.prototype.addJoystick = function (laststate, state) {
+            var _this = this;
+            this.overlay2d = new gd3d.framework.overlay2D();
+            this.overlay2d.autoAsp = false;
+            this.overlay2d.canvas.pixelWidth = window.innerWidth;
+            this.overlay2d.canvas.pixelHeight = window.innerHeight;
+            this.camera.addOverLay(this.overlay2d);
+            this.joystick = new Joystick();
+            this.joystick.init(this.app, this.overlay2d);
+            this.joystick.triggerFunc = function () {
+                if (_this.fireTick >= _this.fireStep) {
+                    _this.fireTick = 0;
+                    _this.fire();
+                }
+            };
+            state.finish = true;
+        };
+        TankGame.prototype.addObject = function (laststate, state) {
+            {
+                var n = 2;
+                for (var i = 0; i < n; i++) {
+                    var cube = new gd3d.framework.transform();
+                    cube.name = "cube" + i;
+                    cube.localScale = new gd3d.math.vector3(3, 3, 3);
+                    cube.localTranslate = new gd3d.math.vector3(-2 * (n - 1) + i * 4, 2, 16);
+                    this.scene.addChild(cube);
+                    var filter = cube.gameObject.addComponent("meshFilter");
+                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                    filter.mesh = smesh;
+                    var renderer = cube.gameObject.addComponent("meshRenderer");
+                    var shader = this.app.getAssetMgr().getShader("diffuse.shader.json");
+                    if (shader != null) {
+                        renderer.materials = [];
+                        renderer.materials.push(new gd3d.framework.material());
+                        renderer.materials[0].setShader(shader);
+                        var texture = this.app.getAssetMgr().getAssetByName("gd3d.png");
+                        renderer.materials[0].setTexture("_MainTex", texture);
+                    }
+                    var col = cube.gameObject.addComponent("boxcollider");
+                    col.colliderVisible = this.colVisible;
+                    cube.markDirty();
+                    this.cubes.push(cube);
+                }
+            }
+            state.finish = true;
+        };
+        TankGame.prototype.start = function (app) {
+            var _this = this;
+            this.label = document.getElementById("Label");
+            this.app = app;
+            this.scene = app.getScene();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+            this.taskmgr.addTaskCall(this.loadHeroPrefab.bind(this));
+            this.taskmgr.addTaskCall(this.loadEnemyPrefab.bind(this));
+            this.taskmgr.addTaskCall(this.loadScene.bind(this));
+            this.taskmgr.addTaskCall(this.addCamera.bind(this));
+            this.taskmgr.addTaskCall(this.addObject.bind(this));
+            this.taskmgr.addTaskCall(this.addJoystick.bind(this));
+            document.addEventListener("keydown", function (e) { _this.keyMap[e.keyCode] = true; });
+        };
+        TankGame.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+            if (this.joystick != null) {
+                this.joystick.update(delta);
+            }
+            this.tankControl(delta);
+            this.updateBullet(delta);
+            for (var i = 0; i < this.bulletList.length; i++) {
+                var col = this.bulletList[i].transform.gameObject.getComponent("boxcollider");
+                for (var j = 0; j < this.cubes.length; j++) {
+                    var c = this.cubes[j];
+                    if (c != null && col.intersectsTransform(c)) {
+                        this.scene.removeChild(c);
+                        c.dispose();
+                        this.bulletList[i].life = 0;
+                        break;
+                    }
+                }
+            }
+            this.fireTick += delta;
+        };
+        TankGame.prototype.testTankCol = function (tran) {
+            var col = tran.gameObject.getComponent("boxcollider");
+            for (var i = 0; i < this.cubes.length; i++) {
+                var c_5 = this.cubes[i].gameObject.getComponent("boxcollider");
+                if (c_5 != null && col.obb.intersects(c_5.obb)) {
+                    return true;
+                }
+            }
+            for (var i = 0; i < this.walls.length; i++) {
+                var c_6 = this.walls[i].gameObject.getComponent("boxcollider");
+                if (col.obb.intersects(c_6.obb)) {
+                    return true;
+                }
+            }
+            var c = this.enemyTank.gameObject.getComponent("boxcollider");
+            if (col.obb.intersects(c.obb)) {
+                return true;
+            }
+            return false;
+        };
+        TankGame.prototype.tankControl = function (delta) {
+            if (this.joystick != null) {
+                var targetAngle = new gd3d.math.vector3();
+                var goForward = true;
+                if (gd3d.math.vec2Length(this.joystick.leftAxis) > 0.05) {
+                    var point = new gd3d.math.vector3(this.joystick.leftAxis.x, 0, -this.joystick.leftAxis.y);
+                    gd3d.math.vec3Add(this.heroTank.getWorldTranslate(), point, point);
+                    var quat = new gd3d.math.quaternion();
+                    gd3d.math.quatLookat(this.heroTank.getWorldTranslate(), point, quat);
+                    gd3d.math.quatToEulerAngles(quat, targetAngle);
+                    var rotateSpeed = new gd3d.math.vector3();
+                    gd3d.math.vec3ScaleByNum(this.tankRotateSpeed, delta, rotateSpeed);
+                    var d = Math.abs(this.heroTank.localEulerAngles.y - targetAngle.y);
+                    if (d > 180) {
+                        d = 360 - d;
+                    }
+                    if (d <= 90) {
+                        goForward = true;
+                    }
+                    else {
+                        if (targetAngle.y > 0) {
+                            targetAngle.y -= 180;
+                        }
+                        else {
+                            targetAngle.y += 180;
+                        }
+                        goForward = false;
+                    }
+                    if (d > rotateSpeed.y) {
+                        var vec = new gd3d.math.vector3();
+                        if (this.heroTank.localEulerAngles.y > targetAngle.y && this.heroTank.localEulerAngles.y - targetAngle.y < 180
+                            || targetAngle.y > this.heroTank.localEulerAngles.y && targetAngle.y - this.heroTank.localEulerAngles.y >= 180) {
+                            gd3d.math.vec3Subtract(this.heroTank.localEulerAngles, rotateSpeed, vec);
+                        }
+                        else {
+                            gd3d.math.vec3Add(this.heroTank.localEulerAngles, rotateSpeed, vec);
+                        }
+                        this.heroTank.localEulerAngles = vec;
+                    }
+                    else {
+                        this.heroTank.localEulerAngles = targetAngle;
+                    }
+                    this.heroTank.markDirty();
+                }
+                if (gd3d.math.vec2Length(this.joystick.leftAxis) > 0.05) {
+                    var speed = 0;
+                    if (Math.abs(this.heroTank.localEulerAngles.y - targetAngle.y) < this.angleLimit) {
+                        speed = this.tankMoveSpeed * delta;
+                    }
+                    else {
+                        speed = this.tankMoveSpeed * delta * 0.8;
+                    }
+                    var v = new gd3d.math.vector3();
+                    this.heroTank.getForwardInWorld(v);
+                    gd3d.math.vec3ScaleByNum(v, speed, v);
+                    if (!goForward) {
+                        gd3d.math.vec3ScaleByNum(v, -1, v);
+                    }
+                    var col = this.heroTank.gameObject.getComponent("boxcollider");
+                    var f = false;
+                    var r = false;
+                    var l = false;
+                    gd3d.math.vec3Add(col.obb.center, v, col.obb.center);
+                    f = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v, col.obb.center);
+                    var q = new gd3d.math.quaternion();
+                    var v1 = new gd3d.math.vector3();
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 45, q);
+                    gd3d.math.quatTransformVector(q, v, v1);
+                    gd3d.math.vec3ScaleByNum(v1, 0.5, v1);
+                    gd3d.math.vec3Add(col.obb.center, v1, col.obb.center);
+                    r = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v1, col.obb.center);
+                    var v2 = new gd3d.math.vector3();
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, -45, q);
+                    gd3d.math.quatTransformVector(q, v, v2);
+                    gd3d.math.vec3ScaleByNum(v2, 0.5, v2);
+                    gd3d.math.vec3Add(col.obb.center, v2, col.obb.center);
+                    l = this.testTankCol(this.heroTank);
+                    gd3d.math.vec3Subtract(col.obb.center, v2, col.obb.center);
+                    if (!f) {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
+                    }
+                    else if (!r && l) {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v1, this.heroTank.localTranslate);
+                    }
+                    else if (r && !l) {
+                        gd3d.math.vec3Add(this.heroTank.localTranslate, v2, this.heroTank.localTranslate);
+                    }
+                    this.heroTank.markDirty();
+                }
+                if (gd3d.math.vec2Length(this.joystick.rightAxis) > 0.2) {
+                    var point = new gd3d.math.vector3(this.joystick.rightAxis.x, 0, -this.joystick.rightAxis.y);
+                    gd3d.math.vec3Add(this.heroGun.getWorldTranslate(), point, point);
+                    var quat = new gd3d.math.quaternion();
+                    gd3d.math.quatLookat(this.heroGun.getWorldTranslate(), point, quat);
+                    var vec = new gd3d.math.vector3();
+                    gd3d.math.quatToEulerAngles(quat, vec);
+                    gd3d.math.vec3Subtract(vec, this.heroTank.localEulerAngles, vec);
+                    if (vec.y > 180) {
+                        vec.y -= 360;
+                    }
+                    if (vec.y < -180) {
+                        vec.y += 360;
+                    }
+                    var rotateSpeed = new gd3d.math.vector3();
+                    gd3d.math.vec3ScaleByNum(this.gunRotateSpeed, delta, rotateSpeed);
+                    if (Math.abs(this.heroGun.localEulerAngles.y - vec.y) > rotateSpeed.y) {
+                        if (this.heroGun.localEulerAngles.y > vec.y && this.heroGun.localEulerAngles.y - vec.y < 180
+                            || vec.y > this.heroGun.localEulerAngles.y && vec.y - this.heroGun.localEulerAngles.y >= 180) {
+                            gd3d.math.vec3Subtract(this.heroGun.localEulerAngles, rotateSpeed, vec);
+                        }
+                        else {
+                            gd3d.math.vec3Add(this.heroGun.localEulerAngles, rotateSpeed, vec);
+                        }
+                        this.heroGun.localEulerAngles = vec;
+                    }
+                    else {
+                        this.heroGun.localEulerAngles = vec;
+                    }
+                    this.heroGun.markDirty();
+                }
+                if (this.camera != null) {
+                    this.camera.gameObject.transform.localTranslate.x = this.heroTank.localTranslate.x;
+                    this.camera.gameObject.transform.localTranslate.y = this.heroTank.localTranslate.y + 20;
+                    this.camera.gameObject.transform.localTranslate.z = this.heroTank.localTranslate.z - 16;
+                    this.camera.gameObject.transform.markDirty();
+                }
+            }
+        };
+        TankGame.prototype.fire = function () {
+            var tran = new gd3d.framework.transform();
+            tran.name = "bullet" + this.bulletId;
+            tran.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
+            tran.localTranslate = this.heroSlot.getWorldTranslate();
+            this.scene.addChild(tran);
+            var filter = tran.gameObject.addComponent("meshFilter");
+            var smesh = this.app.getAssetMgr().getDefaultMesh("sphere");
+            filter.mesh = smesh;
+            var renderer = tran.gameObject.addComponent("meshRenderer");
+            var shader = this.app.getAssetMgr().getShader("light1.shader.json");
+            if (shader != null) {
+                renderer.materials = [];
+                renderer.materials.push(new gd3d.framework.material());
+                renderer.materials[0].setShader(shader);
+                var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
+                renderer.materials[0].setTexture("_MainTex", texture);
+            }
+            var col = tran.gameObject.addComponent("boxcollider");
+            col.size = new gd3d.math.vector3(0.2, 0.2, 0.2);
+            col.colliderVisible = this.colVisible;
+            tran.markDirty();
+            var dir = new gd3d.math.vector3();
+            this.heroGun.getForwardInWorld(dir);
+            var bullet = {
+                id: this.bulletId++,
+                transform: tran,
+                direction: dir,
+                life: 3
+            };
+            this.bulletList.push(bullet);
+        };
+        TankGame.prototype.updateBullet = function (delta) {
+            for (var i = 0; i < this.bulletList.length; i++) {
+                var b = this.bulletList[i];
+                var v = gd3d.math.pool.new_vector3();
+                var speed = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3ScaleByNum(b.direction, this.bulletSpeed * delta, speed);
+                gd3d.math.vec3Add(b.transform.localTranslate, speed, v);
+                b.transform.localTranslate = v;
+                b.transform.markDirty();
+                b.life -= delta;
+            }
+            for (var i = 0; i < this.bulletList.length; i++) {
+                var b = this.bulletList[i];
+                if (b.life <= 0) {
+                    this.bulletList.splice(i, 1);
+                    this.scene.removeChild(b.transform);
+                    b.transform.dispose();
+                }
+            }
+        };
+        return TankGame;
+    }());
+    Demo.TankGame = TankGame;
+})(Demo || (Demo = {}));
 //# sourceMappingURL=app.js.map

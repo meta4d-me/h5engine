@@ -130,6 +130,10 @@ namespace gd3d.framework
         setTexture(texture: texture, border?: math.border, rect?: math.rect)
         {
             this.needRefreshImg = true;
+            if(this.sprite)
+            {
+                this.sprite.unuse();
+            }
             var _sprite = new sprite();
             _sprite.texture = texture;
             if (border != null)
@@ -142,10 +146,12 @@ namespace gd3d.framework
                 _sprite.rect = new math.rect(0, 0, texture.glTexture.width, texture.glTexture.height);
 
             this.sprite = _sprite;
-
+            this.sprite.use();
             this.prepareData();
-            if (this.transform != null)
+            if (this.transform != null){
                 this.transform.markDirty();
+                this.updateTran();
+            }
         }
 
         /**
@@ -166,6 +172,7 @@ namespace gd3d.framework
             this._sprite.use();
             this.prepareData();
             this.transform.markDirty();
+            this.updateTran();
         }
         public get sprite()
         {

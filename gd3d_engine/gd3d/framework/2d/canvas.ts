@@ -323,7 +323,7 @@ namespace gd3d.framework
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr)
         {
             //context.updateModel(this.gameObject.transform);
-
+            if(!node.visible)return;
             if (node.renderer != null)
             {
                 node.renderer.render(this);

@@ -42,9 +42,10 @@
             var mesh = this.cube2.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
             mesh.mesh = (smesh);
             var renderer = this.cube2.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            let coll = this.cube2.gameObject.addComponent("spherecollider") as gd3d.framework.spherecollider;
-            coll.center = new gd3d.math.vector3(0, 1, 0);
-            coll.radius = 1;
+            let coll = this.cube2.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
+            // coll.center = new gd3d.math.vector3(0, 1, 0);
+            // coll.radius = 1;
+            coll.colliderVisible=true;
 
             //---------------------baocuo
             //this.cube2.gameObject.addComponent("frustumculling") as gd3d.framework.frustumculling;
@@ -91,6 +92,7 @@
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
         objCam.lookat(this.cube);
         objCam.markDirty();//标记为需要刷新
+        CameraController.instance().init(this.app,this.camera);
 
     }
     camera: gd3d.framework.camera;
@@ -104,6 +106,7 @@
     pointDown: boolean = false;
     update(delta: number)
     {
+        CameraController.instance().update(delta);
         if (this.pointDown == false && this.inputMgr.point.touch == true)//pointdown
         {
             var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
@@ -121,6 +124,12 @@
         {
             return;
         }
+
+        if ((this.cube2.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider).intersectsTransform(this.cube3))
+        {
+            return;
+        }
+
         this.timer += delta;
         this.cube3.localTranslate.x += delta;
         this.cube3.markDirty();
@@ -132,10 +141,13 @@
         // objCam.localTranslate.x += delta;
         // objCam.markDirty();
 
-        // var tv = new gd3d.math.vector3();
-        // gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
-        // //this.cube2.localTranslate = this.movetarget;
-        // this.cube2.markDirty();
+        var tv = new gd3d.math.vector3();
+        gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
+        this.cube2.localTranslate = this.movetarget;
+        this.cube2.markDirty();
+
+        
+
 
     }
 }
