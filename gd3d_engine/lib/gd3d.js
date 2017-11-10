@@ -8865,6 +8865,7 @@ var gd3d;
                     }
                     else {
                         console.warn("is null of animationclip.frames! ");
+                        return;
                     }
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];

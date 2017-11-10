@@ -218,6 +218,7 @@ namespace gd3d.framework
                     frame = this._playClip.frames[this._playFrameid];
                 }else{
                     console.warn("is null of animationclip.frames! ");
+                    return ;
                 }
 
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
