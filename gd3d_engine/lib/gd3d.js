@@ -8476,7 +8476,9 @@ var gd3d;
                 framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
             };
             texture.prototype.dispose = function () {
-                this.glTexture.dispose(framework.sceneMgr.app.getAssetMgr().webgl);
+                if (this && this.glTexture) {
+                    this.glTexture.dispose(framework.sceneMgr.app.getAssetMgr().webgl);
+                }
             };
             texture.prototype.caclByteLength = function () {
                 if (this.glTexture) {
