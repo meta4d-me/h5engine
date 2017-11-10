@@ -190,6 +190,19 @@ declare class test_NewScene implements IState {
     start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
+declare class test_postCamera implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    timer: number;
+    update(delta: number): void;
+    camTran: gd3d.framework.transform;
+    postColor: gd3d.framework.cameraPostQueue_Color;
+    postQuad: gd3d.framework.cameraPostQueue_Quad;
+    depthColor: gd3d.framework.cameraPostQueue_Depth;
+    private addCamera();
+}
 declare class test_RangeScreen implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

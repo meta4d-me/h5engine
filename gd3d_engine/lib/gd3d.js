@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000036";
+                this.build = "b000037";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -6357,6 +6357,7 @@ var gd3d;
                 if (assetName === void 0) { assetName = null; }
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this.frames = {};
                 if (!assetName) {
                     assetName = "animationClip_" + this.getGUID();
                 }
@@ -8717,11 +8718,17 @@ var gd3d;
                     var bone = this._playClip.bones[i];
                     if (cached && !this.carelist[bone])
                         continue;
-                    var frame = this._playClip.frames[this._playFrameid];
+                    var frame;
+                    if (this._playClip != null && this._playClip.frames != null) {
+                        frame = this._playClip.frames[this._playFrameid];
+                    }
+                    else {
+                        console.warn("is null of animationclip.frames! ");
+                    }
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
                     var tpose = this.tpose[bone];
-                    if (outb != undefined) {
+                    if (outb != undefined || frame == null) {
                         if (this.mix) {
                             var last = this.lerppose[bone];
                             if (last != undefined) {
