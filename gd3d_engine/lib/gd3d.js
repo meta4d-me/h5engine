@@ -6822,6 +6822,7 @@ var gd3d;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
                 this._changeShaderMap = {};
+                this.queue = 0;
                 this.mapUniform = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
@@ -6996,7 +6997,7 @@ var gd3d;
                 return this.shader.layer;
             };
             material.prototype.getQueue = function () {
-                return this.shader.queue;
+                return this.shader.queue + this.queue;
             };
             material.prototype.getShader = function () {
                 return this.shader;
@@ -7238,6 +7239,10 @@ var gd3d;
                     console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
                 }
                 this.setShader(shader);
+                var queue = json["queue"];
+                if (queue) {
+                    this.queue = queue;
+                }
                 var mapUniform = json["mapUniform"];
                 for (var i in mapUniform) {
                     var jsonChild = mapUniform[i];
@@ -24567,65 +24572,6 @@ var gd3d;
                 }
                 else {
                     webgl.disable(webgl.BLEND);
-                }
-                if (glDrawPass.lastShowFace == undefined || glDrawPass.lastShowFace != this.state_showface) {
-                    if (this.state_showface == ShowFaceStateEnum.ALL) {
-                        webgl.disable(webgl.CULL_FACE);
-                    }
-                    else {
-                        if (this.state_showface == ShowFaceStateEnum.CCW) {
-                            webgl.frontFace(webgl.CCW);
-                        }
-                        else {
-                            webgl.frontFace(webgl.CW);
-                        }
-                        webgl.cullFace(webgl.BACK);
-                        webgl.enable(webgl.CULL_FACE);
-                    }
-                    glDrawPass.lastShowFace = this.state_showface;
-                }
-                if (glDrawPass.lastZWrite == undefined || glDrawPass.lastZWrite != this.state_zwrite) {
-                    if (this.state_zwrite) {
-                        webgl.depthMask(true);
-                    }
-                    else {
-                        webgl.depthMask(false);
-                    }
-                    glDrawPass.lastZWrite = this.state_zwrite;
-                }
-                {
-                    if (this.state_ztest) {
-                        webgl.enable(webgl.DEPTH_TEST);
-                        {
-                            webgl.depthFunc(this.state_ztest_method);
-                            glDrawPass.lastZTestMethod = this.state_ztest_method;
-                        }
-                    }
-                    else {
-                        webgl.disable(webgl.DEPTH_TEST);
-                    }
-                    glDrawPass.lastZTest = this.state_ztest;
-                }
-                if (this.state_blend) {
-                    if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
-                        webgl.enable(webgl.BLEND);
-                        glDrawPass.lastBlend = this.state_blend;
-                    }
-                    if (glDrawPass.lastBlendEquation == undefined || glDrawPass.lastBlendEquation != this.state_blendEquation) {
-                        webgl.blendEquation(this.state_blendEquation);
-                    }
-                    var blendVal = this.getCurBlendVal();
-                    if (blendVal != glDrawPass.lastBlendVal) {
-                        webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
-                        glDrawPass.lastBlendVal = blendVal;
-                    }
-                    glDrawPass.lastBlendEquation = this.state_blendEquation;
-                }
-                else {
-                    if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
-                        webgl.disable(webgl.BLEND);
-                        glDrawPass.lastBlend = this.state_blend;
-                    }
                 }
                 this.program.use(webgl);
                 if (applyUniForm) {

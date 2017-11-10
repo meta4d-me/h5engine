@@ -25,7 +25,7 @@ void main()
 	lowp vec2 _speed= vec2(_speedu,_speedv);
     _light_uv = (_glesMultiTexCoord0.xy * _streamLight_ST.xy + _streamLight_ST.zw)  + _speed * glstate_timer;
 
-    normalDir=mat3(glstate_matrix_model)*_glesVertex.xyz;
+    normalDir=mat3(glstate_matrix_model)*_glesNormal;
 	gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
 }
 
