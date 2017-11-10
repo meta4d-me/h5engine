@@ -80,7 +80,9 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("test_UI_component", () => new test_UI_Component());
         this.addBtn("test_四分屏", () => new test_pick_4p());
-        this.addBtn("test_drawMesh", () => new test_drawMesh());
+        //this.addBtn("test_drawMesh", () => new test_drawMesh());
+        //this.addBtn("cj_zs",()=>new dome.testCJ());
+        //this.addBtn("cj_zs_effect",()=>new dome.db_test_eff());
         
     }
     private x: number = 0;

@@ -15,7 +15,7 @@ varying highp vec3 normalDir;
 
 void main()
 {
-    lowp vec4 asmcolor=texture2D(_MainTex,_asm_uv);
+    lowp vec4 asmcolor=texture2D(_asm,_asm_uv);
     if(asmcolor.a*_alphaRate<0.5)
     {
         discard;
@@ -24,10 +24,10 @@ void main()
 
     lowp vec3 mainTexcolor=basecolor*_diffuseRate;
     lowp vec3 specColor=basecolor*_speculerRate*asmcolor.g;
-
     lowp vec2 streamligtuv=normalDir.xy*0.5+_light_uv;
     lowp vec3 lightcolor=texture2D(_streamLight,streamligtuv).rgb;
-    lightcolor=min(lightcolor,vec3(asmcolor.b))*_LightColor.rgb*_LightRate;
+
+    lightcolor=min(vec3(asmcolor.b),lightcolor)*_LightColor.rgb*_LightRate;
     
     gl_FragData[0]=vec4(mainTexcolor+specColor+lightcolor,1.0);
 }

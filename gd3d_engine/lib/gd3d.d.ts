@@ -1166,6 +1166,7 @@ declare namespace gd3d.framework {
         private _changeShaderMap;
         changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
+        private queue;
         getQueue(): number;
         getShader(): shader;
         private shader;
