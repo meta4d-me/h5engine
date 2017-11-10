@@ -213,8 +213,10 @@ namespace gd3d.framework
 
                 if (cached && !this.carelist[bone])
                     continue;
-
-                var frame = this._playClip.frames[this._playFrameid];
+                var frame;
+                if(this._playClip != null && this._playClip.frames != null)
+                    frame = this._playClip.frames[this._playFrameid];
+                    
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
                 var outb = this.nowpose[bone];
                 var tpose = this.tpose[bone];

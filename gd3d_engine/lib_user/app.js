@@ -581,7 +581,6 @@ var main = (function () {
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
         this.addBtn("test_UI_component", function () { return new test_UI_Component(); });
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
-        this.addBtn("test_drawMesh", function () { return new test_drawMesh(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -6645,11 +6644,6 @@ var t;
                         }
                     }
                     this.cube = cube;
-                    var tt = dome.addcube(this.app.getAssetMgr());
-                    this.cube.addChild(tt);
-                    tt.localTranslate.z = 1;
-                    tt.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-                    tt.markDirty();
                 }
                 {
                     var ref_cube = new gd3d.framework.transform();

@@ -8713,7 +8713,9 @@ var gd3d;
                     var bone = this._playClip.bones[i];
                     if (cached && !this.carelist[bone])
                         continue;
-                    var frame = this._playClip.frames[this._playFrameid];
+                    var frame;
+                    if (this._playClip != null && this._playClip.frames != null)
+                        frame = this._playClip.frames[this._playFrameid];
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
                     var tpose = this.tpose[bone];
