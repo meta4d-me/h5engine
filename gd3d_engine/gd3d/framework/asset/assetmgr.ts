@@ -1361,12 +1361,25 @@ namespace gd3d.framework
                         onstate(state);
                         return;
                     }
-                    let filename = this.getFileName(url);
-
-                    var ab = new assetBundle(url);
-                    ab.name = filename;
-                    ab.parse(JSON.parse(txt));
-                    ab.load(this, onstate, state);
+                    let json = JSON.parse(txt);
+                    let filename = "";
+                    if (json["files"]){
+                        filename = this.getFileName(url);
+                        
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        ab.parse(JSON.parse(txt));
+                        ab.load(this, onstate, state);
+                    }else{
+                        let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                        filename = this.getFileName(url);
+    
+                        var ab = new assetBundle(url);
+                        ab.name = filename;
+                        ab.totalLength = json["totalLength"];
+                        ab.loadCompressBundle(loadurl, onstate, state, this);
+                    }
+                  
 
                     this.mapBundle[filename] = ab;
                 });

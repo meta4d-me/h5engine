@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000034";
+                this.build = "b000037";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -4704,11 +4704,23 @@ var gd3d;
                             onstate(state);
                             return;
                         }
-                        var filename = _this.getFileName(url);
-                        var ab = new assetBundle(url);
-                        ab.name = filename;
-                        ab.parse(JSON.parse(txt));
-                        ab.load(_this, onstate, state);
+                        var json = JSON.parse(txt);
+                        var filename = "";
+                        if (json["files"]) {
+                            filename = _this.getFileName(url);
+                            var ab = new assetBundle(url);
+                            ab.name = filename;
+                            ab.parse(JSON.parse(txt));
+                            ab.load(_this, onstate, state);
+                        }
+                        else {
+                            var loadurl = url.replace(".assetbundle.json", ".packs.txt");
+                            filename = _this.getFileName(url);
+                            var ab = new assetBundle(url);
+                            ab.name = filename;
+                            ab.totalLength = json["totalLength"];
+                            ab.loadCompressBundle(loadurl, onstate, state, _this);
+                        }
                         _this.mapBundle[filename] = ab;
                     });
                 }
@@ -6386,6 +6398,7 @@ var gd3d;
                 if (assetName === void 0) { assetName = null; }
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this.frames = {};
                 if (!assetName) {
                     assetName = "animationClip_" + this.getGUID();
                 }
@@ -6948,6 +6961,7 @@ var gd3d;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
                 this._changeShaderMap = {};
+                this.queue = 0;
                 this.mapUniform = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
@@ -7122,7 +7136,7 @@ var gd3d;
                 return this.shader.layer;
             };
             material.prototype.getQueue = function () {
-                return this.shader.queue;
+                return this.shader.queue + this.queue;
             };
             material.prototype.getShader = function () {
                 return this.shader;
@@ -7364,6 +7378,10 @@ var gd3d;
                     console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
                 }
                 this.setShader(shader);
+                var queue = json["queue"];
+                if (queue) {
+                    this.queue = queue;
+                }
                 var mapUniform = json["mapUniform"];
                 for (var i in mapUniform) {
                     var jsonChild = mapUniform[i];
@@ -8602,7 +8620,9 @@ var gd3d;
                 framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
             };
             texture.prototype.dispose = function () {
-                this.glTexture.dispose(framework.sceneMgr.app.getAssetMgr().webgl);
+                if (this && this.glTexture) {
+                    this.glTexture.dispose(framework.sceneMgr.app.getAssetMgr().webgl);
+                }
             };
             texture.prototype.caclByteLength = function () {
                 if (this.glTexture) {
@@ -8839,11 +8859,17 @@ var gd3d;
                     var bone = this._playClip.bones[i];
                     if (cached && !this.carelist[bone])
                         continue;
-                    var frame = this._playClip.frames[this._playFrameid];
+                    var frame;
+                    if (this._playClip != null && this._playClip.frames != null) {
+                        frame = this._playClip.frames[this._playFrameid];
+                    }
+                    else {
+                        console.warn("is null of animationclip.frames! ");
+                    }
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
                     var tpose = this.tpose[bone];
-                    if (outb != undefined) {
+                    if (outb != undefined || frame == null) {
                         if (this.mix) {
                             var last = this.lerppose[bone];
                             if (last != undefined) {
@@ -24842,65 +24868,6 @@ var gd3d;
                 }
                 else {
                     webgl.disable(webgl.BLEND);
-                }
-                if (glDrawPass.lastShowFace == undefined || glDrawPass.lastShowFace != this.state_showface) {
-                    if (this.state_showface == ShowFaceStateEnum.ALL) {
-                        webgl.disable(webgl.CULL_FACE);
-                    }
-                    else {
-                        if (this.state_showface == ShowFaceStateEnum.CCW) {
-                            webgl.frontFace(webgl.CCW);
-                        }
-                        else {
-                            webgl.frontFace(webgl.CW);
-                        }
-                        webgl.cullFace(webgl.BACK);
-                        webgl.enable(webgl.CULL_FACE);
-                    }
-                    glDrawPass.lastShowFace = this.state_showface;
-                }
-                if (glDrawPass.lastZWrite == undefined || glDrawPass.lastZWrite != this.state_zwrite) {
-                    if (this.state_zwrite) {
-                        webgl.depthMask(true);
-                    }
-                    else {
-                        webgl.depthMask(false);
-                    }
-                    glDrawPass.lastZWrite = this.state_zwrite;
-                }
-                {
-                    if (this.state_ztest) {
-                        webgl.enable(webgl.DEPTH_TEST);
-                        {
-                            webgl.depthFunc(this.state_ztest_method);
-                            glDrawPass.lastZTestMethod = this.state_ztest_method;
-                        }
-                    }
-                    else {
-                        webgl.disable(webgl.DEPTH_TEST);
-                    }
-                    glDrawPass.lastZTest = this.state_ztest;
-                }
-                if (this.state_blend) {
-                    if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
-                        webgl.enable(webgl.BLEND);
-                        glDrawPass.lastBlend = this.state_blend;
-                    }
-                    if (glDrawPass.lastBlendEquation == undefined || glDrawPass.lastBlendEquation != this.state_blendEquation) {
-                        webgl.blendEquation(this.state_blendEquation);
-                    }
-                    var blendVal = this.getCurBlendVal();
-                    if (blendVal != glDrawPass.lastBlendVal) {
-                        webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
-                        glDrawPass.lastBlendVal = blendVal;
-                    }
-                    glDrawPass.lastBlendEquation = this.state_blendEquation;
-                }
-                else {
-                    if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend) {
-                        webgl.disable(webgl.BLEND);
-                        glDrawPass.lastBlend = this.state_blend;
-                    }
                 }
                 this.program.use(webgl);
                 if (applyUniForm) {
