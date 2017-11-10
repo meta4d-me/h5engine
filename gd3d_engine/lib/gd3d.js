@@ -8714,8 +8714,12 @@ var gd3d;
                     if (cached && !this.carelist[bone])
                         continue;
                     var frame;
-                    if (this._playClip != null && this._playClip.frames != null)
+                    if (this._playClip != null && this._playClip.frames != null) {
                         frame = this._playClip.frames[this._playFrameid];
+                    }
+                    else {
+                        console.warn("is null of animationclip.frames! ");
+                    }
                     var nextseek = i * 7 + 1;
                     var outb = this.nowpose[bone];
                     var tpose = this.tpose[bone];
