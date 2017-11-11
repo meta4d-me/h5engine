@@ -327,6 +327,7 @@ namespace gd3d.framework
         {
             return this.shader.layer;
         }
+        private queue:number=0;
         /**
          * @public
          * @language zh_CN
@@ -336,7 +337,7 @@ namespace gd3d.framework
          */
         getQueue()
         {
-            return this.shader.queue;
+            return this.shader.queue+this.queue;
         }
         /**
          * @public
@@ -698,6 +699,12 @@ namespace gd3d.framework
                 console.error("shader 为空！shadername："+shaderName+" bundleName: "+bundleName);
             }
             this.setShader(shader);
+            var queue=json["queue"];
+            if(queue)
+            {
+                this.queue=queue;
+            }
+
             var mapUniform = json["mapUniform"];
             for (var i in mapUniform)
             {

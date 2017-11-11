@@ -213,7 +213,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        frames: { [fid: string]: Float32Array };
+        frames: { [fid: string]: Float32Array } = {};
 
         /**
          * @private

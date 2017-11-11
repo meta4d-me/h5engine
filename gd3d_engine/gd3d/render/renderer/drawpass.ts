@@ -316,87 +316,87 @@
             // }
 
 
-            if (glDrawPass.lastShowFace == undefined || glDrawPass.lastShowFace != this.state_showface)
-            {
-                if (this.state_showface == ShowFaceStateEnum.ALL)
-                {
-                    webgl.disable(webgl.CULL_FACE);
-                }
-                else
-                {
-                    if (this.state_showface == ShowFaceStateEnum.CCW)
-                    {
-                        webgl.frontFace(webgl.CCW);
-                    }
-                    else
-                    {
-                        webgl.frontFace(webgl.CW);
-                    }
-                    webgl.cullFace(webgl.BACK);
-                    webgl.enable(webgl.CULL_FACE);
-                }
-                glDrawPass.lastShowFace = this.state_showface;
-            }
-            if (glDrawPass.lastZWrite == undefined || glDrawPass.lastZWrite != this.state_zwrite)
-            {
-                if (this.state_zwrite)
-                {
-                    webgl.depthMask(true);
-                }
-                else
-                {
-                    webgl.depthMask(false);
-                }
-                glDrawPass.lastZWrite = this.state_zwrite;
-            }
+            // if (glDrawPass.lastShowFace == undefined || glDrawPass.lastShowFace != this.state_showface)
+            // {
+            //     if (this.state_showface == ShowFaceStateEnum.ALL)
+            //     {
+            //         webgl.disable(webgl.CULL_FACE);
+            //     }
+            //     else
+            //     {
+            //         if (this.state_showface == ShowFaceStateEnum.CCW)
+            //         {
+            //             webgl.frontFace(webgl.CCW);
+            //         }
+            //         else
+            //         {
+            //             webgl.frontFace(webgl.CW);
+            //         }
+            //         webgl.cullFace(webgl.BACK);
+            //         webgl.enable(webgl.CULL_FACE);
+            //     }
+            //     glDrawPass.lastShowFace = this.state_showface;
+            // }
+            // if (glDrawPass.lastZWrite == undefined || glDrawPass.lastZWrite != this.state_zwrite)
+            // {
+            //     if (this.state_zwrite)
+            //     {
+            //         webgl.depthMask(true);
+            //     }
+            //     else
+            //     {
+            //         webgl.depthMask(false);
+            //     }
+            //     glDrawPass.lastZWrite = this.state_zwrite;
+            // }
 
-            // if (glDrawPass.lastZTest == undefined || glDrawPass.lastZTest != this.state_ztest)
-            {
-                if (this.state_ztest)
-                {
-                    webgl.enable(webgl.DEPTH_TEST);
-                    // if (glDrawPass.lastZTestMethod == undefined || glDrawPass.lastZTestMethod != this.state_ztest_method)
-                    {
-                        webgl.depthFunc(this.state_ztest_method);
-                        glDrawPass.lastZTestMethod = this.state_ztest_method;
-                    }
-                }
-                else
-                {
-                    webgl.disable(webgl.DEPTH_TEST);
-                }
-                glDrawPass.lastZTest = this.state_ztest;
-            }
+            // // if (glDrawPass.lastZTest == undefined || glDrawPass.lastZTest != this.state_ztest)
+            // {
+            //     if (this.state_ztest)
+            //     {
+            //         webgl.enable(webgl.DEPTH_TEST);
+            //         // if (glDrawPass.lastZTestMethod == undefined || glDrawPass.lastZTestMethod != this.state_ztest_method)
+            //         {
+            //             webgl.depthFunc(this.state_ztest_method);
+            //             glDrawPass.lastZTestMethod = this.state_ztest_method;
+            //         }
+            //     }
+            //     else
+            //     {
+            //         webgl.disable(webgl.DEPTH_TEST);
+            //     }
+            //     glDrawPass.lastZTest = this.state_ztest;
+            // }
 
-            if (this.state_blend)
-            {
-                if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend)
-                {
-                    webgl.enable(webgl.BLEND);
-                    glDrawPass.lastBlend = this.state_blend;
-                }
-                if (glDrawPass.lastBlendEquation == undefined || glDrawPass.lastBlendEquation != this.state_blendEquation)
-                {
-                    webgl.blendEquation(this.state_blendEquation);
-                    //this.webgl.blendFunc(this.webgl.ONE, this.webgl.ONE_MINUS_SRC_ALPHA);
-                }
-                let blendVal = this.getCurBlendVal();
-                if (blendVal != glDrawPass.lastBlendVal)
-                {
-                    webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB,
-                        this.state_blendSrcAlpha, this.state_blendDestALpha);
-                    glDrawPass.lastBlendVal = blendVal;
-                }
-                glDrawPass.lastBlendEquation = this.state_blendEquation;
-            }
-            else
-            {
-                if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend)
-                {
-                    webgl.disable(webgl.BLEND);
-                    glDrawPass.lastBlend = this.state_blend;
-                }
-            }
+            // if (this.state_blend)
+            // {
+            //     if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend)
+            //     {
+            //         webgl.enable(webgl.BLEND);
+            //         glDrawPass.lastBlend = this.state_blend;
+            //     }
+            //     if (glDrawPass.lastBlendEquation == undefined || glDrawPass.lastBlendEquation != this.state_blendEquation)
+            //     {
+            //         webgl.blendEquation(this.state_blendEquation);
+            //         //this.webgl.blendFunc(this.webgl.ONE, this.webgl.ONE_MINUS_SRC_ALPHA);
+            //     }
+            //     let blendVal = this.getCurBlendVal();
+            //     if (blendVal != glDrawPass.lastBlendVal)
+            //     {
+            //         webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB,
+            //             this.state_blendSrcAlpha, this.state_blendDestALpha);
+            //         glDrawPass.lastBlendVal = blendVal;
+            //     }
+            //     glDrawPass.lastBlendEquation = this.state_blendEquation;
+            // }
+            // else
+            // {
+            //     if (glDrawPass.lastBlend == undefined || glDrawPass.lastBlend != this.state_blend)
+            //     {
+            //         webgl.disable(webgl.BLEND);
+            //         glDrawPass.lastBlend = this.state_blend;
+            //     }
+            // }
 
             //use program
             this.program.use(webgl);

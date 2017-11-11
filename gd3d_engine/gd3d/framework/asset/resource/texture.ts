@@ -85,7 +85,9 @@ namespace gd3d.framework
          */
         dispose()
         {
-            this.glTexture.dispose(sceneMgr.app.getAssetMgr().webgl);
+            if(this && this.glTexture){
+                this.glTexture.dispose(sceneMgr.app.getAssetMgr().webgl);
+            }         
         }
         /**
          * @private
