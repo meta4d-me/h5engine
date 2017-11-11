@@ -21,6 +21,8 @@ namespace gd3d.framework
             gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
             gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
         }
+
+        private _unitLen = 13; 
         //2d使用固定的顶点格式
         //pos[0,1,2]color[3,4,5,6]uv[7,8]color2[9,10,11,12] length=13
         private datar: number[] = [
@@ -46,13 +48,30 @@ namespace gd3d.framework
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 材质
-         * @version egret-gd3d 1.0
+         * @private
+         * ui默认材质
          */
-        mat: material;
+        _uimat: material;
+        private get uimat(){
+            if (this._sprite  && this._sprite.texture ){
+                let canvas = this.transform.canvas;
+                let mat = canvas.assetmgr.getMaterial(this._sprite.texture.getName()+"_uimask");
+                if(mat == null){
+                    if(this._uimat != null) this._uimat.unuse();
+                    mat = new material();
+                    mat.setShader(canvas.assetmgr.getShader("shader/defmaskui"));
+                    canvas.assetmgr.mapMaterial[this._sprite.texture.getName()+"_uimask"] = mat;
+                    mat.use();
+                }
+                if(this.transform.parentIsMask){
+                    mat.setFloat("MaskState",1);
+                }else{
+                    mat.setFloat("MaskState",0);
+                }
+                this._uimat = mat;
+            }
+            return this._uimat;
+        }
 
         private _imageType: ImageType = ImageType.Simple;
         /**
@@ -179,26 +198,14 @@ namespace gd3d.framework
             return this._sprite;
         }
 
+        
+
         /**
          * @private
          */
         render(canvas: canvas)
         {
-            if (this.mat == null)
-            {
-                let mat:material;
-                if (this._sprite  && this._sprite.texture ){
-                    mat = canvas.assetmgr.getMaterial(this._sprite.texture.getName());
-                    
-                    if(mat == null){
-                        mat = new material();
-                        mat.setShader(canvas.assetmgr.getShader("shader/defui"));
-                        canvas.assetmgr.mapMaterial[this._sprite.texture.getName()] = mat;
-                    }
-
-                    this.mat = mat;
-                }
-            }
+            let mat = this.uimat;
 
             var img = null;
             if (this._sprite != null && this._sprite.texture != null)
@@ -213,14 +220,25 @@ namespace gd3d.framework
             // }
             if(img != null){
                 if(this.needRefreshImg){
-                    this.mat.setTexture("_MainTex", img);
+                    this._uimat.setTexture("_MainTex", img);
                     this.needRefreshImg = false;
                 }
-                canvas.pushRawData(this.mat, this.datar);
+                
+                if(this.transform.parentIsMask){
+                    if(this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
+                    let rect = this.transform.maskRect;
+                    if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h){
+                        this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y;this._cacheMaskV4.z = rect.w;this._cacheMaskV4.w = rect.h;
+                        mat.setVector4("_maskRect",this._cacheMaskV4);
+                    }
+                }
+                
+                canvas.pushRawData(mat, this.datar);
             }
 
         }
 
+        private _cacheMaskV4:math.vector4;
         
         /**
          * @private
@@ -426,8 +444,9 @@ namespace gd3d.framework
                     }
                     break;
             }
-        }
 
+        }
+        
         /**
          * @private
          */
@@ -467,16 +486,17 @@ namespace gd3d.framework
                     break;
             }
             //主color
-            let vertexCount = this.datar.length / 13;
+            let vertexCount = this.datar.length / this._unitLen;
             for (var i = 0; i < vertexCount; i++)
             {
-                this.datar[i * 13 + 3] = this.color.r;
-                this.datar[i * 13 + 4] = this.color.g;
-                this.datar[i * 13 + 5] = this.color.b;
-                this.datar[i * 13 + 6] = this.color.a;
+                this.datar[i * this._unitLen + 3] = this.color.r;
+                this.datar[i * this._unitLen + 4] = this.color.g;
+                this.datar[i * this._unitLen + 5] = this.color.b;
+                this.datar[i * this._unitLen + 6] = this.color.a;
             }
-
         }
+
+        
 
         /**
          * @private
@@ -487,33 +507,33 @@ namespace gd3d.framework
             let _index: number = quadIndex * 6;
             if (!mirror)
             {
-                this.datar[(_index + 0) * 13] = x0;
-                this.datar[(_index + 0) * 13 + 1] = y0;
-                this.datar[(_index + 1) * 13] = x1;
-                this.datar[(_index + 1) * 13 + 1] = y1;
-                this.datar[(_index + 2) * 13] = x2;
-                this.datar[(_index + 2) * 13 + 1] = y2;
-                this.datar[(_index + 3) * 13] = x2;
-                this.datar[(_index + 3) * 13 + 1] = y2;
-                this.datar[(_index + 4) * 13] = x1;
-                this.datar[(_index + 4) * 13 + 1] = y1;
-                this.datar[(_index + 5) * 13] = x3;
-                this.datar[(_index + 5) * 13 + 1] = y3;
+                this.datar[(_index + 0) * this._unitLen] = x0;
+                this.datar[(_index + 0) * this._unitLen + 1] = y0;
+                this.datar[(_index + 1) * this._unitLen] = x1;
+                this.datar[(_index + 1) * this._unitLen + 1] = y1;
+                this.datar[(_index + 2) * this._unitLen] = x2;
+                this.datar[(_index + 2) * this._unitLen + 1] = y2;
+                this.datar[(_index + 3) * this._unitLen] = x2;
+                this.datar[(_index + 3) * this._unitLen + 1] = y2;
+                this.datar[(_index + 4) * this._unitLen] = x1;
+                this.datar[(_index + 4) * this._unitLen + 1] = y1;
+                this.datar[(_index + 5) * this._unitLen] = x3;
+                this.datar[(_index + 5) * this._unitLen + 1] = y3;
             }
             else
             {
-                this.datar[(_index + 0) * 13] = x0;
-                this.datar[(_index + 0) * 13 + 1] = y0;
-                this.datar[(_index + 1) * 13] = x1;
-                this.datar[(_index + 1) * 13 + 1] = y1;
-                this.datar[(_index + 2) * 13] = x3;
-                this.datar[(_index + 2) * 13 + 1] = y3;
-                this.datar[(_index + 3) * 13] = x0;
-                this.datar[(_index + 3) * 13 + 1] = y0;
-                this.datar[(_index + 4) * 13] = x3;
-                this.datar[(_index + 4) * 13 + 1] = y3;
-                this.datar[(_index + 5) * 13] = x2;
-                this.datar[(_index + 5) * 13 + 1] = y2;
+                this.datar[(_index + 0) * this._unitLen] = x0;
+                this.datar[(_index + 0) * this._unitLen + 1] = y0;
+                this.datar[(_index + 1) * this._unitLen] = x1;
+                this.datar[(_index + 1) * this._unitLen + 1] = y1;
+                this.datar[(_index + 2) * this._unitLen] = x3;
+                this.datar[(_index + 2) * this._unitLen + 1] = y3;
+                this.datar[(_index + 3) * this._unitLen] = x0;
+                this.datar[(_index + 3) * this._unitLen + 1] = y0;
+                this.datar[(_index + 4) * this._unitLen] = x3;
+                this.datar[(_index + 4) * this._unitLen + 1] = y3;
+                this.datar[(_index + 5) * this._unitLen] = x2;
+                this.datar[(_index + 5) * this._unitLen + 1] = y2;
             }
         }
 
@@ -710,18 +730,18 @@ namespace gd3d.framework
 
                 this.updateQuadData(partVertexs[0].x, partVertexs[0].y, partVertexs[1].x, partVertexs[1].y, partVertexs[2].x, partVertexs[2].y, partVertexs[3].x, partVertexs[3].y, i);
 
-                this.datar[(0 + i * 6) * 13 + 7] = partUVs[0].x;
-                this.datar[(0 + i * 6) * 13 + 8] = partUVs[0].y;
-                this.datar[(1 + i * 6) * 13 + 7] = partUVs[1].x;
-                this.datar[(1 + i * 6) * 13 + 8] = partUVs[1].y;
-                this.datar[(2 + i * 6) * 13 + 7] = partUVs[2].x;
-                this.datar[(2 + i * 6) * 13 + 8] = partUVs[2].y;
-                this.datar[(3 + i * 6) * 13 + 7] = partUVs[2].x;
-                this.datar[(3 + i * 6) * 13 + 8] = partUVs[2].y;
-                this.datar[(4 + i * 6) * 13 + 7] = partUVs[1].x;
-                this.datar[(4 + i * 6) * 13 + 8] = partUVs[1].y;
-                this.datar[(5 + i * 6) * 13 + 7] = partUVs[3].x;
-                this.datar[(5 + i * 6) * 13 + 8] = partUVs[3].y;
+                this.datar[(0 + i * 6) * this._unitLen + 7] = partUVs[0].x;
+                this.datar[(0 + i * 6) * this._unitLen + 8] = partUVs[0].y;
+                this.datar[(1 + i * 6) * this._unitLen + 7] = partUVs[1].x;
+                this.datar[(1 + i * 6) * this._unitLen + 8] = partUVs[1].y;
+                this.datar[(2 + i * 6) * this._unitLen + 7] = partUVs[2].x;
+                this.datar[(2 + i * 6) * this._unitLen + 8] = partUVs[2].y;
+                this.datar[(3 + i * 6) * this._unitLen + 7] = partUVs[2].x;
+                this.datar[(3 + i * 6) * this._unitLen + 8] = partUVs[2].y;
+                this.datar[(4 + i * 6) * this._unitLen + 7] = partUVs[1].x;
+                this.datar[(4 + i * 6) * this._unitLen + 8] = partUVs[1].y;
+                this.datar[(5 + i * 6) * this._unitLen + 7] = partUVs[3].x;
+                this.datar[(5 + i * 6) * this._unitLen + 8] = partUVs[3].y;
 
                 partVertexs.length = 0;
                 partUVs.length = 0;
@@ -756,9 +776,9 @@ namespace gd3d.framework
                         x3 = x3 - (1 - this.fillAmmount) * (x3 - x2);
                         y3 = y3 - (1 - this.fillAmmount) * (y3 - y2);
 
-                        this.datar[1 * 13 + 7] = urange.x + this.fillAmmount * ulen;
-                        this.datar[4 * 13 + 7] = urange.x + this.fillAmmount * ulen;
-                        this.datar[5 * 13 + 7] = urange.x + this.fillAmmount * ulen;
+                        this.datar[1 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
+                        this.datar[4 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
+                        this.datar[5 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
                     }
                     else if (this._fillMethod == FillMethod.Vertical)
                     {
@@ -767,9 +787,9 @@ namespace gd3d.framework
                         x1 = x1 - (1 - this.fillAmmount) * (x1 - x3);
                         y1 = y1 - (1 - this.fillAmmount) * (y1 - y3);
 
-                        this.datar[0 * 13 + 8] = (vrange.y - this.fillAmmount * vlen);
-                        this.datar[1 * 13 + 8] = (vrange.y - this.fillAmmount * vlen);
-                        this.datar[4 * 13 + 8] = (vrange.y - this.fillAmmount * vlen);
+                        this.datar[0 * this._unitLen + 8] = (vrange.y - this.fillAmmount * vlen);
+                        this.datar[1 * this._unitLen + 8] = (vrange.y - this.fillAmmount * vlen);
+                        this.datar[4 * this._unitLen + 8] = (vrange.y - this.fillAmmount * vlen);
 
                     }
                     else if (this._fillMethod == FillMethod.Radial_90)
@@ -780,9 +800,9 @@ namespace gd3d.framework
                             x0 = x0 - _fillRate * (x0 - x1);
                             y0 = y0 - _fillRate * (y0 - y1);
 
-                            this.datar[0 * 13 + 7] = urange.x + _fillRate * ulen;
-                            this.datar[1 * 13 + 8] = vrange.x;
-                            this.datar[4 * 13 + 8] = vrange.x;
+                            this.datar[0 * this._unitLen + 7] = urange.x + _fillRate * ulen;
+                            this.datar[1 * this._unitLen + 8] = vrange.x;
+                            this.datar[4 * this._unitLen + 8] = vrange.x;
                         }
                         else
                         {
@@ -792,9 +812,9 @@ namespace gd3d.framework
                             x0 = x1;
                             y0 = y1;
 
-                            this.datar[0 * 13 + 8] = vrange.x + _fillRate * vlen;
-                            this.datar[1 * 13 + 8] = vrange.x + _fillRate * vlen;
-                            this.datar[4 * 13 + 8] = vrange.x + _fillRate * vlen;
+                            this.datar[0 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
+                            this.datar[1 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
+                            this.datar[4 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
                         }
                     }
                     this.updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3);
@@ -810,12 +830,12 @@ namespace gd3d.framework
                         x2 = x2 - _fillRate * (x2 - x0);
                         y2 = y2 - _fillRate * (y2 - y0);
 
-                        this.datar[5 * 13 + 8] = vrange.y - _fillRate * vlen;
-                        this.datar[0 * 13 + 7] = urange.x;
-                        this.datar[3 * 13 + 7] = urange.x;
-                        this.datar[6 * 13 + 7] = halfu;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
+                        this.datar[5  * this._unitLen + 8] = vrange.y - _fillRate * vlen;
+                        this.datar[0  * this._unitLen + 7] = urange.x;
+                        this.datar[3  * this._unitLen + 7] = urange.x;
+                        this.datar[6  * this._unitLen + 7] = halfu;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
                     }
                     else if (this.fillAmmount >= 0.5)
                     {
@@ -825,11 +845,11 @@ namespace gd3d.framework
                         x2 = x0;
                         y2 = y0;
 
-                        this.datar[0 * 13 + 7] = urange.x + 0.5 * ulen * _fillRate;
-                        this.datar[3 * 13 + 7] = urange.x + 0.5 * ulen * _fillRate;
-                        this.datar[6 * 13 + 7] = halfu;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
+                        this.datar[0  * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
+                        this.datar[3  * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
+                        this.datar[6  * this._unitLen + 7] = halfu;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
                     }
                     else if (this.fillAmmount >= 0.25)
                     {
@@ -841,9 +861,9 @@ namespace gd3d.framework
                         x2 = x0;
                         y2 = y0;
 
-                        this.datar[6 * 13 + 7] = halfu + 0.5 * ulen * _fillRate;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
+                        this.datar[6  * this._unitLen + 7] = halfu + 0.5 * ulen * _fillRate;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
                     }
                     else
                     {
@@ -857,8 +877,8 @@ namespace gd3d.framework
                         x2 = x0;
                         y2 = y0;
 
-                        this.datar[7 * 13 + 8] = vrange.x + _fillRate * vlen;
-                        this.datar[10 * 13 + 8] = vrange.x + _fillRate * vlen;
+                        this.datar[7  * this._unitLen + 8] = vrange.x + _fillRate * vlen;
+                        this.datar[10 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
                     }
                     this.updateQuadData(x0, y0, tx, ty, x2, y2, bx, by, 0, true);
                     this.updateQuadData(tx, ty, x1, y1, bx, by, x3, y3, 1);
@@ -883,18 +903,18 @@ namespace gd3d.framework
                         b_x = b_x - _fillRate * (b_x - x2);
                         b_y = b_y - _fillRate * (b_y - y2);
 
-                        this.datar[17 * 13 + 7] = halfu - 0.5 * _fillRate * ulen;
-                        this.datar[14 * 13 + 8] = vrange.y;
-                        this.datar[15 * 13 + 8] = vrange.y;
-                        this.datar[5 * 13 + 8] = halfv;
-                        this.datar[0 * 13 + 7] = urange.x;
-                        this.datar[3 * 13 + 7] = urange.x;
-                        this.datar[6 * 13 + 7] = halfu;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
-                        this.datar[19 * 13 + 8] = halfv;
-                        this.datar[20 * 13 + 7] = urange.y;
-                        this.datar[22 * 13 + 7] = urange.y;
+                        this.datar[17 * this._unitLen + 7] = halfu - 0.5 * _fillRate * ulen;
+                        this.datar[14 * this._unitLen + 8] = vrange.y;
+                        this.datar[15 * this._unitLen + 8] = vrange.y;
+                        this.datar[5  * this._unitLen + 8] = halfv;
+                        this.datar[0  * this._unitLen + 7] = urange.x;
+                        this.datar[3  * this._unitLen + 7] = urange.x;
+                        this.datar[6  * this._unitLen + 7] = halfu;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
+                        this.datar[19 * this._unitLen + 8] = halfv;
+                        this.datar[20 * this._unitLen + 7] = urange.y;
+                        this.datar[22 * this._unitLen + 7] = urange.y;
                     }
                     else if (this.fillAmmount >= 0.75)
                     {
@@ -904,17 +924,17 @@ namespace gd3d.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[14 * 13 + 8] = vrange.y - 0.5 * _fillRate * vlen;
-                        this.datar[15 * 13 + 8] = vrange.y - 0.5 * _fillRate * vlen;
-                        this.datar[5 * 13 + 8] = halfv;
-                        this.datar[0 * 13 + 7] = urange.x;
-                        this.datar[3 * 13 + 7] = urange.x;
-                        this.datar[6 * 13 + 7] = halfu;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
-                        this.datar[19 * 13 + 8] = halfv;
-                        this.datar[20 * 13 + 7] = urange.y;
-                        this.datar[22 * 13 + 7] = urange.y;
+                        this.datar[14 * this._unitLen + 8] = vrange.y - 0.5 * _fillRate * vlen;
+                        this.datar[15 * this._unitLen + 8] = vrange.y - 0.5 * _fillRate * vlen;
+                        this.datar[5  * this._unitLen + 8] = halfv;
+                        this.datar[0  * this._unitLen + 7] = urange.x;
+                        this.datar[3  * this._unitLen + 7] = urange.x;
+                        this.datar[6  * this._unitLen + 7] = halfu;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
+                        this.datar[19 * this._unitLen + 8] = halfv;
+                        this.datar[20 * this._unitLen + 7] = urange.y;
+                        this.datar[22 * this._unitLen + 7] = urange.y;
                     }
                     else if (this.fillAmmount >= 0.625)
                     {
@@ -926,15 +946,15 @@ namespace gd3d.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[5 * 13 + 8] = halfv - 0.5 * _fillRate * vlen;
-                        this.datar[0 * 13 + 7] = urange.x;
-                        this.datar[3 * 13 + 7] = urange.x;
-                        this.datar[6 * 13 + 7] = halfu;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
-                        this.datar[19 * 13 + 8] = halfv;
-                        this.datar[20 * 13 + 7] = urange.y;
-                        this.datar[22 * 13 + 7] = urange.y;
+                        this.datar[5  * this._unitLen + 8] = halfv - 0.5 * _fillRate * vlen;
+                        this.datar[0  * this._unitLen + 7] = urange.x;
+                        this.datar[3  * this._unitLen + 7] = urange.x;
+                        this.datar[6  * this._unitLen + 7] = halfu;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
+                        this.datar[19 * this._unitLen + 8] = halfv;
+                        this.datar[20 * this._unitLen + 7] = urange.y;
+                        this.datar[22 * this._unitLen + 7] = urange.y;
                     }
                     else if (this.fillAmmount >= 0.5)
                     {
@@ -948,14 +968,14 @@ namespace gd3d.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[0 * 13 + 7] = urange.x + 0.5 * _fillRate * ulen;
-                        this.datar[3 * 13 + 7] = urange.x + 0.5 * _fillRate * ulen;
-                        this.datar[6 * 13 + 7] = halfu;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
-                        this.datar[19 * 13 + 8] = halfv;
-                        this.datar[20 * 13 + 7] = urange.y;
-                        this.datar[22 * 13 + 7] = urange.y;
+                        this.datar[0  * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
+                        this.datar[3  * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
+                        this.datar[6  * this._unitLen + 7] = halfu;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
+                        this.datar[19 * this._unitLen + 8] = halfv;
+                        this.datar[20 * this._unitLen + 7] = urange.y;
+                        this.datar[22 * this._unitLen + 7] = urange.y;
                     }
                     else if (this.fillAmmount >= 0.375)
                     {
@@ -971,12 +991,12 @@ namespace gd3d.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[6 * 13 + 7] = halfu + 0.5 * _fillRate * ulen;
-                        this.datar[7 * 13 + 8] = vrange.x;
-                        this.datar[10 * 13 + 8] = vrange.x;
-                        this.datar[19 * 13 + 8] = halfv;
-                        this.datar[20 * 13 + 7] = urange.y;
-                        this.datar[22 * 13 + 7] = urange.y;
+                        this.datar[6  * this._unitLen + 7] = halfu + 0.5 * _fillRate * ulen;
+                        this.datar[7  * this._unitLen + 8] = vrange.x;
+                        this.datar[10 * this._unitLen + 8] = vrange.x;
+                        this.datar[19 * this._unitLen + 8] = halfv;
+                        this.datar[20 * this._unitLen + 7] = urange.y;
+                        this.datar[22 * this._unitLen + 7] = urange.y;
                     }
                     else if (this.fillAmmount >= 0.25)
                     {
@@ -994,11 +1014,11 @@ namespace gd3d.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[7 * 13 + 8] = vrange.x + 0.5 * _fillRate * vlen;
-                        this.datar[10 * 13 + 8] = vrange.x + 0.5 * _fillRate * vlen;
-                        this.datar[19 * 13 + 8] = halfv;
-                        this.datar[20 * 13 + 7] = urange.y;
-                        this.datar[22 * 13 + 7] = urange.y;
+                        this.datar[7  * this._unitLen + 8] = vrange.x + 0.5 * _fillRate * vlen;
+                        this.datar[10 * this._unitLen + 8] = vrange.x + 0.5 * _fillRate * vlen;
+                        this.datar[19 * this._unitLen + 8] = halfv;
+                        this.datar[20 * this._unitLen + 7] = urange.y;
+                        this.datar[22 * this._unitLen + 7] = urange.y;
                     }
                     else if (this.fillAmmount >= 0.125)
                     {
@@ -1018,9 +1038,9 @@ namespace gd3d.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[19 * 13 + 8] = halfv + 0.5 * _fillRate * vlen;
-                        this.datar[20 * 13 + 7] = urange.y;
-                        this.datar[22 * 13 + 7] = urange.y;
+                        this.datar[19 * this._unitLen + 8] = halfv + 0.5 * _fillRate * vlen;
+                        this.datar[20 * this._unitLen + 7] = urange.y;
+                        this.datar[22 * this._unitLen + 7] = urange.y;
                     }
                     else
                     {
@@ -1042,8 +1062,8 @@ namespace gd3d.framework
                         b_x = x2;
                         b_y = y2;
 
-                        this.datar[20 * 13 + 7] = urange.y - 0.5 * _fillRate * ulen;
-                        this.datar[22 * 13 + 7] = urange.y - 0.5 * _fillRate * ulen;
+                        this.datar[20 * this._unitLen + 7] = urange.y - 0.5 * _fillRate * ulen;
+                        this.datar[22 * this._unitLen + 7] = urange.y - 0.5 * _fillRate * ulen;
                     }
 
 

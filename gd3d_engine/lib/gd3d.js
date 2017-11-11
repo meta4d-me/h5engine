@@ -934,6 +934,7 @@ var gd3d;
                 this.pointEvent = new framework.PointEvent();
                 this.pointX = 0;
                 this.pointY = 0;
+                this.lastMaskSta = -1;
                 this.pixelWidth = 640;
                 this.pixelHeight = 480;
                 this.rootNode = new framework.transform2D();
@@ -1023,6 +1024,22 @@ var gd3d;
                     mat.uploadUniform(pass);
                     pass.use(this.webgl);
                     this.batcher.begin(this.webgl, pass);
+                }
+                else {
+                    var msta = mat.mapUniform["MaskState"];
+                    var mr = mat.mapUniform["_maskRect"];
+                    if (msta != null && msta.value != null && mr != null && mr.value != null) {
+                        var rect = mr.value;
+                        if (this.lastMaskV4 == null)
+                            this.lastMaskV4 = new gd3d.math.vector4();
+                        if (msta.value != this.lastMaskSta || this.lastMaskV4.x != rect.x || this.lastMaskV4.y != rect.y || this.lastMaskV4.z != rect.z || this.lastMaskV4.w != rect.w) {
+                            this.lastMaskSta = msta.value;
+                            gd3d.math.vec4Clone(rect, this.lastMaskV4);
+                            this.batcher.end(this.webgl);
+                            var pass = this.lastMat.getShader().passes["base"][0];
+                            mat.uploadUniform(pass);
+                        }
+                    }
                 }
                 this.batcher.push(this.webgl, data, null);
             };
@@ -1771,6 +1788,8 @@ var gd3d;
                 this.localTranslate = new gd3d.math.vector2(0, 0);
                 this.localScale = new gd3d.math.vector2(1, 1);
                 this.localRotate = 0;
+                this._isMask = false;
+                this._parentIsMask = false;
                 this.localMatrix = new gd3d.math.matrix3x2;
                 this.worldMatrix = new gd3d.math.matrix3x2();
                 this.worldRotate = new gd3d.math.angelref();
@@ -1825,6 +1844,88 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(transform2D.prototype, "maskRect", {
+                get: function () {
+                    if (this._temp_maskRect == null)
+                        this._temp_maskRect = new gd3d.math.rect();
+                    if (this._maskRect != null) {
+                        this._temp_maskRect.x = this._maskRect.x;
+                        this._temp_maskRect.y = this._maskRect.y;
+                        this._temp_maskRect.w = this._maskRect.w;
+                        this._temp_maskRect.h = this._maskRect.h;
+                    }
+                    return this._temp_maskRect;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(transform2D.prototype, "isMask", {
+                get: function () {
+                    return this._isMask;
+                },
+                set: function (b) {
+                    this._isMask = b;
+                    this.markDirty();
+                    this.updateTran(true);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform2D.prototype.updateMaskRect = function () {
+                var rect_x;
+                var rect_y;
+                var rect_w;
+                var rect_h;
+                var ParentRect;
+                if (this.parent != null) {
+                    this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
+                    ParentRect = this.parent.maskRect;
+                }
+                else
+                    this._parentIsMask = false;
+                if (this.isMask || this.parentIsMask) {
+                    if (this.isMask) {
+                        var wPos = this.getWorldTranslate();
+                        var wW = this.canvas.pixelWidth;
+                        var wH = this.canvas.pixelHeight;
+                        rect_x = wPos.x / wW;
+                        rect_y = wPos.y / wH;
+                        rect_w = this.width / wW;
+                        rect_h = this.height / wH;
+                        if (this.parentIsMask && ParentRect != null) {
+                            var min_x = Math.max(rect_x, ParentRect.x);
+                            var min_y = Math.max(rect_y, ParentRect.y);
+                            var max_x = Math.min(rect_x + rect_w, ParentRect.x + ParentRect.w);
+                            var max_y = Math.min(rect_y + rect_h, ParentRect.y + ParentRect.h);
+                            rect_x = min_x;
+                            rect_y = min_y;
+                            rect_w = max_x - min_x;
+                            rect_h = max_y - min_y;
+                        }
+                    }
+                    else if (ParentRect != null) {
+                        rect_x = ParentRect.x;
+                        rect_y = ParentRect.y;
+                        rect_w = ParentRect.w;
+                        rect_h = ParentRect.h;
+                    }
+                    if (this._maskRect == null)
+                        this._maskRect = new gd3d.math.rect();
+                    if (this._maskRect.x != rect_x || this._maskRect.x != rect_y || this._maskRect.x != rect_w || this._maskRect.x != rect_h) {
+                        this._maskRect.x = rect_x;
+                        this._maskRect.y = rect_y;
+                        this._maskRect.w = rect_w;
+                        this._maskRect.h = rect_h;
+                    }
+                }
+            };
+            Object.defineProperty(transform2D.prototype, "parentIsMask", {
+                get: function () {
+                    return this._parentIsMask;
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform2D.prototype.addChild = function (node) {
                 if (node.parent != null) {
                     node.parent.removeChild(node);
@@ -1835,6 +1936,7 @@ var gd3d;
                 node.parent = this;
                 node.canvas = this.canvas;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                this.markDirty();
             };
             transform2D.prototype.addChildAt = function (node, index) {
                 if (index < 0)
@@ -1848,6 +1950,7 @@ var gd3d;
                 node.canvas = this.canvas;
                 node.parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                this.markDirty();
             };
             transform2D.prototype.removeChild = function (node) {
                 if (node.parent != this || this.children == null) {
@@ -1888,6 +1991,7 @@ var gd3d;
                     else {
                         gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                     }
+                    this.updateMaskRect();
                     if (this.renderer != null) {
                         this.renderer.updateTran();
                     }
@@ -2430,6 +2534,7 @@ var gd3d;
     (function (framework) {
         var image2D = (function () {
             function image2D() {
+                this._unitLen = 13;
                 this.datar = [
                     0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
@@ -2446,6 +2551,32 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
                 gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
             }
+            Object.defineProperty(image2D.prototype, "uimat", {
+                get: function () {
+                    if (this._sprite && this._sprite.texture) {
+                        var canvas_1 = this.transform.canvas;
+                        var mat = canvas_1.assetmgr.getMaterial(this._sprite.texture.getName() + "_uimask");
+                        if (mat == null) {
+                            if (this._uimat != null)
+                                this._uimat.unuse();
+                            mat = new framework.material();
+                            mat.setShader(canvas_1.assetmgr.getShader("shader/defmaskui"));
+                            canvas_1.assetmgr.mapMaterial[this._sprite.texture.getName() + "_uimask"] = mat;
+                            mat.use();
+                        }
+                        if (this.transform.parentIsMask) {
+                            mat.setFloat("MaskState", 1);
+                        }
+                        else {
+                            mat.setFloat("MaskState", 0);
+                        }
+                        this._uimat = mat;
+                    }
+                    return this._uimat;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(image2D.prototype, "imageType", {
                 get: function () {
                     return this._imageType;
@@ -2526,28 +2657,29 @@ var gd3d;
                 configurable: true
             });
             image2D.prototype.render = function (canvas) {
-                if (this.mat == null) {
-                    var mat = void 0;
-                    if (this._sprite && this._sprite.texture) {
-                        mat = canvas.assetmgr.getMaterial(this._sprite.texture.getName());
-                        if (mat == null) {
-                            mat = new framework.material();
-                            mat.setShader(canvas.assetmgr.getShader("shader/defui"));
-                            canvas.assetmgr.mapMaterial[this._sprite.texture.getName()] = mat;
-                        }
-                        this.mat = mat;
-                    }
-                }
+                var mat = this.uimat;
                 var img = null;
                 if (this._sprite != null && this._sprite.texture != null) {
                     img = this._sprite.texture;
                 }
                 if (img != null) {
                     if (this.needRefreshImg) {
-                        this.mat.setTexture("_MainTex", img);
+                        this._uimat.setTexture("_MainTex", img);
                         this.needRefreshImg = false;
                     }
-                    canvas.pushRawData(this.mat, this.datar);
+                    if (this.transform.parentIsMask) {
+                        if (this._cacheMaskV4 == null)
+                            this._cacheMaskV4 = new gd3d.math.vector4();
+                        var rect = this.transform.maskRect;
+                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h) {
+                            this._cacheMaskV4.x = rect.x;
+                            this._cacheMaskV4.y = rect.y;
+                            this._cacheMaskV4.z = rect.w;
+                            this._cacheMaskV4.w = rect.h;
+                            mat.setVector4("_maskRect", this._cacheMaskV4);
+                        }
+                    }
+                    canvas.pushRawData(mat, this.datar);
                 }
             };
             image2D.prototype.start = function () {
@@ -2733,12 +2865,12 @@ var gd3d;
                         this.updateFilledData(x0, y0, x1, y1, x2, y2, x3, y3);
                         break;
                 }
-                var vertexCount = this.datar.length / 13;
+                var vertexCount = this.datar.length / this._unitLen;
                 for (var i = 0; i < vertexCount; i++) {
-                    this.datar[i * 13 + 3] = this.color.r;
-                    this.datar[i * 13 + 4] = this.color.g;
-                    this.datar[i * 13 + 5] = this.color.b;
-                    this.datar[i * 13 + 6] = this.color.a;
+                    this.datar[i * this._unitLen + 3] = this.color.r;
+                    this.datar[i * this._unitLen + 4] = this.color.g;
+                    this.datar[i * this._unitLen + 5] = this.color.b;
+                    this.datar[i * this._unitLen + 6] = this.color.a;
                 }
             };
             image2D.prototype.updateQuadData = function (x0, y0, x1, y1, x2, y2, x3, y3, quadIndex, mirror) {
@@ -2746,32 +2878,32 @@ var gd3d;
                 if (mirror === void 0) { mirror = false; }
                 var _index = quadIndex * 6;
                 if (!mirror) {
-                    this.datar[(_index + 0) * 13] = x0;
-                    this.datar[(_index + 0) * 13 + 1] = y0;
-                    this.datar[(_index + 1) * 13] = x1;
-                    this.datar[(_index + 1) * 13 + 1] = y1;
-                    this.datar[(_index + 2) * 13] = x2;
-                    this.datar[(_index + 2) * 13 + 1] = y2;
-                    this.datar[(_index + 3) * 13] = x2;
-                    this.datar[(_index + 3) * 13 + 1] = y2;
-                    this.datar[(_index + 4) * 13] = x1;
-                    this.datar[(_index + 4) * 13 + 1] = y1;
-                    this.datar[(_index + 5) * 13] = x3;
-                    this.datar[(_index + 5) * 13 + 1] = y3;
+                    this.datar[(_index + 0) * this._unitLen] = x0;
+                    this.datar[(_index + 0) * this._unitLen + 1] = y0;
+                    this.datar[(_index + 1) * this._unitLen] = x1;
+                    this.datar[(_index + 1) * this._unitLen + 1] = y1;
+                    this.datar[(_index + 2) * this._unitLen] = x2;
+                    this.datar[(_index + 2) * this._unitLen + 1] = y2;
+                    this.datar[(_index + 3) * this._unitLen] = x2;
+                    this.datar[(_index + 3) * this._unitLen + 1] = y2;
+                    this.datar[(_index + 4) * this._unitLen] = x1;
+                    this.datar[(_index + 4) * this._unitLen + 1] = y1;
+                    this.datar[(_index + 5) * this._unitLen] = x3;
+                    this.datar[(_index + 5) * this._unitLen + 1] = y3;
                 }
                 else {
-                    this.datar[(_index + 0) * 13] = x0;
-                    this.datar[(_index + 0) * 13 + 1] = y0;
-                    this.datar[(_index + 1) * 13] = x1;
-                    this.datar[(_index + 1) * 13 + 1] = y1;
-                    this.datar[(_index + 2) * 13] = x3;
-                    this.datar[(_index + 2) * 13 + 1] = y3;
-                    this.datar[(_index + 3) * 13] = x0;
-                    this.datar[(_index + 3) * 13 + 1] = y0;
-                    this.datar[(_index + 4) * 13] = x3;
-                    this.datar[(_index + 4) * 13 + 1] = y3;
-                    this.datar[(_index + 5) * 13] = x2;
-                    this.datar[(_index + 5) * 13 + 1] = y2;
+                    this.datar[(_index + 0) * this._unitLen] = x0;
+                    this.datar[(_index + 0) * this._unitLen + 1] = y0;
+                    this.datar[(_index + 1) * this._unitLen] = x1;
+                    this.datar[(_index + 1) * this._unitLen + 1] = y1;
+                    this.datar[(_index + 2) * this._unitLen] = x3;
+                    this.datar[(_index + 2) * this._unitLen + 1] = y3;
+                    this.datar[(_index + 3) * this._unitLen] = x0;
+                    this.datar[(_index + 3) * this._unitLen + 1] = y0;
+                    this.datar[(_index + 4) * this._unitLen] = x3;
+                    this.datar[(_index + 4) * this._unitLen + 1] = y3;
+                    this.datar[(_index + 5) * this._unitLen] = x2;
+                    this.datar[(_index + 5) * this._unitLen + 1] = y2;
                 }
             };
             image2D.prototype.updateSimpleData = function (x0, y0, x1, y1, x2, y2, x3, y3) {
@@ -2921,18 +3053,18 @@ var gd3d;
                     partVertexs = [vertexs[0 + c + r_1 * 4], vertexs[1 + c + r_1 * 4], vertexs[4 + c + r_1 * 4], vertexs[5 + c + r_1 * 4]];
                     partUVs = [uvs[0 + c + r_1 * 4], uvs[1 + c + r_1 * 4], uvs[4 + c + r_1 * 4], uvs[5 + c + r_1 * 4]];
                     this.updateQuadData(partVertexs[0].x, partVertexs[0].y, partVertexs[1].x, partVertexs[1].y, partVertexs[2].x, partVertexs[2].y, partVertexs[3].x, partVertexs[3].y, i);
-                    this.datar[(0 + i * 6) * 13 + 7] = partUVs[0].x;
-                    this.datar[(0 + i * 6) * 13 + 8] = partUVs[0].y;
-                    this.datar[(1 + i * 6) * 13 + 7] = partUVs[1].x;
-                    this.datar[(1 + i * 6) * 13 + 8] = partUVs[1].y;
-                    this.datar[(2 + i * 6) * 13 + 7] = partUVs[2].x;
-                    this.datar[(2 + i * 6) * 13 + 8] = partUVs[2].y;
-                    this.datar[(3 + i * 6) * 13 + 7] = partUVs[2].x;
-                    this.datar[(3 + i * 6) * 13 + 8] = partUVs[2].y;
-                    this.datar[(4 + i * 6) * 13 + 7] = partUVs[1].x;
-                    this.datar[(4 + i * 6) * 13 + 8] = partUVs[1].y;
-                    this.datar[(5 + i * 6) * 13 + 7] = partUVs[3].x;
-                    this.datar[(5 + i * 6) * 13 + 8] = partUVs[3].y;
+                    this.datar[(0 + i * 6) * this._unitLen + 7] = partUVs[0].x;
+                    this.datar[(0 + i * 6) * this._unitLen + 8] = partUVs[0].y;
+                    this.datar[(1 + i * 6) * this._unitLen + 7] = partUVs[1].x;
+                    this.datar[(1 + i * 6) * this._unitLen + 8] = partUVs[1].y;
+                    this.datar[(2 + i * 6) * this._unitLen + 7] = partUVs[2].x;
+                    this.datar[(2 + i * 6) * this._unitLen + 8] = partUVs[2].y;
+                    this.datar[(3 + i * 6) * this._unitLen + 7] = partUVs[2].x;
+                    this.datar[(3 + i * 6) * this._unitLen + 8] = partUVs[2].y;
+                    this.datar[(4 + i * 6) * this._unitLen + 7] = partUVs[1].x;
+                    this.datar[(4 + i * 6) * this._unitLen + 8] = partUVs[1].y;
+                    this.datar[(5 + i * 6) * this._unitLen + 7] = partUVs[3].x;
+                    this.datar[(5 + i * 6) * this._unitLen + 8] = partUVs[3].y;
                     partVertexs.length = 0;
                     partUVs.length = 0;
                 }
@@ -2956,27 +3088,27 @@ var gd3d;
                             y1 = y1 - (1 - this.fillAmmount) * (y1 - y0);
                             x3 = x3 - (1 - this.fillAmmount) * (x3 - x2);
                             y3 = y3 - (1 - this.fillAmmount) * (y3 - y2);
-                            this.datar[1 * 13 + 7] = urange.x + this.fillAmmount * ulen;
-                            this.datar[4 * 13 + 7] = urange.x + this.fillAmmount * ulen;
-                            this.datar[5 * 13 + 7] = urange.x + this.fillAmmount * ulen;
+                            this.datar[1 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
+                            this.datar[4 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
+                            this.datar[5 * this._unitLen + 7] = urange.x + this.fillAmmount * ulen;
                         }
                         else if (this._fillMethod == FillMethod.Vertical) {
                             x0 = x0 - (1 - this.fillAmmount) * (x0 - x2);
                             y0 = y0 - (1 - this.fillAmmount) * (y0 - y2);
                             x1 = x1 - (1 - this.fillAmmount) * (x1 - x3);
                             y1 = y1 - (1 - this.fillAmmount) * (y1 - y3);
-                            this.datar[0 * 13 + 8] = (vrange.y - this.fillAmmount * vlen);
-                            this.datar[1 * 13 + 8] = (vrange.y - this.fillAmmount * vlen);
-                            this.datar[4 * 13 + 8] = (vrange.y - this.fillAmmount * vlen);
+                            this.datar[0 * this._unitLen + 8] = (vrange.y - this.fillAmmount * vlen);
+                            this.datar[1 * this._unitLen + 8] = (vrange.y - this.fillAmmount * vlen);
+                            this.datar[4 * this._unitLen + 8] = (vrange.y - this.fillAmmount * vlen);
                         }
                         else if (this._fillMethod == FillMethod.Radial_90) {
                             if (this.fillAmmount >= 0.5) {
                                 var _fillRate = 2 * (1 - this.fillAmmount);
                                 x0 = x0 - _fillRate * (x0 - x1);
                                 y0 = y0 - _fillRate * (y0 - y1);
-                                this.datar[0 * 13 + 7] = urange.x + _fillRate * ulen;
-                                this.datar[1 * 13 + 8] = vrange.x;
-                                this.datar[4 * 13 + 8] = vrange.x;
+                                this.datar[0 * this._unitLen + 7] = urange.x + _fillRate * ulen;
+                                this.datar[1 * this._unitLen + 8] = vrange.x;
+                                this.datar[4 * this._unitLen + 8] = vrange.x;
                             }
                             else {
                                 var _fillRate = 2 * (0.5 - this.fillAmmount);
@@ -2984,9 +3116,9 @@ var gd3d;
                                 y1 = y1 - _fillRate * (y1 - y3);
                                 x0 = x1;
                                 y0 = y1;
-                                this.datar[0 * 13 + 8] = vrange.x + _fillRate * vlen;
-                                this.datar[1 * 13 + 8] = vrange.x + _fillRate * vlen;
-                                this.datar[4 * 13 + 8] = vrange.x + _fillRate * vlen;
+                                this.datar[0 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
+                                this.datar[1 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
+                                this.datar[4 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
                             }
                         }
                         this.updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3);
@@ -3000,12 +3132,12 @@ var gd3d;
                             var _fillRate = 4 * (1 - this.fillAmmount);
                             x2 = x2 - _fillRate * (x2 - x0);
                             y2 = y2 - _fillRate * (y2 - y0);
-                            this.datar[5 * 13 + 8] = vrange.y - _fillRate * vlen;
-                            this.datar[0 * 13 + 7] = urange.x;
-                            this.datar[3 * 13 + 7] = urange.x;
-                            this.datar[6 * 13 + 7] = halfu;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
+                            this.datar[5 * this._unitLen + 8] = vrange.y - _fillRate * vlen;
+                            this.datar[0 * this._unitLen + 7] = urange.x;
+                            this.datar[3 * this._unitLen + 7] = urange.x;
+                            this.datar[6 * this._unitLen + 7] = halfu;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
                         }
                         else if (this.fillAmmount >= 0.5) {
                             var _fillRate = 4 * (0.75 - this.fillAmmount);
@@ -3013,11 +3145,11 @@ var gd3d;
                             y0 = y0 - _fillRate * (y0 - ty);
                             x2 = x0;
                             y2 = y0;
-                            this.datar[0 * 13 + 7] = urange.x + 0.5 * ulen * _fillRate;
-                            this.datar[3 * 13 + 7] = urange.x + 0.5 * ulen * _fillRate;
-                            this.datar[6 * 13 + 7] = halfu;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
+                            this.datar[0 * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
+                            this.datar[3 * this._unitLen + 7] = urange.x + 0.5 * ulen * _fillRate;
+                            this.datar[6 * this._unitLen + 7] = halfu;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
                         }
                         else if (this.fillAmmount >= 0.25) {
                             var _fillRate = 4 * (0.5 - this.fillAmmount);
@@ -3027,9 +3159,9 @@ var gd3d;
                             y0 = ty;
                             x2 = x0;
                             y2 = y0;
-                            this.datar[6 * 13 + 7] = halfu + 0.5 * ulen * _fillRate;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
+                            this.datar[6 * this._unitLen + 7] = halfu + 0.5 * ulen * _fillRate;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
                         }
                         else {
                             var _fillRate = 4 * (0.25 - this.fillAmmount);
@@ -3041,8 +3173,8 @@ var gd3d;
                             y0 = ty;
                             x2 = x0;
                             y2 = y0;
-                            this.datar[7 * 13 + 8] = vrange.x + _fillRate * vlen;
-                            this.datar[10 * 13 + 8] = vrange.x + _fillRate * vlen;
+                            this.datar[7 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
+                            this.datar[10 * this._unitLen + 8] = vrange.x + _fillRate * vlen;
                         }
                         this.updateQuadData(x0, y0, tx, ty, x2, y2, bx, by, 0, true);
                         this.updateQuadData(tx, ty, x1, y1, bx, by, x3, y3, 1);
@@ -3064,18 +3196,18 @@ var gd3d;
                             var _fillRate = 8 * (1 - this.fillAmmount);
                             b_x = b_x - _fillRate * (b_x - x2);
                             b_y = b_y - _fillRate * (b_y - y2);
-                            this.datar[17 * 13 + 7] = halfu - 0.5 * _fillRate * ulen;
-                            this.datar[14 * 13 + 8] = vrange.y;
-                            this.datar[15 * 13 + 8] = vrange.y;
-                            this.datar[5 * 13 + 8] = halfv;
-                            this.datar[0 * 13 + 7] = urange.x;
-                            this.datar[3 * 13 + 7] = urange.x;
-                            this.datar[6 * 13 + 7] = halfu;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
-                            this.datar[19 * 13 + 8] = halfv;
-                            this.datar[20 * 13 + 7] = urange.y;
-                            this.datar[22 * 13 + 7] = urange.y;
+                            this.datar[17 * this._unitLen + 7] = halfu - 0.5 * _fillRate * ulen;
+                            this.datar[14 * this._unitLen + 8] = vrange.y;
+                            this.datar[15 * this._unitLen + 8] = vrange.y;
+                            this.datar[5 * this._unitLen + 8] = halfv;
+                            this.datar[0 * this._unitLen + 7] = urange.x;
+                            this.datar[3 * this._unitLen + 7] = urange.x;
+                            this.datar[6 * this._unitLen + 7] = halfu;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
+                            this.datar[19 * this._unitLen + 8] = halfv;
+                            this.datar[20 * this._unitLen + 7] = urange.y;
+                            this.datar[22 * this._unitLen + 7] = urange.y;
                         }
                         else if (this.fillAmmount >= 0.75) {
                             var _fillRate = 8 * (0.875 - this.fillAmmount);
@@ -3083,17 +3215,17 @@ var gd3d;
                             y2 = y2 - _fillRate * (y2 - l_y);
                             b_x = x2;
                             b_y = y2;
-                            this.datar[14 * 13 + 8] = vrange.y - 0.5 * _fillRate * vlen;
-                            this.datar[15 * 13 + 8] = vrange.y - 0.5 * _fillRate * vlen;
-                            this.datar[5 * 13 + 8] = halfv;
-                            this.datar[0 * 13 + 7] = urange.x;
-                            this.datar[3 * 13 + 7] = urange.x;
-                            this.datar[6 * 13 + 7] = halfu;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
-                            this.datar[19 * 13 + 8] = halfv;
-                            this.datar[20 * 13 + 7] = urange.y;
-                            this.datar[22 * 13 + 7] = urange.y;
+                            this.datar[14 * this._unitLen + 8] = vrange.y - 0.5 * _fillRate * vlen;
+                            this.datar[15 * this._unitLen + 8] = vrange.y - 0.5 * _fillRate * vlen;
+                            this.datar[5 * this._unitLen + 8] = halfv;
+                            this.datar[0 * this._unitLen + 7] = urange.x;
+                            this.datar[3 * this._unitLen + 7] = urange.x;
+                            this.datar[6 * this._unitLen + 7] = halfu;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
+                            this.datar[19 * this._unitLen + 8] = halfv;
+                            this.datar[20 * this._unitLen + 7] = urange.y;
+                            this.datar[22 * this._unitLen + 7] = urange.y;
                         }
                         else if (this.fillAmmount >= 0.625) {
                             var _fillRate = 8 * (0.75 - this.fillAmmount);
@@ -3103,15 +3235,15 @@ var gd3d;
                             y2 = l_y;
                             b_x = x2;
                             b_y = y2;
-                            this.datar[5 * 13 + 8] = halfv - 0.5 * _fillRate * vlen;
-                            this.datar[0 * 13 + 7] = urange.x;
-                            this.datar[3 * 13 + 7] = urange.x;
-                            this.datar[6 * 13 + 7] = halfu;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
-                            this.datar[19 * 13 + 8] = halfv;
-                            this.datar[20 * 13 + 7] = urange.y;
-                            this.datar[22 * 13 + 7] = urange.y;
+                            this.datar[5 * this._unitLen + 8] = halfv - 0.5 * _fillRate * vlen;
+                            this.datar[0 * this._unitLen + 7] = urange.x;
+                            this.datar[3 * this._unitLen + 7] = urange.x;
+                            this.datar[6 * this._unitLen + 7] = halfu;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
+                            this.datar[19 * this._unitLen + 8] = halfv;
+                            this.datar[20 * this._unitLen + 7] = urange.y;
+                            this.datar[22 * this._unitLen + 7] = urange.y;
                         }
                         else if (this.fillAmmount >= 0.5) {
                             var _fillRate = 8 * (0.625 - this.fillAmmount);
@@ -3123,14 +3255,14 @@ var gd3d;
                             y2 = l_y;
                             b_x = x2;
                             b_y = y2;
-                            this.datar[0 * 13 + 7] = urange.x + 0.5 * _fillRate * ulen;
-                            this.datar[3 * 13 + 7] = urange.x + 0.5 * _fillRate * ulen;
-                            this.datar[6 * 13 + 7] = halfu;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
-                            this.datar[19 * 13 + 8] = halfv;
-                            this.datar[20 * 13 + 7] = urange.y;
-                            this.datar[22 * 13 + 7] = urange.y;
+                            this.datar[0 * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
+                            this.datar[3 * this._unitLen + 7] = urange.x + 0.5 * _fillRate * ulen;
+                            this.datar[6 * this._unitLen + 7] = halfu;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
+                            this.datar[19 * this._unitLen + 8] = halfv;
+                            this.datar[20 * this._unitLen + 7] = urange.y;
+                            this.datar[22 * this._unitLen + 7] = urange.y;
                         }
                         else if (this.fillAmmount >= 0.375) {
                             var _fillRate = 8 * (0.5 - this.fillAmmount);
@@ -3144,12 +3276,12 @@ var gd3d;
                             y2 = l_y;
                             b_x = x2;
                             b_y = y2;
-                            this.datar[6 * 13 + 7] = halfu + 0.5 * _fillRate * ulen;
-                            this.datar[7 * 13 + 8] = vrange.x;
-                            this.datar[10 * 13 + 8] = vrange.x;
-                            this.datar[19 * 13 + 8] = halfv;
-                            this.datar[20 * 13 + 7] = urange.y;
-                            this.datar[22 * 13 + 7] = urange.y;
+                            this.datar[6 * this._unitLen + 7] = halfu + 0.5 * _fillRate * ulen;
+                            this.datar[7 * this._unitLen + 8] = vrange.x;
+                            this.datar[10 * this._unitLen + 8] = vrange.x;
+                            this.datar[19 * this._unitLen + 8] = halfv;
+                            this.datar[20 * this._unitLen + 7] = urange.y;
+                            this.datar[22 * this._unitLen + 7] = urange.y;
                         }
                         else if (this.fillAmmount >= 0.25) {
                             var _fillRate = 8 * (0.375 - this.fillAmmount);
@@ -3165,11 +3297,11 @@ var gd3d;
                             y2 = l_y;
                             b_x = x2;
                             b_y = y2;
-                            this.datar[7 * 13 + 8] = vrange.x + 0.5 * _fillRate * vlen;
-                            this.datar[10 * 13 + 8] = vrange.x + 0.5 * _fillRate * vlen;
-                            this.datar[19 * 13 + 8] = halfv;
-                            this.datar[20 * 13 + 7] = urange.y;
-                            this.datar[22 * 13 + 7] = urange.y;
+                            this.datar[7 * this._unitLen + 8] = vrange.x + 0.5 * _fillRate * vlen;
+                            this.datar[10 * this._unitLen + 8] = vrange.x + 0.5 * _fillRate * vlen;
+                            this.datar[19 * this._unitLen + 8] = halfv;
+                            this.datar[20 * this._unitLen + 7] = urange.y;
+                            this.datar[22 * this._unitLen + 7] = urange.y;
                         }
                         else if (this.fillAmmount >= 0.125) {
                             var _fillRate = 8 * (0.25 - this.fillAmmount);
@@ -3187,9 +3319,9 @@ var gd3d;
                             y2 = l_y;
                             b_x = x2;
                             b_y = y2;
-                            this.datar[19 * 13 + 8] = halfv + 0.5 * _fillRate * vlen;
-                            this.datar[20 * 13 + 7] = urange.y;
-                            this.datar[22 * 13 + 7] = urange.y;
+                            this.datar[19 * this._unitLen + 8] = halfv + 0.5 * _fillRate * vlen;
+                            this.datar[20 * this._unitLen + 7] = urange.y;
+                            this.datar[22 * this._unitLen + 7] = urange.y;
                         }
                         else {
                             var _fillRate = 8 * (0.125 - this.fillAmmount);
@@ -3209,8 +3341,8 @@ var gd3d;
                             y2 = l_y;
                             b_x = x2;
                             b_y = y2;
-                            this.datar[20 * 13 + 7] = urange.y - 0.5 * _fillRate * ulen;
-                            this.datar[22 * 13 + 7] = urange.y - 0.5 * _fillRate * ulen;
+                            this.datar[20 * this._unitLen + 7] = urange.y - 0.5 * _fillRate * ulen;
+                            this.datar[22 * this._unitLen + 7] = urange.y - 0.5 * _fillRate * ulen;
                         }
                         this.updateQuadData(x0, y0, t_x, t_y, l_x, l_y, c_x, c_y, 0, true);
                         this.updateQuadData(t_x, t_y, x1, y1, c_x, c_y, r_x, r_y, 1);
@@ -3597,6 +3729,7 @@ var gd3d;
     (function (framework) {
         var label = (function () {
             function label() {
+                this.needRefreshImg = false;
                 this._fontsize = 14;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
@@ -3634,6 +3767,7 @@ var gd3d;
                     return this._font;
                 },
                 set: function (font) {
+                    this.needRefreshImg = true;
                     if (this._font) {
                         this._font.unuse();
                     }
@@ -3771,27 +3905,62 @@ var gd3d;
                     yadd += this._fontsize * this.linespace;
                 }
             };
+            Object.defineProperty(label.prototype, "uimat", {
+                get: function () {
+                    if (this.font && this.font.texture) {
+                        var canvas_2 = this.transform.canvas;
+                        var mat = canvas_2.assetmgr.getMaterial(this.font.texture.getName() + "_fontmask");
+                        if (mat == null) {
+                            if (this._uimat != null)
+                                this._uimat.unuse();
+                            mat = new framework.material();
+                            mat.setShader(canvas_2.assetmgr.getShader("shader/defmaskfont"));
+                            canvas_2.assetmgr.mapMaterial[this.font.texture.getName() + "_fontmask"] = mat;
+                            mat.use();
+                        }
+                        if (this.transform.parentIsMask) {
+                            mat.setFloat("MaskState", 1);
+                        }
+                        else {
+                            mat.setFloat("MaskState", 0);
+                        }
+                        this._uimat = mat;
+                    }
+                    return this._uimat;
+                },
+                enumerable: true,
+                configurable: true
+            });
             label.prototype.render = function (canvas) {
                 if (this._font != null) {
                     if (this.dirtyData == true) {
                         this.updateData(this._font);
                         this.dirtyData = false;
                     }
-                    if (this.mat == null) {
-                        this.mat = new framework.material();
-                        this.mat.setShader(canvas.assetmgr.getShader("shader/defuifont"));
-                    }
+                    var mat = this.uimat;
                     var img;
                     if (this._font != null) {
                         img = this._font.texture;
                     }
-                    if (img == null) {
-                        var scene = this.transform.canvas.scene;
-                        img = scene.app.getAssetMgr().getDefaultTexture("grid");
-                    }
-                    this.mat.setTexture("_MainTex", img);
-                    if (this.datar.length != 0) {
-                        canvas.pushRawData(this.mat, this.datar);
+                    if (img != null) {
+                        if (this.needRefreshImg) {
+                            mat.setTexture("_MainTex", img);
+                            this.needRefreshImg = false;
+                        }
+                        if (this.transform.parentIsMask) {
+                            if (this._cacheMaskV4 == null)
+                                this._cacheMaskV4 = new gd3d.math.vector4();
+                            var rect = this.transform.maskRect;
+                            if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h) {
+                                this._cacheMaskV4.x = rect.x;
+                                this._cacheMaskV4.y = rect.y;
+                                this._cacheMaskV4.z = rect.w;
+                                this._cacheMaskV4.w = rect.h;
+                                mat.setVector4("_maskRect", this._cacheMaskV4);
+                            }
+                        }
+                        if (this.datar.length != 0)
+                            canvas.pushRawData(mat, this.datar);
                     }
                 }
             };
@@ -3883,26 +4052,53 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(rawImage2D.prototype, "uimat", {
+                get: function () {
+                    if (this.image != null) {
+                        var canvas_3 = this.transform.canvas;
+                        var mat = canvas_3.assetmgr.getMaterial(this.image.getName() + "_uimask");
+                        if (mat == null) {
+                            if (this._uimat != null)
+                                this._uimat.unuse();
+                            mat = new framework.material();
+                            mat.setShader(canvas_3.assetmgr.getShader("shader/defmaskui"));
+                            canvas_3.assetmgr.mapMaterial[this.image.getName() + "_uimask"] = mat;
+                            mat.use();
+                        }
+                        if (this.transform.parentIsMask) {
+                            mat.setFloat("MaskState", 1);
+                        }
+                        else {
+                            mat.setFloat("MaskState", 0);
+                        }
+                        this._uimat = mat;
+                    }
+                    return this._uimat;
+                },
+                enumerable: true,
+                configurable: true
+            });
             rawImage2D.prototype.render = function (canvas) {
                 var img = this.image;
-                if (this.mat == null) {
-                    var mat = void 0;
-                    if (img != null) {
-                        mat = canvas.assetmgr.getMaterial(img.getName());
-                        if (mat == null) {
-                            mat = new framework.material();
-                            mat.setShader(canvas.assetmgr.getShader("shader/defui"));
-                            canvas.assetmgr.mapMaterial[img.getName()] = mat;
-                        }
-                        this.mat = mat;
-                    }
-                }
+                var mat = this.uimat;
                 if (img != null) {
                     if (this.needRefreshImg) {
-                        this.mat.setTexture("_MainTex", img);
+                        mat.setTexture("_MainTex", img);
                         this.needRefreshImg = false;
                     }
-                    canvas.pushRawData(this.mat, this.datar);
+                    if (this.transform.parentIsMask) {
+                        if (this._cacheMaskV4 == null)
+                            this._cacheMaskV4 = new gd3d.math.vector4();
+                        var rect = this.transform.maskRect;
+                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h) {
+                            this._cacheMaskV4.x = rect.x;
+                            this._cacheMaskV4.y = rect.y;
+                            this._cacheMaskV4.z = rect.w;
+                            this._cacheMaskV4.w = rect.h;
+                            mat.setVector4("_maskRect", this._cacheMaskV4);
+                        }
+                    }
+                    canvas.pushRawData(mat, this.datar);
                 }
             };
             rawImage2D.prototype.updateTran = function () {
@@ -3956,11 +4152,6 @@ var gd3d;
                 gd3d.reflect.UIStyle("vector4"),
                 __metadata("design:type", gd3d.math.color)
             ], rawImage2D.prototype, "color", void 0);
-            __decorate([
-                gd3d.reflect.Field("material"),
-                gd3d.reflect.UIStyle("material"),
-                __metadata("design:type", framework.material)
-            ], rawImage2D.prototype, "mat", void 0);
             rawImage2D = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
@@ -5296,12 +5487,18 @@ var gd3d;
                 pool.compileVS(assetmgr.webgl, "line", defShader.vsline);
                 pool.compileFS(assetmgr.webgl, "line", defShader.fsline);
                 pool.compileVS(assetmgr.webgl, "materialcolor", defShader.vsmaterialcolor);
+                pool.compileVS(assetmgr.webgl, "defUIMaskVS", defShader.vsUiMaskCode);
+                pool.compileFS(assetmgr.webgl, "defUIMaskFS", defShader.fscodeMaskUi);
+                pool.compileVS(assetmgr.webgl, "defuifontMaskVS", defShader.vscodeuifontmask);
+                pool.compileFS(assetmgr.webgl, "defuifontMaskFS", defShader.fscodeuifontmask);
                 var program = pool.linkProgram(assetmgr.webgl, "def", "def");
                 var program2 = pool.linkProgram(assetmgr.webgl, "def", "defui");
                 var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
                 var programdiffuse = pool.linkProgram(assetmgr.webgl, "diffuse", "diffuse");
                 var programline = pool.linkProgram(assetmgr.webgl, "line", "line");
                 var programmaterialcolor = pool.linkProgram(assetmgr.webgl, "materialcolor", "line");
+                var programMaskUI = pool.linkProgram(assetmgr.webgl, "defUIMaskVS", "defUIMaskFS");
+                var programMaskfont = pool.linkProgram(assetmgr.webgl, "defuifontMaskVS", "defuifontMaskFS");
                 {
                     var sh = new framework.shader("shader/def");
                     sh.defaultAsset = true;
@@ -5406,6 +5603,36 @@ var gd3d;
                     sh.layer = framework.RenderLayerEnum.Overlay;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
+                {
+                    var sh = new framework.shader("shader/defmaskui");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
+                    p.setProgram(programMaskUI);
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.state_ztest = false;
+                    p.state_zwrite = false;
+                    p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
+                {
+                    var sh = new framework.shader("shader/defmaskfont");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
+                    p.setProgram(programMaskfont);
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.state_ztest = false;
+                    p.state_zwrite = false;
+                    p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
             };
             defShader.shader0 = "{\
             \"properties\": [\
@@ -5428,6 +5655,63 @@ var gd3d;
             xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
+            defShader.vsUiMaskCode = "\
+        attribute vec4 _glesVertex;   \
+        attribute vec4 _glesColor;                  \
+        attribute vec4 _glesMultiTexCoord0;         \
+        uniform highp mat4 glstate_matrix_mvp;      \
+        uniform lowp float MaskState;      \
+        varying lowp vec4 xlv_COLOR;                \
+        varying highp vec2 xlv_TEXCOORD0;           \
+        varying highp vec2 mask_TEXCOORD;           \
+        void main()                                     \
+        {                                               \
+            highp vec4 tmpvar_1;                        \
+            tmpvar_1.w = 1.0;                           \
+            tmpvar_1.xyz = _glesVertex.xyz;             \
+            xlv_COLOR = _glesColor;                     \
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            if(MaskState != 0.0){    \
+                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
+                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
+            }\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
+        }";
+            defShader.fscodeMaskUi = "         \
+        uniform sampler2D _MainTex;                                                 \
+        uniform highp vec4 _maskRect;                                                 \
+        uniform lowp float MaskState;      \
+        varying lowp vec4 xlv_COLOR;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;   \
+        varying highp vec2 mask_TEXCOORD;           \
+        bool CalcuCut(){   \
+            highp float l;\
+            highp float t;\
+            highp float r;\
+            highp float b;\
+            highp vec2 texc1;\
+            bool beCut;\
+            l = _maskRect.x;\
+            t = _maskRect.y;\
+            r = _maskRect.z + l;\
+            b = _maskRect.w + t;\
+            texc1 = mask_TEXCOORD;\
+            if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){ \
+                beCut = true; \
+            }else{\
+                beCut = false;\
+            }\
+            return beCut;\
+        }\
+           \
+        void main() \
+        {\
+            lowp vec4 tmpvar_3;\
+            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
+            if(MaskState != 0.0 && CalcuCut()) tmpvar_3 *= 0.0;\
+            gl_FragData[0] = tmpvar_3 ;\
+        }\
+        ";
             defShader.fscode = "         \
         uniform sampler2D _MainTex;                                                 \
         varying lowp vec4 xlv_COLOR;                                                 \
@@ -5455,7 +5739,8 @@ var gd3d;
         ";
             defShader.uishader = "{\
             \"properties\": [\
-              \"_MainTex('MainTex',Texture)='white'{}\"\
+              \"_MainTex('MainTex',Texture)='white'{}\",\
+              \"_MaskTex('MaskTex',Texture)='white'{}\"\
             ]\
             }";
             defShader.fscodeui = "         \
@@ -5494,25 +5779,92 @@ var gd3d;
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
             defShader.fscodeuifont = "\
-        precision mediump float;//鎸囧畾娴偣鍨嬬簿纭害 \n\
-        uniform sampler2D _MainTex; \n\
-        varying lowp vec4 xlv_COLOR;\n\
-        varying lowp vec4 xlv_COLOREx;\n\
-        varying highp vec2 xlv_TEXCOORD0;   \n\
-        void main() \n\
-        {\n\
-        float scale = 10.0;//  \n\
-        float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  //0.5\n\
-        float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  //0.34\n\
-        \n\
-        float c=xlv_COLOR.a * clamp ( d,0.0,1.0); \n\
-        float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0); \n\
-        bc =min(1.0-c,bc);\n\
-        \n\
-        \n\
-        \n\
-        gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;\n\
+        precision mediump float ;\
+        uniform sampler2D _MainTex;\
+        varying lowp vec4 xlv_COLOR;\
+        varying lowp vec4 xlv_COLOREx;\
+        varying highp vec2 xlv_TEXCOORD0;    \
+        void main()  \
+        { \
+            float scale = 10.0;   \
+            float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   \
+        float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   \
+        \
+        float c=xlv_COLOR.a * clamp ( d,0.0,1.0);  \
+        float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);  \
+        bc =min(1.0-c,bc); \
+        \
+        \
+        \
+        gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc; \
+    }";
+            defShader.vscodeuifontmask = "\
+        attribute vec4 _glesVertex;   \
+        attribute vec4 _glesColor;                  \
+        attribute vec4 _glesColorEx;                  \
+        attribute vec4 _glesMultiTexCoord0;         \
+        uniform highp mat4 glstate_matrix_mvp;      \
+        uniform lowp float MaskState;      \
+        varying lowp vec4 xlv_COLOR;                \
+        varying lowp vec4 xlv_COLOREx;                                                 \
+        varying highp vec2 xlv_TEXCOORD0;           \
+        varying highp vec2 mask_TEXCOORD;           \
+        void main()                                     \
+        {                                               \
+            highp vec4 tmpvar_1;                        \
+            tmpvar_1.w = 1.0;                           \
+            tmpvar_1.xyz = _glesVertex.xyz;             \
+            xlv_COLOR = _glesColor;                     \
+            xlv_COLOREx = _glesColorEx;                     \
+            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            if(MaskState != 0.0){    \
+                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
+                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
+            }\
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
+            defShader.fscodeuifontmask = "\
+        precision mediump float;\
+            uniform sampler2D _MainTex;  \
+            uniform lowp float MaskState;      \
+            uniform highp vec4 _maskRect;       \
+            varying lowp vec4 xlv_COLOR; \
+            varying lowp vec4 xlv_COLOREx; \
+            varying highp vec2 xlv_TEXCOORD0;    \
+            varying highp vec2 mask_TEXCOORD;     \
+            bool CalcuCut(){   \
+                highp float l;\
+                highp float t;\
+                highp float r;\
+                highp float b;\
+                highp vec2 texc1;\
+                bool beCut;\
+                l = _maskRect.x;\
+                t = _maskRect.y;\
+                r = _maskRect.z + l;\
+                b = _maskRect.w + t;\
+                texc1 = mask_TEXCOORD;\
+                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){ \
+                    beCut = true; \
+                }else{\
+                    beCut = false;\
+                }\
+                return beCut;\
+            }\
+            \
+            void main()  \
+            { \
+            float scale = 10.0;   \
+            float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  \
+            float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  \
+            \
+            float c=xlv_COLOR.a * clamp ( d,0.0,1.0);  \
+            float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);  \
+            bc =min(1.0-c,bc); \
+            lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ;\
+            if(MaskState != 0.0 && CalcuCut()) final *= 0.0;\
+            gl_FragData[0] = final ;\
+            }";
             defShader.diffuseShader = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\",\

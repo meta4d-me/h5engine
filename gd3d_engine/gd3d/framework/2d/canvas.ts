@@ -282,7 +282,7 @@ namespace gd3d.framework
             {
                 this.lastMat = mat;
                 this.batcher.end(this.webgl);
-                var pass = this.lastMat.getShader().passes["base"][0];
+                let pass = this.lastMat.getShader().passes["base"][0];
 
                 //有一些自动参数要传进去
                 mat.setMatrix("glstate_matrix_mvp", this.context.matrixModelViewProject);
@@ -296,11 +296,28 @@ namespace gd3d.framework
                 // this.batcher.push(context.webgl, this.vbod, null);
                 // this.batcher.end(context.webgl);
                 this.batcher.begin(this.webgl, pass);
+            }else{
+                let msta = mat.mapUniform["MaskState"]; 
+                let mr = mat.mapUniform["_maskRect"];
+                if(msta != null && msta.value != null && mr != null && mr.value != null){
+                    let rect = mr.value as math.vector4;
+                    if(this.lastMaskV4 == null) this.lastMaskV4 = new math.vector4();
+                    if(msta.value != this.lastMaskSta || this.lastMaskV4.x != rect.x || this.lastMaskV4.y != rect.y || this.lastMaskV4.z != rect.z || this.lastMaskV4.w != rect.w){
+                        this.lastMaskSta = msta.value;
+                        math.vec4Clone(rect,this.lastMaskV4);
+                        this.batcher.end(this.webgl);
+                        let pass = this.lastMat.getShader().passes["base"][0];
+                        mat.uploadUniform(pass);
+                    }
+                }
             }
+            
             this.batcher.push(this.webgl, data, null);
         }
         private context: renderContext;
 
+        private lastMaskSta:number = -1;
+        private lastMaskV4:math.vector4;
         /**
          * @public
          * @language zh_CN
