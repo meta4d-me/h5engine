@@ -277,7 +277,8 @@ namespace gd3d.framework
         set isMask(b:boolean){
             this._isMask = b;
             this.markDirty();
-            this.updateTran(true);
+            if(this.parent != null) 
+                this.updateTran(true);
         }
 
         private updateMaskRect(){

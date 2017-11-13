@@ -228,6 +228,7 @@ declare namespace gd3d.framework {
         pixelHeight: number;
         private rootNode;
         getRoot(): transform2D;
+        screenToCanvasPoint(fromP: math.vector2, outP: math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
@@ -658,6 +659,24 @@ declare namespace gd3d.framework {
         transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+}
+declare namespace gd3d.framework {
+    class scrollRect implements I2DComponent {
+        private _content;
+        content: transform2D;
+        horizontal: boolean;
+        vertical: boolean;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        private isPointDown;
+        private lastPoint;
+        private strPoint;
+        private strPos;
+        private SlideTo(addtransX, addtransY);
+        remove(): void;
     }
 }
 declare namespace gd3d.framework {

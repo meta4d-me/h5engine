@@ -78,9 +78,8 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("demo_ScreenRange",()=>new demo_ScreenRange());
         this.addBtn("test_liloadscene", () => new test_LiLoadScene());
 
-        this.addBtn("test_UI_component", () => new test_UI_Component());
+        this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_四分屏", () => new test_pick_4p());
-        this.addBtn("test_UI软裁剪", () => new test_softCut());
         
     }
     private x: number = 0;

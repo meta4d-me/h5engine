@@ -393,5 +393,14 @@ namespace gd3d.framework
             }
             return this.rootNode;
         }
+
+        //屏幕空间坐标 转到 canvas 坐标
+        screenToCanvasPoint(fromP:math.vector2,outP:math.vector2){
+            if(fromP == null || outP == null) return;
+            let scalx = 1 - (fromP.x - 1)/-2;  
+            let scaly =  (fromP.y - 1)/-2;
+            outP.x = scalx * this.pixelWidth;
+            outP.y = scaly * this.pixelHeight;
+        }
     }
 }

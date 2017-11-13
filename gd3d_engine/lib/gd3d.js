@@ -1063,6 +1063,14 @@ var gd3d;
                 }
                 return this.rootNode;
             };
+            canvas.prototype.screenToCanvasPoint = function (fromP, outP) {
+                if (fromP == null || outP == null)
+                    return;
+                var scalx = 1 - (fromP.x - 1) / -2;
+                var scaly = (fromP.y - 1) / -2;
+                outP.x = scalx * this.pixelWidth;
+                outP.y = scaly * this.pixelHeight;
+            };
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -1866,7 +1874,8 @@ var gd3d;
                 set: function (b) {
                     this._isMask = b;
                     this.markDirty();
-                    this.updateTran(true);
+                    if (this.parent != null)
+                        this.updateTran(true);
                 },
                 enumerable: true,
                 configurable: true
@@ -2443,6 +2452,7 @@ var gd3d;
                 if (oncap == false) {
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
+                        ev.eated = true;
                         if (ev.type == framework.PointEventEnum.PointDown) {
                             this._downInThis = true;
                             this.showPress();
@@ -3657,6 +3667,7 @@ var gd3d;
                         return;
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
+                        ev.eated = true;
                         this.inputElement.style.visibility = "visible";
                         this.inputElement.focus();
                     }
@@ -4159,6 +4170,123 @@ var gd3d;
             return rawImage2D;
         }());
         framework.rawImage2D = rawImage2D;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var scrollRect = (function () {
+            function scrollRect() {
+                this.horizontal = true;
+                this.vertical = true;
+                this.isPointDown = false;
+            }
+            Object.defineProperty(scrollRect.prototype, "content", {
+                get: function () {
+                    return this._content;
+                },
+                set: function (content) {
+                    this._content = content;
+                    if (content != null)
+                        this.transform.addChild(content);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            scrollRect.prototype.start = function () {
+            };
+            scrollRect.prototype.update = function (delta) {
+            };
+            scrollRect.prototype.onPointEvent = function (canvas, ev, oncap) {
+                if (oncap == false) {
+                    var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
+                    if (b) {
+                        ev.eated = true;
+                        if (this._content == null)
+                            return;
+                        if (!this.horizontal && !this.vertical)
+                            return;
+                        var temps = gd3d.math.pool.new_vector2();
+                        temps.x = ev.x;
+                        temps.y = ev.y;
+                        var tempc = gd3d.math.pool.new_vector2();
+                        this.transform.canvas.screenToCanvasPoint(temps, tempc);
+                        if (this.strPoint == null)
+                            this.strPoint = new gd3d.math.vector2();
+                        var sp = this.strPoint;
+                        if (ev.type == framework.PointEventEnum.PointDown) {
+                            this.isPointDown = true;
+                            sp.x = tempc.x;
+                            sp.y = tempc.y;
+                            if (this.strPos == null)
+                                this.strPos = new gd3d.math.vector2();
+                            gd3d.math.vec2Clone(this._content.transform.localTranslate, this.strPos);
+                        }
+                        if (ev.type == framework.PointEventEnum.PointHold && this.isPointDown) {
+                            if (this.lastPoint == null)
+                                this.lastPoint = new gd3d.math.vector2();
+                            var lp = this.lastPoint;
+                            if (lp.x != tempc.x || lp.y != tempc.y) {
+                                lp.x = tempc.x;
+                                lp.y = tempc.y;
+                                var addtransX = lp.x - sp.x;
+                                var addtransY = lp.y - sp.y;
+                                this.SlideTo(addtransX, addtransY);
+                            }
+                        }
+                        gd3d.math.pool.delete_vector2(temps);
+                        gd3d.math.pool.delete_vector2(tempc);
+                    }
+                }
+                if (ev.type == framework.PointEventEnum.PointUp) {
+                    this.isPointDown = false;
+                }
+            };
+            scrollRect.prototype.SlideTo = function (addtransX, addtransY) {
+                if (this._content == null || this.strPos == null)
+                    return;
+                var ctrans = this._content.transform;
+                var cpos = ctrans.localTranslate;
+                var trans = this.transform;
+                gd3d.math.vec2Clone(this.strPos, cpos);
+                if (this.horizontal) {
+                    cpos.x += addtransX;
+                    if (cpos.x > 0)
+                        cpos.x = 0;
+                    if (ctrans.width > trans.width && cpos.x + ctrans.width < trans.width)
+                        cpos.x = -1 * (ctrans.width - trans.width);
+                }
+                if (this.vertical) {
+                    cpos.y += addtransY;
+                    if (cpos.y > 0)
+                        cpos.y = 0;
+                    if (ctrans.height > trans.height && cpos.y + ctrans.height < trans.height)
+                        cpos.y = -1 * (ctrans.height - trans.height);
+                }
+                ctrans.markDirty();
+            };
+            scrollRect.prototype.remove = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("transform2D"),
+                __metadata("design:type", framework.transform2D),
+                __metadata("design:paramtypes", [framework.transform2D])
+            ], scrollRect.prototype, "content", null);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], scrollRect.prototype, "horizontal", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], scrollRect.prototype, "vertical", void 0);
+            scrollRect = __decorate([
+                gd3d.reflect.node2DComponent
+            ], scrollRect);
+            return scrollRect;
+        }());
+        framework.scrollRect = scrollRect;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -12674,6 +12802,7 @@ var gd3d;
     (function (framework) {
         var pointinfo = (function () {
             function pointinfo() {
+                this.touch = false;
             }
             return pointinfo;
         }());

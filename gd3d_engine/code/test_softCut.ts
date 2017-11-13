@@ -79,6 +79,7 @@ class test_softCut implements IState{
 
         //按鈕
         let btn_t = new gd3d.framework.transform2D;
+        btn_t.name = "btnt"
         btn_t.width = 100;
         btn_t.height = 36;
         btn_t.pivot.x = 0;
@@ -131,16 +132,7 @@ class test_softCut implements IState{
         let raw_i = raw_t.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
         raw_i.image = Temptex;
         
-        //raw png
-        let raw_t2 = new gd3d.framework.transform2D;
-        raw_t2.width = 130;
-        raw_t2.height = 130;
-        raw_t2.pivot.x = 0;
-        raw_t2.pivot.y = 0;
-        this.rooto2d.addChild(raw_t2);
-        let raw_i2 = raw_t2.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
-        raw_i2.image = Temptex;
-
+        
         //文本
         let lab_t = new gd3d.framework.transform2D;
         lab_t.width = 120;
@@ -153,7 +145,7 @@ class test_softCut implements IState{
         lab_l.fontsize = 24;
         lab_l.text = "我是段文本";
         lab_l.color =new gd3d.math.color(0.2,0.2,0.2,1);
-
+        
         //文本
         let lab_t2 = new gd3d.framework.transform2D;
         lab_t2.width = 200;
@@ -166,6 +158,55 @@ class test_softCut implements IState{
         lab_l2.fontsize = 30;
         lab_l2.text = "我是段文本2";
         lab_l2.color =new gd3d.math.color(0.9,0.1,0.2,1);
+
+        //scroll view
+        let scroll_t = new gd3d.framework.transform2D;
+        scroll_t.width =  200;
+        scroll_t.height = 200;
+        this.rooto2d.addChild(scroll_t);
+        scroll_t.localTranslate.x = 260;
+        scroll_t.localTranslate.y = 100;
+        let scroll_ = scroll_t.addComponent("scrollRect") as gd3d.framework.scrollRect;
+        let ct = new gd3d.framework.transform2D;
+        ct.width = 350;
+        ct.height = 450;
+        scroll_.content = ct;
+        scroll_t.isMask = true;
+        scroll_.horizontal = true;
+        scroll_.vertical = true;
+        
+        //raw png
+        let raw_t2 = new gd3d.framework.transform2D;
+        raw_t2.width = 300;
+        raw_t2.height = 400;
+        let raw_i2 = raw_t2.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
+        raw_i2.image = Temptex;
+        ct.addChild(raw_t2);
+        
+        
+        //sub scroll
+        let scroll_t1 = new gd3d.framework.transform2D;
+        scroll_t1.width =  200;
+        scroll_t1.height = 200;
+        ct.addChild(scroll_t1);
+        scroll_t1.localTranslate.x = -50;
+        scroll_t1.localTranslate.y = 100;
+        let scroll_1 = scroll_t1.addComponent("scrollRect") as gd3d.framework.scrollRect;
+        let ct1 = new gd3d.framework.transform2D;
+        ct1.width = 350;
+        ct1.height = 450;
+        scroll_1.content = ct1;
+        scroll_t1.isMask = true;
+        scroll_1.horizontal = true;
+        scroll_1.vertical = true;
+        
+        //raw png
+        let raw_t3 = new gd3d.framework.transform2D;
+        raw_t3.width = 300;
+        raw_t3.height = 400;
+        let raw_i3 = raw_t3.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
+        raw_i3.image = Temptex;
+        ct1.addChild(raw_t3);
 
         // //flame 
         // let flame_t = new gd3d.framework.transform2D;
