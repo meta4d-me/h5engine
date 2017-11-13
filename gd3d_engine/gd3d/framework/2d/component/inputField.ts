@@ -289,14 +289,13 @@ namespace gd3d.framework
                 
                 var b = this.transform.ContainsCanvasPoint(new math.vector2(ev.x, ev.y));
                 if(b){
-                    ev.eated = true;
                     this.inputElement.style.visibility = "visible";
                     this.inputElement.focus();
                 }else{
                     if(this.beFocus)
                         this.inputElement.blur();
 
-                    if(this.inputElement.style.visibility != "hidden") 
+                    if(this.inputElement.style.visibility != "hidden")
                         this.inputElement.style.visibility = "hidden";
                 }       
             }

@@ -76,9 +76,9 @@ namespace gd3d.framework
            \
         void main() \
         {\
+            if(MaskState != 0.0 && CalcuCut()) discard;\
             lowp vec4 tmpvar_3;\
             tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-            if(MaskState != 0.0 && CalcuCut()) tmpvar_3 *= 0.0;\
             gl_FragData[0] = tmpvar_3 ;\
         }\
         ";
@@ -234,6 +234,7 @@ namespace gd3d.framework
             \
             void main()  \
             { \
+                if(MaskState != 0.0 && CalcuCut())  discard;\
             float scale = 10.0;   \
             float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  \
             float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  \
@@ -242,7 +243,6 @@ namespace gd3d.framework
             float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);  \
             bc =min(1.0-c,bc); \
             lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ;\
-            if(MaskState != 0.0 && CalcuCut()) final *= 0.0;\
             gl_FragData[0] = final ;\
             }";
 
