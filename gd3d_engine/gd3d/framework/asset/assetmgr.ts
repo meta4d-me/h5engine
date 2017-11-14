@@ -1274,7 +1274,7 @@ namespace gd3d.framework
         {
             if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1)
             {
-                console.log("aaa");
+               // console.log("aaa");
             }
             let assetFactory: IAssetFactory = this.getAssetFactory(type);
             if (assetFactory != null)

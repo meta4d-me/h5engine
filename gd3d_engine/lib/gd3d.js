@@ -4960,7 +4960,6 @@ var gd3d;
             };
             assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
                 if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1) {
-                    console.log("aaa");
                 }
                 var assetFactory = this.getAssetFactory(type);
                 if (assetFactory != null) {
@@ -7968,7 +7967,7 @@ var gd3d;
                             }
                             break;
                         default:
-                            console.log("materialJson的mapuniform中的某type：" + jsonChild["type"] + "不符合范围（0-2）");
+                            break;
                     }
                 }
             };
