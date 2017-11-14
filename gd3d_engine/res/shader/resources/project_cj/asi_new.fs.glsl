@@ -12,6 +12,12 @@ varying mediump vec2 _maintex_uv;
 varying mediump vec2 _asm_uv;
 varying mediump vec2 _light_uv;
 varying highp vec3 normalDir;
+varying mediump vec3 lightDir;
+
+//varying lowp float light2dot;
+uniform lowp float _light2_area;
+uniform lowp float _Light2Rate;
+uniform mediump vec4 _Light2Color;
 
 void main()
 {
@@ -28,6 +34,7 @@ void main()
     lowp vec3 lightcolor=texture2D(_streamLight,streamligtuv).rgb;
 
     lightcolor=min(vec3(asmcolor.b),lightcolor)*_LightColor.rgb*_LightRate;
+    lowp vec3 lightcolor2=vec3(pow(max(dot(normalDir,lightDir),0.0),_light2_area))*_Light2Rate*_Light2Color.rgb*2.0;
     
-    gl_FragData[0]=vec4(mainTexcolor+specColor+lightcolor,1.0);
+    gl_FragData[0]=vec4(mainTexcolor+specColor+lightcolor+lightcolor2,1.0);
 }
