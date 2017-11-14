@@ -1161,9 +1161,14 @@ declare namespace gd3d.framework {
         use(): void;
         beloop: boolean;
         timeLength: number;
+        frameRate: number;
         positionitems: keyframepathpositionitem[];
         rotationitmes: keyframepathrotationitem[];
+        pathdata: {
+            [pathid: string]: pathData;
+        };
         Parse(json: JSON): void;
+        addPathData(children: any[]): void;
         unuse(): void;
         dispose(): void;
         caclByteLength(): number;
@@ -1175,6 +1180,17 @@ declare namespace gd3d.framework {
     class keyframepathrotationitem {
         rotation: gd3d.math.quaternion;
         time: number;
+    }
+    class children {
+        name: string;
+        position: keyframepathpositionitem[];
+        rotation: keyframepathrotationitem[];
+        children: children[];
+    }
+    class pathData {
+        name: string;
+        positions: keyframepathpositionitem[];
+        rotations: keyframepathrotationitem[];
     }
 }
 declare namespace gd3d.framework {
@@ -1838,15 +1854,28 @@ declare namespace gd3d.framework {
         private rotations;
         private timelength;
         private beloop;
+        private frameRate;
+        pathdata: {
+            [pathid: string]: pathData;
+        };
         playingtime: number;
         keyframeasset: keyframeAnimationPathAsset;
         setkeyframeanimationasst(keyframeanimationpathasset: keyframeAnimationPathAsset): void;
+        childrentrans: {
+            [pathname: string]: transform;
+        };
+        childrenpaths: {
+            child: transform;
+            path: pathData;
+        }[];
+        setChildTrans(mytrans: transform): void;
         isactived: boolean;
         start(): void;
         update(delta: number): void;
         lastpositionindex: number;
         lastrotationindex: number;
         private followmove(delta);
+        private childrenfollow(delta);
         gameObject: gameObject;
         private mystrans;
         remove(): void;

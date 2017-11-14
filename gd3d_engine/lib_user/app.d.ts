@@ -89,6 +89,14 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_drawMesh implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    timer: number;
+    update(delta: number): void;
+}
 declare class test_fakepbr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -98,6 +106,26 @@ declare class test_fakepbr implements IState {
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;
     timer: number;
+    update(delta: number): void;
+}
+declare class test_heilongbo implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskMgr: gd3d.framework.taskMgr;
+    keyframeanicomponet: gd3d.framework.keyframeanimation;
+    keyframeanicomponet1: gd3d.framework.keyframeanimation;
+    longtou: gd3d.framework.transform;
+    start(app: gd3d.framework.application): void;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private loadCube(laststate, state);
+    private loadkeyFrameAnimationPath(laststate, state);
+    private loadasset(laststate, state);
+    cube: gd3d.framework.transform;
+    private iniscene(laststate, state);
+    private addbtns();
+    private addbtn(text, x, y, func);
     update(delta: number): void;
 }
 declare class test_keyframeAnimation implements IState {
@@ -161,6 +189,19 @@ declare namespace demo {
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
     }
+}
+declare class test_postCamera implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    timer: number;
+    update(delta: number): void;
+    camTran: gd3d.framework.transform;
+    postColor: gd3d.framework.cameraPostQueue_Color;
+    postQuad: gd3d.framework.cameraPostQueue_Quad;
+    depthColor: gd3d.framework.cameraPostQueue_Depth;
+    private addCamera();
 }
 declare class test_RangeScreen implements IState {
     app: gd3d.framework.application;

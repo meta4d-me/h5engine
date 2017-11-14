@@ -6841,6 +6841,7 @@ var gd3d;
                 this.beloop = false;
                 this.positionitems = [];
                 this.rotationitmes = [];
+                this.pathdata = {};
                 if (!assetName) {
                     assetName = "keyframepath_" + this.getGUID();
                 }
@@ -6864,6 +6865,7 @@ var gd3d;
                     this.beloop = false;
                 }
                 this.timeLength = json["timeLength"];
+                this.frameRate = json["frameRate"];
                 var position = json["position"];
                 for (var key in position) {
                     var item = new keyframepathpositionitem();
@@ -6883,6 +6885,64 @@ var gd3d;
                     var arr1 = itemrotation.split(",");
                     item1.rotation = new gd3d.math.quaternion(parseFloat(arr1[0]), parseFloat(arr1[1]), parseFloat(arr1[2]), parseFloat(arr1[3]));
                     this.rotationitmes.push(item1);
+                }
+                var children = json["children"];
+                for (var i = 0; i < children.length; i++) {
+                    var childname = children[i]["name"];
+                    var childpathdata = new pathData();
+                    var position_1 = children[i]["position"];
+                    for (var key in position_1) {
+                        var item_1 = new keyframepathpositionitem();
+                        var positionnode = position_1[key];
+                        item_1.time = positionnode["time"];
+                        var itemposition = positionnode["position"];
+                        var arr_1 = itemposition.split(",");
+                        item_1.position = new gd3d.math.vector3(parseFloat(arr_1[0]), parseFloat(arr_1[1]), parseFloat(arr_1[2]));
+                        childpathdata.positions.push(item_1);
+                    }
+                    var rotation_1 = children[i]["rotation"];
+                    for (var key in rotation_1) {
+                        var item_2 = new keyframepathrotationitem();
+                        var rotationnode = rotation_1[key];
+                        item_2.time = rotationnode["time"];
+                        var itemrotation = rotationnode["rotation"];
+                        var arr_2 = itemrotation.split(",");
+                        item_2.rotation = new gd3d.math.quaternion(parseFloat(arr_2[0]), parseFloat(arr_2[1]), parseFloat(arr_2[2]), parseFloat(arr_2[3]));
+                        childpathdata.rotations.push(item_2);
+                    }
+                    this.pathdata[childname] = childpathdata;
+                    var nextchildren = children[i]["children"];
+                    this.addPathData(nextchildren);
+                }
+            };
+            keyframeAnimationPathAsset.prototype.addPathData = function (children) {
+                for (var i = 0; i < children.length; i++) {
+                    var childname = children[i]["name"];
+                    var childpathdata = new pathData();
+                    childpathdata.name = childname;
+                    var position = children[i]["position"];
+                    for (var key in position) {
+                        var item = new keyframepathpositionitem();
+                        var positionnode = position[key];
+                        item.time = positionnode["time"];
+                        var itemposition = positionnode["position"];
+                        var arr = itemposition.split(",");
+                        item.position = new gd3d.math.vector3(parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]));
+                        childpathdata.positions.push(item);
+                    }
+                    var rotation = children[i]["rotation"];
+                    for (var key in rotation) {
+                        var item = new keyframepathrotationitem();
+                        var rotationnode = rotation[key];
+                        item.time = rotationnode["time"];
+                        var itemrotation = rotationnode["rotation"];
+                        var arr = itemrotation.split(",");
+                        item.rotation = new gd3d.math.quaternion(parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]), parseFloat(arr[3]));
+                        childpathdata.rotations.push(item);
+                    }
+                    this.pathdata[childname] = childpathdata;
+                    var nextchildren = children[i]["children"];
+                    this.addPathData(nextchildren);
                 }
             };
             keyframeAnimationPathAsset.prototype.unuse = function () {
@@ -6925,6 +6985,23 @@ var gd3d;
             return keyframepathrotationitem;
         }());
         framework.keyframepathrotationitem = keyframepathrotationitem;
+        var children = (function () {
+            function children() {
+                this.position = [];
+                this.rotation = [];
+                this.children = [];
+            }
+            return children;
+        }());
+        framework.children = children;
+        var pathData = (function () {
+            function pathData() {
+                this.positions = [];
+                this.rotations = [];
+            }
+            return pathData;
+        }());
+        framework.pathData = pathData;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -10863,7 +10940,11 @@ var gd3d;
             function keyframeanimation() {
                 this.timelength = 0;
                 this.beloop = false;
+                this.frameRate = 0;
+                this.pathdata = {};
                 this.playingtime = 0;
+                this.childrentrans = {};
+                this.childrenpaths = [];
                 this.isactived = false;
                 this.lastpositionindex = 0;
                 this.lastrotationindex = 0;
@@ -10894,6 +10975,8 @@ var gd3d;
                 this.rotations = keyframeanimationpathasset.rotationitmes;
                 this.timelength = keyframeanimationpathasset.timeLength;
                 this.beloop = keyframeanimationpathasset.beloop;
+                this.frameRate = keyframeanimationpathasset.frameRate;
+                this.pathdata = keyframeanimationpathasset.pathdata;
                 if (this.positions[0] != null) {
                     gd3d.math.vec3Clone(this.positions[0].position, this.gameObject.transform.localTranslate);
                 }
@@ -10901,7 +10984,30 @@ var gd3d;
                     gd3d.math.quatClone(this.rotations[0].rotation, this.gameObject.transform.localRotate);
                 }
                 this.mystrans = this.gameObject.transform;
+                this.setChildTrans(this.mystrans);
                 this.mystrans.markDirty();
+            };
+            keyframeanimation.prototype.setChildTrans = function (mytrans) {
+                if (mytrans.children) {
+                    for (var i = 0; i < mytrans.children.length; i++) {
+                        if (mytrans.children[i] != this.mystrans) {
+                            var parent = new gd3d.framework.transform();
+                            parent = mytrans.children[i].parent;
+                            var name = mytrans.children[i].name;
+                            while (parent != this.mystrans) {
+                                name = parent.name + "/" + name;
+                                parent = parent.parent;
+                            }
+                            for (var key in this.pathdata) {
+                                if (name == key) {
+                                    this.childrentrans[name] = mytrans.children[i];
+                                    this.childrenpaths.push({ child: this.childrentrans[name], path: this.pathdata[key] });
+                                }
+                            }
+                        }
+                        this.setChildTrans(mytrans.children[i]);
+                    }
+                }
             };
             keyframeanimation.prototype.start = function () {
             };
@@ -10915,7 +11021,7 @@ var gd3d;
                 var lastpositionindex = this.lastpositionindex;
                 var lastrotationindex = this.lastrotationindex;
                 if (this.positions[0] != null) {
-                    if (this.playingtime >= this.positions[this.positions.length - 1].time) {
+                    if (this.playingtime >= this.timelength) {
                         if (!this.beloop) {
                             this.isactived = false;
                         }
@@ -10930,21 +11036,20 @@ var gd3d;
                                 break;
                         }
                     }
-                    if (this.positions[lastpositionindex].time - this.playingtime < 0.016) {
+                    if (this.positions[lastpositionindex].time > (this.playingtime - delta) && this.positions[lastpositionindex].time - this.playingtime < 0.016) {
                         this.mystrans.localTranslate.x = this.positions[lastpositionindex].position.x;
                         this.mystrans.localTranslate.y = this.positions[lastpositionindex].position.y;
                         this.mystrans.localTranslate.z = this.positions[lastpositionindex].position.z;
                         this.mystrans.markDirty();
-                        this.playingtime = this.positions[lastpositionindex].time;
                     }
-                    else {
+                    else if (this.positions[lastpositionindex].time > (this.playingtime - delta)) {
                         var positionlerp = delta / (this.positions[lastpositionindex].time - (this.playingtime - delta));
                         gd3d.math.vec3SLerp(this.mystrans.localTranslate, this.positions[lastpositionindex].position, positionlerp, this.mystrans.localTranslate);
                         this.mystrans.markDirty();
                     }
                 }
                 if (this.rotations[0] != null) {
-                    if (this.playingtime >= this.rotations[this.rotations.length - 1].time) {
+                    if (this.playingtime >= this.timelength) {
                         if (!this.beloop) {
                             this.isactived = false;
                         }
@@ -10959,22 +11064,69 @@ var gd3d;
                                 break;
                         }
                     }
-                    if (this.rotations[lastrotationindex].time - this.playingtime < 0.01) {
+                    if (this.rotations[lastrotationindex].time > (this.playingtime - delta) && this.rotations[lastrotationindex].time - (this.playingtime - delta) < 0.01) {
                         this.mystrans.localRotate.x = this.rotations[lastrotationindex].rotation.x;
                         this.mystrans.localRotate.y = this.rotations[lastrotationindex].rotation.y;
                         this.mystrans.localRotate.z = this.rotations[lastrotationindex].rotation.z;
                         this.mystrans.localRotate.w = this.rotations[lastrotationindex].rotation.w;
                         this.mystrans.markDirty();
-                        this.playingtime = this.rotations[lastrotationindex].time;
                     }
-                    else {
+                    else if (this.rotations[lastrotationindex].time > (this.playingtime - delta)) {
                         var rotationlerp = delta / (this.rotations[lastrotationindex].time - (this.playingtime - delta));
                         gd3d.math.quatLerp(this.mystrans.localRotate, this.rotations[lastrotationindex].rotation, this.mystrans.localRotate, rotationlerp);
                         this.mystrans.markDirty();
                     }
                 }
+                this.childrenfollow(delta);
                 this.lastpositionindex = lastpositionindex;
                 this.lastrotationindex = lastrotationindex;
+            };
+            keyframeanimation.prototype.childrenfollow = function (delta) {
+                var playingtime = this.playingtime;
+                for (var i = 0; i < this.childrenpaths.length; i++) {
+                    var item = this.childrenpaths[i];
+                    var childtrans = item.child;
+                    var childpositions = item.path.positions;
+                    var childrotations = item.path.rotations;
+                    if (childpositions.length > 0) {
+                        var aheadpositionindex = 0;
+                        while (playingtime > childpositions[aheadpositionindex].time) {
+                            aheadpositionindex++;
+                            if (aheadpositionindex == childpositions.length - 1)
+                                break;
+                        }
+                        if (playingtime <= childpositions[aheadpositionindex].time) {
+                            if (childpositions[aheadpositionindex].time - playingtime < 0.016) {
+                                gd3d.math.vec3Clone(childpositions[aheadpositionindex].position, childtrans.localTranslate);
+                                childtrans.markDirty();
+                            }
+                            else {
+                                var positionlerp = delta / (childpositions[aheadpositionindex].time - (playingtime - delta));
+                                gd3d.math.vec3SLerp(childtrans.localTranslate, childpositions[aheadpositionindex].position, positionlerp, childtrans.localTranslate);
+                                childtrans.markDirty();
+                            }
+                        }
+                    }
+                    if (childrotations.length > 0) {
+                        var aheadrotationindex = 0;
+                        while (playingtime > childrotations[aheadrotationindex].time) {
+                            aheadrotationindex++;
+                            if (aheadrotationindex == childrotations.length - 1)
+                                break;
+                        }
+                        if (playingtime <= childrotations[aheadrotationindex].time) {
+                            if (childrotations[aheadrotationindex].time - playingtime < 0.016) {
+                                gd3d.math.quatClone(childrotations[aheadrotationindex].rotation, childtrans.localRotate);
+                                childtrans.markDirty();
+                            }
+                            else {
+                                var rotationlerp = delta / (childrotations[aheadrotationindex].time - (playingtime - delta));
+                                gd3d.math.quatLerp(childtrans.localRotate, childrotations[aheadrotationindex].rotation, childtrans.localRotate, rotationlerp);
+                                childtrans.markDirty();
+                            }
+                        }
+                    }
+                }
             };
             keyframeanimation.prototype.remove = function () {
                 if (this._keyframeasset) {
@@ -10997,10 +11149,10 @@ var gd3d;
                 this.lastpositionindex = 0;
                 this.lastrotationindex = 0;
                 if (this.positions[0] != null) {
-                    this.mystrans.localTranslate = this.positions[0].position;
+                    gd3d.math.vec3Clone(this.positions[0].position, this.mystrans.localTranslate);
                 }
                 if (this.rotations[0] != null) {
-                    this.mystrans.localRotate = this.rotations[0].rotation;
+                    gd3d.math.quatClone(this.rotations[0].rotation, this.mystrans.localRotate);
                 }
                 this.isactived = true;
             };

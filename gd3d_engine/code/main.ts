@@ -82,9 +82,9 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_UI_component", () => new test_UI_Component());
         this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
         this.addBtn("test_四分屏", () => new test_pick_4p());        
-        this.addBtn("test_keyframeAnimation",()=> new test_keyframeAnimation());
-        
+        this.addBtn("test_heilongbo_keyframeAni",()=>new test_heilongbo());
     }
+    
     private x: number = 0;
     private y: number = 100;
     private btns: HTMLButtonElement[] = [];
