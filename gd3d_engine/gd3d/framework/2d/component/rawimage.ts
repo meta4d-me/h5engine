@@ -61,15 +61,30 @@ namespace gd3d.framework
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 材质
-         * @version egret-gd3d 1.0
+         * @private
+         * ui默认材质
          */
-        @gd3d.reflect.Field("material")
-        @gd3d.reflect.UIStyle("material")
-        mat: material;
+        _uimat: material;
+        private get uimat(){
+            if (this.image != null ){
+                let canvas = this.transform.canvas;
+                let mat = canvas.assetmgr.getMaterial(this.image.getName()+"_uimask");
+                if(mat == null){
+                    if(this._uimat != null) this._uimat.unuse();
+                    mat = new material();
+                    mat.setShader(canvas.assetmgr.getShader("shader/defmaskui"));
+                    canvas.assetmgr.mapMaterial[this.image.getName()+"_uimask"] = mat;
+                    mat.use();
+                }
+                if(this.transform.parentIsMask){
+                    mat.setFloat("MaskState",1);
+                }else{
+                    mat.setFloat("MaskState",0);
+                }
+                this._uimat = mat;
+            }
+            return this._uimat;
+        }
 
         /**
          * @private
@@ -77,22 +92,7 @@ namespace gd3d.framework
         render(canvas: canvas)
         {
             let img = this.image;
-
-            if (this.mat == null)
-            {
-                let mat:material;
-                if (img != null){
-                    mat = canvas.assetmgr.getMaterial(img.getName());
-                    
-                    if(mat == null){
-                        mat = new material();
-                        mat.setShader(canvas.assetmgr.getShader("shader/defui"));
-                        canvas.assetmgr.mapMaterial[img.getName()] = mat;
-                    }
-
-                    this.mat = mat;
-                }
-            }
+            let mat = this.uimat;
 
             // if (img == null)
             // {
@@ -101,12 +101,24 @@ namespace gd3d.framework
             // }
             if(img != null){
                 if(this.needRefreshImg){
-                    this.mat.setTexture("_MainTex", img);
+                    mat.setTexture("_MainTex", img);
                     this.needRefreshImg = false;
                 }
-                canvas.pushRawData(this.mat, this.datar);
+
+                if(this.transform.parentIsMask){
+                    if(this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
+                    let rect = this.transform.maskRect;
+                    if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h){
+                        this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y;this._cacheMaskV4.z = rect.w;this._cacheMaskV4.w = rect.h;
+                        mat.setVector4("_maskRect",this._cacheMaskV4);
+                    }
+                }
+
+                canvas.pushRawData(mat , this.datar);
             }
         }
+        
+        private _cacheMaskV4:math.vector4;
 
         /**
          * @private

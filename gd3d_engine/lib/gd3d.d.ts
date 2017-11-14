@@ -220,12 +220,15 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr): void;
         pushRawData(mat: material, data: number[]): void;
         private context;
+        private lastMaskSta;
+        private lastMaskV4;
         assetmgr: assetMgr;
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr): void;
         pixelWidth: number;
         pixelHeight: number;
         private rootNode;
         getRoot(): transform2D;
+        screenToCanvasPoint(fromP: math.vector2, outP: math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
@@ -416,6 +419,14 @@ declare namespace gd3d.framework {
         localTranslate: math.vector2;
         localScale: math.vector2;
         localRotate: number;
+        private _maskRect;
+        private _temp_maskRect;
+        readonly maskRect: math.rect;
+        private _isMask;
+        isMask: boolean;
+        private updateMaskRect();
+        private _parentIsMask;
+        readonly parentIsMask: boolean;
         private localMatrix;
         private worldMatrix;
         private worldRotate;
@@ -502,11 +513,13 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class image2D implements IRectRenderer {
         constructor();
+        private _unitLen;
         private datar;
         private _sprite;
         private needRefreshImg;
         color: math.color;
-        mat: material;
+        _uimat: material;
+        private readonly uimat;
         private _imageType;
         imageType: ImageType;
         private _fillMethod;
@@ -516,6 +529,7 @@ declare namespace gd3d.framework {
         setTexture(texture: texture, border?: math.border, rect?: math.rect): void;
         sprite: sprite;
         render(canvas: canvas): void;
+        private _cacheMaskV4;
         start(): void;
         update(delta: number): void;
         transform: transform2D;
@@ -592,6 +606,7 @@ declare namespace gd3d.framework {
         text: string;
         private _font;
         font: font;
+        private needRefreshImg;
         private _fontsize;
         fontsize: number;
         linespace: number;
@@ -604,9 +619,11 @@ declare namespace gd3d.framework {
         private datar;
         color: math.color;
         color2: math.color;
-        mat: material;
+        _uimat: material;
+        private readonly uimat;
         private dirtyData;
         render(canvas: canvas): void;
+        private _cacheMaskV4;
         updateTran(): void;
         start(): void;
         update(delta: number): void;
@@ -632,14 +649,34 @@ declare namespace gd3d.framework {
         private needRefreshImg;
         image: texture;
         color: math.color;
-        mat: material;
+        _uimat: material;
+        private readonly uimat;
         render(canvas: canvas): void;
+        private _cacheMaskV4;
         updateTran(): void;
         start(): void;
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+}
+declare namespace gd3d.framework {
+    class scrollRect implements I2DComponent {
+        private _content;
+        content: transform2D;
+        horizontal: boolean;
+        vertical: boolean;
+        start(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        private isPointDown;
+        private lastPoint;
+        private strPoint;
+        private strPos;
+        private SlideTo(addtransX, addtransY);
+        remove(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -893,6 +930,8 @@ declare namespace gd3d.framework {
     class defShader {
         static shader0: string;
         static vscode: string;
+        static vsUiMaskCode: string;
+        static fscodeMaskUi: string;
         static fscode: string;
         static fscode2: string;
         static uishader: string;
@@ -900,6 +939,8 @@ declare namespace gd3d.framework {
         static shaderuifront: string;
         static vscodeuifont: string;
         static fscodeuifont: string;
+        static vscodeuifontmask: string;
+        static fscodeuifontmask: string;
         static diffuseShader: string;
         static vsdiffuse: string;
         static fsdiffuse: string;

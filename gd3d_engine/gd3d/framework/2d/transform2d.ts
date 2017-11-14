@@ -250,6 +250,87 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         localRotate: number = 0;//旋转
+
+        private _maskRect : math.rect;
+        private _temp_maskRect:math.rect;
+        get maskRect(){
+            if(this._temp_maskRect == null) this._temp_maskRect = new math.rect();
+            if(this._maskRect != null){
+                this._temp_maskRect.x = this._maskRect.x;
+                this._temp_maskRect.y = this._maskRect.y;
+                this._temp_maskRect.w = this._maskRect.w;
+                this._temp_maskRect.h = this._maskRect.h;
+            }
+            return this._temp_maskRect;
+        }
+        private _isMask:boolean = false;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前节点是否是mask
+         * @version egret-gd3d 1.0
+         */
+        get isMask(){
+            return this._isMask;            
+        }
+        set isMask(b:boolean){
+            this._isMask = b;
+            this.markDirty();
+            if(this.parent != null) 
+                this.updateTran(true);
+        }
+
+        private updateMaskRect(){
+            let rect_x; let rect_y; let rect_w; let rect_h;
+            let ParentRect;
+            if(this.parent != null){
+                this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
+                ParentRect = this.parent.maskRect;
+            }else
+                this._parentIsMask = false;
+            if(this.isMask || this.parentIsMask){
+                if(this.isMask){
+                    //计算 maskrect 
+                    let wPos = this.getWorldTranslate();
+                    let wW = this.canvas.pixelWidth;
+                    let wH = this.canvas.pixelHeight;
+                    rect_x = wPos.x/wW;
+                    rect_y = wPos.y/wH;
+                    rect_w = this.width/wW;
+                    rect_h = this.height/wH;
+                    if(this.parentIsMask && ParentRect != null){
+                        //计算 rect  ∩  parentRect
+                        let min_x =Math.max(rect_x,ParentRect.x);
+                        let min_y =Math.max(rect_y,ParentRect.y);
+                        let max_x =Math.min(rect_x+rect_w,ParentRect.x+ParentRect.w);
+                        let max_y =Math.min(rect_y+rect_h,ParentRect.y+ParentRect.h);
+        
+                        rect_x = min_x;
+                        rect_y = min_y;
+                        rect_w = max_x - min_x;
+                        rect_h = max_y - min_y;
+                    }
+                }else if(ParentRect != null){
+                    rect_x = ParentRect.x; rect_y = ParentRect.y; rect_w = ParentRect.w; rect_h = ParentRect.h;
+                }
+                if(this._maskRect == null) this._maskRect = new math.rect();
+
+                if(this._maskRect.x != rect_x || this._maskRect.x != rect_y ||this._maskRect.x != rect_w ||this._maskRect.x != rect_h ){
+                    this._maskRect.x = rect_x; 
+                    this._maskRect.y = rect_y; 
+                    this._maskRect.w = rect_w; 
+                    this._maskRect.h = rect_h; 
+                }
+            }
+        }
+        
+
+        private _parentIsMask = false;
+        get parentIsMask(){
+            return this._parentIsMask;
+        }
+
         private localMatrix: math.matrix3x2 = new gd3d.math.matrix3x2;//2d矩阵
         //这个是如果爹改了就要跟着算的
 
@@ -278,6 +359,7 @@ namespace gd3d.framework
             node.parent = this;
             node.canvas = this.canvas;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            this.markDirty();
         }
 
         /**
@@ -305,6 +387,7 @@ namespace gd3d.framework
             node.canvas = this.canvas;
             node.parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            this.markDirty();
         }
 
         /**
@@ -394,6 +477,7 @@ namespace gd3d.framework
                 {
                     gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
+                this.updateMaskRect();
                 if (this.renderer != null)
                 {
                     this.renderer.updateTran();

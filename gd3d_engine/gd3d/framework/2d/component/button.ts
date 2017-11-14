@@ -211,6 +211,7 @@ namespace gd3d.framework
 
                 if (b)
                 {
+                    ev.eated = true;
                     if (ev.type == PointEventEnum.PointDown)
                     {
                         this._downInThis = true;

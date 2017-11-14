@@ -218,6 +218,19 @@ declare class test_RangeScreen implements IState {
     pointDown: boolean;
     update(delta: number): void;
 }
+declare class test_softCut implements IState {
+    static temp: any;
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    rooto2d: gd3d.framework.overlay2D;
+    start(app: gd3d.framework.application): void;
+    private createUI(astState, state);
+    private loadTexture(lastState, state);
+    update(delta: number): void;
+}
 declare enum ShockType {
     Vertical = 0,
     Horizontal = 1,

@@ -66,6 +66,7 @@ namespace gd3d.framework
         }
         set font(font: font)
         {
+            this.needRefreshImg = true;
             if(this._font)
             {
                 this._font.unuse();
@@ -73,6 +74,7 @@ namespace gd3d.framework
             this._font = font;
             this._font.use();
         }
+        private needRefreshImg = false;
 
         private _fontsize: number = 14;
         /**
@@ -386,14 +388,33 @@ namespace gd3d.framework
          */
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
         
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 材质
-         * @version egret-gd3d 1.0
+       /**
+         * @private
+         * ui默认材质
          */
-        mat: material;
+        _uimat: material;
+        private get uimat(){
+            if (this.font  && this.font.texture ){
+                let canvas = this.transform.canvas;
+                let mat = canvas.assetmgr.getMaterial(this.font.texture.getName()+"_fontmask");
+                if(mat == null){
+                    if(this._uimat != null) this._uimat.unuse();
+                    mat = new material();
+                    mat.setShader(canvas.assetmgr.getShader("shader/defmaskfont"));
+                    canvas.assetmgr.mapMaterial[this.font.texture.getName()+"_fontmask"] = mat;
+                    mat.use();
+                }
+                if(this.transform.parentIsMask){
+                    mat.setFloat("MaskState",1);
+                }else{
+                    mat.setFloat("MaskState",0);
+                }
+                this._uimat = mat;
+            }
+            return this._uimat;
+        }
+
+
         private dirtyData: boolean = true;
 
         /**
@@ -409,11 +430,7 @@ namespace gd3d.framework
                     this.dirtyData = false;
                 }
 
-                if (this.mat == null)
-                {
-                    this.mat = new material();
-                    this.mat.setShader(canvas.assetmgr.getShader("shader/defuifont"));
-                }
+                let mat = this.uimat;
 
                 var img;
                 if (this._font != null)
@@ -421,18 +438,29 @@ namespace gd3d.framework
                     img = this._font.texture;
                 }
 
-                if (img == null)
+                if (img != null)
                 {
-                    var scene = this.transform.canvas.scene;
-                    img = scene.app.getAssetMgr().getDefaultTexture("grid");
-                }
-                this.mat.setTexture("_MainTex", img);
-                if (this.datar.length != 0)
-                {
-                    canvas.pushRawData(this.mat, this.datar);
+                    if(this.needRefreshImg){
+                        mat.setTexture("_MainTex", img);
+                        this.needRefreshImg = false;
+                    }
+
+                    if(this.transform.parentIsMask){
+                        if(this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
+                        let rect = this.transform.maskRect;
+                        if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h){
+                            this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y;this._cacheMaskV4.z = rect.w;this._cacheMaskV4.w = rect.h;
+                            mat.setVector4("_maskRect",this._cacheMaskV4);
+                        }
+                    }
+
+                    if (this.datar.length != 0)
+                        canvas.pushRawData(mat, this.datar);
                 }
             }
         }
+
+        private _cacheMaskV4:math.vector4;
 
         /**
          * @private

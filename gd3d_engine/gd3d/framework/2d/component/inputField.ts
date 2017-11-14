@@ -295,7 +295,7 @@ namespace gd3d.framework
                     if(this.beFocus)
                         this.inputElement.blur();
 
-                    if(this.inputElement.style.visibility != "hidden") 
+                    if(this.inputElement.style.visibility != "hidden")
                         this.inputElement.style.visibility = "hidden";
                 }       
             }
