@@ -69,22 +69,24 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_shadowmap", () => new test_ShadowMap());
         this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
 
+        //----------------------------------------------文档案例
         this.addBtn("example_newScene",() =>new test_NewScene());
         this.addBtn("example_newObject",()=>new test_NewGameObject);
         this.addBtn("example_changeMesh",()=>new test_ChangeMesh());
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
-        this.addBtn("example_Sound",()=>new test_Sound());
-        this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
+        this.addBtn("example_Sound",()=>new test_Sound());      
         this.addBtn("demo_ScreenRange",()=>new demo_ScreenRange());
-        this.addBtn("test_liloadscene", () => new test_LiLoadScene());
+        //----------------------------------------------文档案例
 
+        this.addBtn("test_liloadscene", () => new test_LiLoadScene());
         this.addBtn("test_UI_component", () => new test_UI_Component());
-        this.addBtn("test_四分屏", () => new test_pick_4p());
-        //this.addBtn("test_drawMesh", () => new test_drawMesh());
-        //this.addBtn("cj_zs",()=>new dome.testCJ());
-        //this.addBtn("cj_zs_effect",()=>new dome.db_test_eff());
-        
+        this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
+        this.addBtn("test_四分屏", () => new test_pick_4p());       
+        this.addBtn("test_UI组件", () => new test_UI_Component());
+        this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
+
     }
+    
     private x: number = 0;
     private y: number = 100;
     private btns: HTMLButtonElement[] = [];

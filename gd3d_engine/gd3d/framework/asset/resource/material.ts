@@ -742,7 +742,8 @@ namespace gd3d.framework
                         }
                         break;
                     default:
-                        console.log("materialJson的mapuniform中的某type：" + jsonChild["type"] + "不符合范围（0-2）")
+                        //console.log("materialJson的mapuniform中的某type：" + jsonChild["type"] + "不符合范围（0-2）")
+                        break;
                 }
             }
         }

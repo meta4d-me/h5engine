@@ -11,7 +11,7 @@ namespace gd3d.framework
     export class pointinfo
     {
         id: number;
-        touch: boolean;
+        touch: boolean = false;
         x: number;
         y: number;
     }
