@@ -9354,7 +9354,8 @@ var gd3d;
                         this._clipnameCount = this.clips.length;
                         this._clipnames = {};
                         for (var key in this.clips) {
-                            this.clipnames[this.clips[key].getName()] = parseInt(key);
+                            if (this.clips[key])
+                                this.clipnames[this.clips[key].getName()] = parseInt(key);
                         }
                     }
                     return this._clipnames;

@@ -38,6 +38,7 @@ namespace gd3d.framework
                 this._clipnames = {};
                 for (let key in this.clips)
                 {
+                    if (this.clips[key])
                     this.clipnames[this.clips[key].getName()] = parseInt(key);
                 }
             }

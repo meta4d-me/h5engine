@@ -1,0 +1,1 @@
+{"shader":"flowwater.shader.json","srcshader":"Gd3d/FlowWater","mapUniform":{"_MainTex":{"type":0,"value":"91_0555.imgdesc.json"},"_MainColor":{"type":3,"value":"(0.07039361,0.181,0.218,0.644)"},"_speedu":{"type":1,"value":0},"_speedv":{"type":1,"value":0.100000001490116},"_alpha":{"type":1,"value":0.428999990224838}}}

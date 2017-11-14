@@ -576,12 +576,13 @@ var main = (function () {
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
         this.addBtn("example_Sound", function () { return new test_Sound(); });
-        this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
         this.addBtn("demo_ScreenRange", function () { return new demo_ScreenRange(); });
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
         this.addBtn("test_UI_component", function () { return new test_UI_Component(); });
+        this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
-        this.addBtn("cj_zs", function () { return new dome.testCJ(); });
+        this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
+        this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -754,184 +755,6 @@ var t;
     }());
     t_1.test_blend = test_blend;
 })(t || (t = {}));
-var test_ChangeMaterial = (function () {
-    function test_ChangeMaterial() {
-        this.isCube = false;
-        this.timer = 0;
-        this.material1 = new gd3d.framework.material();
-        this.material2 = new gd3d.framework.material();
-        this.taskmgr = new gd3d.framework.taskMgr();
-        this.isMaterial1 = false;
-        this.zeroPoint = new gd3d.math.vector3(0, 0, 0);
-    }
-    test_ChangeMaterial.prototype.loadShader = function (laststate, state) {
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                state.finish = true;
-            }
-        });
-    };
-    test_ChangeMaterial.prototype.loadTexture = function (laststate, state) {
-        var c = 0;
-        c++;
-        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                c--;
-                if (c == 0) {
-                    state.finish = true;
-                }
-            }
-            else {
-                state.error = true;
-            }
-        });
-        c++;
-        this.app.getAssetMgr().load("res/map_normal.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                c--;
-                if (c == 0) {
-                    state.finish = true;
-                }
-            }
-        });
-    };
-    test_ChangeMaterial.prototype.addCam = function (laststate, state) {
-        var objCam = new gd3d.framework.transform;
-        objCam.name = "Camera";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(this.cube);
-        objCam.markDirty();
-        console.log("add camera");
-        state.finish = true;
-    };
-    test_ChangeMaterial.prototype.addCube = function (laststate, state) {
-        var cube = new gd3d.framework.transform();
-        cube.name = "Cube1";
-        cube.localScale.x = cube.localScale.y = cube.localScale.z = 2;
-        this.scene.addChild(cube);
-        var mesh = cube.gameObject.addComponent("meshFilter");
-        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
-        cube.gameObject.addComponent("meshRenderer");
-        this.cube = cube;
-        cube.markDirty();
-        console.log("add cube");
-        state.finish = true;
-    };
-    test_ChangeMaterial.prototype.addBtn = function () {
-        var _this = this;
-        var btn1 = document.createElement("button");
-        btn1.textContent = "button1 更换material";
-        btn1.onclick = function () {
-            var renderer = _this.cube.gameObject.getComponent("meshRenderer");
-            if (renderer != null) {
-                renderer.materials = [];
-                renderer.materials.push(new gd3d.framework.material());
-                if (_this.isMaterial1) {
-                    renderer.materials[0] = _this.material2;
-                    _this.isMaterial1 = false;
-                }
-                else {
-                    renderer.materials[0] = _this.material1;
-                    _this.isMaterial1 = true;
-                }
-            }
-        };
-        btn1.style.top = "128px";
-        btn1.style.position = "absolute";
-        this.app.container.appendChild(btn1);
-    };
-    test_ChangeMaterial.prototype.setMaterial = function (laststate, state) {
-        var shader1 = this.app.getAssetMgr().getShader("diffuse.shader.json");
-        if (shader1 != null) {
-            this.material1.setShader(shader1);
-            var texture1 = this.app.getAssetMgr().getAssetByName("zg256.png");
-            this.material1.setTexture("_MainTex", texture1);
-            this.material2.setShader(shader1);
-            var texture2 = this.app.getAssetMgr().getAssetByName("map_normal.png");
-            this.material2.setTexture("_MainTex", texture2);
-        }
-        state.finish = true;
-    };
-    test_ChangeMaterial.prototype.start = function (app) {
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.taskmgr.addTaskCall(this.loadShader.bind(this));
-        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskmgr.addTaskCall(this.setMaterial.bind(this));
-        this.taskmgr.addTaskCall(this.addCube.bind(this));
-        this.taskmgr.addTaskCall(this.addCam.bind(this));
-        this.addBtn();
-    };
-    test_ChangeMaterial.prototype.update = function (delta) {
-        this.taskmgr.move(delta);
-        this.timer += delta;
-        if (this.cube != null) {
-            var x2 = Math.sin(this.timer * 0.1);
-            var z2 = Math.cos(this.timer * 0.1);
-            if (this.camera != null) {
-                var objCam = this.camera.gameObject.transform;
-                objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 4, -z2 * 10);
-                objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-            }
-        }
-    };
-    return test_ChangeMaterial;
-}());
-var test_ChangeMesh = (function () {
-    function test_ChangeMesh() {
-        this.isCube = false;
-    }
-    test_ChangeMesh.prototype.start = function (app) {
-        var _this = this;
-        this.app = app;
-        this.scene = this.app.getScene();
-        {
-            var cube = new gd3d.framework.transform();
-            cube.name = "Cube1";
-            cube.localScale.x = cube.localScale.y = cube.localScale.z = 2;
-            this.scene.addChild(cube);
-            var mesh = cube.gameObject.addComponent("meshFilter");
-            mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
-            cube.gameObject.addComponent("meshRenderer");
-            cube.gameObject.addComponent("boxcollider");
-            this.cube = cube;
-            cube.markDirty();
-        }
-        var btn1 = document.createElement("button");
-        btn1.textContent = "button1 更换mesh";
-        btn1.onclick = function () {
-            if (_this.isCube == false) {
-                var mesh_1 = cube.gameObject.getComponent("meshFilter");
-                mesh_1.mesh = (_this.app.getAssetMgr()).getDefaultMesh("sphere");
-                _this.isCube = true;
-            }
-            else {
-                var mesh_2 = cube.gameObject.getComponent("meshFilter");
-                mesh_2.mesh = _this.app.getAssetMgr().getDefaultMesh("cube");
-                _this.isCube = false;
-            }
-        };
-        btn1.style.top = "128px";
-        btn1.style.position = "absolute";
-        this.app.container.appendChild(btn1);
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "camera";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(this.cube);
-        objCam.markDirty();
-    };
-    test_ChangeMesh.prototype.update = function (delta) {
-    };
-    return test_ChangeMesh;
-}());
 var test_drawMesh = (function () {
     function test_drawMesh() {
         this.timer = 0;
@@ -1052,6 +875,310 @@ var test_fakepbr = (function () {
         }
     };
     return test_fakepbr;
+}());
+var test_heilongbo = (function () {
+    function test_heilongbo() {
+        this.taskMgr = new gd3d.framework.taskMgr();
+    }
+    test_heilongbo.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskMgr.addTaskCall(this.loadkeyFrameAnimationPath.bind(this));
+        this.taskMgr.addTaskCall(this.loadCube.bind(this));
+        this.taskMgr.addTaskCall(this.loadasset.bind(this));
+        this.taskMgr.addTaskCall(this.iniscene.bind(this));
+        this.taskMgr.addTaskCall(this.addbtns.bind(this));
+    };
+    test_heilongbo.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_heilongbo.prototype.loadTexture = function (laststate, state) {
+        var texnumber = 2;
+        this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                texnumber--;
+                if (texnumber == 0) {
+                    state.finish = true;
+                }
+            }
+            else {
+                state.error = true;
+            }
+        });
+        this.app.getAssetMgr().load("res/sd_hlb_1.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                texnumber--;
+                if (texnumber == 0) {
+                    state.finish = true;
+                }
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_heilongbo.prototype.loadCube = function (laststate, state) {
+        this.app.getAssetMgr().load("res/prefabs/Cube/Cube.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_heilongbo.prototype.loadkeyFrameAnimationPath = function (laststate, state) {
+        var number = 0;
+        number++;
+        this.app.getAssetMgr().load("res/keyframeAnimation/hlb_lthr.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                number--;
+                if (number == 0) {
+                    state.finish = true;
+                }
+            }
+        });
+        number++;
+        this.app.getAssetMgr().load("res/keyframeAnimation/Cube.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                number--;
+                if (number == 0) {
+                    state.finish = true;
+                }
+            }
+        });
+    };
+    test_heilongbo.prototype.loadasset = function (laststate, state) {
+        this.app.getAssetMgr().load("res/prefabs/hlb_lthr/hlb_lthr.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_heilongbo.prototype.iniscene = function (laststate, state) {
+        var cubeprefab = this.app.getAssetMgr().getAssetByName("Cube.prefab.json");
+        var cube = cubeprefab.getCloneTrans();
+        this.scene.addChild(cube);
+        this.cube = cube;
+        var longtouprefab = this.app.getAssetMgr().getAssetByName("hlb_lthr.prefab.json");
+        var keyframeanimationpath = this.app.getAssetMgr().getAssetByName("hlb_lthr.keyFrameAnimationPath.json");
+        var keyframeanimationpath1 = this.app.getAssetMgr().getAssetByName("Cube.keyFrameAnimationPath.json");
+        var head = longtouprefab.getCloneTrans();
+        head.localScale.x = head.localScale.y = head.localScale.z = 1;
+        head.localTranslate.x = head.localTranslate.y = head.localTranslate.z = 0;
+        this.scene.addChild(head);
+        this.longtou = head;
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "keyframeAni Cam";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.order = 0;
+        this.camera.near = 0.01;
+        this.camera.far = 1000;
+        this.camera.fov = 60;
+        objCam.localTranslate = new gd3d.math.vector3(0, 8, 1);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        var keyframeani = this.longtou.gameObject.addComponent("keyframeanimation");
+        keyframeani.setkeyframeanimationasst(keyframeanimationpath);
+        this.keyframeanicomponet = keyframeani;
+        var keyframeani1 = this.cube.gameObject.addComponent("keyframeanimation");
+        keyframeani1.setkeyframeanimationasst(keyframeanimationpath1);
+        this.keyframeanicomponet1 = keyframeani1;
+        state.finish = true;
+    };
+    test_heilongbo.prototype.addbtns = function () {
+        var _this = this;
+        this.addbtn("play", 10, 100, function () {
+            _this.longtou.gameObject.visible = true;
+            _this.keyframeanicomponet.play();
+            _this.keyframeanicomponet1.play();
+        });
+        this.addbtn("stop", 10, 200, function () {
+            _this.longtou.gameObject.visible = true;
+            _this.keyframeanicomponet.stop();
+            _this.keyframeanicomponet1.stop();
+        });
+        this.addbtn("replay", 10, 300, function () {
+            _this.longtou.gameObject.visible = true;
+            _this.keyframeanicomponet.replay();
+            _this.keyframeanicomponet1.replay();
+        });
+        var input = document.createElement("input");
+        input.type = "range";
+        input.valueAsNumber = 50;
+        this.longtou.localTranslate.x = input.valueAsNumber - 50;
+        input.oninput = function (e) {
+            _this.longtou.localTranslate.x = input.valueAsNumber - 50;
+            _this.longtou.markDirty();
+            console.log(input.valueAsNumber);
+        };
+        input.style.top = "400px";
+        input.style.left = "10px";
+        input.style.position = "absolute";
+        this.app.container.appendChild(input);
+    };
+    test_heilongbo.prototype.addbtn = function (text, x, y, func) {
+        var btn = document.createElement("button");
+        btn.textContent = text;
+        btn.onclick = function () {
+            func();
+        };
+        btn.style.top = y + "px";
+        btn.style.left = x + "px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+    };
+    test_heilongbo.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+        if (this.cube != null && this.keyframeanicomponet1.isactived) {
+            console.log(this.cube.localTranslate);
+        }
+    };
+    return test_heilongbo;
+}());
+var test_keyframeAnimation = (function () {
+    function test_keyframeAnimation() {
+        this.taskMgr = new gd3d.framework.taskMgr();
+    }
+    test_keyframeAnimation.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskMgr.addTaskCall(this.loadkeyFrameAnimationPath.bind(this));
+        this.taskMgr.addTaskCall(this.loadasset.bind(this));
+        this.taskMgr.addTaskCall(this.iniscene.bind(this));
+        this.taskMgr.addTaskCall(this.addbtns.bind(this));
+    };
+    test_keyframeAnimation.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_keyframeAnimation.prototype.loadTexture = function (laststate, state) {
+        var texnumber = 2;
+        this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                texnumber--;
+                if (texnumber == 0) {
+                    state.finish = true;
+                }
+            }
+            else {
+                state.error = true;
+            }
+        });
+        this.app.getAssetMgr().load("res/sd_hlb_1.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                texnumber--;
+                if (texnumber == 0) {
+                    state.finish = true;
+                }
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_keyframeAnimation.prototype.loadkeyFrameAnimationPath = function (laststate, state) {
+        this.app.getAssetMgr().load("res/keyframeAnimation/cubeKeyframepath.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_keyframeAnimation.prototype.loadasset = function (laststate, state) {
+        this.app.getAssetMgr().load("res/prefabs/rotatedLongTou/rotatedLongTou.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_keyframeAnimation.prototype.iniscene = function (laststate, state) {
+        var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
+        var keyframeanimationpath = this.app.getAssetMgr().getAssetByName("cubeKeyframepath.keyFrameAnimationPath.json");
+        var head = longtouprefab.getCloneTrans();
+        head.localScale.x = head.localScale.y = head.localScale.z = 10;
+        head.localTranslate.x = head.localTranslate.y = head.localTranslate.z = 0;
+        this.scene.addChild(head);
+        this.longtou = head;
+        var cube = new gd3d.framework.transform();
+        cube.name = "cube1";
+        cube.localTranslate.x = 4;
+        this.scene.addChild(cube);
+        var meshfiter = cube.gameObject.addComponent("meshFilter");
+        var mesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        meshfiter.mesh = mesh;
+        var meshrender = cube.gameObject.addComponent("meshRenderer");
+        cube.markDirty();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "keyframeAni Cam";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.order = 0;
+        this.camera.near = 0.3;
+        this.camera.far = 1000;
+        this.camera.fov = 60;
+        objCam.localTranslate = new gd3d.math.vector3(-5, 10, 3);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        var keyframeani = head.gameObject.addComponent("keyframeanimation");
+        keyframeani.setkeyframeanimationasst(keyframeanimationpath);
+        this.keyframeanicomponet = keyframeani;
+        state.finish = true;
+    };
+    test_keyframeAnimation.prototype.addbtns = function () {
+        var _this = this;
+        this.addbtn("play", 10, 100, function () {
+            _this.longtou.gameObject.visible = true;
+            _this.keyframeanicomponet.play();
+        });
+        this.addbtn("stop", 10, 200, function () {
+            _this.longtou.gameObject.visible = false;
+            _this.keyframeanicomponet.stop();
+        });
+        this.addbtn("replay", 10, 300, function () {
+            _this.longtou.gameObject.visible = true;
+            _this.keyframeanicomponet.replay();
+        });
+        var input = document.createElement("input");
+        input.type = "range";
+        input.valueAsNumber = 50;
+        this.longtou.localTranslate.x = input.valueAsNumber - 50;
+        input.oninput = function (e) {
+            _this.longtou.localTranslate.x = input.valueAsNumber - 50;
+            _this.longtou.markDirty();
+            console.log(input.valueAsNumber);
+        };
+        input.style.top = "400px";
+        input.style.left = "10px";
+        input.style.position = "absolute";
+        this.app.container.appendChild(input);
+    };
+    test_keyframeAnimation.prototype.addbtn = function (text, x, y, func) {
+        var btn = document.createElement("button");
+        btn.textContent = text;
+        btn.onclick = function () {
+            func();
+        };
+        btn.style.top = y + "px";
+        btn.style.left = x + "px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+    };
+    test_keyframeAnimation.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+    };
+    return test_keyframeAnimation;
 }());
 var t;
 (function (t) {
@@ -1303,68 +1430,6 @@ var demo;
     }());
     demo.DragonTest = DragonTest;
 })(demo || (demo = {}));
-var test_NewGameObject = (function () {
-    function test_NewGameObject() {
-    }
-    test_NewGameObject.prototype.start = function (app) {
-        this.app = app;
-        this.scene = this.app.getScene();
-        {
-            var cube = new gd3d.framework.transform();
-            cube.name = "Cube1";
-            cube.localScale.x = cube.localScale.y = cube.localScale.z = 2;
-            this.scene.addChild(cube);
-            var mesh = cube.gameObject.addComponent("meshFilter");
-            mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
-            cube.gameObject.addComponent("meshRenderer");
-            cube.gameObject.addComponent("boxcollider");
-            this.cube = cube;
-            cube.markDirty();
-        }
-        {
-            var sphere = new gd3d.framework.transform();
-            sphere.name = "Cube's child";
-            cube.addChild(sphere);
-            sphere.localScale.x = sphere.localScale.y = sphere.localScale.z = 1;
-            sphere.localTranslate.x = 2;
-            var mesh = sphere.gameObject.addComponent("meshFilter");
-            mesh.mesh = this.app.getAssetMgr().getDefaultMesh("sphere");
-            sphere.gameObject.addComponent("meshRenderer");
-            sphere.markDirty();
-        }
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "camera";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(this.cube);
-        objCam.markDirty();
-    };
-    test_NewGameObject.prototype.update = function (delta) {
-    };
-    return test_NewGameObject;
-}());
-var test_NewScene = (function () {
-    function test_NewScene() {
-    }
-    test_NewScene.prototype.start = function (app) {
-        this.app = app;
-        this.scene = this.app.getScene();
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "camera";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.markDirty();
-    };
-    test_NewScene.prototype.update = function (delta) {
-    };
-    return test_NewScene;
-}());
 var test_postCamera = (function () {
     function test_postCamera() {
         this.timer = 0;
@@ -1608,89 +1673,204 @@ var test_RangeScreen = (function () {
     };
     return test_RangeScreen;
 }());
-var test_Sound = (function () {
-    function test_Sound() {
+var test_softCut = (function () {
+    function test_softCut() {
         this.taskmgr = new gd3d.framework.taskMgr();
-        this.time = 0;
     }
-    test_Sound.prototype.loadShader = function (laststate, state) {
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                state.finish = true;
-            }
-            else {
-                state.error = true;
-            }
-        });
-    };
-    test_Sound.prototype.loadTexture = function (laststate, state) {
-        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                state.finish = true;
-            }
-            else {
-                state.error = true;
-            }
-        });
-    };
-    test_Sound.prototype.addCam = function (laststate, state) {
+    test_softCut.prototype.start = function (app) {
+        test_softCut.temp = this;
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.assetMgr = this.app.getAssetMgr();
         var objCam = new gd3d.framework.transform();
-        objCam.name = "Main Camera";
+        objCam.name = "sth.";
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        objCam.markDirty();
-        state.finish = true;
-    };
-    test_Sound.prototype.addCube = function (laststate, state) {
-        var objCube = new gd3d.framework.transform();
-        objCube.name = "Cube";
-        this.scene.addChild(objCube);
-        objCube.localScale.x = objCube.localScale.y = objCube.localScale.z = 1;
-        objCube.localTranslate = new gd3d.math.vector3(0, 0, 0);
-        var mesh = objCube.gameObject.addComponent("meshFilter");
-        var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-        mesh.mesh = (smesh);
-        var render = objCube.gameObject.addComponent("meshRenderer");
-        var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
-        if (sh != null) {
-            render.materials = [];
-            render.materials.push(new gd3d.framework.material());
-            render.materials[0].setShader(sh);
-            var texture0 = this.app.getAssetMgr().getAssetByName("zg256.png");
-            render.materials[0].setTexture("_MainTex", texture0);
-        }
-        this.cube = objCube;
-        this.cube.markDirty();
-        state.finish = true;
-    };
-    test_Sound.prototype.addBtnLoadSound = function (laststate, state) {
-    };
-    test_Sound.prototype.start = function (app) {
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.camera.far = 10;
+        this.rooto2d = new gd3d.framework.overlay2D();
+        this.camera.addOverLay(this.rooto2d);
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskmgr.addTaskCall(this.addCam.bind(this));
-        this.taskmgr.addTaskCall(this.addCube.bind(this));
+        this.taskmgr.addTaskCall(this.createUI.bind(this));
     };
-    test_Sound.prototype.update = function (delta) {
+    test_softCut.prototype.createUI = function (astState, state) {
+        var Temptex = this.assetMgr.getAssetByName("cutbg.png");
+        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
+        var over_t2 = new gd3d.framework.transform2D;
+        over_t2.width = 100;
+        over_t2.height = 60;
+        over_t2.pivot.x = 0;
+        over_t2.pivot.y = 0;
+        over_t2.localTranslate.x = 120;
+        over_t2.localTranslate.y = 100;
+        this.rooto2d.addChild(over_t2);
+        var over_i2 = over_t2.addComponent("image2D");
+        over_i2.sprite = atlasComp.sprites["bg"];
+        over_i2.imageType = gd3d.framework.ImageType.Sliced;
+        over_i2.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        var cut_t = new gd3d.framework.transform2D;
+        cut_t.width = 200;
+        cut_t.height = this.rooto2d.canvas.pixelHeight / 2;
+        cut_t.pivot.x = 0;
+        cut_t.pivot.y = 0;
+        cut_t.localTranslate.x = 100;
+        cut_t.localTranslate.y = 50;
+        this.rooto2d.addChild(cut_t);
+        cut_t.isMask = true;
+        var bg_t = new gd3d.framework.transform2D;
+        bg_t.width = this.rooto2d.canvas.pixelWidth / 2;
+        bg_t.height = this.rooto2d.canvas.pixelHeight / 2;
+        bg_t.pivot.x = 0;
+        bg_t.pivot.y = 0;
+        bg_t.localTranslate.x = -50;
+        bg_t.localTranslate.y = 0;
+        bg_t.localRotate = 25 * Math.PI / 180;
+        cut_t.addChild(bg_t);
+        var bg_i = bg_t.addComponent("image2D");
+        bg_i.sprite = atlasComp.sprites["bg"];
+        bg_i.imageType = gd3d.framework.ImageType.Sliced;
+        bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        var btn_t = new gd3d.framework.transform2D;
+        btn_t.name = "btnt";
+        btn_t.width = 100;
+        btn_t.height = 36;
+        btn_t.pivot.x = 0;
+        btn_t.pivot.y = 0;
+        btn_t.localTranslate.x = 30;
+        btn_t.localTranslate.y = 70;
+        bg_t.addChild(btn_t);
+        var btn_b = btn_t.addComponent("button");
+        btn_b.targetImage = btn_t.addComponent("image2D");
+        btn_b.targetImage.sprite = atlasComp.sprites["ui_public_button_hits"];
+        btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
+        btn_b.pressedColor = new gd3d.math.color(1, 1, 1, 1);
+        btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        btn_t.visible = true;
+        var subc_t = new gd3d.framework.transform2D;
+        subc_t.width = 60;
+        subc_t.height = 50;
+        subc_t.pivot.x = 0;
+        subc_t.pivot.y = 0;
+        subc_t.localTranslate.x = 170;
+        subc_t.localTranslate.y = 200;
+        this.rooto2d.addChild(subc_t);
+        subc_t.isMask = true;
+        var over_t = new gd3d.framework.transform2D;
+        over_t.width = 100;
+        over_t.height = 60;
+        over_t.pivot.x = 0;
+        over_t.pivot.y = 0;
+        subc_t.addChild(over_t);
+        over_t.localTranslate.x = -20;
+        var over_i = over_t.addComponent("image2D");
+        over_i.sprite = atlasComp.sprites["bg"];
+        over_i.imageType = gd3d.framework.ImageType.Sliced;
+        over_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        var raw_t = new gd3d.framework.transform2D;
+        raw_t.width = 130;
+        raw_t.height = 130;
+        raw_t.pivot.x = 0;
+        raw_t.pivot.y = 0;
+        subc_t.addChild(raw_t);
+        var raw_i = raw_t.addComponent("rawImage2D");
+        raw_i.image = Temptex;
+        var lab_t = new gd3d.framework.transform2D;
+        lab_t.width = 120;
+        lab_t.height = 24;
+        lab_t.localTranslate.x = 10;
+        lab_t.localTranslate.y = 30;
+        this.rooto2d.addChild(lab_t);
+        var lab_l = lab_t.addComponent("label");
+        lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        lab_l.fontsize = 24;
+        lab_l.text = "我是段文本";
+        lab_l.color = new gd3d.math.color(0.2, 0.2, 0.2, 1);
+        var lab_t2 = new gd3d.framework.transform2D;
+        lab_t2.width = 200;
+        lab_t2.height = 24;
+        raw_t.addChild(lab_t2);
+        var lab_l2 = lab_t2.addComponent("label");
+        lab_l2.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        lab_l2.fontsize = 30;
+        lab_l2.text = "我是段文本2";
+        lab_l2.color = new gd3d.math.color(0.9, 0.1, 0.2, 1);
+        var scroll_t = new gd3d.framework.transform2D;
+        scroll_t.width = 200;
+        scroll_t.height = 200;
+        this.rooto2d.addChild(scroll_t);
+        scroll_t.localTranslate.x = 260;
+        scroll_t.localTranslate.y = 100;
+        var scroll_ = scroll_t.addComponent("scrollRect");
+        var ct = new gd3d.framework.transform2D;
+        ct.width = 350;
+        ct.height = 450;
+        scroll_.content = ct;
+        scroll_t.isMask = true;
+        scroll_.horizontal = true;
+        scroll_.vertical = true;
+        var raw_t2 = new gd3d.framework.transform2D;
+        raw_t2.width = 300;
+        raw_t2.height = 400;
+        var raw_i2 = raw_t2.addComponent("rawImage2D");
+        raw_i2.image = Temptex;
+        ct.addChild(raw_t2);
+        var scroll_t1 = new gd3d.framework.transform2D;
+        scroll_t1.width = 200;
+        scroll_t1.height = 200;
+        ct.addChild(scroll_t1);
+        scroll_t1.localTranslate.x = -50;
+        scroll_t1.localTranslate.y = 100;
+        var scroll_1 = scroll_t1.addComponent("scrollRect");
+        var ct1 = new gd3d.framework.transform2D;
+        ct1.width = 350;
+        ct1.height = 450;
+        scroll_1.content = ct1;
+        scroll_t1.isMask = true;
+        scroll_1.horizontal = true;
+        scroll_1.vertical = true;
+        var raw_t3 = new gd3d.framework.transform2D;
+        raw_t3.width = 300;
+        raw_t3.height = 400;
+        var raw_i3 = raw_t3.addComponent("rawImage2D");
+        raw_i3.image = Temptex;
+        ct1.addChild(raw_t3);
+        var Preader = new gd3d.render.textureReader(this.app.webgl, Temptex.glTexture.texture, Temptex.glTexture.width, Temptex.glTexture.height, false);
+        var inputMgr = this.app.getInputMgr();
+        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
+            if (ev.keyCode == 81) {
+                console.error("getpixle: " + Preader.getPixel(1, 0.5));
+            }
+        }, false);
+        state.finish = true;
+    };
+    test_softCut.prototype.loadTexture = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    if (s.isfinish) {
+                                        _this.assetMgr.load("res/cutbg.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                            if (s.isfinish) {
+                                                state.finish = true;
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_softCut.prototype.update = function (delta) {
         this.taskmgr.move(delta);
-        this.time += delta;
-        if (this.cube != null) {
-            var cubeTrans = this.cube.gameObject.transform;
-            var yRoate = (this.time * 30) % 360;
-            var yQuaternion = gd3d.math.pool.new_quaternion();
-            gd3d.math.quatFromEulerAngles(0, yRoate, 0, yQuaternion);
-            cubeTrans.localRotate = yQuaternion;
-            cubeTrans.markDirty();
-            console.log(this.time);
-        }
     };
-    return test_Sound;
+    return test_softCut;
 }());
 var ShockType;
 (function (ShockType) {
@@ -2852,6 +3032,8 @@ var test_UI_Component = (function () {
         this.taskmgr.addTaskCall(this.createUI.bind(this));
     };
     test_UI_Component.prototype.createUI = function (astState, state) {
+        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
+        var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
         var bg_t = new gd3d.framework.transform2D;
         bg_t.width = 400;
         bg_t.height = 260;
@@ -2862,7 +3044,6 @@ var test_UI_Component = (function () {
         this.rooto2d.addChild(bg_t);
         var bg_i = bg_t.addComponent("image2D");
         bg_i.imageType = gd3d.framework.ImageType.Sliced;
-        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
         bg_i.sprite = atlasComp.sprites["bg"];
         bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
         var lab_t = new gd3d.framework.transform2D;
@@ -2890,7 +3071,6 @@ var test_UI_Component = (function () {
         btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
         btn_b.pressedColor = new gd3d.math.color(1, 1, 1, 1);
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
-        btn_t.visible = false;
         var closeSce = 0.8;
         var close_bt = new gd3d.framework.transform2D;
         close_bt.width = 25 * closeSce;
@@ -2966,6 +3146,26 @@ var test_UI_Component = (function () {
         ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
         ipt.PlaceholderLabel.fontsize = 24;
         ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
+        var scroll_t = new gd3d.framework.transform2D;
+        scroll_t.width = 70;
+        scroll_t.height = 100;
+        bg_t.addChild(scroll_t);
+        scroll_t.localTranslate.x = 160;
+        scroll_t.localTranslate.y = 30;
+        var scroll_ = scroll_t.addComponent("scrollRect");
+        var ct = new gd3d.framework.transform2D;
+        ct.width = 120;
+        ct.height = 120;
+        scroll_.content = ct;
+        scroll_t.isMask = true;
+        scroll_.horizontal = true;
+        scroll_.vertical = true;
+        var raw_t2 = new gd3d.framework.transform2D;
+        raw_t2.width = 120;
+        raw_t2.height = 120;
+        var raw_i2 = raw_t2.addComponent("rawImage2D");
+        raw_i2.image = tex_0;
+        ct.addChild(raw_t2);
         test_UI_Component.temp = iptFrame_t;
         var inputMgr = this.app.getInputMgr();
         this.app.webgl.canvas.addEventListener("keydown", function (ev) {
@@ -2983,9 +3183,11 @@ var test_UI_Component = (function () {
                         _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                             if (s.isfinish) {
                                 _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                    if (s.isfinish) {
-                                        state.finish = true;
-                                    }
+                                    _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                        if (s.isfinish) {
+                                            state.finish = true;
+                                        }
+                                    });
                                 });
                             }
                         });
@@ -6449,14 +6651,20 @@ var test_loadprefab = (function () {
             }
         }
     };
-    test_loadprefab.prototype.refreshAniclip = function (tran) {
+    test_loadprefab.prototype.refreshAniclip = function (tran, name) {
         var anipalyer = tran.gameObject.getComponentsInChildren("aniplayer");
         for (var i = 0; i < anipalyer.length; i++) {
+            var b = false;
             for (var j = 0; j < anipalyer[i].clips.length; j++) {
                 var v = anipalyer[i].clips[j];
                 anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName());
+                if (v.getName() == name) {
+                    b = true;
+                }
             }
-            anipalyer[i].playByIndex(0);
+            if (b == true) {
+                anipalyer[i].playCross(name, 0.2);
+            }
         }
     };
     test_loadprefab.prototype.start = function (app) {
@@ -6469,24 +6677,20 @@ var test_loadprefab = (function () {
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/" + name + "/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                name = "0000_GS_128";
+                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "attack_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                        _this.baihu = _prefab.getCloneTrans();
-                        _this.scene.addChild(_this.baihu);
-                        _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
-                        objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
-                        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-                        objCam.markDirty();
-                        _this.app.getAssetMgr().load("res/prefabs/" + name + "/textures/" + name + "texture.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                             if (s.isfinish) {
-                                _this.refreshTexture(_this.baihu);
-                            }
-                        });
-                        _this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/" + name + "aniclip.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                            if (s.isfinish) {
-                                _this.refreshAniclip(_this.baihu);
+                                var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                                _this.baihu = _prefab.getCloneTrans();
+                                _this.scene.addChild(_this.baihu);
+                                _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                                _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
+                                objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                                objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                                objCam.markDirty();
+                                _this.refreshAniclip(_this.baihu, "attack_01.FBAni.aniclip.bin");
                             }
                         });
                     }
@@ -8632,320 +8836,330 @@ var Test_CameraController = (function () {
     };
     return Test_CameraController;
 }());
-var dome;
-(function (dome) {
-    var db_test_eff = (function () {
-        function db_test_eff() {
-            this.timer = 0;
-            this.taskmgr = new gd3d.framework.taskMgr();
-        }
-        db_test_eff.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-                if (_state.isfinish) {
+var test_ChangeMaterial = (function () {
+    function test_ChangeMaterial() {
+        this.isCube = false;
+        this.timer = 0;
+        this.material1 = new gd3d.framework.material();
+        this.material2 = new gd3d.framework.material();
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.isMaterial1 = false;
+        this.zeroPoint = new gd3d.math.vector3(0, 0, 0);
+    }
+    test_ChangeMaterial.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_ChangeMaterial.prototype.loadTexture = function (laststate, state) {
+        var c = 0;
+        c++;
+        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                c--;
+                if (c == 0) {
                     state.finish = true;
-                }
-            });
-        };
-        db_test_eff.prototype.addcube = function (laststate, state) {
-            {
-                {
-                    var cube = new gd3d.framework.transform();
-                    cube.name = "cube";
-                    cube.localTranslate.x = 0;
-                    this.scene.addChild(cube);
-                    var mesh = cube.gameObject.addComponent("meshFilter");
-                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                    mesh.mesh = (smesh);
-                    var renderer = cube.gameObject.addComponent("meshRenderer");
-                    var cuber = renderer;
-                    var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
-                    if (sh != null) {
-                        cuber.materials = [];
-                        cuber.materials.push(new gd3d.framework.material());
-                        cuber.materials[0].setShader(sh);
-                        var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
-                        cuber.materials[0].setTexture("_MainTex", texture);
-                    }
                 }
             }
-            state.finish = true;
-        };
-        db_test_eff.prototype.start = function (app) {
-            console.log("i am here.");
-            this.app = app;
-            this.scene = this.app.getScene();
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.addcam.bind(this));
-            this.taskmgr.addTaskCall(this.loadScene.bind(this));
-            this.taskmgr.addTaskCall(this.loadEffect.bind(this));
-        };
-        db_test_eff.prototype.loadEffect = function (laststate, state) {
-            var _this = this;
-            var names = ["0fx_boss_02", "fx_boss_02", "fx_shengji_jiaose", "fx_ss_female@attack_03", "fx_ss_female@attack_02", "fx_0_zs_male@attack_02", "fx_shuijing_cj", "fx_fs_female@attack_02", "fx_0005_sword_sword", "fx_0005_sword_sword", "fx_0_zs_male@attack_02", "fx_fs_female@attack_02"];
-            var name = names[2];
-            name = "0fx_cj_zs_03";
-            this.app.getAssetMgr().load("res/particleEffect/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-                if (_state.isfinish) {
-                    _this.tr = new gd3d.framework.transform();
-                    _this.effect = _this.tr.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_EFFECTSYSTEM);
-                    _this.text = _this.app.getAssetMgr().getAssetByName(name + ".effect.json");
-                    _this.effect.autoplay = false;
-                    _this.effect.setJsonData(_this.text);
-                    _this.scene.addChild(_this.tr);
-                    _this.tr.markDirty();
-                    state.finish = true;
-                    _this.addButton();
-                }
-            });
-        };
-        db_test_eff.prototype.loadScene = function (laststate, state) {
-            var _this = this;
-            var name = "chuangjue_1024";
-            this.app.getAssetMgr().load("res/scenes/chuangjue_1024/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
-                    var _root = _scene.getSceneRoot();
-                    _this.scene.addChild(_root);
-                    _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                    _root.markDirty();
-                    _this.app.getScene().lightmaps = [];
-                    _scene.useLightMap(_this.app.getScene());
+            else {
+                state.error = true;
+            }
+        });
+        c++;
+        this.app.getAssetMgr().load("res/map_normal.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                c--;
+                if (c == 0) {
                     state.finish = true;
                 }
-            });
-        };
-        db_test_eff.prototype.addButton = function () {
-            var _this = this;
-            var btn = document.createElement("button");
-            btn.textContent = "Play";
-            btn.onclick = function () {
-                _this.effect.play();
-            };
-            btn.style.top = "160px";
-            btn.style.position = "absolute";
-            this.app.container.appendChild(btn);
-        };
-        db_test_eff.prototype.addcam = function (laststate, state) {
-            var objCam = new gd3d.framework.transform();
-            objCam.name = "sth.";
-            this.scene.addChild(objCam);
-            this.camera = objCam.gameObject.addComponent("camera");
-            this.camera.near = 0.01;
-            this.camera.far = 200;
-            this.camera.fov = Math.PI * 0.3;
-            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-            objCam.localTranslate = new gd3d.math.vector3(0, 20, 20);
-            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-            objCam.markDirty();
-            state.finish = true;
-        };
-        db_test_eff.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
-        };
-        return db_test_eff;
-    }());
-    dome.db_test_eff = db_test_eff;
-})(dome || (dome = {}));
-var dome;
-(function (dome) {
-    var testloadMesh = (function () {
-        function testloadMesh() {
-            this.transList = [];
-            this.time = 0;
-        }
-        testloadMesh.prototype.loadmesh = function () {
-            var _this = this;
-            var url = "res/resources/cube.mesh.bin";
-            this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                if (state.isfinish) {
-                    url = "res/resources/sphere.mesh.bin";
-                    _this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                        if (state.isfinish) {
-                            _this.test();
-                        }
-                    });
+            }
+        });
+    };
+    test_ChangeMaterial.prototype.addCam = function (laststate, state) {
+        var objCam = new gd3d.framework.transform;
+        objCam.name = "Camera";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.lookat(this.cube);
+        objCam.markDirty();
+        console.log("add camera");
+        state.finish = true;
+    };
+    test_ChangeMaterial.prototype.addCube = function (laststate, state) {
+        var cube = new gd3d.framework.transform();
+        cube.name = "Cube1";
+        cube.localScale.x = cube.localScale.y = cube.localScale.z = 2;
+        this.scene.addChild(cube);
+        var mesh = cube.gameObject.addComponent("meshFilter");
+        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
+        cube.gameObject.addComponent("meshRenderer");
+        this.cube = cube;
+        cube.markDirty();
+        console.log("add cube");
+        state.finish = true;
+    };
+    test_ChangeMaterial.prototype.addBtn = function () {
+        var _this = this;
+        var btn1 = document.createElement("button");
+        btn1.textContent = "button1 更换material";
+        btn1.onclick = function () {
+            var renderer = _this.cube.gameObject.getComponent("meshRenderer");
+            if (renderer != null) {
+                renderer.materials = [];
+                renderer.materials.push(new gd3d.framework.material());
+                if (_this.isMaterial1) {
+                    renderer.materials[0] = _this.material2;
+                    _this.isMaterial1 = false;
                 }
-            });
-        };
-        testloadMesh.prototype.test = function () {
-            var quad = this.assetMgr.getDefaultMesh("quad");
-            var tran = new gd3d.framework.transform();
-            var meshf = tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
-            meshf.mesh = quad;
-            var render = tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
-            this.app.getScene().addChild(tran);
-            var tran2 = new gd3d.framework.transform();
-            var cam = tran2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_CAMERA);
-            this.app.getScene().addChild(tran2);
-            tran2.localTranslate.z = 10;
-            tran2.markDirty();
-            this.trans = tran;
-        };
-        testloadMesh.prototype.start = function (app) {
-            this.app = app;
-            this.assetMgr = this.app.getAssetMgr();
-            this.loadmesh();
-        };
-        testloadMesh.prototype.update = function (delta) {
-            this.time += delta;
-            for (var i = 0; i < this.transList.length; i++) {
-                var tran = this.transList[i];
-                gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.time * 180 / Math.PI, tran.localRotate);
-                tran.markDirty();
+                else {
+                    renderer.materials[0] = _this.material1;
+                    _this.isMaterial1 = true;
+                }
             }
         };
-        return testloadMesh;
-    }());
-    dome.testloadMesh = testloadMesh;
-})(dome || (dome = {}));
-var dome;
-(function (dome) {
-    var testCJ = (function () {
-        function testCJ() {
-            this.time = 0;
+        btn1.style.top = "128px";
+        btn1.style.position = "absolute";
+        this.app.container.appendChild(btn1);
+    };
+    test_ChangeMaterial.prototype.setMaterial = function (laststate, state) {
+        var shader1 = this.app.getAssetMgr().getShader("diffuse.shader.json");
+        if (shader1 != null) {
+            this.material1.setShader(shader1);
+            var texture1 = this.app.getAssetMgr().getAssetByName("zg256.png");
+            this.material1.setTexture("_MainTex", texture1);
+            this.material2.setShader(shader1);
+            var texture2 = this.app.getAssetMgr().getAssetByName("map_normal.png");
+            this.material2.setTexture("_MainTex", texture2);
         }
-        testCJ.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    state.finish = true;
-                }
-            });
-        };
-        testCJ.prototype.loadmesh = function (laststate, state) {
-            var _this = this;
-            this.app.getAssetMgr().load("res/prefabs/zs_chuangjue_01/zs_chuangjue_01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName("zs_chuangjue_01.prefab.json");
-                    _this.dragon = _prefab.getCloneTrans();
-                    _this.dragon.localEulerAngles = new gd3d.math.vector3(0, -180, 0);
-                    _this.scene.addChild(_this.dragon);
-                    _this.dragon.markDirty();
-                    state.finish = true;
-                }
-            });
-        };
-        testCJ.prototype.loadweapon = function (laststate, state) {
-            var _this = this;
-            var name = "Quad";
-            this.app.getAssetMgr().load("res/prefabs/Quad/Quad.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName("Quad.prefab.json");
-                    var pp = _prefab.getCloneTrans();
-                    pp.localTranslate = new gd3d.math.vector3();
-                    pp.localEulerAngles = new gd3d.math.vector3();
-                    _this.scene.addChild(pp);
-                    state.finish = true;
-                }
-            });
-        };
-        testCJ.prototype.test = function (laststate, state) {
-            this.dragon = new gd3d.framework.transform();
-            var mesh = this.assetMgr.getAssetByName("MU1.0----1.9_TeXiao_Guoyichen_Effect_Mesh_Plane_danxiangsuofang_01.FBX_Plane01.mesh.bin");
-            var mat = this.assetMgr.getAssetByName("WuQi_zhenhong_02.mat.json");
-            var shder = this.assetMgr.getAssetByName("diffuse_bothside.shader.json");
-            var mattt = new gd3d.framework.material();
-            mattt.setShader(shder);
-            var meshf = this.dragon.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
-            meshf.mesh = mesh;
-            var meshr = this.dragon.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
-            meshr.materials[0] = mat;
-            this.dragon.localScale = new gd3d.math.vector3(13, 41, 21);
-            this.dragon.markDirty();
-            this.scene.addChild(this.dragon);
-            state.finish = true;
-        };
-        testCJ.prototype.addCamera = function (laststate, state) {
-            var tranCam = new gd3d.framework.transform();
-            tranCam.name = "Cam";
-            this.scene.addChild(tranCam);
-            tranCam.localTranslate = new gd3d.math.vector3(0, 3, -10);
-            this.camera = tranCam.gameObject.addComponent("camera");
-            this.camera.near = 0.001;
-            this.camera.far = 1000;
-            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
-            tranCam.lookatPoint(new gd3d.math.vector3());
-            tranCam.markDirty();
-            state.finish = true;
-        };
-        testCJ.prototype.start = function (app) {
-            this.app = app;
-            this.scene = this.app.getScene();
-            this.assetMgr = this.app.getAssetMgr();
-            this.taskmgr = new gd3d.framework.taskMgr();
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.addCamera.bind(this));
-            this.taskmgr.addTaskCall(this.loadmesh.bind(this));
-        };
-        testCJ.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
-            if (this.dragon && this.camera) {
-                this.camera.gameObject.transform.lookat(this.dragon);
+        state.finish = true;
+    };
+    test_ChangeMaterial.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.setMaterial.bind(this));
+        this.taskmgr.addTaskCall(this.addCube.bind(this));
+        this.taskmgr.addTaskCall(this.addCam.bind(this));
+        this.addBtn();
+    };
+    test_ChangeMaterial.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+        this.timer += delta;
+        if (this.cube != null) {
+            var x2 = Math.sin(this.timer * 0.1);
+            var z2 = Math.cos(this.timer * 0.1);
+            if (this.camera != null) {
+                var objCam = this.camera.gameObject.transform;
+                objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 4, -z2 * 10);
+                objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             }
-        };
-        return testCJ;
-    }());
-    dome.testCJ = testCJ;
-})(dome || (dome = {}));
-var dome;
-(function (dome) {
-    var testMath = (function () {
-        function testMath() {
-            this.taskmgr = new gd3d.framework.taskMgr();
         }
-        testMath.prototype.start = function (app) {
-            console.log("i am here.");
-            this.app = app;
-            this.scene = this.app.getScene();
-            this.taskmgr.addTaskCall(this.addcam.bind(this));
-        };
-        testMath.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
-        };
-        testMath.prototype.addcam = function (laststate, state) {
-            var objCam = new gd3d.framework.transform();
-            objCam.name = "sth.";
-            this.scene.addChild(objCam);
-            this.camera = objCam.gameObject.addComponent("camera");
-            this.camera.near = 0.01;
-            this.camera.far = 200;
-            this.camera.fov = Math.PI * 0.3;
-            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-            objCam.localTranslate = new gd3d.math.vector3(0, 0, 20);
-            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-            objCam.markDirty();
-            state.finish = true;
-            var dir = new gd3d.math.vector3();
-            objCam.getForwardInWorld(dir);
-            this.scene.addChild(addsphere(this.app.getAssetMgr()));
-            var cube = addcube(this.scene.app.getAssetMgr());
+    };
+    return test_ChangeMaterial;
+}());
+var test_ChangeMesh = (function () {
+    function test_ChangeMesh() {
+        this.isCube = false;
+    }
+    test_ChangeMesh.prototype.start = function (app) {
+        var _this = this;
+        this.app = app;
+        this.scene = this.app.getScene();
+        {
+            var cube = new gd3d.framework.transform();
+            cube.name = "Cube1";
+            cube.localScale.x = cube.localScale.y = cube.localScale.z = 2;
             this.scene.addChild(cube);
-            var targetpos = gd3d.math.pool.new_vector3();
-            var screnpos = new gd3d.math.vector3(this.app.webgl.canvas.width * 0.5, this.app.webgl.canvas.height * 0.5, 0.999);
-            objCam.updateWorldTran();
-            this.camera.calcWorldPosFromScreenPos(this.app, screnpos, targetpos);
-            cube.localTranslate = targetpos;
+            var mesh = cube.gameObject.addComponent("meshFilter");
+            mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
+            cube.gameObject.addComponent("meshRenderer");
+            cube.gameObject.addComponent("boxcollider");
+            this.cube = cube;
             cube.markDirty();
+        }
+        var btn1 = document.createElement("button");
+        btn1.textContent = "button1 更换mesh";
+        btn1.onclick = function () {
+            if (_this.isCube == false) {
+                var mesh_1 = cube.gameObject.getComponent("meshFilter");
+                mesh_1.mesh = (_this.app.getAssetMgr()).getDefaultMesh("sphere");
+                _this.isCube = true;
+            }
+            else {
+                var mesh_2 = cube.gameObject.getComponent("meshFilter");
+                mesh_2.mesh = _this.app.getAssetMgr().getDefaultMesh("cube");
+                _this.isCube = false;
+            }
         };
-        return testMath;
-    }());
-    dome.testMath = testMath;
-    function addcube(assetmgr) {
-        var trans = new gd3d.framework.transform();
-        var meshf = trans.gameObject.addComponent("meshFilter");
-        var meshr = trans.gameObject.addComponent("meshRenderer");
-        meshf.mesh = assetmgr.getDefaultMesh("cube");
-        return trans;
+        btn1.style.top = "128px";
+        btn1.style.position = "absolute";
+        this.app.container.appendChild(btn1);
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.lookat(this.cube);
+        objCam.markDirty();
+    };
+    test_ChangeMesh.prototype.update = function (delta) {
+    };
+    return test_ChangeMesh;
+}());
+var test_NewGameObject = (function () {
+    function test_NewGameObject() {
     }
-    dome.addcube = addcube;
-    function addsphere(assetmgr) {
-        var trans = new gd3d.framework.transform();
-        var meshf = trans.gameObject.addComponent("meshFilter");
-        var meshr = trans.gameObject.addComponent("meshRenderer");
-        meshf.mesh = assetmgr.getDefaultMesh("sphere");
-        return trans;
+    test_NewGameObject.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        {
+            var cube = new gd3d.framework.transform();
+            cube.name = "Cube1";
+            cube.localScale.x = cube.localScale.y = cube.localScale.z = 2;
+            this.scene.addChild(cube);
+            var mesh = cube.gameObject.addComponent("meshFilter");
+            mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
+            cube.gameObject.addComponent("meshRenderer");
+            cube.gameObject.addComponent("boxcollider");
+            this.cube = cube;
+            cube.markDirty();
+        }
+        {
+            var sphere = new gd3d.framework.transform();
+            sphere.name = "Cube's child";
+            cube.addChild(sphere);
+            sphere.localScale.x = sphere.localScale.y = sphere.localScale.z = 1;
+            sphere.localTranslate.x = 2;
+            var mesh = sphere.gameObject.addComponent("meshFilter");
+            mesh.mesh = this.app.getAssetMgr().getDefaultMesh("sphere");
+            sphere.gameObject.addComponent("meshRenderer");
+            sphere.markDirty();
+        }
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.lookat(this.cube);
+        objCam.markDirty();
+    };
+    test_NewGameObject.prototype.update = function (delta) {
+    };
+    return test_NewGameObject;
+}());
+var test_NewScene = (function () {
+    function test_NewScene() {
     }
-    dome.addsphere = addsphere;
-})(dome || (dome = {}));
+    test_NewScene.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.markDirty();
+    };
+    test_NewScene.prototype.update = function (delta) {
+    };
+    return test_NewScene;
+}());
+var test_Sound = (function () {
+    function test_Sound() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.time = 0;
+    }
+    test_Sound.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_Sound.prototype.loadTexture = function (laststate, state) {
+        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_Sound.prototype.addCam = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "Main Camera";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    test_Sound.prototype.addCube = function (laststate, state) {
+        var objCube = new gd3d.framework.transform();
+        objCube.name = "Cube";
+        this.scene.addChild(objCube);
+        objCube.localScale.x = objCube.localScale.y = objCube.localScale.z = 1;
+        objCube.localTranslate = new gd3d.math.vector3(0, 0, 0);
+        var mesh = objCube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        mesh.mesh = (smesh);
+        var render = objCube.gameObject.addComponent("meshRenderer");
+        var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+        if (sh != null) {
+            render.materials = [];
+            render.materials.push(new gd3d.framework.material());
+            render.materials[0].setShader(sh);
+            var texture0 = this.app.getAssetMgr().getAssetByName("zg256.png");
+            render.materials[0].setTexture("_MainTex", texture0);
+        }
+        this.cube = objCube;
+        this.cube.markDirty();
+        state.finish = true;
+    };
+    test_Sound.prototype.addBtnLoadSound = function (laststate, state) {
+    };
+    test_Sound.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.addCam.bind(this));
+        this.taskmgr.addTaskCall(this.addCube.bind(this));
+    };
+    test_Sound.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+        this.time += delta;
+        if (this.cube != null) {
+            var cubeTrans = this.cube.gameObject.transform;
+            var yRoate = (this.time * 30) % 360;
+            var yQuaternion = gd3d.math.pool.new_quaternion();
+            gd3d.math.quatFromEulerAngles(0, yRoate, 0, yQuaternion);
+            cubeTrans.localRotate = yQuaternion;
+            cubeTrans.markDirty();
+            console.log(this.time);
+        }
+    };
+    return test_Sound;
+}());
 var EffectElement = (function (_super) {
     __extends(EffectElement, _super);
     function EffectElement() {
@@ -9139,986 +9353,4 @@ var test_effecteditor = (function () {
     };
     return test_effecteditor;
 }());
-var JoystickNew = (function () {
-    function JoystickNew() {
-        this.taskmgr = new gd3d.framework.taskMgr();
-        this.leftAxis = new gd3d.math.vector2(0, 0);
-        this.maxScale = 128;
-        this.touchLeft = 0;
-        this.mouseLeft = false;
-    }
-    JoystickNew.prototype.init = function (app, overlay2d) {
-        var _this = this;
-        this.app = app;
-        this.overlay2d = overlay2d;
-        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskmgr.addTaskCall(this.addJoystick.bind(this));
-        this.app.webgl.canvas.addEventListener("mousedown", function (e) { _this.onMouseDown(e); e.preventDefault(); });
-        this.app.webgl.canvas.addEventListener("mouseup", function (e) { _this.onMouseUp(e); e.preventDefault(); });
-        this.app.webgl.canvas.addEventListener("mousemove", function (e) { _this.onMouseMove(e); e.preventDefault(); });
-        this.app.webgl.canvas.addEventListener("touchstart", function (e) { _this.onTouchStart(e); e.preventDefault(); });
-        this.app.webgl.canvas.addEventListener("touchend", function (e) { _this.onTouchEnd(e); e.preventDefault(); });
-        this.app.webgl.canvas.addEventListener("touchmove", function (e) { _this.onTouchMove(e); e.preventDefault(); });
-    };
-    JoystickNew.prototype.loadTexture = function (laststate, state) {
-        var _this = this;
-        this.app.getAssetMgr().load("res/joystick0.png", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
-            if (s0.isfinish) {
-                _this.app.getAssetMgr().load("res/joystick1.png", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                    if (s1.isfinish) {
-                        state.finish = true;
-                    }
-                    else {
-                        state.error = true;
-                    }
-                });
-            }
-            else {
-                state.error = true;
-            }
-        });
-    };
-    JoystickNew.prototype.addJoystick = function (laststate, state) {
-        var _this = this;
-        {
-            this.joystickLeft0 = new gd3d.framework.transform2D();
-            this.joystickLeft0.name = "left0";
-            this.joystickLeft0.width = 256;
-            this.joystickLeft0.height = 256;
-            this.joystickLeft0.pivot = new gd3d.math.vector2(0.5, 0.5);
-            this.joystickLeft0.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.16, window.innerHeight * 0.75);
-            var img0 = this.joystickLeft0.addComponent("rawImage2D");
-            var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
-            img0.image = tex0;
-            this.overlay2d.addChild(this.joystickLeft0);
-            this.joystickLeft0.markDirty();
-            this.joystickLeft1 = new gd3d.framework.transform2D();
-            this.joystickLeft1.name = "left1";
-            this.joystickLeft1.width = 256;
-            this.joystickLeft1.height = 256;
-            this.joystickLeft1.pivot = new gd3d.math.vector2(0.5, 0.5);
-            this.joystickLeft1.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.16, window.innerHeight * 0.75);
-            var img1 = this.joystickLeft1.addComponent("rawImage2D");
-            var tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png");
-            img1.image = tex1;
-            this.overlay2d.addChild(this.joystickLeft1);
-            this.joystickLeft1.markDirty();
-        }
-        {
-            this.joystickRight0 = new gd3d.framework.transform2D();
-            this.joystickRight0.name = "right0";
-            this.joystickRight0.width = 200;
-            this.joystickRight0.height = 200;
-            this.joystickRight0.pivot = new gd3d.math.vector2(0.5, 0.5);
-            this.joystickRight0.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.84, window.innerHeight * 0.8);
-            var btn0 = this.joystickRight0.addComponent("button");
-            var img0 = this.joystickRight0.addComponent("image2D");
-            var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
-            img0.setTexture(tex0);
-            btn0.targetImage = img0;
-            btn0.transition = gd3d.framework.TransitionType.ColorTint;
-            btn0.onClick.addListener(function () {
-                if (_this.callback0) {
-                    _this.callback0();
-                }
-            });
-            this.overlay2d.addChild(this.joystickRight0);
-            this.joystickRight0.markDirty();
-            this.joystickRight1 = new gd3d.framework.transform2D();
-            this.joystickRight1.name = "right1";
-            this.joystickRight1.width = 120;
-            this.joystickRight1.height = 120;
-            this.joystickRight1.pivot = new gd3d.math.vector2(0.5, 0.5);
-            this.joystickRight1.localTranslate = new gd3d.math.vector2(window.innerWidth * 0.92, window.innerHeight * 0.6);
-            var btn1 = this.joystickRight1.addComponent("button");
-            var img1 = this.joystickRight1.addComponent("image2D");
-            var tex1 = this.app.getAssetMgr().getAssetByName("joystick0.png");
-            img1.setTexture(tex1);
-            btn1.targetImage = img1;
-            btn1.onClick.addListener(function () {
-                if (_this.callback1) {
-                    _this.callback1();
-                }
-            });
-            this.overlay2d.addChild(this.joystickRight1);
-            this.joystickRight1.markDirty();
-        }
-        state.finish = true;
-    };
-    JoystickNew.prototype.onMouseDown = function (e) {
-        if (e.clientX <= this.overlay2d.canvas.pixelWidth / 2) {
-            this.mouseLeft = true;
-            var v = new gd3d.math.vector2(e.clientX, e.clientY);
-            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
-            if (gd3d.math.vec2Length(v) > this.maxScale) {
-                gd3d.math.vec2Normalize(v, v);
-                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
-                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
-            }
-            else {
-                this.joystickLeft1.localTranslate.x = e.clientX;
-                this.joystickLeft1.localTranslate.y = e.clientY;
-            }
-            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
-            this.joystickLeft1.markDirty();
-        }
-    };
-    JoystickNew.prototype.onMouseUp = function (e) {
-        this.mouseLeft = false;
-        this.joystickLeft1.localTranslate.x = this.joystickLeft0.localTranslate.x;
-        this.joystickLeft1.localTranslate.y = this.joystickLeft0.localTranslate.y;
-        this.leftAxis = new gd3d.math.vector2(0, 0);
-        this.joystickLeft1.markDirty();
-    };
-    JoystickNew.prototype.onMouseMove = function (e) {
-        if (this.mouseLeft) {
-            var v = new gd3d.math.vector2(e.clientX, e.clientY);
-            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
-            if (gd3d.math.vec2Length(v) > this.maxScale) {
-                gd3d.math.vec2Normalize(v, v);
-                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
-                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
-            }
-            else {
-                this.joystickLeft1.localTranslate.x = e.clientX;
-                this.joystickLeft1.localTranslate.y = e.clientY;
-            }
-            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
-            this.joystickLeft1.markDirty();
-        }
-    };
-    JoystickNew.prototype.onTouchStart = function (e) {
-        if (e.touches[0].clientX <= this.overlay2d.canvas.pixelWidth / 2) {
-            this.touchLeft = e.touches[0].identifier;
-            var v = new gd3d.math.vector2(e.touches[0].clientX, e.touches[0].clientY);
-            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
-            if (gd3d.math.vec2Length(v) > this.maxScale) {
-                gd3d.math.vec2Normalize(v, v);
-                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
-                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
-            }
-            else {
-                this.joystickLeft1.localTranslate.x = e.touches[0].clientX;
-                this.joystickLeft1.localTranslate.y = e.touches[0].clientY;
-            }
-            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
-            this.joystickLeft1.markDirty();
-        }
-        if (e.touches[1] != null && e.touches[1].clientX <= this.overlay2d.canvas.pixelWidth / 2 && this.touchLeft == 0) {
-            this.touchLeft = e.touches[1].identifier;
-            var v = new gd3d.math.vector2(e.touches[1].clientX, e.touches[1].clientY);
-            gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
-            if (gd3d.math.vec2Length(v) > this.maxScale) {
-                gd3d.math.vec2Normalize(v, v);
-                gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
-                gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
-            }
-            else {
-                this.joystickLeft1.localTranslate.x = e.touches[1].clientX;
-                this.joystickLeft1.localTranslate.y = e.touches[1].clientY;
-            }
-            gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
-            this.joystickLeft1.markDirty();
-        }
-    };
-    JoystickNew.prototype.onTouchEnd = function (e) {
-        if (this.touchLeft) {
-            var flag = false;
-            for (var i = 0; i < e.touches.length; i++) {
-                if (this.touchLeft == e.touches[i].identifier) {
-                    flag = true;
-                }
-            }
-            if (!flag) {
-                this.touchLeft = 0;
-                this.joystickLeft1.localTranslate.x = this.joystickLeft0.localTranslate.x;
-                this.joystickLeft1.localTranslate.y = this.joystickLeft0.localTranslate.y;
-                this.leftAxis.x = 0;
-                this.leftAxis.y = 0;
-                this.joystickLeft1.markDirty();
-            }
-        }
-    };
-    JoystickNew.prototype.onTouchMove = function (e) {
-        if (this.touchLeft != 0) {
-            var index = -1;
-            if (this.touchLeft == e.touches[0].identifier) {
-                index = 0;
-            }
-            else if (e.touches[1] != null && this.touchLeft == e.touches[1].identifier) {
-                index = 1;
-            }
-            if (index != -1) {
-                var v = new gd3d.math.vector2(e.touches[index].clientX, e.touches[index].clientY);
-                gd3d.math.vec2Subtract(v, this.joystickLeft0.localTranslate, v);
-                if (gd3d.math.vec2Length(v) > this.maxScale) {
-                    gd3d.math.vec2Normalize(v, v);
-                    gd3d.math.vec2ScaleByNum(v, this.maxScale, v);
-                    gd3d.math.vec2Add(this.joystickLeft0.localTranslate, v, this.joystickLeft1.localTranslate);
-                }
-                else {
-                    this.joystickLeft1.localTranslate.x = e.touches[index].clientX;
-                    this.joystickLeft1.localTranslate.y = e.touches[index].clientY;
-                }
-                gd3d.math.vec2ScaleByNum(v, 1.0 / this.maxScale, this.leftAxis);
-                this.joystickLeft1.markDirty();
-            }
-        }
-    };
-    JoystickNew.prototype.update = function (delta) {
-        this.taskmgr.move(delta);
-    };
-    return JoystickNew;
-}());
-var Demo;
-(function (Demo) {
-    var TankNew = (function () {
-        function TankNew() {
-            this.cubes = [];
-            this.walls = [];
-            this.taskmgr = new gd3d.framework.taskMgr();
-            this.colVisible = false;
-            this.keyMap = {};
-            this.moveSpeed = 3;
-            this.rotateSpeed = 20;
-            this.bulletId = 0;
-            this.bulletList = [];
-            this.bulletSpeed = 200;
-            this.fireStep = 1;
-            this.fireTick = 0;
-        }
-        TankNew.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    state.finish = true;
-                }
-            });
-        };
-        TankNew.prototype.loadTexture = function (laststate, state) {
-            this.app.getAssetMgr().load("res/gd3d.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    state.finish = true;
-                }
-            });
-        };
-        TankNew.prototype.loadHeroPrefab = function (laststate, state) {
-            var _this = this;
-            this.app.getAssetMgr().load("res/prefabs/tank01/tank01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank01.prefab.json");
-                    _this.heroTank = _prefab.getCloneTrans();
-                    _this.scene.addChild(_this.heroTank);
-                    _this.heroTank.localScale = new gd3d.math.vector3(4, 4, 4);
-                    _this.heroTank.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                    var col = _this.heroTank.gameObject.addComponent("boxcollider");
-                    col.center = new gd3d.math.vector3(0, 0.2, 0);
-                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = _this.colVisible;
-                    _this.heroGun = _this.heroTank.find("tank_up");
-                    _this.heroBase = _this.heroTank.find("tank_down");
-                    _this.heroSlot = _this.heroGun.find("slot");
-                    state.finish = true;
-                }
-            });
-        };
-        TankNew.prototype.loadEnemyPrefab = function (laststate, state) {
-            var _this = this;
-            this.app.getAssetMgr().load("res/prefabs/tank02/tank02.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank02.prefab.json");
-                    _this.enemyTank = _prefab.getCloneTrans();
-                    _this.scene.addChild(_this.enemyTank);
-                    _this.enemyTank.localScale = new gd3d.math.vector3(4, 4, 4);
-                    _this.enemyTank.localTranslate = new gd3d.math.vector3(0, 0, -6);
-                    var col = _this.enemyTank.gameObject.addComponent("boxcollider");
-                    col.center = new gd3d.math.vector3(0, 0.2, 0);
-                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = _this.colVisible;
-                    _this.enemyGun = _this.enemyTank.find("tank_up");
-                    _this.enemySlot = _this.enemyGun.find("slot");
-                    state.finish = true;
-                }
-            });
-        };
-        TankNew.prototype.loadScene = function (laststate, state) {
-            var _this = this;
-            this.app.getAssetMgr().load("res/scenes/test_scene/test_scene.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _scene = _this.app.getAssetMgr().getAssetByName("test_scene.scene.json");
-                    var _root = _scene.getSceneRoot();
-                    _this.scene.addChild(_root);
-                    _root.localTranslate.y = -0.1;
-                    for (var i = 0; i < 8; i++) {
-                        var tran = _root.find("wall" + i);
-                        var col = tran.gameObject.getComponent("boxcollider");
-                        col.colliderVisible = _this.colVisible;
-                        _this.walls.push(tran);
-                    }
-                    _this.app.getScene().lightmaps = [];
-                    _scene.useLightMap(_this.app.getScene());
-                    state.finish = true;
-                }
-            });
-        };
-        TankNew.prototype.addCamera = function (laststate, state) {
-            var tranCam = new gd3d.framework.transform();
-            tranCam.name = "Cam";
-            this.heroGun.addChild(tranCam);
-            this.camera = tranCam.gameObject.addComponent("camera");
-            this.camera.near = 0.1;
-            this.camera.far = 200;
-            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
-            tranCam.markDirty();
-            this.switchCameraMode(true);
-            state.finish = true;
-        };
-        TankNew.prototype.addJoystick = function (laststate, state) {
-            var _this = this;
-            this.overlay2d = new gd3d.framework.overlay2D();
-            this.overlay2d.autoAsp = false;
-            this.overlay2d.canvas.pixelWidth = window.innerWidth;
-            this.overlay2d.canvas.pixelHeight = window.innerHeight;
-            this.camera.addOverLay(this.overlay2d);
-            this.joystick = new JoystickNew();
-            this.joystick.init(this.app, this.overlay2d);
-            this.joystick.callback0 = function () {
-                if (_this.fireTick >= _this.fireStep) {
-                    _this.fireTick = 0;
-                    _this.fire();
-                }
-            };
-            this.joystick.callback1 = function () {
-                _this.switchCameraMode(!_this.cameraFocus);
-            };
-            state.finish = true;
-        };
-        TankNew.prototype.addObject = function (laststate, state) {
-            {
-                var n = 2;
-                for (var i = 0; i < n; i++) {
-                    var cube = new gd3d.framework.transform();
-                    cube.name = "cube" + i;
-                    cube.localScale = new gd3d.math.vector3(3, 3, 3);
-                    cube.localTranslate = new gd3d.math.vector3(-2 * (n - 1) + i * 4, 2, 16);
-                    this.scene.addChild(cube);
-                    var filter = cube.gameObject.addComponent("meshFilter");
-                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                    filter.mesh = smesh;
-                    var renderer = cube.gameObject.addComponent("meshRenderer");
-                    var shader = this.app.getAssetMgr().getShader("diffuse.shader.json");
-                    if (shader != null) {
-                        renderer.materials = [];
-                        renderer.materials.push(new gd3d.framework.material());
-                        renderer.materials[0].setShader(shader);
-                        var texture = this.app.getAssetMgr().getAssetByName("gd3d.png");
-                        renderer.materials[0].setTexture("_MainTex", texture);
-                    }
-                    var col = cube.gameObject.addComponent("boxcollider");
-                    col.colliderVisible = this.colVisible;
-                    cube.markDirty();
-                    this.cubes.push(cube);
-                }
-            }
-            state.finish = true;
-        };
-        TankNew.prototype.start = function (app) {
-            var _this = this;
-            this.label = document.getElementById("Label");
-            this.app = app;
-            this.scene = app.getScene();
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-            this.taskmgr.addTaskCall(this.loadHeroPrefab.bind(this));
-            this.taskmgr.addTaskCall(this.loadEnemyPrefab.bind(this));
-            this.taskmgr.addTaskCall(this.loadScene.bind(this));
-            this.taskmgr.addTaskCall(this.addCamera.bind(this));
-            this.taskmgr.addTaskCall(this.addObject.bind(this));
-            this.taskmgr.addTaskCall(this.addJoystick.bind(this));
-            document.addEventListener("keydown", function (e) { _this.keyMap[e.keyCode] = true; });
-        };
-        TankNew.prototype.switchCameraMode = function (mode) {
-            this.cameraFocus = mode;
-            if (this.cameraFocus) {
-                this.camera.fov = 0.82;
-                this.camera.gameObject.transform.localTranslate = new gd3d.math.vector3(0, 0.8, -2);
-                this.camera.gameObject.transform.localEulerAngles = new gd3d.math.vector3(5, 0, 0);
-                this.camera.gameObject.transform.markDirty();
-                this.camera.gameObject.transform.updateTran(false);
-                this.moveSpeed = 3;
-                this.rotateSpeed = 20;
-            }
-            else {
-                this.camera.fov = 0.41;
-                this.camera.gameObject.transform.localTranslate = new gd3d.math.vector3(0, 0.1, 0.2);
-                this.camera.gameObject.transform.localEulerAngles = new gd3d.math.vector3(2, 0, 0);
-                this.camera.gameObject.transform.markDirty();
-                this.camera.gameObject.transform.updateTran(false);
-                this.moveSpeed = 0.5;
-                this.rotateSpeed = 5;
-            }
-        };
-        TankNew.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
-            if (this.joystick != null) {
-                this.joystick.update(delta);
-            }
-            this.tankControl(delta);
-            this.fireTick += delta;
-        };
-        TankNew.prototype.testTankCol = function (tran) {
-            var col = tran.gameObject.getComponent("boxcollider");
-            for (var i = 0; i < this.cubes.length; i++) {
-                var c_3 = this.cubes[i].gameObject.getComponent("boxcollider");
-                if (c_3 != null && col.obb.intersects(c_3.obb)) {
-                    return true;
-                }
-            }
-            for (var i = 0; i < this.walls.length; i++) {
-                var c_4 = this.walls[i].gameObject.getComponent("boxcollider");
-                if (col.obb.intersects(c_4.obb)) {
-                    return true;
-                }
-            }
-            var c = this.enemyTank.gameObject.getComponent("boxcollider");
-            if (col.obb.intersects(c.obb)) {
-                return true;
-            }
-            return false;
-        };
-        TankNew.prototype.tankControl = function (delta) {
-            if (this.joystick != null) {
-                var targetAngle = new gd3d.math.vector3();
-                if (gd3d.math.vec2Length(this.joystick.leftAxis) > 0.05) {
-                    var axis = new gd3d.math.vector2(this.joystick.leftAxis.x, -this.joystick.leftAxis.y);
-                    gd3d.math.vec2Normalize(axis, axis);
-                    if (axis.x < -0.3827) {
-                        var vec = this.heroGun.localEulerAngles;
-                        vec.y += this.rotateSpeed * delta * this.joystick.leftAxis.x;
-                        this.heroGun.localEulerAngles = vec;
-                        this.heroGun.markDirty();
-                        this.heroGun.updateTran(false);
-                    }
-                    else if (axis.x > 0.3827) {
-                        var vec = this.heroGun.localEulerAngles;
-                        vec.y += this.rotateSpeed * delta * this.joystick.leftAxis.x;
-                        this.heroGun.localEulerAngles = vec;
-                        this.heroGun.markDirty();
-                        this.heroGun.updateTran(false);
-                    }
-                    if (axis.y > 0.3827) {
-                        var vec = gd3d.math.pool.new_vector3();
-                        this.heroGun.getForwardInWorld(vec);
-                        gd3d.math.vec3ScaleByNum(vec, this.moveSpeed * delta, vec);
-                        gd3d.math.vec3Add(this.heroTank.localTranslate, vec, this.heroTank.localTranslate);
-                        this.heroTank.markDirty();
-                        gd3d.math.pool.delete_vector3(vec);
-                        gd3d.math.vec3Clone(this.heroGun.localEulerAngles, targetAngle);
-                        var rotate = new gd3d.math.vector3(0, 2 * this.rotateSpeed * delta, 0);
-                        var d = Math.abs(this.heroBase.localEulerAngles.y - targetAngle.y);
-                        if (d > 180) {
-                            d = 360 - d;
-                        }
-                        if (d > 90) {
-                            if (targetAngle.y > 0) {
-                                targetAngle.y -= 180;
-                            }
-                            else {
-                                targetAngle.y += 180;
-                            }
-                        }
-                        if (d > rotate.y) {
-                            var vec_1 = new gd3d.math.vector3();
-                            if (this.heroBase.localEulerAngles.y > targetAngle.y && this.heroBase.localEulerAngles.y - targetAngle.y < 180
-                                || targetAngle.y > this.heroBase.localEulerAngles.y && targetAngle.y - this.heroBase.localEulerAngles.y >= 180) {
-                                gd3d.math.vec3Subtract(this.heroBase.localEulerAngles, rotate, vec_1);
-                            }
-                            else {
-                                gd3d.math.vec3Add(this.heroBase.localEulerAngles, rotate, vec_1);
-                            }
-                            this.heroBase.localEulerAngles = vec_1;
-                        }
-                        else {
-                            this.heroBase.localEulerAngles = targetAngle;
-                        }
-                        this.heroBase.markDirty();
-                    }
-                    else if (axis.y < -0.3827) {
-                        var vec = gd3d.math.pool.new_vector3();
-                        this.heroGun.getForwardInWorld(vec);
-                        gd3d.math.vec3ScaleByNum(vec, -this.moveSpeed * delta, vec);
-                        gd3d.math.vec3Add(this.heroTank.localTranslate, vec, this.heroTank.localTranslate);
-                        this.heroTank.markDirty();
-                        gd3d.math.pool.delete_vector3(vec);
-                        gd3d.math.vec3Clone(this.heroGun.localEulerAngles, targetAngle);
-                        var rotate = new gd3d.math.vector3(0, 2 * this.rotateSpeed * delta, 0);
-                        var d = Math.abs(this.heroBase.localEulerAngles.y - targetAngle.y);
-                        if (d > 180) {
-                            d = 360 - d;
-                        }
-                        if (d > 90) {
-                            if (targetAngle.y > 0) {
-                                targetAngle.y -= 180;
-                            }
-                            else {
-                                targetAngle.y += 180;
-                            }
-                        }
-                        if (d > rotate.y) {
-                            var vec_2 = new gd3d.math.vector3();
-                            if (this.heroBase.localEulerAngles.y > targetAngle.y && this.heroBase.localEulerAngles.y - targetAngle.y < 180
-                                || targetAngle.y > this.heroBase.localEulerAngles.y && targetAngle.y - this.heroBase.localEulerAngles.y >= 180) {
-                                gd3d.math.vec3Subtract(this.heroBase.localEulerAngles, rotate, vec_2);
-                            }
-                            else {
-                                gd3d.math.vec3Add(this.heroBase.localEulerAngles, rotate, vec_2);
-                            }
-                            this.heroBase.localEulerAngles = vec_2;
-                        }
-                        else {
-                            this.heroBase.localEulerAngles = targetAngle;
-                        }
-                        this.heroBase.markDirty();
-                    }
-                }
-            }
-        };
-        TankNew.prototype.fire = function () {
-            var tran = new gd3d.framework.transform();
-            tran.name = "bullet" + this.bulletId;
-            tran.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-            tran.setWorldPosition(new gd3d.math.vector3(0, 9999, 0));
-            this.scene.addChild(tran);
-            var filter = tran.gameObject.addComponent("meshFilter");
-            var smesh = this.app.getAssetMgr().getDefaultMesh("sphere");
-            filter.mesh = smesh;
-            var renderer = tran.gameObject.addComponent("meshRenderer");
-            var shader = this.app.getAssetMgr().getShader("diffuse.shader.json");
-            if (shader != null) {
-                renderer.materials = [];
-                renderer.materials.push(new gd3d.framework.material());
-                renderer.materials[0].setShader(shader);
-                var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
-                renderer.materials[0].setTexture("_MainTex", texture);
-            }
-            tran.markDirty();
-            var explodePos;
-            var delay = 0;
-            var dir = gd3d.math.pool.new_vector3();
-            this.heroGun.getForwardInWorld(dir);
-            var ray = new gd3d.framework.ray(this.heroSlot.getWorldTranslate(), dir);
-            gd3d.math.pool.delete_vector3(dir);
-            for (var i = 0; i < this.cubes.length; i++) {
-                var pickinfo = ray.intersectCollider(this.cubes[i]);
-                if (pickinfo != null) {
-                    explodePos = pickinfo.hitposition;
-                    var l = gd3d.math.vec3Distance(this.heroSlot.getWorldTranslate(), explodePos);
-                    delay = l / this.bulletSpeed;
-                    break;
-                }
-            }
-            var bullet = {
-                id: this.bulletId++,
-                transform: tran,
-                explodePos: explodePos,
-                delay: delay
-            };
-            this.bulletList.push(bullet);
-        };
-        return TankNew;
-    }());
-    Demo.TankNew = TankNew;
-})(Demo || (Demo = {}));
-var Demo;
-(function (Demo) {
-    var TankGame = (function () {
-        function TankGame() {
-            this.cubes = [];
-            this.walls = [];
-            this.taskmgr = new gd3d.framework.taskMgr();
-            this.tankMoveSpeed = 4;
-            this.tankRotateSpeed = new gd3d.math.vector3(0, 72, 0);
-            this.gunRotateSpeed = new gd3d.math.vector3(0, 150, 0);
-            this.angleLimit = 5;
-            this.colVisible = false;
-            this.keyMap = {};
-            this.bulletId = 0;
-            this.bulletList = [];
-            this.bulletSpeed = 30;
-            this.fireStep = 0.5;
-            this.fireTick = 0;
-        }
-        TankGame.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    state.finish = true;
-                }
-            });
-        };
-        TankGame.prototype.loadTexture = function (laststate, state) {
-            this.app.getAssetMgr().load("res/gd3d.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    state.finish = true;
-                }
-            });
-        };
-        TankGame.prototype.loadHeroPrefab = function (laststate, state) {
-            var _this = this;
-            this.app.getAssetMgr().load("res/prefabs/tank01/tank01.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank01.prefab.json");
-                    _this.heroTank = _prefab.getCloneTrans();
-                    _this.scene.addChild(_this.heroTank);
-                    _this.heroTank.localScale = new gd3d.math.vector3(4, 4, 4);
-                    _this.heroTank.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                    var col = _this.heroTank.gameObject.addComponent("boxcollider");
-                    col.center = new gd3d.math.vector3(0, 0.2, 0);
-                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = _this.colVisible;
-                    _this.heroGun = _this.heroTank.find("tank_up");
-                    _this.heroSlot = _this.heroGun.find("slot");
-                    state.finish = true;
-                }
-            });
-        };
-        TankGame.prototype.loadEnemyPrefab = function (laststate, state) {
-            var _this = this;
-            this.app.getAssetMgr().load("res/prefabs/tank02/tank02.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _prefab = _this.app.getAssetMgr().getAssetByName("tank02.prefab.json");
-                    _this.enemyTank = _prefab.getCloneTrans();
-                    _this.scene.addChild(_this.enemyTank);
-                    _this.enemyTank.localScale = new gd3d.math.vector3(4, 4, 4);
-                    _this.enemyTank.localTranslate = new gd3d.math.vector3(0, 0, -6);
-                    var col = _this.enemyTank.gameObject.addComponent("boxcollider");
-                    col.center = new gd3d.math.vector3(0, 0.2, 0);
-                    col.size = new gd3d.math.vector3(0.46, 0.4, 0.54);
-                    col.colliderVisible = _this.colVisible;
-                    _this.enemyGun = _this.enemyTank.find("tank_up");
-                    _this.enemySlot = _this.enemyGun.find("slot");
-                    state.finish = true;
-                }
-            });
-        };
-        TankGame.prototype.loadScene = function (laststate, state) {
-            var _this = this;
-            this.app.getAssetMgr().load("res/scenes/test_scene/test_scene.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    var _scene = _this.app.getAssetMgr().getAssetByName("test_scene.scene.json");
-                    var _root = _scene.getSceneRoot();
-                    _this.scene.addChild(_root);
-                    _root.localTranslate.y = -0.1;
-                    for (var i = 0; i < 8; i++) {
-                        var tran = _root.find("wall" + i);
-                        var col = tran.gameObject.getComponent("boxcollider");
-                        col.colliderVisible = _this.colVisible;
-                        _this.walls.push(tran);
-                    }
-                    _this.app.getScene().lightmaps = [];
-                    _scene.useLightMap(_this.app.getScene());
-                    state.finish = true;
-                }
-            });
-        };
-        TankGame.prototype.addCamera = function (laststate, state) {
-            var tranCam = new gd3d.framework.transform();
-            tranCam.name = "Cam";
-            this.scene.addChild(tranCam);
-            this.camera = tranCam.gameObject.addComponent("camera");
-            this.camera.near = 0.1;
-            this.camera.far = 200;
-            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
-            this.cameraShock = tranCam.gameObject.addComponent("CameraShock");
-            tranCam.localTranslate = new gd3d.math.vector3(0, 20, -16);
-            tranCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-            tranCam.markDirty();
-            state.finish = true;
-        };
-        TankGame.prototype.addJoystick = function (laststate, state) {
-            var _this = this;
-            this.overlay2d = new gd3d.framework.overlay2D();
-            this.overlay2d.autoAsp = false;
-            this.overlay2d.canvas.pixelWidth = window.innerWidth;
-            this.overlay2d.canvas.pixelHeight = window.innerHeight;
-            this.camera.addOverLay(this.overlay2d);
-            this.joystick = new Joystick();
-            this.joystick.init(this.app, this.overlay2d);
-            this.joystick.triggerFunc = function () {
-                if (_this.fireTick >= _this.fireStep) {
-                    _this.fireTick = 0;
-                    _this.fire();
-                }
-            };
-            state.finish = true;
-        };
-        TankGame.prototype.addObject = function (laststate, state) {
-            {
-                var n = 2;
-                for (var i = 0; i < n; i++) {
-                    var cube = new gd3d.framework.transform();
-                    cube.name = "cube" + i;
-                    cube.localScale = new gd3d.math.vector3(3, 3, 3);
-                    cube.localTranslate = new gd3d.math.vector3(-2 * (n - 1) + i * 4, 2, 16);
-                    this.scene.addChild(cube);
-                    var filter = cube.gameObject.addComponent("meshFilter");
-                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                    filter.mesh = smesh;
-                    var renderer = cube.gameObject.addComponent("meshRenderer");
-                    var shader = this.app.getAssetMgr().getShader("diffuse.shader.json");
-                    if (shader != null) {
-                        renderer.materials = [];
-                        renderer.materials.push(new gd3d.framework.material());
-                        renderer.materials[0].setShader(shader);
-                        var texture = this.app.getAssetMgr().getAssetByName("gd3d.png");
-                        renderer.materials[0].setTexture("_MainTex", texture);
-                    }
-                    var col = cube.gameObject.addComponent("boxcollider");
-                    col.colliderVisible = this.colVisible;
-                    cube.markDirty();
-                    this.cubes.push(cube);
-                }
-            }
-            state.finish = true;
-        };
-        TankGame.prototype.start = function (app) {
-            var _this = this;
-            this.label = document.getElementById("Label");
-            this.app = app;
-            this.scene = app.getScene();
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-            this.taskmgr.addTaskCall(this.loadHeroPrefab.bind(this));
-            this.taskmgr.addTaskCall(this.loadEnemyPrefab.bind(this));
-            this.taskmgr.addTaskCall(this.loadScene.bind(this));
-            this.taskmgr.addTaskCall(this.addCamera.bind(this));
-            this.taskmgr.addTaskCall(this.addObject.bind(this));
-            this.taskmgr.addTaskCall(this.addJoystick.bind(this));
-            document.addEventListener("keydown", function (e) { _this.keyMap[e.keyCode] = true; });
-        };
-        TankGame.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
-            if (this.joystick != null) {
-                this.joystick.update(delta);
-            }
-            this.tankControl(delta);
-            this.updateBullet(delta);
-            for (var i = 0; i < this.bulletList.length; i++) {
-                var col = this.bulletList[i].transform.gameObject.getComponent("boxcollider");
-                for (var j = 0; j < this.cubes.length; j++) {
-                    var c = this.cubes[j];
-                    if (c != null && col.intersectsTransform(c)) {
-                        this.scene.removeChild(c);
-                        c.dispose();
-                        this.bulletList[i].life = 0;
-                        break;
-                    }
-                }
-            }
-            this.fireTick += delta;
-        };
-        TankGame.prototype.testTankCol = function (tran) {
-            var col = tran.gameObject.getComponent("boxcollider");
-            for (var i = 0; i < this.cubes.length; i++) {
-                var c_5 = this.cubes[i].gameObject.getComponent("boxcollider");
-                if (c_5 != null && col.obb.intersects(c_5.obb)) {
-                    return true;
-                }
-            }
-            for (var i = 0; i < this.walls.length; i++) {
-                var c_6 = this.walls[i].gameObject.getComponent("boxcollider");
-                if (col.obb.intersects(c_6.obb)) {
-                    return true;
-                }
-            }
-            var c = this.enemyTank.gameObject.getComponent("boxcollider");
-            if (col.obb.intersects(c.obb)) {
-                return true;
-            }
-            return false;
-        };
-        TankGame.prototype.tankControl = function (delta) {
-            if (this.joystick != null) {
-                var targetAngle = new gd3d.math.vector3();
-                var goForward = true;
-                if (gd3d.math.vec2Length(this.joystick.leftAxis) > 0.05) {
-                    var point = new gd3d.math.vector3(this.joystick.leftAxis.x, 0, -this.joystick.leftAxis.y);
-                    gd3d.math.vec3Add(this.heroTank.getWorldTranslate(), point, point);
-                    var quat = new gd3d.math.quaternion();
-                    gd3d.math.quatLookat(this.heroTank.getWorldTranslate(), point, quat);
-                    gd3d.math.quatToEulerAngles(quat, targetAngle);
-                    var rotateSpeed = new gd3d.math.vector3();
-                    gd3d.math.vec3ScaleByNum(this.tankRotateSpeed, delta, rotateSpeed);
-                    var d = Math.abs(this.heroTank.localEulerAngles.y - targetAngle.y);
-                    if (d > 180) {
-                        d = 360 - d;
-                    }
-                    if (d <= 90) {
-                        goForward = true;
-                    }
-                    else {
-                        if (targetAngle.y > 0) {
-                            targetAngle.y -= 180;
-                        }
-                        else {
-                            targetAngle.y += 180;
-                        }
-                        goForward = false;
-                    }
-                    if (d > rotateSpeed.y) {
-                        var vec = new gd3d.math.vector3();
-                        if (this.heroTank.localEulerAngles.y > targetAngle.y && this.heroTank.localEulerAngles.y - targetAngle.y < 180
-                            || targetAngle.y > this.heroTank.localEulerAngles.y && targetAngle.y - this.heroTank.localEulerAngles.y >= 180) {
-                            gd3d.math.vec3Subtract(this.heroTank.localEulerAngles, rotateSpeed, vec);
-                        }
-                        else {
-                            gd3d.math.vec3Add(this.heroTank.localEulerAngles, rotateSpeed, vec);
-                        }
-                        this.heroTank.localEulerAngles = vec;
-                    }
-                    else {
-                        this.heroTank.localEulerAngles = targetAngle;
-                    }
-                    this.heroTank.markDirty();
-                }
-                if (gd3d.math.vec2Length(this.joystick.leftAxis) > 0.05) {
-                    var speed = 0;
-                    if (Math.abs(this.heroTank.localEulerAngles.y - targetAngle.y) < this.angleLimit) {
-                        speed = this.tankMoveSpeed * delta;
-                    }
-                    else {
-                        speed = this.tankMoveSpeed * delta * 0.8;
-                    }
-                    var v = new gd3d.math.vector3();
-                    this.heroTank.getForwardInWorld(v);
-                    gd3d.math.vec3ScaleByNum(v, speed, v);
-                    if (!goForward) {
-                        gd3d.math.vec3ScaleByNum(v, -1, v);
-                    }
-                    var col = this.heroTank.gameObject.getComponent("boxcollider");
-                    var f = false;
-                    var r = false;
-                    var l = false;
-                    gd3d.math.vec3Add(col.obb.center, v, col.obb.center);
-                    f = this.testTankCol(this.heroTank);
-                    gd3d.math.vec3Subtract(col.obb.center, v, col.obb.center);
-                    var q = new gd3d.math.quaternion();
-                    var v1 = new gd3d.math.vector3();
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, 45, q);
-                    gd3d.math.quatTransformVector(q, v, v1);
-                    gd3d.math.vec3ScaleByNum(v1, 0.5, v1);
-                    gd3d.math.vec3Add(col.obb.center, v1, col.obb.center);
-                    r = this.testTankCol(this.heroTank);
-                    gd3d.math.vec3Subtract(col.obb.center, v1, col.obb.center);
-                    var v2 = new gd3d.math.vector3();
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, -45, q);
-                    gd3d.math.quatTransformVector(q, v, v2);
-                    gd3d.math.vec3ScaleByNum(v2, 0.5, v2);
-                    gd3d.math.vec3Add(col.obb.center, v2, col.obb.center);
-                    l = this.testTankCol(this.heroTank);
-                    gd3d.math.vec3Subtract(col.obb.center, v2, col.obb.center);
-                    if (!f) {
-                        gd3d.math.vec3Add(this.heroTank.localTranslate, v, this.heroTank.localTranslate);
-                    }
-                    else if (!r && l) {
-                        gd3d.math.vec3Add(this.heroTank.localTranslate, v1, this.heroTank.localTranslate);
-                    }
-                    else if (r && !l) {
-                        gd3d.math.vec3Add(this.heroTank.localTranslate, v2, this.heroTank.localTranslate);
-                    }
-                    this.heroTank.markDirty();
-                }
-                if (gd3d.math.vec2Length(this.joystick.rightAxis) > 0.2) {
-                    var point = new gd3d.math.vector3(this.joystick.rightAxis.x, 0, -this.joystick.rightAxis.y);
-                    gd3d.math.vec3Add(this.heroGun.getWorldTranslate(), point, point);
-                    var quat = new gd3d.math.quaternion();
-                    gd3d.math.quatLookat(this.heroGun.getWorldTranslate(), point, quat);
-                    var vec = new gd3d.math.vector3();
-                    gd3d.math.quatToEulerAngles(quat, vec);
-                    gd3d.math.vec3Subtract(vec, this.heroTank.localEulerAngles, vec);
-                    if (vec.y > 180) {
-                        vec.y -= 360;
-                    }
-                    if (vec.y < -180) {
-                        vec.y += 360;
-                    }
-                    var rotateSpeed = new gd3d.math.vector3();
-                    gd3d.math.vec3ScaleByNum(this.gunRotateSpeed, delta, rotateSpeed);
-                    if (Math.abs(this.heroGun.localEulerAngles.y - vec.y) > rotateSpeed.y) {
-                        if (this.heroGun.localEulerAngles.y > vec.y && this.heroGun.localEulerAngles.y - vec.y < 180
-                            || vec.y > this.heroGun.localEulerAngles.y && vec.y - this.heroGun.localEulerAngles.y >= 180) {
-                            gd3d.math.vec3Subtract(this.heroGun.localEulerAngles, rotateSpeed, vec);
-                        }
-                        else {
-                            gd3d.math.vec3Add(this.heroGun.localEulerAngles, rotateSpeed, vec);
-                        }
-                        this.heroGun.localEulerAngles = vec;
-                    }
-                    else {
-                        this.heroGun.localEulerAngles = vec;
-                    }
-                    this.heroGun.markDirty();
-                }
-                if (this.camera != null) {
-                    this.camera.gameObject.transform.localTranslate.x = this.heroTank.localTranslate.x;
-                    this.camera.gameObject.transform.localTranslate.y = this.heroTank.localTranslate.y + 20;
-                    this.camera.gameObject.transform.localTranslate.z = this.heroTank.localTranslate.z - 16;
-                    this.camera.gameObject.transform.markDirty();
-                }
-            }
-        };
-        TankGame.prototype.fire = function () {
-            var tran = new gd3d.framework.transform();
-            tran.name = "bullet" + this.bulletId;
-            tran.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-            tran.localTranslate = this.heroSlot.getWorldTranslate();
-            this.scene.addChild(tran);
-            var filter = tran.gameObject.addComponent("meshFilter");
-            var smesh = this.app.getAssetMgr().getDefaultMesh("sphere");
-            filter.mesh = smesh;
-            var renderer = tran.gameObject.addComponent("meshRenderer");
-            var shader = this.app.getAssetMgr().getShader("light1.shader.json");
-            if (shader != null) {
-                renderer.materials = [];
-                renderer.materials.push(new gd3d.framework.material());
-                renderer.materials[0].setShader(shader);
-                var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
-                renderer.materials[0].setTexture("_MainTex", texture);
-            }
-            var col = tran.gameObject.addComponent("boxcollider");
-            col.size = new gd3d.math.vector3(0.2, 0.2, 0.2);
-            col.colliderVisible = this.colVisible;
-            tran.markDirty();
-            var dir = new gd3d.math.vector3();
-            this.heroGun.getForwardInWorld(dir);
-            var bullet = {
-                id: this.bulletId++,
-                transform: tran,
-                direction: dir,
-                life: 3
-            };
-            this.bulletList.push(bullet);
-        };
-        TankGame.prototype.updateBullet = function (delta) {
-            for (var i = 0; i < this.bulletList.length; i++) {
-                var b = this.bulletList[i];
-                var v = gd3d.math.pool.new_vector3();
-                var speed = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3ScaleByNum(b.direction, this.bulletSpeed * delta, speed);
-                gd3d.math.vec3Add(b.transform.localTranslate, speed, v);
-                b.transform.localTranslate = v;
-                b.transform.markDirty();
-                b.life -= delta;
-            }
-            for (var i = 0; i < this.bulletList.length; i++) {
-                var b = this.bulletList[i];
-                if (b.life <= 0) {
-                    this.bulletList.splice(i, 1);
-                    this.scene.removeChild(b.transform);
-                    b.transform.dispose();
-                }
-            }
-        };
-        return TankGame;
-    }());
-    Demo.TankGame = TankGame;
-})(Demo || (Demo = {}));
 //# sourceMappingURL=app.js.map
