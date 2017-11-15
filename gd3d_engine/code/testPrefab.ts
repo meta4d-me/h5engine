@@ -43,18 +43,27 @@ class test_loadprefab implements IState
             }
         }
     }
-    refreshAniclip(tran:gd3d.framework.transform)
+    refreshAniclip(tran:gd3d.framework.transform, name:string)
     {
         let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
         for(let i=0; i<anipalyer.length; i++)
         {
+            var b:boolean = false;
             for(let j=0; j<anipalyer[i].clips.length; j++)
             {
                 let v = anipalyer[i].clips[j];
                 anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+                
+                if (v.getName() == name){
+                    b = true;
+                }
+            }
+            if (b == true){
+                anipalyer[i].playCross(name,0.2);
             }
             
-            anipalyer[i].playByIndex(0);
+            //anipalyer[i].playByIndex(0);
+            //anipalyer[i].playCross(name,0.2);
         }
     }
     start(app: gd3d.framework.application)
@@ -69,40 +78,68 @@ class test_loadprefab implements IState
         {
             if(state.isfinish)
             {
-                this.app.getAssetMgr().load("res/prefabs/" + name + "/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, 
+                // this.app.getAssetMgr().load("res/prefabs/" + name + "/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, 
+                // (s) => 
+                // {
+                //     if(s.isfinish)
+                //     {
+                //         var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
+                //         this.baihu = _prefab.getCloneTrans();
+                //         this.scene.addChild(this.baihu);
+                //         // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
+                //         this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                //         this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
+
+                //         objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                //         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                //         objCam.markDirty();
+
+                //         this.app.getAssetMgr().load("res/prefabs/" + name + "/textures/" + name + "texture.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                //         (s) => 
+                //         {
+                //             if(s.isfinish)
+                //             {
+                //                 this.refreshTexture(this.baihu);
+                //             }
+                //         });
+                //         this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/resources/" + "Ready.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
+                //         (s) => 
+                //         {
+                //             if(s.isfinish)
+                //             {
+                //                 this.refreshAniclip(this.baihu);
+                //             }
+                //         });
+                //     }
+                // });
+                name = "0000_GS_128";
+                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "attack_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
                 (s) => 
                 {
                     if(s.isfinish)
                     {
-                        var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
-                        this.baihu = _prefab.getCloneTrans();
-                        this.scene.addChild(this.baihu);
-                        // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
-                        this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
-
-                        objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
-                        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-                        objCam.markDirty();
-
-                        this.app.getAssetMgr().load("res/prefabs/" + name + "/textures/" + name + "texture.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                        this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, 
                         (s) => 
                         {
                             if(s.isfinish)
                             {
-                                this.refreshTexture(this.baihu);
-                            }
-                        });
-                        this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/" + name + "aniclip.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                        (s) => 
-                        {
-                            if(s.isfinish)
-                            {
-                                this.refreshAniclip(this.baihu);
+                                var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
+                                this.baihu = _prefab.getCloneTrans();
+                                this.scene.addChild(this.baihu);
+                                // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
+                                this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                                this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
+        
+                                objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
+                                objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                                objCam.markDirty();
+        
+                                this.refreshAniclip(this.baihu, "attack_01.FBAni.aniclip.bin");
                             }
                         });
                     }
                 });
+                
             }
         });
 

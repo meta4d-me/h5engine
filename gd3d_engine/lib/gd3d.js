@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000037";
+                this.build = "b000038";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -9354,7 +9354,8 @@ var gd3d;
                         this._clipnameCount = this.clips.length;
                         this._clipnames = {};
                         for (var key in this.clips) {
-                            this.clipnames[this.clips[key].getName()] = parseInt(key);
+                            if (this.clips[key])
+                                this.clipnames[this.clips[key].getName()] = parseInt(key);
                         }
                     }
                     return this._clipnames;
