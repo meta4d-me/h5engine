@@ -89,36 +89,6 @@ declare namespace t {
         update(delta: number): void;
     }
 }
-declare class test_ChangeMaterial implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    cube: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    isCube: boolean;
-    timer: number;
-    material1: gd3d.framework.material;
-    material2: gd3d.framework.material;
-    taskmgr: gd3d.framework.taskMgr;
-    private loadShader(laststate, state);
-    private loadTexture(laststate, state);
-    private addCam(laststate, state);
-    private addCube(laststate, state);
-    isMaterial1: boolean;
-    private addBtn();
-    private setMaterial(laststate, state);
-    start(app: gd3d.framework.application): void;
-    zeroPoint: gd3d.math.vector3;
-    update(delta: number): void;
-}
-declare class test_ChangeMesh implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    cube: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    isCube: boolean;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
 declare class test_drawMesh implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -136,6 +106,43 @@ declare class test_fakepbr implements IState {
     camera: gd3d.framework.camera;
     baihu: gd3d.framework.transform;
     timer: number;
+    update(delta: number): void;
+}
+declare class test_heilongbo implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskMgr: gd3d.framework.taskMgr;
+    keyframeanicomponet: gd3d.framework.keyframeanimation;
+    keyframeanicomponet1: gd3d.framework.keyframeanimation;
+    longtou: gd3d.framework.transform;
+    start(app: gd3d.framework.application): void;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private loadCube(laststate, state);
+    private loadkeyFrameAnimationPath(laststate, state);
+    private loadasset(laststate, state);
+    cube: gd3d.framework.transform;
+    private iniscene(laststate, state);
+    private addbtns();
+    private addbtn(text, x, y, func);
+    update(delta: number): void;
+}
+declare class test_keyframeAnimation implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskMgr: gd3d.framework.taskMgr;
+    keyframeanicomponet: gd3d.framework.keyframeanimation;
+    longtou: gd3d.framework.transform;
+    start(app: gd3d.framework.application): void;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private loadkeyFrameAnimationPath(laststate, state);
+    private loadasset(laststate, state);
+    private iniscene(laststate, state);
+    private addbtns();
+    private addbtn(text, x, y, func);
     update(delta: number): void;
 }
 declare namespace t {
@@ -183,21 +190,6 @@ declare namespace demo {
         update(delta: number): void;
     }
 }
-declare class test_NewGameObject implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    cube: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
-declare class test_NewScene implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    camera: gd3d.framework.camera;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
 declare class test_postCamera implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -226,19 +218,17 @@ declare class test_RangeScreen implements IState {
     pointDown: boolean;
     update(delta: number): void;
 }
-declare class test_Sound implements IState {
+declare class test_softCut implements IState {
+    static temp: any;
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    taskmgr: gd3d.framework.taskMgr;
     camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    time: number;
-    private loadShader(laststate, state);
-    private loadTexture(laststate, state);
-    private addCam(laststate, state);
-    private addCube(laststate, state);
-    private addBtnLoadSound(laststate, state);
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    rooto2d: gd3d.framework.overlay2D;
     start(app: gd3d.framework.application): void;
+    private createUI(astState, state);
+    private loadTexture(lastState, state);
     update(delta: number): void;
 }
 declare enum ShockType {
@@ -1240,6 +1230,66 @@ declare namespace dome {
     }
     function addcube(assetmgr: gd3d.framework.assetMgr): gd3d.framework.transform;
     function addsphere(assetmgr: gd3d.framework.assetMgr): gd3d.framework.transform;
+}
+declare class test_ChangeMaterial implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    isCube: boolean;
+    timer: number;
+    material1: gd3d.framework.material;
+    material2: gd3d.framework.material;
+    taskmgr: gd3d.framework.taskMgr;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private addCam(laststate, state);
+    private addCube(laststate, state);
+    isMaterial1: boolean;
+    private addBtn();
+    private setMaterial(laststate, state);
+    start(app: gd3d.framework.application): void;
+    zeroPoint: gd3d.math.vector3;
+    update(delta: number): void;
+}
+declare class test_ChangeMesh implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    isCube: boolean;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class test_NewGameObject implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    cube: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class test_NewScene implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class test_Sound implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    taskmgr: gd3d.framework.taskMgr;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    time: number;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private addCam(laststate, state);
+    private addCube(laststate, state);
+    private addBtnLoadSound(laststate, state);
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
 }
 declare class EffectElement extends gd3d.framework.transform {
     type: gd3d.framework.EffectElementTypeEnum;
