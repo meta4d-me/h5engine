@@ -45,6 +45,10 @@
           "length":0
           },
       {
+          "name":"resources/base/diffuse_ttt.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/base/fog_bone_eff.vs.glsl",
           "length":0
           },
@@ -266,6 +270,10 @@
           },
       {
           "name":"resources/example/transparent-diffuse.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/mu_shader/alpha_blend.shader.json",
           "length":0
           },
       {
@@ -509,6 +517,10 @@
           "length":0
           },
       {
+          "name":"resources/project/bone_eff_rimlight.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/fakepbr.fs.glsl",
           "length":0
           },
@@ -597,6 +609,18 @@
           "length":0
           },
       {
+          "name":"resources/project/rim_light_vf.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/rim_light_vf.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/rim_light_vf.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/streamlight.fs.glsl",
           "length":0
           },
@@ -626,6 +650,90 @@
           },
       {
           "name":"resources/project/uvroll.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/asi_alpha_new.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/asi_new.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/asi_new.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/asi_new_bone_eff.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_asi_new.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_asi_new.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_asi_new_bone_eff.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_mask_trans_tint.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_mask_trans_tint.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_mask_trans_tint_bone_eff.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_mask_trans_tint_uvroll.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/fog_mask_trans_tint_uvroll_bone_eff.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_add_tint.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_add_tint_uvroll.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_blend_tint.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_blend_tint_uvroll.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_trans_tint.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_trans_tint.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_trans_tint_bone_eff.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_trans_tint_uvroll.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project_cj/mask_trans_tint_uvroll_bone_eff.vs.glsl",
           "length":0
           },
       {
@@ -707,90 +815,6 @@
       {
           "name":"resources/white.fs.glsl",
           "length":0
-          },
-    {
-        "name":"resources/project_cj/asi_alpha_new.shader.json",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/asi_new.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_asi_new.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/asi_new_bone_eff.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_asi_new_bone_eff.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/asi_new.fs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_asi_new.fs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_blend_tint.shader.json",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_trans_tint.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_mask_trans_tint.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_trans_tint_bone_eff.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_mask_trans_tint_bone_eff.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_trans_tint.fs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_mask_trans_tint.fs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_add_tint.shader.json",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_add_tint_uvroll.shader.json",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_blend_tint_uvroll.shader.json",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_trans_tint_uvroll.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_mask_trans_tint_uvroll.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/mask_trans_tint_uvroll_bone_eff.vs.glsl",
-        "length":0
-        },
-    {
-        "name":"resources/project_cj/fog_mask_trans_tint_uvroll_bone_eff.vs.glsl",
-        "length":0
-        }
+          }
       ]
   }

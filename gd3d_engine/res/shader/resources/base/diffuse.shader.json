@@ -1,5 +1,5 @@
 {
-    "layer": "geometry",
+    "layer": "common",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
         "_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.5",
