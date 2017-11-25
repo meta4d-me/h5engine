@@ -4,6 +4,7 @@ attribute lowp vec4 _glesBlendWeight4;
 attribute mediump vec4 _glesMultiTexCoord0;
 attribute highp vec3 _glesNormal;
 uniform highp mat4 glstate_matrix_mvp;
+uniform highp mat4 glstate_matrix_world2object;
 uniform highp vec4 glstate_vec4_bones[110];
 uniform mediump vec4 _MainTex_ST;
 uniform mediump vec4 glstate_eyepos; 
@@ -55,8 +56,8 @@ void main()
     highp vec4 tmpvar_1;                        
     tmpvar_1.w = 1.0;                           
     tmpvar_1.xyz = calcVertex(_glesVertex,_glesBlendIndex4,_glesBlendWeight4).xyz;  
-    mediump vec3 viewDir = normalize(glstate_eyepos.xyz - tmpvar_1.xyz);
-    mediump float val = 1.0 - clamp(dot(_glesNormal, viewDir),0.0,1.0);//计算点乘值
+    mediump vec3 viewDir = normalize((glstate_matrix_world2object * glstate_eyepos).xyz - tmpvar_1.xyz);
+    mediump float val = 1.0 - dot(_glesNormal, viewDir);//计算点乘值
     rimcolor = _RimColor * val * (1.0 + _RimIntensity);//计算强度
 
     gl_Position = glstate_matrix_mvp *  tmpvar_1;
