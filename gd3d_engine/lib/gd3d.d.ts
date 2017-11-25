@@ -3734,6 +3734,7 @@ declare namespace gd3d.framework {
         matrixView: gd3d.math.matrix;
         matrixProject: gd3d.math.matrix;
         matrixModel: gd3d.math.matrix;
+        matrixWorld2Object: gd3d.math.matrix;
         matrixModelViewProject: gd3d.math.matrix;
         matrixModelView: gd3d.math.matrix;
         matrixViewProject: gd3d.math.matrix;

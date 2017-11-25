@@ -7843,6 +7843,9 @@ var gd3d;
                             case "glstate_matrix_model":
                                 this.setMatrix(key, context.matrixModel);
                                 break;
+                            case "glstate_matrix_world2object":
+                                this.setMatrix(key, context.matrixWorld2Object);
+                                break;
                             case "glstate_matrix_view":
                                 this.setMatrix(key, context.matrixView);
                                 break;
@@ -22475,6 +22478,7 @@ var gd3d;
                 this.matrixView = new gd3d.math.matrix();
                 this.matrixProject = new gd3d.math.matrix();
                 this.matrixModel = new gd3d.math.matrix();
+                this.matrixWorld2Object = new gd3d.math.matrix();
                 this.matrixModelViewProject = new gd3d.math.matrix;
                 this.matrixModelView = new gd3d.math.matrix;
                 this.matrixViewProject = new gd3d.math.matrix;
@@ -22525,6 +22529,7 @@ var gd3d;
             };
             renderContext.prototype.updateModel = function (model) {
                 gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
+                gd3d.math.matrixInverse(this.matrixModel, this.matrixWorld2Object);
                 gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
             };
             renderContext.prototype.updateModeTrail = function () {
