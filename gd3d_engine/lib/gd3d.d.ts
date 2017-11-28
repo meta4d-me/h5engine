@@ -382,6 +382,14 @@ declare namespace gd3d.math {
     }
 }
 declare namespace gd3d.framework {
+    enum layoutOption {
+        LEFT = 1,
+        TOP = 2,
+        RIGHT = 4,
+        BOTTOM = 8,
+        H_CENTER = 16,
+        V_CENTER = 32,
+    }
     interface I2DComponent {
         start(): any;
         update(delta: number): any;
@@ -463,6 +471,18 @@ declare namespace gd3d.framework {
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
         ContainsCanvasPoint(pworld: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
+        private readonly optionArr;
+        private _layoutState;
+        setLayoutState(state: number): void;
+        private layoutValueMap;
+        private lastLayoutVmap;
+        SetLayoutValue(option: layoutOption, value: number): void;
+        private percentModelMap;
+        SetLayoutPercentState(state: number): void;
+        private layoutMapInit();
+        private layoutDirty;
+        private refreshLayout();
+        private getLayValue(opation);
     }
     class t2dInfo {
         pivot: math.vector2;

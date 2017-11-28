@@ -7,6 +7,22 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * @classdesc
+     * UI布局选项
+     * @version egret-gd3d 1.0
+     */
+    export enum layoutOption{
+        LEFT = 1,
+        TOP = 2,
+        RIGHT = 4,
+        BOTTOM = 8,
+        H_CENTER = 16,
+        V_CENTER = 32
+    }
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
      * 2d组件的接口
      * @version egret-gd3d 1.0
      */
@@ -1038,9 +1054,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 事件分发
-         * @param canvas canvas实例
-         * @param ev 事件对象
+         * 当前节点的渲染组件，一个节点同时只能存在一个渲染组件
          * @version egret-gd3d 1.0
          */
         onPointEvent(canvas: canvas, ev: PointEvent)
@@ -1080,6 +1094,103 @@ namespace gd3d.framework
 
 
         }
+
+        private readonly optionArr : layoutOption[] = [layoutOption.LEFT,layoutOption.TOP,layoutOption.RIGHT,layoutOption.BOTTOM,layoutOption.H_CENTER,layoutOption.V_CENTER];
+        private _layoutState : number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局状态
+         * @version egret-gd3d 1.0
+         */
+        setLayoutState(state:number){
+            if(isNaN(state) || state==undefined) return;
+            this._layoutState = state;
+        }
+
+        private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
+        private lastLayoutVmap : {[option:number]: number} = {};   // 最后记录的layoutValue
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局状态值
+         * @version egret-gd3d 1.0
+         */
+        SetLayoutValue(option:layoutOption,value:number){
+            if(isNaN(option) || isNaN(value) || option==undefined || value==undefined) return;
+            this.layoutValueMap[option] = value;
+        }
+
+
+        private percentModelMap : {[option:number] : boolean} = {}; //百分比模式
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局百分比模式状态
+         * @version egret-gd3d 1.0
+         */
+        SetLayoutPercentState(state:number){
+            if(isNaN(state) || state==undefined) return;
+            this.optionArr.forEach(option=>{
+                this.percentModelMap[option] = (state & option) != 0;
+            });
+        }
+
+
+        private layoutMapInit(){
+            for(var i=0;i< this.optionArr.length;i++){
+                let op = this.optionArr[i];
+                this.layoutValueMap[op] = 0;
+                this.lastLayoutVmap[op] = 0;
+                this.percentModelMap[op] = false;
+            }
+        }
+
+        private layoutDirty = false;
+
+        private refreshLayout(){
+            if(!this.layoutDirty) return;
+            let parent = this.parent;
+            if(!parent) return;
+            let state = this._layoutState;
+
+            if(state & layoutOption.LEFT){
+                if(state & layoutOption.RIGHT){
+                    this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                }
+                this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+            }else if (state & layoutOption.RIGHT){
+                this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
+            }
+
+            if(state & layoutOption.V_CENTER){
+                this.localTranslate.x = (parent.width - this.width)/2;
+            }
+
+            if(state & layoutOption.TOP){
+                if(state & layoutOption.BOTTOM){
+                    this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                }
+                this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+            }else if(state & layoutOption.BOTTOM){
+                this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+            }
+
+            if(state & layoutOption.H_CENTER){
+                this.localTranslate.y = (parent.width - this.width)/2;
+            }
+
+            this.layoutDirty = false;
+        }
+
+        private getLayValue(opation:layoutOption){
+            if(this.layoutValueMap[opation] == undefined)
+                this.layoutValueMap[opation] = 0;
+            return this.layoutValueMap[opation];
+        }
     }
 
     export class t2dInfo
@@ -1096,6 +1207,4 @@ namespace gd3d.framework
             outCenter.y=info.pivotPos.y-info.width*(0.5-info.pivot.x)*Math.sin(info.rot)+info.height*(0.5-info.pivot.y)*Math.cos(info.rot);
         }
     }
-
-    
 }
