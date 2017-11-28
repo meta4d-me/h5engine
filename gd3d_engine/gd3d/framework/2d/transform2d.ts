@@ -1104,9 +1104,12 @@ namespace gd3d.framework
          * 布局状态
          * @version egret-gd3d 1.0
          */
-        setLayoutState(state:number){
+        set layoutState(state:number){
             if(isNaN(state) || state==undefined) return;
             this._layoutState = state;
+        }
+        get layoutState(){
+            return this._layoutState;
         }
 
         private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
@@ -1115,16 +1118,18 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 布局状态值
+         * 布局设定值
          * @version egret-gd3d 1.0
          */
-        SetLayoutValue(option:layoutOption,value:number){
+        setLayoutValue(option:layoutOption,value:number){
             if(isNaN(option) || isNaN(value) || option==undefined || value==undefined) return;
             this.layoutValueMap[option] = value;
         }
+        getLayoutValue(option:layoutOption){
+            return this.layoutValueMap[option];     
+        }
 
-
-        private percentModelMap : {[option:number] : boolean} = {}; //百分比模式
+        private _layoutPercentState:number = 0;//百分比模式
         /**
          * @public
          * @language zh_CN
@@ -1132,20 +1137,19 @@ namespace gd3d.framework
          * 布局百分比模式状态
          * @version egret-gd3d 1.0
          */
-        SetLayoutPercentState(state:number){
+        set layoutPercentState(state:number){
             if(isNaN(state) || state==undefined) return;
-            this.optionArr.forEach(option=>{
-                this.percentModelMap[option] = (state & option) != 0;
-            });
+            this._layoutPercentState = state;
         }
-
+        get layoutPercentState(){
+            return this._layoutPercentState;
+        }
 
         private layoutMapInit(){
             for(var i=0;i< this.optionArr.length;i++){
                 let op = this.optionArr[i];
                 this.layoutValueMap[op] = 0;
                 this.lastLayoutVmap[op] = 0;
-                this.percentModelMap[op] = false;
             }
         }
 
