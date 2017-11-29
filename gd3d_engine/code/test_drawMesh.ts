@@ -8,7 +8,7 @@ class test_drawMesh implements IState{
         this.app = app;
         this.scene = this.app.getScene();
         
-        let name = "0000_fs_female_512";
+        let name = "Cube1_1024";
         let isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state)=>{
             if (state.isfinish){

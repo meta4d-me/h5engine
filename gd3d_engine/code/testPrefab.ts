@@ -48,22 +48,31 @@ class test_loadprefab implements IState
         let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
         for(let i=0; i<anipalyer.length; i++)
         {
-            var b:boolean = false;
-            for(let j=0; j<anipalyer[i].clips.length; j++)
-            {
-                let v = anipalyer[i].clips[j];
-                anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+            for (let key in anipalyer[i].clipnames){
+                let j = anipalyer[i].clipnames[key];
+                let v = anipalyer[i].clips[j]
+                let clip = this.app.getAssetMgr().getAssetByName("gs_chuangjue_01_" + v.getName()) as gd3d.framework.animationClip;
+                if (clip){
+                    anipalyer[i].clips[j] = clip;
+                    if (anipalyer[i].clipnames[clip.getName()]){
+
+                    }else{
+                        anipalyer[i].clipnames[clip.getName()] = j;
+                    }
+                }                
+            }
+            // for(let j=0; j<anipalyer[i].clips.length; j++)
+            // {
+            //     let v = anipalyer[i].clips[j];
                 
-                if (v.getName() == name){
-                    b = true;
-                }
-            }
-            if (b == true){
-                anipalyer[i].playCross(name,0.2);
-            }
+            //     let clip = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+            //     if (clip){
+            //         anipalyer[i].clips[j] = clip;
+            //     }
+            // }
+            anipalyer[i].playCross(name,0.2);      
             
-            //anipalyer[i].playByIndex(0);
-            //anipalyer[i].playCross(name,0.2);
+            anipalyer[i].playCross("gs_chuangjue_01_" + name,0.2); 
         }
     }
     start(app: gd3d.framework.application)
@@ -86,7 +95,7 @@ class test_loadprefab implements IState
                 //         var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
                 //         this.baihu = _prefab.getCloneTrans();
                 //         this.scene.addChild(this.baihu);
-                //         // this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
+                //         this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
                 //         this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 //         this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
 
@@ -112,12 +121,12 @@ class test_loadprefab implements IState
                 //         });
                 //     }
                 // });
-                name = "0000_GS_128";
-                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "attack_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
+                name = "gs_chuangjue_01";
+                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_idle_none.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
                 (s) => 
                 {
-                    if(s.isfinish)
-                    {
+                    if (s.isfinish){
+                        
                         this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, 
                         (s) => 
                         {
@@ -134,12 +143,20 @@ class test_loadprefab implements IState
                                 objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
                                 objCam.markDirty();
         
-                                this.refreshAniclip(this.baihu, "attack_01.FBAni.aniclip.bin");
-                            }
-                        });
+                                let ani = this.baihu.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
+                                // ani.clipnames;
+
+                                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_chuangjue_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
+                                (s) => 
+                                {
+                                    if (s.isfinish){
+                                        this.refreshAniclip(this.baihu, "chuangjue_01.FBAni.aniclip.bin");
+                                    }
+                                });  
+                            }                                
+                        }); 
                     }
-                });
-                
+                });                              
             }
         });
 
