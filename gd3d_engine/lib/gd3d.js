@@ -1766,6 +1766,15 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var layoutOption;
+        (function (layoutOption) {
+            layoutOption[layoutOption["LEFT"] = 1] = "LEFT";
+            layoutOption[layoutOption["TOP"] = 2] = "TOP";
+            layoutOption[layoutOption["RIGHT"] = 4] = "RIGHT";
+            layoutOption[layoutOption["BOTTOM"] = 8] = "BOTTOM";
+            layoutOption[layoutOption["H_CENTER"] = 16] = "H_CENTER";
+            layoutOption[layoutOption["V_CENTER"] = 32] = "V_CENTER";
+        })(layoutOption = framework.layoutOption || (framework.layoutOption = {}));
         var C2DComponent = (function () {
             function C2DComponent(comp, init) {
                 if (init === void 0) { init = false; }
@@ -1804,6 +1813,12 @@ var gd3d;
                 this.worldTranslate = new gd3d.math.vector2(0, 0);
                 this.worldScale = new gd3d.math.vector2(1, 1);
                 this.components = [];
+                this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
+                this._layoutState = 0;
+                this.layoutValueMap = {};
+                this.lastLayoutVmap = {};
+                this.percentModelMap = {};
+                this.layoutDirty = false;
             }
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
@@ -2280,6 +2295,70 @@ var gd3d;
                             }
                     }
                 }
+            };
+            transform2D.prototype.setLayoutState = function (state) {
+                if (isNaN(state) || state == undefined)
+                    return;
+                this._layoutState = state;
+            };
+            transform2D.prototype.SetLayoutValue = function (option, value) {
+                if (isNaN(option) || isNaN(value) || option == undefined || value == undefined)
+                    return;
+                this.layoutValueMap[option] = value;
+            };
+            transform2D.prototype.SetLayoutPercentState = function (state) {
+                var _this = this;
+                if (isNaN(state) || state == undefined)
+                    return;
+                this.optionArr.forEach(function (option) {
+                    _this.percentModelMap[option] = (state & option) != 0;
+                });
+            };
+            transform2D.prototype.layoutMapInit = function () {
+                for (var i = 0; i < this.optionArr.length; i++) {
+                    var op = this.optionArr[i];
+                    this.layoutValueMap[op] = 0;
+                    this.lastLayoutVmap[op] = 0;
+                    this.percentModelMap[op] = false;
+                }
+            };
+            transform2D.prototype.refreshLayout = function () {
+                if (!this.layoutDirty)
+                    return;
+                var parent = this.parent;
+                if (!parent)
+                    return;
+                var state = this._layoutState;
+                if (state & layoutOption.LEFT) {
+                    if (state & layoutOption.RIGHT) {
+                        this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                    }
+                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+                }
+                else if (state & layoutOption.RIGHT) {
+                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
+                }
+                if (state & layoutOption.V_CENTER) {
+                    this.localTranslate.x = (parent.width - this.width) / 2;
+                }
+                if (state & layoutOption.TOP) {
+                    if (state & layoutOption.BOTTOM) {
+                        this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                    }
+                    this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                }
+                else if (state & layoutOption.BOTTOM) {
+                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                }
+                if (state & layoutOption.H_CENTER) {
+                    this.localTranslate.y = (parent.width - this.width) / 2;
+                }
+                this.layoutDirty = false;
+            };
+            transform2D.prototype.getLayValue = function (opation) {
+                if (this.layoutValueMap[opation] == undefined)
+                    this.layoutValueMap[opation] = 0;
+                return this.layoutValueMap[opation];
             };
             __decorate([
                 gd3d.reflect.Field("string"),

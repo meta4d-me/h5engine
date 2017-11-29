@@ -1224,66 +1224,6 @@ declare class test_Sound implements IState {
     start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
-declare class test_ChangeMaterial implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    cube: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    isCube: boolean;
-    timer: number;
-    material1: gd3d.framework.material;
-    material2: gd3d.framework.material;
-    taskmgr: gd3d.framework.taskMgr;
-    private loadShader(laststate, state);
-    private loadTexture(laststate, state);
-    private addCam(laststate, state);
-    private addCube(laststate, state);
-    isMaterial1: boolean;
-    private addBtn();
-    private setMaterial(laststate, state);
-    start(app: gd3d.framework.application): void;
-    zeroPoint: gd3d.math.vector3;
-    update(delta: number): void;
-}
-declare class test_ChangeMesh implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    cube: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    isCube: boolean;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
-declare class test_NewGameObject implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    cube: gd3d.framework.transform;
-    camera: gd3d.framework.camera;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
-declare class test_NewScene implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    camera: gd3d.framework.camera;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
-declare class test_Sound implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    taskmgr: gd3d.framework.taskMgr;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    time: number;
-    private loadShader(laststate, state);
-    private loadTexture(laststate, state);
-    private addCam(laststate, state);
-    private addCube(laststate, state);
-    private addBtnLoadSound(laststate, state);
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
 declare class EffectElement extends gd3d.framework.transform {
     type: gd3d.framework.EffectElementTypeEnum;
     beLoop: boolean;

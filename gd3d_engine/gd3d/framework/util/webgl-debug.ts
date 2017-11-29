@@ -183,16 +183,32 @@ namespace gd3d.framework{
      */
     public makeDebugContext(ctx:WebGLRenderingContext, opt_onErrorFunc:(err, funcName, args)=>void = null) :WebGLRenderingContext{
         this.init(ctx);
-        opt_onErrorFunc = opt_onErrorFunc || function(err, functionName, args) {
-              // apparently we can't do args.join(",");
-              var argStr = "";
-              for (var ii = 0; ii < args.length; ++ii) {
-                argStr += ((ii == 0) ? '' : ', ') +
-                    this.glFunctionArgToString(functionName, ii, args[ii]);
-              }
-              this.log("WebGL error "+ this.glEnumToString(err) + " in "+ functionName +
-                  "(" + argStr + ")");
-            };
+      
+        opt_onErrorFunc = opt_onErrorFunc ||
+        ((err, functionName, args) =>{
+          // apparently we can't do args.join(",");
+          var argStr = "";
+          for (var ii = 0; ii < args.length; ++ii) {
+            argStr += ((ii == 0) ? '' : ', ') +
+            this.glFunctionArgToString(functionName, ii, args[ii]);
+          }
+          // self.log("WebGL error "+ self.glEnumToString(err) + " in "+ functionName +
+          //     "(" + argStr + ")");
+          console.error("WebGL error "+ this.glEnumToString(err) + " in "+ functionName +
+              "(" + argStr + ")");
+        });
+        // function(err, functionName, args) {
+        //       // apparently we can't do args.join(",");
+        //       var argStr = "";
+        //       for (var ii = 0; ii < args.length; ++ii) {
+        //         argStr += ((ii == 0) ? '' : ', ') +
+        //         self.glFunctionArgToString(functionName, ii, args[ii]);
+        //       }
+        //       // self.log("WebGL error "+ self.glEnumToString(err) + " in "+ functionName +
+        //       //     "(" + argStr + ")");
+        //       console.error("WebGL error "+ self.glEnumToString(err) + " in "+ functionName +
+        //           "(" + argStr + ")");
+        //     };
       
         // Holds booleans for each GL error so after we get the error ourselves
         // we can still return it to the client app.
