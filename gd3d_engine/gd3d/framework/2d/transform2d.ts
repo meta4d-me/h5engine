@@ -475,16 +475,13 @@ namespace gd3d.framework
             if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                 return;
 
-                if(this.localTranslate.x == 10 && this.localTranslate.y == 200){
-                    this;
-                }
-
             if (this.dirty)
             {
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
             if (this.dirty || parentChange)
             {
+                this.refreshLayout();
                 if (this.parent == null)
                 {
                     gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
@@ -1091,8 +1088,6 @@ namespace gd3d.framework
                 }
             }
 
-
-
         }
 
         private readonly optionArr : layoutOption[] = [layoutOption.LEFT,layoutOption.TOP,layoutOption.RIGHT,layoutOption.BOTTOM,layoutOption.H_CENTER,layoutOption.V_CENTER];
@@ -1106,14 +1101,17 @@ namespace gd3d.framework
          */
         set layoutState(state:number){
             if(isNaN(state) || state==undefined) return;
-            this._layoutState = state;
+            if(state != this._layoutState){
+                this.layoutDirty = true;
+                this.markDirty();
+                this._layoutState = state;
+            }
         }
         get layoutState(){
             return this._layoutState;
         }
 
         private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
-        private lastLayoutVmap : {[option:number]: number} = {};   // 最后记录的layoutValue
         /**
          * @public
          * @language zh_CN
@@ -1123,7 +1121,11 @@ namespace gd3d.framework
          */
         setLayoutValue(option:layoutOption,value:number){
             if(isNaN(option) || isNaN(value) || option==undefined || value==undefined) return;
-            this.layoutValueMap[option] = value;
+            if(this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option]){
+                this.layoutDirty = true;
+                this.markDirty();
+                this.layoutValueMap[option] = value;
+            }
         }
         getLayoutValue(option:layoutOption){
             return this.layoutValueMap[option];     
@@ -1139,61 +1141,89 @@ namespace gd3d.framework
          */
         set layoutPercentState(state:number){
             if(isNaN(state) || state==undefined) return;
-            this._layoutPercentState = state;
+            if(state != this._layoutPercentState){
+                this.layoutDirty = true;
+                this.markDirty();
+                this._layoutPercentState = state;
+            }
         }
         get layoutPercentState(){
             return this._layoutPercentState;
         }
 
-        private layoutMapInit(){
-            for(var i=0;i< this.optionArr.length;i++){
-                let op = this.optionArr[i];
-                this.layoutValueMap[op] = 0;
-                this.lastLayoutVmap[op] = 0;
-            }
-        }
-
         private layoutDirty = false;
-
+        private lastParentWidth = 0;
+        private lastParentHeight = 0;
+        
         private refreshLayout(){
-            if(!this.layoutDirty) return;
             let parent = this.parent;
             if(!parent) return;
+            if(parent.width != this.lastParentWidth || parent.height != this.lastParentHeight)
+                this.layoutDirty = true;
+
+            if(!this.layoutDirty) return;
+            console.error(`refreshLayout : ${this.name}`);
             let state = this._layoutState;
-
-            if(state & layoutOption.LEFT){
-                if(state & layoutOption.RIGHT){
-                    this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+            if(state != 0){
+                if(state & layoutOption.LEFT){
+                    if(state & layoutOption.RIGHT){
+                        this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                    }
+                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+                }else if (state & layoutOption.RIGHT){
+                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
                 }
-                this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
-            }else if (state & layoutOption.RIGHT){
-                this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
-            }
-
-            if(state & layoutOption.V_CENTER){
-                this.localTranslate.x = (parent.width - this.width)/2;
-            }
-
-            if(state & layoutOption.TOP){
-                if(state & layoutOption.BOTTOM){
-                    this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+    
+                if(state & layoutOption.H_CENTER){
+                    this.localTranslate.x = (parent.width - this.width)/2 + this.getLayValue(layoutOption.H_CENTER);
                 }
-                this.localTranslate.y = this.getLayValue(layoutOption.TOP);
-            }else if(state & layoutOption.BOTTOM){
-                this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
-            }
-
-            if(state & layoutOption.H_CENTER){
-                this.localTranslate.y = (parent.width - this.width)/2;
+    
+                if(state & layoutOption.TOP){
+                    if(state & layoutOption.BOTTOM){
+                        this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                    }
+                    this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                }else if(state & layoutOption.BOTTOM){
+                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                }
+    
+                if(state & layoutOption.V_CENTER){
+                    this.localTranslate.y = (parent.height - this.height)/2 + this.getLayValue(layoutOption.V_CENTER);
+                }
+                //布局调整 后刷新 matrix
+                gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
 
             this.layoutDirty = false;
+            this.lastParentWidth = this.parent.width;
+            this.lastParentHeight = this.parent.height;
         }
 
         private getLayValue(opation:layoutOption){
             if(this.layoutValueMap[opation] == undefined)
                 this.layoutValueMap[opation] = 0;
-            return this.layoutValueMap[opation];
+
+            let value = 0;
+            if(this._layoutPercentState & opation){
+                if(this.parent){
+                    switch(opation){
+                        case layoutOption.LEFT:
+                        case layoutOption.H_CENTER:
+                        case layoutOption.RIGHT:
+                        value = this.parent.width * this.layoutValueMap[opation];
+                        break;
+                        case layoutOption.TOP:
+                        case layoutOption.V_CENTER:
+                        case layoutOption.BOTTOM:
+                        value = this.parent.height * this.layoutValueMap[opation];
+                        break;
+                    }
+                }
+            }else{
+                value = this.layoutValueMap[opation];
+            }
+            
+            return value;
         }
     }
 
