@@ -7,6 +7,22 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * @classdesc
+     * UI布局选项
+     * @version egret-gd3d 1.0
+     */
+    export enum layoutOption{
+        LEFT = 1,
+        TOP = 2,
+        RIGHT = 4,
+        BOTTOM = 8,
+        H_CENTER = 16,
+        V_CENTER = 32
+    }
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
      * 2d组件的接口
      * @version egret-gd3d 1.0
      */
@@ -250,6 +266,87 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         localRotate: number = 0;//旋转
+
+        private _maskRect : math.rect;
+        private _temp_maskRect:math.rect;
+        get maskRect(){
+            if(this._temp_maskRect == null) this._temp_maskRect = new math.rect();
+            if(this._maskRect != null){
+                this._temp_maskRect.x = this._maskRect.x;
+                this._temp_maskRect.y = this._maskRect.y;
+                this._temp_maskRect.w = this._maskRect.w;
+                this._temp_maskRect.h = this._maskRect.h;
+            }
+            return this._temp_maskRect;
+        }
+        private _isMask:boolean = false;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 当前节点是否是mask
+         * @version egret-gd3d 1.0
+         */
+        get isMask(){
+            return this._isMask;            
+        }
+        set isMask(b:boolean){
+            this._isMask = b;
+            this.markDirty();
+            if(this.parent != null) 
+                this.updateTran(true);
+        }
+
+        private updateMaskRect(){
+            let rect_x; let rect_y; let rect_w; let rect_h;
+            let ParentRect;
+            if(this.parent != null){
+                this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
+                ParentRect = this.parent.maskRect;
+            }else
+                this._parentIsMask = false;
+            if(this.isMask || this.parentIsMask){
+                if(this.isMask){
+                    //计算 maskrect 
+                    let wPos = this.getWorldTranslate();
+                    let wW = this.canvas.pixelWidth;
+                    let wH = this.canvas.pixelHeight;
+                    rect_x = wPos.x/wW;
+                    rect_y = wPos.y/wH;
+                    rect_w = this.width/wW;
+                    rect_h = this.height/wH;
+                    if(this.parentIsMask && ParentRect != null){
+                        //计算 rect  ∩  parentRect
+                        let min_x =Math.max(rect_x,ParentRect.x);
+                        let min_y =Math.max(rect_y,ParentRect.y);
+                        let max_x =Math.min(rect_x+rect_w,ParentRect.x+ParentRect.w);
+                        let max_y =Math.min(rect_y+rect_h,ParentRect.y+ParentRect.h);
+        
+                        rect_x = min_x;
+                        rect_y = min_y;
+                        rect_w = max_x - min_x;
+                        rect_h = max_y - min_y;
+                    }
+                }else if(ParentRect != null){
+                    rect_x = ParentRect.x; rect_y = ParentRect.y; rect_w = ParentRect.w; rect_h = ParentRect.h;
+                }
+                if(this._maskRect == null) this._maskRect = new math.rect();
+
+                if(this._maskRect.x != rect_x || this._maskRect.x != rect_y ||this._maskRect.x != rect_w ||this._maskRect.x != rect_h ){
+                    this._maskRect.x = rect_x; 
+                    this._maskRect.y = rect_y; 
+                    this._maskRect.w = rect_w; 
+                    this._maskRect.h = rect_h; 
+                }
+            }
+        }
+        
+
+        private _parentIsMask = false;
+        get parentIsMask(){
+            return this._parentIsMask;
+        }
+
         private localMatrix: math.matrix3x2 = new gd3d.math.matrix3x2;//2d矩阵
         //这个是如果爹改了就要跟着算的
 
@@ -278,6 +375,7 @@ namespace gd3d.framework
             node.parent = this;
             node.canvas = this.canvas;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            this.markDirty();
         }
 
         /**
@@ -305,6 +403,7 @@ namespace gd3d.framework
             node.canvas = this.canvas;
             node.parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            this.markDirty();
         }
 
         /**
@@ -394,6 +493,7 @@ namespace gd3d.framework
                 {
                     gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
+                this.updateMaskRect();
                 if (this.renderer != null)
                 {
                     this.renderer.updateTran();
@@ -954,9 +1054,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 事件分发
-         * @param canvas canvas实例
-         * @param ev 事件对象
+         * 当前节点的渲染组件，一个节点同时只能存在一个渲染组件
          * @version egret-gd3d 1.0
          */
         onPointEvent(canvas: canvas, ev: PointEvent)
@@ -996,6 +1094,107 @@ namespace gd3d.framework
 
 
         }
+
+        private readonly optionArr : layoutOption[] = [layoutOption.LEFT,layoutOption.TOP,layoutOption.RIGHT,layoutOption.BOTTOM,layoutOption.H_CENTER,layoutOption.V_CENTER];
+        private _layoutState : number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局状态
+         * @version egret-gd3d 1.0
+         */
+        set layoutState(state:number){
+            if(isNaN(state) || state==undefined) return;
+            this._layoutState = state;
+        }
+        get layoutState(){
+            return this._layoutState;
+        }
+
+        private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
+        private lastLayoutVmap : {[option:number]: number} = {};   // 最后记录的layoutValue
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局设定值
+         * @version egret-gd3d 1.0
+         */
+        setLayoutValue(option:layoutOption,value:number){
+            if(isNaN(option) || isNaN(value) || option==undefined || value==undefined) return;
+            this.layoutValueMap[option] = value;
+        }
+        getLayoutValue(option:layoutOption){
+            return this.layoutValueMap[option];     
+        }
+
+        private _layoutPercentState:number = 0;//百分比模式
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局百分比模式状态
+         * @version egret-gd3d 1.0
+         */
+        set layoutPercentState(state:number){
+            if(isNaN(state) || state==undefined) return;
+            this._layoutPercentState = state;
+        }
+        get layoutPercentState(){
+            return this._layoutPercentState;
+        }
+
+        private layoutMapInit(){
+            for(var i=0;i< this.optionArr.length;i++){
+                let op = this.optionArr[i];
+                this.layoutValueMap[op] = 0;
+                this.lastLayoutVmap[op] = 0;
+            }
+        }
+
+        private layoutDirty = false;
+
+        private refreshLayout(){
+            if(!this.layoutDirty) return;
+            let parent = this.parent;
+            if(!parent) return;
+            let state = this._layoutState;
+
+            if(state & layoutOption.LEFT){
+                if(state & layoutOption.RIGHT){
+                    this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                }
+                this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+            }else if (state & layoutOption.RIGHT){
+                this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
+            }
+
+            if(state & layoutOption.V_CENTER){
+                this.localTranslate.x = (parent.width - this.width)/2;
+            }
+
+            if(state & layoutOption.TOP){
+                if(state & layoutOption.BOTTOM){
+                    this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                }
+                this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+            }else if(state & layoutOption.BOTTOM){
+                this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+            }
+
+            if(state & layoutOption.H_CENTER){
+                this.localTranslate.y = (parent.width - this.width)/2;
+            }
+
+            this.layoutDirty = false;
+        }
+
+        private getLayValue(opation:layoutOption){
+            if(this.layoutValueMap[opation] == undefined)
+                this.layoutValueMap[opation] = 0;
+            return this.layoutValueMap[opation];
+        }
     }
 
     export class t2dInfo
@@ -1012,6 +1211,4 @@ namespace gd3d.framework
             outCenter.y=info.pivotPos.y-info.width*(0.5-info.pivot.x)*Math.sin(info.rot)+info.height*(0.5-info.pivot.y)*Math.cos(info.rot);
         }
     }
-
-    
 }

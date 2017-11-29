@@ -38,6 +38,7 @@ namespace gd3d.framework
                 this._clipnames = {};
                 for (let key in this.clips)
                 {
+                    if (this.clips[key])
                     this.clipnames[this.clips[key].getName()] = parseInt(key);
                 }
             }
@@ -218,6 +219,7 @@ namespace gd3d.framework
                     frame = this._playClip.frames[this._playFrameid];
                 }else{
                     console.warn("is null of animationclip.frames! ");
+                    return ;
                 }
 
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];

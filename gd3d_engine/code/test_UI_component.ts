@@ -32,6 +32,9 @@ class test_UI_Component implements IState {
     }
 
     private createUI(astState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        let atlasComp = this.assetMgr.getAssetByName("comp.atlas.json") as gd3d.framework.atlas;
+        let tex_0 = this.assetMgr.getAssetByName("zg03_256.png") as gd3d.framework.texture;
+
         //9宫格拉伸底图
         let bg_t = new gd3d.framework.transform2D;
         bg_t.width = 400;
@@ -43,7 +46,6 @@ class test_UI_Component implements IState {
         this.rooto2d.addChild(bg_t);
         let bg_i = bg_t.addComponent("image2D") as gd3d.framework.image2D;
         bg_i.imageType = gd3d.framework.ImageType.Sliced;
-        let atlasComp = this.assetMgr.getAssetByName("comp.atlas.json") as gd3d.framework.atlas;
         bg_i.sprite = atlasComp.sprites["bg"];
         bg_i.sprite.border = new gd3d.math.border(10,50,10,10);
 
@@ -75,7 +77,6 @@ class test_UI_Component implements IState {
         btn_b.pressedGraphic = atlasComp.sprites["ui_public_button_1"];
         btn_b.pressedColor = new gd3d.math.color(1,1,1,1);
         btn_b.transition = gd3d.framework.TransitionType.SpriteSwap;
-        btn_t.visible = false;
 
         //关闭按钮
         let closeSce = 0.8;
@@ -163,6 +164,32 @@ class test_UI_Component implements IState {
         ipt.PlaceholderLabel.fontsize = 24
         ipt.PlaceholderLabel.color =new gd3d.math.color(0.6,0.6,0.6,1);
 
+        //滑动卷轴框
+        let scroll_t = new gd3d.framework.transform2D;
+        scroll_t.width =  70;
+        scroll_t.height = 100;
+        bg_t.addChild(scroll_t);
+        scroll_t.localTranslate.x = 160;
+        scroll_t.localTranslate.y = 30;
+        let scroll_ = scroll_t.addComponent("scrollRect") as gd3d.framework.scrollRect;
+        let ct = new gd3d.framework.transform2D;
+        ct.width = 120;
+        ct.height = 120;
+        scroll_.content = ct;
+        scroll_t.isMask = true;
+        scroll_.horizontal = true;
+        scroll_.vertical = true;
+        
+        //raw png
+        let raw_t2 = new gd3d.framework.transform2D;
+        raw_t2.width = 120;
+        raw_t2.height = 120;
+        let raw_i2 = raw_t2.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
+        raw_i2.image = tex_0;
+        ct.addChild(raw_t2);
+        
+
+
 
         test_UI_Component.temp = iptFrame_t;
 
@@ -192,9 +219,11 @@ class test_UI_Component implements IState {
                         this.assetMgr.load("res/STXINGKA.TTF.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
                             if(s.isfinish){
                                 this.assetMgr.load("res/resources/STXINGKA.font.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                    if(s.isfinish){
-                                        state.finish = true;
-                                    }
+                                    this.assetMgr.load("res/zg03_256.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
+                                        if(s.isfinish){
+                                            state.finish = true;
+                                        }
+                                    });
                                 });
                             }
                         });

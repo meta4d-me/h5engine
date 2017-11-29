@@ -1,0 +1,1 @@
+{"shader":"diffuse.shader.json","srcshader":"Legacy Shaders/Transparent/Cutout/Diffuse","mapUniform":{"_Color":{"type":3,"value":"(1,1,1,1)"},"_MainTex":{"type":0,"value":"87_chengmen_002_alpha.imgdesc.json"},"_Cutoff":{"type":1,"value":0.5}}}
