@@ -140,6 +140,9 @@ namespace gd3d.framework
         private pointX: number = 0;
         private pointY: number = 0;
 
+        private lastWidth = 0;
+        private lastHeight = 0;
+
         /**
          * @public
          * @language zh_CN
@@ -162,8 +165,12 @@ namespace gd3d.framework
             this.rootNode.localTranslate.y = 1;
             this.rootNode.localTranslate.x = -1;
 
-            this.rootNode.width = this.pixelWidth;
-            this.rootNode.height = this.pixelHeight;
+            if(this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight){
+                this.lastWidth = this.rootNode.width = this.pixelWidth;
+                this.lastHeight = this.rootNode.height = this.pixelHeight;
+                this.rootNode.markDirty();
+            }
+
             this.rootNode.pivot.x = 0;
             this.rootNode.pivot.y = 0;
             this.rootNode.updateTran(false);
