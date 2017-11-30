@@ -7,6 +7,22 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * @classdesc
+     * UI布局选项
+     * @version egret-gd3d 1.0
+     */
+    export enum layoutOption{
+        LEFT = 1,
+        TOP = 2,
+        RIGHT = 4,
+        BOTTOM = 8,
+        H_CENTER = 16,
+        V_CENTER = 32
+    }
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
      * 2d组件的接口
      * @version egret-gd3d 1.0
      */
@@ -459,16 +475,13 @@ namespace gd3d.framework
             if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                 return;
 
-                if(this.localTranslate.x == 10 && this.localTranslate.y == 200){
-                    this;
-                }
-
             if (this.dirty)
             {
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
             if (this.dirty || parentChange)
             {
+                this.refreshLayout();
                 if (this.parent == null)
                 {
                     gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
@@ -1038,9 +1051,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 事件分发
-         * @param canvas canvas实例
-         * @param ev 事件对象
+         * 当前节点的渲染组件，一个节点同时只能存在一个渲染组件
          * @version egret-gd3d 1.0
          */
         onPointEvent(canvas: canvas, ev: PointEvent)
@@ -1077,8 +1088,142 @@ namespace gd3d.framework
                 }
             }
 
+        }
 
+        private readonly optionArr : layoutOption[] = [layoutOption.LEFT,layoutOption.TOP,layoutOption.RIGHT,layoutOption.BOTTOM,layoutOption.H_CENTER,layoutOption.V_CENTER];
+        private _layoutState : number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局状态
+         * @version egret-gd3d 1.0
+         */
+        set layoutState(state:number){
+            if(isNaN(state) || state==undefined) return;
+            if(state != this._layoutState){
+                this.layoutDirty = true;
+                this.markDirty();
+                this._layoutState = state;
+            }
+        }
+        get layoutState(){
+            return this._layoutState;
+        }
 
+        private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局设定值
+         * @version egret-gd3d 1.0
+         */
+        setLayoutValue(option:layoutOption,value:number){
+            if(isNaN(option) || isNaN(value) || option==undefined || value==undefined) return;
+            if(this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option]){
+                this.layoutDirty = true;
+                this.markDirty();
+                this.layoutValueMap[option] = value;
+            }
+        }
+        getLayoutValue(option:layoutOption){
+            return this.layoutValueMap[option];     
+        }
+
+        private _layoutPercentState:number = 0;//百分比模式
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 布局百分比模式状态
+         * @version egret-gd3d 1.0
+         */
+        set layoutPercentState(state:number){
+            if(isNaN(state) || state==undefined) return;
+            if(state != this._layoutPercentState){
+                this.layoutDirty = true;
+                this.markDirty();
+                this._layoutPercentState = state;
+            }
+        }
+        get layoutPercentState(){
+            return this._layoutPercentState;
+        }
+
+        private layoutDirty = false;
+        private lastParentWidth = 0;
+        private lastParentHeight = 0;
+        
+        private refreshLayout(){
+            let parent = this.parent;
+            if(!parent) return;
+            if(parent.width != this.lastParentWidth || parent.height != this.lastParentHeight)
+                this.layoutDirty = true;
+
+            if(!this.layoutDirty) return;
+            console.error(`refreshLayout : ${this.name}`);
+            let state = this._layoutState;
+            if(state != 0){
+                if(state & layoutOption.LEFT){
+                    if(state & layoutOption.RIGHT){
+                        this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                    }
+                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+                }else if (state & layoutOption.RIGHT){
+                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
+                }
+    
+                if(state & layoutOption.H_CENTER){
+                    this.localTranslate.x = (parent.width - this.width)/2 + this.getLayValue(layoutOption.H_CENTER);
+                }
+    
+                if(state & layoutOption.TOP){
+                    if(state & layoutOption.BOTTOM){
+                        this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                    }
+                    this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                }else if(state & layoutOption.BOTTOM){
+                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                }
+    
+                if(state & layoutOption.V_CENTER){
+                    this.localTranslate.y = (parent.height - this.height)/2 + this.getLayValue(layoutOption.V_CENTER);
+                }
+                //布局调整 后刷新 matrix
+                gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+            }
+
+            this.layoutDirty = false;
+            this.lastParentWidth = this.parent.width;
+            this.lastParentHeight = this.parent.height;
+        }
+
+        private getLayValue(opation:layoutOption){
+            if(this.layoutValueMap[opation] == undefined)
+                this.layoutValueMap[opation] = 0;
+
+            let value = 0;
+            if(this._layoutPercentState & opation){
+                if(this.parent){
+                    switch(opation){
+                        case layoutOption.LEFT:
+                        case layoutOption.H_CENTER:
+                        case layoutOption.RIGHT:
+                        value = this.parent.width * this.layoutValueMap[opation];
+                        break;
+                        case layoutOption.TOP:
+                        case layoutOption.V_CENTER:
+                        case layoutOption.BOTTOM:
+                        value = this.parent.height * this.layoutValueMap[opation];
+                        break;
+                    }
+                }
+            }else{
+                value = this.layoutValueMap[opation];
+            }
+            
+            return value;
         }
     }
 
@@ -1096,6 +1241,4 @@ namespace gd3d.framework
             outCenter.y=info.pivotPos.y-info.width*(0.5-info.pivot.x)*Math.sin(info.rot)+info.height*(0.5-info.pivot.y)*Math.cos(info.rot);
         }
     }
-
-    
 }
