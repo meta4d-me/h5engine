@@ -8141,7 +8141,7 @@ var gd3d;
                         for (var i = 0; i < vcount; i++) {
                             var uv = new gd3d.math.vector2();
                             uv.x = read.readSingle();
-                            uv.y = 1 - read.readSingle();
+                            uv.y = read.readSingle();
                             data.uv.push(uv);
                         }
                     }
@@ -8153,7 +8153,7 @@ var gd3d;
                         for (var i = 0; i < vcount; i++) {
                             var uv = new gd3d.math.vector2();
                             uv.x = read.readSingle();
-                            uv.y = 1 - read.readSingle();
+                            uv.y = read.readSingle();
                             data.uv2.push(uv);
                         }
                     }
@@ -27206,7 +27206,7 @@ var gd3d;
                 this.mipmap = mipmap;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
@@ -27267,7 +27267,7 @@ var gd3d;
                 this.mipmap = mipmap;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)

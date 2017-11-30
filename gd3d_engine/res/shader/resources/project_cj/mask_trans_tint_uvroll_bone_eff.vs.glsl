@@ -11,8 +11,6 @@ uniform mediump vec4 _Main_Color;
 
 varying mediump vec2 _maintex_uv;
 varying mediump vec2 _mask_uv;
-varying lowp vec4 v_color;
-
 
 
 uniform float _speedu;
@@ -21,7 +19,7 @@ uniform float _speedv;
 
 attribute vec4 _glesBlendIndex4;
 attribute vec4 _glesBlendWeight4;
-uniform highp vec4 glstate_vec4_bones[80];
+uniform highp vec4 glstate_vec4_bones[110];
 mat4 buildMat4(int index)
 {
 	vec4 quat = glstate_vec4_bones[index * 2 + 0];
@@ -47,12 +45,9 @@ mat4 buildMat4(int index)
 void main()
 {
 
-	lowp vec2 _speed= vec2(_speedu,-_speedv);
+	lowp vec2 _speed= vec2(_speedu,_speedv);
     _maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw + _speed * glstate_timer;
-    
     _mask_uv = _glesMultiTexCoord0.xy * _Mask_ST.xy + _Mask_ST.zw;
-    //v_color =_glesColor*_Main_Color*2.0;
-    v_color =_Main_Color*2.0;
 
 	//gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
 

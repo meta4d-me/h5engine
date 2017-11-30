@@ -21,7 +21,8 @@ varying mediump vec2 _maintex_uv;
 varying mediump vec2 _asm_uv;
 varying mediump vec2 _light_uv;
 varying highp vec3 normalDir;
-varying mediump vec3 lightDir;
+varying mediump	float angle;
+//varying mediump vec3 lightDir;
 
 void main()
 {
@@ -29,10 +30,12 @@ void main()
 	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + _asm_ST.zw;
 	lowp vec2 _speed= vec2(_speedu,_speedv);
     _light_uv = (_glesMultiTexCoord0.xy * _streamLight_ST.xy + _streamLight_ST.zw)  + _speed * glstate_timer;
- 	mediump	float angle=_lightAngleSpeed*glstate_timer+3.141592654;
-	lightDir=vec3(cos(angle),0.0,sin(angle));
+ 	angle=_lightAngleSpeed*glstate_timer;
+	//lightDir=vec3(cos(angle),0.0,sin(angle));
 
-    normalDir=mat3(glstate_matrix_model)*_glesNormal;
+   	mediump vec3 temnormal=mat3(glstate_matrix_model)*_glesNormal;
+	temnormal=normalize(temnormal);
+	normalDir=temnormal;
 	gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
 }
 

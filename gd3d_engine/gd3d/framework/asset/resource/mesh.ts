@@ -209,7 +209,7 @@ namespace gd3d.framework
                     {
                         var uv = new gd3d.math.vector2();
                         uv.x = read.readSingle();
-                        uv.y = 1 - read.readSingle();
+                        uv.y=read.readSingle();
                         data.uv.push(uv);
                     }
                 }
@@ -224,7 +224,8 @@ namespace gd3d.framework
                     {
                         var uv = new gd3d.math.vector2();
                         uv.x = read.readSingle();
-                        uv.y = 1 - read.readSingle();
+                        uv.y=read.readSingle();
+                        //uv.y = 1 - read.readSingle();
                         data.uv2.push(uv);
 
                     }

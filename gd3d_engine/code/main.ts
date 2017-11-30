@@ -86,6 +86,9 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
 
         this.addBtn("cj_zs",()=>new dome.testCJ());
+        this.addBtn("test_eff",()=>new dome.db_test_eff());
+        
+
 
     }
     
