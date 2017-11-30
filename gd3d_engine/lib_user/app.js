@@ -571,6 +571,7 @@ var main = (function () {
         this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
         this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
+        this.addBtn("test_liChange", function () { return new testLiChangeMesh(); });
         this.addBtn("example_newScene", function () { return new test_NewScene(); });
         this.addBtn("example_newObject", function () { return new test_NewGameObject; });
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
@@ -583,8 +584,7 @@ var main = (function () {
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
-        this.addBtn("cj_zs", function () { return new dome.testCJ(); });
-        this.addBtn("test_eff", function () { return new dome.db_test_eff(); });
+        this.addBtn("tesrtss", function () { return new dome.testCJ(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -766,7 +766,7 @@ var test_drawMesh = (function () {
         console.log("i see you are a dog!");
         this.app = app;
         this.scene = this.app.getScene();
-        var name = "0000_fs_female_512";
+        var name = "Cube1_1024";
         var isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -4490,6 +4490,94 @@ var testloadImmediate = (function () {
     };
     return testloadImmediate;
 }());
+var dome;
+(function (dome) {
+    var testCJ = (function () {
+        function testCJ() {
+            this.time = 0;
+        }
+        testCJ.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        testCJ.prototype.loadmesh = function (laststate, state) {
+            var _this = this;
+            var name = "zs_chuangjue_01";
+            name = "gs_chuangjue_01";
+            name = "0000_fs_female_1024";
+            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                    _this.dragon = _prefab.getCloneTrans();
+                    _this.dragon.localEulerAngles = new gd3d.math.vector3(0, -180, 0);
+                    _this.scene.addChild(_this.dragon);
+                    _this.dragon.markDirty();
+                    _this.cameraPoint = _this.dragon.find("Camera001");
+                    state.finish = true;
+                }
+            });
+        };
+        testCJ.prototype.loadweapon = function (laststate, state) {
+            var _this = this;
+            var name = "Quad";
+            this.app.getAssetMgr().load("res/prefabs/Quad/Quad.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName("Quad.prefab.json");
+                    var pp = _prefab.getCloneTrans();
+                    pp.localTranslate = new gd3d.math.vector3();
+                    pp.localEulerAngles = new gd3d.math.vector3();
+                    _this.scene.addChild(pp);
+                    state.finish = true;
+                }
+            });
+        };
+        testCJ.prototype.test = function (laststate, state) {
+            this.dragon = new gd3d.framework.transform();
+            var mesh = this.assetMgr.getAssetByName("MU1.0----1.9_TeXiao_Guoyichen_Effect_Mesh_Plane_danxiangsuofang_01.FBX_Plane01.mesh.bin");
+            var mat = this.assetMgr.getAssetByName("WuQi_zhenhong_02.mat.json");
+            var shder = this.assetMgr.getAssetByName("diffuse_bothside.shader.json");
+            var mattt = new gd3d.framework.material();
+            mattt.setShader(shder);
+            var meshf = this.dragon.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+            meshf.mesh = mesh;
+            var meshr = this.dragon.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+            meshr.materials[0] = mat;
+            this.dragon.localScale = new gd3d.math.vector3(13, 41, 21);
+            this.dragon.markDirty();
+            this.scene.addChild(this.dragon);
+            state.finish = true;
+        };
+        testCJ.prototype.addCamera = function (laststate, state) {
+            var tranCam = new gd3d.framework.transform();
+            tranCam.name = "Cam";
+            this.scene.addChild(tranCam);
+            tranCam.localTranslate = new gd3d.math.vector3(0, 0, -3);
+            this.camera = tranCam.gameObject.addComponent("camera");
+            this.camera.near = 0.001;
+            this.camera.far = 1000;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            tranCam.markDirty();
+            state.finish = true;
+        };
+        testCJ.prototype.start = function (app) {
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.assetMgr = this.app.getAssetMgr();
+            this.taskmgr = new gd3d.framework.taskMgr();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.addCamera.bind(this));
+            this.taskmgr.addTaskCall(this.loadweapon.bind(this));
+        };
+        testCJ.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+        };
+        return testCJ;
+    }());
+    dome.testCJ = testCJ;
+})(dome || (dome = {}));
 var test_loadMulBundle = (function () {
     function test_loadMulBundle() {
         this.timer = 0;
@@ -6656,17 +6744,21 @@ var test_loadprefab = (function () {
     test_loadprefab.prototype.refreshAniclip = function (tran, name) {
         var anipalyer = tran.gameObject.getComponentsInChildren("aniplayer");
         for (var i = 0; i < anipalyer.length; i++) {
-            var b = false;
-            for (var j = 0; j < anipalyer[i].clips.length; j++) {
+            for (var key in anipalyer[i].clipnames) {
+                var j = anipalyer[i].clipnames[key];
                 var v = anipalyer[i].clips[j];
-                anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName());
-                if (v.getName() == name) {
-                    b = true;
+                var clip = this.app.getAssetMgr().getAssetByName("gs_chuangjue_01_" + v.getName());
+                if (clip) {
+                    anipalyer[i].clips[j] = clip;
+                    if (anipalyer[i].clipnames[clip.getName()]) {
+                    }
+                    else {
+                        anipalyer[i].clipnames[clip.getName()] = j;
+                    }
                 }
             }
-            if (b == true) {
-                anipalyer[i].playCross(name, 0.2);
-            }
+            anipalyer[i].playCross(name, 0.2);
+            anipalyer[i].playCross("gs_chuangjue_01_" + name, 0.2);
         }
     };
     test_loadprefab.prototype.start = function (app) {
@@ -6679,8 +6771,8 @@ var test_loadprefab = (function () {
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                name = "0000_GS_128";
-                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "attack_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                name = "gs_chuangjue_01";
+                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_idle_none.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                             if (s.isfinish) {
@@ -6692,7 +6784,12 @@ var test_loadprefab = (function () {
                                 objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
                                 objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
                                 objCam.markDirty();
-                                _this.refreshAniclip(_this.baihu, "attack_01.FBAni.aniclip.bin");
+                                var ani = _this.baihu.gameObject.getComponent("aniplayer");
+                                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_chuangjue_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    if (s.isfinish) {
+                                        _this.refreshAniclip(_this.baihu, "chuangjue_01.FBAni.aniclip.bin");
+                                    }
+                                });
                             }
                         });
                     }

@@ -86,16 +86,12 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
 
-<<<<<<< HEAD
-        this.addBtn("test_drawMesh",()=>new test_drawMesh());
-        this.addBtn("cj_zs",()=>new dome.testCJ());
-        this.addBtn("test_eff",()=>new dome.db_test_eff());
-        
 
-
-=======
+        // this.addBtn("test_drawMesh",()=>new test_drawMesh());
+        // this.addBtn("cj_zs",()=>new dome.testCJ());
+        // this.addBtn("test_eff",()=>new dome.db_test_eff());
         this.addBtn("tesrtss",()=>new dome.testCJ());
->>>>>>> c5808e46ec098214016908d1d1f18543a50f0c4d
+
     }
     
     private x: number = 0;

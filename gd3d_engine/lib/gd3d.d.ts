@@ -214,6 +214,8 @@ declare namespace gd3d.framework {
         private pointEvent;
         private pointX;
         private pointY;
+        private lastWidth;
+        private lastHeight;
         update(delta: number, touch: Boolean, XOnScreenSpace: number, YOnScreenSpace: number): void;
         private lastMat;
         afterRender: Function;
@@ -473,14 +475,15 @@ declare namespace gd3d.framework {
         onPointEvent(canvas: canvas, ev: PointEvent): void;
         private readonly optionArr;
         private _layoutState;
-        setLayoutState(state: number): void;
+        layoutState: number;
         private layoutValueMap;
-        private lastLayoutVmap;
-        SetLayoutValue(option: layoutOption, value: number): void;
-        private percentModelMap;
-        SetLayoutPercentState(state: number): void;
-        private layoutMapInit();
+        setLayoutValue(option: layoutOption, value: number): void;
+        getLayoutValue(option: layoutOption): number;
+        private _layoutPercentState;
+        layoutPercentState: number;
         private layoutDirty;
+        private lastParentWidth;
+        private lastParentHeight;
         private refreshLayout();
         private getLayValue(opation);
     }
@@ -810,7 +813,7 @@ declare namespace gd3d.framework {
         totalLength: number;
         constructor(url: string);
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
-        parse(json: any): void;
+        parse(json: any, totalLength?: number): void;
         unload(): void;
         private curLoadState;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
@@ -1316,6 +1319,10 @@ declare namespace gd3d.framework {
         glMesh: gd3d.render.glMesh;
         data: gd3d.render.meshData;
         submesh: subMeshInfo[];
+        onReadFinish: () => void;
+        private reading;
+        private readProcess(read, data, objVF, vcount, vec10tpose, callback);
+        private readFinish(read, data, buf, objVF, webgl);
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): void;
         intersects(ray: ray, matrix: gd3d.math.matrix): pickinfo;
         clone(): mesh;
