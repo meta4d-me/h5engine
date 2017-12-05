@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000038";
+                this.build = "b000041";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -5554,7 +5554,7 @@ var PvrParse = (function () {
         this.version = tool.readUInt32();
         if (this.version === 0x03525650) {
             this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
-            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
             var tex = this.parseV3(tool);
             tool.dispose();
             return tex;

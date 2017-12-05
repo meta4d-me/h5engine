@@ -37,7 +37,7 @@ class PvrParse
         {
             //v3
             this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
-            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转
+            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);//不对Y翻转
             let tex = this.parseV3(tool);
             tool.dispose();
             return tex;
