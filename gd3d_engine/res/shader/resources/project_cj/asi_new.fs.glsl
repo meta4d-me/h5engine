@@ -15,7 +15,7 @@ varying highp vec3 normalDir;
 varying mediump vec3 lightDir;
 
 //varying lowp float light2dot;
-varying mediump	float angle;
+varying highp float angle;
 uniform lowp float _light2_area;
 uniform lowp float _Light2Rate;
 uniform mediump vec4 _Light2Color;
@@ -38,15 +38,15 @@ void main()
     lowp vec3 lightcolor=texture2D(_streamLight,streamligtuv).rgb;
     lightcolor=min(vec3(asmcolor.b),lightcolor)*_LightColor.rgb*_LightRate;
 
-    lowp vec3 lightDir=vec3(cos(angle)*-1.0,0.0,sin(angle)*-1.0);
+    highp vec3 lightDir=vec3(cos(angle)*-1.0,0.0,sin(angle)*-1.0);
     highp vec3 normalxz=normalize(vec3(normalDir.x,0,normalDir.z));
-    lowp vec3 lightcolor2=vec3(pow(max(dot(normalxz,lightDir),0.0),_light2_area))*_Light2Rate*_Light2Color.rgb;
+    highp vec3 lightcolor2=vec3(pow(max(dot(normalxz,lightDir),0.0),_light2_area))*_Light2Rate*_Light2Color.rgb;
     
-    lowp float angle3=angle*2.0+3.141592654;
-    lowp vec3 lightDir3=vec3(cos(angle3)*-8.0+6.0,0.0,pow(sin(angle3),2.0));
+    highp float angle3=angle*2.0+3.141592654;
+    highp vec3 lightDir3=vec3(cos(angle3)*-8.0+6.0,0.0,pow(sin(angle3),2.0));
     lightDir3=normalize(lightDir3);
-    lowp float showlight3=max(sin(angle),0.0);
-    lowp vec3 lightcolor3=pow(max(dot(normalxz,lightDir3),0.0),_light3_area)*_Light3Rate*_Light3Color.rgb*showlight3;
+    highp float showlight3=max(sin(angle),0.0);
+    highp vec3 lightcolor3=pow(max(dot(normalxz,lightDir3),0.0),_light3_area)*_Light3Rate*_Light3Color.rgb*showlight3;
 
     gl_FragData[0]=vec4(mainTexcolor+specColor+lightcolor+lightcolor2+lightcolor3,1.0);
     //gl_FragData[0]=vec4(normalxz,1.0);

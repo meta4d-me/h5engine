@@ -22,7 +22,7 @@ void main()
 	_base_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + _asm_ST.zw;
 	lowp vec2 _speed;
-    _speed = vec2(_speedu,_speedv);
+    _speed = vec2(_speedu,-_speedv);
     _light_uv = (_glesMultiTexCoord0.xy * _streamlight_ST.xy + _streamlight_ST.zw)  + _speed * glstate_timer;
 
 

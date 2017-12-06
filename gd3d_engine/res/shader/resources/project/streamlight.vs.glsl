@@ -16,7 +16,7 @@ void main()
     tmpvar_1.xyz = _glesVertex.xyz;
     xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;  
     lowp vec2 _speed;
-    _speed = vec2(_SpeedU,_SpeedV);
+    _speed = vec2(_SpeedU,-_SpeedV);
     _StreamLightUV = (_glesMultiTexCoord0.xy * _LightTex_ST.xy + _LightTex_ST.zw)  + _speed * glstate_timer;
     gl_Position = (glstate_matrix_mvp * tmpvar_1);
 }

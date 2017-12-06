@@ -80,10 +80,10 @@
                 new math.vector3(half, -half, 0)
             ]);
             meshData.addQuadVec2(data.uv, [
-                new math.vector2(0, 1),
                 new math.vector2(0, 0),
-                new math.vector2(1, 1),
-                new math.vector2(1, 0)
+                new math.vector2(0, 1),
+                new math.vector2(1, 0),
+                new math.vector2(1, 1)
             ]);
             meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
             return data;

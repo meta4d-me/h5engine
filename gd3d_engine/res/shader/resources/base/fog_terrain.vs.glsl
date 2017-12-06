@@ -39,7 +39,7 @@ void main()
         beforelightUV = _glesMultiTexCoord0.xy;
     }
     lowp float u = beforelightUV.x * glstate_lightmapOffset.x + glstate_lightmapOffset.z;
-    lowp float v = beforelightUV.y * glstate_lightmapOffset.y + glstate_lightmapOffset.w;
+    lowp float v = 1.0 - ((1.0 - beforelightUV.y) * glstate_lightmapOffset.y + glstate_lightmapOffset.w);
     xlv_TEXCOORD1 = vec2(u,v);
     
     highp vec4 pos = (glstate_matrix_mvp * tmpvar_1);
