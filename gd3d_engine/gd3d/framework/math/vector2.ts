@@ -46,7 +46,13 @@
         out.x = vector.x * (1 - v) + vector2.x * v;
         out.y = vector.y * (1 - v) + vector2.y * v;
     }
-
+    export function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4) {
+        out.x = vector.x * (1 - v) + vector2.x * v;
+        out.y = vector.y * (1 - v) + vector2.y * v;
+        out.z = vector.z * (1 - v) + vector2.z * v;
+        out.w = vector.w * (1 - v) + vector2.w * v;
+        
+    }
     export function vec2Normalize(from: vector2, out: vector2)
     {
         var num: number = vec2Length(from);

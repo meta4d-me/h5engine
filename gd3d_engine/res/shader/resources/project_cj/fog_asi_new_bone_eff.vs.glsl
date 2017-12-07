@@ -58,7 +58,7 @@ void main()
 {
 	_maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + _asm_ST.zw;
-	lowp vec2 _speed= vec2(_speedu,_speedv);
+	lowp vec2 _speed= vec2(_speedu,-_speedv);
     _light_uv = (_glesMultiTexCoord0.xy * _streamLight_ST.xy + _streamLight_ST.zw)  + _speed * glstate_timer;
 
  	lowp float angle=_lightAngleSpeed*glstate_timer;

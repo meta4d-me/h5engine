@@ -420,7 +420,7 @@ namespace gd3d.framework
 
                 let json = JSON.parse(txt);
                 this.bundlePackJson = json;
-                this.parse(json["bundleinfo"]);
+                this.parse(json["bundleinfo"], this.totalLength);
                 this.load(assetmgr, onstate, state);
 
                 assetmgr.mapBundle[this.name] = this;
@@ -439,7 +439,7 @@ namespace gd3d.framework
          * @param json 
          * @version egret-gd3d 1.0
          */
-        parse(json: any)
+        parse(json: any, totalLength:number = 0)
         {
             var files = json["files"];
             for (var i = 0; i < files.length; i++)
@@ -460,7 +460,9 @@ namespace gd3d.framework
             }else {
                 if (json["totalLength"] != undefined)
                 {
-                    this.totalLength = json["totalLength"];
+                    if (totalLength == 0){                       
+                        this.totalLength = json["totalLength"];
+                    }                   
                 }
             }            
         }
@@ -1606,6 +1608,9 @@ namespace gd3d.framework
                 let _lightmap = {};
                 _lightmap["name"] = lightmaps[str].getName();
                 _lightmaps.push(_lightmap);
+
+                let lightMapUrl = this.getAssetUrl(lightmaps[str]);
+                io.SerializeDependent.resourseDatas.push({ "url": lightMapUrl, "type": io.SaveAssetType.FullUrl });
             }
 
             _scene["rootNode"] = _rootNode;

@@ -1,17 +1,1 @@
-{
-    "shaderName":"Standard",
-    "_Color":"255,255,255,255",
-    "_Cutoff":0.5,
-    "_Glossiness":0.5,
-    "_GlossMapScale":1,
-    "_SmoothnessTextureChannel":0,
-    "_Metallic":0,
-    "_SpecularHighlights":1,
-    "_GlossyReflections":1,
-    "_BumpScale":1,
-    "_Parallax":0.0199999995529652,
-    "_OcclusionStrength":1,
-    "_EmissionColor":"0,0,0,254",
-    "_DetailNormalMapScale":1,
-    "_UVSec":0
-    }
+{"shader":"standard.shader.json","srcshader":"Standard","mapUniform":{"_Color":{"type":3,"value":"(1,1,1,1)"},"_MainTex":{},"_Cutoff":{"type":1,"value":0.5},"_Glossiness":{"type":1,"value":0.5},"_GlossMapScale":{"type":1,"value":1},"_SmoothnessTextureChannel":{"type":1,"value":0},"_Metallic":{"type":1,"value":0},"_MetallicGlossMap":{},"_SpecularHighlights":{"type":1,"value":1},"_GlossyReflections":{"type":1,"value":1},"_BumpScale":{"type":1,"value":1},"_BumpMap":{},"_Parallax":{"type":1,"value":0.0199999995529652},"_ParallaxMap":{},"_OcclusionStrength":{"type":1,"value":1},"_OcclusionMap":{},"_EmissionColor":{"type":3,"value":"(0,0,0,0.9999999)"},"_EmissionMap":{},"_DetailMask":{},"_DetailAlbedoMap":{},"_DetailNormalMapScale":{"type":1,"value":1},"_DetailNormalMap":{},"_UVSec":{"type":1,"value":0}}}

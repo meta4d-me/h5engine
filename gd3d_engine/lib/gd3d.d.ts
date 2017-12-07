@@ -214,6 +214,8 @@ declare namespace gd3d.framework {
         private pointEvent;
         private pointX;
         private pointY;
+        private lastWidth;
+        private lastHeight;
         update(delta: number, touch: Boolean, XOnScreenSpace: number, YOnScreenSpace: number): void;
         private lastMat;
         afterRender: Function;
@@ -382,6 +384,14 @@ declare namespace gd3d.math {
     }
 }
 declare namespace gd3d.framework {
+    enum layoutOption {
+        LEFT = 1,
+        TOP = 2,
+        RIGHT = 4,
+        BOTTOM = 8,
+        H_CENTER = 16,
+        V_CENTER = 32,
+    }
     interface I2DComponent {
         start(): any;
         update(delta: number): any;
@@ -463,6 +473,19 @@ declare namespace gd3d.framework {
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
         ContainsCanvasPoint(pworld: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
+        private readonly optionArr;
+        private _layoutState;
+        layoutState: number;
+        private layoutValueMap;
+        setLayoutValue(option: layoutOption, value: number): void;
+        getLayoutValue(option: layoutOption): number;
+        private _layoutPercentState;
+        layoutPercentState: number;
+        private layoutDirty;
+        private lastParentWidth;
+        private lastParentHeight;
+        private refreshLayout();
+        private getLayValue(opation);
     }
     class t2dInfo {
         pivot: math.vector2;
@@ -790,7 +813,7 @@ declare namespace gd3d.framework {
         totalLength: number;
         constructor(url: string);
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
-        parse(json: any): void;
+        parse(json: any, totalLength?: number): void;
         unload(): void;
         private curLoadState;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
@@ -1296,6 +1319,10 @@ declare namespace gd3d.framework {
         glMesh: gd3d.render.glMesh;
         data: gd3d.render.meshData;
         submesh: subMeshInfo[];
+        onReadFinish: () => void;
+        private reading;
+        private readProcess(read, data, objVF, vcount, vec10tpose, callback);
+        private readFinish(read, data, buf, objVF, webgl);
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): void;
         intersects(ray: ray, matrix: gd3d.math.matrix): pickinfo;
         clone(): mesh;

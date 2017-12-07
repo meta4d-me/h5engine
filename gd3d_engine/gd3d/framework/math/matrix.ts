@@ -580,10 +580,14 @@
 
         out.rawData[8] = out.rawData[9] = 0.0;
         out.rawData[10] = -zfar / (znear - zfar);
+        //out.rawData[10] = (zfar+znear) / (zfar - znear);//-1~1
+        //out.rawData[10] = 1/(zfar-znear);//0~1
         out.rawData[11] = 1.0;
 
         out.rawData[12] = out.rawData[13] = out.rawData[15] = 0.0;
         out.rawData[14] = (znear * zfar) / (znear - zfar);
+        //out.rawData[14] = 2*zfar*znear/(znear-zfar);
+        //out.rawData[14] =znear/(znear-zfar);
     }
     export function matrixProject_OrthoLH(width: number, height: number, znear: number, zfar: number, out: matrix)
     {
