@@ -56,7 +56,7 @@ namespace gd3d.framework
             }
             this.name = new constText(assetName);
             gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = render.UniformTypeEnum;
-            this.mapUniformTemp = {};
+            // this.mapUniformTemp = {};
         }
 
         /**
@@ -362,7 +362,7 @@ namespace gd3d.framework
         } = {};//参数
         private mapUniformTemp: {
             [id: string]: UniformData
-        };
+        }={};
         /**
          * @private
          */
@@ -648,7 +648,7 @@ namespace gd3d.framework
                             break;
                         case "glstate_fog_color":
                             this.setVector4(key, context.fog._Color);
-                            break;
+                            break; 
                     }
                 }
                 this.uploadUniform(pass);

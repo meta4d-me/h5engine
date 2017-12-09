@@ -35,9 +35,7 @@ class PvrParse
         this.version = tool.readUInt32();
         if (this.version === 0x03525650)
         {
-            //v3
-            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
-            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转
+
             let tex = this.parseV3(tool);
             tool.dispose();
             return tex;
@@ -56,6 +54,7 @@ class PvrParse
 
     private parseV3(tool: gd3d.io.binTool)
     {
+
         this.flags = tool.readUInt32();//0:没有设置  0x02 ：alpha预乘
         if (this.flags == 0)
             this.gl.pixelStorei(this.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);//开启预乘
@@ -114,6 +113,10 @@ class PvrParse
         var target = this.gl.TEXTURE_2D;
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP;
+
+                    //v3
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);//对齐方式
+        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL,0);//不对Y翻转
 
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(target, t2d.texture);

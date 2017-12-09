@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000038";
+                this.build = "b000041";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -934,6 +934,8 @@ var gd3d;
                 this.pointEvent = new framework.PointEvent();
                 this.pointX = 0;
                 this.pointY = 0;
+                this.lastWidth = 0;
+                this.lastHeight = 0;
                 this.lastMaskSta = -1;
                 this.pixelWidth = 640;
                 this.pixelHeight = 480;
@@ -963,8 +965,11 @@ var gd3d;
                 this.rootNode.localScale.y = -2 / this.pixelHeight;
                 this.rootNode.localTranslate.y = 1;
                 this.rootNode.localTranslate.x = -1;
-                this.rootNode.width = this.pixelWidth;
-                this.rootNode.height = this.pixelHeight;
+                if (this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight) {
+                    this.lastWidth = this.rootNode.width = this.pixelWidth;
+                    this.lastHeight = this.rootNode.height = this.pixelHeight;
+                    this.rootNode.markDirty();
+                }
                 this.rootNode.pivot.x = 0;
                 this.rootNode.pivot.y = 0;
                 this.rootNode.updateTran(false);
@@ -1402,7 +1407,9 @@ var gd3d;
                 outv2.x = sx;
                 outv2.y = sy;
                 var root = this.canvas.getRoot();
-                return this.dopick2d(outv2, root, tolerance);
+                var trans = this.dopick2d(outv2, root, tolerance);
+                gd3d.math.pool.delete_vector2(outv2);
+                return trans;
             };
             overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
@@ -1816,9 +1823,10 @@ var gd3d;
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
-                this.lastLayoutVmap = {};
-                this.percentModelMap = {};
+                this._layoutPercentState = 0;
                 this.layoutDirty = false;
+                this.lastParentWidth = 0;
+                this.lastParentHeight = 0;
             }
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
@@ -2002,13 +2010,11 @@ var gd3d;
             transform2D.prototype.updateTran = function (parentChange) {
                 if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                     return;
-                if (this.localTranslate.x == 10 && this.localTranslate.y == 200) {
-                    this;
-                }
                 if (this.dirty) {
                     gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
                 if (this.dirty || parentChange) {
+                    this.refreshLayout();
                     if (this.parent == null) {
                         gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
                     }
@@ -2296,69 +2302,115 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.setLayoutState = function (state) {
-                if (isNaN(state) || state == undefined)
-                    return;
-                this._layoutState = state;
-            };
-            transform2D.prototype.SetLayoutValue = function (option, value) {
+            Object.defineProperty(transform2D.prototype, "layoutState", {
+                get: function () {
+                    return this._layoutState;
+                },
+                set: function (state) {
+                    if (isNaN(state) || state == undefined)
+                        return;
+                    if (state != this._layoutState) {
+                        this.layoutDirty = true;
+                        this.markDirty();
+                        this._layoutState = state;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform2D.prototype.setLayoutValue = function (option, value) {
                 if (isNaN(option) || isNaN(value) || option == undefined || value == undefined)
                     return;
-                this.layoutValueMap[option] = value;
-            };
-            transform2D.prototype.SetLayoutPercentState = function (state) {
-                var _this = this;
-                if (isNaN(state) || state == undefined)
-                    return;
-                this.optionArr.forEach(function (option) {
-                    _this.percentModelMap[option] = (state & option) != 0;
-                });
-            };
-            transform2D.prototype.layoutMapInit = function () {
-                for (var i = 0; i < this.optionArr.length; i++) {
-                    var op = this.optionArr[i];
-                    this.layoutValueMap[op] = 0;
-                    this.lastLayoutVmap[op] = 0;
-                    this.percentModelMap[op] = false;
+                if (this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option]) {
+                    this.layoutDirty = true;
+                    this.markDirty();
+                    this.layoutValueMap[option] = value;
                 }
             };
+            transform2D.prototype.getLayoutValue = function (option) {
+                return this.layoutValueMap[option];
+            };
+            Object.defineProperty(transform2D.prototype, "layoutPercentState", {
+                get: function () {
+                    return this._layoutPercentState;
+                },
+                set: function (state) {
+                    if (isNaN(state) || state == undefined)
+                        return;
+                    if (state != this._layoutPercentState) {
+                        this.layoutDirty = true;
+                        this.markDirty();
+                        this._layoutPercentState = state;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform2D.prototype.refreshLayout = function () {
-                if (!this.layoutDirty)
-                    return;
                 var parent = this.parent;
                 if (!parent)
                     return;
+                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight)
+                    this.layoutDirty = true;
+                if (!this.layoutDirty)
+                    return;
+                console.error("refreshLayout : " + this.name);
                 var state = this._layoutState;
-                if (state & layoutOption.LEFT) {
-                    if (state & layoutOption.RIGHT) {
-                        this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                if (state != 0) {
+                    if (state & layoutOption.LEFT) {
+                        if (state & layoutOption.RIGHT) {
+                            this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                        }
+                        this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
                     }
-                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
-                }
-                else if (state & layoutOption.RIGHT) {
-                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
-                }
-                if (state & layoutOption.V_CENTER) {
-                    this.localTranslate.x = (parent.width - this.width) / 2;
-                }
-                if (state & layoutOption.TOP) {
-                    if (state & layoutOption.BOTTOM) {
-                        this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                    else if (state & layoutOption.RIGHT) {
+                        this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
                     }
-                    this.localTranslate.y = this.getLayValue(layoutOption.TOP);
-                }
-                else if (state & layoutOption.BOTTOM) {
-                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
-                }
-                if (state & layoutOption.H_CENTER) {
-                    this.localTranslate.y = (parent.width - this.width) / 2;
+                    if (state & layoutOption.H_CENTER) {
+                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER);
+                    }
+                    if (state & layoutOption.TOP) {
+                        if (state & layoutOption.BOTTOM) {
+                            this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                        }
+                        this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                    }
+                    else if (state & layoutOption.BOTTOM) {
+                        this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                    }
+                    if (state & layoutOption.V_CENTER) {
+                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER);
+                    }
+                    gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
                 this.layoutDirty = false;
+                this.lastParentWidth = this.parent.width;
+                this.lastParentHeight = this.parent.height;
             };
             transform2D.prototype.getLayValue = function (opation) {
                 if (this.layoutValueMap[opation] == undefined)
                     this.layoutValueMap[opation] = 0;
-                return this.layoutValueMap[opation];
+                var value = 0;
+                if (this._layoutPercentState & opation) {
+                    if (this.parent) {
+                        switch (opation) {
+                            case layoutOption.LEFT:
+                            case layoutOption.H_CENTER:
+                            case layoutOption.RIGHT:
+                                value = this.parent.width * this.layoutValueMap[opation];
+                                break;
+                            case layoutOption.TOP:
+                            case layoutOption.V_CENTER:
+                            case layoutOption.BOTTOM:
+                                value = this.parent.height * this.layoutValueMap[opation];
+                                break;
+                        }
+                    }
+                }
+                else {
+                    value = this.layoutValueMap[opation];
+                }
+                return value;
             };
             __decorate([
                 gd3d.reflect.Field("string"),
@@ -4559,7 +4611,7 @@ var gd3d;
                     }
                     var json = JSON.parse(txt);
                     _this.bundlePackJson = json;
-                    _this.parse(json["bundleinfo"]);
+                    _this.parse(json["bundleinfo"], _this.totalLength);
                     _this.load(assetmgr, onstate, state);
                     assetmgr.mapBundle[_this.name] = _this;
                 }, function (loadedLength, totalLength) {
@@ -4567,7 +4619,8 @@ var gd3d;
                     onstate(state);
                 });
             };
-            assetBundle.prototype.parse = function (json) {
+            assetBundle.prototype.parse = function (json, totalLength) {
+                if (totalLength === void 0) { totalLength = 0; }
                 var files = json["files"];
                 for (var i = 0; i < files.length; i++) {
                     var item = files[i];
@@ -4584,7 +4637,9 @@ var gd3d;
                 }
                 else {
                     if (json["totalLength"] != undefined) {
-                        this.totalLength = json["totalLength"];
+                        if (totalLength == 0) {
+                            this.totalLength = json["totalLength"];
+                        }
                     }
                 }
             };
@@ -5252,6 +5307,8 @@ var gd3d;
                     var _lightmap = {};
                     _lightmap["name"] = lightmaps[str].getName();
                     _lightmaps.push(_lightmap);
+                    var lightMapUrl = this.getAssetUrl(lightmaps[str]);
+                    gd3d.io.SerializeDependent.resourseDatas.push({ "url": lightMapUrl, "type": gd3d.io.SaveAssetType.FullUrl });
                 }
                 _scene["rootNode"] = _rootNode;
                 _scene["lightmap"] = _lightmaps;
@@ -5497,7 +5554,7 @@ var PvrParse = (function () {
         this.version = tool.readUInt32();
         if (this.version === 0x03525650) {
             this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
-            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
+            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
             var tex = this.parseV3(tool);
             tool.dispose();
             return tex;
@@ -6525,8 +6582,10 @@ var gd3d;
                     if (framework.AssetFactoryTools.catchError(err, onstate, state))
                         return;
                     var _mesh = asset ? asset : new framework.mesh(filename);
+                    _mesh.onReadFinish = function () {
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                    };
                     _mesh.Parse(_buffer, assetMgr.webgl);
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
@@ -6536,8 +6595,10 @@ var gd3d;
                 state.resstate[filename] = new framework.ResourceState();
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
+                _mesh.onReadFinish = function () {
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                };
                 _mesh.Parse(_buffer, assetMgr.webgl);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
             };
             return AssetFactory_Mesh;
         }());
@@ -8125,6 +8186,7 @@ var gd3d;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
                 this.submesh = [];
+                this.reading = false;
                 if (!assetName) {
                     assetName = "mesh_" + this.getGUID();
                 }
@@ -8160,154 +8222,158 @@ var gd3d;
                 }
                 return total;
             };
-            mesh.prototype.Parse = function (buf, webgl) {
-                var vf = 0;
-                var data = new gd3d.render.meshData();
-                var read = new gd3d.io.binReader(buf);
-                var meshName = read.readStringAnsi();
-                read.position = read.position + 24;
-                var vcount = read.readUInt32();
-                var vec10tpose = [];
-                while (true) {
-                    var tag = read.readUInt8();
-                    if (tag == 255)
-                        break;
-                    if (tag == 1) {
-                        if (data.pos == undefined) {
-                            data.pos = [];
-                            vf = vf | gd3d.render.VertexFormatMask.Position;
-                        }
-                        for (var i = 0; i < vcount; i++) {
-                            var _position = new gd3d.math.vector3();
-                            _position.x = read.readSingle();
-                            _position.y = read.readSingle();
-                            _position.z = read.readSingle();
-                            data.pos.push(_position);
-                        }
+            mesh.prototype.readProcess = function (read, data, objVF, vcount, vec10tpose, callback) {
+                var _this = this;
+                if (this.reading)
+                    return;
+                var tag = read.readUInt8();
+                if (tag == 255) {
+                    callback();
+                    return;
+                }
+                if (tag == 1) {
+                    if (data.pos == undefined) {
+                        data.pos = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Position;
                     }
-                    else if (tag == 2) {
-                        if (data.color == undefined) {
-                            data.color = [];
-                            vf = vf | gd3d.render.VertexFormatMask.Color;
-                        }
-                        for (var i = 0; i < vcount; i++) {
-                            var _color = new gd3d.math.color();
-                            _color.a = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
-                            _color.r = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
-                            _color.g = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
-                            _color.b = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
-                            data.color.push(_color);
-                        }
-                    }
-                    else if (tag == 3) {
-                        if (data.normal == undefined) {
-                            data.normal = [];
-                            vf = vf | gd3d.render.VertexFormatMask.Normal;
-                        }
-                        for (var i = 0; i < vcount; i++) {
-                            var _normal = new gd3d.math.vector3();
-                            _normal.x = read.readSingle();
-                            _normal.y = read.readSingle();
-                            _normal.z = read.readSingle();
-                            data.normal.push(_normal);
-                        }
-                    }
-                    else if (tag == 4) {
-                        if (data.uv == undefined) {
-                            data.uv = [];
-                            vf = vf | gd3d.render.VertexFormatMask.UV0;
-                        }
-                        for (var i = 0; i < vcount; i++) {
-                            var uv = new gd3d.math.vector2();
-                            uv.x = read.readSingle();
-                            uv.y = 1 - read.readSingle();
-                            data.uv.push(uv);
-                        }
-                    }
-                    else if (tag == 5) {
-                        if (data.uv2 == undefined) {
-                            data.uv2 = [];
-                            vf = vf | gd3d.render.VertexFormatMask.UV1;
-                        }
-                        for (var i = 0; i < vcount; i++) {
-                            var uv = new gd3d.math.vector2();
-                            uv.x = read.readSingle();
-                            uv.y = 1 - read.readSingle();
-                            data.uv2.push(uv);
-                        }
-                    }
-                    else if (tag == 6) {
-                        for (var i = 0; i < vcount; i++) {
-                            read.readSingle();
-                            1 - read.readSingle();
-                        }
-                    }
-                    else if (tag == 7) {
-                        if (data.tangent == undefined) {
-                            data.tangent = [];
-                            vf = vf | gd3d.render.VertexFormatMask.Tangent;
-                        }
-                        for (var i = 0; i < vcount; i++) {
-                            var tangent = new gd3d.math.vector3();
-                            var x = read.readSingle();
-                            var y = read.readSingle();
-                            var z = read.readSingle();
-                            var w = read.readSingle();
-                            tangent.x = x / w;
-                            tangent.y = y / w;
-                            tangent.z = z / w;
-                            data.tangent.push(tangent);
-                        }
-                    }
-                    else if (tag == 8) {
-                        for (var i = 0; i < vcount; i++) {
-                            read.readSingle();
-                            1 - read.readSingle();
-                        }
-                    }
-                    else if (tag == 16) {
-                        var tposelen = read.readUInt8();
-                        for (var i = 0; i < tposelen; i++) {
-                            vec10tpose[i * 10 + 0] = read.readSingle();
-                            vec10tpose[i * 10 + 1] = read.readSingle();
-                            vec10tpose[i * 10 + 2] = read.readSingle();
-                            vec10tpose[i * 10 + 3] = read.readSingle();
-                            vec10tpose[i * 10 + 4] = read.readSingle();
-                            vec10tpose[i * 10 + 5] = read.readSingle();
-                            vec10tpose[i * 10 + 6] = read.readSingle();
-                            vec10tpose[i * 10 + 7] = read.readSingle();
-                            vec10tpose[i * 10 + 8] = read.readSingle();
-                            vec10tpose[i * 10 + 9] = read.readSingle();
-                        }
-                    }
-                    else if (tag == 17) {
-                        if (data.blendIndex == undefined) {
-                            data.blendIndex = [];
-                            vf = vf | gd3d.render.VertexFormatMask.BlendIndex4;
-                        }
-                        if (data.blendWeight == undefined) {
-                            data.blendWeight = [];
-                            vf = vf | gd3d.render.VertexFormatMask.BlendWeight4;
-                        }
-                        for (var i = 0; i < vcount; i++) {
-                            var _boneIndex = new gd3d.render.number4();
-                            _boneIndex.v0 = read.readUInt32();
-                            _boneIndex.v1 = read.readUInt32();
-                            _boneIndex.v2 = read.readUInt32();
-                            _boneIndex.v3 = read.readUInt32();
-                            var _boneWeight = new gd3d.render.number4();
-                            _boneWeight.v0 = read.readSingle();
-                            _boneWeight.v1 = read.readSingle();
-                            _boneWeight.v2 = read.readSingle();
-                            _boneWeight.v3 = read.readSingle();
-                            data.blendIndex.push(_boneIndex);
-                            data.blendWeight.push(_boneWeight);
-                        }
-                    }
-                    else {
-                        throw "notwrite" + tag;
+                    for (var i = 0; i < vcount; i++) {
+                        var _position = new gd3d.math.vector3();
+                        _position.x = read.readSingle();
+                        _position.y = read.readSingle();
+                        _position.z = read.readSingle();
+                        data.pos.push(_position);
                     }
                 }
+                else if (tag == 2) {
+                    if (data.color == undefined) {
+                        data.color = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Color;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var _color = new gd3d.math.color();
+                        _color.a = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        _color.r = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        _color.g = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        _color.b = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        data.color.push(_color);
+                    }
+                }
+                else if (tag == 3) {
+                    if (data.normal == undefined) {
+                        data.normal = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Normal;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var _normal = new gd3d.math.vector3();
+                        _normal.x = read.readSingle();
+                        _normal.y = read.readSingle();
+                        _normal.z = read.readSingle();
+                        data.normal.push(_normal);
+                    }
+                }
+                else if (tag == 4) {
+                    if (data.uv == undefined) {
+                        data.uv = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.UV0;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var uv = new gd3d.math.vector2();
+                        uv.x = read.readSingle();
+                        uv.y = read.readSingle();
+                        data.uv.push(uv);
+                    }
+                }
+                else if (tag == 5) {
+                    if (data.uv2 == undefined) {
+                        data.uv2 = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.UV1;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var uv = new gd3d.math.vector2();
+                        uv.x = read.readSingle();
+                        uv.y = read.readSingle();
+                        data.uv2.push(uv);
+                    }
+                }
+                else if (tag == 6) {
+                    for (var i = 0; i < vcount; i++) {
+                        read.readSingle();
+                        1 - read.readSingle();
+                    }
+                }
+                else if (tag == 7) {
+                    if (data.tangent == undefined) {
+                        data.tangent = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Tangent;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var tangent = new gd3d.math.vector3();
+                        var x = read.readSingle();
+                        var y = read.readSingle();
+                        var z = read.readSingle();
+                        var w = read.readSingle();
+                        tangent.x = x / w;
+                        tangent.y = y / w;
+                        tangent.z = z / w;
+                        data.tangent.push(tangent);
+                    }
+                }
+                else if (tag == 8) {
+                    for (var i = 0; i < vcount; i++) {
+                        read.readSingle();
+                        1 - read.readSingle();
+                    }
+                }
+                else if (tag == 16) {
+                    var tposelen = read.readUInt8();
+                    for (var i = 0; i < tposelen; i++) {
+                        vec10tpose[i * 10 + 0] = read.readSingle();
+                        vec10tpose[i * 10 + 1] = read.readSingle();
+                        vec10tpose[i * 10 + 2] = read.readSingle();
+                        vec10tpose[i * 10 + 3] = read.readSingle();
+                        vec10tpose[i * 10 + 4] = read.readSingle();
+                        vec10tpose[i * 10 + 5] = read.readSingle();
+                        vec10tpose[i * 10 + 6] = read.readSingle();
+                        vec10tpose[i * 10 + 7] = read.readSingle();
+                        vec10tpose[i * 10 + 8] = read.readSingle();
+                        vec10tpose[i * 10 + 9] = read.readSingle();
+                    }
+                }
+                else if (tag == 17) {
+                    if (data.blendIndex == undefined) {
+                        data.blendIndex = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.BlendIndex4;
+                    }
+                    if (data.blendWeight == undefined) {
+                        data.blendWeight = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.BlendWeight4;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var _boneIndex = new gd3d.render.number4();
+                        _boneIndex.v0 = read.readUInt32();
+                        _boneIndex.v1 = read.readUInt32();
+                        _boneIndex.v2 = read.readUInt32();
+                        _boneIndex.v3 = read.readUInt32();
+                        var _boneWeight = new gd3d.render.number4();
+                        _boneWeight.v0 = read.readSingle();
+                        _boneWeight.v1 = read.readSingle();
+                        _boneWeight.v2 = read.readSingle();
+                        _boneWeight.v3 = read.readSingle();
+                        data.blendIndex.push(_boneIndex);
+                        data.blendWeight.push(_boneWeight);
+                    }
+                }
+                else {
+                    throw "notwrite" + tag;
+                }
+                this.reading = false;
+                setTimeout(function () {
+                    _this.readProcess(read, data, objVF, vcount, vec10tpose, function () {
+                        callback();
+                    });
+                });
+            };
+            mesh.prototype.readFinish = function (read, data, buf, objVF, webgl) {
                 var subcount = read.readUInt8();
                 data.trisindex = [];
                 this.submesh = [];
@@ -8325,15 +8391,29 @@ var gd3d;
                     }
                 }
                 buf = null;
-                data.originVF = vf;
+                data.originVF = objVF.vf;
                 this.data = data;
                 this.glMesh = new gd3d.render.glMesh();
-                var vertexs = this.data.genVertexDataArray(vf);
+                var vertexs = this.data.genVertexDataArray(objVF.vf);
                 var indices = this.data.genIndexDataArray();
-                this.glMesh.initBuffer(webgl, vf, this.data.pos.length);
+                this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
                 this.glMesh.uploadVertexData(webgl, vertexs);
                 this.glMesh.addIndex(webgl, indices.length);
                 this.glMesh.uploadIndexData(webgl, 0, indices);
+                this.onReadFinish();
+            };
+            mesh.prototype.Parse = function (buf, webgl) {
+                var _this = this;
+                var objVF = { vf: 0 };
+                var data = new gd3d.render.meshData();
+                var read = new gd3d.io.binReader(buf);
+                var meshName = read.readStringAnsi();
+                read.position = read.position + 24;
+                var vcount = read.readUInt32();
+                var vec10tpose = [];
+                this.readProcess(read, data, objVF, vcount, vec10tpose, function () {
+                    _this.readFinish(read, data, buf, objVF, webgl);
+                });
             };
             mesh.prototype.intersects = function (ray, matrix) {
                 var pickinfo = null;
@@ -14612,7 +14692,11 @@ var gd3d;
             }
             referenceInfo.oldmap = {};
             deSerializeObj(serializedObj["value"], instanceObj, assetMgr, bundlename);
-            referenceInfo.oldmap[serializedObj["insid"]] = instanceObj;
+            var insid = serializedObj["insid"];
+            if (!insid) {
+            }
+            else
+                referenceInfo.oldmap[insid] = instanceObj;
             fillReference(serializedObj["value"], instanceObj);
         }
         io.deSerialize = deSerialize;
@@ -14892,7 +14976,11 @@ var gd3d;
                             instanceObj[key] = _newInstance;
                     }
                     deSerializeObj(serializedObj[key].value, _newInstance, assetMgr, bundlename);
-                    referenceInfo.oldmap[serializedObj[key].insid] = _newInstance;
+                    var insid = serializedObj[key].insid;
+                    if (!insid) {
+                    }
+                    else
+                        referenceInfo.oldmap[insid] = _newInstance;
                 }
             }
         }
@@ -24338,17 +24426,19 @@ var gd3d;
                 return value.toString();
             };
             WebGLDebugUtils.prototype.makeDebugContext = function (ctx, opt_onErrorFunc) {
+                var _this = this;
                 if (opt_onErrorFunc === void 0) { opt_onErrorFunc = null; }
                 this.init(ctx);
-                opt_onErrorFunc = opt_onErrorFunc || function (err, functionName, args) {
-                    var argStr = "";
-                    for (var ii = 0; ii < args.length; ++ii) {
-                        argStr += ((ii == 0) ? '' : ', ') +
-                            this.glFunctionArgToString(functionName, ii, args[ii]);
-                    }
-                    this.log("WebGL error " + this.glEnumToString(err) + " in " + functionName +
-                        "(" + argStr + ")");
-                };
+                opt_onErrorFunc = opt_onErrorFunc ||
+                    (function (err, functionName, args) {
+                        var argStr = "";
+                        for (var ii = 0; ii < args.length; ++ii) {
+                            argStr += ((ii == 0) ? '' : ', ') +
+                                _this.glFunctionArgToString(functionName, ii, args[ii]);
+                        }
+                        console.error("WebGL error " + _this.glEnumToString(err) + " in " + functionName +
+                            "(" + argStr + ")");
+                    });
                 var glErrorShadow = {};
                 function makeErrorWrapper(ctx, functionName) {
                     return function () {
@@ -27285,7 +27375,7 @@ var gd3d;
                 this.mipmap = mipmap;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
@@ -27346,7 +27436,7 @@ var gd3d;
                 this.mipmap = mipmap;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
