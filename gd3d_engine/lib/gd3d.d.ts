@@ -1658,6 +1658,31 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class bloomctr implements INodeComponent {
+        private _bloomIntensity;
+        private _bloomThreshold;
+        private _blurSpread;
+        bloomThreshold: number;
+        bloomIntensity: number;
+        blurSpread: number;
+        private app;
+        private scene;
+        private camera;
+        private material;
+        private material_1;
+        private material_2;
+        private material_3;
+        private readonly tag;
+        gameObject: gameObject;
+        private _init;
+        private init();
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     interface ICollider {
         gameObject: gameObject;
         subTran: transform;

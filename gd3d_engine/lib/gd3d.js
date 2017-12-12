@@ -10065,6 +10065,204 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var bloomctr = (function () {
+            function bloomctr() {
+                this._bloomIntensity = 1.4;
+                this._bloomThreshold = 0.5;
+                this._blurSpread = 3;
+                this.tag = "__bloomtag__";
+                this._init = false;
+            }
+            Object.defineProperty(bloomctr.prototype, "bloomThreshold", {
+                get: function () { return this._bloomThreshold; },
+                set: function (value) {
+                    this._bloomThreshold = value;
+                    if (!this.material || !this.material_1 || !this.material_2)
+                        return;
+                    this.material.setFloat("_bloomThreshold", this._bloomThreshold);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(bloomctr.prototype, "bloomIntensity", {
+                get: function () { return this._bloomIntensity; },
+                set: function (value) {
+                    this._bloomIntensity = value;
+                    if (!this.material || !this.material_3)
+                        return;
+                    this.material_3.setFloat("_bloomIntensity", this._bloomIntensity);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(bloomctr.prototype, "blurSpread", {
+                get: function () { return this._blurSpread; },
+                set: function (value) {
+                    this._blurSpread = value;
+                    if (!this.material_1 || !this.material_2)
+                        return;
+                    var v4_1 = gd3d.math.pool.new_vector4();
+                    var v4_2 = gd3d.math.pool.new_vector4();
+                    v4_1.x = value;
+                    v4_1.y = 0;
+                    v4_2.x = 0;
+                    v4_2.y = value;
+                    this.material_1.setVector4("_blurSpread", v4_1);
+                    this.material_2.setVector4("_blurSpread", v4_2);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            bloomctr.prototype.init = function () {
+                var sh = this.scene.app.getAssetMgr().getShader("bloom.shader.json");
+                if (!sh) {
+                    console.warn("bloom.shader.json not find");
+                    return;
+                }
+                var psize = 1024;
+                var color = new framework.cameraPostQueue_Color();
+                color[this.tag] = true;
+                color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                if (!this.camera.postQueues)
+                    this.camera.postQueues = [];
+                this.camera.postQueues.push(color);
+                var textcolor = new framework.texture("_color");
+                textcolor.glTexture = color.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                post0[this.tag] = true;
+                this.material = post0.material;
+                this.material.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", textcolor);
+                post0.material.setTexture("_BlurTex", textcolor);
+                post0.material.setFloat("_bloomIntensity", 1.2);
+                post0.material.setFloat("_bloomThreshold", this._bloomThreshold);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(0, 0, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                var threTex = new framework.texture("_threshold");
+                threTex.glTexture = post0.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                post0[this.tag] = true;
+                this.material_1 = post0.material;
+                this.material_1.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", threTex);
+                post0.material.setTexture("_BlurTex", threTex);
+                post0.material.setFloat("_bloomIntensity", this._bloomIntensity);
+                post0.material.setFloat("_bloomThreshold", 1.0);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(this._blurSpread, 0, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                var hBlur = new framework.texture("_blur0");
+                hBlur.glTexture = post0.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                post0[this.tag] = true;
+                this.material_2 = post0.material;
+                this.material_2.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", hBlur);
+                post0.material.setTexture("_BlurTex", hBlur);
+                post0.material.setFloat("_bloomIntensity", this._bloomIntensity);
+                post0.material.setFloat("_bloomThreshold", 1.0);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(0, this._blurSpread, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                var hvBlur = new framework.texture("_blur1");
+                hvBlur.glTexture = post0.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0[this.tag] = true;
+                this.material_3 = post0.material;
+                post0.material.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", textcolor);
+                post0.material.setTexture("_BlurTex", hvBlur);
+                post0.material.setFloat("_bloomIntensity", this._bloomIntensity);
+                post0.material.setFloat("_bloomThreshold", 0.5);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(0.5, 0.5, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                this._init = true;
+            };
+            bloomctr.prototype.start = function () {
+                this.app = this.gameObject.transform.scene.app;
+                this.scene = this.app.getScene();
+            };
+            bloomctr.prototype.update = function (delta) {
+                if (this._init)
+                    return;
+                if (!this.camera)
+                    this.camera = this.gameObject.getComponent("camera");
+                if (this.camera)
+                    this.init();
+            };
+            bloomctr.prototype.remove = function () {
+                this._init = false;
+                if (this.camera) {
+                    var arr_3 = this.camera.postQueues;
+                    var dArr = [];
+                    for (var i = 0; i < arr_3.length; i++) {
+                        var temp = arr_3[i];
+                        if (temp[this.tag]) {
+                            dArr.push(temp);
+                        }
+                    }
+                    dArr.forEach(function (element) {
+                        if (element) {
+                            var idx = arr_3.indexOf(element);
+                            if (idx != -1) {
+                                arr_3.splice(idx, 1);
+                            }
+                        }
+                    });
+                }
+                if (this.material) {
+                    this.material.unuse();
+                    this.material = null;
+                }
+                if (this.material_1) {
+                    this.material_1.unuse();
+                    this.material_1 = null;
+                }
+                if (this.material_2) {
+                    this.material_2.unuse();
+                    this.material_2 = null;
+                }
+                if (this.material_3) {
+                    this.material_3.unuse();
+                    this.material_3 = null;
+                }
+            };
+            bloomctr.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], bloomctr.prototype, "bloomThreshold", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], bloomctr.prototype, "bloomIntensity", null);
+            bloomctr = __decorate([
+                gd3d.reflect.nodeComponent
+            ], bloomctr);
+            return bloomctr;
+        }());
+        framework.bloomctr = bloomctr;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var boxcollider = (function () {
             function boxcollider() {
                 this._colliderVisible = false;
