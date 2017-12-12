@@ -5004,15 +5004,15 @@ var gd3d;
                     }
                 }
                 this.mapRes[id].refcount++;
-                if (this.mapRes[id]["_AssetLoingTag_"]) {
-                    delete this.mapRes[id]["_AssetLoingTag_"];
+                if (this.mapRes[id][this._loadingTag]) {
+                    delete this.mapRes[id][this._loadingTag];
                 }
             };
             assetMgr.prototype.regRes = function (name, asset) {
                 var id = asset.getGUID();
                 if (this.mapRes[id] == null) {
                     this.mapRes[id] = { asset: asset, refcount: 0 };
-                    this.mapRes[id]["_AssetLoingTag_"] = true;
+                    this.mapRes[id][this._loadingTag] = true;
                     if (name != null) {
                         if (this.mapNamed[name] == null)
                             this.mapNamed[name] = [];
@@ -5023,6 +5023,8 @@ var gd3d;
             assetMgr.prototype.releaseUnuseAsset = function () {
                 for (var k in this.mapRes) {
                     if (this.mapRes[k].refcount <= 0) {
+                        if (!this.mapRes[k][this._loadingTag])
+                            continue;
                         var name_1 = this.mapRes[k].asset.getName();
                         if (this.mapNamed[name_1].length <= 1) {
                             delete this.mapNamed[name_1];
