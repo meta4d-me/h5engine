@@ -498,6 +498,9 @@ namespace gd3d.framework
          */
         remove()
         {
+            this.materials.forEach(element=>{
+                if(element) element.unuse();
+            });
             if (this.mesh)
                 this.mesh.unuse(true);
             this.bones.length = 0;

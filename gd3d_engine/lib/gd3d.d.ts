@@ -857,6 +857,7 @@ declare namespace gd3d.framework {
         getAssetBundle(bundlename: string): assetBundle;
         unuse(res: IAsset, disposeNow?: boolean): void;
         use(res: IAsset): void;
+        private readonly _loadingTag;
         regRes(name: string, asset: IAsset): void;
         releaseUnuseAsset(): void;
         getAssetsRefcount(): {
@@ -2550,6 +2551,7 @@ declare namespace gd3d.math {
     function vec4Clone(from: vector4, to: vector4): void;
     function vec2Length(a: vector2): number;
     function vec2SLerp(vector: vector2, vector2: vector2, v: number, out: vector2): void;
+    function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
     function vec2Normalize(from: vector2, out: vector2): void;
     function vec2Multiply(a: vector2, b: vector2): number;
     function vec2Equal(vector: vector2, vector2: vector2, threshold?: number): boolean;

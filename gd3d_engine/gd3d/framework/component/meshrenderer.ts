@@ -127,7 +127,9 @@ namespace gd3d.framework
             if (this.materials == null || this.materials.length == 0)
             {
                 this.materials = [];
-                this.materials.push(new framework.material());
+                let material = new framework.material();
+                material.use();
+                this.materials.push(material);
                 this.materials[0].setShader(sceneMgr.app.getAssetMgr().getShader("shader/def"));
             }
 
@@ -210,6 +212,9 @@ namespace gd3d.framework
          */
         remove()
         {
+            this.materials.forEach(element=>{
+                if(element) element.unuse();                
+            });
             this.materials.length=0;
         }
          /**

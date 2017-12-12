@@ -490,10 +490,15 @@ namespace gd3d.framework
          * @private
          */
         remove()
-        {
+        {   
+            this.clips.forEach(temp =>{
+                if(temp) temp.unuse();
+            });
+
             this.clips.length = 0;
             this.bones.length = 0;
             this.startPos.length = 0;
+            this._playClip = null;
             delete this.tpose;
             delete this.nowpose;
             delete this.lerppose;

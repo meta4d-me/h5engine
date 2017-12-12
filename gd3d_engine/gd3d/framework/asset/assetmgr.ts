@@ -975,8 +975,10 @@ namespace gd3d.framework
         getAssetByName(name: string, bundlename: string = null): IAsset
         {
             let id = null;
-            if (this.mapNamed[name] != null)
-                id = this.mapNamed[name][0];
+            if (this.mapNamed[name] != null){
+                //id = this.mapNamed[name][0];
+                id = this.mapNamed[name][this.mapNamed[name].length -1];
+            }
             if (bundlename != null)
             {
                 let assetbundle = this.mapBundle[bundlename] as assetBundle;
@@ -1032,6 +1034,8 @@ namespace gd3d.framework
             {
                 return;
             }
+            if(!this.mapRes[id]) return;
+
             this.mapRes[id].refcount--;
             if (disposeNow && this.mapRes[id].refcount <= 0)
             {
@@ -1087,13 +1091,19 @@ namespace gd3d.framework
                 }
             }
             this.mapRes[id].refcount++;
+            if(this.mapRes[id][this._loadingTag]){
+                delete this.mapRes[id][this._loadingTag];
+            }
         }
+        private readonly _loadingTag = "_AssetLoingTag_";
+
         regRes(name: string, asset: IAsset)
         {
             let id = asset.getGUID();
             if (this.mapRes[id] == null)
             {
                 this.mapRes[id] = { asset: asset, refcount: 0 };
+                this.mapRes[id][this._loadingTag] = true; //没加载完之前 标记一下防止被清理
                 if (name != null)
                 {
                     if (this.mapNamed[name] == null)
@@ -1115,6 +1125,8 @@ namespace gd3d.framework
             {
                 if (this.mapRes[k].refcount <= 0)
                 {
+                    if(!this.mapRes[k][this._loadingTag])continue;
+                    
                     let name = this.mapRes[k].asset.getName();
                     if (this.mapNamed[name].length <= 1)
                     {
