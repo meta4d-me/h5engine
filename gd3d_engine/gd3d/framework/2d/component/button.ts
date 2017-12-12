@@ -57,6 +57,12 @@ namespace gd3d.framework
 
         private _originalColor: math.color;
         private _originalSprite: sprite;
+        @gd3d.reflect.Field("string")
+        private _origianlSpriteName:string ="";
+        @gd3d.reflect.Field("string")
+        private _pressedSpriteName:string ="";
+
+
         private _targetImage: image2D;
         /**
          * @public
@@ -65,6 +71,7 @@ namespace gd3d.framework
          * 默认显示图像
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("reference")
         get targetImage()
         {
             return this._targetImage;
@@ -79,6 +86,8 @@ namespace gd3d.framework
             {
                 this._originalColor = graphic.color;
                 this._originalSprite = graphic.sprite;
+                if(graphic.sprite)
+                    this._origianlSpriteName = graphic.sprite.getName();
                 if (this._transition = TransitionType.ColorTint)
                 {
                     graphic.color = this.normalColor;
@@ -107,6 +116,9 @@ namespace gd3d.framework
         set pressedGraphic(sprite: sprite)
         {
             this._pressedSprite = sprite;
+            if(sprite != null){
+                this._pressedSpriteName = sprite.getName();
+            }
         }
 
         private _normalColor: math.color = new math.color(1, 1, 1, 1);
@@ -118,6 +130,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("color")
+        @reflect.UIStyle("color")
         get normalColor()
         {
             return this._normalColor;
@@ -139,6 +152,8 @@ namespace gd3d.framework
          * 按下后的颜色
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("color")
+        @reflect.UIStyle("color")
         get pressedColor()
         {
             return this._pressedColor;
@@ -273,10 +288,14 @@ namespace gd3d.framework
             }
             else if (this.transition == TransitionType.SpriteSwap)
             {
+                if(!this._originalSprite){
+                    this._originalSprite = this.tryGetSprite(this._origianlSpriteName);
+                }
                 this.changeSprite(this._originalSprite);
             }
         }
 
+        
         /**
          * @private
          */
@@ -291,7 +310,18 @@ namespace gd3d.framework
                 if (this._targetImage != null && this._targetImage.sprite != null && this._originalSprite == null){
                     this._originalSprite = this._targetImage.sprite;
                 }
+                if(!this._pressedSprite){
+                    this._pressedSprite = this.tryGetSprite(this._pressedSpriteName);
+                }
                 this.changeSprite(this._pressedSprite);
+            }
+        }
+
+        private tryGetSprite(spriteName:string){
+            let temp = this.transform.canvas.assetmgr.mapNamed[spriteName];
+            if(temp != null){
+                let tsprite = this.transform.canvas.assetmgr.getAssetByName(spriteName) as gd3d.framework.sprite;
+                if(tsprite)   return tsprite;
             }
         }
 

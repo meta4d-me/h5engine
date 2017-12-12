@@ -214,6 +214,8 @@ declare namespace gd3d.framework {
         private pointEvent;
         private pointX;
         private pointY;
+        private lastWidth;
+        private lastHeight;
         update(delta: number, touch: Boolean, XOnScreenSpace: number, YOnScreenSpace: number): void;
         private lastMat;
         afterRender: Function;
@@ -473,14 +475,15 @@ declare namespace gd3d.framework {
         onPointEvent(canvas: canvas, ev: PointEvent): void;
         private readonly optionArr;
         private _layoutState;
-        setLayoutState(state: number): void;
+        layoutState: number;
         private layoutValueMap;
-        private lastLayoutVmap;
-        SetLayoutValue(option: layoutOption, value: number): void;
-        private percentModelMap;
-        SetLayoutPercentState(state: number): void;
-        private layoutMapInit();
+        setLayoutValue(option: layoutOption, value: number): void;
+        getLayoutValue(option: layoutOption): number;
+        private _layoutPercentState;
+        layoutPercentState: number;
         private layoutDirty;
+        private lastParentWidth;
+        private lastParentHeight;
         private refreshLayout();
         private getLayValue(opation);
     }
@@ -504,6 +507,8 @@ declare namespace gd3d.framework {
         transition: TransitionType;
         private _originalColor;
         private _originalSprite;
+        private _origianlSpriteName;
+        private _pressedSpriteName;
         private _targetImage;
         targetImage: image2D;
         private _pressedSprite;
@@ -526,6 +531,7 @@ declare namespace gd3d.framework {
         private _dragOut;
         private showNormal();
         private showPress();
+        private tryGetSprite(spriteName);
         private changeColor(targetColor);
         private changeSprite(sprite);
     }
@@ -546,13 +552,14 @@ declare namespace gd3d.framework {
         fillMethod: FillMethod;
         private _fillAmmount;
         fillAmmount: number;
+        transform: transform2D;
         setTexture(texture: texture, border?: math.border, rect?: math.rect): void;
         sprite: sprite;
+        private _spriteName;
         render(canvas: canvas): void;
         private _cacheMaskV4;
         start(): void;
         update(delta: number): void;
-        transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private prepareData();
@@ -586,7 +593,7 @@ declare namespace gd3d.framework {
         private beFocus;
         private inputElement;
         private _text;
-        text: string;
+        readonly text: string;
         myLineType: lineType;
         myContentType: contentType;
         private _textLable;
@@ -626,7 +633,8 @@ declare namespace gd3d.framework {
         text: string;
         private _font;
         font: font;
-        private needRefreshImg;
+        private needRefreshFont;
+        private _fontName;
         private _fontsize;
         fontsize: number;
         linespace: number;

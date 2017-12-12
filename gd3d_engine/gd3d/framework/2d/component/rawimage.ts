@@ -23,7 +23,7 @@ namespace gd3d.framework
             0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
             0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
         ];
-        @gd3d.reflect.Field("texture")
+        
         private _image: texture;
 
         private needRefreshImg = false;
@@ -34,6 +34,7 @@ namespace gd3d.framework
          * 图片
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("texture")
         public get image()
         {
             return this._image;

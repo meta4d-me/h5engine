@@ -206,8 +206,10 @@ namespace gd3d.framework
                 //事件走的是flash U型圈
                 if (!skip)
                 {
-                    this.rootNode.onCapturePointEvent(this, this.pointEvent);
-                    this.rootNode.onPointEvent(this, this.pointEvent);
+                    if(this.scene.app.bePlay){
+                        this.rootNode.onCapturePointEvent(this, this.pointEvent);
+                        this.rootNode.onPointEvent(this, this.pointEvent);
+                    }
                     this.pointSelect = this.pointEvent.selected;//选中了啥，同步回来
                     this.pointDown = touch;
                     this.pointX = this.pointEvent.x;

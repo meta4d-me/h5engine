@@ -934,6 +934,8 @@ var gd3d;
                 this.pointEvent = new framework.PointEvent();
                 this.pointX = 0;
                 this.pointY = 0;
+                this.lastWidth = 0;
+                this.lastHeight = 0;
                 this.lastMaskSta = -1;
                 this.pixelWidth = 640;
                 this.pixelHeight = 480;
@@ -963,8 +965,11 @@ var gd3d;
                 this.rootNode.localScale.y = -2 / this.pixelHeight;
                 this.rootNode.localTranslate.y = 1;
                 this.rootNode.localTranslate.x = -1;
-                this.rootNode.width = this.pixelWidth;
-                this.rootNode.height = this.pixelHeight;
+                if (this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight) {
+                    this.lastWidth = this.rootNode.width = this.pixelWidth;
+                    this.lastHeight = this.rootNode.height = this.pixelHeight;
+                    this.rootNode.markDirty();
+                }
                 this.rootNode.pivot.x = 0;
                 this.rootNode.pivot.y = 0;
                 this.rootNode.updateTran(false);
@@ -990,8 +995,10 @@ var gd3d;
                         this.pointEvent.type = framework.PointEventEnum.PointUp;
                     }
                     if (!skip) {
-                        this.rootNode.onCapturePointEvent(this, this.pointEvent);
-                        this.rootNode.onPointEvent(this, this.pointEvent);
+                        if (this.scene.app.bePlay) {
+                            this.rootNode.onCapturePointEvent(this, this.pointEvent);
+                            this.rootNode.onPointEvent(this, this.pointEvent);
+                        }
                         this.pointSelect = this.pointEvent.selected;
                         this.pointDown = touch;
                         this.pointX = this.pointEvent.x;
@@ -1402,7 +1409,9 @@ var gd3d;
                 outv2.x = sx;
                 outv2.y = sy;
                 var root = this.canvas.getRoot();
-                return this.dopick2d(outv2, root, tolerance);
+                var trans = this.dopick2d(outv2, root, tolerance);
+                gd3d.math.pool.delete_vector2(outv2);
+                return trans;
             };
             overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
@@ -1816,9 +1825,10 @@ var gd3d;
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
-                this.lastLayoutVmap = {};
-                this.percentModelMap = {};
+                this._layoutPercentState = 0;
                 this.layoutDirty = false;
+                this.lastParentWidth = 0;
+                this.lastParentHeight = 0;
             }
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
@@ -2002,13 +2012,11 @@ var gd3d;
             transform2D.prototype.updateTran = function (parentChange) {
                 if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                     return;
-                if (this.localTranslate.x == 10 && this.localTranslate.y == 200) {
-                    this;
-                }
                 if (this.dirty) {
                     gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
                 if (this.dirty || parentChange) {
+                    this.refreshLayout();
                     if (this.parent == null) {
                         gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
                     }
@@ -2296,69 +2304,115 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.setLayoutState = function (state) {
-                if (isNaN(state) || state == undefined)
-                    return;
-                this._layoutState = state;
-            };
-            transform2D.prototype.SetLayoutValue = function (option, value) {
+            Object.defineProperty(transform2D.prototype, "layoutState", {
+                get: function () {
+                    return this._layoutState;
+                },
+                set: function (state) {
+                    if (isNaN(state) || state == undefined)
+                        return;
+                    if (state != this._layoutState) {
+                        this.layoutDirty = true;
+                        this.markDirty();
+                        this._layoutState = state;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform2D.prototype.setLayoutValue = function (option, value) {
                 if (isNaN(option) || isNaN(value) || option == undefined || value == undefined)
                     return;
-                this.layoutValueMap[option] = value;
-            };
-            transform2D.prototype.SetLayoutPercentState = function (state) {
-                var _this = this;
-                if (isNaN(state) || state == undefined)
-                    return;
-                this.optionArr.forEach(function (option) {
-                    _this.percentModelMap[option] = (state & option) != 0;
-                });
-            };
-            transform2D.prototype.layoutMapInit = function () {
-                for (var i = 0; i < this.optionArr.length; i++) {
-                    var op = this.optionArr[i];
-                    this.layoutValueMap[op] = 0;
-                    this.lastLayoutVmap[op] = 0;
-                    this.percentModelMap[op] = false;
+                if (this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option]) {
+                    this.layoutDirty = true;
+                    this.markDirty();
+                    this.layoutValueMap[option] = value;
                 }
             };
+            transform2D.prototype.getLayoutValue = function (option) {
+                return this.layoutValueMap[option];
+            };
+            Object.defineProperty(transform2D.prototype, "layoutPercentState", {
+                get: function () {
+                    return this._layoutPercentState;
+                },
+                set: function (state) {
+                    if (isNaN(state) || state == undefined)
+                        return;
+                    if (state != this._layoutPercentState) {
+                        this.layoutDirty = true;
+                        this.markDirty();
+                        this._layoutPercentState = state;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform2D.prototype.refreshLayout = function () {
-                if (!this.layoutDirty)
-                    return;
                 var parent = this.parent;
                 if (!parent)
                     return;
+                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight)
+                    this.layoutDirty = true;
+                if (!this.layoutDirty)
+                    return;
+                console.error("refreshLayout : " + this.name);
                 var state = this._layoutState;
-                if (state & layoutOption.LEFT) {
-                    if (state & layoutOption.RIGHT) {
-                        this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                if (state != 0) {
+                    if (state & layoutOption.LEFT) {
+                        if (state & layoutOption.RIGHT) {
+                            this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
+                        }
+                        this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
                     }
-                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
-                }
-                else if (state & layoutOption.RIGHT) {
-                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
-                }
-                if (state & layoutOption.V_CENTER) {
-                    this.localTranslate.x = (parent.width - this.width) / 2;
-                }
-                if (state & layoutOption.TOP) {
-                    if (state & layoutOption.BOTTOM) {
-                        this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                    else if (state & layoutOption.RIGHT) {
+                        this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
                     }
-                    this.localTranslate.y = this.getLayValue(layoutOption.TOP);
-                }
-                else if (state & layoutOption.BOTTOM) {
-                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
-                }
-                if (state & layoutOption.H_CENTER) {
-                    this.localTranslate.y = (parent.width - this.width) / 2;
+                    if (state & layoutOption.H_CENTER) {
+                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER);
+                    }
+                    if (state & layoutOption.TOP) {
+                        if (state & layoutOption.BOTTOM) {
+                            this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
+                        }
+                        this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                    }
+                    else if (state & layoutOption.BOTTOM) {
+                        this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                    }
+                    if (state & layoutOption.V_CENTER) {
+                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER);
+                    }
+                    gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
                 this.layoutDirty = false;
+                this.lastParentWidth = this.parent.width;
+                this.lastParentHeight = this.parent.height;
             };
             transform2D.prototype.getLayValue = function (opation) {
                 if (this.layoutValueMap[opation] == undefined)
                     this.layoutValueMap[opation] = 0;
-                return this.layoutValueMap[opation];
+                var value = 0;
+                if (this._layoutPercentState & opation) {
+                    if (this.parent) {
+                        switch (opation) {
+                            case layoutOption.LEFT:
+                            case layoutOption.H_CENTER:
+                            case layoutOption.RIGHT:
+                                value = this.parent.width * this.layoutValueMap[opation];
+                                break;
+                            case layoutOption.TOP:
+                            case layoutOption.V_CENTER:
+                            case layoutOption.BOTTOM:
+                                value = this.parent.height * this.layoutValueMap[opation];
+                                break;
+                        }
+                    }
+                }
+                else {
+                    value = this.layoutValueMap[opation];
+                }
+                return value;
             };
             __decorate([
                 gd3d.reflect.Field("string"),
@@ -2388,6 +2442,11 @@ var gd3d;
                 gd3d.reflect.Field("vector2"),
                 __metadata("design:type", gd3d.math.vector2)
             ], transform2D.prototype, "localScale", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Boolean])
+            ], transform2D.prototype, "isMask", null);
             __decorate([
                 gd3d.reflect.Field("C2DComponent[]"),
                 __metadata("design:type", Array)
@@ -2425,6 +2484,8 @@ var gd3d;
         var button = (function () {
             function button() {
                 this._transition = TransitionType.ColorTint;
+                this._origianlSpriteName = "";
+                this._pressedSpriteName = "";
                 this._normalColor = new gd3d.math.color(1, 1, 1, 1);
                 this._pressedColor = new gd3d.math.color(0.5, 0.5, 0.5, 1);
                 this._fadeDuration = 0.1;
@@ -2461,6 +2522,8 @@ var gd3d;
                     if (graphic != null) {
                         this._originalColor = graphic.color;
                         this._originalSprite = graphic.sprite;
+                        if (graphic.sprite)
+                            this._origianlSpriteName = graphic.sprite.getName();
                         if (this._transition = TransitionType.ColorTint) {
                             graphic.color = this.normalColor;
                         }
@@ -2480,6 +2543,9 @@ var gd3d;
                 },
                 set: function (sprite) {
                     this._pressedSprite = sprite;
+                    if (sprite != null) {
+                        this._pressedSpriteName = sprite.getName();
+                    }
                 },
                 enumerable: true,
                 configurable: true
@@ -2566,6 +2632,9 @@ var gd3d;
                     this.changeColor(this._normalColor);
                 }
                 else if (this.transition == TransitionType.SpriteSwap) {
+                    if (!this._originalSprite) {
+                        this._originalSprite = this.tryGetSprite(this._origianlSpriteName);
+                    }
                     this.changeSprite(this._originalSprite);
                 }
             };
@@ -2577,7 +2646,18 @@ var gd3d;
                     if (this._targetImage != null && this._targetImage.sprite != null && this._originalSprite == null) {
                         this._originalSprite = this._targetImage.sprite;
                     }
+                    if (!this._pressedSprite) {
+                        this._pressedSprite = this.tryGetSprite(this._pressedSpriteName);
+                    }
                     this.changeSprite(this._pressedSprite);
+                }
+            };
+            button.prototype.tryGetSprite = function (spriteName) {
+                var temp = this.transform.canvas.assetmgr.mapNamed[spriteName];
+                if (temp != null) {
+                    var tsprite = this.transform.canvas.assetmgr.getAssetByName(spriteName);
+                    if (tsprite)
+                        return tsprite;
                 }
             };
             button.prototype.changeColor = function (targetColor) {
@@ -2600,10 +2680,30 @@ var gd3d;
                 __metadata("design:paramtypes", [Number])
             ], button.prototype, "transition", null);
             __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], button.prototype, "_origianlSpriteName", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], button.prototype, "_pressedSpriteName", void 0);
+            __decorate([
+                gd3d.reflect.Field("reference"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.image2D])
+            ], button.prototype, "targetImage", null);
+            __decorate([
                 gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [gd3d.math.color])
             ], button.prototype, "normalColor", null);
+            __decorate([
+                gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [gd3d.math.color])
+            ], button.prototype, "pressedColor", null);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object),
@@ -2637,6 +2737,7 @@ var gd3d;
                 this._imageType = ImageType.Simple;
                 this._fillMethod = FillMethod.Horizontal;
                 this._fillAmmount = 1;
+                this._spriteName = "";
                 gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
                 gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
             }
@@ -2738,14 +2839,27 @@ var gd3d;
                     }
                     this._sprite = _sprite;
                     this._sprite.use();
+                    this._spriteName = this._sprite.getName();
                     this.prepareData();
-                    this.transform.markDirty();
-                    this.updateTran();
+                    if (this.transform != null) {
+                        this.transform.markDirty();
+                        this.updateTran();
+                    }
                 },
                 enumerable: true,
                 configurable: true
             });
             image2D.prototype.render = function (canvas) {
+                if (this._sprite == null) {
+                    var temp = canvas.assetmgr.mapNamed[this._spriteName];
+                    if (temp != null) {
+                        var tspr = canvas.assetmgr.getAssetByName(this._spriteName);
+                        if (tspr) {
+                            this.sprite = tspr;
+                            this.needRefreshImg = true;
+                        }
+                    }
+                }
                 var mat = this.uimat;
                 var img = null;
                 if (this._sprite != null && this._sprite.texture != null) {
@@ -3547,21 +3661,25 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
+                gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", gd3d.math.color)
             ], image2D.prototype, "color", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("ImageType"),
+                gd3d.reflect.UIStyle("enum"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "imageType", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("FillMethod"),
+                gd3d.reflect.UIStyle("enum"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "fillMethod", null);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], image2D.prototype, "_spriteName", void 0);
             image2D = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender,
@@ -3613,11 +3731,6 @@ var gd3d;
                 get: function () {
                     return this._text;
                 },
-                set: function (text) {
-                    if (this._textLable) {
-                        this._textLable.text = text;
-                    }
-                },
                 enumerable: true,
                 configurable: true
             });
@@ -3665,6 +3778,7 @@ var gd3d;
             };
             inputField.prototype.start = function () {
                 var _this = this;
+                debugger;
                 this.inputElement = document.createElement("Input");
                 this.inputElement.style.opacity = "0";
                 this.inputElement.style.visibility = "hidden";
@@ -3721,7 +3835,9 @@ var gd3d;
                     }
                 }
                 this.inputElement.value = this._text;
-                this.text = this._text;
+                if (this._textLable) {
+                    this._textLable.text = this._text;
+                }
                 if (this._text == "") {
                     this._placeholderLabel.transform.visible = true;
                     this._textLable.transform.visible = false;
@@ -3758,30 +3874,25 @@ var gd3d;
                 }
             };
             __decorate([
-                gd3d.reflect.Field("image2D"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [framework.image2D])
             ], inputField.prototype, "frameImage", null);
             __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String),
-                __metadata("design:paramtypes", [String])
-            ], inputField.prototype, "text", null);
-            __decorate([
-                gd3d.reflect.Field("lineType"),
+                gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], inputField.prototype, "myLineType", void 0);
             __decorate([
-                gd3d.reflect.Field("contentType"),
+                gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], inputField.prototype, "myContentType", void 0);
             __decorate([
-                gd3d.reflect.Field("label"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "TextLabel", null);
             __decorate([
-                gd3d.reflect.Field("label"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "PlaceholderLabel", null);
@@ -3818,7 +3929,8 @@ var gd3d;
     (function (framework) {
         var label = (function () {
             function label() {
-                this.needRefreshImg = false;
+                this.needRefreshFont = false;
+                this._fontName = "defFont";
                 this._fontsize = 14;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
@@ -3856,12 +3968,13 @@ var gd3d;
                     return this._font;
                 },
                 set: function (font) {
-                    this.needRefreshImg = true;
+                    this.needRefreshFont = true;
                     if (this._font) {
                         this._font.unuse();
                     }
                     this._font = font;
                     this._font.use();
+                    this._fontName = this._font.getName();
                 },
                 enumerable: true,
                 configurable: true
@@ -4021,6 +4134,16 @@ var gd3d;
                 configurable: true
             });
             label.prototype.render = function (canvas) {
+                if (this._font == null) {
+                    var temp = canvas.assetmgr.mapNamed[this._fontName];
+                    if (temp != null) {
+                        var tfont = canvas.assetmgr.getAssetByName(this._fontName);
+                        if (tfont) {
+                            this.font = tfont;
+                            this.needRefreshFont = true;
+                        }
+                    }
+                }
                 if (this._font != null) {
                     if (this.dirtyData == true) {
                         this.updateData(this._font);
@@ -4032,9 +4155,9 @@ var gd3d;
                         img = this._font.texture;
                     }
                     if (img != null) {
-                        if (this.needRefreshImg) {
+                        if (this.needRefreshFont) {
                             mat.setTexture("_MainTex", img);
-                            this.needRefreshImg = false;
+                            this.needRefreshFont = false;
                         }
                         if (this.transform.parentIsMask) {
                             if (this._cacheMaskV4 == null)
@@ -4079,15 +4202,24 @@ var gd3d;
                 __metadata("design:paramtypes", [String])
             ], label.prototype, "text", null);
             __decorate([
-                gd3d.reflect.Field("font"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.font])
-            ], label.prototype, "font", null);
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", Object)
+            ], label.prototype, "_fontName", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Number])
             ], label.prototype, "fontsize", null);
+            __decorate([
+                gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
+                __metadata("design:type", gd3d.math.color)
+            ], label.prototype, "color", void 0);
+            __decorate([
+                gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
+                __metadata("design:type", gd3d.math.color)
+            ], label.prototype, "color2", void 0);
             label = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
@@ -4234,8 +4366,9 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("texture"),
-                __metadata("design:type", framework.texture)
-            ], rawImage2D.prototype, "_image", void 0);
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.texture])
+            ], rawImage2D.prototype, "image", null);
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("vector4"),
@@ -7272,6 +7405,10 @@ var gd3d;
                     this.sprites[spriteName] = r;
                 }
             };
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], atlas.prototype, "name", void 0);
             atlas = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -8738,8 +8875,18 @@ var gd3d;
             };
             prefab.prototype.Parse = function (jsonStr, assetmgr) {
                 this.jsonstr = jsonStr;
-                this.trans = new framework.transform();
-                gd3d.io.deSerialize(JSON.parse(jsonStr), this.trans, assetmgr, this.assetbundle);
+                var jsonObj = JSON.parse(jsonStr);
+                var type = jsonObj["type"];
+                switch (type) {
+                    case "transform":
+                        this.trans = new framework.transform;
+                        break;
+                    case "transform2D":
+                        this.trans = new framework.transform2D;
+                        break;
+                }
+                if (type != null)
+                    gd3d.io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
             };
             prefab = __decorate([
                 gd3d.reflect.SerializeType,

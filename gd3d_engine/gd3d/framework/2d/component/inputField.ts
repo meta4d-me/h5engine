@@ -30,7 +30,7 @@ namespace gd3d.framework
          * 底框显示图像
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("image2D")
+        @gd3d.reflect.Field("reference")
         get frameImage()
         {
             return this._frameImage;
@@ -50,18 +50,11 @@ namespace gd3d.framework
          * 文字内容
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("string")
         get text(): string
         {
             return this._text;
         }
-        set text(text: string)
-        {
-            if(this._textLable){
-                this._textLable.text = text;
-            }
-        }
-        
+  
         /**
          * @public
          * @language zh_CN
@@ -69,7 +62,7 @@ namespace gd3d.framework
          * 文本行格式
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("lineType")
+        @gd3d.reflect.Field("number")
          myLineType :lineType = lineType.SingleLine;
 
          /**
@@ -79,7 +72,7 @@ namespace gd3d.framework
          * 文本行格式
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("contentType")
+        @gd3d.reflect.Field("number")
         myContentType :contentType = contentType.None;
         
         private _textLable : label;
@@ -90,7 +83,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("label")
+        @gd3d.reflect.Field("reference")
         get TextLabel():label{
 
             return this._textLable;
@@ -108,7 +101,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("label")
+        @gd3d.reflect.Field("reference")
         get PlaceholderLabel():label{
 
             return this._placeholderLabel;
@@ -164,6 +157,7 @@ namespace gd3d.framework
          */
         start()
         {
+            debugger;
             this.inputElement = <HTMLInputElement>document.createElement("Input");
             this.inputElement.style.opacity = "0";
             this.inputElement.style.visibility = "hidden";
@@ -246,7 +240,9 @@ namespace gd3d.framework
 
             }
             this.inputElement.value = this._text;
-            this.text = this._text;
+            if(this._textLable){
+                this._textLable.text = this._text;
+            }
 
             if(this._text == ""){
                 this._placeholderLabel.transform.visible = true;

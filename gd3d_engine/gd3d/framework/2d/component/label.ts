@@ -59,23 +59,25 @@ namespace gd3d.framework
          * 字体
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("font")
         get font()
         {
             return this._font;
         }
         set font(font: font)
         {
-            this.needRefreshImg = true;
+            this.needRefreshFont = true;
             if(this._font)
             {
                 this._font.unuse();
             }
             this._font = font;
             this._font.use();
+            this._fontName = this._font.getName();
         }
-        private needRefreshImg = false;
+        private needRefreshFont = false;
 
+        @gd3d.reflect.Field("string")
+        private _fontName = "defFont";
         private _fontsize: number = 14;
         /**
          * @public
@@ -377,6 +379,8 @@ namespace gd3d.framework
          * 填充颜色
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("color")
+        @reflect.UIStyle("color")
         color: math.color = new math.color(1, 1, 1, 1);
 
         /**
@@ -386,6 +390,8 @@ namespace gd3d.framework
          * 描边颜色
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("color")
+        @reflect.UIStyle("color")
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
         
        /**
@@ -422,6 +428,17 @@ namespace gd3d.framework
          */
         render(canvas: canvas)
         {
+            if(this._font == null ){
+                let temp = canvas.assetmgr.mapNamed[this._fontName];
+                if(temp != null){
+                    let tfont = canvas.assetmgr.getAssetByName(this._fontName) as gd3d.framework.font;
+                    if(tfont){
+                        this.font = tfont;
+                        this.needRefreshFont = true;
+                    }
+                }
+            }
+
             if (this._font != null)
             {
                 if (this.dirtyData == true)
@@ -440,9 +457,9 @@ namespace gd3d.framework
 
                 if (img != null)
                 {
-                    if(this.needRefreshImg){
+                    if(this.needRefreshFont){
                         mat.setTexture("_MainTex", img);
-                        this.needRefreshImg = false;
+                        this.needRefreshFont = false;
                     }
 
                     if(this.transform.parentIsMask){

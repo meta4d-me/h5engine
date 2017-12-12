@@ -287,6 +287,7 @@ namespace gd3d.framework
          * 当前节点是否是mask
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("boolean")
         get isMask(){
             return this._isMask;            
         }

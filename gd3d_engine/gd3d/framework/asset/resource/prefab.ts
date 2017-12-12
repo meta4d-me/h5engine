@@ -104,7 +104,7 @@
             let total = 0;
             return total;
         }
-        private trans: transform;
+        private trans: transform | transform2D;
         
         /**
          * @public
@@ -149,8 +149,15 @@
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
             this.jsonstr = jsonStr;
-            this.trans = new transform();
-            io.deSerialize(JSON.parse(jsonStr), this.trans, assetmgr, this.assetbundle);
+            let jsonObj =JSON.parse(jsonStr);
+            let type = jsonObj["type"];
+            switch(type){
+                case "transform": this.trans = new transform; break;
+                case "transform2D": this.trans = new transform2D; break;
+            }
+            
+            if(type != null)
+            io.deSerialize(jsonObj , this.trans, assetmgr, this.assetbundle);
         }
     }
 }

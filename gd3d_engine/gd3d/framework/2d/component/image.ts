@@ -44,7 +44,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("color")
-        @reflect.UIStyle("vector4")
+        @reflect.UIStyle("color")
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
 
         /**
@@ -82,7 +82,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        @reflect.UIStyle("ImageType")
+        @reflect.UIStyle("enum")
         get imageType()
         {
             return this._imageType;
@@ -104,7 +104,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        @reflect.UIStyle("FillMethod")
+        @reflect.UIStyle("enum")
         get fillMethod()
         {
             return this._fillMethod;
@@ -134,8 +134,10 @@ namespace gd3d.framework
             this._fillAmmount = ammount;
             if (this.transform != null)
                 this.transform.markDirty();
-        }
+            }
 
+        transform: transform2D;
+            
         /**
          * @public
          * @language zh_CN
@@ -147,7 +149,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         setTexture(texture: texture, border?: math.border, rect?: math.rect)
-        {
+        {   //image 不应该有setTexture
             this.needRefreshImg = true;
             if(this.sprite)
             {
@@ -172,7 +174,7 @@ namespace gd3d.framework
                 this.updateTran();
             }
         }
-
+        
         /**
          * @public
          * @language zh_CN
@@ -189,15 +191,20 @@ namespace gd3d.framework
             }
             this._sprite = _sprite;
             this._sprite.use();
+            this._spriteName = this._sprite.getName();
             this.prepareData();
-            this.transform.markDirty();
-            this.updateTran();
+            if (this.transform != null){
+                this.transform.markDirty();
+                this.updateTran();
+            }
         }
         public get sprite()
         {
             return this._sprite;
         }
 
+        @gd3d.reflect.Field("string")
+        private _spriteName:string = "";
         
 
         /**
@@ -205,6 +212,17 @@ namespace gd3d.framework
          */
         render(canvas: canvas)
         {
+            if(this._sprite == null){
+                let temp = canvas.assetmgr.mapNamed[this._spriteName];
+                if(temp != null){
+                    let tspr = canvas.assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;
+                    if(tspr){
+                        this.sprite = tspr;
+                        this.needRefreshImg = true;
+                    }
+                }
+            }
+
             let mat = this.uimat;
 
             var img = null;
@@ -255,7 +273,6 @@ namespace gd3d.framework
         {
 
         }
-        transform: transform2D;
 
         /**
          * @private

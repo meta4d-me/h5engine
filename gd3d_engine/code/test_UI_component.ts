@@ -41,13 +41,18 @@ class test_UI_Component implements IState {
         bg_t.height = 260;
         bg_t.pivot.x = 0;
         bg_t.pivot.y = 0;
-        bg_t.localTranslate.x = 100;
+        //bg_t.localTranslate.x = 100;
         bg_t.localTranslate.y = 100;
         this.rooto2d.addChild(bg_t);
         let bg_i = bg_t.addComponent("image2D") as gd3d.framework.image2D;
         bg_i.imageType = gd3d.framework.ImageType.Sliced;
         bg_i.sprite = atlasComp.sprites["bg"];
         bg_i.sprite.border = new gd3d.math.border(10,50,10,10);
+        bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT,60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP,60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT,60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM,60);
 
         //文本
         let lab_t = new gd3d.framework.transform2D;
@@ -93,6 +98,9 @@ class test_UI_Component implements IState {
         close_b.targetImage.sprite = atlasComp.sprites["ui_boundary_close_in"];
         close_b.pressedGraphic = atlasComp.sprites["ui_boundary_close"];
         close_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        close_bt.layoutState = 0 | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP;
+        close_bt.setLayoutValue(gd3d.framework.layoutOption.RIGHT,5);
+        close_bt.setLayoutValue(gd3d.framework.layoutOption.TOP,3);
         
         //精灵图 数字
         let nums = "45789";
