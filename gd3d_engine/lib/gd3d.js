@@ -5549,7 +5549,7 @@ var gd3d;
                     else if (extname == ".keyFrameAnimationPath.json") {
                         return AssetTypeEnum.KeyFrameAnimaionAsset;
                     }
-                    else if (extname = ".effect.json") {
+                    else if (extname == ".effect.json") {
                         return AssetTypeEnum.F14Effect;
                     }
                     i = file.indexOf(".", i + 1);

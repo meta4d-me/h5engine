@@ -1940,7 +1940,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.KeyFrameAnimaionAsset;
                 }
-                else if(extname=".effect.json")
+                else if(extname==".effect.json")
                 {
                     return AssetTypeEnum.F14Effect;
                 }
