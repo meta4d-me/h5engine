@@ -2267,7 +2267,7 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue?: number): void;
         restartFrame: number;
         private totalTime;
-        private totalFrame;
+        totalFrame: number;
         private addF14layer(type, layerdata);
         getElementCount(): number;
         dispose(): void;
@@ -2679,7 +2679,7 @@ declare namespace gd3d.framework {
         targetMat: math.matrix;
         refreshTargetMatrix(): void;
         uploadMeshdata(): void;
-        refreshCurTex_ST(curframe: number, fps: number): void;
+        refreshCurTex_ST(curframe: number, detalTime: number, fps: number): void;
     }
 }
 declare namespace gd3d.framework {
