@@ -382,6 +382,10 @@ declare namespace gd3d.math {
         constructor(datas?: Float32Array);
         toString(): string;
     }
+    function vec4FormJson(json: string, vec4: vector4): void;
+    function vec3FormJson(json: string, vec3: vector3): void;
+    function vec2FormJson(json: string, vec2: vector2): void;
+    function colorFormJson(json: string, _color: color): void;
 }
 declare namespace gd3d.framework {
     enum layoutOption {
@@ -759,6 +763,7 @@ declare namespace gd3d.framework {
         PathAsset = 19,
         KeyFrameAnimaionAsset = 20,
         PVR = 21,
+        F14Effect = 22,
     }
     enum AssetBundleLoadState {
         None = 0,
@@ -771,6 +776,7 @@ declare namespace gd3d.framework {
         Scene = 64,
         Textasset = 128,
         Pvr = 256,
+        f14eff = 512,
     }
     class ResourceState {
         res: IAsset;
@@ -995,6 +1001,13 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_f14eff implements IAssetFactory {
+        newAsset(): f14eff;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: f14eff): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: f14eff): void;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_Font implements IAssetFactory {
         newAsset(filename?: string): font;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: font): void;
@@ -1177,6 +1190,25 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class f14eff implements IAsset {
+        defaultAsset: boolean;
+        private name;
+        private id;
+        constructor(assetName?: string);
+        assetbundle: string;
+        getName(): string;
+        getGUID(): number;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        dispose(): void;
+        caclByteLength(): number;
+        f14data: F14EffectData;
+        trans: transform;
+        f14Effect: F14Effect;
+        Parse(jsonStr: string, assetmgr: assetMgr): void;
+    }
+}
+declare namespace gd3d.framework {
     class font implements IAsset {
         private name;
         private id;
@@ -1284,6 +1316,7 @@ declare namespace gd3d.framework {
         getLayer(): RenderLayerEnum;
         private queue;
         getQueue(): number;
+        setQueue(queue: number): void;
         getShader(): shader;
         private shader;
         mapUniform: {
@@ -1293,6 +1326,7 @@ declare namespace gd3d.framework {
         setFloat(_id: string, _number: number): void;
         setFloatv(_id: string, _numbers: Float32Array): void;
         setVector4(_id: string, _vector4: math.vector4): void;
+        setColor(_id: string, _vector4: math.color): void;
         setVector4v(_id: string, _vector4v: Float32Array): void;
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
@@ -2208,6 +2242,508 @@ declare namespace gd3d.framework {
     class trailStick {
         location: gd3d.math.vector3;
         updir: gd3d.math.vector3;
+    }
+}
+declare namespace gd3d.framework {
+    class F14Effect implements IRenderer {
+        layer: RenderLayerEnum;
+        renderLayer: CullingMask;
+        queue: number;
+        start(): void;
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+        private fps;
+        data: F14EffectData;
+        layers: F14Layer[];
+        VF: number;
+        webgl: WebGLRenderingContext;
+        setData(data: F14EffectData): void;
+        private elements;
+        renderBatch: F14Basebatch[];
+        update(deltaTime: number): void;
+        private _renderCamera;
+        readonly renderCamera: camera;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue?: number): void;
+        restartFrame: number;
+        private totalTime;
+        private totalFrame;
+        private addF14layer(type, layerdata);
+        getElementCount(): number;
+        dispose(): void;
+        private active;
+        play(): void;
+        stop(): void;
+        onFinish: () => void;
+    }
+}
+declare namespace gd3d.framework {
+    class f14EffectSystem implements IRenderer {
+        gameObject: gameObject;
+        layer: RenderLayerEnum;
+        renderLayer: CullingMask;
+        queue: number;
+        start(): void;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    enum F14TypeEnum {
+        SingleMeshType = 0,
+        particlesType = 1,
+        RefType = 2,
+    }
+    interface F14Element {
+        type: F14TypeEnum;
+        update(deltaTime: number, frame: number, fps: number): any;
+        layer: F14Layer;
+        drawActive: boolean;
+        active: boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class F14Layer {
+        active: boolean;
+        effect: F14Effect;
+        data: F14LayerData;
+        type: F14TypeEnum;
+        frameList: number[];
+        frames: {
+            [index: number]: F14Frame;
+        };
+        Attlines: {
+            [name: string]: F14AttTimeLine;
+        };
+        element: F14Element;
+        batch: F14Basebatch;
+        constructor(effect: F14Effect, data: F14LayerData);
+        addFrame(index: number, framedata: F14FrameData): F14Frame;
+        removeFrame(frame: number): void;
+    }
+    class F14Frame {
+        layer: F14Layer;
+        data: F14FrameData;
+        attDic: {
+            [name: string]: any;
+        };
+        constructor(layer: F14Layer, data: F14FrameData);
+        setdata(name: string, obj: any): void;
+        removedata(name: string): void;
+        getdata(name: string): any;
+    }
+    class F14AttTimeLine {
+        name: string;
+        lerpFunc: (from, to, lerp, out) => void;
+        cloneFunc: (from, to) => void;
+        constructor(name: string, lerpfunc: (from, to, lerp, out) => void, clonefunc: (from, to) => void);
+        frameList: number[];
+        line: {
+            [index: number]: any;
+        };
+        addNode(frame: number, value: any): void;
+        remove(frame: number): void;
+        getValue(frame: number, basedate: F14SingleMeshBaseData, out: any): void;
+    }
+}
+declare namespace gd3d.framework {
+    class F14EffectData {
+        beloop: boolean;
+        lifeTime: number;
+        layers: F14LayerData[];
+        parsejson(json: any, assetmgr: assetMgr, assetbundle: string): void;
+    }
+    class F14LayerData {
+        Name: string;
+        type: F14TypeEnum;
+        elementdata: F14ElementData;
+        frames: {
+            [frame: number]: F14FrameData;
+        };
+        constructor();
+        parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
+    }
+    class F14FrameData {
+        frameindex: number;
+        singlemeshAttDic: {
+            [name: string]: any;
+        };
+        EmissionData: F14EmissionBaseData;
+        constructor(index: number, type: F14TypeEnum);
+    }
+}
+declare namespace gd3d.framework {
+    interface F14ElementData {
+        parse(json: any, assetmgr: assetMgr, assetbundle: string): any;
+    }
+}
+declare namespace gd3d.framework {
+    class NumberData {
+        isRandom: boolean;
+        _value: number;
+        _valueLimitMin: number;
+        _valueLimitMax: number;
+        beInited: boolean;
+        key: number;
+        setValue(value: number): void;
+        setRandomValue(max: number, min: number): void;
+        getValue(reRandom?: boolean): number;
+        constructor(value?: number);
+        static copyto(from: NumberData, to: NumberData): void;
+        static FormJson(json: string, data: NumberData): void;
+    }
+    class Vector3Data {
+        x: NumberData;
+        y: NumberData;
+        z: NumberData;
+        constructor(x?: number, y?: number, z?: number);
+        getValue(reRandom?: boolean): math.vector3;
+        static copyto(from: Vector3Data, to: Vector3Data): void;
+        static FormJson(json: string, data: Vector3Data): void;
+    }
+    class NumberKey {
+        key: number;
+        value: number;
+        constructor(_key: number, _value: number);
+    }
+    class Vector3Key {
+        key: number;
+        value: math.vector3;
+        constructor(_key: number, _value: math.vector3);
+    }
+    class Vector2Key {
+        key: number;
+        value: math.vector2;
+        constructor(_key: number, _value: math.vector2);
+    }
+}
+declare namespace gd3d.framework {
+    class F14Emission implements F14Element {
+        type: F14TypeEnum;
+        layer: F14Layer;
+        drawActive: boolean;
+        active: boolean;
+        effect: F14Effect;
+        baseddata: F14EmissionBaseData;
+        currentData: F14EmissionBaseData;
+        particlelist: F14Particle[];
+        deadParticles: F14Particle[];
+        private frameLife;
+        private TotalTime;
+        private newStartDataTime;
+        curTime: number;
+        private beover;
+        private numcount;
+        localMatrix: math.matrix;
+        private _worldMatrix;
+        private localrot;
+        private worldRot;
+        vertexCount: number;
+        vertexLength: number;
+        dataforvboLen: number;
+        dataforebo: Uint16Array;
+        posArr: math.vector3[];
+        colorArr: math.color[];
+        uvArr: math.vector2[];
+        constructor(effect: F14Effect, layer: F14Layer);
+        private lastFrame;
+        update(deltaTime: number, frame: number, fps: number): void;
+        changeCurrentBaseData(data: F14EmissionBaseData): void;
+        private initBycurrentdata();
+        getWorldMatrix(): math.matrix;
+        getWorldRotation(): math.quaternion;
+        uploadMeshData(): void;
+        private updateLife();
+        private reInit();
+        private updateEmission();
+        private addParticle(count?);
+    }
+}
+declare namespace gd3d.framework {
+    enum RenderModelEnum {
+        None = 0,
+        BillBoard = 1,
+        StretchedBillBoard = 2,
+        HorizontalBillBoard = 3,
+        VerticalBillBoard = 4,
+        Mesh = 5,
+    }
+    class F14EmissionBaseData implements F14ElementData {
+        loopenum: LoopEnum;
+        mesh: mesh;
+        material: material;
+        rotPosition: math.vector3;
+        rotScale: math.vector3;
+        rotEuler: math.vector3;
+        rendermodel: RenderModelEnum;
+        beloop: boolean;
+        lifeTime: NumberData;
+        simulateInLocalSpace: boolean;
+        startScaleRate: NumberData;
+        startScale: Vector3Data;
+        startEuler: Vector3Data;
+        startColor: Vector3Data;
+        startAlpha: NumberData;
+        colorRate: number;
+        simulationSpeed: NumberData;
+        start_tex_st: math.vector4;
+        delayTime: number;
+        duration: number;
+        rateOverTime: NumberData;
+        bursts: busrtInfo[];
+        shapeType: ParticleSystemShape;
+        width: number;
+        height: number;
+        depth: number;
+        radius: number;
+        angle: number;
+        emitFrom: emitfromenum;
+        enableVelocityOverLifetime: boolean;
+        moveSpeed: Vector3Data;
+        enableSizeOverLifetime: boolean;
+        sizeNodes: NumberKey[];
+        enableRotOverLifeTime: boolean;
+        angleSpeed: NumberData;
+        enableColorOverLifetime: boolean;
+        colorNodes: Vector3Key[];
+        alphaNodes: NumberKey[];
+        enableTexAnimation: boolean;
+        uvType: UVTypeEnum;
+        uSpeed: number;
+        vSpeed: number;
+        row: number;
+        column: number;
+        count: number;
+        parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
+        static getRandomDirAndPosByZEmission(emission: F14EmissionBaseData, outDir: gd3d.math.vector3, outPos: gd3d.math.vector3): void;
+    }
+    class busrtInfo {
+        time: number;
+        count: NumberData;
+        private _beburst;
+        beburst(): boolean;
+        burst(bebusrt?: boolean): void;
+        static CreatformJson(json: any): busrtInfo;
+    }
+}
+declare namespace gd3d.framework {
+    class F14EmissionBatch implements F14Basebatch {
+        type: F14TypeEnum;
+        effect: F14Effect;
+        emission: F14Emission;
+        private mesh;
+        private mat;
+        dataForVbo: Float32Array;
+        dataForEbo: Uint16Array;
+        curRealVboCount: number;
+        curVertexcount: number;
+        curIndexCount: number;
+        vertexLength: number;
+        constructor(effect: F14Effect, element: F14Emission);
+        private getMaxVertexCount();
+        render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
+        unRender(): void;
+        getElementCount(): number;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class F14Particle {
+        private data;
+        private element;
+        private totalLife;
+        private startScaleRate;
+        private startScale;
+        Starteuler: math.vector3;
+        StartPos: math.vector3;
+        startColor: math.vector3;
+        startAlpha: number;
+        colorRate: number;
+        private simulationSpeed;
+        private simulateInLocalSpace;
+        private starTex_ST;
+        private speedDir;
+        enableVelocityOverLifetime: boolean;
+        private movespeed;
+        enableSizeOverLifetime: boolean;
+        private sizeNodes;
+        enableRotOverLifeTime: boolean;
+        eulerSpeed: number;
+        enableColorOverLifetime: boolean;
+        private colorNodes;
+        private alphaNodes;
+        enableTexAnimation: boolean;
+        uvType: UVTypeEnum;
+        tex_ST: math.vector4;
+        rotationByEuler: math.quaternion;
+        rotationByShape: math.quaternion;
+        startRotation: math.quaternion;
+        rotAngle: number;
+        localMatrix: math.matrix;
+        localTranslate: math.vector3;
+        localRotation: math.quaternion;
+        localScale: math.vector3;
+        color: math.vector3;
+        alpha: number;
+        private Color;
+        private curLife;
+        private life01;
+        actived: boolean;
+        private emissionMatToWorld;
+        private emissionWorldRotation;
+        constructor(element: F14Emission, data: F14EmissionBaseData);
+        initByEmissionData(data: F14EmissionBaseData): void;
+        update(deltaTime: number): void;
+        uploadMeshdata(): void;
+        private transformVertex;
+        private updateLocalMatrix();
+        private updatePos();
+        private updateSize();
+        private updateEuler();
+        private angleRot;
+        private worldpos;
+        private tarWorldpos;
+        private lookDir;
+        private worldRotation;
+        private invParWorldRot;
+        private updateRot();
+        private updateColor();
+        private updateUV();
+        getCurTex_ST(data: F14EmissionBaseData): void;
+    }
+}
+declare namespace gd3d.framework {
+    class F14RefElementBatch implements F14Basebatch {
+        type: F14TypeEnum;
+        effect: F14Effect;
+        private element;
+        constructor(effect: F14Effect, element: F14RefElement);
+        unRender(): void;
+        getElementCount(): number;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class F14RefBaseData implements F14ElementData {
+        beLoop: boolean;
+        refData: F14EffectData;
+        F14RefBaseData(data?: F14EffectData): void;
+        parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    class F14RefElement implements F14Element {
+        type: F14TypeEnum;
+        layer: F14Layer;
+        drawActive: boolean;
+        active: boolean;
+        baseddata: F14RefBaseData;
+        startFrame: number;
+        endFrame: number;
+        effect: F14Effect;
+        constructor(effect: F14Effect, layer: F14Layer);
+        RefEffect: F14Effect;
+        private refreshStartEndFrame();
+        update(deltaTime: number, frame: number, fps: number): void;
+    }
+}
+declare namespace gd3d.framework {
+    class F14SingleMesh implements F14Element {
+        drawActive: boolean;
+        active: boolean;
+        type: F14TypeEnum;
+        layer: F14Layer;
+        private effect;
+        RenderBatch: F14SingleMeshBath;
+        position: math.vector3;
+        scale: math.vector3;
+        euler: math.vector3;
+        color: math.color;
+        tex_ST: math.vector4;
+        baseddata: F14SingleMeshBaseData;
+        private localRotate;
+        startFrame: number;
+        endFrame: number;
+        private vertexCount;
+        private posArr;
+        private colorArr;
+        private uvArr;
+        private dataforvbo;
+        private dataforebo;
+        constructor(effect: F14Effect, layer: F14Layer);
+        refreshStartEndFrame(): void;
+        update(deltaTime: number, frame: number, fps: number): void;
+        targetMat: math.matrix;
+        refreshTargetMatrix(): void;
+        uploadMeshdata(): void;
+        refreshCurTex_ST(curframe: number, fps: number): void;
+    }
+}
+declare namespace gd3d.framework {
+    interface F14Basebatch {
+        type: F14TypeEnum;
+        effect: F14Effect;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): any;
+        unRender(): any;
+        dispose(): any;
+        getElementCount(): number;
+    }
+    class F14SingleMeshBath implements F14Basebatch {
+        type: F14TypeEnum;
+        effect: F14Effect;
+        ElementMat: gd3d.framework.material;
+        meshlist: F14SingleMesh[];
+        private activemeshlist;
+        private mesh;
+        indices: number[];
+        vertices: math.vector3[];
+        colors: math.color[];
+        uv: math.vector2[];
+        dataForVbo: Float32Array;
+        dataForEbo: Uint16Array;
+        curRealVboCount: number;
+        curVertexcount: number;
+        curIndexCount: number;
+        vertexLength: number;
+        constructor(mat: material, effect: F14Effect);
+        OnEndCollectElement(): void;
+        reInit(mat: material, effect: F14Effect): void;
+        addElement(mesh: F14SingleMesh, insert?: boolean): void;
+        canBatch(mesh: F14SingleMesh): boolean;
+        getElementCount(): number;
+        private mat;
+        private defST;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
+        unRender(): void;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    enum LoopEnum {
+        Restart = 0,
+        TimeContinue = 1,
+    }
+    class F14SingleMeshBaseData implements F14ElementData {
+        loopenum: LoopEnum;
+        mesh: mesh;
+        material: material;
+        position: gd3d.math.vector3;
+        scale: gd3d.math.vector3;
+        euler: gd3d.math.vector3;
+        color: gd3d.math.color;
+        tex_ST: gd3d.math.vector4;
+        enableTexAnimation: boolean;
+        uvType: UVTypeEnum;
+        uSpeed: number;
+        vSpeed: number;
+        row: number;
+        column: number;
+        count: number;
+        F14SingleMeshBaseData(): void;
+        parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
     }
 }
 declare namespace gd3d.framework {
@@ -3296,41 +3832,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class NumberData {
-        isRandom: boolean;
-        private _value;
-        private _valueLimitMin;
-        private _valueLimitMax;
-        private beInited;
-        private key;
-        setValue(value: number): void;
-        setRandomValue(max: number, min: number): void;
-        getValue(reRandom?: boolean): number;
-        constructor(value?: number);
-        static RandomRange(min: number, max: number, isInteger?: boolean): number;
-    }
-    class Vector3Data {
-        x: NumberData;
-        y: NumberData;
-        z: NumberData;
-        constructor(x?: number, y?: number, z?: number);
-        getValue(): gd3d.math.vector3;
-    }
-    class NumberKey {
-        key: number;
-        value: number;
-        constructor(_key: number, _value: number);
-    }
-    class Vector3Key {
-        key: number;
-        value: math.vector3;
-        constructor(_key: number, _value: math.vector3);
-    }
-    class Vector2Key {
-        key: number;
-        value: math.vector2;
-        constructor(_key: number, _value: math.vector2);
-    }
     class effTools {
         static getRandomDirAndPosByZEmission(emission: EffectElementEmission, outDir: gd3d.math.vector3, outPos: gd3d.math.vector3): void;
         static getTex_ST(emission: EffectElementEmission, out_St: math.vector4): void;
