@@ -16,7 +16,7 @@
             {
                 "showface": "ccw",
                 "vs": "post_quad",
-                "fs": "bloom"
+                "fs": "custom_bloom"
             }
         ],
         "base_depth": [

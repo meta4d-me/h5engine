@@ -605,6 +605,9 @@ namespace gd3d.framework
                         case "glstate_matrix_model":
                             this.setMatrix(key, context.matrixModel);
                             break;
+                        case "glstate_matrix_world2object":
+                            this.setMatrix(key, context.matrixWorld2Object);
+                            break;
                         case "glstate_matrix_view":
                             this.setMatrix(key, context.matrixView);
                             break;

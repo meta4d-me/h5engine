@@ -409,6 +409,7 @@ namespace gd3d.framework
         intersects(ray: ray, matrix: gd3d.math.matrix): pickinfo
         {
             var pickinfo = null;
+            if(!this.submesh) return pickinfo;
             for (var i = 0; i < this.submesh.length; i++)
             {
                 var submesh = this.submesh[i];

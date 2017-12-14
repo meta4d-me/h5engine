@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000041";
+                this.build = "b000043";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -4891,6 +4891,7 @@ var gd3d;
                 this.mapBundle = {};
                 this.mapRes = {};
                 this.mapNamed = {};
+                this._loadingTag = "_AssetLoingTag_";
                 this.mapInLoad = {};
                 this.assetUrlDic = {};
                 this.assetFactorys = {};
@@ -4930,8 +4931,9 @@ var gd3d;
             assetMgr.prototype.getAssetByName = function (name, bundlename) {
                 if (bundlename === void 0) { bundlename = null; }
                 var id = null;
-                if (this.mapNamed[name] != null)
-                    id = this.mapNamed[name][0];
+                if (this.mapNamed[name] != null) {
+                    id = this.mapNamed[name][this.mapNamed[name].length - 1];
+                }
                 if (bundlename != null) {
                     var assetbundle = this.mapBundle[bundlename];
                     if (assetbundle != null)
@@ -4964,6 +4966,8 @@ var gd3d;
                 if (res.defaultAsset) {
                     return;
                 }
+                if (!this.mapRes[id])
+                    return;
                 this.mapRes[id].refcount--;
                 if (disposeNow && this.mapRes[id].refcount <= 0) {
                     this.mapRes[id].asset.dispose();
@@ -5000,11 +5004,15 @@ var gd3d;
                     }
                 }
                 this.mapRes[id].refcount++;
+                if (this.mapRes[id][this._loadingTag]) {
+                    delete this.mapRes[id][this._loadingTag];
+                }
             };
             assetMgr.prototype.regRes = function (name, asset) {
                 var id = asset.getGUID();
                 if (this.mapRes[id] == null) {
                     this.mapRes[id] = { asset: asset, refcount: 0 };
+                    this.mapRes[id][this._loadingTag] = true;
                     if (name != null) {
                         if (this.mapNamed[name] == null)
                             this.mapNamed[name] = [];
@@ -5015,6 +5023,8 @@ var gd3d;
             assetMgr.prototype.releaseUnuseAsset = function () {
                 for (var k in this.mapRes) {
                     if (this.mapRes[k].refcount <= 0) {
+                        if (this.mapRes[k][this._loadingTag])
+                            continue;
                         var name_1 = this.mapRes[k].asset.getName();
                         if (this.mapNamed[name_1].length <= 1) {
                             delete this.mapNamed[name_1];
@@ -5553,8 +5563,6 @@ var PvrParse = (function () {
         tool.writeUint8Array(ar);
         this.version = tool.readUInt32();
         if (this.version === 0x03525650) {
-            this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
-            this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
             var tex = this.parseV3(tool);
             tool.dispose();
             return tex;
@@ -5622,6 +5630,8 @@ var PvrParse = (function () {
         var target = this.gl.TEXTURE_2D;
         if (this.numFaces > 1)
             target = this.gl.TEXTURE_CUBE_MAP;
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1);
+        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0);
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(target, t2d.texture);
         if (this.numFaces > 1)
@@ -7658,12 +7668,12 @@ var gd3d;
                 this._changeShaderMap = {};
                 this.queue = 0;
                 this.mapUniform = {};
+                this.mapUniformTemp = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
                 }
                 this.name = new framework.constText(assetName);
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
-                this.mapUniformTemp = {};
             }
             material_1 = material;
             material.prototype.getName = function () {
@@ -7983,6 +7993,9 @@ var gd3d;
                             case "glstate_matrix_model":
                                 this.setMatrix(key, context.matrixModel);
                                 break;
+                            case "glstate_matrix_world2object":
+                                this.setMatrix(key, context.matrixWorld2Object);
+                                break;
                             case "glstate_matrix_view":
                                 this.setMatrix(key, context.matrixView);
                                 break;
@@ -8279,7 +8292,7 @@ var gd3d;
                     for (var i = 0; i < vcount; i++) {
                         var uv = new gd3d.math.vector2();
                         uv.x = read.readSingle();
-                        uv.y = read.readSingle();
+                        uv.y = 1 - read.readSingle();
                         data.uv.push(uv);
                     }
                 }
@@ -8291,7 +8304,7 @@ var gd3d;
                     for (var i = 0; i < vcount; i++) {
                         var uv = new gd3d.math.vector2();
                         uv.x = read.readSingle();
-                        uv.y = read.readSingle();
+                        uv.y = 1 - read.readSingle();
                         data.uv2.push(uv);
                     }
                 }
@@ -8417,6 +8430,8 @@ var gd3d;
             };
             mesh.prototype.intersects = function (ray, matrix) {
                 var pickinfo = null;
+                if (!this.submesh)
+                    return pickinfo;
                 for (var i = 0; i < this.submesh.length; i++) {
                     var submesh = this.submesh[i];
                     if (submesh.line) {
@@ -9734,9 +9749,14 @@ var gd3d;
                 return false;
             };
             aniplayer.prototype.remove = function () {
+                this.clips.forEach(function (temp) {
+                    if (temp)
+                        temp.unuse();
+                });
                 this.clips.length = 0;
                 this.bones.length = 0;
                 this.startPos.length = 0;
+                this._playClip = null;
                 delete this.tpose;
                 delete this.nowpose;
                 delete this.lerppose;
@@ -10041,6 +10061,204 @@ var gd3d;
             return AudioPlayer;
         }());
         framework.AudioPlayer = AudioPlayer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var bloomctr = (function () {
+            function bloomctr() {
+                this._bloomIntensity = 1.4;
+                this._bloomThreshold = 0.5;
+                this._blurSpread = 3;
+                this.tag = "__bloomtag__";
+                this._init = false;
+            }
+            Object.defineProperty(bloomctr.prototype, "bloomThreshold", {
+                get: function () { return this._bloomThreshold; },
+                set: function (value) {
+                    this._bloomThreshold = value;
+                    if (!this.material || !this.material_1 || !this.material_2)
+                        return;
+                    this.material.setFloat("_bloomThreshold", this._bloomThreshold);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(bloomctr.prototype, "bloomIntensity", {
+                get: function () { return this._bloomIntensity; },
+                set: function (value) {
+                    this._bloomIntensity = value;
+                    if (!this.material || !this.material_3)
+                        return;
+                    this.material_3.setFloat("_bloomIntensity", this._bloomIntensity);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(bloomctr.prototype, "blurSpread", {
+                get: function () { return this._blurSpread; },
+                set: function (value) {
+                    this._blurSpread = value;
+                    if (!this.material_1 || !this.material_2)
+                        return;
+                    var v4_1 = gd3d.math.pool.new_vector4();
+                    var v4_2 = gd3d.math.pool.new_vector4();
+                    v4_1.x = value;
+                    v4_1.y = 0;
+                    v4_2.x = 0;
+                    v4_2.y = value;
+                    this.material_1.setVector4("_blurSpread", v4_1);
+                    this.material_2.setVector4("_blurSpread", v4_2);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            bloomctr.prototype.init = function () {
+                var sh = this.scene.app.getAssetMgr().getShader("bloom.shader.json");
+                if (!sh) {
+                    console.warn("bloom.shader.json not find");
+                    return;
+                }
+                var psize = 1024;
+                var color = new framework.cameraPostQueue_Color();
+                color[this.tag] = true;
+                color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                if (!this.camera.postQueues)
+                    this.camera.postQueues = [];
+                this.camera.postQueues.push(color);
+                var textcolor = new framework.texture("_color");
+                textcolor.glTexture = color.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                post0[this.tag] = true;
+                this.material = post0.material;
+                this.material.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", textcolor);
+                post0.material.setTexture("_BlurTex", textcolor);
+                post0.material.setFloat("_bloomIntensity", 1.2);
+                post0.material.setFloat("_bloomThreshold", this._bloomThreshold);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(0, 0, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                var threTex = new framework.texture("_threshold");
+                threTex.glTexture = post0.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                post0[this.tag] = true;
+                this.material_1 = post0.material;
+                this.material_1.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", threTex);
+                post0.material.setTexture("_BlurTex", threTex);
+                post0.material.setFloat("_bloomIntensity", this._bloomIntensity);
+                post0.material.setFloat("_bloomThreshold", 1.0);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(this._blurSpread, 0, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                var hBlur = new framework.texture("_blur0");
+                hBlur.glTexture = post0.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, psize, psize, true, false);
+                post0[this.tag] = true;
+                this.material_2 = post0.material;
+                this.material_2.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", hBlur);
+                post0.material.setTexture("_BlurTex", hBlur);
+                post0.material.setFloat("_bloomIntensity", this._bloomIntensity);
+                post0.material.setFloat("_bloomThreshold", 1.0);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(0, this._blurSpread, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                var hvBlur = new framework.texture("_blur1");
+                hvBlur.glTexture = post0.renderTarget;
+                var post0 = new framework.cameraPostQueue_Quad();
+                post0[this.tag] = true;
+                this.material_3 = post0.material;
+                post0.material.use();
+                post0.material.setShader(sh);
+                post0.material.setTexture("_MainTex", textcolor);
+                post0.material.setTexture("_BlurTex", hvBlur);
+                post0.material.setFloat("_bloomIntensity", this._bloomIntensity);
+                post0.material.setFloat("_bloomThreshold", 0.5);
+                post0.material.setVector4("_blurSpread", new gd3d.math.vector4(0.5, 0.5, 0, 0));
+                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
+                this.camera.postQueues.push(post0);
+                this._init = true;
+            };
+            bloomctr.prototype.start = function () {
+                this.app = this.gameObject.transform.scene.app;
+                this.scene = this.app.getScene();
+            };
+            bloomctr.prototype.update = function (delta) {
+                if (this._init)
+                    return;
+                if (!this.camera)
+                    this.camera = this.gameObject.getComponent("camera");
+                if (this.camera)
+                    this.init();
+            };
+            bloomctr.prototype.remove = function () {
+                this._init = false;
+                if (this.camera) {
+                    var arr_3 = this.camera.postQueues;
+                    var dArr = [];
+                    for (var i = 0; i < arr_3.length; i++) {
+                        var temp = arr_3[i];
+                        if (temp[this.tag]) {
+                            dArr.push(temp);
+                        }
+                    }
+                    dArr.forEach(function (element) {
+                        if (element) {
+                            var idx = arr_3.indexOf(element);
+                            if (idx != -1) {
+                                arr_3.splice(idx, 1);
+                            }
+                        }
+                    });
+                }
+                if (this.material) {
+                    this.material.unuse();
+                    this.material = null;
+                }
+                if (this.material_1) {
+                    this.material_1.unuse();
+                    this.material_1 = null;
+                }
+                if (this.material_2) {
+                    this.material_2.unuse();
+                    this.material_2 = null;
+                }
+                if (this.material_3) {
+                    this.material_3.unuse();
+                    this.material_3 = null;
+                }
+            };
+            bloomctr.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], bloomctr.prototype, "bloomThreshold", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], bloomctr.prototype, "bloomIntensity", null);
+            bloomctr = __decorate([
+                gd3d.reflect.nodeComponent
+            ], bloomctr);
+            return bloomctr;
+        }());
+        framework.bloomctr = bloomctr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -12009,7 +12227,9 @@ var gd3d;
             meshRenderer.prototype.refreshLayerAndQue = function () {
                 if (this.materials == null || this.materials.length == 0) {
                     this.materials = [];
-                    this.materials.push(new framework.material());
+                    var material_2 = new framework.material();
+                    material_2.use();
+                    this.materials.push(material_2);
                     this.materials[0].setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
                 }
                 this.layer = this.materials[0].getLayer();
@@ -12067,6 +12287,10 @@ var gd3d;
                 }
             };
             meshRenderer.prototype.remove = function () {
+                this.materials.forEach(function (element) {
+                    if (element)
+                        element.unuse();
+                });
                 this.materials.length = 0;
             };
             meshRenderer.prototype.clone = function () {
@@ -12387,6 +12611,10 @@ var gd3d;
                 }
             };
             skinnedMeshRenderer.prototype.remove = function () {
+                this.materials.forEach(function (element) {
+                    if (element)
+                        element.unuse();
+                });
                 if (this.mesh)
                     this.mesh.unuse(true);
                 this.bones.length = 0;
@@ -14092,6 +14320,9 @@ var gd3d;
                 var type = _meta["class"]["typename"];
                 if (io.isAsset(type)) {
                     var _defaultAsset = instanceObj[key].defaultAsset;
+                    if (instanceObj[key].use) {
+                        instanceObj[key].use();
+                    }
                     if (isArray_3) {
                         clonedObj.push(instanceObj[key]);
                     }
@@ -16729,6 +16960,13 @@ var gd3d;
             out.y = vector.y * (1 - v) + vector2.y * v;
         }
         math.vec2SLerp = vec2SLerp;
+        function vec4SLerp(vector, vector2, v, out) {
+            out.x = vector.x * (1 - v) + vector2.x * v;
+            out.y = vector.y * (1 - v) + vector2.y * v;
+            out.z = vector.z * (1 - v) + vector2.z * v;
+            out.w = vector.w * (1 - v) + vector2.w * v;
+        }
+        math.vec4SLerp = vec4SLerp;
         function vec2Normalize(from, out) {
             var num = vec2Length(from);
             if (num > Number.MIN_VALUE) {
@@ -22642,6 +22880,7 @@ var gd3d;
                 this.matrixView = new gd3d.math.matrix();
                 this.matrixProject = new gd3d.math.matrix();
                 this.matrixModel = new gd3d.math.matrix();
+                this.matrixWorld2Object = new gd3d.math.matrix();
                 this.matrixModelViewProject = new gd3d.math.matrix;
                 this.matrixModelView = new gd3d.math.matrix;
                 this.matrixViewProject = new gd3d.math.matrix;
@@ -22692,6 +22931,7 @@ var gd3d;
             };
             renderContext.prototype.updateModel = function (model) {
                 gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
+                gd3d.math.matrixInverse(this.matrixModel, this.matrixWorld2Object);
                 gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
             };
             renderContext.prototype.updateModeTrail = function () {
@@ -27375,7 +27615,7 @@ var gd3d;
                 this.mipmap = mipmap;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
@@ -27436,7 +27676,7 @@ var gd3d;
                 this.mipmap = mipmap;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)

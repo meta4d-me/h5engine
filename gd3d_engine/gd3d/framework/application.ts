@@ -93,7 +93,7 @@ namespace gd3d.framework
             return this._timeScale;
         }
         private version: string = "v0.0.1";
-        private build: string = "b000041";
+        private build: string = "b000043";
         private _tar: number = -1;
         private _standDeltaTime: number = -1;
         /**
