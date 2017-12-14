@@ -1920,7 +1920,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.Font;
                 }
-                else if (extname == ".json" || extname == ".txt")
+                else if (extname == ".json" || extname == ".txt"||extname==".effect.json")
                 {
                     return AssetTypeEnum.TextAsset;
                 }
@@ -1940,7 +1940,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.KeyFrameAnimaionAsset;
                 }
-                else if(extname=".effect.json")
+                else if(extname==".f14effect.json")
                 {
                     return AssetTypeEnum.F14Effect;
                 }

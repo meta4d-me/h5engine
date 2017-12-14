@@ -95,7 +95,7 @@ namespace gd3d.framework
         }
         public restartFrame:number;
         private totalTime:number=0;
-        private totalFrame:number=0;
+        totalFrame:number=0;
         // public updateAndRenderAll(deltaTime:number)
         // {
         //     if (this.data == null) return;

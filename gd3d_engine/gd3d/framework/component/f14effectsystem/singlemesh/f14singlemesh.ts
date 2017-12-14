@@ -119,7 +119,7 @@ namespace gd3d.framework
 
             if (this.baseddata.enableTexAnimation)
             {
-                this.refreshCurTex_ST(frame,fps);
+                this.refreshCurTex_ST(frame,deltaTime,fps);
             }
             
             this.refreshTargetMatrix();
@@ -168,29 +168,31 @@ namespace gd3d.framework
     
     
     
-        public refreshCurTex_ST(curframe:number,fps:number)
+        public refreshCurTex_ST(curframe:number,detalTime:number,fps:number)
         {
             if (this.baseddata.uvType == UVTypeEnum.UVRoll)
-            {   
-                this.tex_ST.z = this.baseddata.uSpeed * (curframe-this.startFrame)/fps+this.tex_ST.z;
-                this.tex_ST.w = this.baseddata.vSpeed * (curframe - this.startFrame) /fps + this.tex_ST.w;
+            {
+                this.tex_ST.z +=this.baseddata.uSpeed*detalTime;
+                this.tex_ST.w +=this.baseddata.vSpeed*detalTime;
             }
             else if(this.baseddata.uvType==UVTypeEnum.UVSprite)
             {
                 let lerp = (curframe - this.startFrame) /(this.endFrame - this.startFrame);
-                
-                let index =Math.floor(lerp * this.baseddata.count);
-                index = index %this.baseddata.count;
+                let spritindex =Math.floor(lerp * this.baseddata.count);
+                gd3d.math.spriteAnimation(this.baseddata.row,this.baseddata.column,spritindex,this.tex_ST);
+
+
+                // index = index %this.baseddata.count;
     
-                let width = 1.0/ this.baseddata.column;//width
-                let height = 1.0/ this.baseddata.row;//height
-                let offsetx = width * (index % this.baseddata.column);//offsetx
-                let offsety = height * Math.floor(index / this.baseddata.column);//offsety
+                // let width = 1.0/ this.baseddata.column;//width
+                // let height = 1.0/ this.baseddata.row;//height
+                // let offsetx = width * (index % this.baseddata.column);//offsetx
+                // let offsety = height * Math.floor(index / this.baseddata.column);//offsety
     
-                this.tex_ST.x = width;
-                this.tex_ST.y = height;
-                this.tex_ST.z = offsetx;
-                this.tex_ST.w = offsety;
+                // this.tex_ST.x = width;
+                // this.tex_ST.y = height;
+                // this.tex_ST.z = offsetx;
+                // this.tex_ST.w = offsety;
             }
         }
     }
