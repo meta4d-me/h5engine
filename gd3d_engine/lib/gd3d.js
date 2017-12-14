@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000041";
+                this.build = "b000043";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -5023,7 +5023,7 @@ var gd3d;
             assetMgr.prototype.releaseUnuseAsset = function () {
                 for (var k in this.mapRes) {
                     if (this.mapRes[k].refcount <= 0) {
-                        if (!this.mapRes[k][this._loadingTag])
+                        if (this.mapRes[k][this._loadingTag])
                             continue;
                         var name_1 = this.mapRes[k].asset.getName();
                         if (this.mapNamed[name_1].length <= 1) {

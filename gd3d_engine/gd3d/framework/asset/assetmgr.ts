@@ -1125,7 +1125,7 @@ namespace gd3d.framework
             {
                 if (this.mapRes[k].refcount <= 0)
                 {
-                    if(!this.mapRes[k][this._loadingTag])continue;
+                    if(this.mapRes[k][this._loadingTag])continue;
                     
                     let name = this.mapRes[k].asset.getName();
                     if (this.mapNamed[name].length <= 1)
