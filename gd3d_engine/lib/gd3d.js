@@ -5534,7 +5534,7 @@ var gd3d;
                     else if (extname == ".font.json") {
                         return AssetTypeEnum.Font;
                     }
-                    else if (extname == ".json" || extname == ".txt") {
+                    else if (extname == ".json" || extname == ".txt" || extname == ".effect.json") {
                         return AssetTypeEnum.TextAsset;
                     }
                     else if (extname == ".packs.bin") {
@@ -5549,7 +5549,7 @@ var gd3d;
                     else if (extname == ".keyFrameAnimationPath.json") {
                         return AssetTypeEnum.KeyFrameAnimaionAsset;
                     }
-                    else if (extname == ".effect.json") {
+                    else if (extname == ".f14effect.json") {
                         return AssetTypeEnum.F14Effect;
                     }
                     i = file.indexOf(".", i + 1);
