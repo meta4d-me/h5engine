@@ -5,7 +5,9 @@
         "_Mask('Mask',Texture)='white'{}",
         "_MainTex_ST('MainTex_ST',Vector)=(1,1,0,0)",
         "_Mask_ST('Mask_ST',Vector)=(1,1,0,0)",
-        "_Main_Color('Main_Color', Color) = (1,1,0,1)"
+        "_Main_Color('Main_Color', Color) = (1,1,1,1)",
+        "_mixAlphaRate('mixAlphaRate',Float) = 1",
+        "_mixColorRate('mixColorRate',Float) = 1"
     ],
     "passes": {
         "base": [

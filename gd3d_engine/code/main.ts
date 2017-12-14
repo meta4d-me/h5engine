@@ -92,6 +92,7 @@ class main implements gd3d.framework.IUserCode
         // this.addBtn("test_eff",()=>new dome.db_test_eff());
         this.addBtn("tesrtss",()=>new dome.testCJ());
 
+        //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }
     
     private x: number = 0;
