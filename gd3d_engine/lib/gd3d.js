@@ -995,8 +995,10 @@ var gd3d;
                         this.pointEvent.type = framework.PointEventEnum.PointUp;
                     }
                     if (!skip) {
-                        this.rootNode.onCapturePointEvent(this, this.pointEvent);
-                        this.rootNode.onPointEvent(this, this.pointEvent);
+                        if (this.scene.app.bePlay) {
+                            this.rootNode.onCapturePointEvent(this, this.pointEvent);
+                            this.rootNode.onPointEvent(this, this.pointEvent);
+                        }
                         this.pointSelect = this.pointEvent.selected;
                         this.pointDown = touch;
                         this.pointX = this.pointEvent.x;
@@ -1864,6 +1866,8 @@ var gd3d;
                 this.layoutDirty = false;
                 this.lastParentWidth = 0;
                 this.lastParentHeight = 0;
+                this.lastParentPivot = new gd3d.math.vector2(0, 0);
+                this.lastPivot = new gd3d.math.vector2(0, 0);
             }
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
@@ -2084,22 +2088,25 @@ var gd3d;
                 var top = dirtylist.pop();
                 top.updateTran(false);
             };
+            transform2D.prototype.CalcReCanvasMtx = function (out) {
+                if (!out)
+                    return;
+                var tsca = gd3d.math.pool.new_vector2();
+                var ttran = gd3d.math.pool.new_vector2();
+                tsca.x = this.canvas.pixelWidth / 2;
+                tsca.y = -this.canvas.pixelHeight / 2;
+                ttran.x = this.canvas.pixelWidth / 2;
+                ttran.y = this.canvas.pixelHeight / 2;
+                gd3d.math.matrix3x2MakeTransformRTS(ttran, tsca, 0, out);
+            };
             transform2D.prototype.decomposeWorldMatrix = function () {
                 if (this.dirtyWorldDecompose) {
-                    var reCanvsMtx = gd3d.math.pool.new_matrix3x2();
-                    var tsca = gd3d.math.pool.new_vector2();
-                    var ttran = gd3d.math.pool.new_vector2();
-                    tsca.x = this.canvas.pixelWidth / 2;
-                    tsca.y = -this.canvas.pixelHeight / 2;
-                    ttran.x = this.canvas.pixelWidth / 2;
-                    ttran.y = this.canvas.pixelHeight / 2;
-                    gd3d.math.matrix3x2MakeTransformRTS(ttran, tsca, 0, reCanvsMtx);
+                    var reCanvasMtx = gd3d.math.pool.new_matrix3x2();
+                    this.CalcReCanvasMtx(reCanvasMtx);
                     var outMatrix = gd3d.math.pool.new_matrix3x2();
-                    gd3d.math.matrix3x2Multiply(reCanvsMtx, this.worldMatrix, outMatrix);
+                    gd3d.math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, outMatrix);
                     gd3d.math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    gd3d.math.pool.delete_vector2(tsca);
-                    gd3d.math.pool.delete_vector2(ttran);
-                    gd3d.math.pool.delete_matrix3x2(reCanvsMtx);
+                    gd3d.math.pool.delete_matrix3x2(reCanvasMtx);
                     gd3d.math.pool.delete_matrix3x2(outMatrix);
                     this.dirtyWorldDecompose = false;
                 }
@@ -2387,7 +2394,8 @@ var gd3d;
                 var parent = this.parent;
                 if (!parent)
                     return;
-                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight)
+                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
+                    || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                     this.layoutDirty = true;
                 if (!this.layoutDirty)
                     return;
@@ -2398,31 +2406,35 @@ var gd3d;
                         if (state & layoutOption.RIGHT) {
                             this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
                         }
-                        this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+                        this.localTranslate.x = this.getLayValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     else if (state & layoutOption.RIGHT) {
-                        this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
+                        this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     if (state & layoutOption.H_CENTER) {
-                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER);
+                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     if (state & layoutOption.TOP) {
                         if (state & layoutOption.BOTTOM) {
                             this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
                         }
-                        this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                        this.localTranslate.y = this.getLayValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     else if (state & layoutOption.BOTTOM) {
-                        this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                        this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     if (state & layoutOption.V_CENTER) {
-                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER);
+                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
                 this.layoutDirty = false;
-                this.lastParentWidth = this.parent.width;
-                this.lastParentHeight = this.parent.height;
+                this.lastParentWidth = parent.width;
+                this.lastParentHeight = parent.height;
+                this.lastParentPivot.x = parent.pivot.x;
+                this.lastParentPivot.y = parent.pivot.y;
+                this.lastPivot.x = this.pivot.x;
+                this.lastPivot.y = this.pivot.y;
             };
             transform2D.prototype.getLayValue = function (opation) {
                 if (this.layoutValueMap[opation] == undefined)
@@ -2434,12 +2446,12 @@ var gd3d;
                             case layoutOption.LEFT:
                             case layoutOption.H_CENTER:
                             case layoutOption.RIGHT:
-                                value = this.parent.width * this.layoutValueMap[opation];
+                                value = this.parent.width * this.layoutValueMap[opation] / 100;
                                 break;
                             case layoutOption.TOP:
                             case layoutOption.V_CENTER:
                             case layoutOption.BOTTOM:
-                                value = this.parent.height * this.layoutValueMap[opation];
+                                value = this.parent.height * this.layoutValueMap[opation] / 100;
                                 break;
                         }
                     }
@@ -2478,6 +2490,11 @@ var gd3d;
                 __metadata("design:type", gd3d.math.vector2)
             ], transform2D.prototype, "localScale", void 0);
             __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Boolean])
+            ], transform2D.prototype, "isMask", null);
+            __decorate([
                 gd3d.reflect.Field("C2DComponent[]"),
                 __metadata("design:type", Array)
             ], transform2D.prototype, "components", void 0);
@@ -2514,6 +2531,8 @@ var gd3d;
         var button = (function () {
             function button() {
                 this._transition = TransitionType.ColorTint;
+                this._origianlSpriteName = "";
+                this._pressedSpriteName = "";
                 this._normalColor = new gd3d.math.color(1, 1, 1, 1);
                 this._pressedColor = new gd3d.math.color(0.5, 0.5, 0.5, 1);
                 this._fadeDuration = 0.1;
@@ -2550,6 +2569,8 @@ var gd3d;
                     if (graphic != null) {
                         this._originalColor = graphic.color;
                         this._originalSprite = graphic.sprite;
+                        if (graphic.sprite)
+                            this._origianlSpriteName = graphic.sprite.getName();
                         if (this._transition = TransitionType.ColorTint) {
                             graphic.color = this.normalColor;
                         }
@@ -2569,6 +2590,9 @@ var gd3d;
                 },
                 set: function (sprite) {
                     this._pressedSprite = sprite;
+                    if (sprite != null) {
+                        this._pressedSpriteName = sprite.getName();
+                    }
                 },
                 enumerable: true,
                 configurable: true
@@ -2655,6 +2679,9 @@ var gd3d;
                     this.changeColor(this._normalColor);
                 }
                 else if (this.transition == TransitionType.SpriteSwap) {
+                    if (!this._originalSprite) {
+                        this._originalSprite = this.tryGetSprite(this._origianlSpriteName);
+                    }
                     this.changeSprite(this._originalSprite);
                 }
             };
@@ -2666,7 +2693,18 @@ var gd3d;
                     if (this._targetImage != null && this._targetImage.sprite != null && this._originalSprite == null) {
                         this._originalSprite = this._targetImage.sprite;
                     }
+                    if (!this._pressedSprite) {
+                        this._pressedSprite = this.tryGetSprite(this._pressedSpriteName);
+                    }
                     this.changeSprite(this._pressedSprite);
+                }
+            };
+            button.prototype.tryGetSprite = function (spriteName) {
+                var temp = this.transform.canvas.assetmgr.mapNamed[spriteName];
+                if (temp != null) {
+                    var tsprite = this.transform.canvas.assetmgr.getAssetByName(spriteName);
+                    if (tsprite)
+                        return tsprite;
                 }
             };
             button.prototype.changeColor = function (targetColor) {
@@ -2689,10 +2727,30 @@ var gd3d;
                 __metadata("design:paramtypes", [Number])
             ], button.prototype, "transition", null);
             __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], button.prototype, "_origianlSpriteName", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], button.prototype, "_pressedSpriteName", void 0);
+            __decorate([
+                gd3d.reflect.Field("reference"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.image2D])
+            ], button.prototype, "targetImage", null);
+            __decorate([
                 gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [gd3d.math.color])
             ], button.prototype, "normalColor", null);
+            __decorate([
+                gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [gd3d.math.color])
+            ], button.prototype, "pressedColor", null);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object),
@@ -2726,6 +2784,7 @@ var gd3d;
                 this._imageType = ImageType.Simple;
                 this._fillMethod = FillMethod.Horizontal;
                 this._fillAmmount = 1;
+                this._spriteName = "";
                 gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
                 gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
             }
@@ -2827,14 +2886,32 @@ var gd3d;
                     }
                     this._sprite = _sprite;
                     this._sprite.use();
+                    this._spriteName = this._sprite.getName();
                     this.prepareData();
-                    this.transform.markDirty();
-                    this.updateTran();
+                    if (this.transform != null) {
+                        this.transform.markDirty();
+                        this.updateTran();
+                    }
                 },
                 enumerable: true,
                 configurable: true
             });
             image2D.prototype.render = function (canvas) {
+                if (this._sprite == null) {
+                    var temp = canvas.assetmgr.mapNamed[this._spriteName];
+                    var tspr = void 0;
+                    if (temp != null) {
+                        tspr = canvas.assetmgr.getAssetByName(this._spriteName);
+                    }
+                    else {
+                        if (canvas.assetmgr.mapDefaultSprite[this._spriteName])
+                            tspr = canvas.assetmgr.getDefaultSprite(this._spriteName);
+                    }
+                    if (tspr) {
+                        this.sprite = tspr;
+                        this.needRefreshImg = true;
+                    }
+                }
                 var mat = this.uimat;
                 var img = null;
                 if (this._sprite != null && this._sprite.texture != null) {
@@ -3636,21 +3713,25 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("color"),
-                gd3d.reflect.UIStyle("vector4"),
+                gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", gd3d.math.color)
             ], image2D.prototype, "color", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("ImageType"),
+                gd3d.reflect.UIStyle("enum"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "imageType", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                gd3d.reflect.UIStyle("FillMethod"),
+                gd3d.reflect.UIStyle("enum"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "fillMethod", null);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], image2D.prototype, "_spriteName", void 0);
             image2D = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender,
@@ -3701,11 +3782,6 @@ var gd3d;
             Object.defineProperty(inputField.prototype, "text", {
                 get: function () {
                     return this._text;
-                },
-                set: function (text) {
-                    if (this._textLable) {
-                        this._textLable.text = text;
-                    }
                 },
                 enumerable: true,
                 configurable: true
@@ -3810,7 +3886,9 @@ var gd3d;
                     }
                 }
                 this.inputElement.value = this._text;
-                this.text = this._text;
+                if (this._textLable) {
+                    this._textLable.text = this._text;
+                }
                 if (this._text == "") {
                     this._placeholderLabel.transform.visible = true;
                     this._textLable.transform.visible = false;
@@ -3847,30 +3925,25 @@ var gd3d;
                 }
             };
             __decorate([
-                gd3d.reflect.Field("image2D"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [framework.image2D])
             ], inputField.prototype, "frameImage", null);
             __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String),
-                __metadata("design:paramtypes", [String])
-            ], inputField.prototype, "text", null);
-            __decorate([
-                gd3d.reflect.Field("lineType"),
+                gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], inputField.prototype, "myLineType", void 0);
             __decorate([
-                gd3d.reflect.Field("contentType"),
+                gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], inputField.prototype, "myContentType", void 0);
             __decorate([
-                gd3d.reflect.Field("label"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "TextLabel", null);
             __decorate([
-                gd3d.reflect.Field("label"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "PlaceholderLabel", null);
@@ -3907,7 +3980,8 @@ var gd3d;
     (function (framework) {
         var label = (function () {
             function label() {
-                this.needRefreshImg = false;
+                this.needRefreshFont = false;
+                this._fontName = "defFont";
                 this._fontsize = 14;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
@@ -3945,12 +4019,13 @@ var gd3d;
                     return this._font;
                 },
                 set: function (font) {
-                    this.needRefreshImg = true;
+                    this.needRefreshFont = true;
                     if (this._font) {
                         this._font.unuse();
                     }
                     this._font = font;
                     this._font.use();
+                    this._fontName = this._font.getName();
                 },
                 enumerable: true,
                 configurable: true
@@ -4110,6 +4185,16 @@ var gd3d;
                 configurable: true
             });
             label.prototype.render = function (canvas) {
+                if (this._font == null) {
+                    var temp = canvas.assetmgr.mapNamed[this._fontName];
+                    if (temp != null) {
+                        var tfont = canvas.assetmgr.getAssetByName(this._fontName);
+                        if (tfont) {
+                            this.font = tfont;
+                            this.needRefreshFont = true;
+                        }
+                    }
+                }
                 if (this._font != null) {
                     if (this.dirtyData == true) {
                         this.updateData(this._font);
@@ -4121,9 +4206,9 @@ var gd3d;
                         img = this._font.texture;
                     }
                     if (img != null) {
-                        if (this.needRefreshImg) {
+                        if (this.needRefreshFont) {
                             mat.setTexture("_MainTex", img);
-                            this.needRefreshImg = false;
+                            this.needRefreshFont = false;
                         }
                         if (this.transform.parentIsMask) {
                             if (this._cacheMaskV4 == null)
@@ -4168,15 +4253,24 @@ var gd3d;
                 __metadata("design:paramtypes", [String])
             ], label.prototype, "text", null);
             __decorate([
-                gd3d.reflect.Field("font"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.font])
-            ], label.prototype, "font", null);
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", Object)
+            ], label.prototype, "_fontName", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Number])
             ], label.prototype, "fontsize", null);
+            __decorate([
+                gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
+                __metadata("design:type", gd3d.math.color)
+            ], label.prototype, "color", void 0);
+            __decorate([
+                gd3d.reflect.Field("color"),
+                gd3d.reflect.UIStyle("color"),
+                __metadata("design:type", gd3d.math.color)
+            ], label.prototype, "color2", void 0);
             label = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
@@ -4323,8 +4417,9 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("texture"),
-                __metadata("design:type", framework.texture)
-            ], rawImage2D.prototype, "_image", void 0);
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.texture])
+            ], rawImage2D.prototype, "image", null);
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("vector4"),
@@ -4930,6 +5025,7 @@ var gd3d;
                 this.mapShader = {};
                 this.mapDefaultMesh = {};
                 this.mapDefaultTexture = {};
+                this.mapDefaultSprite = {};
                 this.mapMaterial = {};
                 this.mapBundle = {};
                 this.mapRes = {};
@@ -4952,6 +5048,7 @@ var gd3d;
                 framework.defMesh.initDefaultMesh(this);
                 framework.defTexture.initDefaultTexture(this);
                 framework.defmaterial.initDefaultMaterial(this);
+                framework.defsprite.initDefaultSprite(this);
             };
             assetMgr.prototype.getShader = function (name) {
                 return this.mapShader[name];
@@ -4961,6 +5058,9 @@ var gd3d;
             };
             assetMgr.prototype.getDefaultTexture = function (name) {
                 return this.mapDefaultTexture[name];
+            };
+            assetMgr.prototype.getDefaultSprite = function (name) {
+                return this.mapDefaultSprite[name];
             };
             assetMgr.prototype.getMaterial = function (name) {
                 return this.mapMaterial[name];
@@ -6019,7 +6119,7 @@ var gd3d;
             tmpvar_1.w = 1.0;                           \
             tmpvar_1.xyz = _glesVertex.xyz;             \
             xlv_COLOR = _glesColor;                     \
-            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
             if(MaskState != 0.0){    \
                 mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
                 mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
@@ -6124,7 +6224,7 @@ var gd3d;
             tmpvar_1.xyz = _glesVertex.xyz;             \
             xlv_COLOR = _glesColor;                     \
             xlv_COLOREx = _glesColorEx;                     \
-            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
             defShader.fscodeuifont = "\
@@ -6165,7 +6265,7 @@ var gd3d;
             tmpvar_1.xyz = _glesVertex.xyz;             \
             xlv_COLOR = _glesColor;                     \
             xlv_COLOREx = _glesColorEx;                     \
-            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
             if(MaskState != 0.0){    \
                 mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
                 mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
@@ -6284,6 +6384,32 @@ var gd3d;
             return defShader;
         }());
         framework.defShader = defShader;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var defsprite = (function () {
+            function defsprite() {
+            }
+            defsprite.initDefaultSprite = function (assetmgr) {
+                var spt_white = new framework.sprite("white_sprite");
+                spt_white.texture = assetmgr.getDefaultTexture("white");
+                spt_white.defaultAsset = true;
+                assetmgr.mapDefaultSprite["white_sprite"] = spt_white;
+                var spt_gray = new framework.sprite("gray_sprite");
+                spt_white.texture = assetmgr.getDefaultTexture("gray");
+                spt_white.defaultAsset = true;
+                assetmgr.mapDefaultSprite["gray_sprite"] = spt_white;
+                var spt_grid = new framework.sprite("grid_sprite");
+                spt_white.texture = assetmgr.getDefaultTexture("grid");
+                spt_white.defaultAsset = true;
+                assetmgr.mapDefaultSprite["grid_sprite"] = spt_white;
+            };
+            return defsprite;
+        }());
+        framework.defsprite = defsprite;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -7430,6 +7556,10 @@ var gd3d;
                     this.sprites[spriteName] = r;
                 }
             };
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], atlas.prototype, "name", void 0);
             atlas = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -7443,6 +7573,12 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var f14node = (function () {
+            function f14node() {
+            }
+            return f14node;
+        }());
+        framework.f14node = f14node;
         var f14eff = (function () {
             function f14eff(assetName) {
                 if (assetName === void 0) { assetName = null; }
@@ -7478,9 +7614,20 @@ var gd3d;
                 this.f14data = new framework.F14EffectData();
                 this.f14data.parsejson(json, assetmgr, this.assetbundle);
                 this.trans = new gd3d.framework.transform();
-                this.f14Effect = this.trans.gameObject.addComponent("F14Effect");
+                this.f14Effect = this.trans.gameObject.addComponent("f14EffectSystem");
                 this.f14Effect.setData(this.f14data);
             };
+            f14eff.prototype.getCloneF14eff = function () {
+                var f14node = new gd3d.framework.f14node();
+                f14node.trans = new gd3d.framework.transform();
+                f14node.f14Effect = this.trans.gameObject.addComponent("f14EffectSystem");
+                f14node.f14Effect.setData(this.f14data);
+                return f14node;
+            };
+            f14eff = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], f14eff);
             return f14eff;
         }());
         framework.f14eff = f14eff;
@@ -8973,15 +9120,32 @@ var gd3d;
                 return total;
             };
             prefab.prototype.getCloneTrans = function () {
-                return gd3d.io.cloneObj(this.trans);
+                var temp = gd3d.io.cloneObj(this.trans);
+                if (temp instanceof framework.transform)
+                    return temp;
+            };
+            prefab.prototype.getCloneTrans2D = function () {
+                var temp = gd3d.io.cloneObj(this.trans);
+                if (temp instanceof framework.transform2D)
+                    return temp;
             };
             prefab.prototype.apply = function (trans) {
                 this.trans = trans;
             };
             prefab.prototype.Parse = function (jsonStr, assetmgr) {
                 this.jsonstr = jsonStr;
-                this.trans = new framework.transform();
-                gd3d.io.deSerialize(JSON.parse(jsonStr), this.trans, assetmgr, this.assetbundle);
+                var jsonObj = JSON.parse(jsonStr);
+                var type = jsonObj["type"];
+                switch (type) {
+                    case "transform":
+                        this.trans = new framework.transform;
+                        break;
+                    case "transform2D":
+                        this.trans = new framework.transform2D;
+                        break;
+                }
+                if (type != null)
+                    gd3d.io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
             };
             prefab = __decorate([
                 gd3d.reflect.SerializeType,
@@ -13485,8 +13649,8 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var F14Effect = (function () {
-            function F14Effect() {
+        var f14EffectSystem = (function () {
+            function f14EffectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
                 this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
@@ -13495,14 +13659,14 @@ var gd3d;
                 this.VF = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
                 this.elements = [];
                 this.renderBatch = [];
+                this.loopCount = 0;
                 this.totalTime = 0;
                 this.totalFrame = 0;
                 this.active = false;
             }
-            F14Effect.prototype.start = function () { };
-            F14Effect.prototype.remove = function () { };
-            F14Effect.prototype.clone = function () { };
-            F14Effect.prototype.setData = function (data) {
+            f14EffectSystem.prototype.start = function () { };
+            f14EffectSystem.prototype.remove = function () { };
+            f14EffectSystem.prototype.setData = function (data) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.data = data;
                 for (var i = 0, count = this.data.layers.length; i < count; i++) {
@@ -13515,7 +13679,7 @@ var gd3d;
                     }
                 }
             };
-            F14Effect.prototype.update = function (deltaTime) {
+            f14EffectSystem.prototype.update = function (deltaTime) {
                 if (!this.active)
                     return;
                 if (this.data == null)
@@ -13524,11 +13688,21 @@ var gd3d;
                 this.totalFrame = this.totalTime * this.fps;
                 this.restartFrame = this.totalFrame % this.data.lifeTime;
                 this.restartFrame = Math.floor(this.restartFrame);
+                var newLoopCount = Math.floor(this.totalFrame / this.data.lifeTime);
+                if (newLoopCount != this.loopCount) {
+                    this.OnEndOnceLoop();
+                }
+                this.loopCount = newLoopCount;
                 for (var i = 0; i < this.elements.length; i++) {
                     this.elements[i].update(deltaTime, this.totalFrame, this.fps);
                 }
             };
-            Object.defineProperty(F14Effect.prototype, "renderCamera", {
+            f14EffectSystem.prototype.OnEndOnceLoop = function () {
+                for (var i = 0; i < this.elements.length; i++) {
+                    this.elements[i].OnEndOnceLoop();
+                }
+            };
+            Object.defineProperty(f14EffectSystem.prototype, "renderCamera", {
                 get: function () {
                     if (this._renderCamera != null) {
                         return this._renderCamera;
@@ -13540,7 +13714,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            F14Effect.prototype.render = function (context, assetmgr, camera, Effqueue) {
+            f14EffectSystem.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 if (Effqueue === void 0) { Effqueue = 0; }
                 if (!this.active)
                     return;
@@ -13552,7 +13726,7 @@ var gd3d;
                     curCount += this.renderBatch[i].getElementCount();
                 }
             };
-            F14Effect.prototype.addF14layer = function (type, layerdata) {
+            f14EffectSystem.prototype.addF14layer = function (type, layerdata) {
                 if (type == framework.F14TypeEnum.SingleMeshType) {
                     var layer = new framework.F14Layer(this, layerdata);
                     var element = new framework.F14SingleMesh(this, layer);
@@ -13604,7 +13778,7 @@ var gd3d;
                     return layer;
                 }
             };
-            F14Effect.prototype.getElementCount = function () {
+            f14EffectSystem.prototype.getElementCount = function () {
                 var totalcount = 0;
                 for (var i = 0; i < this.layers.length; i++) {
                     if (this.layers[i].type == framework.F14TypeEnum.RefType) {
@@ -13616,40 +13790,20 @@ var gd3d;
                 }
                 return totalcount;
             };
-            F14Effect.prototype.dispose = function () {
+            f14EffectSystem.prototype.dispose = function () {
             };
-            F14Effect.prototype.play = function () {
+            f14EffectSystem.prototype.play = function () {
                 this.active = true;
             };
-            F14Effect.prototype.stop = function () {
+            f14EffectSystem.prototype.stop = function () {
                 this.active = false;
+                this.reset();
             };
-            F14Effect = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
-            ], F14Effect);
-            return F14Effect;
-        }());
-        framework.F14Effect = F14Effect;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var f14EffectSystem = (function () {
-            function f14EffectSystem() {
-                this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
-                this.queue = 0;
-            }
-            f14EffectSystem.prototype.start = function () {
-            };
-            f14EffectSystem.prototype.render = function (context, assetmgr, camera) {
-            };
-            f14EffectSystem.prototype.update = function (delta) {
-            };
-            f14EffectSystem.prototype.remove = function () {
+            f14EffectSystem.prototype.reset = function () {
+                this.totalTime = 0;
+                for (var i = 0; i < this.elements.length; i++) {
+                    this.elements[i].reset();
+                }
             };
             f14EffectSystem.prototype.clone = function () {
             };
@@ -14047,6 +14201,7 @@ var gd3d;
                 this.layer = layer;
                 this.baseddata = layer.data.elementdata;
                 this.currentData = this.baseddata;
+                this.newStartDataTime = this.baseddata.delayTime;
                 this.initBycurrentdata();
                 this.vertexCount = this.currentData.mesh.data.pos.length;
                 this.posArr = this.currentData.mesh.data.pos;
@@ -14057,22 +14212,24 @@ var gd3d;
                 this.dataforvboLen = this.vertexCount * this.vertexLength;
             }
             F14Emission.prototype.update = function (deltaTime, frame, fps) {
-                this.drawActive = true;
                 this.TotalTime += deltaTime;
+                this.refreshByFrameData(fps);
+                this.updateLife();
+                for (var i = 0; i < this.particlelist.length; i++) {
+                    this.particlelist[i].update(deltaTime);
+                }
+            };
+            F14Emission.prototype.refreshByFrameData = function (fps) {
                 this.frameLife = Math.floor(this.baseddata.duration * fps);
                 if (this.frameLife == 0)
                     this.frameLife = 1;
-                frame = Math.floor(this.TotalTime * fps) % this.frameLife;
-                this.updateLife();
+                var frame = Math.floor(this.TotalTime * fps) % this.frameLife;
                 if (frame != this.lastFrame && this.layer.frames[frame]) {
                     if (this.layer.frames[frame].data.EmissionData != this.currentData) {
                         this.changeCurrentBaseData(this.layer.frames[frame].data.EmissionData);
                     }
                 }
                 this.lastFrame = frame;
-                for (var i = 0; i < this.particlelist.length; i++) {
-                    this.particlelist[i].update(deltaTime);
-                }
             };
             F14Emission.prototype.changeCurrentBaseData = function (data) {
                 this.currentData = data;
@@ -14094,8 +14251,6 @@ var gd3d;
                 gd3d.math.quatMultiply(rot, this.localrot, this.worldRot);
                 return this.worldRot;
             };
-            F14Emission.prototype.uploadMeshData = function () {
-            };
             F14Emission.prototype.updateLife = function () {
                 if (this.beover)
                     return;
@@ -14103,7 +14258,7 @@ var gd3d;
                 if (this.curTime <= 0)
                     return;
                 this.updateEmission();
-                if (this.TotalTime > this.baseddata.duration) {
+                if (this.curTime > this.baseddata.duration) {
                     if (this.baseddata.beloop) {
                         switch (this.baseddata.loopenum) {
                             case framework.LoopEnum.Restart:
@@ -14134,7 +14289,7 @@ var gd3d;
                 var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
                 var realcount = needCount - this.numcount;
                 this.addParticle(realcount);
-                this.numcount = needCount;
+                this.numcount += realcount;
                 if (this.baseddata.bursts.length > 0) {
                     for (var i = 0; i < this.baseddata.bursts.length; i++) {
                         if (!this.baseddata.bursts[i].beburst() && this.baseddata.bursts[i].time <= this.TotalTime) {
@@ -14157,6 +14312,17 @@ var gd3d;
                         this.particlelist.push(pp);
                     }
                 }
+            };
+            F14Emission.prototype.reset = function () {
+                this.reInit();
+                for (var i = 0; i < this.particlelist.length; i++) {
+                    if (this.particlelist[i].actived) {
+                        this.particlelist[i].actived = false;
+                        this.deadParticles.push(this.particlelist[i]);
+                    }
+                }
+            };
+            F14Emission.prototype.OnEndOnceLoop = function () {
             };
             return F14Emission;
         }());
@@ -14452,7 +14618,7 @@ var gd3d;
                 this.mesh = this.emission.baseddata.mesh;
                 this.mat = this.emission.baseddata.material;
                 this.vertexLength = gd3d.render.meshData.calcByteSize(this.effect.VF) / 4;
-                var maxParticlesCount = this.getMaxVertexCount();
+                var maxParticlesCount = this.getMaxParticleCount();
                 var particleVertexCount = this.mesh.data.pos.length;
                 var particleIndexCount = this.mesh.data.trisindex.length;
                 var totalVertex = maxParticlesCount * particleVertexCount;
@@ -14473,7 +14639,7 @@ var gd3d;
                     this.mesh.submesh.push(sm);
                 }
             }
-            F14EmissionBatch.prototype.getMaxVertexCount = function () {
+            F14EmissionBatch.prototype.getMaxParticleCount = function () {
                 var maxrate;
                 var basrat = this.emission.baseddata.rateOverTime;
                 maxrate = basrat.isRandom ? basrat._valueLimitMax : basrat._value;
@@ -14499,7 +14665,7 @@ var gd3d;
                     var Count = info.count.isRandom ? info.count._valueLimitMax : info.count._value;
                     burstCount += Count;
                 }
-                return maxrate * maxlife + burstCount;
+                return Math.floor(maxrate * maxlife + burstCount + 1);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 this.mat.setQueue(Effqueue);
@@ -14509,7 +14675,6 @@ var gd3d;
                 for (var i = 0, len = this.emission.particlelist.length; i < len; i++) {
                     this.emission.particlelist[i].uploadMeshdata();
                 }
-                this.mesh.glMesh.bindVboBuffer(context.webgl);
                 this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = this.curIndexCount;
@@ -14547,6 +14712,9 @@ var gd3d;
                 this.alpha = 1;
                 this.Color = new gd3d.math.color();
                 this.actived = false;
+                this.tempos = gd3d.math.pool.new_vector3();
+                this.temcolor = gd3d.math.pool.new_color();
+                this.temUv = gd3d.math.pool.new_vector2();
                 this.transformVertex = new gd3d.math.matrix();
                 this.angleRot = new gd3d.math.quaternion();
                 this.worldpos = new gd3d.math.vector3();
@@ -14582,10 +14750,11 @@ var gd3d;
                 framework.F14EmissionBaseData.getRandomDirAndPosByZEmission(data, this.speedDir, this.StartPos);
                 gd3d.math.quatFromEulerAngles(this.Starteuler.x, this.Starteuler.y, this.Starteuler.z, this.rotationByEuler);
                 this.rotAngle = 0;
-                this.localScale = this.startScale;
-                this.color = this.startColor;
+                gd3d.math.vec3Clone(this.startScale, this.localScale);
+                gd3d.math.vec3Clone(this.startColor, this.color);
                 this.alpha = this.startAlpha;
                 this.tex_ST = this.starTex_ST;
+                gd3d.math.vec4Clone(this.starTex_ST, this.tex_ST);
             };
             F14Particle.prototype.update = function (deltaTime) {
                 if (!this.actived)
@@ -14609,22 +14778,19 @@ var gd3d;
                 if (this.actived) {
                     var batch = this.element.layer.batch;
                     for (var i = 0; i < this.element.vertexCount; i++) {
-                        var tempos = gd3d.math.pool.new_vector3();
-                        gd3d.math.matrixTransformVector3(this.element.posArr[i], this.transformVertex, tempos);
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 0] = tempos.x;
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 1] = tempos.y;
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 2] = tempos.z;
-                        var temColor = gd3d.math.pool.new_color();
-                        gd3d.math.colorMultiply(this.element.colorArr[i], this.Color, temColor);
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 3] = temColor.r;
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 4] = temColor.g;
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 5] = temColor.b;
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 6] = temColor.a;
-                        var temUv = gd3d.math.pool.new_vector2();
-                        temUv.x = this.element.uvArr[i].x * this.tex_ST.x + this.tex_ST.z;
-                        temUv.y = this.element.uvArr[i].y * this.tex_ST.y + this.tex_ST.w;
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 7] = temUv.x;
-                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 8] = temUv.y;
+                        gd3d.math.matrixTransformVector3(this.element.posArr[i], this.transformVertex, this.tempos);
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 0] = this.tempos.x;
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 1] = this.tempos.y;
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 2] = this.tempos.z;
+                        gd3d.math.colorMultiply(this.element.colorArr[i], this.Color, this.temcolor);
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 3] = this.temcolor.r;
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 4] = this.temcolor.g;
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 5] = this.temcolor.b;
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 6] = this.temcolor.a;
+                        this.temUv.x = this.element.uvArr[i].x * this.tex_ST.x + this.tex_ST.z;
+                        this.temUv.y = this.element.uvArr[i].y * this.tex_ST.y + this.tex_ST.w;
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 7] = this.temUv.x;
+                        batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 8] = this.temUv.y;
                     }
                     for (var i = 0; i < this.element.dataforebo.length; i++) {
                         batch.dataForEbo[i + batch.curIndexCount] = this.element.dataforebo[i] + batch.curVertexcount;
@@ -14845,7 +15011,7 @@ var gd3d;
                 this.baseddata = layer.data.elementdata;
                 this.layer = layer;
                 this.refreshStartEndFrame();
-                this.RefEffect = new framework.F14Effect();
+                this.RefEffect = new framework.f14EffectSystem();
                 this.RefEffect.setData(this.baseddata.refData);
             }
             F14RefElement.prototype.refreshStartEndFrame = function () {
@@ -14875,6 +15041,10 @@ var gd3d;
                     this.drawActive = true;
                 }
                 this.RefEffect.update(deltaTime);
+            };
+            F14RefElement.prototype.OnEndOnceLoop = function () {
+            };
+            F14RefElement.prototype.reset = function () {
             };
             return F14RefElement;
         }());
@@ -14930,28 +15100,21 @@ var gd3d;
                     this.drawActive = false;
                     return;
                 }
-                switch (this.baseddata.loopenum) {
-                    case framework.LoopEnum.Restart:
-                        if (this.effect.data.beloop) {
+                if (this.effect.data.beloop) {
+                    switch (this.baseddata.loopenum) {
+                        case framework.LoopEnum.Restart:
                             frame = this.effect.restartFrame;
-                        }
-                        if (frame < this.startFrame || frame > this.endFrame) {
-                            this.drawActive = false;
-                            return;
-                        }
-                        else {
-                            this.drawActive = true;
-                        }
-                        break;
-                    case framework.LoopEnum.TimeContinue:
-                        if (frame < this.startFrame || frame > this.endFrame) {
-                            this.drawActive = false;
-                            return;
-                        }
-                        else {
-                            this.drawActive = true;
-                        }
-                        break;
+                            break;
+                        case framework.LoopEnum.TimeContinue:
+                            break;
+                    }
+                }
+                if (frame < this.startFrame || frame > this.endFrame) {
+                    this.drawActive = false;
+                    return;
+                }
+                else {
+                    this.drawActive = true;
                 }
                 for (var item in this.layer.Attlines) {
                     var att = this.layer.Attlines[item];
@@ -14961,6 +15124,9 @@ var gd3d;
                     this.refreshCurTex_ST(frame, deltaTime, fps);
                 }
                 this.refreshTargetMatrix();
+            };
+            F14SingleMesh.prototype.OnEndOnceLoop = function () {
+                this.reset();
             };
             F14SingleMesh.prototype.refreshTargetMatrix = function () {
                 gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.localRotate);
@@ -15004,6 +15170,13 @@ var gd3d;
                     gd3d.math.spriteAnimation(this.baseddata.row, this.baseddata.column, spritindex, this.tex_ST);
                 }
             };
+            F14SingleMesh.prototype.reset = function () {
+                gd3d.math.vec3Clone(this.baseddata.position, this.position);
+                gd3d.math.vec3Clone(this.baseddata.scale, this.scale);
+                gd3d.math.vec3Clone(this.baseddata.euler, this.euler);
+                gd3d.math.colorClone(this.baseddata.color, this.color);
+                gd3d.math.vec4Clone(this.baseddata.tex_ST, this.tex_ST);
+            };
             return F14SingleMesh;
         }());
         framework.F14SingleMesh = F14SingleMesh;
@@ -15026,6 +15199,7 @@ var gd3d;
                 this.curVertexcount = 0;
                 this.curIndexCount = 0;
                 this.vertexLength = 0;
+                this.noBatch = false;
                 this.mat = new gd3d.math.matrix();
                 this.defST = new gd3d.math.vector4(1, 1, 0, 0);
                 this.type = framework.F14TypeEnum.SingleMeshType;
@@ -15034,6 +15208,25 @@ var gd3d;
             }
             F14SingleMeshBath.prototype.OnEndCollectElement = function () {
                 this.vertexLength = gd3d.render.meshData.calcByteSize(this.effect.VF) / 4;
+                if (this.meshlist.length == 1) {
+                    this.noBatch = true;
+                    this.mesh.glMesh = new gd3d.render.glMesh();
+                    this.dataForVbo = this.meshlist[0].dataforvbo;
+                    this.dataForEbo = this.meshlist[0].dataforebo;
+                    this.mesh.glMesh.initBuffer(this.effect.webgl, this.effect.VF, this.meshlist[0].baseddata.mesh.data.pos.length, gd3d.render.MeshTypeEnum.Static);
+                    this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
+                    this.mesh.submesh = [];
+                    {
+                        var sm = new framework.subMeshInfo();
+                        sm.matIndex = 0;
+                        sm.useVertexIndex = 0;
+                        sm.start = 0;
+                        sm.size = this.dataForEbo.length;
+                        sm.line = false;
+                        this.mesh.submesh.push(sm);
+                    }
+                    return;
+                }
                 var totalVertexCount = 0;
                 var toltalIndexCount = 0;
                 for (var i = 0, len = this.meshlist.length; i < len; i++) {
@@ -15084,18 +15277,25 @@ var gd3d;
                 if (this.activemeshlist.length < 1)
                     return;
                 this.ElementMat.setQueue(Effqueue);
-                this.curIndexCount = 0;
-                this.curVertexcount = 0;
-                this.curRealVboCount = 0;
-                for (var i = 0, len = this.activemeshlist.length; i < len; i++) {
-                    this.activemeshlist[i].uploadMeshdata();
+                if (this.noBatch) {
+                    this.ElementMat.setColor("_Main_Color", this.activemeshlist[0].color);
+                    this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
+                    this.ElementMat.setMatrix("_mat", this.activemeshlist[0].targetMat);
+                    this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
                 }
-                this.mesh.glMesh.bindVboBuffer(context.webgl);
-                this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
-                this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
-                this.mesh.submesh[0].size = this.curIndexCount;
-                this.ElementMat.setVector4("_Main_Color", new gd3d.math.vector4(1, 1, 1, 1));
-                this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
+                else {
+                    this.curIndexCount = 0;
+                    this.curVertexcount = 0;
+                    this.curRealVboCount = 0;
+                    for (var i = 0, len = this.activemeshlist.length; i < len; i++) {
+                        this.activemeshlist[i].uploadMeshdata();
+                    }
+                    this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
+                    this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
+                    this.mesh.submesh[0].size = this.curIndexCount;
+                    this.ElementMat.setVector4("_Main_Color", new gd3d.math.vector4(1, 1, 1, 1));
+                    this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
+                }
             };
             F14SingleMeshBath.prototype.unRender = function () {
             };
@@ -24626,7 +24826,7 @@ var gd3d;
                 this.matrixView = new gd3d.math.matrix();
                 this.matrixProject = new gd3d.math.matrix();
                 this.matrixModel = new gd3d.math.matrix();
-                this.matrixWorld2Object = new gd3d.math.matrix();
+                this._matrixWorld2Object = new gd3d.math.matrix();
                 this.matrixModelViewProject = new gd3d.math.matrix;
                 this.matrixModelView = new gd3d.math.matrix;
                 this.matrixViewProject = new gd3d.math.matrix;
@@ -24640,6 +24840,14 @@ var gd3d;
                 this.lightmapOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.webgl = webgl;
             }
+            Object.defineProperty(renderContext.prototype, "matrixWorld2Object", {
+                get: function () {
+                    gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
+                    return this._matrixWorld2Object;
+                },
+                enumerable: true,
+                configurable: true
+            });
             renderContext.prototype.updateCamera = function (app, camera) {
                 camera.calcViewPortPixel(app, this.viewPortPixel);
                 var asp = this.viewPortPixel.w / this.viewPortPixel.h;
@@ -24677,7 +24885,6 @@ var gd3d;
             };
             renderContext.prototype.updateModel = function (model) {
                 gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
-                gd3d.math.matrixInverse(this.matrixModel, this.matrixWorld2Object);
                 gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
             };
             renderContext.prototype.updateModeTrail = function () {
@@ -26297,7 +26504,7 @@ var gd3d;
             TransformUtil.create2D_image2D = function (img, app) {
                 img.transform.width = 100;
                 img.transform.height = 100;
-                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+                img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
             };
             TransformUtil.create2D_label = function (label, app) {
                 label.transform.width = 150;
@@ -26326,7 +26533,7 @@ var gd3d;
                 btn.transform.width = 150;
                 btn.transform.height = 50;
                 var img = btn.transform.addComponent("image2D");
-                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+                img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
                 img.imageType = gd3d.framework.ImageType.Sliced;
                 btn.targetImage = img;
                 btn.transition = gd3d.framework.TransitionType.ColorTint;

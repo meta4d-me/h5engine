@@ -453,6 +453,7 @@ declare namespace gd3d.framework {
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
+        private CalcReCanvasMtx(out);
         private decomposeWorldMatrix();
         getWorldTranslate(): math.vector2;
         getWorldScale(): math.vector2;
@@ -488,6 +489,8 @@ declare namespace gd3d.framework {
         private layoutDirty;
         private lastParentWidth;
         private lastParentHeight;
+        private lastParentPivot;
+        private lastPivot;
         private refreshLayout();
         private getLayValue(opation);
     }
@@ -511,6 +514,8 @@ declare namespace gd3d.framework {
         transition: TransitionType;
         private _originalColor;
         private _originalSprite;
+        private _origianlSpriteName;
+        private _pressedSpriteName;
         private _targetImage;
         targetImage: image2D;
         private _pressedSprite;
@@ -533,6 +538,7 @@ declare namespace gd3d.framework {
         private _dragOut;
         private showNormal();
         private showPress();
+        private tryGetSprite(spriteName);
         private changeColor(targetColor);
         private changeSprite(sprite);
     }
@@ -553,13 +559,14 @@ declare namespace gd3d.framework {
         fillMethod: FillMethod;
         private _fillAmmount;
         fillAmmount: number;
+        transform: transform2D;
         setTexture(texture: texture, border?: math.border, rect?: math.rect): void;
         sprite: sprite;
+        private _spriteName;
         render(canvas: canvas): void;
         private _cacheMaskV4;
         start(): void;
         update(delta: number): void;
-        transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private prepareData();
@@ -593,7 +600,7 @@ declare namespace gd3d.framework {
         private beFocus;
         private inputElement;
         private _text;
-        text: string;
+        readonly text: string;
         myLineType: lineType;
         myContentType: contentType;
         private _textLable;
@@ -633,7 +640,8 @@ declare namespace gd3d.framework {
         text: string;
         private _font;
         font: font;
-        private needRefreshImg;
+        private needRefreshFont;
+        private _fontName;
         private _fontsize;
         fontsize: number;
         linespace: number;
@@ -845,6 +853,10 @@ declare namespace gd3d.framework {
             [id: string]: texture;
         };
         getDefaultTexture(name: string): texture;
+        mapDefaultSprite: {
+            [id: string]: sprite;
+        };
+        getDefaultSprite(name: string): sprite;
         mapMaterial: {
             [id: string]: material;
         };
@@ -979,6 +991,11 @@ declare namespace gd3d.framework {
         static materialShader: string;
         static vsmaterialcolor: string;
         static initDefaultShader(assetmgr: assetMgr): void;
+    }
+}
+declare namespace gd3d.framework {
+    class defsprite {
+        static initDefaultSprite(assetmgr: assetMgr): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1190,6 +1207,10 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class f14node {
+        trans: transform;
+        f14Effect: f14EffectSystem;
+    }
     class f14eff implements IAsset {
         defaultAsset: boolean;
         private name;
@@ -1204,8 +1225,9 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         f14data: F14EffectData;
         trans: transform;
-        f14Effect: F14Effect;
+        f14Effect: f14EffectSystem;
         Parse(jsonStr: string, assetmgr: assetMgr): void;
+        getCloneF14eff(): f14node;
     }
 }
 declare namespace gd3d.framework {
@@ -1421,6 +1443,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         private trans;
         getCloneTrans(): transform;
+        getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
         Parse(jsonStr: string, assetmgr: assetMgr): void;
@@ -2245,14 +2268,13 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class F14Effect implements IRenderer {
+    class f14EffectSystem implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: CullingMask;
         queue: number;
         start(): void;
         gameObject: gameObject;
         remove(): void;
-        clone(): void;
         private fps;
         data: F14EffectData;
         layers: F14Layer[];
@@ -2261,12 +2283,14 @@ declare namespace gd3d.framework {
         setData(data: F14EffectData): void;
         private elements;
         renderBatch: F14Basebatch[];
+        private loopCount;
         update(deltaTime: number): void;
+        private OnEndOnceLoop();
         private _renderCamera;
         readonly renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue?: number): void;
-        restartFrame: number;
         private totalTime;
+        restartFrame: number;
         totalFrame: number;
         private addF14layer(type, layerdata);
         getElementCount(): number;
@@ -2274,19 +2298,7 @@ declare namespace gd3d.framework {
         private active;
         play(): void;
         stop(): void;
-        onFinish: () => void;
-    }
-}
-declare namespace gd3d.framework {
-    class f14EffectSystem implements IRenderer {
-        gameObject: gameObject;
-        layer: RenderLayerEnum;
-        renderLayer: CullingMask;
-        queue: number;
-        start(): void;
-        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        update(delta: number): void;
-        remove(): void;
+        reset(): void;
         clone(): void;
     }
 }
@@ -2299,15 +2311,16 @@ declare namespace gd3d.framework {
     interface F14Element {
         type: F14TypeEnum;
         update(deltaTime: number, frame: number, fps: number): any;
+        reset(): any;
+        OnEndOnceLoop(): any;
         layer: F14Layer;
         drawActive: boolean;
-        active: boolean;
     }
 }
 declare namespace gd3d.framework {
     class F14Layer {
         active: boolean;
-        effect: F14Effect;
+        effect: f14EffectSystem;
         data: F14LayerData;
         type: F14TypeEnum;
         frameList: number[];
@@ -2319,7 +2332,7 @@ declare namespace gd3d.framework {
         };
         element: F14Element;
         batch: F14Basebatch;
-        constructor(effect: F14Effect, data: F14LayerData);
+        constructor(effect: f14EffectSystem, data: F14LayerData);
         addFrame(index: number, framedata: F14FrameData): F14Frame;
         removeFrame(frame: number): void;
     }
@@ -2424,8 +2437,7 @@ declare namespace gd3d.framework {
         type: F14TypeEnum;
         layer: F14Layer;
         drawActive: boolean;
-        active: boolean;
-        effect: F14Effect;
+        effect: f14EffectSystem;
         baseddata: F14EmissionBaseData;
         currentData: F14EmissionBaseData;
         particlelist: F14Particle[];
@@ -2447,18 +2459,20 @@ declare namespace gd3d.framework {
         posArr: math.vector3[];
         colorArr: math.color[];
         uvArr: math.vector2[];
-        constructor(effect: F14Effect, layer: F14Layer);
+        constructor(effect: f14EffectSystem, layer: F14Layer);
         private lastFrame;
         update(deltaTime: number, frame: number, fps: number): void;
+        private refreshByFrameData(fps);
         changeCurrentBaseData(data: F14EmissionBaseData): void;
         private initBycurrentdata();
         getWorldMatrix(): math.matrix;
         getWorldRotation(): math.quaternion;
-        uploadMeshData(): void;
         private updateLife();
         private reInit();
         private updateEmission();
         private addParticle(count?);
+        reset(): void;
+        OnEndOnceLoop(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2531,7 +2545,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class F14EmissionBatch implements F14Basebatch {
         type: F14TypeEnum;
-        effect: F14Effect;
+        effect: f14EffectSystem;
         emission: F14Emission;
         private mesh;
         private mat;
@@ -2541,8 +2555,8 @@ declare namespace gd3d.framework {
         curVertexcount: number;
         curIndexCount: number;
         vertexLength: number;
-        constructor(effect: F14Effect, element: F14Emission);
-        private getMaxVertexCount();
+        constructor(effect: f14EffectSystem, element: F14Emission);
+        private getMaxParticleCount();
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
         unRender(): void;
         getElementCount(): number;
@@ -2596,6 +2610,9 @@ declare namespace gd3d.framework {
         constructor(element: F14Emission, data: F14EmissionBaseData);
         initByEmissionData(data: F14EmissionBaseData): void;
         update(deltaTime: number): void;
+        private tempos;
+        private temcolor;
+        private temUv;
         uploadMeshdata(): void;
         private transformVertex;
         private updateLocalMatrix();
@@ -2617,9 +2634,9 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class F14RefElementBatch implements F14Basebatch {
         type: F14TypeEnum;
-        effect: F14Effect;
+        effect: f14EffectSystem;
         private element;
-        constructor(effect: F14Effect, element: F14RefElement);
+        constructor(effect: f14EffectSystem, element: F14RefElement);
         unRender(): void;
         getElementCount(): number;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
@@ -2639,21 +2656,21 @@ declare namespace gd3d.framework {
         type: F14TypeEnum;
         layer: F14Layer;
         drawActive: boolean;
-        active: boolean;
         baseddata: F14RefBaseData;
         startFrame: number;
         endFrame: number;
-        effect: F14Effect;
-        constructor(effect: F14Effect, layer: F14Layer);
-        RefEffect: F14Effect;
+        effect: f14EffectSystem;
+        constructor(effect: f14EffectSystem, layer: F14Layer);
+        RefEffect: f14EffectSystem;
         private refreshStartEndFrame();
         update(deltaTime: number, frame: number, fps: number): void;
+        OnEndOnceLoop(): void;
+        reset(): void;
     }
 }
 declare namespace gd3d.framework {
     class F14SingleMesh implements F14Element {
         drawActive: boolean;
-        active: boolean;
         type: F14TypeEnum;
         layer: F14Layer;
         private effect;
@@ -2671,21 +2688,23 @@ declare namespace gd3d.framework {
         private posArr;
         private colorArr;
         private uvArr;
-        private dataforvbo;
-        private dataforebo;
-        constructor(effect: F14Effect, layer: F14Layer);
+        dataforvbo: Float32Array;
+        dataforebo: Uint16Array;
+        constructor(effect: f14EffectSystem, layer: F14Layer);
         refreshStartEndFrame(): void;
         update(deltaTime: number, frame: number, fps: number): void;
+        OnEndOnceLoop(): void;
         targetMat: math.matrix;
         refreshTargetMatrix(): void;
         uploadMeshdata(): void;
         refreshCurTex_ST(curframe: number, detalTime: number, fps: number): void;
+        reset(): void;
     }
 }
 declare namespace gd3d.framework {
     interface F14Basebatch {
         type: F14TypeEnum;
-        effect: F14Effect;
+        effect: f14EffectSystem;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): any;
         unRender(): any;
         dispose(): any;
@@ -2693,7 +2712,7 @@ declare namespace gd3d.framework {
     }
     class F14SingleMeshBath implements F14Basebatch {
         type: F14TypeEnum;
-        effect: F14Effect;
+        effect: f14EffectSystem;
         ElementMat: gd3d.framework.material;
         meshlist: F14SingleMesh[];
         private activemeshlist;
@@ -2708,9 +2727,10 @@ declare namespace gd3d.framework {
         curVertexcount: number;
         curIndexCount: number;
         vertexLength: number;
-        constructor(mat: material, effect: F14Effect);
+        constructor(mat: material, effect: f14EffectSystem);
+        private noBatch;
         OnEndCollectElement(): void;
-        reInit(mat: material, effect: F14Effect): void;
+        reInit(mat: material, effect: f14EffectSystem): void;
         addElement(mesh: F14SingleMesh, insert?: boolean): void;
         canBatch(mesh: F14SingleMesh): boolean;
         getElementCount(): number;
@@ -4289,7 +4309,8 @@ declare namespace gd3d.framework {
         matrixView: gd3d.math.matrix;
         matrixProject: gd3d.math.matrix;
         matrixModel: gd3d.math.matrix;
-        matrixWorld2Object: gd3d.math.matrix;
+        private _matrixWorld2Object;
+        readonly matrixWorld2Object: math.matrix;
         matrixModelViewProject: gd3d.math.matrix;
         matrixModelView: gd3d.math.matrix;
         matrixViewProject: gd3d.math.matrix;
