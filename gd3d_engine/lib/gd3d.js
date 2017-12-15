@@ -14958,7 +14958,7 @@ var gd3d;
                     att.getValue(frame, this.baseddata, this[item]);
                 }
                 if (this.baseddata.enableTexAnimation) {
-                    this.refreshCurTex_ST(frame, fps);
+                    this.refreshCurTex_ST(frame, deltaTime, fps);
                 }
                 this.refreshTargetMatrix();
             };
@@ -14993,23 +14993,15 @@ var gd3d;
                 batch.curIndexCount += this.dataforebo.length;
                 batch.curVertexcount += this.vertexCount;
             };
-            F14SingleMesh.prototype.refreshCurTex_ST = function (curframe, fps) {
+            F14SingleMesh.prototype.refreshCurTex_ST = function (curframe, detalTime, fps) {
                 if (this.baseddata.uvType == framework.UVTypeEnum.UVRoll) {
-                    this.tex_ST.z = this.baseddata.uSpeed * (curframe - this.startFrame) / fps + this.tex_ST.z;
-                    this.tex_ST.w = this.baseddata.vSpeed * (curframe - this.startFrame) / fps + this.tex_ST.w;
+                    this.tex_ST.z += this.baseddata.uSpeed * detalTime;
+                    this.tex_ST.w += this.baseddata.vSpeed * detalTime;
                 }
                 else if (this.baseddata.uvType == framework.UVTypeEnum.UVSprite) {
                     var lerp = (curframe - this.startFrame) / (this.endFrame - this.startFrame);
-                    var index = Math.floor(lerp * this.baseddata.count);
-                    index = index % this.baseddata.count;
-                    var width = 1.0 / this.baseddata.column;
-                    var height = 1.0 / this.baseddata.row;
-                    var offsetx = width * (index % this.baseddata.column);
-                    var offsety = height * Math.floor(index / this.baseddata.column);
-                    this.tex_ST.x = width;
-                    this.tex_ST.y = height;
-                    this.tex_ST.z = offsetx;
-                    this.tex_ST.w = offsety;
+                    var spritindex = Math.floor(lerp * this.baseddata.count);
+                    gd3d.math.spriteAnimation(this.baseddata.row, this.baseddata.column, spritindex, this.tex_ST);
                 }
             };
             return F14SingleMesh;
