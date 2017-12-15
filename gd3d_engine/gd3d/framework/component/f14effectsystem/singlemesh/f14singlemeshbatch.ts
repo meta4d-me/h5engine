@@ -3,7 +3,7 @@ namespace gd3d.framework
     export interface F14Basebatch
     {
         type:F14TypeEnum;
-        effect:F14Effect;
+        effect:f14EffectSystem;
         //public F14Layer layer;
         render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number);
         unRender();
@@ -16,7 +16,7 @@ namespace gd3d.framework
     {
 
         type: F14TypeEnum;
-        effect: F14Effect;
+        effect: f14EffectSystem;
 
         public ElementMat:gd3d.framework.material;
     
@@ -42,17 +42,38 @@ namespace gd3d.framework
 
         vertexLength:number=0;
 
-        public constructor(mat:material, effect:F14Effect)
+        public constructor(mat:material, effect:f14EffectSystem)
         {
             this.type=F14TypeEnum.SingleMeshType;
             this.effect = effect;
     
             this.ElementMat = mat;
         }
+        private noBatch=false;
         OnEndCollectElement()
         {
             this.vertexLength=gd3d.render.meshData.calcByteSize(this.effect.VF)/4;
+            if(this.meshlist.length==1)
+            {
+                this.noBatch=true;
+                this.mesh.glMesh = new gd3d.render.glMesh();
+                this.dataForVbo=this.meshlist[0].dataforvbo;
+                this.dataForEbo=this.meshlist[0].dataforebo;
 
+                this.mesh.glMesh.initBuffer(this.effect.webgl,this.effect.VF,this.meshlist[0].baseddata.mesh.data.pos.length,render.MeshTypeEnum.Static);
+                this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
+                this.mesh.submesh = [];
+                {
+                    var sm = new subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = this.dataForEbo.length;
+                    sm.line = false;
+                    this.mesh.submesh.push(sm);
+                }
+                return;
+            }
             let totalVertexCount:number=0;
             let toltalIndexCount:number=0;
             for(let i=0,len=this.meshlist.length;i<len;i++)
@@ -84,7 +105,7 @@ namespace gd3d.framework
         }
 
 
-        public reInit(mat:material,effect:F14Effect)
+        public reInit(mat:material,effect:f14EffectSystem)
         {
             this.effect = effect;
             this.ElementMat = mat;
@@ -122,6 +143,34 @@ namespace gd3d.framework
 
             if (this.activemeshlist.length < 1) return;
             this.ElementMat.setQueue(Effqueue);
+            if(this.noBatch)
+            {
+                this.ElementMat.setColor("_Main_Color",this.activemeshlist[0].color);
+                this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
+                this.ElementMat.setMatrix("_mat",this.activemeshlist[0].targetMat);
+                this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
+            }else
+            {
+                //---------------------集合数据
+                this.curIndexCount=0;
+                this.curVertexcount=0;
+                this.curRealVboCount=0;
+                for(let i=0,len=this.activemeshlist.length;i<len;i++)
+                {
+                    this.activemeshlist[i].uploadMeshdata();
+                }
+
+                //---------------------render
+                //this.mesh.glMesh.bindVboBuffer(context.webgl);
+                
+                this.mesh.glMesh.uploadVertexData(context.webgl,this.dataForVbo);
+                this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
+                this.mesh.submesh[0].size=this.curIndexCount;
+
+                this.ElementMat.setVector4("_Main_Color",new math.vector4(1,1,1,1));
+                this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
+            }
+
             // if (this.activemeshlist.length == 1)
             // {
             //     let singlemsh=this.activemeshlist[0];
@@ -149,25 +198,6 @@ namespace gd3d.framework
             //     this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
             // }
 
-            //---------------------集合数据
-            this.curIndexCount=0;
-            this.curVertexcount=0;
-            this.curRealVboCount=0;
-            for(let i=0,len=this.activemeshlist.length;i<len;i++)
-            {
-                this.activemeshlist[i].uploadMeshdata();
-            }
-
-            //---------------------render
-            this.mesh.glMesh.bindVboBuffer(context.webgl);
-            
-            this.mesh.glMesh.uploadVertexData(context.webgl,this.dataForVbo);
-            this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
-            this.mesh.submesh[0].size=this.curIndexCount;
-
-            this.ElementMat.setVector4("_Main_Color",new math.vector4(1,1,1,1));
-            this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
-        
             //----------------------------按照count分情况处理--------------------------------------
         }
         unRender() {

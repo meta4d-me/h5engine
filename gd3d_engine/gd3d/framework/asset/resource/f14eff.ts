@@ -1,5 +1,12 @@
 namespace gd3d.framework
 {
+
+    export class f14node
+    {
+        trans:transform;
+        f14Effect:f14EffectSystem;
+    }
+    @gd3d.reflect.SerializeType    
     export class f14eff implements IAsset
     {
         defaultAsset: boolean=false;
@@ -38,7 +45,7 @@ namespace gd3d.framework
         }
         f14data:F14EffectData;
         trans:transform;
-        f14Effect:F14Effect;
+        f14Effect:f14EffectSystem;
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
             let json=JSON.parse(jsonStr);
@@ -46,8 +53,19 @@ namespace gd3d.framework
             this.f14data.parsejson(json,assetmgr,this.assetbundle);
             
             this.trans=new gd3d.framework.transform();
-            this.f14Effect=this.trans.gameObject.addComponent("F14Effect") as gd3d.framework.F14Effect;
+            this.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
             this.f14Effect.setData(this.f14data);
         }
-    }    
+
+        getCloneF14eff():f14node
+        {
+            let f14node=new gd3d.framework.f14node();
+            f14node.trans=new gd3d.framework.transform();
+            f14node.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
+            f14node.f14Effect.setData(this.f14data);
+            return f14node;
+        }
+    }
+
+
 }

@@ -2,16 +2,16 @@ namespace gd3d.framework
 {
     @reflect.nodeRender
     @reflect.nodeComponent
-    export class F14Effect implements IRenderer
+    export class f14EffectSystem implements IRenderer
     {
+
         layer: RenderLayerEnum=RenderLayerEnum.Transparent;
         renderLayer: CullingMask=CullingMask.default;
         queue: number=0;
         start() {}
         gameObject: gameObject;
         remove() {}
-        clone() {}
-
+        
         private fps:number=60;
         public data:F14EffectData;
         public layers:F14Layer[] =[];
@@ -37,21 +37,12 @@ namespace gd3d.framework
                     (this.renderBatch[i] as F14SingleMeshBath).OnEndCollectElement();
                 } 
             }
-
-
-
         }
-        // public changeData(data:F14EffectData)
-        // {
-        //     this.dispose();
-        //     this.setData(data);
-        // }
-    
+
         private elements:F14Element[] =[];
-        //public batchList:F14Basebatch[] =[];
-    
-        //public batchPool:F14SingleMeshBath[] =[];
         public renderBatch:F14Basebatch[] =[];
+
+        private loopCount:number=0;
         public update(deltaTime:number)
         {
             if(!this.active) return;
@@ -61,12 +52,26 @@ namespace gd3d.framework
             this.restartFrame = this.totalFrame % this.data.lifeTime;
             this.restartFrame=Math.floor(this.restartFrame);
 
+
+            let newLoopCount=Math.floor(this.totalFrame/this.data.lifeTime);
+            if(newLoopCount!=this.loopCount)
+            {
+                this.OnEndOnceLoop();
+            }
+            this.loopCount=newLoopCount;
+
             for (let i = 0; i < this.elements.length; i++)
             {
                 this.elements[i].update(deltaTime, this.totalFrame, this.fps);
             }
         }
-
+        private OnEndOnceLoop()
+        {
+            for (let i = 0; i < this.elements.length; i++)
+            {
+                this.elements[i].OnEndOnceLoop();
+            }
+        }
 
         private _renderCamera:camera;
         get renderCamera():camera
@@ -93,21 +98,9 @@ namespace gd3d.framework
             }
             
         }
-        public restartFrame:number;
         private totalTime:number=0;
+        public restartFrame:number;
         totalFrame:number=0;
-        // public updateAndRenderAll(deltaTime:number)
-        // {
-        //     if (this.data == null) return;
-        //     this.totalTime+=deltaTime;
-        //     this.totalFrame=this.totalTime*this.fps;
-
-        //     this.restartFrame = this.totalFrame % this.data.lifeTime;
-        //     this.update(deltaTime, this.totalFrame,this.fps);
-        //     this.render();
-        // }
-    
-      
 
         private addF14layer(type:F14TypeEnum, layerdata:F14LayerData):F14Layer
         {
@@ -203,7 +196,18 @@ namespace gd3d.framework
         public stop()
         {
             this.active=false;
+            this.reset();
         }
-        onFinish:()=>void;
+        reset()
+        {
+            this.totalTime=0;
+            for (let i = 0; i < this.elements.length; i++)
+            {
+                this.elements[i].reset();
+            }
+        }
+        clone() {
+            
+        }
     }
 }

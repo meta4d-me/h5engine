@@ -4,7 +4,7 @@ namespace gd3d.framework
     {
 
         type: F14TypeEnum;
-        effect: F14Effect;
+        effect: f14EffectSystem;
 
         //public Material mat;
         public emission:F14Emission;//
@@ -23,7 +23,7 @@ namespace gd3d.framework
 
         vertexLength:number=0;
 
-        public constructor(effect:F14Effect,element:F14Emission)
+        public constructor(effect:f14EffectSystem,element:F14Emission)
         {
             this.type= F14TypeEnum.particlesType;
             this.effect = effect;
@@ -34,7 +34,7 @@ namespace gd3d.framework
             //---------------------
             this.vertexLength=gd3d.render.meshData.calcByteSize(this.effect.VF)/4;
 
-            let maxParticlesCount=this.getMaxVertexCount();
+            let maxParticlesCount=this.getMaxParticleCount();
             let particleVertexCount=this.mesh.data.pos.length;
             let particleIndexCount=this.mesh.data.trisindex.length;
             let totalVertex=maxParticlesCount*particleVertexCount;
@@ -61,7 +61,7 @@ namespace gd3d.framework
                 this.mesh.submesh.push(sm);
             }
         }
-        private getMaxVertexCount():number
+        private getMaxParticleCount():number
         {
             let maxrate:number;
             let basrat=this.emission.baseddata.rateOverTime;
@@ -98,8 +98,9 @@ namespace gd3d.framework
                 let Count=info.count.isRandom?info.count._valueLimitMax:info.count._value;
                 burstCount+=Count;
             }
-            return maxrate*maxlife+burstCount;
+            return Math.floor(maxrate*maxlife+burstCount+1);
         }
+
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number)
         {
             this.mat.setQueue(Effqueue);
@@ -110,10 +111,15 @@ namespace gd3d.framework
             for(let i=0,len=this.emission.particlelist.length;i<len;i++)
             {
                 this.emission.particlelist[i].uploadMeshdata();
+                
             }
-
+            // if(this.maxcount<this.emission.particlelist.length)
+            // {
+            //     console.error("max:"+this.maxcount +"curPar:"+this.emission.particlelist.length);
+            // }
+            
             //---------------------render
-            this.mesh.glMesh.bindVboBuffer(context.webgl);      
+            //this.mesh.glMesh.bindVboBuffer(context.webgl);      
 
             this.mesh.glMesh.uploadVertexData(context.webgl,this.dataForVbo);
             this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);

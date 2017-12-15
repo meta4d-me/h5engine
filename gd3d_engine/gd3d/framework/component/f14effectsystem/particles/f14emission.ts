@@ -5,11 +5,8 @@ namespace gd3d.framework
         type: F14TypeEnum;
         layer: F14Layer;
         drawActive: boolean;
-        active: boolean;
-        public effect:F14Effect;
+        public effect:f14EffectSystem;
 
-
-    
         public baseddata:F14EmissionBaseData;
         public currentData:F14EmissionBaseData;
         //-------------------------数据------------------------------------
@@ -41,7 +38,7 @@ namespace gd3d.framework
         colorArr:math.color[];
         uvArr:math.vector2[];
 
-        public constructor(effect:F14Effect,layer:F14Layer)
+        public constructor(effect:f14EffectSystem,layer:F14Layer)
         {
             this.type = F14TypeEnum.particlesType;
             this.effect = effect;
@@ -49,6 +46,8 @@ namespace gd3d.framework
             this.baseddata = layer.data.elementdata as F14EmissionBaseData;
             this.currentData = this.baseddata;
             
+            this.newStartDataTime=this.baseddata.delayTime;
+
             this.initBycurrentdata();
             this.vertexCount=this.currentData.mesh.data.pos.length;
             this.posArr=this.currentData.mesh.data.pos;
@@ -62,12 +61,21 @@ namespace gd3d.framework
         private lastFrame:number = 0;
         public update(deltaTime:number, frame:number,fps:number)
         {
-            this.drawActive = true;
+            //this.drawActive = true;
             this.TotalTime += deltaTime;
+            
+            this.refreshByFrameData(fps);
+            this.updateLife();            
+            for (let i = 0; i < this.particlelist.length; i++)
+            {
+                this.particlelist[i].update(deltaTime);
+            }
+        }
+        private refreshByFrameData(fps:number)
+        {
             this.frameLife =Math.floor(this.baseddata.duration * fps);
             if (this.frameLife == 0) this.frameLife = 1;
-            frame = Math.floor(this.TotalTime * fps) % this.frameLife;
-            this.updateLife();
+            let frame = Math.floor(this.TotalTime * fps) % this.frameLife;
             //-------------------------------change current basedata------------------------------------------------------------
             if(frame!=this.lastFrame&&this.layer.frames[frame])
             {
@@ -76,12 +84,9 @@ namespace gd3d.framework
                     this.changeCurrentBaseData(this.layer.frames[frame].data.EmissionData);
                 }
             }
-            this.lastFrame = frame;
-            for (let i = 0; i < this.particlelist.length; i++)
-            {
-                this.particlelist[i].update(deltaTime);
-            }
+            this.lastFrame = frame;            
         }
+
         public changeCurrentBaseData(data:F14EmissionBaseData)
         {
             this.currentData = data;
@@ -94,8 +99,6 @@ namespace gd3d.framework
         {
             math.quatFromEulerAngles(this.currentData.rotEuler.x,this.currentData.rotEuler.y,this.currentData.rotEuler.z,this.localrot);
             math.matrixMakeTransformRTS(this.currentData.rotPosition,this.currentData.rotScale,this.localrot,this.localMatrix);
-
-            
         }
 
         public getWorldMatrix():math.matrix
@@ -110,39 +113,6 @@ namespace gd3d.framework
             gd3d.math.quatMultiply(rot, this.localrot, this.worldRot);
             return this.worldRot;
         }
-
-
-        public uploadMeshData()
-        {
-            // var perVertexCount=this.currentData.mesh.vertexCount;
-            // int[] indicArr = this.currentData.mesh.GetIndices(0);
-    
-            // this.vertices.Clear();
-            // this.colors.Clear();
-            // this.uv.Clear();
-    
-            // this.indices.Clear();
-            // for (int i = this.particlelist.Count-1,j=0; i >=0 ; i--,j++)
-            // //for (int i=0;i<this.particlelist.Count;i++)
-            // {
-            //     this.particlelist[i].updateMeshData();
-            //     for (int k = 0; k < indicArr.Length; k++)
-            //     {
-            //         int index = indicArr[k] +j*perVertexCount;
-            //         this.indices.Add(index);
-            //     }
-            // }
-            // this.refreshVirtualMeshData();
-        }
-    
-        // public void refreshVirtualMeshData()
-        // {
-        //     this.combinemesh.Clear();
-        //     this.combinemesh.SetVertices(this.vertices);
-        //     this.combinemesh.SetColors(this.colors);
-        //     this.combinemesh.SetUVs(0, this.uv);
-        //     this.combinemesh.SetIndices(this.indices.ToArray(), MeshTopology.Triangles, 0);
-        // }
     
         private updateLife()
         {
@@ -152,7 +122,7 @@ namespace gd3d.framework
             //--------------update in Livelife-------------------
             this.updateEmission();
     
-            if (this.TotalTime > this.baseddata.duration)
+            if (this.curTime > this.baseddata.duration)
             {
                 if (this.baseddata.beloop)
                 {
@@ -193,8 +163,8 @@ namespace gd3d.framework
             let needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime-this.newStartDataTime));
             let realcount = needCount - this.numcount;
             this.addParticle(realcount);
-            this.numcount=needCount;
-    
+            this.numcount+=realcount;
+
             if(this.baseddata.bursts.length>0)
             {
                 for(let i=0;i<this.baseddata.bursts.length;i++)
@@ -215,11 +185,6 @@ namespace gd3d.framework
             {
                 if (this.deadParticles.length > 0)
                 {
-                    // let pp = this.deadParticles[0];
-                    // this.deadParticles.RemoveAt(0);
-                    // pp.initByEmissionData(this.currentData);
-                    // this.particlelist.Add(pp);
-
                     let pp=this.deadParticles.pop();
                     pp.initByEmissionData(this.currentData);
                 }
@@ -229,6 +194,24 @@ namespace gd3d.framework
                     this.particlelist.push(pp);
                 }
             }
+        }
+        //重置，例子啥的消失
+        reset()
+        {
+            this.reInit();
+            //----------------
+            for(let i=0;i<this.particlelist.length;i++)
+            {
+                if(this.particlelist[i].actived)
+                {
+                    this.particlelist[i].actived=false;
+                    this.deadParticles.push(this.particlelist[i]);
+                }
+            }
+        }
+        OnEndOnceLoop()
+        {
+
         }
     }
     

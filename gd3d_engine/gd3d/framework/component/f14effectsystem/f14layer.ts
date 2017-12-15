@@ -3,7 +3,7 @@ namespace gd3d.framework
     export class F14Layer
     {
         public active:boolean = true;//timeline window 的toggle
-        public effect:F14Effect;
+        public effect:f14EffectSystem;
 
         public data:F14LayerData;
         public type:F14TypeEnum;
@@ -15,7 +15,7 @@ namespace gd3d.framework
     
         public element:F14Element;
         public batch:F14Basebatch;
-        constructor(effect:F14Effect,data:F14LayerData)
+        constructor(effect:f14EffectSystem,data:F14LayerData)
         {
             this.effect = effect;
             this.data = data;

@@ -102,10 +102,11 @@ namespace gd3d.framework
             //todo simulateinworld/billboard
     
     
-            this.localScale = this.startScale;
-            this.color = this.startColor;
+            gd3d.math.vec3Clone(this.startScale,this.localScale);
+            gd3d.math.vec3Clone(this.startColor,this.color);
             this.alpha = this.startAlpha;
             this.tex_ST = this.starTex_ST;
+            gd3d.math.vec4Clone(this.starTex_ST,this.tex_ST);
         }
     
         public update(deltaTime:number)
@@ -114,7 +115,6 @@ namespace gd3d.framework
             this.curLife += deltaTime;
             //this.curLife = Time.time - this.startTime;
             this.life01 = this.curLife / this.totalLife;
-    
             if (this.life01 > 1)
             {
                 this.actived = false;
@@ -132,9 +132,12 @@ namespace gd3d.framework
             this.updateLocalMatrix();
             this.updateColor();
             this.updateUV();
-    
+            
             //this.updateMeshData(this.curVertexCount);
         }
+        private tempos=math.pool.new_vector3();
+        private temcolor=math.pool.new_color();
+        private temUv=math.pool.new_vector2();
         uploadMeshdata()
         {
             if(this.actived)
@@ -142,24 +145,21 @@ namespace gd3d.framework
                 let batch=this.element.layer.batch as F14EmissionBatch;
                 for(let i=0;i<this.element.vertexCount;i++)
                 {
-                    let tempos=math.pool.new_vector3();
-                    math.matrixTransformVector3(this.element.posArr[i],this.transformVertex,tempos);
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+0]= tempos.x;
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+1]= tempos.y;
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+2]= tempos.z;
+                    math.matrixTransformVector3(this.element.posArr[i],this.transformVertex,this.tempos);
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+0]= this.tempos.x;
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+1]= this.tempos.y;
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+2]= this.tempos.z;
     
-                    let temColor=math.pool.new_color();
-                    math.colorMultiply(this.element.colorArr[i],this.Color,temColor);
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+3]= temColor.r;
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+4]= temColor.g;
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+5]= temColor.b;
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+6]= temColor.a;
-    
-                    let temUv=math.pool.new_vector2();
-                    temUv.x=this.element.uvArr[i].x*this.tex_ST.x+this.tex_ST.z;
-                    temUv.y=this.element.uvArr[i].y*this.tex_ST.y+this.tex_ST.w;
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+7]= temUv.x;
-                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+8]= temUv.y;
+                    math.colorMultiply(this.element.colorArr[i],this.Color,this.temcolor);
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+3]= this.temcolor.r;
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+4]= this.temcolor.g;
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+5]= this.temcolor.b;
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+6]= this.temcolor.a;
+
+                    this.temUv.x=this.element.uvArr[i].x*this.tex_ST.x+this.tex_ST.z;
+                    this.temUv.y=this.element.uvArr[i].y*this.tex_ST.y+this.tex_ST.w;
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+7]= this.temUv.x;
+                    batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+8]= this.temUv.y;
                 }
                 for(let i=0;i<this.element.dataforebo.length;i++)
                 {

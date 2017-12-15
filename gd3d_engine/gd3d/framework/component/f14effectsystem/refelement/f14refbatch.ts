@@ -3,9 +3,9 @@ namespace gd3d.framework
     export class F14RefElementBatch implements F14Basebatch
     {
         type: F14TypeEnum;
-        effect: F14Effect;
+        effect: f14EffectSystem;
         private element:F14RefElement;
-        public constructor(effect:F14Effect,element:F14RefElement)
+        public constructor(effect:f14EffectSystem,element:F14RefElement)
         {
             this.type = F14TypeEnum.RefType;
             this.effect = effect;

@@ -5,14 +5,13 @@ namespace gd3d.framework
         type: F14TypeEnum;
         layer: F14Layer;
         drawActive: boolean;
-        active: boolean;
         public baseddata:F14RefBaseData;
         //-----------------life from to---------------------
         public startFrame:number;
         public endFrame:number;
     
-        public effect:F14Effect;
-        public constructor(effect:F14Effect, layer:F14Layer)
+        public effect:f14EffectSystem;
+        public constructor(effect:f14EffectSystem, layer:F14Layer)
         {
             this.type = F14TypeEnum.RefType;
             this.effect = effect;
@@ -20,11 +19,11 @@ namespace gd3d.framework
             this.layer = layer;
             this.refreshStartEndFrame();
 
-            this.RefEffect = new F14Effect();
+            this.RefEffect = new f14EffectSystem();
             this.RefEffect.setData(this.baseddata.refData);
             //this.RefEffect.batchRoot = effect.player.transform;
         }
-        public RefEffect:F14Effect;
+        public RefEffect:f14EffectSystem;
     
         // public changeData(data:F14EffectData)
         // {
@@ -74,6 +73,15 @@ namespace gd3d.framework
                 this.drawActive = true;
             }
             this.RefEffect.update(deltaTime);
+        }
+
+        OnEndOnceLoop()
+        {
+
+        }
+        reset()
+        {
+
         }
     
     }
