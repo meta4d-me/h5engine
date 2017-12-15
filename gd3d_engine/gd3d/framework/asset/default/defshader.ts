@@ -39,7 +39,7 @@ namespace gd3d.framework
             tmpvar_1.w = 1.0;                           \
             tmpvar_1.xyz = _glesVertex.xyz;             \
             xlv_COLOR = _glesColor;                     \
-            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
             if(MaskState != 0.0){    \
                 mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
                 mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
@@ -151,7 +151,7 @@ namespace gd3d.framework
             tmpvar_1.xyz = _glesVertex.xyz;             \
             xlv_COLOR = _glesColor;                     \
             xlv_COLOREx = _glesColorEx;                     \
-            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
 
@@ -195,7 +195,7 @@ namespace gd3d.framework
             tmpvar_1.xyz = _glesVertex.xyz;             \
             xlv_COLOR = _glesColor;                     \
             xlv_COLOREx = _glesColorEx;                     \
-            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
             if(MaskState != 0.0){    \
                 mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
                 mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
