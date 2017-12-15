@@ -214,12 +214,16 @@ namespace gd3d.framework
         {
             if(this._sprite == null){
                 let temp = canvas.assetmgr.mapNamed[this._spriteName];
+                let tspr:sprite;
                 if(temp != null){
-                    let tspr = canvas.assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;
-                    if(tspr){
-                        this.sprite = tspr;
-                        this.needRefreshImg = true;
-                    }
+                    tspr = canvas.assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;
+                }else{
+                    if(canvas.assetmgr.mapDefaultSprite[this._spriteName]) //找默认资源
+                        tspr = canvas.assetmgr.getDefaultSprite(this._spriteName);
+                }
+                if(tspr){
+                    this.sprite = tspr;
+                    this.needRefreshImg = true;
                 }
             }
 

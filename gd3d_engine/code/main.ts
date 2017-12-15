@@ -84,6 +84,8 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_四分屏", () => new test_pick_4p());       
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
+        this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
+        
 
 
     }
@@ -104,7 +106,7 @@ class main implements gd3d.framework.IUserCode
         }
         btn.style.top = this.y + "px";
         btn.style.left = this.x + "px";
-        if (this.y + 24 > 400)
+        if (this.y + 24 > 550)
         {
             this.y = 100;
             this.x += 200;

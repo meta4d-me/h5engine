@@ -157,7 +157,6 @@ namespace gd3d.framework
          */
         start()
         {
-            debugger;
             this.inputElement = <HTMLInputElement>document.createElement("Input");
             this.inputElement.style.opacity = "0";
             this.inputElement.style.visibility = "hidden";

@@ -583,6 +583,7 @@ var main = (function () {
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
+        this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -596,7 +597,7 @@ var main = (function () {
         };
         btn.style.top = this.y + "px";
         btn.style.left = this.x + "px";
-        if (this.y + 24 > 400) {
+        if (this.y + 24 > 550) {
             this.y = 100;
             this.x += 200;
         }
@@ -3389,6 +3390,119 @@ var AlignType;
     AlignType[AlignType["TOP_RIGHT"] = 8] = "TOP_RIGHT";
     AlignType[AlignType["BOTTOM_RIGHT"] = 9] = "BOTTOM_RIGHT";
 })(AlignType || (AlignType = {}));
+var test_uiPerfabLoad = (function () {
+    function test_uiPerfabLoad() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+    }
+    test_uiPerfabLoad.prototype.start = function (app) {
+        var _this = this;
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.assetMgr = this.app.getAssetMgr();
+        this.app.closeFps();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 10;
+        this.rooto2d = new gd3d.framework.overlay2D();
+        this.camera.addOverLay(this.rooto2d);
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.createUI.bind(this));
+        var inputh = document.createElement("input");
+        this.app.container.appendChild(inputh);
+        inputh.style.position = "absolute";
+        inputh.style.width = 100 + "px";
+        inputh.style.height = 30 + "px";
+        var btn = document.createElement("button");
+        this.app.container.appendChild(btn);
+        btn.textContent = "加载";
+        btn.style.position = "absolute";
+        btn.style.left = 120 + "px";
+        btn.onclick = function () {
+            console.error(inputh.innerText);
+            console.error(inputh.textContent);
+            console.error(inputh.value);
+            _this.doLoad(inputh.value);
+        };
+    };
+    test_uiPerfabLoad.prototype.createUI = function (astState, state) {
+        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
+        var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
+        var bg_t = new gd3d.framework.transform2D;
+        bg_t.width = 400;
+        bg_t.height = 260;
+        bg_t.pivot.x = 0;
+        bg_t.pivot.y = 0;
+        bg_t.localTranslate.y = 100;
+        this.rooto2d.addChild(bg_t);
+        var bg_i = bg_t.addComponent("image2D");
+        bg_i.imageType = gd3d.framework.ImageType.Sliced;
+        bg_i.sprite = atlasComp.sprites["bg"];
+        bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
+        this.bgui = bg_t;
+        var prefabName = "button";
+        this.doLoad(prefabName);
+        var inputMgr = this.app.getInputMgr();
+        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
+            if (ev.keyCode == 81) {
+            }
+        }, false);
+        state.finish = true;
+    };
+    test_uiPerfabLoad.prototype.doLoad = function (name) {
+        var _this = this;
+        if (!this.bgui)
+            return;
+        if (this.targetui) {
+            this.bgui.removeChild(this.targetui);
+        }
+        var prefabName = name;
+        this.assetMgr.load("res/prefabs/UI/" + prefabName + "/" + prefabName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+            if (s1.isfinish) {
+                var ass = _this.assetMgr;
+                var temp = _this.assetMgr.getAssetByName(prefabName + ".prefab.json");
+                var t2d = temp.getCloneTrans2D();
+                _this.bgui.addChild(t2d);
+                t2d.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
+                t2d.markDirty();
+                _this.targetui = t2d;
+            }
+        });
+    };
+    test_uiPerfabLoad.prototype.loadTexture = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                        if (s.isfinish) {
+                                            state.finish = true;
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_uiPerfabLoad.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return test_uiPerfabLoad;
+}());
 var test_01 = (function () {
     function test_01() {
         this.timer = 0;

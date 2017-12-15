@@ -449,6 +449,7 @@ declare namespace gd3d.framework {
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
+        private CalcReCanvasMtx(out);
         private decomposeWorldMatrix();
         getWorldTranslate(): math.vector2;
         getWorldScale(): math.vector2;
@@ -484,6 +485,8 @@ declare namespace gd3d.framework {
         private layoutDirty;
         private lastParentWidth;
         private lastParentHeight;
+        private lastParentPivot;
+        private lastPivot;
         private refreshLayout();
         private getLayValue(opation);
     }
@@ -844,6 +847,10 @@ declare namespace gd3d.framework {
             [id: string]: texture;
         };
         getDefaultTexture(name: string): texture;
+        mapDefaultSprite: {
+            [id: string]: sprite;
+        };
+        getDefaultSprite(name: string): sprite;
         mapMaterial: {
             [id: string]: material;
         };
@@ -977,6 +984,11 @@ declare namespace gd3d.framework {
         static materialShader: string;
         static vsmaterialcolor: string;
         static initDefaultShader(assetmgr: assetMgr): void;
+    }
+}
+declare namespace gd3d.framework {
+    class defsprite {
+        static initDefaultSprite(assetmgr: assetMgr): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1387,6 +1399,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         private trans;
         getCloneTrans(): transform;
+        getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
         Parse(jsonStr: string, assetmgr: assetMgr): void;

@@ -113,10 +113,27 @@
          * 获取克隆的transform
          * @version egret-gd3d 1.0
          */
-        getCloneTrans(): transform
+        getCloneTrans(): transform 
         {
-            return io.cloneObj(this.trans);
+            let temp = io.cloneObj(this.trans);
+            if(temp instanceof transform)
+                return temp;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取克隆的transform2D
+         * @version egret-gd3d 1.0
+         */
+        getCloneTrans2D(): transform2D 
+        {
+            let temp = io.cloneObj(this.trans);
+            if(temp instanceof transform2D)
+                return temp;
+        }
+
         /**
          * @public
          * @language zh_CN

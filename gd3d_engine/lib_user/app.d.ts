@@ -421,6 +421,21 @@ declare enum AlignType {
     TOP_RIGHT = 8,
     BOTTOM_RIGHT = 9,
 }
+declare class test_uiPerfabLoad implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    rooto2d: gd3d.framework.overlay2D;
+    start(app: gd3d.framework.application): void;
+    private bgui;
+    private createUI(astState, state);
+    targetui: gd3d.framework.transform2D;
+    private doLoad(name);
+    private loadTexture(lastState, state);
+    update(delta: number): void;
+}
 declare class test_01 implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

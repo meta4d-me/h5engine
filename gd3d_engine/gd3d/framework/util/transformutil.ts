@@ -118,7 +118,7 @@ namespace gd3d.framework
         {
             img.transform.width = 100;
             img.transform.height = 100;
-            img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+            img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
         }
 
         private static create2D_label(label: label, app: application)
@@ -156,7 +156,7 @@ namespace gd3d.framework
             btn.transform.width = 150;
             btn.transform.height = 50;
             let img = btn.transform.addComponent("image2D") as gd3d.framework.image2D;
-            img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+            img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
             img.imageType = gd3d.framework.ImageType.Sliced;
             btn.targetImage = img;
             btn.transition = gd3d.framework.TransitionType.ColorTint;//颜色变换

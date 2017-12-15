@@ -1829,6 +1829,8 @@ var gd3d;
                 this.layoutDirty = false;
                 this.lastParentWidth = 0;
                 this.lastParentHeight = 0;
+                this.lastParentPivot = new gd3d.math.vector2(0, 0);
+                this.lastPivot = new gd3d.math.vector2(0, 0);
             }
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
@@ -2049,22 +2051,25 @@ var gd3d;
                 var top = dirtylist.pop();
                 top.updateTran(false);
             };
+            transform2D.prototype.CalcReCanvasMtx = function (out) {
+                if (!out)
+                    return;
+                var tsca = gd3d.math.pool.new_vector2();
+                var ttran = gd3d.math.pool.new_vector2();
+                tsca.x = this.canvas.pixelWidth / 2;
+                tsca.y = -this.canvas.pixelHeight / 2;
+                ttran.x = this.canvas.pixelWidth / 2;
+                ttran.y = this.canvas.pixelHeight / 2;
+                gd3d.math.matrix3x2MakeTransformRTS(ttran, tsca, 0, out);
+            };
             transform2D.prototype.decomposeWorldMatrix = function () {
                 if (this.dirtyWorldDecompose) {
-                    var reCanvsMtx = gd3d.math.pool.new_matrix3x2();
-                    var tsca = gd3d.math.pool.new_vector2();
-                    var ttran = gd3d.math.pool.new_vector2();
-                    tsca.x = this.canvas.pixelWidth / 2;
-                    tsca.y = -this.canvas.pixelHeight / 2;
-                    ttran.x = this.canvas.pixelWidth / 2;
-                    ttran.y = this.canvas.pixelHeight / 2;
-                    gd3d.math.matrix3x2MakeTransformRTS(ttran, tsca, 0, reCanvsMtx);
+                    var reCanvasMtx = gd3d.math.pool.new_matrix3x2();
+                    this.CalcReCanvasMtx(reCanvasMtx);
                     var outMatrix = gd3d.math.pool.new_matrix3x2();
-                    gd3d.math.matrix3x2Multiply(reCanvsMtx, this.worldMatrix, outMatrix);
+                    gd3d.math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, outMatrix);
                     gd3d.math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    gd3d.math.pool.delete_vector2(tsca);
-                    gd3d.math.pool.delete_vector2(ttran);
-                    gd3d.math.pool.delete_matrix3x2(reCanvsMtx);
+                    gd3d.math.pool.delete_matrix3x2(reCanvasMtx);
                     gd3d.math.pool.delete_matrix3x2(outMatrix);
                     this.dirtyWorldDecompose = false;
                 }
@@ -2352,7 +2357,8 @@ var gd3d;
                 var parent = this.parent;
                 if (!parent)
                     return;
-                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight)
+                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
+                    || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                     this.layoutDirty = true;
                 if (!this.layoutDirty)
                     return;
@@ -2363,31 +2369,35 @@ var gd3d;
                         if (state & layoutOption.RIGHT) {
                             this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
                         }
-                        this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+                        this.localTranslate.x = this.getLayValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     else if (state & layoutOption.RIGHT) {
-                        this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
+                        this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     if (state & layoutOption.H_CENTER) {
-                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER);
+                        this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                     }
                     if (state & layoutOption.TOP) {
                         if (state & layoutOption.BOTTOM) {
                             this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
                         }
-                        this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                        this.localTranslate.y = this.getLayValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     else if (state & layoutOption.BOTTOM) {
-                        this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                        this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     if (state & layoutOption.V_CENTER) {
-                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER);
+                        this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                     }
                     gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
                 this.layoutDirty = false;
-                this.lastParentWidth = this.parent.width;
-                this.lastParentHeight = this.parent.height;
+                this.lastParentWidth = parent.width;
+                this.lastParentHeight = parent.height;
+                this.lastParentPivot.x = parent.pivot.x;
+                this.lastParentPivot.y = parent.pivot.y;
+                this.lastPivot.x = this.pivot.x;
+                this.lastPivot.y = this.pivot.y;
             };
             transform2D.prototype.getLayValue = function (opation) {
                 if (this.layoutValueMap[opation] == undefined)
@@ -2399,12 +2409,12 @@ var gd3d;
                             case layoutOption.LEFT:
                             case layoutOption.H_CENTER:
                             case layoutOption.RIGHT:
-                                value = this.parent.width * this.layoutValueMap[opation];
+                                value = this.parent.width * this.layoutValueMap[opation] / 100;
                                 break;
                             case layoutOption.TOP:
                             case layoutOption.V_CENTER:
                             case layoutOption.BOTTOM:
-                                value = this.parent.height * this.layoutValueMap[opation];
+                                value = this.parent.height * this.layoutValueMap[opation] / 100;
                                 break;
                         }
                     }
@@ -2852,12 +2862,17 @@ var gd3d;
             image2D.prototype.render = function (canvas) {
                 if (this._sprite == null) {
                     var temp = canvas.assetmgr.mapNamed[this._spriteName];
+                    var tspr = void 0;
                     if (temp != null) {
-                        var tspr = canvas.assetmgr.getAssetByName(this._spriteName);
-                        if (tspr) {
-                            this.sprite = tspr;
-                            this.needRefreshImg = true;
-                        }
+                        tspr = canvas.assetmgr.getAssetByName(this._spriteName);
+                    }
+                    else {
+                        if (canvas.assetmgr.mapDefaultSprite[this._spriteName])
+                            tspr = canvas.assetmgr.getDefaultSprite(this._spriteName);
+                    }
+                    if (tspr) {
+                        this.sprite = tspr;
+                        this.needRefreshImg = true;
                     }
                 }
                 var mat = this.uimat;
@@ -3778,7 +3793,6 @@ var gd3d;
             };
             inputField.prototype.start = function () {
                 var _this = this;
-                debugger;
                 this.inputElement = document.createElement("Input");
                 this.inputElement.style.opacity = "0";
                 this.inputElement.style.visibility = "hidden";
@@ -4965,6 +4979,7 @@ var gd3d;
                 this.mapShader = {};
                 this.mapDefaultMesh = {};
                 this.mapDefaultTexture = {};
+                this.mapDefaultSprite = {};
                 this.mapMaterial = {};
                 this.mapBundle = {};
                 this.mapRes = {};
@@ -4986,6 +5001,7 @@ var gd3d;
                 framework.defMesh.initDefaultMesh(this);
                 framework.defTexture.initDefaultTexture(this);
                 framework.defmaterial.initDefaultMaterial(this);
+                framework.defsprite.initDefaultSprite(this);
             };
             assetMgr.prototype.getShader = function (name) {
                 return this.mapShader[name];
@@ -4995,6 +5011,9 @@ var gd3d;
             };
             assetMgr.prototype.getDefaultTexture = function (name) {
                 return this.mapDefaultTexture[name];
+            };
+            assetMgr.prototype.getDefaultSprite = function (name) {
+                return this.mapDefaultSprite[name];
             };
             assetMgr.prototype.getMaterial = function (name) {
                 return this.mapMaterial[name];
@@ -6303,6 +6322,32 @@ var gd3d;
             return defShader;
         }());
         framework.defShader = defShader;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var defsprite = (function () {
+            function defsprite() {
+            }
+            defsprite.initDefaultSprite = function (assetmgr) {
+                var spt_white = new framework.sprite("white_sprite");
+                spt_white.texture = assetmgr.getDefaultTexture("white");
+                spt_white.defaultAsset = true;
+                assetmgr.mapDefaultSprite["white_sprite"] = spt_white;
+                var spt_gray = new framework.sprite("gray_sprite");
+                spt_white.texture = assetmgr.getDefaultTexture("gray");
+                spt_white.defaultAsset = true;
+                assetmgr.mapDefaultSprite["gray_sprite"] = spt_white;
+                var spt_grid = new framework.sprite("grid_sprite");
+                spt_white.texture = assetmgr.getDefaultTexture("grid");
+                spt_white.defaultAsset = true;
+                assetmgr.mapDefaultSprite["grid_sprite"] = spt_white;
+            };
+            return defsprite;
+        }());
+        framework.defsprite = defsprite;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -8868,7 +8913,14 @@ var gd3d;
                 return total;
             };
             prefab.prototype.getCloneTrans = function () {
-                return gd3d.io.cloneObj(this.trans);
+                var temp = gd3d.io.cloneObj(this.trans);
+                if (temp instanceof framework.transform)
+                    return temp;
+            };
+            prefab.prototype.getCloneTrans2D = function () {
+                var temp = gd3d.io.cloneObj(this.trans);
+                if (temp instanceof framework.transform2D)
+                    return temp;
             };
             prefab.prototype.apply = function (trans) {
                 this.trans = trans;
@@ -24370,7 +24422,7 @@ var gd3d;
             TransformUtil.create2D_image2D = function (img, app) {
                 img.transform.width = 100;
                 img.transform.height = 100;
-                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+                img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
             };
             TransformUtil.create2D_label = function (label, app) {
                 label.transform.width = 150;
@@ -24399,7 +24451,7 @@ var gd3d;
                 btn.transform.width = 150;
                 btn.transform.height = 50;
                 var img = btn.transform.addComponent("image2D");
-                img.setTexture(app.getAssetMgr().getDefaultTexture("white"));
+                img.sprite = app.getAssetMgr().getDefaultSprite("white_sprite");
                 img.imageType = gd3d.framework.ImageType.Sliced;
                 btn.targetImage = img;
                 btn.transition = gd3d.framework.TransitionType.ColorTint;
