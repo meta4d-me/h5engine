@@ -326,6 +326,10 @@ namespace gd3d.io
             if (isAsset(type))
             {
                 let _defaultAsset: boolean = instanceObj[key].defaultAsset;
+                if(instanceObj[key].use){
+                    instanceObj[key].use();  
+                }
+
                 if (isArray)
                 {
                     clonedObj.push(instanceObj[key]);

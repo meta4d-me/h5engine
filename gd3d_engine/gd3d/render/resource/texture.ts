@@ -214,7 +214,7 @@
             this.mipmap = mipmap;
             this.loaded = true;
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
 
 
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
@@ -302,7 +302,7 @@
             this.mipmap = mipmap;
             this.loaded = true;
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
 
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             var formatGL = this.webgl.RGBA;

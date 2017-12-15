@@ -235,4 +235,43 @@ namespace gd3d.math
     //     rot: quaternion = new quaternion();
     //     tran: vector3 = new vector3();
     // }
+
+    export function vec4FormJson(json:string,vec4:vector4)
+    {
+        json=json.replace("(","");
+        json=json.replace(")","");    
+        let arr=json.split(",");
+        vec4.x=Number(arr[0]);
+        vec4.y=Number(arr[1]);
+        vec4.z=Number(arr[2]);
+        vec4.w=Number(arr[3]);
+    }
+    export function vec3FormJson(json:string,vec3:vector3)
+    {
+        json=json.replace("(","");
+        json=json.replace(")","");
+        
+        let arr=json.split(",");
+        vec3.x=Number(arr[0]);
+        vec3.y=Number(arr[1]);
+        vec3.z=Number(arr[2]);
+    }
+    export function vec2FormJson(json:string,vec2:vector2)
+    {
+        json=json.replace("(","");
+        json=json.replace(")","");    
+        let arr=json.split(",");
+        vec2.x=Number(arr[0]);
+        vec2.y=Number(arr[1]);
+    }
+    export function colorFormJson(json:string,_color:color)
+    {
+        json=json.replace("RGBA(","");
+        json=json.replace(")","");  
+        let arr=json.split(",");
+        _color.r=Number(arr[0]);
+        _color.g=Number(arr[1]);
+        _color.b=Number(arr[2]);
+        _color.a=Number(arr[3]);
+    }
 }

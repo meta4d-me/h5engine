@@ -89,14 +89,6 @@ declare namespace t {
         update(delta: number): void;
     }
 }
-declare class test_drawMesh implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    camera: gd3d.framework.camera;
-    timer: number;
-    update(delta: number): void;
-}
 declare class test_fakepbr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -143,6 +135,17 @@ declare class test_keyframeAnimation implements IState {
     private iniscene(laststate, state);
     private addbtns();
     private addbtn(text, x, y, func);
+    update(delta: number): void;
+}
+declare class testLiChangeMesh implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    uileft: number;
+    createChangeBtn(role: gd3d.framework.transform, role1: gd3d.framework.transform, o2d: gd3d.framework.overlay2D, part: string, part2: any): void;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    timer: number;
     update(delta: number): void;
 }
 declare namespace t {
@@ -596,14 +599,6 @@ declare namespace t {
         update(delta: number): void;
     }
 }
-declare class test_LiLoadScene implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    camera: gd3d.framework.camera;
-    timer: number;
-    update(delta: number): void;
-}
 declare class testloadImmediate implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -614,6 +609,26 @@ declare class testloadImmediate implements IState {
     cube3: gd3d.framework.transform;
     timer: number;
     update(delta: number): void;
+}
+declare namespace dome {
+    class testCJ implements IState {
+        private loadShader(laststate, state);
+        dragon: gd3d.framework.transform;
+        cameraPoint: gd3d.framework.transform;
+        private loadmesh(laststate, state);
+        private loadweapon(laststate, state);
+        private test(laststate, state);
+        camera: gd3d.framework.camera;
+        private addCamera(laststate, state);
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        taskmgr: gd3d.framework.taskMgr;
+        assetMgr: gd3d.framework.assetMgr;
+        start(app: gd3d.framework.application): void;
+        trans: gd3d.framework.transform;
+        time: number;
+        update(delta: number): void;
+    }
 }
 declare class test_loadMulBundle implements IState {
     app: gd3d.framework.application;
@@ -1277,5 +1292,21 @@ declare class test_effecteditor implements IState {
     effectloaded: boolean;
     bestop: boolean;
     bereplay: boolean;
+    update(delta: number): void;
+}
+declare class test_drawMesh implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    timer: number;
+    update(delta: number): void;
+}
+declare class test_LiLoadScene implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    camera: gd3d.framework.camera;
+    timer: number;
     update(delta: number): void;
 }

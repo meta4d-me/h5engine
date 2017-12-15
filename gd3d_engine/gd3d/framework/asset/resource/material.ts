@@ -56,7 +56,7 @@ namespace gd3d.framework
             }
             this.name = new constText(assetName);
             gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = render.UniformTypeEnum;
-            this.mapUniformTemp = {};
+            // this.mapUniformTemp = {};
         }
 
         /**
@@ -339,6 +339,10 @@ namespace gd3d.framework
         {
             return this.shader.queue+this.queue;
         }
+        setQueue(queue:number)
+        {
+            this.queue=queue;
+        }
         /**
          * @public
          * @language zh_CN
@@ -362,7 +366,7 @@ namespace gd3d.framework
         } = {};//参数
         private mapUniformTemp: {
             [id: string]: UniformData
-        };
+        }={};
         /**
          * @private
          */
@@ -412,6 +416,21 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
             }
         }
+        setColor(_id: string, _vector4: math.color)
+        {
+            if (this.mapUniform[_id] != undefined)
+                this.mapUniform[_id].value = _vector4;
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4)
+            {
+                this.mapUniformTemp[_id].value = _vector4;
+            }
+            else
+            {
+                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
+            }
+        }
+        
+
         /**
          * @private
          */
@@ -586,6 +605,9 @@ namespace gd3d.framework
                         case "glstate_matrix_model":
                             this.setMatrix(key, context.matrixModel);
                             break;
+                        case "glstate_matrix_world2object":
+                            this.setMatrix(key, context.matrixWorld2Object);
+                            break;
                         case "glstate_matrix_view":
                             this.setMatrix(key, context.matrixView);
                             break;
@@ -648,7 +670,7 @@ namespace gd3d.framework
                             break;
                         case "glstate_fog_color":
                             this.setVector4(key, context.fog._Color);
-                            break;
+                            break; 
                     }
                 }
                 this.uploadUniform(pass);

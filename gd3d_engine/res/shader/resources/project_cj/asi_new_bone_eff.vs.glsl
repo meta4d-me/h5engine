@@ -8,7 +8,6 @@ uniform highp mat4 glstate_matrix_model;
 
 uniform mediump vec4 _MainTex_ST;
 uniform mediump vec4 _asm_ST;
-uniform mediump vec4 _streamLight_ST;
 
 uniform lowp float _speedu;
 uniform lowp float _speedv;
@@ -19,12 +18,13 @@ varying mediump vec2 _maintex_uv;
 varying mediump vec2 _asm_uv;
 varying mediump vec2 _light_uv;
 varying highp vec3 normalDir;
-varying mediump vec3 lightDir;
+varying highp float angle;
+
 
 
 attribute vec4 _glesBlendIndex4;
 attribute vec4 _glesBlendWeight4;
-uniform highp vec4 glstate_vec4_bones[80];
+uniform highp vec4 glstate_vec4_bones[110];
 
 
 mat4 buildMat4(int index)
@@ -54,13 +54,9 @@ void main()
 	_maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + _asm_ST.zw;
 	lowp vec2 _speed= vec2(_speedu,_speedv);
-    _light_uv = (_glesMultiTexCoord0.xy * _streamLight_ST.xy + _streamLight_ST.zw)  + _speed * glstate_timer;
+    _light_uv =_speed * glstate_timer;
 	
- 	lowp float angle=_lightAngleSpeed*glstate_timer;
-	lightDir=vec3(cos(angle),0.0,sin(angle));
-
-
-	// gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
+ 	angle=_lightAngleSpeed*glstate_timer;
 
 
     lowp vec4 tmpvar_1=vec4(_glesVertex.xyz, 1.0);                       
@@ -75,8 +71,8 @@ void main()
 			 + buildMat4(i3)*_glesBlendWeight4.z 
 			 + buildMat4(i4)*_glesBlendWeight4.w;
 
-    normalDir=mat3(glstate_matrix_model)*mat3(mat)*_glesNormal;
-			 
+    mediump vec3 temnormal=mat3(glstate_matrix_model)*mat3(mat)*_glesNormal;
+	normalDir=temnormal;
     gl_Position = (glstate_matrix_mvp * mat)* tmpvar_1;
 }
 

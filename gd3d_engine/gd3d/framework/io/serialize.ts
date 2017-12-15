@@ -95,7 +95,8 @@ namespace gd3d.io
         let _flag: gd3d.framework.HideFlags = gd3d.framework.HideFlags.None;
         let _type: string;
 
-        if(boolInNull(instanceObj)){
+        if (boolInNull(instanceObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
 
@@ -124,7 +125,8 @@ namespace gd3d.io
         {
             if (key == "children") continue;
             let t = instanceObj["__gdmeta__"][key];
-            if (boolInNull(t)){
+            if (boolInNull(t))
+            {
                 continue;
             }
             if (t["custom"] == null)
@@ -161,10 +163,12 @@ namespace gd3d.io
      */
     export function serializeOtherTypeOrArrayForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean)
     {
-        if (boolInNull(instanceObj)){
+        if (boolInNull(instanceObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
-        if (boolInNull(serializedObj)){
+        if (boolInNull(serializedObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         if (instanceObj[key])
@@ -183,7 +187,8 @@ namespace gd3d.io
 
                 for (var newkey in instanceObj[key])
                 {
-                    if(instanceObj[key][newkey] == null || instanceObj[key][newkey] == undefined){
+                    if (instanceObj[key][newkey] == null || instanceObj[key][newkey] == undefined)
+                    {
                         continue;
                     }
                     if (instanceObj[key][newkey]["__gdmeta__"])
@@ -209,7 +214,8 @@ namespace gd3d.io
                                 case "number":
                                 case "string":
                                 case "boolean":
-                                    if (boolInNull(serializedObj[key]["value"])){
+                                    if (boolInNull(serializedObj[key]["value"]))
+                                    {
                                         continue;
                                     }
 
@@ -239,9 +245,10 @@ namespace gd3d.io
                 if (instanceObj["__gdmeta__"][key] && instanceObj["__gdmeta__"][key]["custom"])//&& instanceObj["__gdmeta__"][key]["custom"]["FieldUIStyle"]
                 {
                     let custom = instanceObj["__gdmeta__"][key]["custom"];
-                    if (custom["valueType"]){
+                    if (custom["valueType"])
+                    {
                         var info = new inspectorValueInfo(null, custom["valueType"]);
-                        if (custom["FieldUIStyle"])info.UIStyle = custom["FieldUIStyle"];
+                        if (custom["FieldUIStyle"]) info.UIStyle = custom["FieldUIStyle"];
                         if (custom["defvalue"]) info.defvalue = custom["defvalue"];
                         if (custom["min"]) info.min = custom["min"];
                         if (custom["max"]) info.max = custom["max"];
@@ -253,7 +260,7 @@ namespace gd3d.io
                         {
                             serializedObj[key] = info;//new valueInfo(_serializeObj, type, id);
                         }
-                    }                    
+                    }
                 }
             }
         }
@@ -264,13 +271,16 @@ namespace gd3d.io
      */
     export function serializeOtherTypeForInspector(instanceObj: any, serializedObj: any, key: string, beComponent: boolean, arrayInst: any = null)
     {
-        if(boolInNull(instanceObj)){
+        if (boolInNull(instanceObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
-        if (boolInNull(serializedObj)){
+        if (boolInNull(serializedObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
-        if (boolInNull(instanceObj[key]) || boolInNull(instanceObj[key]["__gdmeta__"])){
+        if (boolInNull(instanceObj[key]) || boolInNull(instanceObj[key]["__gdmeta__"]))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         let _meta = instanceObj[key]["__gdmeta__"];
@@ -402,7 +412,8 @@ namespace gd3d.io
      */
     export function serializeObj(instanceObj: any, serializedObj: any = undefined, assetMgr: any = null): any
     {
-        if (boolInNull(instanceObj)){
+        if (boolInNull(instanceObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         //过滤掉不需要序列化的对象
@@ -436,7 +447,8 @@ namespace gd3d.io
         for (let key in instanceObj["__gdmeta__"])
         {
             let t = instanceObj["__gdmeta__"][key];
-            if (t == null){
+            if (t == null)
+            {
                 continue;
             }
             if (t["custom"] == null)
@@ -471,10 +483,12 @@ namespace gd3d.io
      */
     export function serializeOtherTypeOrArray(instanceObj: any, serializedObj: any, key: string, assetMgr: any = null)
     {
-        if (boolInNull(instanceObj)){
+        if (boolInNull(instanceObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
-        if (boolInNull(serializedObj)){
+        if (boolInNull(serializedObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         if (instanceObj[key])
@@ -510,7 +524,8 @@ namespace gd3d.io
                         //如果数组是int、string、boolean。
                         if (!instanceObj[key]["__gdmeta__"])
                         {
-                            if(instanceObj[key][newkey] == null || instanceObj[key][newkey] == undefined){
+                            if (instanceObj[key][newkey] == null || instanceObj[key][newkey] == undefined)
+                            {
                                 continue;
                             }
                             let baseType: string = typeof (instanceObj[key][newkey]);
@@ -520,7 +535,8 @@ namespace gd3d.io
                                 case "string":
                                 case "boolean":
                                     let info: valueInfo = new valueInfo(instanceObj[key][newkey], baseType);
-                                    if (serializedObj[key]["value"]){
+                                    if (serializedObj[key]["value"])
+                                    {
                                         if (isArray)
                                         {
                                             serializedObj[key]["value"].push(info);
@@ -529,7 +545,7 @@ namespace gd3d.io
                                         {
                                             serializedObj[key]["value"][newkey] = info;
                                         }
-                                    }                                   
+                                    }
                                     break;
                                 default:
                                     break;
@@ -546,10 +562,12 @@ namespace gd3d.io
      */
     export function serializeOtherType(instanceObj: any, serializedObj: any, key: string, arrayInst: any = null, assetMgr: any = null)
     {
-        if (boolInNull(instanceObj || boolInNull(serializedObj))){
+        if (boolInNull(instanceObj || boolInNull(serializedObj)))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
-        if (boolInNull(instanceObj[key]) || boolInNull(instanceObj[key]["__gdmeta__"])){
+        if (boolInNull(instanceObj[key]) || boolInNull(instanceObj[key]["__gdmeta__"]))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         let _meta = instanceObj[key]["__gdmeta__"];
@@ -654,13 +672,20 @@ namespace gd3d.io
      */
     export function deSerialize(serializedObj: string, instanceObj: any, assetMgr: any, bundlename: string = null)
     {
-        if (boolInNull(serializedObj)){
+        if (boolInNull(serializedObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         referenceInfo.oldmap = {};
         //var serializedObj = JSON.parse(json);
         deSerializeObj(serializedObj["value"], instanceObj, assetMgr, bundlename);
-        referenceInfo.oldmap[serializedObj["insid"]] = instanceObj;
+        let insid = serializedObj["insid"];
+        if (!insid)
+        {
+            //console.error(serializedObj);
+        }
+        else
+            referenceInfo.oldmap[insid] = instanceObj;
 
         fillReference(serializedObj["value"], instanceObj);
     }
@@ -670,14 +695,16 @@ namespace gd3d.io
      */
     export function fillReference(serializedObj: any, instanceObj: any)
     {
-        if (boolInNull(instanceObj) || boolInNull(instanceObj["__gdmeta__"])){
+        if (boolInNull(instanceObj) || boolInNull(instanceObj["__gdmeta__"]))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         for (let key in instanceObj["__gdmeta__"])
         {
             let t = instanceObj["__gdmeta__"][key];
 
-            if (boolInNull(t)){
+            if (boolInNull(t))
+            {
                 continue;
             }
             if (t["custom"] == null)
@@ -708,7 +735,8 @@ namespace gd3d.io
      */
     export function dofillReferenceOrArray(serializedObj: any, instanceObj: any, key: string)
     {
-        if (boolInNull(serializedObj) || boolInNull(instanceObj)){
+        if (boolInNull(serializedObj) || boolInNull(instanceObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         if (serializedObj[key])
@@ -728,7 +756,7 @@ namespace gd3d.io
                 let arrayObj = null;
 
                 if (boolInNull(instanceObj["__gdmeta__"]) && boolInNull(instanceObj["__gdmeta__"][key]) && boolInNull(instanceObj["__gdmeta__"][key]["custom"])
-                 && instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type)
+                    && instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type)
                 {
                     throw new Error("反序列化失败，类型不匹配：" + instanceObj["__gdmeta__"][key]["custom"]["valueType"] + " as " + serializedObj[key].type);
                 }
@@ -736,7 +764,8 @@ namespace gd3d.io
 
                 for (var newkey in arrayObj)
                 {
-                    if (boolInNull(arrayObj[newkey])){
+                    if (boolInNull(arrayObj[newkey]))
+                    {
                         continue;
                     }
                     let baseType: string = arrayObj[newkey].type;
@@ -763,7 +792,8 @@ namespace gd3d.io
      */
     export function dofillReference(serializedObj: any, instanceObj: any, key: string)
     {
-        if (boolInNull(instanceObj) || boolInNull(serializedObj) || boolInNull(serializedObj[key])){
+        if (boolInNull(instanceObj) || boolInNull(serializedObj) || boolInNull(serializedObj[key]))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         let _isArray = instanceObj instanceof Array;
@@ -819,13 +849,15 @@ namespace gd3d.io
         {
             throw new Error("必须传入一个实例，用来赋值");
         }
-        if (boolInNull(instanceObj["__gdmeta__"])){
+        if (boolInNull(instanceObj["__gdmeta__"]))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         for (let key in instanceObj["__gdmeta__"])
         {
             let t = instanceObj["__gdmeta__"][key];
-            if (boolInNull(t)){
+            if (boolInNull(t))
+            {
                 continue;
             }
             if (t["custom"] == null)
@@ -868,13 +900,15 @@ namespace gd3d.io
      */
     export function deSerializeOtherTypeOrArray(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename: string = null)
     {
-        if (boolInNull(serializedObj) || boolInNull(instanceObj)){
+        if (boolInNull(serializedObj) || boolInNull(instanceObj))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         if (serializedObj[key])
         {
             let type: string = serializedObj[key].type;
-            if (type == null){
+            if (type == null)
+            {
                 throw new Error("必须传入一个实例，用来赋值");
             }
             if (isArrayOrDic(type.toLowerCase()))
@@ -891,7 +925,7 @@ namespace gd3d.io
                 let arrayObj = null;
 
                 if (boolInNull(instanceObj["__gdmeta__"]) && boolInNull(instanceObj["__gdmeta__"][key]) && boolInNull(instanceObj["__gdmeta__"][key]["custom"])
-                &&instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type)
+                    && instanceObj["__gdmeta__"][key]["custom"]["valueType"] != serializedObj[key].type)
                 {
                     throw new Error("反序列化失败，类型不匹配：" + instanceObj["__gdmeta__"][key]["custom"]["valueType"] + " as " + serializedObj[key].type);
                 }
@@ -963,7 +997,8 @@ namespace gd3d.io
      */
     export function deSerializeOtherType(serializedObj: any, instanceObj: any, key: string, assetMgr: any, bundlename: string = null)
     {
-        if (boolInNull(serializedObj) || boolInNull(instanceObj) || boolInNull(serializedObj[key])){
+        if (boolInNull(serializedObj) || boolInNull(instanceObj) || boolInNull(serializedObj[key]))
+        {
             throw new Error("必须传入一个实例，用来赋值");
         }
         let _isArray = instanceObj instanceof Array;
@@ -1040,7 +1075,12 @@ namespace gd3d.io
                         instanceObj[key] = _newInstance;
                 }
                 deSerializeObj(serializedObj[key].value, _newInstance, assetMgr, bundlename);
-                referenceInfo.oldmap[serializedObj[key].insid] = _newInstance;
+                let insid = serializedObj[key].insid;
+                if (!insid)
+                {
+                    // console.error(serializedObj[key]);
+                } else
+                    referenceInfo.oldmap[insid] = _newInstance;
             }
         }
     }
@@ -1180,8 +1220,10 @@ namespace gd3d.io
         static enumMap: { [id: string]: any } = {};
     }
 
-    function boolInNull(obj:any){
-        if (obj == null || obj == undefined){
+    function boolInNull(obj: any)
+    {
+        if (obj == null || obj == undefined)
+        {
             return true;
         }
         return false;

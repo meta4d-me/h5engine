@@ -53,10 +53,10 @@
         out.g = t * (srcb.g - srca.g) + srca.g;
         out.b = t * (srcb.b - srca.b) + srca.b;
 
-        out.a = Math.floor(out.a);
-        out.r = Math.floor(out.r);
-        out.g = Math.floor(out.g);
-        out.b = Math.floor(out.b);
+        // out.a = Math.floor(out.a);
+        // out.r = Math.floor(out.r);
+        // out.g = Math.floor(out.g);
+        // out.b = Math.floor(out.b);
     }
 
 }

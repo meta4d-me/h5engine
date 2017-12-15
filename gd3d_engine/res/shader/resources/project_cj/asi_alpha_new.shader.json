@@ -18,30 +18,16 @@
     "passes": {
         "base": [
             {
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "asi_new",
                 "fs": "asi_new"
             }
         ],
-        "base_fog": [
-            {
-                "showface": "ccw",
-                "vs": "fog_asi_new",
-                "fs": "fog_asi_new"
-            }
-        ],
         "skin": [
             {
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "asi_new_bone_eff",
                 "fs": "asi_new"
-            }
-        ],
-        "skin_fog": [
-            {
-                "showface": "ccw",
-                "vs": "fog_asi_new_bone_eff",
-                "fs": "fog_asi_new"
             }
         ],
         "shadowgen": [],

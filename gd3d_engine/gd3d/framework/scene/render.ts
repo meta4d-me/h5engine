@@ -17,6 +17,11 @@ namespace gd3d.framework
         matrixView: gd3d.math.matrix = new gd3d.math.matrix();
         matrixProject: gd3d.math.matrix = new gd3d.math.matrix();
         matrixModel: gd3d.math.matrix = new gd3d.math.matrix();
+        private _matrixWorld2Object: gd3d.math.matrix = new gd3d.math.matrix();
+        get matrixWorld2Object(){
+            gd3d.math.matrixInverse(this.matrixModel,this._matrixWorld2Object);
+            return this._matrixWorld2Object;
+        }
         matrixModelViewProject: gd3d.math.matrix = new gd3d.math.matrix;
         matrixModelView: gd3d.math.matrix = new gd3d.math.matrix;
         matrixViewProject: gd3d.math.matrix = new gd3d.math.matrix;

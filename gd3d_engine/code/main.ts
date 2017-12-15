@@ -68,6 +68,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_effecteditor", () => new test_effecteditor());
         this.addBtn("test_shadowmap", () => new test_ShadowMap());
         this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
+        this.addBtn("test_liChange", () => new testLiChangeMesh());
 
         //----------------------------------------------文档案例
         this.addBtn("example_newScene",() =>new test_NewScene());
@@ -88,6 +89,12 @@ class main implements gd3d.framework.IUserCode
         
 
 
+        // this.addBtn("test_drawMesh",()=>new test_drawMesh());
+        // this.addBtn("cj_zs",()=>new dome.testCJ());
+        // this.addBtn("test_eff",()=>new dome.db_test_eff());
+        this.addBtn("tesrtss",()=>new dome.testCJ());
+
+        //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }
     
     private x: number = 0;

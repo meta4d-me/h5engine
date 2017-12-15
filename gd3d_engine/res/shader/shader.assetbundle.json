@@ -381,6 +381,10 @@
           "length":0
           },
       {
+          "name":"resources/posteffect/custom_bloom.fs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/posteffect/dof.fs.glsl",
           "length":0
           },

@@ -1,112 +1,112 @@
 namespace gd3d.framework
 {
-    /**
-     * @private
-     */
-    export class NumberData
-    {
-        public isRandom: boolean = false;
-        private _value: number = 0;
-        private _valueLimitMin: number = 0;
-        private _valueLimitMax: number = 0;
-        private beInited: boolean = false;
-        private key:number;//random值（0--1）
-        setValue(value:number)
-        {
-            this._value=value;
-        }
-        setRandomValue(max:number,min:number)
-        {
-            this._valueLimitMax=max;
-            this._valueLimitMin=min;
-            this.isRandom=true;
-        }
-        /**
-         * 针对随机类型，只要随机过一次就返回值不变（rerandom=false），返回新的随机值（rerandom=true）
-         */
-        public getValue(reRandom:boolean=false)
-        {
-            if (this.isRandom)
-            {
-                if(reRandom||!this.beInited)
-                {
-                    this.key=Math.random();
-                    this._value=this.key*(this._valueLimitMax-this._valueLimitMin)+this._valueLimitMin;
-                    this.beInited = true
-                }
-            }
-            return this._value;
-        }
+    // /**
+    //  * @private
+    //  */
+    // export class NumberData
+    // {
+    //     public isRandom: boolean = false;
+    //     public _value: number = 0;
+    //     public _valueLimitMin: number = 0;
+    //     public _valueLimitMax: number = 0;
+    //     private beInited: boolean = false;
+    //     private key:number;//random值（0--1）
+    //     setValue(value:number)
+    //     {
+    //         this._value=value;
+    //     }
+    //     setRandomValue(max:number,min:number)
+    //     {
+    //         this._valueLimitMax=max;
+    //         this._valueLimitMin=min;
+    //         this.isRandom=true;
+    //     }
+    //     /**
+    //      * 针对随机类型，只要随机过一次就返回值不变（rerandom=false），返回新的随机值（rerandom=true）
+    //      */
+    //     public getValue(reRandom:boolean=false)
+    //     {
+    //         if (this.isRandom)
+    //         {
+    //             if(reRandom||!this.beInited)
+    //             {
+    //                 this.key=Math.random();
+    //                 this._value=this.key*(this._valueLimitMax-this._valueLimitMin)+this._valueLimitMin;
+    //                 this.beInited = true
+    //             }
+    //         }
+    //         return this._value;
+    //     }
 
-        constructor(value:number=null)
-        {
-            if(value!=null)
-            {
-                this._value=value;
-            }
-        }
+    //     constructor(value:number=null)
+    //     {
+    //         if(value!=null)
+    //         {
+    //             this._value=value;
+    //         }
+    //     }
 
-        public static RandomRange(min: number, max: number, isInteger: boolean = false)
-        {
-            if (isInteger)
-            {
-                return Math.floor(Math.random() * (max - min + 1) + min);
-            }
-            return Math.random() * (max - min) + min;
-        }
-    }
+    //     public static RandomRange(min: number, max: number, isInteger: boolean = false)
+    //     {
+    //         if (isInteger)
+    //         {
+    //             return Math.floor(Math.random() * (max - min + 1) + min);
+    //         }
+    //         return Math.random() * (max - min) + min;
+    //     }
+    // }
 
-    export class Vector3Data
-    {
-        x:NumberData=new NumberData();
-        y:NumberData=new NumberData();
-        z:NumberData=new NumberData();
+    // export class Vector3Data
+    // {
+    //     x:NumberData=new NumberData();
+    //     y:NumberData=new NumberData();
+    //     z:NumberData=new NumberData();
 
-        constructor(x:number=0,y:number=0,z:number=0)
-        {
-            this.x.setValue(x);
-            this.y.setValue(y);
-            this.z.setValue(z);
-        }
-        getValue():gd3d.math.vector3
-        {
-            var out:gd3d.math.vector3=new gd3d.math.vector3();
-            out.x=this.x.getValue();
-            out.y=this.y.getValue();
-            out.z=this.z.getValue();
-            return out;
-        }
-    }
-    export class NumberKey
-    {
-        key:number;
-        value:number;
-        constructor(_key:number,_value:number)
-        {
-            this.key=_key;
-            this.value=_value;
-        }
-    }
-    export class Vector3Key
-    {
-        key:number;
-        value:math.vector3;
-        constructor(_key:number,_value:math.vector3)
-        {
-            this.key=_key;
-            this.value=_value;
-        }
-    }
-    export class Vector2Key
-    {
-        key:number;
-        value:math.vector2;
-        constructor(_key:number,_value:math.vector2)
-        {
-            this.key=_key;
-            this.value=_value;
-        }
-    }
+    //     constructor(x:number=0,y:number=0,z:number=0)
+    //     {
+    //         this.x.setValue(x);
+    //         this.y.setValue(y);
+    //         this.z.setValue(z);
+    //     }
+    //     getValue():gd3d.math.vector3
+    //     {
+    //         var out:gd3d.math.vector3=new gd3d.math.vector3();
+    //         out.x=this.x.getValue();
+    //         out.y=this.y.getValue();
+    //         out.z=this.z.getValue();
+    //         return out;
+    //     }
+    // }
+    // export class NumberKey
+    // {
+    //     key:number;
+    //     value:number;
+    //     constructor(_key:number,_value:number)
+    //     {
+    //         this.key=_key;
+    //         this.value=_value;
+    //     }
+    // }
+    // export class Vector3Key
+    // {
+    //     key:number;
+    //     value:math.vector3;
+    //     constructor(_key:number,_value:math.vector3)
+    //     {
+    //         this.key=_key;
+    //         this.value=_value;
+    //     }
+    // }
+    // export class Vector2Key
+    // {
+    //     key:number;
+    //     value:math.vector2;
+    //     constructor(_key:number,_value:math.vector2)
+    //     {
+    //         this.key=_key;
+    //         this.value=_value;
+    //     }
+    // }
     export class effTools
     {
         public static getRandomDirAndPosByZEmission(emission:EffectElementEmission,outDir:gd3d.math.vector3,outPos:gd3d.math.vector3)
