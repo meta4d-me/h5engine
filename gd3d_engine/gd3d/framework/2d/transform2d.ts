@@ -1179,7 +1179,6 @@ namespace gd3d.framework
                 this.layoutDirty = true;
 
             if(!this.layoutDirty) return;
-            console.error(`refreshLayout : ${this.name}`);
             let state = this._layoutState;
             if(state != 0){
                 if(state & layoutOption.LEFT){

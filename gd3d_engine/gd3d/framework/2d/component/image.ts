@@ -138,42 +138,42 @@ namespace gd3d.framework
 
         transform: transform2D;
             
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置图片
-         * @param texture 图片
-         * @param border 切片信息
-         * @param rect 显示范围
-         * @version egret-gd3d 1.0
-         */
-        setTexture(texture: texture, border?: math.border, rect?: math.rect)
-        {   //image 不应该有setTexture
-            this.needRefreshImg = true;
-            if(this.sprite)
-            {
-                this.sprite.unuse();
-            }
-            var _sprite = new sprite();
-            _sprite.texture = texture;
-            if (border != null)
-                _sprite.border = border;
-            else
-                _sprite.border = new math.border(0, 0, 0, 0);
-            if (rect != null)
-                _sprite.rect = rect;
-            else
-                _sprite.rect = new math.rect(0, 0, texture.glTexture.width, texture.glTexture.height);
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 设置图片
+        //  * @param texture 图片
+        //  * @param border 切片信息
+        //  * @param rect 显示范围
+        //  * @version egret-gd3d 1.0
+        //  */
+        // setTexture(texture: texture, border?: math.border, rect?: math.rect)
+        // {   //image 不应该有setTexture
+        //     this.needRefreshImg = true;
+        //     if(this.sprite)
+        //     {
+        //         this.sprite.unuse();
+        //     }
+        //     var _sprite = new sprite();
+        //     _sprite.texture = texture;
+        //     if (border != null)
+        //         _sprite.border = border;
+        //     else
+        //         _sprite.border = new math.border(0, 0, 0, 0);
+        //     if (rect != null)
+        //         _sprite.rect = rect;
+        //     else
+        //         _sprite.rect = new math.rect(0, 0, texture.glTexture.width, texture.glTexture.height);
 
-            this.sprite = _sprite;
-            this.sprite.use();
-            this.prepareData();
-            if (this.transform != null){
-                this.transform.markDirty();
-                this.updateTran();
-            }
-        }
+        //     this.sprite = _sprite;
+        //     this.sprite.use();
+        //     this.prepareData();
+        //     if (this.transform != null){
+        //         this.transform.markDirty();
+        //         this.updateTran();
+        //     }
+        // }
         
         /**
          * @public
@@ -182,14 +182,20 @@ namespace gd3d.framework
          * 精灵
          * @version egret-gd3d 1.0
          */
-        public set sprite(_sprite: sprite)
+        public set sprite(sprite: sprite)
         {
+            if(!sprite || sprite == this._sprite) return;
+
             this.needRefreshImg = true;
             if(this._sprite)
             {
                 this._sprite.unuse();
             }
-            this._sprite = _sprite;
+            this._sprite = sprite;
+            this._imageBorder.l = sprite.border.l;
+            this._imageBorder.t = sprite.border.t;
+            this._imageBorder.r = sprite.border.r;
+            this._imageBorder.b = sprite.border.b;
             this._sprite.use();
             this._spriteName = this._sprite.getName();
             this.prepareData();
@@ -206,6 +212,19 @@ namespace gd3d.framework
         @gd3d.reflect.Field("string")
         private _spriteName:string = "";
         
+
+        private _imageBorder = new math.border();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 9宫格边距
+         * @version egret-gd3d 1.0
+         */
+        @reflect.Field("border")
+        get imageBorder(){
+            return this._imageBorder;
+        }
 
         /**
          * @private
@@ -573,7 +592,7 @@ namespace gd3d.framework
          */
         private updateSlicedData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
         {
-            let border = this._sprite.border;
+            let border = this._imageBorder;
             let rect = this._sprite.rect;
 
             //顶点
@@ -1104,7 +1123,7 @@ namespace gd3d.framework
         private updateTiledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
         {
             let rect = this._sprite.rect;
-            let border = this._sprite.border;
+            let border = this._imageBorder;
 
             let urange = this._sprite.urange;
             let vrange = this._sprite.vrange;

@@ -2399,7 +2399,6 @@ var gd3d;
                     this.layoutDirty = true;
                 if (!this.layoutDirty)
                     return;
-                console.error("refreshLayout : " + this.name);
                 var state = this._layoutState;
                 if (state != 0) {
                     if (state & layoutOption.LEFT) {
@@ -2785,6 +2784,7 @@ var gd3d;
                 this._fillMethod = FillMethod.Horizontal;
                 this._fillAmmount = 1;
                 this._spriteName = "";
+                this._imageBorder = new gd3d.math.border();
                 gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
                 gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
             }
@@ -2852,39 +2852,22 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            image2D.prototype.setTexture = function (texture, border, rect) {
-                this.needRefreshImg = true;
-                if (this.sprite) {
-                    this.sprite.unuse();
-                }
-                var _sprite = new framework.sprite();
-                _sprite.texture = texture;
-                if (border != null)
-                    _sprite.border = border;
-                else
-                    _sprite.border = new gd3d.math.border(0, 0, 0, 0);
-                if (rect != null)
-                    _sprite.rect = rect;
-                else
-                    _sprite.rect = new gd3d.math.rect(0, 0, texture.glTexture.width, texture.glTexture.height);
-                this.sprite = _sprite;
-                this.sprite.use();
-                this.prepareData();
-                if (this.transform != null) {
-                    this.transform.markDirty();
-                    this.updateTran();
-                }
-            };
             Object.defineProperty(image2D.prototype, "sprite", {
                 get: function () {
                     return this._sprite;
                 },
-                set: function (_sprite) {
+                set: function (sprite) {
+                    if (!sprite || sprite == this._sprite)
+                        return;
                     this.needRefreshImg = true;
                     if (this._sprite) {
                         this._sprite.unuse();
                     }
-                    this._sprite = _sprite;
+                    this._sprite = sprite;
+                    this._imageBorder.l = sprite.border.l;
+                    this._imageBorder.t = sprite.border.t;
+                    this._imageBorder.r = sprite.border.r;
+                    this._imageBorder.b = sprite.border.b;
                     this._sprite.use();
                     this._spriteName = this._sprite.getName();
                     this.prepareData();
@@ -2892,6 +2875,13 @@ var gd3d;
                         this.transform.markDirty();
                         this.updateTran();
                     }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(image2D.prototype, "imageBorder", {
+                get: function () {
+                    return this._imageBorder;
                 },
                 enumerable: true,
                 configurable: true
@@ -3165,7 +3155,7 @@ var gd3d;
                 this.updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3);
             };
             image2D.prototype.updateSlicedData = function (x0, y0, x1, y1, x2, y2, x3, y3) {
-                var border = this._sprite.border;
+                var border = this._imageBorder;
                 var rect = this._sprite.rect;
                 var r1c1 = gd3d.math.pool.new_vector2();
                 var r1c4 = gd3d.math.pool.new_vector2();
@@ -3608,7 +3598,7 @@ var gd3d;
             };
             image2D.prototype.updateTiledData = function (x0, y0, x1, y1, x2, y2, x3, y3) {
                 var rect = this._sprite.rect;
-                var border = this._sprite.border;
+                var border = this._imageBorder;
                 var urange = this._sprite.urange;
                 var vrange = this._sprite.vrange;
                 var ulen = urange.y - urange.x;
@@ -3732,6 +3722,11 @@ var gd3d;
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
             ], image2D.prototype, "_spriteName", void 0);
+            __decorate([
+                gd3d.reflect.Field("border"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [])
+            ], image2D.prototype, "imageBorder", null);
             image2D = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender,
@@ -6397,15 +6392,18 @@ var gd3d;
                 var spt_white = new framework.sprite("white_sprite");
                 spt_white.texture = assetmgr.getDefaultTexture("white");
                 spt_white.defaultAsset = true;
+                spt_white.rect = new gd3d.math.rect(0, 0, spt_white.texture.glTexture.width, spt_white.texture.glTexture.height);
                 assetmgr.mapDefaultSprite["white_sprite"] = spt_white;
                 var spt_gray = new framework.sprite("gray_sprite");
-                spt_white.texture = assetmgr.getDefaultTexture("gray");
-                spt_white.defaultAsset = true;
-                assetmgr.mapDefaultSprite["gray_sprite"] = spt_white;
+                spt_gray.texture = assetmgr.getDefaultTexture("gray");
+                spt_gray.defaultAsset = true;
+                spt_gray.rect = new gd3d.math.rect(0, 0, spt_gray.texture.glTexture.width, spt_gray.texture.glTexture.height);
+                assetmgr.mapDefaultSprite["gray_sprite"] = spt_gray;
                 var spt_grid = new framework.sprite("grid_sprite");
-                spt_white.texture = assetmgr.getDefaultTexture("grid");
-                spt_white.defaultAsset = true;
-                assetmgr.mapDefaultSprite["grid_sprite"] = spt_white;
+                spt_grid.texture = assetmgr.getDefaultTexture("grid");
+                spt_grid.defaultAsset = true;
+                spt_grid.rect = new gd3d.math.rect(0, 0, spt_grid.texture.glTexture.width, spt_grid.texture.glTexture.height);
+                assetmgr.mapDefaultSprite["grid_sprite"] = spt_grid;
             };
             return defsprite;
         }());
@@ -9508,6 +9506,7 @@ var gd3d;
             function sprite(assetName) {
                 if (assetName === void 0) { assetName = null; }
                 this.id = new framework.resID();
+                this.border = new gd3d.math.border();
                 if (!assetName) {
                     assetName = "sprite_" + this.getGUID();
                 }

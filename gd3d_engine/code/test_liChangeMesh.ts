@@ -152,7 +152,7 @@ class testLiChangeMesh implements IState
             if (s.isfinish) 
             {
                 let texture = this.app.getAssetMgr().getAssetByName("uisprite.png") as gd3d.framework.texture;
-                img9.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                img9.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             }
         });
 

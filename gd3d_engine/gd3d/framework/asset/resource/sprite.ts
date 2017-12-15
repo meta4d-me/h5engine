@@ -149,7 +149,7 @@
          * 有效区域
          * @version egret-gd3d 1.0
          */
-        rect: math.rect;
+        rect: math.rect ;
         /**
          * @public
          * @language zh_CN
@@ -157,7 +157,7 @@
          * 边距
          * @version egret-gd3d 1.0
          */
-        border: math.border;
+        border: math.border = new math.border();
         private _urange: math.vector2;
         private _vrange: math.vector2;
         /**

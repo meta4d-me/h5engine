@@ -247,7 +247,7 @@ namespace t
                             if(state.isfinish)
                             {
                                 var atlas = this.app.getAssetMgr().getAssetByName("1.atlas.json") as gd3d.framework.atlas;
-                                img_1.setTexture(atlas.texture);
+                                img_1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                                 img_2.sprite = atlas.sprites["card_role_1_face"];
                                 img_2.sprite.border = new gd3d.math.border(10, 10, 10, 10);
                                 this.img_3.sprite = atlas.sprites["card_role_1_face"];
@@ -275,7 +275,7 @@ namespace t
                         //img_6.setTexture(texture);
                         //this.img_7.setTexture(texture);
                         //this.img_8.setTexture(texture);
-                        img9.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                        img9.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                     }
                 });
 

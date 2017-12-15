@@ -579,7 +579,6 @@ var main = (function () {
         this.addBtn("example_Sound", function () { return new test_Sound(); });
         this.addBtn("demo_ScreenRange", function () { return new demo_ScreenRange(); });
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
-        this.addBtn("test_UI_component", function () { return new test_UI_Component(); });
         this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
@@ -1239,7 +1238,7 @@ var testLiChangeMesh = (function () {
         this.app.getAssetMgr().load("res/uisprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
             if (s.isfinish) {
                 var texture = _this.app.getAssetMgr().getAssetByName("uisprite.png");
-                img9.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                img9.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             }
         });
         this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
@@ -2066,7 +2065,7 @@ var Joystick = (function () {
             var img0 = this.joystickLeft0.addComponent("image2D");
             img0.imageType = gd3d.framework.ImageType.Simple;
             var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
-            img0.setTexture(tex0);
+            img0.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickLeft0);
             this.joystickLeft0.markDirty();
             this.joystickLeft1 = new gd3d.framework.transform2D();
@@ -2078,7 +2077,7 @@ var Joystick = (function () {
             var img1 = this.joystickLeft1.addComponent("image2D");
             img1.imageType = gd3d.framework.ImageType.Simple;
             var tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png");
-            img1.setTexture(tex1);
+            img1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickLeft1);
             this.joystickLeft1.markDirty();
         }
@@ -2092,7 +2091,7 @@ var Joystick = (function () {
             var img0 = this.joystickRight0.addComponent("image2D");
             img0.imageType = gd3d.framework.ImageType.Simple;
             var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
-            img0.setTexture(tex0);
+            img0.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickRight0);
             this.joystickRight0.markDirty();
             this.joystickRight1 = new gd3d.framework.transform2D();
@@ -2104,7 +2103,7 @@ var Joystick = (function () {
             var img1 = this.joystickRight1.addComponent("image2D");
             img1.imageType = gd3d.framework.ImageType.Simple;
             var tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png");
-            img1.setTexture(tex1);
+            img1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickRight1);
             this.joystickRight1.markDirty();
         }
@@ -3340,7 +3339,7 @@ var test_UIEffect = (function () {
                                 o2d.addChild(t2d_1);
                                 var img_1 = t2d_1.addComponent("image2D");
                                 img_1.imageType = gd3d.framework.ImageType.Simple;
-                                img_1.setTexture(texture);
+                                img_1.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                             }
                         }
                     }
@@ -7086,7 +7085,7 @@ var testReload = (function () {
         this.app.getAssetMgr().load("res/uisprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
             if (s.isfinish) {
                 var texture = _this.app.getAssetMgr().getAssetByName("uisprite.png");
-                img9.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                img9.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             }
         });
         this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
@@ -8476,7 +8475,7 @@ var t;
                         _this.app.getAssetMgr().load("res/resources/1.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
                             if (state.isfinish) {
                                 var atlas = _this.app.getAssetMgr().getAssetByName("1.atlas.json");
-                                img_1_1.setTexture(atlas.texture);
+                                img_1_1.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                                 img_2_1.sprite = atlas.sprites["card_role_1_face"];
                                 img_2_1.sprite.border = new gd3d.math.border(10, 10, 10, 10);
                                 _this.img_3.sprite = atlas.sprites["card_role_1_face"];
@@ -8492,7 +8491,7 @@ var t;
                 this.app.getAssetMgr().load("res/uisprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         var texture = _this.app.getAssetMgr().getAssetByName("uisprite.png");
-                        img9_1.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                        img9_1.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                     }
                 });
                 this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {

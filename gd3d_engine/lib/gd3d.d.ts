@@ -560,9 +560,10 @@ declare namespace gd3d.framework {
         private _fillAmmount;
         fillAmmount: number;
         transform: transform2D;
-        setTexture(texture: texture, border?: math.border, rect?: math.rect): void;
         sprite: sprite;
         private _spriteName;
+        private _imageBorder;
+        readonly imageBorder: math.border;
         render(canvas: canvas): void;
         private _cacheMaskV4;
         start(): void;
