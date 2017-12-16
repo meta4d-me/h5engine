@@ -16192,6 +16192,8 @@ var gd3d;
                             if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && field.type == 3) {
                             }
                             else {
+                                if ((instanceObj[key] instanceof Array) && !clonedObj[key])
+                                    clonedObj[key] = [];
                                 fillCloneReferenceType(instanceObj[key], clonedObj[key], newkey, instanceObj, clonedObj, key);
                             }
                         }
@@ -16241,7 +16243,8 @@ var gd3d;
                         }
                     }
                     else {
-                        fillCloneReference(instanceObj[key], clonedObj[key]);
+                        if (key in clonedObj)
+                            fillCloneReference(instanceObj[key], clonedObj[key]);
                     }
                 }
             }

@@ -2,7 +2,7 @@
 
 namespace gd3d.io
 {
-    
+
     /**
      * @public
      * @language zh_CN
@@ -90,8 +90,8 @@ namespace gd3d.io
                 for (var newkey in instanceObj[key])
                 {
                     let field = instanceObj[key][newkey];
-                   
-                    if (field&&field["__gdmeta__"])
+
+                    if (field && field["__gdmeta__"])
                     {
                         let _meta = field["__gdmeta__"];
                         if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && field.type == 3)
@@ -100,6 +100,8 @@ namespace gd3d.io
                         }
                         else
                         {
+                            if((instanceObj[key] instanceof Array )&& !clonedObj[key])
+                                clonedObj[key] = [];
                             fillCloneReferenceType(instanceObj[key], clonedObj[key], newkey, instanceObj, clonedObj, key);
                         }
                     }
@@ -121,7 +123,7 @@ namespace gd3d.io
             let type: string = _meta["class"]["typename"];
             if (isAsset(type))
             {
-                
+
             }
             else
             {
@@ -153,6 +155,7 @@ namespace gd3d.io
                         instance = referenceInfo.oldmap[insid];
                     }
                 }
+             
                 if (isreference)
                 {
                     if (isArray)
@@ -166,7 +169,8 @@ namespace gd3d.io
                 }
                 else
                 {
-                    fillCloneReference(instanceObj[key], clonedObj[key]);
+                    if (key in clonedObj)
+                        fillCloneReference(instanceObj[key], clonedObj[key]);
                 }
 
             }
@@ -269,8 +273,8 @@ namespace gd3d.io
                 for (var newkey in instanceObj[key])
                 {
                     let field = instanceObj[key][newkey];
-                   
-                    if (field&&field["__gdmeta__"])
+
+                    if (field && field["__gdmeta__"])
                     {
                         let _meta = field["__gdmeta__"];
                         if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && field.type == 3)
@@ -326,8 +330,9 @@ namespace gd3d.io
             if (isAsset(type))
             {
                 let _defaultAsset: boolean = instanceObj[key].defaultAsset;
-                if(instanceObj[key].use){
-                    instanceObj[key].use();  
+                if (instanceObj[key].use)
+                {
+                    instanceObj[key].use();
                 }
 
                 if (isArray)
