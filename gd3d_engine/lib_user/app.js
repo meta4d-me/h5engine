@@ -14,18 +14,21 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var demo_ScreenRange = (function () {
-    function demo_ScreenRange() {
-        this.cameraCount = 0;
+var demo_ScreenSplit = (function () {
+    function demo_ScreenSplit() {
+        this.cameraCurseHover = 0;
         this.windowRate = 0.5;
         this.windowHorizon = true;
+        this.mouseOver = false;
+        this.mouseEnter = false;
+        this.mouseDown = false;
+        this.mouseMove = false;
         this.timer = 0;
         this.movetarget = new gd3d.math.vector3();
         this.pointDown = false;
     }
-    demo_ScreenRange.prototype.start = function (app) {
+    demo_ScreenSplit.prototype.start = function (app) {
         var _this = this;
-        console.log("i am here.");
         this.app = app;
         this.inputMgr = this.app.getInputMgr();
         this.scene = this.app.getScene();
@@ -119,84 +122,146 @@ var demo_ScreenRange = (function () {
             this.app.webgl.canvas.addEventListener("mousemove", function (ev) {
                 var screenRect = _this.outcontainer.getBoundingClientRect();
                 var xRate = ev.clientX / screenRect.width;
-                var yRate = 1 - ev.clientY / screenRect.height;
+                var yRate = ev.clientY / screenRect.height;
+                console.log("ev.clintY  " + ev.clientY);
+                console.log("this.inputMgr.point.y " + _this.inputMgr.point.y);
                 if (_this.windowHorizon) {
                     if (xRate < _this.windowRate) {
                         _this.targetCamera = _this.camera;
-                        _this.cameraCount = 0;
+                        _this.cameraCurseHover = 0;
                     }
                     else {
                         _this.targetCamera = _camera;
-                        _this.cameraCount = 1;
+                        _this.cameraCurseHover = 1;
                     }
                 }
                 else {
                     if (yRate < _this.windowRate) {
                         _this.targetCamera = _this.camera;
-                        _this.cameraCount = 0;
+                        _this.cameraCurseHover = 0;
                     }
                     else {
                         _this.targetCamera = _camera;
-                        _this.cameraCount = 1;
+                        _this.cameraCurseHover = 1;
                     }
                 }
                 Test_CameraController.instance().decideCam(_this.targetCamera);
             });
         }
+        var boundRect = this.outcontainer.getBoundingClientRect();
+        console.log("this boundRect width and " + boundRect.width + "  " + boundRect.height);
+        {
+            var splitline = document.createElement("div");
+            this.splitline = splitline;
+            splitline.style.height = boundRect.height + "px";
+            splitline.style.width = "6px";
+            splitline.style.position = "absolute";
+            splitline.style.top = "0px";
+            splitline.style.left = boundRect.width / 2 - 3 + "px";
+            splitline.style.zIndex = "6";
+            splitline.style.background = "#cccccc";
+            this.mouseEnter = false;
+            this.mouseDown = false;
+            this.mouseMove = false;
+            this.mouseOver = false;
+            splitline.onmouseenter = function (e) {
+                _this.mouseEnter = true;
+                if (_this.windowHorizon) {
+                    splitline.style.cursor = "e-resize";
+                }
+                else {
+                    splitline.style.cursor = "n-resize";
+                }
+            };
+            splitline.onmouseover = function (e) {
+                _this.mouseOver = true;
+            };
+            splitline.onmouseleave = function (e) {
+                _this.mouseOver = false;
+            };
+            this.app.container.addEventListener("mousedown", function (e) {
+                if (_this.mouseOver)
+                    _this.mouseDown = true;
+            }, false);
+            this.app.container.addEventListener("mouseup", function (e) {
+                _this.mouseDown = false;
+                _this.mouseEnter = false;
+                _this.mouseMove = false;
+            }, false);
+            this.app.container.addEventListener("mousemove", function (e) {
+                _this.mouseMove = true;
+                if (_this.mouseEnter) {
+                    if (_this.mouseDown) {
+                        var screenRect = _this.outcontainer.getBoundingClientRect();
+                        var xRate = e.clientX / screenRect.width;
+                        var yRate = e.clientY / screenRect.height;
+                        console.log("e.clientY Test" + e.clientY);
+                        if (_this.windowHorizon) {
+                            _this.splitline.style.left = e.clientX - 3 + "px";
+                            _this.windowRate = xRate;
+                            _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
+                            _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
+                            _this.splitline.style.cursor = "e-resize";
+                        }
+                        else {
+                            splitline.style.top = e.clientY - 3 + "px";
+                            _this.windowRate = yRate;
+                            _this.camera.viewport = new gd3d.math.rect(0, 1 - _this.windowRate, 1, _this.windowRate);
+                            _this.camera1.viewport = new gd3d.math.rect(0, 0, 1, 1 - _this.windowRate);
+                            _this.splitline.style.cursor = "n-resize";
+                        }
+                    }
+                }
+            }, false);
+            this.app.container.appendChild(splitline);
+        }
         {
             var button1 = document.createElement("button");
             button1.textContent = "横屏/竖屏";
-            button1.onclick = function () {
+            button1.onclick = function (e) {
+                var screenRect = _this.outcontainer.getBoundingClientRect();
                 _this.windowHorizon = _this.windowHorizon ? false : true;
                 if (_this.windowHorizon) {
+                    _this.splitline.style.height = screenRect.height + "px";
+                    _this.splitline.style.width = "6px";
+                    _this.splitline.style.left = screenRect.width * _this.windowRate - 3 + "px";
+                    _this.splitline.style.top = "0px";
                     _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
                     _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
                 }
                 else {
-                    _this.camera.viewport = new gd3d.math.rect(0, 0, 1, _this.windowRate);
-                    _this.camera1.viewport = new gd3d.math.rect(0, _this.windowRate, 1, 1 - _this.windowRate);
+                    _this.splitline.style.height = "6px";
+                    _this.splitline.style.width = screenRect.width + "px";
+                    _this.splitline.style.left = "0px";
+                    splitline.style.top = screenRect.height * _this.windowRate - 3 + "px";
+                    _this.camera.viewport = new gd3d.math.rect(0, 1 - _this.windowRate, 1, _this.windowRate);
+                    _this.camera1.viewport = new gd3d.math.rect(0, 0, 1, 1 - _this.windowRate);
                 }
             };
             button1.style.top = "130px";
             button1.style.position = "absolute";
             this.app.container.appendChild(button1);
-            var input = document.createElement("input");
-            input.type = "range";
-            input.valueAsNumber = this.windowRate * 100;
-            input.oninput = function (e) {
-                _this.windowRate = input.valueAsNumber / 100;
-                if (_this.windowHorizon) {
-                    _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
-                    _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
-                }
-                else {
-                    _this.camera.viewport = new gd3d.math.rect(0, 0, 1, _this.windowRate);
-                    _this.camera1.viewport = new gd3d.math.rect(0, _this.windowRate, 1, 1 - _this.windowRate);
-                }
-            };
-            input.style.top = "190px";
-            input.style.position = "absolute";
-            this.app.container.appendChild(input);
         }
     };
-    demo_ScreenRange.prototype.update = function (delta) {
+    demo_ScreenSplit.prototype.update = function (delta) {
         Test_CameraController.instance().update(delta);
+        var screenRect = this.outcontainer.getBoundingClientRect();
         if (this.pointDown == false && this.inputMgr.point.touch == true) {
             var ray;
             if (this.windowHorizon) {
-                if (this.cameraCount == 0) {
+                if (this.cameraCurseHover == 0) {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
                 }
-                else if (this.cameraCount == 1) {
+                else if (this.cameraCurseHover == 1) {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x - this.app.webgl.canvas.width * this.windowRate, this.inputMgr.point.y), this.app);
                 }
             }
             else {
-                if (this.cameraCount == 0) {
-                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y - this.app.webgl.canvas.height * (1 - this.windowRate)), this.app);
-                }
-                else if (this.cameraCount == 1) {
+                if (this.cameraCurseHover == 0) {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
+                }
+                else if (this.cameraCurseHover == 1) {
+                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y - this.app.webgl.canvas.height * this.windowRate), this.app);
                 }
             }
             console.log("inputMgr.point: " + new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y));
@@ -224,7 +289,7 @@ var demo_ScreenRange = (function () {
         gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
         this.cube2.markDirty();
     };
-    return demo_ScreenRange;
+    return demo_ScreenSplit;
 }());
 var t;
 (function (t) {
@@ -577,7 +642,7 @@ var main = (function () {
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
         this.addBtn("example_Sound", function () { return new test_Sound(); });
-        this.addBtn("demo_ScreenRange", function () { return new demo_ScreenRange(); });
+        this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
         this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
