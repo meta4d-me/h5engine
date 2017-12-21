@@ -41,13 +41,16 @@ namespace gd3d.framework
         }
         public set image(_image:texture)
         {
+            if(this._image == _image) return;
             this.needRefreshImg = true;
             if(this._image)
             {
                 this._image.unuse();
             }
             this._image = _image;
-            this._image.use();
+            if(_image){
+                this._image.use();
+            }
         }
 
         /**
@@ -68,13 +71,17 @@ namespace gd3d.framework
         _uimat: material;
         private get uimat(){
             if (this.image != null ){
+                let matName =this._image.getName() + "_uimask";
                 let canvas = this.transform.canvas;
-                let mat = canvas.assetmgr.getMaterial(this.image.getName()+"_uimask");
+                let mat = this._uimat;
+                if(!mat || mat.getName() != matName){
+                    if(mat) mat.unuse(); 
+                    mat = canvas.assetmgr.getAssetByName(matName) as gd3d.framework.material;
+                    if(mat) mat.use();
+                }
                 if(mat == null){
-                    if(this._uimat != null) this._uimat.unuse();
-                    mat = new material();
+                    mat = new material(matName);
                     mat.setShader(canvas.assetmgr.getShader("shader/defmaskui"));
-                    canvas.assetmgr.mapMaterial[this.image.getName()+"_uimask"] = mat;
                     mat.use();
                 }
                 if(this.transform.parentIsMask){
@@ -195,7 +202,12 @@ namespace gd3d.framework
          */
         remove()
         {
-            this._image.unuse(true);
+            if(this._image) this._image.unuse(true);
+            if(this._uimat) this._uimat.unuse(true);
+            this._image = null;   
+            this._cacheMaskV4 = null; 
+            this.transform = null;
+            this.datar.length = 0;
         }
 
         /**

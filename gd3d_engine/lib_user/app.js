@@ -3131,7 +3131,10 @@ var test_UI_Component = (function () {
         var bg_i = bg_t.addComponent("image2D");
         bg_i.imageType = gd3d.framework.ImageType.Sliced;
         bg_i.sprite = atlasComp.sprites["bg"];
-        bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        bg_i.imageBorder.l = 10;
+        bg_i.imageBorder.t = 50;
+        bg_i.imageBorder.r = 10;
+        bg_i.imageBorder.b = 10;
         bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
         bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
@@ -3216,6 +3219,7 @@ var test_UI_Component = (function () {
         iptFrame_t.localTranslate.y = 160;
         bg_t.addChild(iptFrame_t);
         var ipt = iptFrame_t.addComponent("inputField");
+        ipt.LineType = gd3d.framework.lineType.MultiLine;
         var img_t = new gd3d.framework.transform2D;
         img_t.width = iptFrame_t.width;
         img_t.height = iptFrame_t.height;
@@ -3223,7 +3227,10 @@ var test_UI_Component = (function () {
         ipt.frameImage = img_t.addComponent("image2D");
         ipt.frameImage.sprite = atlasComp.sprites["ui_public_input"];
         ipt.frameImage.imageType = gd3d.framework.ImageType.Sliced;
-        ipt.frameImage.sprite.border = new gd3d.math.border(16, 14, 16, 14);
+        ipt.frameImage.imageBorder.l = 16;
+        ipt.frameImage.imageBorder.t = 14;
+        ipt.frameImage.imageBorder.r = 16;
+        ipt.frameImage.imageBorder.b = 14;
         var text_t = new gd3d.framework.transform2D;
         text_t.width = iptFrame_t.width;
         text_t.height = iptFrame_t.height;
@@ -3232,6 +3239,9 @@ var test_UI_Component = (function () {
         ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
         ipt.TextLabel.fontsize = 24;
         ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
+        text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
+        text_t.setLayoutValue(gd3d.framework.layoutOption.H_CENTER, 0);
+        text_t.setLayoutValue(gd3d.framework.layoutOption.V_CENTER, 0);
         var p_t = new gd3d.framework.transform2D;
         p_t.width = iptFrame_t.width;
         p_t.height = iptFrame_t.height;
@@ -3526,7 +3536,10 @@ var test_uiPerfabLoad = (function () {
         var bg_i = bg_t.addComponent("image2D");
         bg_i.imageType = gd3d.framework.ImageType.Sliced;
         bg_i.sprite = atlasComp.sprites["bg"];
-        bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        bg_i.imageBorder.l = 10;
+        bg_i.imageBorder.t = 50;
+        bg_i.imageBorder.r = 10;
+        bg_i.imageBorder.b = 10;
         bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
         bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
@@ -3548,6 +3561,7 @@ var test_uiPerfabLoad = (function () {
             return;
         if (this.targetui) {
             this.bgui.removeChild(this.targetui);
+            this.targetui.dispose();
         }
         var prefabName = name;
         this.assetMgr.load("res/prefabs/UI/" + prefabName + "/" + prefabName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
