@@ -1,11 +1,15 @@
 /// <reference path="../lib/gd3d.d.ts" />
 /// <reference path="../lib/htmlui.d.ts" />
-declare class demo_ScreenRange implements IState {
+declare class demo_ScreenSplit implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    cameraCount: number;
+    cameraCurseHover: number;
     windowRate: number;
     windowHorizon: boolean;
+    mouseOver: boolean;
+    mouseEnter: boolean;
+    mouseDown: boolean;
+    mouseMove: boolean;
     outcontainer: HTMLDivElement;
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
@@ -19,6 +23,7 @@ declare class demo_ScreenRange implements IState {
     targetCamera: gd3d.framework.camera;
     inputMgr: gd3d.framework.inputMgr;
     pointDown: boolean;
+    splitline: HTMLDivElement;
     update(delta: number): void;
 }
 declare namespace t {
