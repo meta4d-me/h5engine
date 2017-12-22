@@ -2704,6 +2704,9 @@ declare namespace gd3d.framework {
         OnEndOnceLoop(): void;
         targetMat: math.matrix;
         refreshTargetMatrix(): void;
+        private tempos;
+        private temColor;
+        private temUv;
         uploadMeshdata(): void;
         refreshCurTex_ST(curframe: number, detalTime: number, fps: number): void;
         reset(): void;
@@ -2770,7 +2773,8 @@ declare namespace gd3d.framework {
         row: number;
         column: number;
         count: number;
-        F14SingleMeshBaseData(): void;
+        firtstFrame: number;
+        constructor(firstFrame: number);
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
     }
 }
