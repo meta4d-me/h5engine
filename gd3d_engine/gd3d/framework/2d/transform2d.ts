@@ -287,6 +287,7 @@ namespace gd3d.framework
          * 当前节点是否是mask
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("boolean")
         get isMask(){
             return this._isMask;            
         }
@@ -532,30 +533,43 @@ namespace gd3d.framework
             top.updateTran(false);
         }
 
+        //计算 to canvasMtx 矩阵
+        private CalcReCanvasMtx(out:math.matrix3x2){
+            if(!out)  return;
+            let tsca = gd3d.math.pool.new_vector2();
+            let ttran = gd3d.math.pool.new_vector2();
+            tsca.x = this.canvas.pixelWidth/2;
+            tsca.y = - this.canvas.pixelHeight/2;
+            ttran.x = this.canvas.pixelWidth/2;
+            ttran.y = this.canvas.pixelHeight/2;
+            math.matrix3x2MakeTransformRTS(ttran,tsca,0,out);
+        }
+
         /**
          * @private
          * 转换并拆解canvas坐标空间 RTS
          */
         private decomposeWorldMatrix(){
             if(this.dirtyWorldDecompose){
-                let reCanvsMtx = gd3d.math.pool.new_matrix3x2();
-                let tsca = gd3d.math.pool.new_vector2();
-                let ttran = gd3d.math.pool.new_vector2();
-                tsca.x = this.canvas.pixelWidth/2;
-                tsca.y = - this.canvas.pixelHeight/2;
-                ttran.x = this.canvas.pixelWidth/2;
-                ttran.y = this.canvas.pixelHeight/2;
+                let reCanvasMtx = gd3d.math.pool.new_matrix3x2();
+                // let tsca = gd3d.math.pool.new_vector2();
+                // let ttran = gd3d.math.pool.new_vector2();
+                // tsca.x = this.canvas.pixelWidth/2;
+                // tsca.y = - this.canvas.pixelHeight/2;
+                // ttran.x = this.canvas.pixelWidth/2;
+                // ttran.y = this.canvas.pixelHeight/2;
             
-                math.matrix3x2MakeTransformRTS(ttran,tsca,0,reCanvsMtx);
+                // math.matrix3x2MakeTransformRTS(ttran,tsca,0,reCanvsMtx);
+                this.CalcReCanvasMtx(reCanvasMtx);
 
                 let outMatrix = gd3d.math.pool.new_matrix3x2();
-                math.matrix3x2Multiply(reCanvsMtx,this.worldMatrix,outMatrix);
+                math.matrix3x2Multiply(reCanvasMtx,this.worldMatrix,outMatrix);
                 
                 math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
 
-                math.pool.delete_vector2(tsca);
-                math.pool.delete_vector2(ttran);
-                math.pool.delete_matrix3x2(reCanvsMtx);
+                // math.pool.delete_vector2(tsca);
+                // math.pool.delete_vector2(ttran);
+                math.pool.delete_matrix3x2(reCanvasMtx);
                 math.pool.delete_matrix3x2(outMatrix);
 
                 this.dirtyWorldDecompose = false;
@@ -1154,49 +1168,55 @@ namespace gd3d.framework
         private layoutDirty = false;
         private lastParentWidth = 0;
         private lastParentHeight = 0;
+        private lastParentPivot = new math.vector2(0,0);
+        private lastPivot = new math.vector2(0,0);
         
         private refreshLayout(){
             let parent = this.parent;
             if(!parent) return;
-            if(parent.width != this.lastParentWidth || parent.height != this.lastParentHeight)
+            if(parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x 
+                || parent.pivot.y != this.lastParentPivot.y || this.pivot.x !=this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                 this.layoutDirty = true;
 
             if(!this.layoutDirty) return;
-            console.error(`refreshLayout : ${this.name}`);
             let state = this._layoutState;
             if(state != 0){
                 if(state & layoutOption.LEFT){
                     if(state & layoutOption.RIGHT){
                         this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
                     }
-                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT);
+                    this.localTranslate.x = this.getLayValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }else if (state & layoutOption.RIGHT){
-                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT);
+                    this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
     
                 if(state & layoutOption.H_CENTER){
-                    this.localTranslate.x = (parent.width - this.width)/2 + this.getLayValue(layoutOption.H_CENTER);
+                    this.localTranslate.x = (parent.width - this.width)/2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
     
                 if(state & layoutOption.TOP){
                     if(state & layoutOption.BOTTOM){
                         this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
                     }
-                    this.localTranslate.y = this.getLayValue(layoutOption.TOP);
+                    this.localTranslate.y = this.getLayValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }else if(state & layoutOption.BOTTOM){
-                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM);
+                    this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
     
                 if(state & layoutOption.V_CENTER){
-                    this.localTranslate.y = (parent.height - this.height)/2 + this.getLayValue(layoutOption.V_CENTER);
+                    this.localTranslate.y = (parent.height - this.height)/2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
                 //布局调整 后刷新 matrix
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
 
             this.layoutDirty = false;
-            this.lastParentWidth = this.parent.width;
-            this.lastParentHeight = this.parent.height;
+            this.lastParentWidth = parent.width;
+            this.lastParentHeight = parent.height;
+            this.lastParentPivot.x = parent.pivot.x;
+            this.lastParentPivot.y = parent.pivot.y;
+            this.lastPivot.x = this.pivot.x;
+            this.lastPivot.y = this.pivot.y;
         }
 
         private getLayValue(opation:layoutOption){
@@ -1210,12 +1230,12 @@ namespace gd3d.framework
                         case layoutOption.LEFT:
                         case layoutOption.H_CENTER:
                         case layoutOption.RIGHT:
-                        value = this.parent.width * this.layoutValueMap[opation];
+                        value = this.parent.width * this.layoutValueMap[opation]/100;
                         break;
                         case layoutOption.TOP:
                         case layoutOption.V_CENTER:
                         case layoutOption.BOTTOM:
-                        value = this.parent.height * this.layoutValueMap[opation];
+                        value = this.parent.height * this.layoutValueMap[opation]/100;
                         break;
                     }
                 }

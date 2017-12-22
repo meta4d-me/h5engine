@@ -59,8 +59,7 @@
                                     o2d.addChild(t2d_1);
                                     let img_1 = t2d_1.addComponent("image2D") as gd3d.framework.image2D;
                                     img_1.imageType = gd3d.framework.ImageType.Simple;
-                                    img_1.setTexture( texture );
-
+                                    img_1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
 
                                     //rawimage
                                     // let robj = new gd3d.framework.transform2D();

@@ -31,6 +31,11 @@ namespace gd3d.framework
             text = text == null? "": text;
             this._text = text;
             //设置缓存长度
+            this.initdater();
+            this.dirtyData = true;
+        }
+
+        private initdater(){
             var cachelen = 6 * 13 * this._text.length;
             this.datar.splice(0, this.datar.length);
             while (this.datar.length < cachelen)
@@ -48,7 +53,6 @@ namespace gd3d.framework
             {
                 this.datar.pop();
             }
-            this.dirtyData = true;
         }
 
         private _font: font;
@@ -59,23 +63,31 @@ namespace gd3d.framework
          * 字体
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("font")
         get font()
         {
             return this._font;
         }
         set font(font: font)
         {
-            this.needRefreshImg = true;
+            if(font == this._font) return;
+
+            this.needRefreshFont = true;
             if(this._font)
             {
                 this._font.unuse();
             }
             this._font = font;
-            this._font.use();
+            if(font){
+                this._font.use();
+                this._fontName = this._font.getName();
+            }else{
+                this._fontName = "";
+            }
         }
-        private needRefreshImg = false;
+        private needRefreshFont = false;
 
+        @gd3d.reflect.Field("string")
+        private _fontName = "defFont";
         private _fontsize: number = 14;
         /**
          * @public
@@ -101,6 +113,7 @@ namespace gd3d.framework
          * 行高
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         linespace: number = 1;//fontsize的倍数
 
         /**
@@ -110,6 +123,7 @@ namespace gd3d.framework
          * 水平排列方式
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         horizontalType: HorizontalType = HorizontalType.Left;
 
         /**
@@ -119,7 +133,28 @@ namespace gd3d.framework
          * 垂直排列方式
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         verticalType: VerticalType = VerticalType.Center;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否横向溢出
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("boolean")
+        horizontalOverflow :boolean = false;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否竖向溢出
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("boolean")
+        verticalOverflow :boolean = false;
 
         //计算数组
         private indexarr = [];
@@ -149,6 +184,8 @@ namespace gd3d.framework
             this.remainarrx = [];
             var remainy = 0;
             tyadd += this._fontsize * this.linespace;
+            let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE: this.transform.width; 
+            let contrast_h = this.verticalOverflow ? Number.MAX_VALUE: this.transform.height; 
             for (var i = 0; i < this._text.length; i++)
             {
                 let c = this._text.charAt(i);
@@ -157,9 +194,9 @@ namespace gd3d.framework
                 {
                     continue;
                 }
-                if (txadd + cinfo.xAddvance * rate > this.transform.width)
+                if (txadd + cinfo.xAddvance * rate > contrast_w)
                 {
-                    if (tyadd + this._fontsize * this.linespace > this.transform.height)
+                    if (tyadd + this._fontsize * this.linespace > contrast_h)
                     {
                         break;
                     }
@@ -188,6 +225,9 @@ namespace gd3d.framework
             {
                 yadd += remainy;
             }
+
+            //清理缓存
+            this.initdater();
             for (var arri = 0; arri < this.indexarr.length; arri++)
             {
                 //一行
@@ -377,6 +417,8 @@ namespace gd3d.framework
          * 填充颜色
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("color")
+        @reflect.UIStyle("color")
         color: math.color = new math.color(1, 1, 1, 1);
 
         /**
@@ -386,6 +428,8 @@ namespace gd3d.framework
          * 描边颜色
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("color")
+        @reflect.UIStyle("color")
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
         
        /**
@@ -395,13 +439,17 @@ namespace gd3d.framework
         _uimat: material;
         private get uimat(){
             if (this.font  && this.font.texture ){
+                let matName = this.font.texture.getName()+"_fontmask";
                 let canvas = this.transform.canvas;
-                let mat = canvas.assetmgr.getMaterial(this.font.texture.getName()+"_fontmask");
+                let mat = this._uimat;
+                if(!mat || mat.getName() != matName){
+                    if(mat) mat.unuse(); 
+                    mat = canvas.assetmgr.getAssetByName(matName) as gd3d.framework.material;
+                    if(mat) mat.use();
+                }
                 if(mat == null){
-                    if(this._uimat != null) this._uimat.unuse();
-                    mat = new material();
+                    mat = new material(matName);
                     mat.setShader(canvas.assetmgr.getShader("shader/defmaskfont"));
-                    canvas.assetmgr.mapMaterial[this.font.texture.getName()+"_fontmask"] = mat;
                     mat.use();
                 }
                 if(this.transform.parentIsMask){
@@ -422,6 +470,17 @@ namespace gd3d.framework
          */
         render(canvas: canvas)
         {
+            if(this._font == null ){
+                let temp = canvas.assetmgr.mapNamed[this._fontName];
+                if(temp != null){
+                    let tfont = canvas.assetmgr.getAssetByName(this._fontName) as gd3d.framework.font;
+                    if(tfont){
+                        this.font = tfont;
+                        this.needRefreshFont = true;
+                    }
+                }
+            }
+
             if (this._font != null)
             {
                 if (this.dirtyData == true)
@@ -440,9 +499,9 @@ namespace gd3d.framework
 
                 if (img != null)
                 {
-                    if(this.needRefreshImg){
+                    if(this.needRefreshFont){
                         mat.setTexture("_MainTex", img);
-                        this.needRefreshImg = false;
+                        this.needRefreshFont = false;
                     }
 
                     if(this.transform.parentIsMask){
@@ -507,10 +566,13 @@ namespace gd3d.framework
          */
         remove()
         {
-            this._font.unuse(true);
+            if(this._font)  this._font.unuse(true);
+            if(this._uimat) this._uimat.unuse(true);
             this.indexarr.length = 0;
             this.remainarrx.length = 0;
             this.datar.length = 0;
+            this.transform = null;
+            this._cacheMaskV4 = null;
         }
         
         /**

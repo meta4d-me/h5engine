@@ -30,7 +30,7 @@ namespace gd3d.framework
          * 底框显示图像
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("image2D")
+        @gd3d.reflect.Field("reference")
         get frameImage()
         {
             return this._frameImage;
@@ -50,18 +50,28 @@ namespace gd3d.framework
          * 文字内容
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("string")
         get text(): string
         {
             return this._text;
         }
-        set text(text: string)
-        {
-            if(this._textLable){
-                this._textLable.text = text;
-            }
-        }
         
+
+        private _charlimit:number = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 限制输入字符数
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("number")
+        get characterLimit(){return this._charlimit;}
+        set characterLimit(charlimit:number){
+            this._charlimit = parseInt(`${charlimit}`);
+            this._charlimit = isNaN(this._charlimit) || this._charlimit< 0 ? 0: this._charlimit;
+        }
+
+        private _lineType :lineType = lineType.SingleLine;
         /**
          * @public
          * @language zh_CN
@@ -69,18 +79,25 @@ namespace gd3d.framework
          * 文本行格式
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("lineType")
-         myLineType :lineType = lineType.SingleLine;
+        @gd3d.reflect.Field("number")
+         get LineType(){  return this._lineType; }
+         set LineType(lineType:lineType) {
+             this._lineType = lineType;
+         }
 
+         private _contentType :number = contentType.None;
          /**
          * @public
          * @language zh_CN
          * @classdesc
-         * 文本行格式
+         * 文本内容格式
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("contentType")
-        myContentType :contentType = contentType.None;
+        @gd3d.reflect.Field("number")
+        get ContentType(){  return this._contentType; }
+        set ContentType(contentType:number) {
+            this._contentType = contentType;
+        }
         
         private _textLable : label;
         /**
@@ -90,7 +107,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("label")
+        @gd3d.reflect.Field("reference")
         get TextLabel():label{
 
             return this._textLable;
@@ -108,7 +125,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("label")
+        @gd3d.reflect.Field("reference")
         get PlaceholderLabel():label{
 
             return this._placeholderLabel;
@@ -209,44 +226,62 @@ namespace gd3d.framework
         private textRefresh(){
             if(!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value) return;
 
+            if(this._charlimit>0 && this.inputElement.value.length >= this._charlimit ){
+                if(this.inputElement.value != this._text)
+                    if(this.inputElement.value.length > this._text.length){
+                        this.inputElement.value = this._text;
+                    }else{
+                        this._text = this.inputElement.value;
+                    }
+                return;
+            }
+
             this._text = this.inputElement.value;
-            if (this.myContentType == contentType.Custom)
+            if (this._contentType == contentType.Custom)
             {
                 if(this.customRegexStr != null && this.customRegexStr != "")
                     this._text = this._text.replace(this.customRegexStr, '');
             }else{
-                if (this.myContentType == contentType.None)
+                if (this._contentType == contentType.None)
                 {
 
                 }
                 //英文字母，数字，汉字，下划线
-                else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word) && (this.myContentType & contentType.ChineseCharacter) && (this.myContentType & contentType.Underline)) {
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Underline)) {
                     this._text = this._text.replace(/^[\u4E00-\u9FA5a-zA-Z0-9_]{3,20}$/ig, '');
                 }
                 //英文字母，数字，下划线
-                else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word) && (this.myContentType & contentType.Underline))
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.Underline))
                 {
                     this._text = this._text.replace(/[^\w\.\/]/ig, '');
                 }
                 //数字，字符
-                else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word))
+                else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word))
                 {
                     this._text = this._text.replace(/[^(A-Za-z0-9)]/ig, '');
                 }
+                //汉字，字符
+                else if ((this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Word))
+                {
+                    this._text = this._text.replace(/[^(A-Za-z\u4E00-\u9FA5)]/ig, '');
+                }
                 //数字
-                else if (this.myContentType == contentType.Number)
+                else if (this._contentType == contentType.Number)
                 {
                     this._text = this._text.replace(/\D+/g, '');
                 }
                 //汉字
-                else if (this.myContentType == contentType.ChineseCharacter)
+                else if (this._contentType == contentType.ChineseCharacter)
                 {
                     this._text = this._text.replace(/[^\u4E00-\u9FA5]/g, '');
                 }
 
             }
             this.inputElement.value = this._text;
-            this.text = this._text;
+            if(this._textLable){
+                this._textLable.text = this._text;
+                this.filterContentText();
+            }
 
             if(this._text == ""){
                 this._placeholderLabel.transform.visible = true;
@@ -255,6 +290,61 @@ namespace gd3d.framework
                 this._placeholderLabel.transform.visible = false;
                 this._textLable.transform.visible = true;
             }
+        }
+
+        private filterContentText(){
+            if(!this._textLable || this._text == null) return;
+            let lab = this._textLable;
+            let rate = lab.fontsize / lab.font.lineHeight;
+            let font = lab.font;
+            let addw = 0;
+            let addh = 0;
+            let str = "";
+            switch(this._lineType){
+                case lineType.SingleLine:
+                for(var i=lab.text.length - 1 ;i>=0 ;i--){
+                    let c = lab.text.charAt(i);
+                    let cinfo = font.cmap[c];
+                    if(!cinfo){
+                        console.warn(`can't find character "${c}" in ${font.getName()} Font`);
+                        continue;
+                    }
+                    addw += cinfo.xAddvance * rate;
+
+                    if(addw > lab.transform.width ){
+                        lab.text = str;
+                        break;
+                    }
+                    str = lab.text[i] + str;
+                }
+
+                break;
+                case lineType.MultiLine:
+                let fristline = true;
+                addh += lab.fontsize * lab.linespace;
+                for(var i=lab.text.length - 1 ;i>=0 ;i--){
+                    let c = lab.text.charAt(i);
+                    let cinfo = font.cmap[c];
+                    if(!cinfo){
+                        console.warn(`can't find character "${c}" in ${font.getName()} Font`);
+                        continue;
+                    }
+                    addw += cinfo.xAddvance * rate;
+
+                    if(addw > lab.transform.width ){
+                        addw = 0;
+                        fristline = false;
+                        addh += lab.fontsize * lab.linespace;
+                    }
+                    if(!fristline && addh > lab.transform.height){
+                        lab.text = str;
+                        break;
+                    }
+                    str = lab.text[i] + str;
+                }
+                break;
+            }
+
         }
 
         /**
@@ -271,11 +361,18 @@ namespace gd3d.framework
          */
         remove()
         {
-            
-            this.inputElement.disabled = false;
-            this.inputElement.value = "";
-            this.inputElement.style.visibility = "hidden";
-            this.inputElement = null;
+            this._placeholderLabel = null;
+            this._textLable = null;
+            this.transform = null;
+            this._frameImage = null;
+            if(this.inputElement) {
+                this.inputElement.disabled = false;
+                this.inputElement.value = "";
+                this.inputElement.style.visibility = "hidden";
+                if(this.inputElement.parentElement)
+                    this.inputElement.parentElement.removeChild(this.inputElement);
+                this.inputElement = null;
+            }
 
         }
         
@@ -312,8 +409,7 @@ namespace gd3d.framework
     export enum lineType
     {
         SingleLine,
-        MultiLineSubmit,
-        MultiLineNewline
+        MultiLine,
     }
     
     /**

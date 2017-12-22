@@ -176,7 +176,7 @@ namespace gd3d.framework
                 console.error("root div does Null at application start ");
                 return;
             }
-
+            div.style.overflow = "hidden";
             div.style.position = "absolute";
             div.style.width = "100%";
             div.style.height = "100%";

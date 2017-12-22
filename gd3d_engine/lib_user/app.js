@@ -14,18 +14,21 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var demo_ScreenRange = (function () {
-    function demo_ScreenRange() {
-        this.cameraCount = 0;
+var demo_ScreenSplit = (function () {
+    function demo_ScreenSplit() {
+        this.cameraCurseHover = 0;
         this.windowRate = 0.5;
         this.windowHorizon = true;
+        this.mouseOver = false;
+        this.mouseEnter = false;
+        this.mouseDown = false;
+        this.mouseMove = false;
         this.timer = 0;
         this.movetarget = new gd3d.math.vector3();
         this.pointDown = false;
     }
-    demo_ScreenRange.prototype.start = function (app) {
+    demo_ScreenSplit.prototype.start = function (app) {
         var _this = this;
-        console.log("i am here.");
         this.app = app;
         this.inputMgr = this.app.getInputMgr();
         this.scene = this.app.getScene();
@@ -119,84 +122,146 @@ var demo_ScreenRange = (function () {
             this.app.webgl.canvas.addEventListener("mousemove", function (ev) {
                 var screenRect = _this.outcontainer.getBoundingClientRect();
                 var xRate = ev.clientX / screenRect.width;
-                var yRate = 1 - ev.clientY / screenRect.height;
+                var yRate = ev.clientY / screenRect.height;
+                console.log("ev.clintY  " + ev.clientY);
+                console.log("this.inputMgr.point.y " + _this.inputMgr.point.y);
                 if (_this.windowHorizon) {
                     if (xRate < _this.windowRate) {
                         _this.targetCamera = _this.camera;
-                        _this.cameraCount = 0;
+                        _this.cameraCurseHover = 0;
                     }
                     else {
                         _this.targetCamera = _camera;
-                        _this.cameraCount = 1;
+                        _this.cameraCurseHover = 1;
                     }
                 }
                 else {
                     if (yRate < _this.windowRate) {
                         _this.targetCamera = _this.camera;
-                        _this.cameraCount = 0;
+                        _this.cameraCurseHover = 0;
                     }
                     else {
                         _this.targetCamera = _camera;
-                        _this.cameraCount = 1;
+                        _this.cameraCurseHover = 1;
                     }
                 }
                 Test_CameraController.instance().decideCam(_this.targetCamera);
             });
         }
+        var boundRect = this.outcontainer.getBoundingClientRect();
+        console.log("this boundRect width and " + boundRect.width + "  " + boundRect.height);
+        {
+            var splitline = document.createElement("div");
+            this.splitline = splitline;
+            splitline.style.height = boundRect.height + "px";
+            splitline.style.width = "6px";
+            splitline.style.position = "absolute";
+            splitline.style.top = "0px";
+            splitline.style.left = boundRect.width / 2 - 3 + "px";
+            splitline.style.zIndex = "6";
+            splitline.style.background = "#cccccc";
+            this.mouseEnter = false;
+            this.mouseDown = false;
+            this.mouseMove = false;
+            this.mouseOver = false;
+            splitline.onmouseenter = function (e) {
+                _this.mouseEnter = true;
+                if (_this.windowHorizon) {
+                    splitline.style.cursor = "e-resize";
+                }
+                else {
+                    splitline.style.cursor = "n-resize";
+                }
+            };
+            splitline.onmouseover = function (e) {
+                _this.mouseOver = true;
+            };
+            splitline.onmouseleave = function (e) {
+                _this.mouseOver = false;
+            };
+            this.app.container.addEventListener("mousedown", function (e) {
+                if (_this.mouseOver)
+                    _this.mouseDown = true;
+            }, false);
+            this.app.container.addEventListener("mouseup", function (e) {
+                _this.mouseDown = false;
+                _this.mouseEnter = false;
+                _this.mouseMove = false;
+            }, false);
+            this.app.container.addEventListener("mousemove", function (e) {
+                _this.mouseMove = true;
+                if (_this.mouseEnter) {
+                    if (_this.mouseDown) {
+                        var screenRect = _this.outcontainer.getBoundingClientRect();
+                        var xRate = e.clientX / screenRect.width;
+                        var yRate = e.clientY / screenRect.height;
+                        console.log("e.clientY Test" + e.clientY);
+                        if (_this.windowHorizon) {
+                            _this.splitline.style.left = e.clientX - 3 + "px";
+                            _this.windowRate = xRate;
+                            _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
+                            _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
+                            _this.splitline.style.cursor = "e-resize";
+                        }
+                        else {
+                            splitline.style.top = e.clientY - 3 + "px";
+                            _this.windowRate = yRate;
+                            _this.camera.viewport = new gd3d.math.rect(0, 1 - _this.windowRate, 1, _this.windowRate);
+                            _this.camera1.viewport = new gd3d.math.rect(0, 0, 1, 1 - _this.windowRate);
+                            _this.splitline.style.cursor = "n-resize";
+                        }
+                    }
+                }
+            }, false);
+            this.app.container.appendChild(splitline);
+        }
         {
             var button1 = document.createElement("button");
             button1.textContent = "横屏/竖屏";
-            button1.onclick = function () {
+            button1.onclick = function (e) {
+                var screenRect = _this.outcontainer.getBoundingClientRect();
                 _this.windowHorizon = _this.windowHorizon ? false : true;
                 if (_this.windowHorizon) {
+                    _this.splitline.style.height = screenRect.height + "px";
+                    _this.splitline.style.width = "6px";
+                    _this.splitline.style.left = screenRect.width * _this.windowRate - 3 + "px";
+                    _this.splitline.style.top = "0px";
                     _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
                     _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
                 }
                 else {
-                    _this.camera.viewport = new gd3d.math.rect(0, 0, 1, _this.windowRate);
-                    _this.camera1.viewport = new gd3d.math.rect(0, _this.windowRate, 1, 1 - _this.windowRate);
+                    _this.splitline.style.height = "6px";
+                    _this.splitline.style.width = screenRect.width + "px";
+                    _this.splitline.style.left = "0px";
+                    splitline.style.top = screenRect.height * _this.windowRate - 3 + "px";
+                    _this.camera.viewport = new gd3d.math.rect(0, 1 - _this.windowRate, 1, _this.windowRate);
+                    _this.camera1.viewport = new gd3d.math.rect(0, 0, 1, 1 - _this.windowRate);
                 }
             };
             button1.style.top = "130px";
             button1.style.position = "absolute";
             this.app.container.appendChild(button1);
-            var input = document.createElement("input");
-            input.type = "range";
-            input.valueAsNumber = this.windowRate * 100;
-            input.oninput = function (e) {
-                _this.windowRate = input.valueAsNumber / 100;
-                if (_this.windowHorizon) {
-                    _this.camera.viewport = new gd3d.math.rect(0, 0, _this.windowRate, 1);
-                    _this.camera1.viewport = new gd3d.math.rect(_this.windowRate, 0, 1 - _this.windowRate, 1);
-                }
-                else {
-                    _this.camera.viewport = new gd3d.math.rect(0, 0, 1, _this.windowRate);
-                    _this.camera1.viewport = new gd3d.math.rect(0, _this.windowRate, 1, 1 - _this.windowRate);
-                }
-            };
-            input.style.top = "190px";
-            input.style.position = "absolute";
-            this.app.container.appendChild(input);
         }
     };
-    demo_ScreenRange.prototype.update = function (delta) {
+    demo_ScreenSplit.prototype.update = function (delta) {
         Test_CameraController.instance().update(delta);
+        var screenRect = this.outcontainer.getBoundingClientRect();
         if (this.pointDown == false && this.inputMgr.point.touch == true) {
             var ray;
             if (this.windowHorizon) {
-                if (this.cameraCount == 0) {
+                if (this.cameraCurseHover == 0) {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
                 }
-                else if (this.cameraCount == 1) {
+                else if (this.cameraCurseHover == 1) {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x - this.app.webgl.canvas.width * this.windowRate, this.inputMgr.point.y), this.app);
                 }
             }
             else {
-                if (this.cameraCount == 0) {
-                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y - this.app.webgl.canvas.height * (1 - this.windowRate)), this.app);
-                }
-                else if (this.cameraCount == 1) {
+                if (this.cameraCurseHover == 0) {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
+                }
+                else if (this.cameraCurseHover == 1) {
+                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y - this.app.webgl.canvas.height * this.windowRate), this.app);
                 }
             }
             console.log("inputMgr.point: " + new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y));
@@ -224,7 +289,7 @@ var demo_ScreenRange = (function () {
         gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
         this.cube2.markDirty();
     };
-    return demo_ScreenRange;
+    return demo_ScreenSplit;
 }());
 var t;
 (function (t) {
@@ -577,13 +642,13 @@ var main = (function () {
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
         this.addBtn("example_Sound", function () { return new test_Sound(); });
-        this.addBtn("demo_ScreenRange", function () { return new demo_ScreenRange(); });
+        this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
         this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
-        this.addBtn("test_UI_component", function () { return new test_UI_Component(); });
         this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
+        this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
     };
     main.prototype.addBtn = function (text, act) {
@@ -598,7 +663,7 @@ var main = (function () {
         };
         btn.style.top = this.y + "px";
         btn.style.left = this.x + "px";
-        if (this.y + 24 > 400) {
+        if (this.y + 24 > 550) {
             this.y = 100;
             this.x += 200;
         }
@@ -1238,7 +1303,7 @@ var testLiChangeMesh = (function () {
         this.app.getAssetMgr().load("res/uisprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
             if (s.isfinish) {
                 var texture = _this.app.getAssetMgr().getAssetByName("uisprite.png");
-                img9.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                img9.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             }
         });
         this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
@@ -2065,7 +2130,7 @@ var Joystick = (function () {
             var img0 = this.joystickLeft0.addComponent("image2D");
             img0.imageType = gd3d.framework.ImageType.Simple;
             var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
-            img0.setTexture(tex0);
+            img0.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickLeft0);
             this.joystickLeft0.markDirty();
             this.joystickLeft1 = new gd3d.framework.transform2D();
@@ -2077,7 +2142,7 @@ var Joystick = (function () {
             var img1 = this.joystickLeft1.addComponent("image2D");
             img1.imageType = gd3d.framework.ImageType.Simple;
             var tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png");
-            img1.setTexture(tex1);
+            img1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickLeft1);
             this.joystickLeft1.markDirty();
         }
@@ -2091,7 +2156,7 @@ var Joystick = (function () {
             var img0 = this.joystickRight0.addComponent("image2D");
             img0.imageType = gd3d.framework.ImageType.Simple;
             var tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png");
-            img0.setTexture(tex0);
+            img0.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickRight0);
             this.joystickRight0.markDirty();
             this.joystickRight1 = new gd3d.framework.transform2D();
@@ -2103,7 +2168,7 @@ var Joystick = (function () {
             var img1 = this.joystickRight1.addComponent("image2D");
             img1.imageType = gd3d.framework.ImageType.Simple;
             var tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png");
-            img1.setTexture(tex1);
+            img1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickRight1);
             this.joystickRight1.markDirty();
         }
@@ -3126,13 +3191,20 @@ var test_UI_Component = (function () {
         bg_t.height = 260;
         bg_t.pivot.x = 0;
         bg_t.pivot.y = 0;
-        bg_t.localTranslate.x = 100;
         bg_t.localTranslate.y = 100;
         this.rooto2d.addChild(bg_t);
         var bg_i = bg_t.addComponent("image2D");
         bg_i.imageType = gd3d.framework.ImageType.Sliced;
         bg_i.sprite = atlasComp.sprites["bg"];
-        bg_i.sprite.border = new gd3d.math.border(10, 50, 10, 10);
+        bg_i.imageBorder.l = 10;
+        bg_i.imageBorder.t = 50;
+        bg_i.imageBorder.r = 10;
+        bg_i.imageBorder.b = 10;
+        bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
         var lab_t = new gd3d.framework.transform2D;
         lab_t.width = 120;
         lab_t.height = 24;
@@ -3172,6 +3244,9 @@ var test_UI_Component = (function () {
         close_b.targetImage.sprite = atlasComp.sprites["ui_boundary_close_in"];
         close_b.pressedGraphic = atlasComp.sprites["ui_boundary_close"];
         close_b.transition = gd3d.framework.TransitionType.SpriteSwap;
+        close_bt.layoutState = 0 | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP;
+        close_bt.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 5);
+        close_bt.setLayoutValue(gd3d.framework.layoutOption.TOP, 3);
         var nums = "45789";
         var scale = 0.6;
         var numIconarr = [];
@@ -3209,6 +3284,7 @@ var test_UI_Component = (function () {
         iptFrame_t.localTranslate.y = 160;
         bg_t.addChild(iptFrame_t);
         var ipt = iptFrame_t.addComponent("inputField");
+        ipt.LineType = gd3d.framework.lineType.MultiLine;
         var img_t = new gd3d.framework.transform2D;
         img_t.width = iptFrame_t.width;
         img_t.height = iptFrame_t.height;
@@ -3216,7 +3292,10 @@ var test_UI_Component = (function () {
         ipt.frameImage = img_t.addComponent("image2D");
         ipt.frameImage.sprite = atlasComp.sprites["ui_public_input"];
         ipt.frameImage.imageType = gd3d.framework.ImageType.Sliced;
-        ipt.frameImage.sprite.border = new gd3d.math.border(16, 14, 16, 14);
+        ipt.frameImage.imageBorder.l = 16;
+        ipt.frameImage.imageBorder.t = 14;
+        ipt.frameImage.imageBorder.r = 16;
+        ipt.frameImage.imageBorder.b = 14;
         var text_t = new gd3d.framework.transform2D;
         text_t.width = iptFrame_t.width;
         text_t.height = iptFrame_t.height;
@@ -3225,6 +3304,9 @@ var test_UI_Component = (function () {
         ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
         ipt.TextLabel.fontsize = 24;
         ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
+        text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
+        text_t.setLayoutValue(gd3d.framework.layoutOption.H_CENTER, 0);
+        text_t.setLayoutValue(gd3d.framework.layoutOption.V_CENTER, 0);
         var p_t = new gd3d.framework.transform2D;
         p_t.width = iptFrame_t.width;
         p_t.height = iptFrame_t.height;
@@ -3332,7 +3414,7 @@ var test_UIEffect = (function () {
                                 o2d.addChild(t2d_1);
                                 var img_1 = t2d_1.addComponent("image2D");
                                 img_1.imageType = gd3d.framework.ImageType.Simple;
-                                img_1.setTexture(texture);
+                                img_1.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                             }
                         }
                     }
@@ -3469,6 +3551,123 @@ var AlignType;
     AlignType[AlignType["TOP_RIGHT"] = 8] = "TOP_RIGHT";
     AlignType[AlignType["BOTTOM_RIGHT"] = 9] = "BOTTOM_RIGHT";
 })(AlignType || (AlignType = {}));
+var test_uiPerfabLoad = (function () {
+    function test_uiPerfabLoad() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+    }
+    test_uiPerfabLoad.prototype.start = function (app) {
+        var _this = this;
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.assetMgr = this.app.getAssetMgr();
+        this.app.closeFps();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 10;
+        this.rooto2d = new gd3d.framework.overlay2D();
+        this.camera.addOverLay(this.rooto2d);
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.createUI.bind(this));
+        var inputh = document.createElement("input");
+        this.app.container.appendChild(inputh);
+        inputh.style.position = "absolute";
+        inputh.style.width = 100 + "px";
+        inputh.style.height = 30 + "px";
+        var btn = document.createElement("button");
+        this.app.container.appendChild(btn);
+        btn.textContent = "加载";
+        btn.style.position = "absolute";
+        btn.style.left = 120 + "px";
+        btn.onclick = function () {
+            console.error(inputh.innerText);
+            console.error(inputh.textContent);
+            console.error(inputh.value);
+            _this.doLoad(inputh.value);
+        };
+    };
+    test_uiPerfabLoad.prototype.createUI = function (astState, state) {
+        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
+        var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
+        var bg_t = new gd3d.framework.transform2D;
+        bg_t.width = 400;
+        bg_t.height = 260;
+        bg_t.pivot.x = 0;
+        bg_t.pivot.y = 0;
+        bg_t.localTranslate.y = 100;
+        this.rooto2d.addChild(bg_t);
+        var bg_i = bg_t.addComponent("image2D");
+        bg_i.imageType = gd3d.framework.ImageType.Sliced;
+        bg_i.sprite = atlasComp.sprites["bg"];
+        bg_i.imageBorder.l = 10;
+        bg_i.imageBorder.t = 50;
+        bg_i.imageBorder.r = 10;
+        bg_i.imageBorder.b = 10;
+        bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
+        this.bgui = bg_t;
+        var prefabName = "button";
+        this.doLoad(prefabName);
+        var inputMgr = this.app.getInputMgr();
+        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
+            if (ev.keyCode == 81) {
+            }
+        }, false);
+        state.finish = true;
+    };
+    test_uiPerfabLoad.prototype.doLoad = function (name) {
+        var _this = this;
+        if (!this.bgui)
+            return;
+        if (this.targetui) {
+            this.bgui.removeChild(this.targetui);
+            this.targetui.dispose();
+        }
+        var prefabName = name;
+        this.assetMgr.load("res/prefabs/UI/" + prefabName + "/" + prefabName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+            if (s1.isfinish) {
+                var ass = _this.assetMgr;
+                var temp = _this.assetMgr.getAssetByName(prefabName + ".prefab.json");
+                var t2d = temp.getCloneTrans2D();
+                _this.bgui.addChild(t2d);
+                t2d.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
+                t2d.markDirty();
+                _this.targetui = t2d;
+            }
+        });
+    };
+    test_uiPerfabLoad.prototype.loadTexture = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                        if (s.isfinish) {
+                                            state.finish = true;
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_uiPerfabLoad.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return test_uiPerfabLoad;
+}());
 var test_01 = (function () {
     function test_01() {
         this.timer = 0;
@@ -6965,7 +7164,7 @@ var testReload = (function () {
         this.app.getAssetMgr().load("res/uisprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
             if (s.isfinish) {
                 var texture = _this.app.getAssetMgr().getAssetByName("uisprite.png");
-                img9.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                img9.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             }
         });
         this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
@@ -8355,7 +8554,7 @@ var t;
                         _this.app.getAssetMgr().load("res/resources/1.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
                             if (state.isfinish) {
                                 var atlas = _this.app.getAssetMgr().getAssetByName("1.atlas.json");
-                                img_1_1.setTexture(atlas.texture);
+                                img_1_1.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                                 img_2_1.sprite = atlas.sprites["card_role_1_face"];
                                 img_2_1.sprite.border = new gd3d.math.border(10, 10, 10, 10);
                                 _this.img_3.sprite = atlas.sprites["card_role_1_face"];
@@ -8371,7 +8570,7 @@ var t;
                 this.app.getAssetMgr().load("res/uisprite.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         var texture = _this.app.getAssetMgr().getAssetByName("uisprite.png");
-                        img9_1.setTexture(texture, new gd3d.math.border(15, 15, 15, 15));
+                        img9_1.sprite = _this.app.getAssetMgr().getDefaultSprite("grid_sprite");
                     }
                 });
                 this.app.getAssetMgr().load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {

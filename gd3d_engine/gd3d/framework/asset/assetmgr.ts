@@ -847,6 +847,7 @@ namespace gd3d.framework
             defMesh.initDefaultMesh(this);
             defTexture.initDefaultTexture(this);
             defmaterial.initDefaultMaterial(this);
+            defsprite.initDefaultSprite(this);
         }
         /**
          * @public
@@ -898,6 +899,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         mapDefaultTexture: { [id: string]: texture } = {};
+
         /**
          * @public
          * @language zh_CN
@@ -909,6 +911,28 @@ namespace gd3d.framework
         getDefaultTexture(name: string): texture
         {
             return this.mapDefaultTexture[name];
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 默认sprite资源
+         * @version egret-gd3d 1.0
+         */
+        mapDefaultSprite:{ [id:string] : sprite} = {};
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过name获取默认sprite资源
+         * @param name
+         * @version egret-gd3d 1.0
+         */
+        getDefaultSprite(name: string): sprite
+        {
+            return this.mapDefaultSprite[name];
         }
 
         /**
