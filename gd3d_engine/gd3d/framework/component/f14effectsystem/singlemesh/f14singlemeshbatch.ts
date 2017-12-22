@@ -143,13 +143,13 @@ namespace gd3d.framework
 
             if (this.activemeshlist.length < 1) return;
             this.ElementMat.setQueue(Effqueue);
-            if(this.noBatch)
-            {
-                this.ElementMat.setColor("_Main_Color",this.activemeshlist[0].color);
-                this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
-                this.ElementMat.setMatrix("_mat",this.activemeshlist[0].targetMat);
-                this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
-            }else
+            // if(this.noBatch)
+            // {
+            //     this.ElementMat.setColor("_Main_Color",this.activemeshlist[0].color);
+            //     this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
+            //     this.ElementMat.setMatrix("_mat",this.activemeshlist[0].targetMat);
+            //     this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
+            // }else
             {
                 //---------------------集合数据
                 this.curIndexCount=0;
@@ -168,6 +168,7 @@ namespace gd3d.framework
                 this.mesh.submesh[0].size=this.curIndexCount;
 
                 this.ElementMat.setVector4("_Main_Color",new math.vector4(1,1,1,1));
+                //this.ElementMat.setVector4("_Main_Tex_ST",new math.vector4(1,1,0,0) );
                 this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
             }
 

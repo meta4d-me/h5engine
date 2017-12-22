@@ -34,8 +34,8 @@ void main()
     lowp vec3 mainTexcolor=basecolor.rgb*_diffuseRate;
     lowp vec3 specColor=basecolor.rgb*_speculerRate*asmcolor.g;
 
-    lowp vec2 streamligtuv=normalDir.xy*0.5+_light_uv;
-    lowp vec3 lightcolor=texture2D(_streamLight,streamligtuv).rgb;
+    highp vec2 streamligtuv=normalDir.xy*0.5+_light_uv;
+    highp vec3 lightcolor=texture2D(_streamLight,streamligtuv).rgb;
     lightcolor=min(vec3(asmcolor.b),lightcolor)*_LightColor.rgb*_LightRate;
 
     highp vec3 lightDir=vec3(cos(angle)*-1.0,0.0,sin(angle)*-1.0);

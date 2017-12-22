@@ -61,7 +61,7 @@ namespace gd3d.framework
         {
             let f14node=new gd3d.framework.f14node();
             f14node.trans=new gd3d.framework.transform();
-            f14node.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
+            f14node.f14Effect=f14node.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
             f14node.f14Effect.setData(this.f14data);
             return f14node;
         }

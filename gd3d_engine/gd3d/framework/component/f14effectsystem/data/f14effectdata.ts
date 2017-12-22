@@ -48,7 +48,7 @@ namespace gd3d.framework
                 break;
                 case "SingleMeshType":
                     this.type=F14TypeEnum.SingleMeshType;
-                    this.elementdata=new F14SingleMeshBaseData();
+                    this.elementdata=new F14SingleMeshBaseData(json.frames[0].frameindex);
                     this.elementdata.parse(json.singlemeshdata,assetmgr,assetbundle);
                     break;
                 case "RefType":
@@ -100,6 +100,7 @@ namespace gd3d.framework
                         frameitem.EmissionData=data;
                 }
             }
+            
         }
     }
 

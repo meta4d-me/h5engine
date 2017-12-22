@@ -39,8 +39,12 @@ namespace gd3d.framework
         public column:number;
         public count:number;
     
-        public F14SingleMeshBaseData()
+
+        //-----------------attline 计算插值
+        firtstFrame:number=0;
+        public constructor(firstFrame:number)
         {
+            this.firtstFrame=firstFrame;
             this.mesh = gd3d.framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad");
             this.material = gd3d.framework.sceneMgr.app.getAssetMgr().getDefParticleMat();
         }
