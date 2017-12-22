@@ -827,6 +827,27 @@
       {
           "name":"resources/f14effect/particles_add.shader.json",
           "length":0
+          },
+      {
+          "name":"resources/project/flowwater_new.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/flowwater_new.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/flowwater_new.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/fog_flowwater_new.vs.glsl",
+          "length":0
+          }
+          ,
+      {
+          "name":"resources/project/fog_flowwater_new.fs.glsl",
+          "length":0
           }
       ]
   }
