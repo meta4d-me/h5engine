@@ -9,10 +9,6 @@
                 "showface": "all",
                 "vs": "color",
                 "fs": "color"
-            },
-            {
-                "vs": "color",
-                "fs": "white"
             }
         ],
         "base_fog": [
@@ -20,10 +16,6 @@
                 "showface": "all",
                 "vs": "fog_color",
                 "fs": "fog_color"
-            },
-            {
-                "vs": "fog_color",
-                "fs": "fog_white"
             }
         ],
         "shadowgen": [],

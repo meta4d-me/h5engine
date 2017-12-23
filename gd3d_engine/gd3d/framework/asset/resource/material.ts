@@ -339,6 +339,10 @@ namespace gd3d.framework
         {
             return this.shader.queue+this.queue;
         }
+        setQueue(queue:number)
+        {
+            this.queue=queue;
+        }
         /**
          * @public
          * @language zh_CN
@@ -412,6 +416,21 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
             }
         }
+        setColor(_id: string, _vector4: math.color)
+        {
+            if (this.mapUniform[_id] != undefined)
+                this.mapUniform[_id].value = _vector4;
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4)
+            {
+                this.mapUniformTemp[_id].value = _vector4;
+            }
+            else
+            {
+                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
+            }
+        }
+        
+
         /**
          * @private
          */

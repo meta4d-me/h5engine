@@ -18,7 +18,7 @@
     "passes": {
         "base": [
             {
-                "showface": "ccw",
+                "showface": "all",
                 "vs": "asi_new",
                 "fs": "asi_new"
             }

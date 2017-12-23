@@ -1,16 +1,20 @@
 
-class demo_ScreenRange implements IState
+class demo_ScreenSplit implements IState
 {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    cameraCount:number=0;
+    cameraCurseHover:number=0;
 
     windowRate:number=0.5;
     windowHorizon:boolean=true;
+    mouseOver:boolean=false;
+    mouseEnter:boolean=false;
+    mouseDown:boolean=false;
+    mouseMove:boolean=false;
     outcontainer:HTMLDivElement;
 
     start(app: gd3d.framework.application) {
-        console.log("i am here.");
+       
         this.app = app;
         this.inputMgr = this.app.getInputMgr();
         this.scene = this.app.getScene();
@@ -37,7 +41,6 @@ class demo_ScreenRange implements IState
 
         cube.markDirty();
         cuber = renderer;
-
 
         this.cube = cube;
 
@@ -129,22 +132,22 @@ class demo_ScreenRange implements IState
                 let screenRect = this.outcontainer.getBoundingClientRect();
 
                 let xRate=ev.clientX/screenRect.width;
-                let yRate=1-ev.clientY/screenRect.height;
+                let yRate=ev.clientY/screenRect.height;
 
-                // let xRate= this.inputMgr.point.x/this.app.webgl.canvas.width;
-                // let yRate= this.inputMgr.point.y/this.app.webgl.canvas.height;
+                console.log("ev.clintY  "+ev.clientY);  //跟浏览器上显示的像素值的匹配
+                console.log("this.inputMgr.point.y "+this.inputMgr.point.y); //跟浏览器上显示的像素值不匹配
 
                 if(this.windowHorizon)
                 {
                     if(xRate<this.windowRate)
                     {
                         this.targetCamera=this.camera; 
-                        this.cameraCount=0;                  
+                        this.cameraCurseHover=0;                  
                     } 
                     else
                     {
                         this.targetCamera=_camera;      
-                        this.cameraCount=1;             
+                        this.cameraCurseHover=1;             
                     }
                 }
                 else
@@ -152,12 +155,12 @@ class demo_ScreenRange implements IState
                     if(yRate<this.windowRate)
                     {
                         this.targetCamera=this.camera; 
-                        this.cameraCount=0;                  
+                        this.cameraCurseHover=0;                  
                     } 
                     else
                     {
                         this.targetCamera=_camera;      
-                        this.cameraCount=1;             
+                        this.cameraCurseHover=1;             
                     }
                 }
                
@@ -165,52 +168,142 @@ class demo_ScreenRange implements IState
             });         
         } 
 
+        let boundRect = this.outcontainer.getBoundingClientRect();     //这个跟浏览器显示出来的边框像素是一致的
+        console.log("this boundRect width and "+boundRect.width+"  "+boundRect.height) 
+     
         {
+            //添加分割线             
+            var splitline=document.createElement("div");
+            this.splitline=splitline;
+            
+
+            splitline.style.height= boundRect.height+"px";
+            splitline.style.width="6px";
+            splitline.style.position="absolute";
+            splitline.style.top = "0px";
+            splitline.style.left = boundRect.width/2-3+"px";
+            splitline.style.zIndex="6";
+            splitline.style.background="#cccccc";
+            
+            this.mouseEnter=false;
+            this.mouseDown=false;
+            this.mouseMove=false;
+            this.mouseOver=false;
+  
+            splitline.onmouseenter=(e)=>
+            {
+                this.mouseEnter=true;
+                if(this.windowHorizon)
+                {
+                    splitline.style.cursor="e-resize";
+                }
+                else
+                {
+                    splitline.style.cursor="n-resize";
+                }
+            }
+
+            splitline.onmouseover=(e)=>
+            {
+                this.mouseOver=true;
+            }
+            
+            splitline.onmouseleave=(e)=>
+            {
+                this.mouseOver=false;
+            }
+     
+            this.app.container.addEventListener("mousedown",(e:MouseEvent)=>{
+                if(this.mouseOver)
+                this.mouseDown=true;
+            },false);
+
+            this.app.container.addEventListener("mouseup",(e:MouseEvent)=>{
+                this.mouseDown=false;
+                this.mouseEnter=false;
+                this.mouseMove=false;  
+            },false);           
+
+            this.app.container.addEventListener("mousemove",(e:MouseEvent)=>{
+                this.mouseMove=true;
+                if(this.mouseEnter)
+                {
+                    if(this.mouseDown){                   
+                        let screenRect = this.outcontainer.getBoundingClientRect();
+    
+                        let xRate=e.clientX/screenRect.width;   
+                        let yRate=e.clientY/screenRect.height;//YRate 左下角是坐标原点
+                        console.log("e.clientY Test"+ e.clientY);
+    
+                        if(this.windowHorizon)
+                        {                       
+                            this.splitline.style.left=e.clientX-3+ "px";                                  
+                            this.windowRate=xRate;
+                            this.camera.viewport=new gd3d.math.rect(0,0,this.windowRate,1);
+                            this.camera1.viewport=new gd3d.math.rect(this.windowRate,0,1-this.windowRate,1);         
+                            this.splitline.style.cursor="e-resize";                  
+                        }
+                        else
+                        { 
+                            splitline.style.top=e.clientY-3+"px";                                 
+                            this.windowRate=yRate;
+
+                            // this.camera.viewport=new gd3d.math.rect(0,1-this.windowRate,1,this.windowRate);
+                            // this.camera1.viewport=new gd3d.math.rect(0,0,1,1-this.windowRate);   
+
+                            this.camera.viewport=new gd3d.math.rect(0,1-this.windowRate,1,this.windowRate);
+                            this.camera1.viewport=new gd3d.math.rect(0,0,1,1-this.windowRate);   
+                            this.splitline.style.cursor="n-resize";      
+                        }
+                    }
+                }
+              
+            },false);        
+            
+            this.app.container.appendChild(splitline);
+        }
+
+        {   
             //添加button
             var button1=document.createElement("button");
             button1.textContent="横屏/竖屏";
-            button1.onclick=()=>
+            button1.onclick=(e)=>
             {
+                let screenRect = this.outcontainer.getBoundingClientRect();
+
                 this.windowHorizon= this.windowHorizon?false:true;
                 if(this.windowHorizon)
                 {
+                    this.splitline.style.height= screenRect.height+"px";
+                    this.splitline.style.width="6px"; 
+                   
+                    this.splitline.style.left=screenRect.width*this.windowRate-3+ "px";    
+                    this.splitline.style.top="0px";
+
                     this.camera.viewport=new gd3d.math.rect(0,0,this.windowRate,1);
                     this.camera1.viewport=new gd3d.math.rect(this.windowRate,0,1-this.windowRate,1);   
                 }
                 else
-                {
-                    this.camera.viewport=new gd3d.math.rect(0,0,1,this.windowRate);
-                    this.camera1.viewport=new gd3d.math.rect(0,this.windowRate,1,1-this.windowRate);   
+                {          
+                    this.splitline.style.height= "6px";
+                    this.splitline.style.width=screenRect.width+"px";           
+
+                    this.splitline.style.left="0px";
+                    splitline.style.top=screenRect.height*this.windowRate-3+"px";     
+                    
+                    this.camera.viewport=new gd3d.math.rect(0,1-this.windowRate,1,this.windowRate);
+                    this.camera1.viewport=new gd3d.math.rect(0,0,1,1-this.windowRate);   
+
+                    // this.camera.viewport=new gd3d.math.rect(0,1-this.windowRate,1,this.windowRate);
+                    // this.camera1.viewport=new gd3d.math.rect(0,0,1,1-this.windowRate);   
                 }
             };
             button1.style.top="130px";    
             button1.style.position = "absolute";
             this.app.container.appendChild(button1);
-
-
-
-            var input = document.createElement("input");
-            input.type = "range";
-            input.valueAsNumber = this.windowRate*100;
-            input.oninput = (e) =>
-            {
-                this.windowRate=input.valueAsNumber/100;
-                if(this.windowHorizon)
-                {
-                    this.camera.viewport=new gd3d.math.rect(0,0,this.windowRate,1);
-                    this.camera1.viewport=new gd3d.math.rect(this.windowRate,0,1-this.windowRate,1);             
-                }
-                else
-                {
-                    this.camera.viewport=new gd3d.math.rect(0,0,1,this.windowRate);
-                    this.camera1.viewport=new gd3d.math.rect(0,this.windowRate,1,1-this.windowRate);   
-                }
-                   
-            };
-            input.style.top = "190px";
-            input.style.position = "absolute";
-            this.app.container.appendChild(input);
         }
+
+
     }
     
     camera: gd3d.framework.camera;
@@ -224,32 +317,41 @@ class demo_ScreenRange implements IState
     targetCamera:gd3d.framework.camera;
     inputMgr: gd3d.framework.inputMgr;
     pointDown: boolean = false;
+    splitline:HTMLDivElement;
+
+   
+
     update(delta: number) {
 
         Test_CameraController.instance().update(delta);
+
+        let screenRect = this.outcontainer.getBoundingClientRect();
+        
         if (this.pointDown == false && this.inputMgr.point.touch == true)//pointdown
         {
             var ray:gd3d.framework.ray;
             if(this.windowHorizon)
             {
-                if(this.cameraCount==0)
+                if(this.cameraCurseHover==0)
                 {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
                 }
-                else if(this.cameraCount==1)
+                else if(this.cameraCurseHover==1)
                 {
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x-this.app.webgl.canvas.width *this.windowRate, this.inputMgr.point.y), this.app);
                 }
             }
             else
             {
-                if(this.cameraCount==0)
+                if(this.cameraCurseHover==0)
                 {
-                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y-this.app.webgl.canvas.height *(1-this.windowRate)), this.app);
-                }
-                else if(this.cameraCount==1)
-                {
+                   //第二种，左上角原点 createByscren 
                     ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
+                }
+                else if(this.cameraCurseHover==1)
+                {
+                 //第二种，左上角原点
+                    ray = this.targetCamera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y-this.app.webgl.canvas.height *this.windowRate), this.app);
                 }
             }
 
@@ -258,7 +360,7 @@ class demo_ScreenRange implements IState
             if (pickinfo != null) {
                 this.movetarget = pickinfo.hitposition;
                 this.timer = 0;
-            }
+            }   
         }
         this.pointDown = this.inputMgr.point.touch;
 

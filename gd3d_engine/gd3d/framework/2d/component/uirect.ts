@@ -18,7 +18,7 @@ namespace gd3d.framework
 
         }
         remove() {
-
+            this.transform = null;
         }
 
     }

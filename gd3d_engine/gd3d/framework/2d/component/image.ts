@@ -44,7 +44,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("color")
-        @reflect.UIStyle("vector4")
+        @reflect.UIStyle("color")
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
 
         /**
@@ -53,14 +53,18 @@ namespace gd3d.framework
          */
         _uimat: material;
         private get uimat(){
-            if (this._sprite  && this._sprite.texture ){
+            if (this._sprite  && this._sprite.texture){
+                let matName =this._sprite.texture.getName() + "_uimask";
                 let canvas = this.transform.canvas;
-                let mat = canvas.assetmgr.getMaterial(this._sprite.texture.getName()+"_uimask");
+                let mat = this._uimat;
+                if(!mat || mat.getName() != matName){
+                    if(mat) mat.unuse(); 
+                    mat = canvas.assetmgr.getAssetByName(matName) as gd3d.framework.material;
+                    if(mat) mat.use();
+                }
                 if(mat == null){
-                    if(this._uimat != null) this._uimat.unuse();
-                    mat = new material();
+                    mat = new material(matName);
                     mat.setShader(canvas.assetmgr.getShader("shader/defmaskui"));
-                    canvas.assetmgr.mapMaterial[this._sprite.texture.getName()+"_uimask"] = mat;
                     mat.use();
                 }
                 if(this.transform.parentIsMask){
@@ -82,7 +86,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        @reflect.UIStyle("ImageType")
+        @reflect.UIStyle("enum")
         get imageType()
         {
             return this._imageType;
@@ -104,7 +108,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        @reflect.UIStyle("FillMethod")
+        @reflect.UIStyle("enum")
         get fillMethod()
         {
             return this._fillMethod;
@@ -125,6 +129,7 @@ namespace gd3d.framework
          * 填充率
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         get fillAmmount()
         {
             return this._fillAmmount;
@@ -134,45 +139,47 @@ namespace gd3d.framework
             this._fillAmmount = ammount;
             if (this.transform != null)
                 this.transform.markDirty();
-        }
-
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置图片
-         * @param texture 图片
-         * @param border 切片信息
-         * @param rect 显示范围
-         * @version egret-gd3d 1.0
-         */
-        setTexture(texture: texture, border?: math.border, rect?: math.rect)
-        {
-            this.needRefreshImg = true;
-            if(this.sprite)
-            {
-                this.sprite.unuse();
             }
-            var _sprite = new sprite();
-            _sprite.texture = texture;
-            if (border != null)
-                _sprite.border = border;
-            else
-                _sprite.border = new math.border(0, 0, 0, 0);
-            if (rect != null)
-                _sprite.rect = rect;
-            else
-                _sprite.rect = new math.rect(0, 0, texture.glTexture.width, texture.glTexture.height);
 
-            this.sprite = _sprite;
-            this.sprite.use();
-            this.prepareData();
-            if (this.transform != null){
-                this.transform.markDirty();
-                this.updateTran();
-            }
-        }
+        transform: transform2D;
+            
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 设置图片
+        //  * @param texture 图片
+        //  * @param border 切片信息
+        //  * @param rect 显示范围
+        //  * @version egret-gd3d 1.0
+        //  */
+        // setTexture(texture: texture, border?: math.border, rect?: math.rect)
+        // {   //image 不应该有setTexture
+        //     this.needRefreshImg = true;
+        //     if(this.sprite)
+        //     {
+        //         this.sprite.unuse();
+        //     }
+        //     var _sprite = new sprite();
+        //     _sprite.texture = texture;
+        //     if (border != null)
+        //         _sprite.border = border;
+        //     else
+        //         _sprite.border = new math.border(0, 0, 0, 0);
+        //     if (rect != null)
+        //         _sprite.rect = rect;
+        //     else
+        //         _sprite.rect = new math.rect(0, 0, texture.glTexture.width, texture.glTexture.height);
 
+        //     this.sprite = _sprite;
+        //     this.sprite.use();
+        //     this.prepareData();
+        //     if (this.transform != null){
+        //         this.transform.markDirty();
+        //         this.updateTran();
+        //     }
+        // }
+        
         /**
          * @public
          * @language zh_CN
@@ -180,31 +187,75 @@ namespace gd3d.framework
          * 精灵
          * @version egret-gd3d 1.0
          */
-        public set sprite(_sprite: sprite)
+        public set sprite(sprite: sprite)
         {
+            if(sprite == this._sprite) return;
+
             this.needRefreshImg = true;
             if(this._sprite)
             {
                 this._sprite.unuse();
             }
-            this._sprite = _sprite;
-            this._sprite.use();
-            this.prepareData();
-            this.transform.markDirty();
-            this.updateTran();
+            this._sprite = sprite;
+            if(sprite){
+                // this._imageBorder.l = sprite.border.l;
+                // this._imageBorder.t = sprite.border.t;
+                // this._imageBorder.r = sprite.border.r;
+                // this._imageBorder.b = sprite.border.b;
+                this._sprite.use();
+                this._spriteName = this._sprite.getName();
+                this.prepareData();
+                if (this.transform != null){
+                    this.transform.markDirty();
+                    this.updateTran();
+                }
+            }else{
+                this._spriteName = "";
+            }
+
         }
         public get sprite()
         {
             return this._sprite;
         }
 
+        @gd3d.reflect.Field("string")
+        private _spriteName:string = "";
         
+        
+        @reflect.Field("border")
+        private _imageBorder = new math.border();
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 9宫格边距
+         * @version egret-gd3d 1.0
+         */
+        get imageBorder(){
+            return this._imageBorder;
+        }
 
         /**
          * @private
          */
         render(canvas: canvas)
         {
+            if(this._sprite == null){
+                let temp = canvas.assetmgr.mapNamed[this._spriteName];
+                let tspr:sprite;
+                if(temp != null){
+                    tspr = canvas.assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;
+                }else{
+                    if(canvas.assetmgr.mapDefaultSprite[this._spriteName]) //找默认资源
+                        tspr = canvas.assetmgr.getDefaultSprite(this._spriteName);
+                }
+                if(tspr){
+                    this.sprite = tspr;
+                    this.needRefreshImg = true;
+                }
+            }
+
             let mat = this.uimat;
 
             var img = null;
@@ -220,7 +271,7 @@ namespace gd3d.framework
             // }
             if(img != null){
                 if(this.needRefreshImg){
-                    this._uimat.setTexture("_MainTex", img);
+                    mat.setTexture("_MainTex", img);
                     this.needRefreshImg = false;
                 }
                 
@@ -255,15 +306,17 @@ namespace gd3d.framework
         {
 
         }
-        transform: transform2D;
 
         /**
          * @private
          */
         remove()
         {
-            this._sprite.unuse(true);
+            if(this._sprite) this._sprite.unuse(true);
+            if(this._uimat) this._uimat.unuse(true);
             this.datar.length = 0;
+            this.transform = null;
+            this._imageBorder = null;
         }
 
         /**
@@ -552,7 +605,7 @@ namespace gd3d.framework
          */
         private updateSlicedData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
         {
-            let border = this._sprite.border;
+            let border = this._imageBorder;
             let rect = this._sprite.rect;
 
             //顶点
@@ -1083,7 +1136,7 @@ namespace gd3d.framework
         private updateTiledData(x0: number, y0: number, x1: number, y1: number, x2: number, y2: number, x3: number, y3: number)
         {
             let rect = this._sprite.rect;
-            let border = this._sprite.border;
+            let border = this._imageBorder;
 
             let urange = this._sprite.urange;
             let vrange = this._sprite.vrange;

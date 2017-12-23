@@ -24,9 +24,9 @@ varying mediump	float angle;
 void main()
 {
 
-	_maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + vec2(_MainTex_ST.z,-_MainTex_ST.w);
-	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + vec2(_asm_ST.z,-_asm_ST.w);
-	lowp vec2 _speed= vec2(_speedu,-_speedv);
+	_maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
+	_asm_uv = _glesMultiTexCoord0.xy * _asm_ST.xy + _asm_ST.zw;
+	lowp vec2 _speed= vec2(_speedu,_speedv);
     _light_uv =_speed * glstate_timer;
  	angle=_lightAngleSpeed*glstate_timer;
 

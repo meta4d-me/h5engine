@@ -132,7 +132,7 @@ class Joystick
             let img0 = this.joystickLeft0.addComponent("image2D") as gd3d.framework.image2D;
             img0.imageType = gd3d.framework.ImageType.Simple;
             let tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png") as gd3d.framework.texture;
-            img0.setTexture(tex0);
+            img0.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickLeft0);
             this.joystickLeft0.markDirty();
 
@@ -145,7 +145,7 @@ class Joystick
             let img1 = this.joystickLeft1.addComponent("image2D") as gd3d.framework.image2D;
             img1.imageType = gd3d.framework.ImageType.Simple;
             let tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png") as gd3d.framework.texture;
-            img1.setTexture(tex1);
+            img1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickLeft1);
             this.joystickLeft1.markDirty();
         }
@@ -159,7 +159,7 @@ class Joystick
             let img0 = this.joystickRight0.addComponent("image2D") as gd3d.framework.image2D;
             img0.imageType = gd3d.framework.ImageType.Simple;
             let tex0 = this.app.getAssetMgr().getAssetByName("joystick0.png") as gd3d.framework.texture;
-            img0.setTexture(tex0);
+            img0.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickRight0);
             this.joystickRight0.markDirty();
 
@@ -172,7 +172,7 @@ class Joystick
             let img1 = this.joystickRight1.addComponent("image2D") as gd3d.framework.image2D;
             img1.imageType = gd3d.framework.ImageType.Simple;
             let tex1 = this.app.getAssetMgr().getAssetByName("joystick1.png") as gd3d.framework.texture;
-            img1.setTexture(tex1);
+            img1.sprite = this.app.getAssetMgr().getDefaultSprite("grid_sprite");
             this.overlay2d.addChild(this.joystickRight1);
             this.joystickRight1.markDirty();
         }

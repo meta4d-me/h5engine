@@ -237,7 +237,7 @@ namespace gd3d.framework
 
         private addParticle(count: number = 1)
         {
-            for (var i = 0; i < count; i++)
+            for (var i = 0; i < count; i++) 
             {
                 if (this.deadParticles.length > 0)
                 {

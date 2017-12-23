@@ -1,5 +1,4 @@
 attribute highp vec3 _glesVertex;
-//attribute lowp vec4 _glesColor;
 attribute mediump vec2 _glesMultiTexCoord0;
 
 uniform lowp float glstate_timer;
@@ -45,9 +44,9 @@ mat4 buildMat4(int index)
 void main()
 {
 
-	lowp vec2 _speed= vec2(_speedu,-_speedv);
-    _maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy +vec2(_MainTex_ST.z,-_MainTex_ST.w) + _speed * glstate_timer;
-    _mask_uv = _glesMultiTexCoord0.xy * _Mask_ST.xy + vec2(_Mask_ST.z,-_Mask_ST.w);
+	lowp vec2 _speed= vec2(_speedu,_speedv);
+    _maintex_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy +_MainTex_ST.zw + _speed * glstate_timer;
+    _mask_uv = _glesMultiTexCoord0.xy * _Mask_ST.xy + _Mask_ST.zw;
 
 	//gl_Position = (glstate_matrix_mvp * vec4(_glesVertex.xyz, 1.0));
 

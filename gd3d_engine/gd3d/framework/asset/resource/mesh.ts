@@ -198,7 +198,7 @@ namespace gd3d.framework
                 {
                     var uv = new gd3d.math.vector2();
                     uv.x = read.readSingle();
-                    uv.y =1-read.readSingle();
+                    uv.y = read.readSingle();
                     data.uv.push(uv);
                 }
             }
@@ -213,7 +213,7 @@ namespace gd3d.framework
                 {
                     var uv = new gd3d.math.vector2();
                     uv.x = read.readSingle();
-                    uv.y =1- read.readSingle();
+                    uv.y = read.readSingle();
                     data.uv2.push(uv);
 
                 }
@@ -226,7 +226,7 @@ namespace gd3d.framework
                     //meshdata.vec2uvs2[i * 2 + 0] =
                     read.readSingle();//u
                     //meshdata.vec2uvs2[i * 2 + 1] =
-                    1 - read.readSingle();//v
+                    read.readSingle();//v
 
                 }
             }
@@ -258,7 +258,7 @@ namespace gd3d.framework
                     //meshdata.vec2uvs2[i * 2 + 0] =
                     read.readSingle();//u
                     //meshdata.vec2uvs2[i * 2 + 1] =
-                    1 - read.readSingle();//v
+                    read.readSingle();//v
 
                 }
             }

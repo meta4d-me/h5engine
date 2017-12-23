@@ -1187,6 +1187,7 @@ namespace gd3d.io
             referenceInfo.regType("vector3");
             referenceInfo.regType("vector4");
             referenceInfo.regType("color");
+            referenceInfo.regType("border");
             referenceInfo.regType("quaternion");
             referenceInfo.regType("material");
             referenceInfo.regType("gameObject");
