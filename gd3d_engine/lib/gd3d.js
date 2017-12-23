@@ -18167,8 +18167,8 @@ var gd3d;
             var r1 = Math.acos(sx);
             var sxs = src.rawData[1] / scale.x;
             var r2 = Math.asin(sxs);
-            if (r2 < 0) {
-                r1 = r1 + Math.PI;
+            if (sxs < 0) {
+                r1 = 2 * Math.PI - r1;
             }
             rotation.v = r1;
             return true;
