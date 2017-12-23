@@ -11372,6 +11372,56 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var canvascontainer = (function () {
+            function canvascontainer() {
+                this._renderMode = canvasRenderMode.ScreenSpaceOverlay;
+            }
+            Object.defineProperty(canvascontainer.prototype, "canvas", {
+                get: function () {
+                    return this._canvas;
+                },
+                set: function (canv) {
+                    this._canvas = canv;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            canvascontainer.prototype.start = function () {
+            };
+            canvascontainer.prototype.update = function (delta) {
+            };
+            canvascontainer.prototype.remove = function () {
+            };
+            canvascontainer.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("reference"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.canvas])
+            ], canvascontainer.prototype, "canvas", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], canvascontainer.prototype, "_renderMode", void 0);
+            canvascontainer = __decorate([
+                gd3d.reflect.nodeComponent,
+                __metadata("design:paramtypes", [])
+            ], canvascontainer);
+            return canvascontainer;
+        }());
+        framework.canvascontainer = canvascontainer;
+        var canvasRenderMode;
+        (function (canvasRenderMode) {
+            canvasRenderMode[canvasRenderMode["ScreenSpaceOverlay"] = 0] = "ScreenSpaceOverlay";
+            canvasRenderMode[canvasRenderMode["ScreenSpaceCamera"] = 1] = "ScreenSpaceCamera";
+            canvasRenderMode[canvasRenderMode["WorldSpace"] = 2] = "WorldSpace";
+        })(canvasRenderMode = framework.canvasRenderMode || (framework.canvasRenderMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var effectSystem = (function () {
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
