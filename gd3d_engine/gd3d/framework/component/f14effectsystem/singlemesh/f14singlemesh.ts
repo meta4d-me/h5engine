@@ -105,7 +105,9 @@ namespace gd3d.framework
             {
                 let att = this.layer.Attlines[item];
                 att.getValue(frame,this.baseddata,this[item]);
+                
             }
+
 
             if (this.baseddata.enableTexAnimation)
             {
@@ -127,30 +129,38 @@ namespace gd3d.framework
             math.matrixMakeTransformRTS(this.position,this.scale,this.localRotate,this.targetMat);
             //return Matrix4x4.TRS(this.position, Quaternion.Euler(this.euler.x, this.euler.y, this.euler.z),this.scale);
         }
-
+        //------temp value
+        private tempos=math.pool.new_vector3();
+        private temColor=math.pool.new_color();
+        private temUv=math.pool.new_vector2();
         uploadMeshdata()
         {
             let batch=this.layer.batch as F14SingleMeshBath;
             for(let i=0;i<this.vertexCount;i++)
             {
-                let tempos=math.pool.new_vector3();
-                math.matrixTransformVector3(this.posArr[i],this.targetMat,tempos);
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+0]= tempos.x;
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+1]= tempos.y;
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+2]= tempos.z;
+                math.matrixTransformVector3(this.posArr[i],this.targetMat,this.tempos);
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+0]= this.tempos.x;
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+1]= this.tempos.y;
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+2]= this.tempos.z;
 
-                let temColor=math.pool.new_color();
-                math.colorMultiply(this.colorArr[i],this.color,temColor);
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+3]= temColor.r;
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+4]= temColor.g;
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+5]= temColor.b;
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+6]= temColor.a;
 
-                let temUv=math.pool.new_vector2();
-                temUv.x=this.uvArr[i].x*this.tex_ST.x+this.tex_ST.z;
-                temUv.y=this.uvArr[i].y*this.tex_ST.y+this.tex_ST.w;
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+7]= temUv.x;
-                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+8]= temUv.y;
+                if(this.colorArr)
+                {
+                    math.colorMultiply(this.colorArr[i],this.color,this.temColor);
+                }else
+                {
+                    math.colorClone(this.color,this.temColor);
+                }
+                
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+3]= this.temColor.r;
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+4]= this.temColor.g;
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+5]= this.temColor.b;
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+6]= this.temColor.a;
+
+                this.temUv.x=this.uvArr[i].x*this.tex_ST.x+this.tex_ST.z;
+                this.temUv.y=this.uvArr[i].y*this.tex_ST.y+this.tex_ST.w;
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+7]= this.temUv.x;
+                batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+8]= this.temUv.y;
             }
             for(let i=0;i<this.dataforebo.length;i++)
             {

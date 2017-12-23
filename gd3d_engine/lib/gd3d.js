@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000044";
+                this.build = "b000045";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -7813,7 +7813,7 @@ var gd3d;
             f14eff.prototype.getCloneF14eff = function () {
                 var f14node = new gd3d.framework.f14node();
                 f14node.trans = new gd3d.framework.transform();
-                f14node.f14Effect = this.trans.gameObject.addComponent("f14EffectSystem");
+                f14node.f14Effect = f14node.trans.gameObject.addComponent("f14EffectSystem");
                 f14node.f14Effect.setData(this.f14data);
                 return f14node;
             };
@@ -14184,7 +14184,8 @@ var gd3d;
                     var toindex = this.frameList[0];
                     var from = basedate[this.name];
                     var to = this.line[toindex];
-                    this.lerpFunc(from, to, frame / toindex, out);
+                    var lerp = (frame - basedate.firtstFrame) / toindex;
+                    this.lerpFunc(from, to, lerp, out);
                 }
                 else if (frame >= this.frameList[this.frameList.length - 1]) {
                     out = this.line[this.frameList[this.frameList.length - 1]];
@@ -14244,7 +14245,7 @@ var gd3d;
                         break;
                     case "SingleMeshType":
                         this.type = framework.F14TypeEnum.SingleMeshType;
-                        this.elementdata = new framework.F14SingleMeshBaseData();
+                        this.elementdata = new framework.F14SingleMeshBaseData(json.frames[0].frameindex);
                         this.elementdata.parse(json.singlemeshdata, assetmgr, assetbundle);
                         break;
                     case "RefType":
@@ -15308,6 +15309,9 @@ var gd3d;
                 this.tex_ST = new gd3d.math.vector4();
                 this.localRotate = new gd3d.math.quaternion();
                 this.targetMat = new gd3d.math.matrix();
+                this.tempos = gd3d.math.pool.new_vector3();
+                this.temColor = gd3d.math.pool.new_color();
+                this.temUv = gd3d.math.pool.new_vector2();
                 this.type = framework.F14TypeEnum.SingleMeshType;
                 this.effect = effect;
                 this.layer = layer;
@@ -15379,22 +15383,24 @@ var gd3d;
             F14SingleMesh.prototype.uploadMeshdata = function () {
                 var batch = this.layer.batch;
                 for (var i = 0; i < this.vertexCount; i++) {
-                    var tempos = gd3d.math.pool.new_vector3();
-                    gd3d.math.matrixTransformVector3(this.posArr[i], this.targetMat, tempos);
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 0] = tempos.x;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 1] = tempos.y;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 2] = tempos.z;
-                    var temColor = gd3d.math.pool.new_color();
-                    gd3d.math.colorMultiply(this.colorArr[i], this.color, temColor);
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 3] = temColor.r;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 4] = temColor.g;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 5] = temColor.b;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 6] = temColor.a;
-                    var temUv = gd3d.math.pool.new_vector2();
-                    temUv.x = this.uvArr[i].x * this.tex_ST.x + this.tex_ST.z;
-                    temUv.y = this.uvArr[i].y * this.tex_ST.y + this.tex_ST.w;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 7] = temUv.x;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 8] = temUv.y;
+                    gd3d.math.matrixTransformVector3(this.posArr[i], this.targetMat, this.tempos);
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 0] = this.tempos.x;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 1] = this.tempos.y;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 2] = this.tempos.z;
+                    if (this.colorArr) {
+                        gd3d.math.colorMultiply(this.colorArr[i], this.color, this.temColor);
+                    }
+                    else {
+                        gd3d.math.colorClone(this.color, this.temColor);
+                    }
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 3] = this.temColor.r;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 4] = this.temColor.g;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 5] = this.temColor.b;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 6] = this.temColor.a;
+                    this.temUv.x = this.uvArr[i].x * this.tex_ST.x + this.tex_ST.z;
+                    this.temUv.y = this.uvArr[i].y * this.tex_ST.y + this.tex_ST.w;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 7] = this.temUv.x;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 8] = this.temUv.y;
                 }
                 for (var i = 0; i < this.dataforebo.length; i++) {
                     batch.dataForEbo[i + batch.curIndexCount] = this.dataforebo[i] + batch.curVertexcount;
@@ -15521,13 +15527,7 @@ var gd3d;
                 if (this.activemeshlist.length < 1)
                     return;
                 this.ElementMat.setQueue(Effqueue);
-                if (this.noBatch) {
-                    this.ElementMat.setColor("_Main_Color", this.activemeshlist[0].color);
-                    this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
-                    this.ElementMat.setMatrix("_mat", this.activemeshlist[0].targetMat);
-                    this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
-                }
-                else {
+                {
                     this.curIndexCount = 0;
                     this.curVertexcount = 0;
                     this.curRealVboCount = 0;
@@ -15560,7 +15560,7 @@ var gd3d;
             LoopEnum[LoopEnum["TimeContinue"] = 1] = "TimeContinue";
         })(LoopEnum = framework.LoopEnum || (framework.LoopEnum = {}));
         var F14SingleMeshBaseData = (function () {
-            function F14SingleMeshBaseData() {
+            function F14SingleMeshBaseData(firstFrame) {
                 this.loopenum = LoopEnum.Restart;
                 this.position = new gd3d.math.vector3();
                 this.scale = new gd3d.math.vector3(1, 1, 1);
@@ -15569,11 +15569,11 @@ var gd3d;
                 this.tex_ST = new gd3d.math.vector4();
                 this.enableTexAnimation = false;
                 this.uvType = framework.UVTypeEnum.NONE;
-            }
-            F14SingleMeshBaseData.prototype.F14SingleMeshBaseData = function () {
+                this.firtstFrame = 0;
+                this.firtstFrame = firstFrame;
                 this.mesh = gd3d.framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad");
                 this.material = gd3d.framework.sceneMgr.app.getAssetMgr().getDefParticleMat();
-            };
+            }
             F14SingleMeshBaseData.prototype.parse = function (json, assetmgr, assetbundle) {
                 switch (json.loopenum) {
                     case "Restart":
