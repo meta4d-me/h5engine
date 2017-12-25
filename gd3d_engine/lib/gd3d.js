@@ -1862,7 +1862,7 @@ var gd3d;
                 this.components = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
-                this.layoutValueMap = {};
+                this.layoutValueMap = [];
                 this._layoutPercentState = 0;
                 this.layoutDirty = false;
                 this.lastParentWidth = 0;
@@ -2498,6 +2498,20 @@ var gd3d;
                 gd3d.reflect.Field("C2DComponent[]"),
                 __metadata("design:type", Array)
             ], transform2D.prototype, "components", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], transform2D.prototype, "layoutState", null);
+            __decorate([
+                gd3d.reflect.Field("number[]"),
+                __metadata("design:type", Array)
+            ], transform2D.prototype, "layoutValueMap", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], transform2D.prototype, "layoutPercentState", null);
             transform2D = __decorate([
                 gd3d.reflect.SerializeType
             ], transform2D);
@@ -17410,14 +17424,14 @@ var gd3d;
                             case "number":
                             case "string":
                             case "boolean":
-                                if (baseType != serializedObj[key][newkey].type) {
-                                    throw new Error("反序列化失败，类型不匹配：" + baseType + " as " + serializedObj[key].type);
+                                if (baseType != serializedObj[key]["value"][newkey].type) {
+                                    throw new Error("反序列化失败，类型不匹配：" + baseType + " as " + serializedObj[key]["value"][newkey].type);
                                 }
                                 if (_isArray) {
-                                    instanceObj[key].push(serializedObj[key][newkey].value);
+                                    instanceObj[key].push(serializedObj[key]["value"][newkey].value);
                                 }
                                 else {
-                                    instanceObj[key][newkey] = serializedObj[key][newkey].value;
+                                    instanceObj[key][newkey] = serializedObj[key]["value"][newkey].value;
                                 }
                                 break;
                             default:

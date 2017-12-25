@@ -1113,6 +1113,7 @@ namespace gd3d.framework
          * 布局状态
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("number")
         set layoutState(state:number){
             if(isNaN(state) || state==undefined) return;
             if(state != this._layoutState){
@@ -1125,7 +1126,9 @@ namespace gd3d.framework
             return this._layoutState;
         }
 
-        private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
+        @reflect.Field("number[]")
+        //private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
+        private layoutValueMap : number[] = [];   // map structure {layoutOption : value}
         /**
          * @public
          * @language zh_CN
@@ -1153,6 +1156,7 @@ namespace gd3d.framework
          * 布局百分比模式状态
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("number")
         set layoutPercentState(state:number){
             if(isNaN(state) || state==undefined) return;
             if(state != this._layoutPercentState){
