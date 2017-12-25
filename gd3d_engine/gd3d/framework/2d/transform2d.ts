@@ -1126,9 +1126,9 @@ namespace gd3d.framework
             return this._layoutState;
         }
 
-        @reflect.Field("number[]")
-        //private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
-        private layoutValueMap : number[] = [];   // map structure {layoutOption : value}
+        @reflect.Field("numberdic")
+        private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
+        //private layoutValueMap : number[] = [];   // map structure {layoutOption : value}
         /**
          * @public
          * @language zh_CN

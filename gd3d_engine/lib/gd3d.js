@@ -1862,7 +1862,7 @@ var gd3d;
                 this.components = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
-                this.layoutValueMap = [];
+                this.layoutValueMap = {};
                 this._layoutPercentState = 0;
                 this.layoutDirty = false;
                 this.lastParentWidth = 0;
@@ -2504,8 +2504,8 @@ var gd3d;
                 __metadata("design:paramtypes", [Number])
             ], transform2D.prototype, "layoutState", null);
             __decorate([
-                gd3d.reflect.Field("number[]"),
-                __metadata("design:type", Array)
+                gd3d.reflect.Field("numberdic"),
+                __metadata("design:type", Object)
             ], transform2D.prototype, "layoutValueMap", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
