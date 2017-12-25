@@ -2804,6 +2804,8 @@ var gd3d;
                     if (this._sprite && this._sprite.texture) {
                         var matName = this._sprite.texture.getName() + "_uimask";
                         var canvas_1 = this.transform.canvas;
+                        if (!canvas_1.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -2920,6 +2922,8 @@ var gd3d;
                     }
                 }
                 var mat = this.uimat;
+                if (!mat)
+                    return;
                 var img = null;
                 if (this._sprite != null && this._sprite.texture != null) {
                     img = this._sprite.texture;
@@ -4304,6 +4308,8 @@ var gd3d;
                     if (this.font && this.font.texture) {
                         var matName = this.font.texture.getName() + "_fontmask";
                         var canvas_2 = this.transform.canvas;
+                        if (!canvas_2.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -4347,6 +4353,8 @@ var gd3d;
                         this.dirtyData = false;
                     }
                     var mat = this.uimat;
+                    if (!mat)
+                        return;
                     var img;
                     if (this._font != null) {
                         img = this._font.texture;
@@ -4504,6 +4512,8 @@ var gd3d;
                     if (this.image != null) {
                         var matName = this._image.getName() + "_uimask";
                         var canvas_3 = this.transform.canvas;
+                        if (!canvas_3.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -4533,6 +4543,8 @@ var gd3d;
             rawImage2D.prototype.render = function (canvas) {
                 var img = this.image;
                 var mat = this.uimat;
+                if (!mat)
+                    return;
                 if (img != null) {
                     if (this.needRefreshImg) {
                         mat.setTexture("_MainTex", img);
@@ -11374,6 +11386,7 @@ var gd3d;
     (function (framework) {
         var canvascontainer = (function () {
             function canvascontainer() {
+                this.isCanvasinit = false;
                 this._renderMode = canvasRenderMode.ScreenSpaceOverlay;
             }
             Object.defineProperty(canvascontainer.prototype, "canvas", {
@@ -11382,13 +11395,23 @@ var gd3d;
                 },
                 set: function (canv) {
                     this._canvas = canv;
+                    this.canvasInit();
                 },
                 enumerable: true,
                 configurable: true
             });
+            canvascontainer.prototype.canvasInit = function () {
+                if (!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene)
+                    return;
+                this._canvas.scene = this.gameObject.transform.scene;
+                this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
+                this.isCanvasinit = true;
+            };
             canvascontainer.prototype.start = function () {
             };
             canvascontainer.prototype.update = function (delta) {
+                if (!this.isCanvasinit)
+                    this.canvasInit();
             };
             canvascontainer.prototype.remove = function () {
             };

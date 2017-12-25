@@ -36,6 +36,14 @@ namespace gd3d.framework
         }
         set canvas(canv:canvas){
             this._canvas = canv;
+            this.canvasInit();
+        }
+        private isCanvasinit = false;
+        private canvasInit(){
+            if(!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene) return; 
+            this._canvas.scene = this.gameObject.transform.scene;
+            this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
+            this.isCanvasinit = true;
         }
 
         @reflect.Field("number")
@@ -46,7 +54,8 @@ namespace gd3d.framework
 
         }
         update(delta: number)
-        {
+        {   
+            if(!this.isCanvasinit) this.canvasInit();
 
         }
         /**

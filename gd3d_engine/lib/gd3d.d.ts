@@ -1868,6 +1868,8 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         private _canvas;
         canvas: canvas;
+        private isCanvasinit;
+        private canvasInit();
         private _renderMode;
         start(): void;
         update(delta: number): void;
