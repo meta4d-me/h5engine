@@ -2804,6 +2804,8 @@ var gd3d;
                     if (this._sprite && this._sprite.texture) {
                         var matName = this._sprite.texture.getName() + "_uimask";
                         var canvas_1 = this.transform.canvas;
+                        if (!canvas_1.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -2920,6 +2922,8 @@ var gd3d;
                     }
                 }
                 var mat = this.uimat;
+                if (!mat)
+                    return;
                 var img = null;
                 if (this._sprite != null && this._sprite.texture != null) {
                     img = this._sprite.texture;
@@ -4304,6 +4308,8 @@ var gd3d;
                     if (this.font && this.font.texture) {
                         var matName = this.font.texture.getName() + "_fontmask";
                         var canvas_2 = this.transform.canvas;
+                        if (!canvas_2.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -4347,6 +4353,8 @@ var gd3d;
                         this.dirtyData = false;
                     }
                     var mat = this.uimat;
+                    if (!mat)
+                        return;
                     var img;
                     if (this._font != null) {
                         img = this._font.texture;
@@ -4504,6 +4512,8 @@ var gd3d;
                     if (this.image != null) {
                         var matName = this._image.getName() + "_uimask";
                         var canvas_3 = this.transform.canvas;
+                        if (!canvas_3.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -4533,6 +4543,8 @@ var gd3d;
             rawImage2D.prototype.render = function (canvas) {
                 var img = this.image;
                 var mat = this.uimat;
+                if (!mat)
+                    return;
                 if (img != null) {
                     if (this.needRefreshImg) {
                         mat.setTexture("_MainTex", img);
@@ -11372,6 +11384,67 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var canvascontainer = (function () {
+            function canvascontainer() {
+                this.isCanvasinit = false;
+                this._renderMode = canvasRenderMode.ScreenSpaceOverlay;
+            }
+            Object.defineProperty(canvascontainer.prototype, "canvas", {
+                get: function () {
+                    return this._canvas;
+                },
+                set: function (canv) {
+                    this._canvas = canv;
+                    this.canvasInit();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            canvascontainer.prototype.canvasInit = function () {
+                if (!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene)
+                    return;
+                this._canvas.scene = this.gameObject.transform.scene;
+                this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
+                this.isCanvasinit = true;
+            };
+            canvascontainer.prototype.start = function () {
+            };
+            canvascontainer.prototype.update = function (delta) {
+                if (!this.isCanvasinit)
+                    this.canvasInit();
+            };
+            canvascontainer.prototype.remove = function () {
+            };
+            canvascontainer.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("reference"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.canvas])
+            ], canvascontainer.prototype, "canvas", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], canvascontainer.prototype, "_renderMode", void 0);
+            canvascontainer = __decorate([
+                gd3d.reflect.nodeComponent,
+                __metadata("design:paramtypes", [])
+            ], canvascontainer);
+            return canvascontainer;
+        }());
+        framework.canvascontainer = canvascontainer;
+        var canvasRenderMode;
+        (function (canvasRenderMode) {
+            canvasRenderMode[canvasRenderMode["ScreenSpaceOverlay"] = 0] = "ScreenSpaceOverlay";
+            canvasRenderMode[canvasRenderMode["ScreenSpaceCamera"] = 1] = "ScreenSpaceCamera";
+            canvasRenderMode[canvasRenderMode["WorldSpace"] = 2] = "WorldSpace";
+        })(canvasRenderMode = framework.canvasRenderMode || (framework.canvasRenderMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var effectSystem = (function () {
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
@@ -18117,8 +18190,8 @@ var gd3d;
             var r1 = Math.acos(sx);
             var sxs = src.rawData[1] / scale.x;
             var r2 = Math.asin(sxs);
-            if (r2 < 0) {
-                r1 = r1 + Math.PI;
+            if (sxs < 0) {
+                r1 = 2 * Math.PI - r1;
             }
             rotation.v = r1;
             return true;

@@ -441,6 +441,7 @@ namespace gd3d.framework
             if (this.font  && this.font.texture ){
                 let matName = this.font.texture.getName()+"_fontmask";
                 let canvas = this.transform.canvas;
+                if(!canvas.assetmgr) return;
                 let mat = this._uimat;
                 if(!mat || mat.getName() != matName){
                     if(mat) mat.unuse(); 
@@ -490,6 +491,7 @@ namespace gd3d.framework
                 }
 
                 let mat = this.uimat;
+                if(!mat) return;
 
                 var img;
                 if (this._font != null)

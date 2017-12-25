@@ -56,6 +56,7 @@ namespace gd3d.framework
             if (this._sprite  && this._sprite.texture){
                 let matName =this._sprite.texture.getName() + "_uimask";
                 let canvas = this.transform.canvas;
+                if(!canvas.assetmgr) return;
                 let mat = this._uimat;
                 if(!mat || mat.getName() != matName){
                     if(mat) mat.unuse(); 
@@ -257,6 +258,7 @@ namespace gd3d.framework
             }
 
             let mat = this.uimat;
+            if(!mat) return;
 
             var img = null;
             if (this._sprite != null && this._sprite.texture != null)

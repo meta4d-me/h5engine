@@ -1863,6 +1863,26 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class canvascontainer implements INodeComponent {
+        constructor();
+        gameObject: gameObject;
+        private _canvas;
+        canvas: canvas;
+        private isCanvasinit;
+        private canvasInit();
+        private _renderMode;
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+    enum canvasRenderMode {
+        ScreenSpaceOverlay = 0,
+        ScreenSpaceCamera = 1,
+        WorldSpace = 2,
+    }
+}
+declare namespace gd3d.framework {
     class effectSystem implements IRenderer {
         gameObject: gameObject;
         layer: RenderLayerEnum;
