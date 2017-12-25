@@ -88,7 +88,7 @@ namespace gd3d.framework
                 this._originalSprite = graphic.sprite;
                 if(graphic.sprite)
                     this._origianlSpriteName = graphic.sprite.getName();
-                if (this._transition = TransitionType.ColorTint)
+                if (this._transition == TransitionType.ColorTint)
                 {
                     graphic.color = this.normalColor;
                 }
@@ -212,7 +212,12 @@ namespace gd3d.framework
          */
         remove()
         {
-
+            this._targetImage = null;
+            this.transform = null;
+            this._normalColor = null;
+            this._originalColor = null;
+            this._pressedColor = null;
+            if(this.pressedGraphic) this.pressedGraphic.unuse(true);
         }
         /**
          * @private
@@ -301,7 +306,9 @@ namespace gd3d.framework
          */
         private showPress()
         {
-            if (this.transition == TransitionType.ColorTint)
+            if(this.transition == TransitionType.None){
+                return;
+            }else if (this.transition == TransitionType.ColorTint)
             {
                 this.changeColor(this._pressedColor);
             }

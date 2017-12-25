@@ -182,7 +182,8 @@ namespace gd3d.framework
                 let toindex = this.frameList[0];
                 let from=basedate[this.name];
                 let to = this.line[toindex];
-                this.lerpFunc(from, to, frame/toindex,out);
+                let lerp=(frame-basedate.firtstFrame)/toindex;
+                this.lerpFunc(from, to,lerp,out);
             }else if(frame>=this.frameList[this.frameList.length-1])
             {
                 out=this.line[this.frameList[this.frameList.length - 1]];

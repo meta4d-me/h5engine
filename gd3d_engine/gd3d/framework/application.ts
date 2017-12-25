@@ -93,7 +93,7 @@ namespace gd3d.framework
             return this._timeScale;
         }
         private version: string = "v0.0.1";
-        private build: string = "b000044";
+        private build: string = "b000045";
         private _tar: number = -1;
         private _standDeltaTime: number = -1;
         /**
@@ -176,7 +176,7 @@ namespace gd3d.framework
                 console.error("root div does Null at application start ");
                 return;
             }
-
+            div.style.overflow = "hidden";
             div.style.position = "absolute";
             div.style.width = "100%";
             div.style.height = "100%";

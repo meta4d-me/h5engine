@@ -69,7 +69,10 @@ class test_uiPerfabLoad implements IState {
         let bg_i = bg_t.addComponent("image2D") as gd3d.framework.image2D;
         bg_i.imageType = gd3d.framework.ImageType.Sliced;
         bg_i.sprite = atlasComp.sprites["bg"];
-        bg_i.sprite.border = new gd3d.math.border(10,50,10,10);
+        bg_i.imageBorder.l = 10;
+        bg_i.imageBorder.t = 50;
+        bg_i.imageBorder.r = 10;
+        bg_i.imageBorder.b = 10;
         bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
         bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT,60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP,60);
@@ -101,6 +104,7 @@ class test_uiPerfabLoad implements IState {
         if(!this.bgui) return;
         if(this.targetui){
             this.bgui.removeChild(this.targetui);
+            this.targetui.dispose();
         }
 
         let prefabName = name;

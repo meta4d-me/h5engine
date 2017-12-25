@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000044";
+                this.build = "b000045";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -126,6 +126,7 @@ var gd3d;
                     console.error("root div does Null at application start ");
                     return;
                 }
+                div.style.overflow = "hidden";
                 div.style.position = "absolute";
                 div.style.width = "100%";
                 div.style.height = "100%";
@@ -2570,7 +2571,7 @@ var gd3d;
                         this._originalSprite = graphic.sprite;
                         if (graphic.sprite)
                             this._origianlSpriteName = graphic.sprite.getName();
-                        if (this._transition = TransitionType.ColorTint) {
+                        if (this._transition == TransitionType.ColorTint) {
                             graphic.color = this.normalColor;
                         }
                     }
@@ -2638,6 +2639,13 @@ var gd3d;
             button.prototype.update = function (delta) {
             };
             button.prototype.remove = function () {
+                this._targetImage = null;
+                this.transform = null;
+                this._normalColor = null;
+                this._originalColor = null;
+                this._pressedColor = null;
+                if (this.pressedGraphic)
+                    this.pressedGraphic.unuse(true);
             };
             button.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
@@ -2685,7 +2693,10 @@ var gd3d;
                 }
             };
             button.prototype.showPress = function () {
-                if (this.transition == TransitionType.ColorTint) {
+                if (this.transition == TransitionType.None) {
+                    return;
+                }
+                else if (this.transition == TransitionType.ColorTint) {
                     this.changeColor(this._pressedColor);
                 }
                 else if (this.transition == TransitionType.SpriteSwap) {
@@ -2791,14 +2802,19 @@ var gd3d;
             Object.defineProperty(image2D.prototype, "uimat", {
                 get: function () {
                     if (this._sprite && this._sprite.texture) {
+                        var matName = this._sprite.texture.getName() + "_uimask";
                         var canvas_1 = this.transform.canvas;
-                        var mat = canvas_1.assetmgr.getMaterial(this._sprite.texture.getName() + "_uimask");
+                        var mat = this._uimat;
+                        if (!mat || mat.getName() != matName) {
+                            if (mat)
+                                mat.unuse();
+                            mat = canvas_1.assetmgr.getAssetByName(matName);
+                            if (mat)
+                                mat.use();
+                        }
                         if (mat == null) {
-                            if (this._uimat != null)
-                                this._uimat.unuse();
-                            mat = new framework.material();
+                            mat = new framework.material(matName);
                             mat.setShader(canvas_1.assetmgr.getShader("shader/defmaskui"));
-                            canvas_1.assetmgr.mapMaterial[this._sprite.texture.getName() + "_uimask"] = mat;
                             mat.use();
                         }
                         if (this.transform.parentIsMask) {
@@ -2857,23 +2873,24 @@ var gd3d;
                     return this._sprite;
                 },
                 set: function (sprite) {
-                    if (!sprite || sprite == this._sprite)
+                    if (sprite == this._sprite)
                         return;
                     this.needRefreshImg = true;
                     if (this._sprite) {
                         this._sprite.unuse();
                     }
                     this._sprite = sprite;
-                    this._imageBorder.l = sprite.border.l;
-                    this._imageBorder.t = sprite.border.t;
-                    this._imageBorder.r = sprite.border.r;
-                    this._imageBorder.b = sprite.border.b;
-                    this._sprite.use();
-                    this._spriteName = this._sprite.getName();
-                    this.prepareData();
-                    if (this.transform != null) {
-                        this.transform.markDirty();
-                        this.updateTran();
+                    if (sprite) {
+                        this._sprite.use();
+                        this._spriteName = this._sprite.getName();
+                        this.prepareData();
+                        if (this.transform != null) {
+                            this.transform.markDirty();
+                            this.updateTran();
+                        }
+                    }
+                    else {
+                        this._spriteName = "";
                     }
                 },
                 enumerable: true,
@@ -2909,7 +2926,7 @@ var gd3d;
                 }
                 if (img != null) {
                     if (this.needRefreshImg) {
-                        this._uimat.setTexture("_MainTex", img);
+                        mat.setTexture("_MainTex", img);
                         this.needRefreshImg = false;
                     }
                     if (this.transform.parentIsMask) {
@@ -2932,8 +2949,13 @@ var gd3d;
             image2D.prototype.update = function (delta) {
             };
             image2D.prototype.remove = function () {
-                this._sprite.unuse(true);
+                if (this._sprite)
+                    this._sprite.unuse(true);
+                if (this._uimat)
+                    this._uimat.unuse(true);
                 this.datar.length = 0;
+                this.transform = null;
+                this._imageBorder = null;
             };
             image2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
@@ -3719,14 +3741,18 @@ var gd3d;
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "fillMethod", null);
             __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], image2D.prototype, "fillAmmount", null);
+            __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
             ], image2D.prototype, "_spriteName", void 0);
             __decorate([
                 gd3d.reflect.Field("border"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [])
-            ], image2D.prototype, "imageBorder", null);
+                __metadata("design:type", Object)
+            ], image2D.prototype, "_imageBorder", void 0);
             image2D = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender,
@@ -3761,8 +3787,9 @@ var gd3d;
                 this.customRegexStr = "";
                 this.beFocus = false;
                 this._text = "";
-                this.myLineType = lineType.SingleLine;
-                this.myContentType = contentType.None;
+                this._charlimit = 0;
+                this._lineType = lineType.SingleLine;
+                this._contentType = contentType.None;
             }
             Object.defineProperty(inputField.prototype, "frameImage", {
                 get: function () {
@@ -3777,6 +3804,31 @@ var gd3d;
             Object.defineProperty(inputField.prototype, "text", {
                 get: function () {
                     return this._text;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "characterLimit", {
+                get: function () { return this._charlimit; },
+                set: function (charlimit) {
+                    this._charlimit = parseInt("" + charlimit);
+                    this._charlimit = isNaN(this._charlimit) || this._charlimit < 0 ? 0 : this._charlimit;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "LineType", {
+                get: function () { return this._lineType; },
+                set: function (lineType) {
+                    this._lineType = lineType;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(inputField.prototype, "ContentType", {
+                get: function () { return this._contentType; },
+                set: function (contentType) {
+                    this._contentType = contentType;
                 },
                 enumerable: true,
                 configurable: true
@@ -3856,33 +3908,47 @@ var gd3d;
             inputField.prototype.textRefresh = function () {
                 if (!this.beFocus || !this._textLable || !this._placeholderLabel || !this.inputElement || this._text == this.inputElement.value)
                     return;
+                if (this._charlimit > 0 && this.inputElement.value.length >= this._charlimit) {
+                    if (this.inputElement.value != this._text)
+                        if (this.inputElement.value.length > this._text.length) {
+                            this.inputElement.value = this._text;
+                        }
+                        else {
+                            this._text = this.inputElement.value;
+                        }
+                    return;
+                }
                 this._text = this.inputElement.value;
-                if (this.myContentType == contentType.Custom) {
+                if (this._contentType == contentType.Custom) {
                     if (this.customRegexStr != null && this.customRegexStr != "")
                         this._text = this._text.replace(this.customRegexStr, '');
                 }
                 else {
-                    if (this.myContentType == contentType.None) {
+                    if (this._contentType == contentType.None) {
                     }
-                    else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word) && (this.myContentType & contentType.ChineseCharacter) && (this.myContentType & contentType.Underline)) {
+                    else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Underline)) {
                         this._text = this._text.replace(/^[\u4E00-\u9FA5a-zA-Z0-9_]{3,20}$/ig, '');
                     }
-                    else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word) && (this.myContentType & contentType.Underline)) {
+                    else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word) && (this._contentType & contentType.Underline)) {
                         this._text = this._text.replace(/[^\w\.\/]/ig, '');
                     }
-                    else if ((this.myContentType & contentType.Number) && (this.myContentType & contentType.Word)) {
+                    else if ((this._contentType & contentType.Number) && (this._contentType & contentType.Word)) {
                         this._text = this._text.replace(/[^(A-Za-z0-9)]/ig, '');
                     }
-                    else if (this.myContentType == contentType.Number) {
+                    else if ((this._contentType & contentType.ChineseCharacter) && (this._contentType & contentType.Word)) {
+                        this._text = this._text.replace(/[^(A-Za-z\u4E00-\u9FA5)]/ig, '');
+                    }
+                    else if (this._contentType == contentType.Number) {
                         this._text = this._text.replace(/\D+/g, '');
                     }
-                    else if (this.myContentType == contentType.ChineseCharacter) {
+                    else if (this._contentType == contentType.ChineseCharacter) {
                         this._text = this._text.replace(/[^\u4E00-\u9FA5]/g, '');
                     }
                 }
                 this.inputElement.value = this._text;
                 if (this._textLable) {
                     this._textLable.text = this._text;
+                    this.filterContentText();
                 }
                 if (this._text == "") {
                     this._placeholderLabel.transform.visible = true;
@@ -3893,14 +3959,73 @@ var gd3d;
                     this._textLable.transform.visible = true;
                 }
             };
+            inputField.prototype.filterContentText = function () {
+                if (!this._textLable || this._text == null)
+                    return;
+                var lab = this._textLable;
+                var rate = lab.fontsize / lab.font.lineHeight;
+                var font = lab.font;
+                var addw = 0;
+                var addh = 0;
+                var str = "";
+                switch (this._lineType) {
+                    case lineType.SingleLine:
+                        for (var i = lab.text.length - 1; i >= 0; i--) {
+                            var c = lab.text.charAt(i);
+                            var cinfo = font.cmap[c];
+                            if (!cinfo) {
+                                console.warn("can't find character \"" + c + "\" in " + font.getName() + " Font");
+                                continue;
+                            }
+                            addw += cinfo.xAddvance * rate;
+                            if (addw > lab.transform.width) {
+                                lab.text = str;
+                                break;
+                            }
+                            str = lab.text[i] + str;
+                        }
+                        break;
+                    case lineType.MultiLine:
+                        var fristline = true;
+                        addh += lab.fontsize * lab.linespace;
+                        for (var i = lab.text.length - 1; i >= 0; i--) {
+                            var c = lab.text.charAt(i);
+                            var cinfo = font.cmap[c];
+                            if (!cinfo) {
+                                console.warn("can't find character \"" + c + "\" in " + font.getName() + " Font");
+                                continue;
+                            }
+                            addw += cinfo.xAddvance * rate;
+                            if (addw > lab.transform.width) {
+                                addw = 0;
+                                fristline = false;
+                                addh += lab.fontsize * lab.linespace;
+                            }
+                            if (!fristline && addh > lab.transform.height) {
+                                lab.text = str;
+                                break;
+                            }
+                            str = lab.text[i] + str;
+                        }
+                        break;
+                }
+            };
             inputField.prototype.update = function (delta) {
                 this.textRefresh();
             };
             inputField.prototype.remove = function () {
-                this.inputElement.disabled = false;
-                this.inputElement.value = "";
-                this.inputElement.style.visibility = "hidden";
-                this.inputElement = null;
+                this._placeholderLabel = null;
+                this._textLable = null;
+                this.transform = null;
+                this._frameImage = null;
+                if (this.inputElement) {
+                    this.inputElement.disabled = false;
+                    this.inputElement.value = "";
+                    this.inputElement.style.visibility = "hidden";
+                    if (this.inputElement.parentElement)
+                        this.inputElement.parentElement.removeChild(this.inputElement);
+                    this.inputElement = null;
+                }
             };
             inputField.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
@@ -3926,12 +4051,19 @@ var gd3d;
             ], inputField.prototype, "frameImage", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], inputField.prototype, "myLineType", void 0);
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], inputField.prototype, "characterLimit", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], inputField.prototype, "myContentType", void 0);
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], inputField.prototype, "LineType", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], inputField.prototype, "ContentType", null);
             __decorate([
                 gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.label),
@@ -3952,8 +4084,7 @@ var gd3d;
         var lineType;
         (function (lineType) {
             lineType[lineType["SingleLine"] = 0] = "SingleLine";
-            lineType[lineType["MultiLineSubmit"] = 1] = "MultiLineSubmit";
-            lineType[lineType["MultiLineNewline"] = 2] = "MultiLineNewline";
+            lineType[lineType["MultiLine"] = 1] = "MultiLine";
         })(lineType = framework.lineType || (framework.lineType = {}));
         var contentType;
         (function (contentType) {
@@ -3981,6 +4112,8 @@ var gd3d;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
                 this.verticalType = VerticalType.Center;
+                this.horizontalOverflow = false;
+                this.verticalOverflow = false;
                 this.indexarr = [];
                 this.remainarrx = [];
                 this.data_begin = new gd3d.math.vector2(0, 0);
@@ -3996,31 +4129,41 @@ var gd3d;
                 set: function (text) {
                     text = text == null ? "" : text;
                     this._text = text;
-                    var cachelen = 6 * 13 * this._text.length;
-                    this.datar.splice(0, this.datar.length);
-                    while (this.datar.length < cachelen) {
-                        this.datar.push(0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
-                    }
-                    while (this.datar.length < cachelen) {
-                        this.datar.pop();
-                    }
+                    this.initdater();
                     this.dirtyData = true;
                 },
                 enumerable: true,
                 configurable: true
             });
+            label.prototype.initdater = function () {
+                var cachelen = 6 * 13 * this._text.length;
+                this.datar.splice(0, this.datar.length);
+                while (this.datar.length < cachelen) {
+                    this.datar.push(0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+                }
+                while (this.datar.length < cachelen) {
+                    this.datar.pop();
+                }
+            };
             Object.defineProperty(label.prototype, "font", {
                 get: function () {
                     return this._font;
                 },
                 set: function (font) {
+                    if (font == this._font)
+                        return;
                     this.needRefreshFont = true;
                     if (this._font) {
                         this._font.unuse();
                     }
                     this._font = font;
-                    this._font.use();
-                    this._fontName = this._font.getName();
+                    if (font) {
+                        this._font.use();
+                        this._fontName = this._font.getName();
+                    }
+                    else {
+                        this._fontName = "";
+                    }
                 },
                 enumerable: true,
                 configurable: true
@@ -4051,14 +4194,16 @@ var gd3d;
                 this.remainarrx = [];
                 var remainy = 0;
                 tyadd += this._fontsize * this.linespace;
+                var contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;
+                var contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;
                 for (var i = 0; i < this._text.length; i++) {
                     var c = this._text.charAt(i);
                     var cinfo = _font.cmap[c];
                     if (cinfo == undefined) {
                         continue;
                     }
-                    if (txadd + cinfo.xAddvance * rate > this.transform.width) {
-                        if (tyadd + this._fontsize * this.linespace > this.transform.height) {
+                    if (txadd + cinfo.xAddvance * rate > contrast_w) {
+                        if (tyadd + this._fontsize * this.linespace > contrast_h) {
                             break;
                         }
                         else {
@@ -4082,6 +4227,7 @@ var gd3d;
                 else if (this.verticalType == VerticalType.Boom) {
                     yadd += remainy;
                 }
+                this.initdater();
                 for (var arri = 0; arri < this.indexarr.length; arri++) {
                     xadd = 0;
                     if (this.horizontalType == HorizontalType.Center) {
@@ -4156,14 +4302,19 @@ var gd3d;
             Object.defineProperty(label.prototype, "uimat", {
                 get: function () {
                     if (this.font && this.font.texture) {
+                        var matName = this.font.texture.getName() + "_fontmask";
                         var canvas_2 = this.transform.canvas;
-                        var mat = canvas_2.assetmgr.getMaterial(this.font.texture.getName() + "_fontmask");
+                        var mat = this._uimat;
+                        if (!mat || mat.getName() != matName) {
+                            if (mat)
+                                mat.unuse();
+                            mat = canvas_2.assetmgr.getAssetByName(matName);
+                            if (mat)
+                                mat.use();
+                        }
                         if (mat == null) {
-                            if (this._uimat != null)
-                                this._uimat.unuse();
-                            mat = new framework.material();
+                            mat = new framework.material(matName);
                             mat.setShader(canvas_2.assetmgr.getShader("shader/defmaskfont"));
-                            canvas_2.assetmgr.mapMaterial[this.font.texture.getName() + "_fontmask"] = mat;
                             mat.use();
                         }
                         if (this.transform.parentIsMask) {
@@ -4235,10 +4386,15 @@ var gd3d;
             label.prototype.update = function (delta) {
             };
             label.prototype.remove = function () {
-                this._font.unuse(true);
+                if (this._font)
+                    this._font.unuse(true);
+                if (this._uimat)
+                    this._uimat.unuse(true);
                 this.indexarr.length = 0;
                 this.remainarrx.length = 0;
                 this.datar.length = 0;
+                this.transform = null;
+                this._cacheMaskV4 = null;
             };
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
@@ -4256,6 +4412,26 @@ var gd3d;
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Number])
             ], label.prototype, "fontsize", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], label.prototype, "linespace", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], label.prototype, "horizontalType", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], label.prototype, "verticalType", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], label.prototype, "horizontalOverflow", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], label.prototype, "verticalOverflow", void 0);
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("color"),
@@ -4309,12 +4485,16 @@ var gd3d;
                     return this._image;
                 },
                 set: function (_image) {
+                    if (this._image == _image)
+                        return;
                     this.needRefreshImg = true;
                     if (this._image) {
                         this._image.unuse();
                     }
                     this._image = _image;
-                    this._image.use();
+                    if (_image) {
+                        this._image.use();
+                    }
                 },
                 enumerable: true,
                 configurable: true
@@ -4322,14 +4502,19 @@ var gd3d;
             Object.defineProperty(rawImage2D.prototype, "uimat", {
                 get: function () {
                     if (this.image != null) {
+                        var matName = this._image.getName() + "_uimask";
                         var canvas_3 = this.transform.canvas;
-                        var mat = canvas_3.assetmgr.getMaterial(this.image.getName() + "_uimask");
+                        var mat = this._uimat;
+                        if (!mat || mat.getName() != matName) {
+                            if (mat)
+                                mat.unuse();
+                            mat = canvas_3.assetmgr.getAssetByName(matName);
+                            if (mat)
+                                mat.use();
+                        }
                         if (mat == null) {
-                            if (this._uimat != null)
-                                this._uimat.unuse();
-                            mat = new framework.material();
+                            mat = new framework.material(matName);
                             mat.setShader(canvas_3.assetmgr.getShader("shader/defmaskui"));
-                            canvas_3.assetmgr.mapMaterial[this.image.getName() + "_uimask"] = mat;
                             mat.use();
                         }
                         if (this.transform.parentIsMask) {
@@ -4406,7 +4591,14 @@ var gd3d;
             rawImage2D.prototype.update = function (delta) {
             };
             rawImage2D.prototype.remove = function () {
-                this._image.unuse(true);
+                if (this._image)
+                    this._image.unuse(true);
+                if (this._uimat)
+                    this._uimat.unuse(true);
+                this._image = null;
+                this._cacheMaskV4 = null;
+                this.transform = null;
+                this.datar.length = 0;
             };
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
@@ -4511,19 +4703,21 @@ var gd3d;
                     cpos.x += addtransX;
                     if (cpos.x > 0)
                         cpos.x = 0;
-                    if (ctrans.width > trans.width && cpos.x + ctrans.width < trans.width)
+                    if (ctrans.width >= trans.width && cpos.x + ctrans.width < trans.width)
                         cpos.x = -1 * (ctrans.width - trans.width);
                 }
                 if (this.vertical) {
                     cpos.y += addtransY;
                     if (cpos.y > 0)
                         cpos.y = 0;
-                    if (ctrans.height > trans.height && cpos.y + ctrans.height < trans.height)
+                    if (ctrans.height >= trans.height && cpos.y + ctrans.height < trans.height)
                         cpos.y = -1 * (ctrans.height - trans.height);
                 }
                 ctrans.markDirty();
             };
             scrollRect.prototype.remove = function () {
+                this._content = null;
+                this.transform = null;
             };
             __decorate([
                 gd3d.reflect.Field("transform2D"),
@@ -4561,6 +4755,7 @@ var gd3d;
             uirect.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             uirect.prototype.remove = function () {
+                this.transform = null;
             };
             uirect = __decorate([
                 gd3d.reflect.node2DComponent
@@ -7618,7 +7813,7 @@ var gd3d;
             f14eff.prototype.getCloneF14eff = function () {
                 var f14node = new gd3d.framework.f14node();
                 f14node.trans = new gd3d.framework.transform();
-                f14node.f14Effect = this.trans.gameObject.addComponent("f14EffectSystem");
+                f14node.f14Effect = f14node.trans.gameObject.addComponent("f14EffectSystem");
                 f14node.f14Effect.setData(this.f14data);
                 return f14node;
             };
@@ -13939,7 +14134,8 @@ var gd3d;
                     var toindex = this.frameList[0];
                     var from = basedate[this.name];
                     var to = this.line[toindex];
-                    this.lerpFunc(from, to, frame / toindex, out);
+                    var lerp = (frame - basedate.firtstFrame) / toindex;
+                    this.lerpFunc(from, to, lerp, out);
                 }
                 else if (frame >= this.frameList[this.frameList.length - 1]) {
                     out = this.line[this.frameList[this.frameList.length - 1]];
@@ -13999,7 +14195,7 @@ var gd3d;
                         break;
                     case "SingleMeshType":
                         this.type = framework.F14TypeEnum.SingleMeshType;
-                        this.elementdata = new framework.F14SingleMeshBaseData();
+                        this.elementdata = new framework.F14SingleMeshBaseData(json.frames[0].frameindex);
                         this.elementdata.parse(json.singlemeshdata, assetmgr, assetbundle);
                         break;
                     case "RefType":
@@ -15063,6 +15259,9 @@ var gd3d;
                 this.tex_ST = new gd3d.math.vector4();
                 this.localRotate = new gd3d.math.quaternion();
                 this.targetMat = new gd3d.math.matrix();
+                this.tempos = gd3d.math.pool.new_vector3();
+                this.temColor = gd3d.math.pool.new_color();
+                this.temUv = gd3d.math.pool.new_vector2();
                 this.type = framework.F14TypeEnum.SingleMeshType;
                 this.effect = effect;
                 this.layer = layer;
@@ -15134,22 +15333,24 @@ var gd3d;
             F14SingleMesh.prototype.uploadMeshdata = function () {
                 var batch = this.layer.batch;
                 for (var i = 0; i < this.vertexCount; i++) {
-                    var tempos = gd3d.math.pool.new_vector3();
-                    gd3d.math.matrixTransformVector3(this.posArr[i], this.targetMat, tempos);
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 0] = tempos.x;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 1] = tempos.y;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 2] = tempos.z;
-                    var temColor = gd3d.math.pool.new_color();
-                    gd3d.math.colorMultiply(this.colorArr[i], this.color, temColor);
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 3] = temColor.r;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 4] = temColor.g;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 5] = temColor.b;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 6] = temColor.a;
-                    var temUv = gd3d.math.pool.new_vector2();
-                    temUv.x = this.uvArr[i].x * this.tex_ST.x + this.tex_ST.z;
-                    temUv.y = this.uvArr[i].y * this.tex_ST.y + this.tex_ST.w;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 7] = temUv.x;
-                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 8] = temUv.y;
+                    gd3d.math.matrixTransformVector3(this.posArr[i], this.targetMat, this.tempos);
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 0] = this.tempos.x;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 1] = this.tempos.y;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 2] = this.tempos.z;
+                    if (this.colorArr) {
+                        gd3d.math.colorMultiply(this.colorArr[i], this.color, this.temColor);
+                    }
+                    else {
+                        gd3d.math.colorClone(this.color, this.temColor);
+                    }
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 3] = this.temColor.r;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 4] = this.temColor.g;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 5] = this.temColor.b;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 6] = this.temColor.a;
+                    this.temUv.x = this.uvArr[i].x * this.tex_ST.x + this.tex_ST.z;
+                    this.temUv.y = this.uvArr[i].y * this.tex_ST.y + this.tex_ST.w;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 7] = this.temUv.x;
+                    batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 8] = this.temUv.y;
                 }
                 for (var i = 0; i < this.dataforebo.length; i++) {
                     batch.dataForEbo[i + batch.curIndexCount] = this.dataforebo[i] + batch.curVertexcount;
@@ -15276,13 +15477,7 @@ var gd3d;
                 if (this.activemeshlist.length < 1)
                     return;
                 this.ElementMat.setQueue(Effqueue);
-                if (this.noBatch) {
-                    this.ElementMat.setColor("_Main_Color", this.activemeshlist[0].color);
-                    this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
-                    this.ElementMat.setMatrix("_mat", this.activemeshlist[0].targetMat);
-                    this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
-                }
-                else {
+                {
                     this.curIndexCount = 0;
                     this.curVertexcount = 0;
                     this.curRealVboCount = 0;
@@ -15315,7 +15510,7 @@ var gd3d;
             LoopEnum[LoopEnum["TimeContinue"] = 1] = "TimeContinue";
         })(LoopEnum = framework.LoopEnum || (framework.LoopEnum = {}));
         var F14SingleMeshBaseData = (function () {
-            function F14SingleMeshBaseData() {
+            function F14SingleMeshBaseData(firstFrame) {
                 this.loopenum = LoopEnum.Restart;
                 this.position = new gd3d.math.vector3();
                 this.scale = new gd3d.math.vector3(1, 1, 1);
@@ -15324,11 +15519,11 @@ var gd3d;
                 this.tex_ST = new gd3d.math.vector4();
                 this.enableTexAnimation = false;
                 this.uvType = framework.UVTypeEnum.NONE;
-            }
-            F14SingleMeshBaseData.prototype.F14SingleMeshBaseData = function () {
+                this.firtstFrame = 0;
+                this.firtstFrame = firstFrame;
                 this.mesh = gd3d.framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad");
                 this.material = gd3d.framework.sceneMgr.app.getAssetMgr().getDefParticleMat();
-            };
+            }
             F14SingleMeshBaseData.prototype.parse = function (json, assetmgr, assetbundle) {
                 switch (json.loopenum) {
                     case "Restart":
@@ -17310,6 +17505,7 @@ var gd3d;
                 referenceInfo.regType("vector3");
                 referenceInfo.regType("vector4");
                 referenceInfo.regType("color");
+                referenceInfo.regType("border");
                 referenceInfo.regType("quaternion");
                 referenceInfo.regType("material");
                 referenceInfo.regType("gameObject");

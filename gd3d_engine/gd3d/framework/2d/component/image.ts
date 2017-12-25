@@ -53,14 +53,18 @@ namespace gd3d.framework
          */
         _uimat: material;
         private get uimat(){
-            if (this._sprite  && this._sprite.texture ){
+            if (this._sprite  && this._sprite.texture){
+                let matName =this._sprite.texture.getName() + "_uimask";
                 let canvas = this.transform.canvas;
-                let mat = canvas.assetmgr.getMaterial(this._sprite.texture.getName()+"_uimask");
+                let mat = this._uimat;
+                if(!mat || mat.getName() != matName){
+                    if(mat) mat.unuse(); 
+                    mat = canvas.assetmgr.getAssetByName(matName) as gd3d.framework.material;
+                    if(mat) mat.use();
+                }
                 if(mat == null){
-                    if(this._uimat != null) this._uimat.unuse();
-                    mat = new material();
+                    mat = new material(matName);
                     mat.setShader(canvas.assetmgr.getShader("shader/defmaskui"));
-                    canvas.assetmgr.mapMaterial[this._sprite.texture.getName()+"_uimask"] = mat;
                     mat.use();
                 }
                 if(this.transform.parentIsMask){
@@ -125,6 +129,7 @@ namespace gd3d.framework
          * 填充率
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         get fillAmmount()
         {
             return this._fillAmmount;
@@ -184,7 +189,7 @@ namespace gd3d.framework
          */
         public set sprite(sprite: sprite)
         {
-            if(!sprite || sprite == this._sprite) return;
+            if(sprite == this._sprite) return;
 
             this.needRefreshImg = true;
             if(this._sprite)
@@ -192,17 +197,22 @@ namespace gd3d.framework
                 this._sprite.unuse();
             }
             this._sprite = sprite;
-            this._imageBorder.l = sprite.border.l;
-            this._imageBorder.t = sprite.border.t;
-            this._imageBorder.r = sprite.border.r;
-            this._imageBorder.b = sprite.border.b;
-            this._sprite.use();
-            this._spriteName = this._sprite.getName();
-            this.prepareData();
-            if (this.transform != null){
-                this.transform.markDirty();
-                this.updateTran();
+            if(sprite){
+                // this._imageBorder.l = sprite.border.l;
+                // this._imageBorder.t = sprite.border.t;
+                // this._imageBorder.r = sprite.border.r;
+                // this._imageBorder.b = sprite.border.b;
+                this._sprite.use();
+                this._spriteName = this._sprite.getName();
+                this.prepareData();
+                if (this.transform != null){
+                    this.transform.markDirty();
+                    this.updateTran();
+                }
+            }else{
+                this._spriteName = "";
             }
+
         }
         public get sprite()
         {
@@ -212,7 +222,8 @@ namespace gd3d.framework
         @gd3d.reflect.Field("string")
         private _spriteName:string = "";
         
-
+        
+        @reflect.Field("border")
         private _imageBorder = new math.border();
         /**
          * @public
@@ -221,7 +232,6 @@ namespace gd3d.framework
          * 9宫格边距
          * @version egret-gd3d 1.0
          */
-        @reflect.Field("border")
         get imageBorder(){
             return this._imageBorder;
         }
@@ -261,7 +271,7 @@ namespace gd3d.framework
             // }
             if(img != null){
                 if(this.needRefreshImg){
-                    this._uimat.setTexture("_MainTex", img);
+                    mat.setTexture("_MainTex", img);
                     this.needRefreshImg = false;
                 }
                 
@@ -302,8 +312,11 @@ namespace gd3d.framework
          */
         remove()
         {
-            this._sprite.unuse(true);
+            if(this._sprite) this._sprite.unuse(true);
+            if(this._uimat) this._uimat.unuse(true);
             this.datar.length = 0;
+            this.transform = null;
+            this._imageBorder = null;
         }
 
         /**

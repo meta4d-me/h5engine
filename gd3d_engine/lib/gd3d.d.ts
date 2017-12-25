@@ -602,8 +602,12 @@ declare namespace gd3d.framework {
         private inputElement;
         private _text;
         readonly text: string;
-        myLineType: lineType;
-        myContentType: contentType;
+        private _charlimit;
+        characterLimit: number;
+        private _lineType;
+        LineType: lineType;
+        private _contentType;
+        ContentType: number;
         private _textLable;
         TextLabel: label;
         private _placeholderLabel;
@@ -614,14 +618,14 @@ declare namespace gd3d.framework {
         start(): void;
         private inputElmLayout();
         private textRefresh();
+        private filterContentText();
         update(delta: number): void;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
     }
     enum lineType {
         SingleLine = 0,
-        MultiLineSubmit = 1,
-        MultiLineNewline = 2,
+        MultiLine = 1,
     }
     enum contentType {
         None = 0,
@@ -639,6 +643,7 @@ declare namespace gd3d.framework {
     class label implements IRectRenderer {
         private _text;
         text: string;
+        private initdater();
         private _font;
         font: font;
         private needRefreshFont;
@@ -648,6 +653,8 @@ declare namespace gd3d.framework {
         linespace: number;
         horizontalType: HorizontalType;
         verticalType: VerticalType;
+        horizontalOverflow: boolean;
+        verticalOverflow: boolean;
         private indexarr;
         private remainarrx;
         updateData(_font: gd3d.framework.font): void;
@@ -2697,6 +2704,9 @@ declare namespace gd3d.framework {
         OnEndOnceLoop(): void;
         targetMat: math.matrix;
         refreshTargetMatrix(): void;
+        private tempos;
+        private temColor;
+        private temUv;
         uploadMeshdata(): void;
         refreshCurTex_ST(curframe: number, detalTime: number, fps: number): void;
         reset(): void;
@@ -2763,7 +2773,8 @@ declare namespace gd3d.framework {
         row: number;
         column: number;
         count: number;
-        F14SingleMeshBaseData(): void;
+        firtstFrame: number;
+        constructor(firstFrame: number);
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
     }
 }
