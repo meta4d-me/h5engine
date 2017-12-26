@@ -36,10 +36,14 @@
             if (s.isfinish){
                 let data: gd3d.framework.textasset = app.getAssetMgr().getAssetByName(navMeshUrl.substring(navMeshUrl.lastIndexOf("/")+1)) as gd3d.framework.textasset;
                 this.navmeshLoaded(data.content, ()=>{
-                    onstate(s);
+                    if(onstate){
+                        onstate(s);
+                    }                   
                 });                
             }else if (s.iserror){
-                onstate(s);
+                if(onstate){
+                    onstate(s);
+                }
             }            
         });
     }
