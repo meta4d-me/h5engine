@@ -1761,7 +1761,7 @@ var gd3d;
                     this.rawData = datas;
                 }
                 else
-                    this.rawData = new Float32Array([1, 0, 0, 0, 1, 0]);
+                    this.rawData = new Float32Array([1, 0, 0, 1, 0, 0]);
             }
             matrix3x2.prototype.toString = function () {
                 return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "],"
@@ -2816,7 +2816,8 @@ var gd3d;
             Object.defineProperty(image2D.prototype, "uimat", {
                 get: function () {
                     if (this._sprite && this._sprite.texture) {
-                        var matName = this._sprite.texture.getName() + "_uimask";
+                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
+                        var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
                         var canvas_1 = this.transform.canvas;
                         if (!canvas_1.assetmgr)
                             return;
@@ -2833,12 +2834,7 @@ var gd3d;
                             mat.setShader(canvas_1.assetmgr.getShader("shader/defmaskui"));
                             mat.use();
                         }
-                        if (this.transform.parentIsMask) {
-                            mat.setFloat("MaskState", 1);
-                        }
-                        else {
-                            mat.setFloat("MaskState", 0);
-                        }
+                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -4320,7 +4316,8 @@ var gd3d;
             Object.defineProperty(label.prototype, "uimat", {
                 get: function () {
                     if (this.font && this.font.texture) {
-                        var matName = this.font.texture.getName() + "_fontmask";
+                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
+                        var matName = this.font.texture.getName() + "_fontmask" + rectPostfix;
                         var canvas_2 = this.transform.canvas;
                         if (!canvas_2.assetmgr)
                             return;
@@ -4337,12 +4334,7 @@ var gd3d;
                             mat.setShader(canvas_2.assetmgr.getShader("shader/defmaskfont"));
                             mat.use();
                         }
-                        if (this.transform.parentIsMask) {
-                            mat.setFloat("MaskState", 1);
-                        }
-                        else {
-                            mat.setFloat("MaskState", 0);
-                        }
+                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -4524,7 +4516,8 @@ var gd3d;
             Object.defineProperty(rawImage2D.prototype, "uimat", {
                 get: function () {
                     if (this.image != null) {
-                        var matName = this._image.getName() + "_uimask";
+                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
+                        var matName = this._image.getName() + "_uimask" + rectPostfix;
                         var canvas_3 = this.transform.canvas;
                         if (!canvas_3.assetmgr)
                             return;
@@ -4541,12 +4534,7 @@ var gd3d;
                             mat.setShader(canvas_3.assetmgr.getShader("shader/defmaskui"));
                             mat.use();
                         }
-                        if (this.transform.parentIsMask) {
-                            mat.setFloat("MaskState", 1);
-                        }
-                        else {
-                            mat.setFloat("MaskState", 0);
-                        }
+                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -27750,8 +27738,8 @@ var gd3d;
                     v.rawData[0] = 1;
                     v.rawData[1] = 0;
                     v.rawData[2] = 0;
-                    v.rawData[3] = 0;
-                    v.rawData[4] = 1;
+                    v.rawData[3] = 1;
+                    v.rawData[4] = 0;
                     v.rawData[5] = 0;
                     pool.unused_matrix3x2.push(v);
                 }
