@@ -135,6 +135,7 @@ var gd3d;
                 this.outcontainer = div;
                 var rotateDiv = document.createElement("div");
                 rotateDiv.className = "full";
+                rotateDiv.style.overflow = "hidden";
                 rotateDiv.style.position = "absolute";
                 rotateDiv.style.width = "100%";
                 rotateDiv.style.height = "100%";
