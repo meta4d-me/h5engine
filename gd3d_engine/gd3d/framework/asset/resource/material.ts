@@ -518,6 +518,51 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
             }
         }
+
+        setCubeTexture(
+            _id: string, resname: string = "",
+            Texture_NEGATIVE_X: gd3d.framework.texture,
+            Texture_NEGATIVE_Y: gd3d.framework.texture,
+            Texture_NEGATIVE_Z: gd3d.framework.texture,
+            Texture_POSITIVE_X: gd3d.framework.texture,
+            Texture_POSITIVE_Y: gd3d.framework.texture,
+            Texture_POSITIVE_Z: gd3d.framework.texture
+        ) {
+
+            // if (this.mapUniform[_id] != undefined)
+            // {
+            //     if (this.mapUniform[_id].value)
+            //     {
+            //         this.mapUniform[_id].value.unuse();
+            //     }
+            //     this.mapUniform[_id].value = _texture;
+            //     if (resname != "")
+            //     {
+            //         this.mapUniform[_id].resname = resname;
+            //     }
+            //     if (_texture != null)
+            //     {
+            //         _texture.use();
+
+            //         //图片的尺寸信息(1/width,1/height,width,height)
+            //         let _texelsizeName = _id + "_TexelSize";
+            //         let _gltexture = _texture.glTexture;
+            //         if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
+            //         {
+            //             this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+            //         }
+            //     }
+            // }
+            // else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Texture)
+            // {
+            //     this.mapUniformTemp[_id].value = _texture;
+            // }
+            // else
+            // {
+            //     this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
+            // }
+
+        }
         /**
          * @private
          */
