@@ -5020,9 +5020,11 @@ var gd3d;
                 var pvrs = [];
                 var packs = [];
                 var f14effs = [];
+                var fonts = [];
+                var atlass = [];
                 var asslist = [];
                 var assstatelist = [];
-                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs, f14effs);
+                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs, f14effs, fonts, atlass);
                 assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff);
                 var realTotal = 0;
                 var mapPackes = {};
@@ -5092,6 +5094,15 @@ var gd3d;
                             case AssetTypeEnum.F14Effect:
                                 asset = new framework.f14eff(fileName);
                                 f14effs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case AssetTypeEnum.Font:
+                                asset = new framework.font(fileName);
+                                fonts.push({ url: url, type: type, asset: asset });
+                                break;
+                            case AssetTypeEnum.Atlas:
+                                asset = new framework.atlas(fileName);
+                                atlass.push({ url: url, type: type, asset: asset });
+                                break;
                         }
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                             && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
@@ -19986,11 +19997,15 @@ var gd3d;
                     if (s.isfinish) {
                         var data = app.getAssetMgr().getAssetByName(navMeshUrl.substring(navMeshUrl.lastIndexOf("/") + 1));
                         _this.navmeshLoaded(data.content, function () {
-                            onstate(s);
+                            if (onstate) {
+                                onstate(s);
+                            }
                         });
                     }
                     else if (s.iserror) {
-                        onstate(s);
+                        if (onstate) {
+                            onstate(s);
+                        }
                     }
                 });
             };

@@ -520,6 +520,8 @@ namespace gd3d.framework
             let pvrs: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let packs: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let f14effs: { url: string, type: AssetTypeEnum, asset: any }[] = [];
+            let fonts: { url: string, type: AssetTypeEnum, asset: any }[] = [];
+            let atlass: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             
 
             let asslist: any[] = [];
@@ -529,7 +531,7 @@ namespace gd3d.framework
             asslist.push(packs, glvshaders, glfshaders,
                 shaders, prefabs, meshs,
                 materials, scenes, textures,
-                texturedescs, anclips, textassets, pvrs,f14effs);
+                texturedescs, anclips, textassets, pvrs,f14effs,fonts,atlass);
 
             assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None,
                 AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh,
@@ -613,6 +615,15 @@ namespace gd3d.framework
                         case AssetTypeEnum.F14Effect:
                             asset=new f14eff(fileName);
                             f14effs.push({url,type,asset:asset});
+                            break;
+                        case AssetTypeEnum.Font:
+                            asset=new font(fileName);
+                            fonts.push({url,type,asset:asset});
+                        break;
+                        case AssetTypeEnum.Atlas:
+                            asset=new atlas(fileName);
+                            atlass.push({url,type,asset:asset});
+                        break;
                     }
                     if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
