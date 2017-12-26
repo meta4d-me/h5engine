@@ -4663,8 +4663,6 @@ var gd3d;
                 },
                 set: function (content) {
                     this._content = content;
-                    if (content != null)
-                        this.transform.addChild(content);
                 },
                 enumerable: true,
                 configurable: true
@@ -4746,7 +4744,7 @@ var gd3d;
                 this.transform = null;
             };
             __decorate([
-                gd3d.reflect.Field("transform2D"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.transform2D),
                 __metadata("design:paramtypes", [framework.transform2D])
             ], scrollRect.prototype, "content", null);
