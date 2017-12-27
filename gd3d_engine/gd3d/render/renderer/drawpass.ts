@@ -69,6 +69,9 @@
                 if (this.program.mapUniform[key].type == UniformTypeEnum.Texture)
                 {
                     this.uniforms[key] = { change: false, location: loc, type: UniformTypeEnum.Texture, value: null };
+                }else if (this.program.mapUniform[key].type == UniformTypeEnum.CubeTexture)
+                {
+                    this.uniforms[key] = { change: false, location: loc, type: UniformTypeEnum.CubeTexture, value: null };
                 }
                 else if (this.program.mapUniform[key].type == UniformTypeEnum.Float4x4v)
                 {
@@ -270,6 +273,7 @@
             if (v == null) throw new Error("do not have this uniform");
             if (v.type != UniformTypeEnum.CubeTexture) throw new Error("wrong uniform type:" + v.type);
             for (var i=0 ; i< typeArr.length ; i++) {
+                if(!v.value) v.value = {};
                 v.value[typeArr[i]] = textures[i];
             }
             v.change = true;
@@ -446,8 +450,9 @@
                 }else if(u.type == UniformTypeEnum.CubeTexture){
                     if (this.uniformallchange || u.change)
                     {
-
-
+                        webgl.activeTexture(webglkit.GetTextureNumber(webgl, texindex));
+                        webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, tex);
+                        webgl.uniform1i(u.location, texindex);
                     }
                 }
                 else if (this.uniformallchange || u.change)

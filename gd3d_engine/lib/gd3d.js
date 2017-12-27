@@ -8189,6 +8189,15 @@ var gd3d;
                             if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
                                 this.mapUniform[id].value.unuse(true);
                             break;
+                        case gd3d.render.UniformTypeEnum.CubeTexture:
+                            if (this.mapUniform[id] != null && this.mapUniform[id].value != null) {
+                                for (var key in this.mapUniform[id].value) {
+                                    if (this.mapUniform[id].value[key]) {
+                                        this.mapUniform[id].value[key].unuse(true);
+                                    }
+                                }
+                            }
+                            break;
                     }
                 }
                 delete this.mapUniform;
@@ -8237,6 +8246,22 @@ var gd3d;
                                 total += defaultValue.caclByteLength();
                             }
                             break;
+                        case gd3d.render.UniformTypeEnum.CubeTexture:
+                            if (value != null) {
+                                for (var _i = 0, value_1 = value; _i < value_1.length; _i++) {
+                                    var t = value_1[_i];
+                                    if (t)
+                                        total += t.caclByteLength();
+                                }
+                            }
+                            else if (defaultValue != null) {
+                                for (var _a = 0, defaultValue_1 = defaultValue; _a < defaultValue_1.length; _a++) {
+                                    var t = defaultValue_1[_a];
+                                    if (t)
+                                        total += t.caclByteLength();
+                                }
+                            }
+                            break;
                     }
                 }
                 for (var k in this.mapUniformTemp) {
@@ -8268,6 +8293,22 @@ var gd3d;
                             }
                             else if (defaultValue != null) {
                                 total += defaultValue.caclByteLength();
+                            }
+                            break;
+                        case gd3d.render.UniformTypeEnum.CubeTexture:
+                            if (value != null) {
+                                for (var _b = 0, value_2 = value; _b < value_2.length; _b++) {
+                                    var t = value_2[_b];
+                                    if (t)
+                                        total += t.caclByteLength();
+                                }
+                            }
+                            else if (defaultValue != null) {
+                                for (var _c = 0, defaultValue_2 = defaultValue; _c < defaultValue_2.length; _c++) {
+                                    var t = defaultValue_2[_c];
+                                    if (t)
+                                        total += t.caclByteLength();
+                                }
                             }
                             break;
                     }
@@ -8308,6 +8349,8 @@ var gd3d;
                         else if (u.type == gd3d.render.UniformTypeEnum.Float4x4v)
                             this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
                         else if (u.type == gd3d.render.UniformTypeEnum.Texture)
+                            this.mapUniform[key] = new UniformData(u.type, null);
+                        else if (u.type == gd3d.render.UniformTypeEnum.CubeTexture)
                             this.mapUniform[key] = new UniformData(u.type, null);
                     }
                 }
@@ -8442,8 +8485,43 @@ var gd3d;
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Texture, _texture);
                 }
             };
-            material.prototype.setCubeTexture = function (_id, resname, Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
-                if (resname === void 0) { resname = ""; }
+            material.prototype.setCubeTexture = function (_id, Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
+                var wrc = WebGLRenderingContext;
+                var textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
+                var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+                if (this.mapUniform[_id] != undefined) {
+                    if (this.mapUniform[_id].value) {
+                        for (var key in this.mapUniform[_id].value) {
+                            if (this.mapUniform[_id].value[key])
+                                this.mapUniform[_id].value[key].unuse();
+                            this.mapUniform[_id].value[key] = null;
+                        }
+                    }
+                    else {
+                        this.mapUniform[_id].value = {};
+                    }
+                    for (var i = 0; i < typeArr.length; i++) {
+                        var _texture = this.mapUniform[_id].value[typeArr[i]] = textures[i];
+                        if (_texture != null) {
+                            _texture.use();
+                            var _texelsizeName = _id + "_TexelSize" + ("_" + typeArr[i]);
+                            var _gltexture = _texture.glTexture;
+                            if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined) {
+                                this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                            }
+                        }
+                    }
+                }
+                else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == gd3d.render.UniformTypeEnum.CubeTexture) {
+                    for (var i = 0; i < typeArr.length; i++) {
+                        this.mapUniformTemp[_id].value[typeArr[i]] = textures[i];
+                    }
+                }
+                else {
+                    for (var i = 0; i < typeArr.length; i++) {
+                        this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.CubeTexture, textures[i]);
+                    }
+                }
             };
             material.prototype.uploadUniform = function (pass) {
                 this.uploadMapUniform(pass, this.mapUniform);
@@ -8486,6 +8564,18 @@ var gd3d;
                             }
                             else {
                                 pass.uniformTexture(id, null);
+                            }
+                            break;
+                        case gd3d.render.UniformTypeEnum.CubeTexture:
+                            var wrc = WebGLRenderingContext;
+                            if (value != null) {
+                                pass.uniformCubeTexture(id, value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X] ? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y] ? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z] ? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, value[wrc.TEXTURE_CUBE_MAP_POSITIVE_X] ? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y] ? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z] ? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null);
+                            }
+                            else if (defaultValue != null) {
+                                pass.uniformCubeTexture(id, defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X] ? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y] ? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z] ? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_X] ? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y] ? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null, defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z] ? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture : null);
+                            }
+                            else {
+                                pass.uniformCubeTexture(id, null, null, null, null, null, null);
                             }
                             break;
                     }
@@ -8646,6 +8736,11 @@ var gd3d;
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
                             mat.setTexture(i, data.value);
+                            break;
+                        case gd3d.render.UniformTypeEnum.CubeTexture:
+                            var wrc = WebGLRenderingContext;
+                            var value = data.value;
+                            mat.setCubeTexture(i, value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X], value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y], value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z], value[wrc.TEXTURE_CUBE_MAP_POSITIVE_X], value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y], value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z]);
                             break;
                         case gd3d.render.UniformTypeEnum.Float:
                             mat.setFloat(i, data.value);
@@ -27953,6 +28048,9 @@ var gd3d;
                     if (this.program.mapUniform[key].type == render.UniformTypeEnum.Texture) {
                         this.uniforms[key] = { change: false, location: loc, type: render.UniformTypeEnum.Texture, value: null };
                     }
+                    else if (this.program.mapUniform[key].type == render.UniformTypeEnum.CubeTexture) {
+                        this.uniforms[key] = { change: false, location: loc, type: render.UniformTypeEnum.CubeTexture, value: null };
+                    }
                     else if (this.program.mapUniform[key].type == render.UniformTypeEnum.Float4x4v) {
                         this.uniforms[key] = { change: false, location: loc, type: render.UniformTypeEnum.Float4x4v, value: uniformDefault ? new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]) : null };
                     }
@@ -28114,6 +28212,22 @@ var gd3d;
                 this.uniforms[name].value = tex;
                 this.uniforms[name].change = true;
             };
+            glDrawPass.prototype.uniformCubeTexture = function (name, Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
+                var wrc = WebGLRenderingContext;
+                var textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
+                var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+                var v = this.uniforms[name];
+                if (v == null)
+                    throw new Error("do not have this uniform");
+                if (v.type != render.UniformTypeEnum.CubeTexture)
+                    throw new Error("wrong uniform type:" + v.type);
+                for (var i = 0; i < typeArr.length; i++) {
+                    if (!v.value)
+                        v.value = {};
+                    v.value[typeArr[i]] = textures[i];
+                }
+                v.change = true;
+            };
             glDrawPass.prototype.use = function (webgl, applyUniForm) {
                 if (applyUniForm === void 0) { applyUniForm = true; }
                 if (this.state_showface == ShowFaceStateEnum.ALL) {
@@ -28167,6 +28281,13 @@ var gd3d;
                             webgl.uniform1i(u.location, texindex);
                         }
                         texindex++;
+                    }
+                    else if (u.type == render.UniformTypeEnum.CubeTexture) {
+                        if (this.uniformallchange || u.change) {
+                            webgl.activeTexture(render.webglkit.GetTextureNumber(webgl, texindex));
+                            webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, tex);
+                            webgl.uniform1i(u.location, texindex);
+                        }
                     }
                     else if (this.uniformallchange || u.change) {
                         if (u.type == render.UniformTypeEnum.Float) {
@@ -29822,12 +29943,20 @@ var gd3d;
                 if (format === void 0) { format = TextureFormatEnum.RGBA; }
                 if (mipmap === void 0) { mipmap = false; }
                 if (linear === void 0) { linear = true; }
+                this.linear = true;
+                this.premultiply = true;
+                this.repeat = true;
+                this.mirroredU = true;
+                this.mirroredV = true;
+                this.cubeTextureMode = false;
                 this.loaded = false;
                 this.width = 0;
                 this.height = 0;
                 this.mipmap = false;
                 this.webgl = webgl;
                 this.format = format;
+                this.linear = linear;
+                this.mipmap = mipmap;
                 this.texture = webgl.createTexture();
                 var extname = "WEBGL_compressed_texture_pvrtc";
                 this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
@@ -29856,6 +29985,11 @@ var gd3d;
                 this.width = img.width;
                 this.height = img.height;
                 this.mipmap = mipmap;
+                this.linear = linear;
+                this.premultiply = premultiply;
+                this.repeat = repeat;
+                this.mirroredU = mirroredU;
+                this.mirroredV = mirroredV;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
                 this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
@@ -29909,6 +30043,7 @@ var gd3d;
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
                 }
+                this.cubeTextureMode = false;
             };
             glTexture2D.prototype.uploadByteArray = function (mipmap, linear, width, height, data, repeat, mirroredU, mirroredV) {
                 if (repeat === void 0) { repeat = false; }
@@ -29917,6 +30052,10 @@ var gd3d;
                 this.width = width;
                 this.height = height;
                 this.mipmap = mipmap;
+                this.linear = linear;
+                this.repeat = repeat;
+                this.mirroredU = mirroredU;
+                this.mirroredV = mirroredV;
                 this.loaded = true;
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
                 this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
@@ -29970,6 +30109,35 @@ var gd3d;
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
                 }
+                this.cubeTextureMode = false;
+            };
+            glTexture2D.prototype.TransferToCubeTextureMode = function (TEXTURE_CUBE_MAP_) {
+                var wrc = WebGLRenderingContext;
+                var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+                var CubeTypeOk = false;
+                for (var i = 0; i < typeArr.length; i++) {
+                    if (typeArr.indexOf(TEXTURE_CUBE_MAP_) >= 0) {
+                        CubeTypeOk = true;
+                        break;
+                    }
+                }
+                if (!CubeTypeOk) {
+                    console.warn("TEXTURE_CUBE_MAP_ is unlegal");
+                    return;
+                }
+                this.getReader();
+                if (this.reader.data) {
+                    console.warn("getReader() fail");
+                    return;
+                }
+                var formatGL = this.webgl.RGBA;
+                if (this.format == TextureFormatEnum.RGB)
+                    formatGL = this.webgl.RGB;
+                else if (this.format == TextureFormatEnum.Gray)
+                    formatGL = this.webgl.LUMINANCE;
+                this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
+                this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, this.width, this.height, 0, formatGL, this.webgl.UNSIGNED_BYTE, this.reader.data);
+                this.cubeTextureMode = true;
             };
             glTexture2D.prototype.caclByteLength = function () {
                 var pixellen = 1;

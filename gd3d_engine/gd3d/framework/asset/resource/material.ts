@@ -189,6 +189,20 @@ namespace gd3d.framework
                             total += defaultValue.caclByteLength();
                         }
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        if (value != null)
+                        {
+                            for (const t of value) {
+                                if(t) total += t.caclByteLength();
+                            }
+                        }
+                        else if (defaultValue != null)
+                        {
+                            for (const t of defaultValue) {
+                                if(t) total += t.caclByteLength();
+                            }
+                        }
+                        break;
                 }
             }
             for (let k in this.mapUniformTemp)
@@ -224,6 +238,20 @@ namespace gd3d.framework
                         else if (defaultValue != null)
                         {
                             total += defaultValue.caclByteLength();
+                        }
+                        break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        if (value != null)
+                        {
+                            for (const t of value) {
+                                if(t) total += t.caclByteLength();
+                            }
+                        }
+                        else if (defaultValue != null)
+                        {
+                            for (const t of defaultValue) {
+                                if(t) total += t.caclByteLength();
+                            }
                         }
                         break;
                 }
@@ -275,6 +303,8 @@ namespace gd3d.framework
                         this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
                     else if (u.type == render.UniformTypeEnum.Texture)
                         this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
+                    else if(u.type == render.UniformTypeEnum.CubeTexture)
+                        this.mapUniform[key] = new UniformData(u.type, null);
                 }
             }
         }
@@ -879,6 +909,17 @@ namespace gd3d.framework
                 {
                     case render.UniformTypeEnum.Texture:
                         mat.setTexture(i, data.value);
+                        break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        let wrc = WebGLRenderingContext;
+                        let value = data.value;
+                        mat.setCubeTexture(i, 
+                            value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X],
+                            value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y],
+                            value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z],
+                            value[wrc.TEXTURE_CUBE_MAP_POSITIVE_X],
+                            value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y],
+                            value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z]);
                         break;
                     case render.UniformTypeEnum.Float:
                         mat.setFloat(i, data.value);

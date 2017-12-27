@@ -649,6 +649,7 @@ var main = (function () {
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
         this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
+        this.addBtn("test_PBR 展示", function () { return new test_pbr(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
     };
     main.prototype.addBtn = function (text, act) {
@@ -1582,6 +1583,128 @@ var demo;
     }());
     demo.DragonTest = DragonTest;
 })(demo || (demo = {}));
+var test_pbr = (function () {
+    function test_pbr() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.PBRPath = "res/pbrRes/";
+        this.material = this.PBRPath + "barrel1/";
+        this.skyName = "map";
+        this.iblPath = this.PBRPath + ("IBL/" + this.skyName + "/");
+    }
+    test_pbr.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.assetMgr = this.app.getAssetMgr();
+        var objCam = new gd3d.framework.transform();
+        objCam.localTranslate.z = -10;
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 10;
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes.bind(this));
+        this.taskmgr.addTaskCall(this.init.bind(this));
+    };
+    test_pbr.prototype.init = function (astState, state) {
+        var temp1 = new gd3d.framework.transform();
+        this.scene.addChild(temp1);
+        var mf = temp1.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh("sphere");
+        var mr = temp1.gameObject.addComponent("meshRenderer");
+        mr.materials[0] = new gd3d.framework.material("testmat");
+        mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json"));
+        mr.materials[0].setTexture("brdf", this.assetMgr.getAssetByName("brdf.png"));
+        var negx = this.assetMgr.getAssetByName("negx.jpg");
+        negx.glTexture;
+        mr.materials[0].setCubeTexture("u_sky", this.assetMgr.getAssetByName("negx.jpg"), this.assetMgr.getAssetByName("negy.jpg"), this.assetMgr.getAssetByName("negz.jpg"), this.assetMgr.getAssetByName("posx.jpg"), this.assetMgr.getAssetByName("posy.jpg"), this.assetMgr.getAssetByName("posz.jpg"));
+        state.finish = true;
+    };
+    test_pbr.prototype.loadpbrRes = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    if (s.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                            if (s.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                                    if (s.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr.prototype.loadTexture = function (lastState, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+            if (s1.isfinish) {
+                _this.assetMgr.load(_this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load(_this.material + "basecolor.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load(_this.material + "normal.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    if (s.isfinish) {
+                                        _this.assetMgr.load(_this.material + "metallicRoughness.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                            if (s.isfinish) {
+                                                _this.assetMgr.load(_this.material + "AO.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                                    if (s.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr.prototype.addCube = function () {
+        var cube = new gd3d.framework.transform();
+        cube.name = "cube";
+        cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
+        this.scene.addChild(cube);
+        var mesh = cube.gameObject.addComponent("meshFilter");
+        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
+        cube.gameObject.addComponent("meshRenderer");
+        cube.gameObject.addComponent("boxcollider");
+        this.cube = cube;
+        cube.markDirty();
+        var cube = new gd3d.framework.transform();
+        cube.name = "cube";
+        cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
+        cube.localTranslate.x = 1;
+        cube.localTranslate.z = 1;
+        this.scene.addChild(cube);
+        var mesh = cube.gameObject.addComponent("meshFilter");
+        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
+        cube.gameObject.addComponent("meshRenderer");
+        cube.gameObject.addComponent("boxcollider");
+        this.cube = cube;
+        cube.markDirty();
+    };
+    test_pbr.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return test_pbr;
+}());
 var test_postCamera = (function () {
     function test_postCamera() {
         this.timer = 0;

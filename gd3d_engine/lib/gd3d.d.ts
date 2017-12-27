@@ -1361,7 +1361,7 @@ declare namespace gd3d.framework {
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
-        setCubeTexture(_id: string, resname: string, Texture_NEGATIVE_X: gd3d.framework.texture, Texture_NEGATIVE_Y: gd3d.framework.texture, Texture_NEGATIVE_Z: gd3d.framework.texture, Texture_POSITIVE_X: gd3d.framework.texture, Texture_POSITIVE_Y: gd3d.framework.texture, Texture_POSITIVE_Z: gd3d.framework.texture): void;
+        setCubeTexture(_id: string, Texture_NEGATIVE_X: gd3d.framework.texture, Texture_NEGATIVE_Y: gd3d.framework.texture, Texture_NEGATIVE_Z: gd3d.framework.texture, Texture_POSITIVE_X: gd3d.framework.texture, Texture_POSITIVE_Y: gd3d.framework.texture, Texture_POSITIVE_Z: gd3d.framework.texture): void;
         uploadUniform(pass: render.glDrawPass): void;
         private uploadMapUniform(pass, mapUniform);
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
@@ -5042,6 +5042,7 @@ declare namespace gd3d.render {
         uniformMatrix(name: string, mat: math.matrix): void;
         uniformMatrixV(name: string, matdata: Float32Array): void;
         uniformTexture(name: string, tex: render.ITexture): void;
+        uniformCubeTexture(name: string, Texture_NEGATIVE_X: render.ITexture, Texture_NEGATIVE_Y: render.ITexture, Texture_NEGATIVE_Z: render.ITexture, Texture_POSITIVE_X: render.ITexture, Texture_POSITIVE_Y: render.ITexture, Texture_POSITIVE_Z: render.ITexture): void;
         static textureID: number[];
         use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
         applyUniformSaved(webgl: WebGLRenderingContext): void;
@@ -5296,10 +5297,17 @@ declare namespace gd3d.render {
     }
     class glTexture2D implements ITexture {
         ext: any;
+        private linear;
+        private premultiply;
+        private repeat;
+        private mirroredU;
+        private mirroredV;
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         private getExt(name);
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
+        cubeTextureMode: boolean;
+        TransferToCubeTextureMode(TEXTURE_CUBE_MAP_: number): void;
         webgl: WebGLRenderingContext;
         loaded: boolean;
         texture: WebGLTexture;

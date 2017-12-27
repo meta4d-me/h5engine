@@ -273,6 +273,18 @@
           "length":0
           },
       {
+          "name":"resources/f14effect/f14trans.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/f14effect/f14trans.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/f14effect/particles_add.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/mu_shader/alpha_blend.shader.json",
           "length":0
           },
@@ -549,6 +561,18 @@
           "length":0
           },
       {
+          "name":"resources/project/flowwater_new.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/flowwater_new.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/flowwater_new.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/fog_additive_alpha.fs.glsl",
           "length":0
           },
@@ -593,6 +617,14 @@
           "length":0
           },
       {
+          "name":"resources/project/fog_flowwater_new.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/fog_flowwater_new.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/fog_streamlight.fs.glsl",
           "length":0
           },
@@ -610,6 +642,18 @@
           },
       {
           "name":"resources/project/fog_uvroll.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/pbr.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/pbr.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/pbr.vs.glsl",
           "length":0
           },
       {
@@ -817,36 +861,7 @@
           "length":0
           },
       {
-          "name":"resources/f14effect/f14trans.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/f14effect/f14trans.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/f14effect/particles_add.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/project/flowwater_new.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/project/flowwater_new.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/project/flowwater_new.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/project/fog_flowwater_new.vs.glsl",
-          "length":0
-          }
-          ,
-      {
-          "name":"resources/project/fog_flowwater_new.fs.glsl",
+          "name":"resources/white.fs.glsl",
           "length":0
           }
       ]

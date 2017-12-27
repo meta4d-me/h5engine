@@ -198,6 +198,25 @@ declare namespace demo {
         update(delta: number): void;
     }
 }
+declare class test_pbr implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    cube: gd3d.framework.transform;
+    static temp: gd3d.framework.transform2D;
+    start(app: gd3d.framework.application): void;
+    private init(astState, state);
+    private PBRPath;
+    private material;
+    private skyName;
+    private iblPath;
+    private loadpbrRes(lastState, state);
+    private loadTexture(lastState, state);
+    private addCube();
+    update(delta: number): void;
+}
 declare class test_postCamera implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
