@@ -1616,24 +1616,32 @@ var test_pbr = (function () {
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json"));
         mr.materials[0].setTexture("brdf", this.assetMgr.getAssetByName("brdf.png"));
         var negx = this.assetMgr.getAssetByName("negx.jpg");
-        negx.glTexture;
-        mr.materials[0].setCubeTexture("u_sky", this.assetMgr.getAssetByName("negx.jpg"), this.assetMgr.getAssetByName("negy.jpg"), this.assetMgr.getAssetByName("negz.jpg"), this.assetMgr.getAssetByName("posx.jpg"), this.assetMgr.getAssetByName("posy.jpg"), this.assetMgr.getAssetByName("posz.jpg"));
+        var negy = this.assetMgr.getAssetByName("negy.jpg");
+        var negz = this.assetMgr.getAssetByName("negz.jpg");
+        var posx = this.assetMgr.getAssetByName("posx.jpg");
+        var posy = this.assetMgr.getAssetByName("posy.jpg");
+        var posz = this.assetMgr.getAssetByName("posz.jpg");
+        var skytex = new gd3d.framework.texture("skyCubeTex");
+        skytex.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex.use();
+        skytex.glTexture.uploadImages(negx, negy, negz, posx, posy, posz);
+        mr.materials[0].setCubeTexture("u_sky", skytex);
         state.finish = true;
     };
     test_pbr.prototype.loadpbrRes = function (lastState, state) {
         var _this = this;
-        this.assetMgr.load(this.iblPath + "negx.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                _this.assetMgr.load(_this.iblPath + "negy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        _this.assetMgr.load(_this.iblPath + "negz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                            if (s.isfinish) {
-                                _this.assetMgr.load(_this.iblPath + "posx.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                    if (s.isfinish) {
-                                        _this.assetMgr.load(_this.iblPath + "posy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                            if (s.isfinish) {
-                                                _this.assetMgr.load(_this.iblPath + "posz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
+        this.assetMgr.load(this.iblPath + "negx.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
                                                         state.finish = true;
                                                     }
                                                 });
@@ -1652,16 +1660,16 @@ var test_pbr = (function () {
         var _this = this;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
             if (s1.isfinish) {
-                _this.assetMgr.load(_this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        _this.assetMgr.load(_this.material + "basecolor.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                            if (s.isfinish) {
-                                _this.assetMgr.load(_this.material + "normal.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                    if (s.isfinish) {
-                                        _this.assetMgr.load(_this.material + "metallicRoughness.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                            if (s.isfinish) {
-                                                _this.assetMgr.load(_this.material + "AO.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
+                _this.assetMgr.load(_this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                    if (s2.isfinish) {
+                        _this.assetMgr.load(_this.material + "basecolor.png", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                            if (s3.isfinish) {
+                                _this.assetMgr.load(_this.material + "normal.png", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                    if (s4.isfinish) {
+                                        _this.assetMgr.load(_this.material + "metallicRoughness.png", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                            if (s5.isfinish) {
+                                                _this.assetMgr.load(_this.material + "AO.png", gd3d.framework.AssetTypeEnum.Auto, function (s6) {
+                                                    if (s6.isfinish) {
                                                         state.finish = true;
                                                     }
                                                 });

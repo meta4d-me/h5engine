@@ -258,25 +258,13 @@
             this.uniforms[name].value = tex;
             this.uniforms[name].change = true;
         }
-        uniformCubeTexture(name: string, 
-            Texture_NEGATIVE_X: render.ITexture,
-            Texture_NEGATIVE_Y: render.ITexture,
-            Texture_NEGATIVE_Z: render.ITexture,
-            Texture_POSITIVE_X: render.ITexture,
-            Texture_POSITIVE_Y: render.ITexture,
-            Texture_POSITIVE_Z: render.ITexture,)
+        uniformCubeTexture(name: string,tex: render.ITexture)
         {
-            let wrc = WebGLRenderingContext;
-            let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
-            const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
             var v = this.uniforms[name];
             if (v == null) throw new Error("do not have this uniform");
             if (v.type != UniformTypeEnum.CubeTexture) throw new Error("wrong uniform type:" + v.type);
-            for (var i=0 ; i< typeArr.length ; i++) {
-                if(!v.value) v.value = {};
-                v.value[typeArr[i]] = textures[i];
-            }
-            v.change = true;
+            this.uniforms[name].value = tex;
+            this.uniforms[name].change = true;
         }
         static textureID: number[] = null;
         //使用材质
@@ -437,23 +425,17 @@
             for (var key in this.uniforms)
             {
                 var u = this.uniforms[key];
-                if (u.type == UniformTypeEnum.Texture)
+                if (u.type == UniformTypeEnum.Texture || u.type == UniformTypeEnum.CubeTexture )
                 {
                     if (this.uniformallchange || u.change)
                     {
-                        var tex = u.value != null ? (u.value as ITexture).texture : null;
+                        let tex = u.value != null ? (u.value as ITexture).texture : null;
                         webgl.activeTexture(webglkit.GetTextureNumber(webgl, texindex));
                         webgl.bindTexture(webgl.TEXTURE_2D, tex);
+                        webgl.bindTexture(u.type == UniformTypeEnum.Texture? webgl.TEXTURE_2D: webgl.TEXTURE_CUBE_MAP, tex);
                         webgl.uniform1i(u.location, texindex);
                     }
                     texindex++;
-                }else if(u.type == UniformTypeEnum.CubeTexture){
-                    if (this.uniformallchange || u.change)
-                    {
-                        webgl.activeTexture(webglkit.GetTextureNumber(webgl, texindex));
-                        webgl.bindTexture(webgl.TEXTURE_CUBE_MAP, tex);
-                        webgl.uniform1i(u.location, texindex);
-                    }
                 }
                 else if (this.uniformallchange || u.change)
                 {

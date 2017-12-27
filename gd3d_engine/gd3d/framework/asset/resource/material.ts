@@ -100,18 +100,10 @@ namespace gd3d.framework
                 switch (this.mapUniform[id].type)
                 {
                     case render.UniformTypeEnum.Texture:
+                    case render.UniformTypeEnum.CubeTexture:
                         if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
                             this.mapUniform[id].value.unuse(true);
                         break;
-                    case render.UniformTypeEnum.CubeTexture:
-                        if (this.mapUniform[id] != null && this.mapUniform[id].value != null){
-                            for (const key in this.mapUniform[id].value) {
-                                if(this.mapUniform[id].value[key] ){
-                                    this.mapUniform[id].value[key].unuse(true);
-                                }
-                            }
-                        }
-                    break;
                 }
             }
             delete this.mapUniform;
@@ -189,20 +181,6 @@ namespace gd3d.framework
                             total += defaultValue.caclByteLength();
                         }
                         break;
-                    case render.UniformTypeEnum.CubeTexture:
-                        if (value != null)
-                        {
-                            for (const t of value) {
-                                if(t) total += t.caclByteLength();
-                            }
-                        }
-                        else if (defaultValue != null)
-                        {
-                            for (const t of defaultValue) {
-                                if(t) total += t.caclByteLength();
-                            }
-                        }
-                        break;
                 }
             }
             for (let k in this.mapUniformTemp)
@@ -238,20 +216,6 @@ namespace gd3d.framework
                         else if (defaultValue != null)
                         {
                             total += defaultValue.caclByteLength();
-                        }
-                        break;
-                    case render.UniformTypeEnum.CubeTexture:
-                        if (value != null)
-                        {
-                            for (const t of value) {
-                                if(t) total += t.caclByteLength();
-                            }
-                        }
-                        else if (defaultValue != null)
-                        {
-                            for (const t of defaultValue) {
-                                if(t) total += t.caclByteLength();
-                            }
                         }
                         break;
                 }
@@ -303,8 +267,8 @@ namespace gd3d.framework
                         this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
                     else if (u.type == render.UniformTypeEnum.Texture)
                         this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
-                    else if(u.type == render.UniformTypeEnum.CubeTexture)
-                        this.mapUniform[key] = new UniformData(u.type, null);
+                    else if (u.type == render.UniformTypeEnum.CubeTexture)
+                        this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
                 }
             }
         }
@@ -561,58 +525,33 @@ namespace gd3d.framework
         /**
          * @private
          */
-        setCubeTexture(
-            _id: string, 
-            Texture_NEGATIVE_X: gd3d.framework.texture,
-            Texture_NEGATIVE_Y: gd3d.framework.texture,
-            Texture_NEGATIVE_Z: gd3d.framework.texture,
-            Texture_POSITIVE_X: gd3d.framework.texture,
-            Texture_POSITIVE_Y: gd3d.framework.texture,
-            Texture_POSITIVE_Z: gd3d.framework.texture,
-        ) {
-            let wrc = WebGLRenderingContext;
-            let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
-            const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+        setCubeTexture(_id: string, _texture: gd3d.framework.texture) {
             if (this.mapUniform[_id] != undefined)
             {
                 if (this.mapUniform[_id].value)
                 {
-                    for (const key in this.mapUniform[_id].value) {
-                        if(this.mapUniform[_id].value[key])
-                            this.mapUniform[_id].value[key].unuse();
-                        this.mapUniform[_id].value[key] = null;
-                    }
-                }else{
-                    this.mapUniform[_id].value = {};
+                    this.mapUniform[_id].value.unuse();
                 }
-                //this.mapUniform[_id].value = _texture;
-                for(var i=0 ; i<typeArr.length ; i++){
-                    let _texture = this.mapUniform[_id].value[typeArr[i]] = textures[i];
-                    if (_texture != null)
+                this.mapUniform[_id].value = _texture;
+                if (_texture != null)
+                {
+                    _texture.use();
+                    //图片的尺寸信息(1/width,1/height,width,height)
+                    let _texelsizeName = _id + "_TexelSize";
+                    let _gltexture = _texture.glTexture;
+                    if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
                     {
-                        _texture.use();
-    
-                        //图片的尺寸信息(1/width,1/height,width,height)
-                        let _texelsizeName = _id + "_TexelSize" + `_${typeArr[i]}`;
-                        let _gltexture = _texture.glTexture;
-                        if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
-                        {
-                            this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
-                        }
+                        this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
             }
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.CubeTexture)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Texture)
             {
-                for(var i=0 ; i<typeArr.length ; i++){
-                    this.mapUniformTemp[_id].value[typeArr[i]] = textures[i];
-                }
+                this.mapUniformTemp[_id].value = _texture;
             }
             else
             {
-                for(var i=0 ; i<typeArr.length ; i++){
-                    this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.CubeTexture, textures[i]);
-                }
+                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
             }
         }
         /**
@@ -669,26 +608,17 @@ namespace gd3d.framework
                         }
                         break;
                     case render.UniformTypeEnum.CubeTexture:
-                        let wrc = WebGLRenderingContext;
                         if (value != null)
-                        {   
-                            pass.uniformCubeTexture(id,
-                                value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                value[wrc.TEXTURE_CUBE_MAP_POSITIVE_X]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null);
-                        }else if(defaultValue != null){
-                            pass.uniformCubeTexture(id,
-                                defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_X]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
-                                defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null);
-                        }else{
-                            pass.uniformCubeTexture(id,null,null,null,null,null,null);
+                        {
+                            pass.uniformCubeTexture(id, value.glTexture);
+                        }
+                        else if (defaultValue != null)
+                        {
+                            pass.uniformCubeTexture(id, defaultValue.glTexture);
+                        }
+                        else
+                        {
+                            pass.uniformCubeTexture(id, null);
                         }
                         break;
                 }
@@ -909,17 +839,6 @@ namespace gd3d.framework
                 {
                     case render.UniformTypeEnum.Texture:
                         mat.setTexture(i, data.value);
-                        break;
-                    case render.UniformTypeEnum.CubeTexture:
-                        let wrc = WebGLRenderingContext;
-                        let value = data.value;
-                        mat.setCubeTexture(i, 
-                            value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X],
-                            value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y],
-                            value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z],
-                            value[wrc.TEXTURE_CUBE_MAP_POSITIVE_X],
-                            value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y],
-                            value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z]);
                         break;
                     case render.UniformTypeEnum.Float:
                         mat.setFloat(i, data.value);

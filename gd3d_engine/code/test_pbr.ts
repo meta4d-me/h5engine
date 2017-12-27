@@ -45,27 +45,18 @@ class test_pbr implements IState {
         mr.materials[0].setTexture("brdf",this.assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture);
 
         //sky
-        let wrc = WebGLRenderingContext;
         let negx = this.assetMgr.getAssetByName(`negx.jpg`)as gd3d.framework.texture;
-        (negx.glTexture as gd3d.render.glTexture2D).TransferToCubeTextureMode(wrc.TEXTURE_CUBE_MAP_NEGATIVE_X);
         let negy = this.assetMgr.getAssetByName(`negy.jpg`)as gd3d.framework.texture;
-        (negx.glTexture as gd3d.render.glTexture2D).TransferToCubeTextureMode(wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y);
         let negz = this.assetMgr.getAssetByName(`negz.jpg`)as gd3d.framework.texture;
-        (negx.glTexture as gd3d.render.glTexture2D).TransferToCubeTextureMode(wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z);
         let posx = this.assetMgr.getAssetByName(`posx.jpg`)as gd3d.framework.texture;
-        (negx.glTexture as gd3d.render.glTexture2D).TransferToCubeTextureMode(wrc.TEXTURE_CUBE_MAP_POSITIVE_X);
         let posy = this.assetMgr.getAssetByName(`posy.jpg`)as gd3d.framework.texture;
-        (negx.glTexture as gd3d.render.glTexture2D).TransferToCubeTextureMode(wrc.TEXTURE_CUBE_MAP_POSITIVE_Y);
         let posz = this.assetMgr.getAssetByName(`posz.jpg`)as gd3d.framework.texture;
-        (negx.glTexture as gd3d.render.glTexture2D).TransferToCubeTextureMode(wrc.TEXTURE_CUBE_MAP_POSITIVE_Z);
 
-        mr.materials[0].setCubeTexture("u_sky",
-        this.assetMgr.getAssetByName(`negx.jpg`)as gd3d.framework.texture,
-        this.assetMgr.getAssetByName(`negy.jpg`)as gd3d.framework.texture,
-        this.assetMgr.getAssetByName(`negz.jpg`)as gd3d.framework.texture,
-        this.assetMgr.getAssetByName(`posx.jpg`)as gd3d.framework.texture,
-        this.assetMgr.getAssetByName(`posy.jpg`)as gd3d.framework.texture,
-        this.assetMgr.getAssetByName(`posz.jpg`)as gd3d.framework.texture);
+        let skytex = new gd3d.framework.texture("skyCubeTex");
+        skytex.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex.use();
+        (skytex.glTexture as gd3d.render.glTextureCube).uploadImages(negx,negy,negz,posx,posy,posz);
+        mr.materials[0].setCubeTexture("u_sky",skytex);
 
         state.finish = true;
     }
@@ -75,18 +66,18 @@ class test_pbr implements IState {
     private skyName = "map";
     private iblPath:string = this.PBRPath + `IBL/${this.skyName}/`;
     private loadpbrRes(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate){
-        this.assetMgr.load(this.iblPath + "negx.jpg",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-            if(s.isfinish){
-                this.assetMgr.load(this.iblPath + "negy.jpg",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                    if(s.isfinish){
-                        this.assetMgr.load(this.iblPath + "negz.jpg",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                            if(s.isfinish){
-                                this.assetMgr.load(this.iblPath + "posx.jpg",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                    if(s.isfinish){
-                                        this.assetMgr.load(this.iblPath + "posy.jpg",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                            if(s.isfinish){
-                                                this.assetMgr.load(this.iblPath + "posz.jpg",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                                    if(s.isfinish){
+        this.assetMgr.load(this.iblPath + "negx.jpg",gd3d.framework.AssetTypeEnum.Auto,(s0)=>{
+            if(s0.isfinish){
+                this.assetMgr.load(this.iblPath + "negy.jpg",gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
+                    if(s1.isfinish){
+                        this.assetMgr.load(this.iblPath + "negz.jpg",gd3d.framework.AssetTypeEnum.Auto,(s2)=>{
+                            if(s2.isfinish){
+                                this.assetMgr.load(this.iblPath + "posx.jpg",gd3d.framework.AssetTypeEnum.Auto,(s3)=>{
+                                    if(s3.isfinish){
+                                        this.assetMgr.load(this.iblPath + "posy.jpg",gd3d.framework.AssetTypeEnum.Auto,(s4)=>{
+                                            if(s4.isfinish){
+                                                this.assetMgr.load(this.iblPath + "posz.jpg",gd3d.framework.AssetTypeEnum.Auto,(s5)=>{
+                                                    if(s5.isfinish){
                                                         state.finish = true;
                                                     }
                                                 });
@@ -106,16 +97,16 @@ class test_pbr implements IState {
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
         {
             if (s1.isfinish){
-                this.assetMgr.load(this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-                    if (s.isfinish) {
-                        this.assetMgr.load(this.material + "basecolor.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-                            if(s.isfinish){
-                                this.assetMgr.load(this.material + "normal.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                    if(s.isfinish){
-                                        this.assetMgr.load(this.material + "metallicRoughness.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                            if(s.isfinish){
-                                                this.assetMgr.load(this.material + "AO.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-                                                    if(s.isfinish){
+                this.assetMgr.load(this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, (s2) => {
+                    if (s2.isfinish) {
+                        this.assetMgr.load(this.material + "basecolor.png", gd3d.framework.AssetTypeEnum.Auto, (s3) => {
+                            if(s3.isfinish){
+                                this.assetMgr.load(this.material + "normal.png",gd3d.framework.AssetTypeEnum.Auto,(s4)=>{
+                                    if(s4.isfinish){
+                                        this.assetMgr.load(this.material + "metallicRoughness.png",gd3d.framework.AssetTypeEnum.Auto,(s5)=>{
+                                            if(s5.isfinish){
+                                                this.assetMgr.load(this.material + "AO.png",gd3d.framework.AssetTypeEnum.Auto,(s6)=>{
+                                                    if(s6.isfinish){
                                                         state.finish = true;
                                                     }
                                                 });
