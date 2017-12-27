@@ -8442,6 +8442,9 @@ var gd3d;
                     this.mapUniformTemp[_id] = new UniformData(gd3d.render.UniformTypeEnum.Texture, _texture);
                 }
             };
+            material.prototype.setCubeTexture = function (_id, resname, Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
+                if (resname === void 0) { resname = ""; }
+            };
             material.prototype.uploadUniform = function (pass) {
                 this.uploadMapUniform(pass, this.mapUniform);
                 this.uploadMapUniform(pass, this.mapUniformTemp);
@@ -29502,6 +29505,7 @@ var gd3d;
             UniformTypeEnum[UniformTypeEnum["Float4v"] = 4] = "Float4v";
             UniformTypeEnum[UniformTypeEnum["Float4x4"] = 5] = "Float4x4";
             UniformTypeEnum[UniformTypeEnum["Float4x4v"] = 6] = "Float4x4v";
+            UniformTypeEnum[UniformTypeEnum["CubeTexture"] = 7] = "CubeTexture";
         })(UniformTypeEnum = render.UniformTypeEnum || (render.UniformTypeEnum = {}));
         var uniform = (function () {
             function uniform() {
@@ -29558,6 +29562,9 @@ var gd3d;
                             }
                             else if (t == "mat4") {
                                 info.type = UniformTypeEnum.Float4x4;
+                            }
+                            else if (t == "samplerCube") {
+                                info.type = UniformTypeEnum.CubeTexture;
                             }
                             else {
                                 throw new Error("uniform type:" + t + " not defined.");

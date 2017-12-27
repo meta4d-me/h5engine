@@ -1361,6 +1361,7 @@ declare namespace gd3d.framework {
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
+        setCubeTexture(_id: string, resname: string, Texture_NEGATIVE_X: gd3d.framework.texture, Texture_NEGATIVE_Y: gd3d.framework.texture, Texture_NEGATIVE_Z: gd3d.framework.texture, Texture_POSITIVE_X: gd3d.framework.texture, Texture_POSITIVE_Y: gd3d.framework.texture, Texture_POSITIVE_Z: gd3d.framework.texture): void;
         uploadUniform(pass: render.glDrawPass): void;
         private uploadMapUniform(pass, mapUniform);
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
@@ -5191,6 +5192,7 @@ declare namespace gd3d.render {
         Float4v = 4,
         Float4x4 = 5,
         Float4x4v = 6,
+        CubeTexture = 7,
     }
     class uniform {
         name: string;

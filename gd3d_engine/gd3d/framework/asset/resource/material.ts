@@ -103,6 +103,15 @@ namespace gd3d.framework
                         if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
                             this.mapUniform[id].value.unuse(true);
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        if (this.mapUniform[id] != null && this.mapUniform[id].value != null){
+                            for (const key in this.mapUniform[id].value) {
+                                if(this.mapUniform[id].value[key] ){
+                                    this.mapUniform[id].value[key].unuse(true);
+                                }
+                            }
+                        }
+                    break;
                 }
             }
             delete this.mapUniform;
@@ -519,49 +528,62 @@ namespace gd3d.framework
             }
         }
 
+        /**
+         * @private
+         */
         setCubeTexture(
-            _id: string, resname: string = "",
+            _id: string, 
             Texture_NEGATIVE_X: gd3d.framework.texture,
             Texture_NEGATIVE_Y: gd3d.framework.texture,
             Texture_NEGATIVE_Z: gd3d.framework.texture,
             Texture_POSITIVE_X: gd3d.framework.texture,
             Texture_POSITIVE_Y: gd3d.framework.texture,
-            Texture_POSITIVE_Z: gd3d.framework.texture
+            Texture_POSITIVE_Z: gd3d.framework.texture,
         ) {
-
-            // if (this.mapUniform[_id] != undefined)
-            // {
-            //     if (this.mapUniform[_id].value)
-            //     {
-            //         this.mapUniform[_id].value.unuse();
-            //     }
-            //     this.mapUniform[_id].value = _texture;
-            //     if (resname != "")
-            //     {
-            //         this.mapUniform[_id].resname = resname;
-            //     }
-            //     if (_texture != null)
-            //     {
-            //         _texture.use();
-
-            //         //图片的尺寸信息(1/width,1/height,width,height)
-            //         let _texelsizeName = _id + "_TexelSize";
-            //         let _gltexture = _texture.glTexture;
-            //         if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
-            //         {
-            //             this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
-            //         }
-            //     }
-            // }
-            // else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Texture)
-            // {
-            //     this.mapUniformTemp[_id].value = _texture;
-            // }
-            // else
-            // {
-            //     this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
-            // }
-
+            let wrc = WebGLRenderingContext;
+            let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
+            const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+            if (this.mapUniform[_id] != undefined)
+            {
+                if (this.mapUniform[_id].value)
+                {
+                    for (const key in this.mapUniform[_id].value) {
+                        if(this.mapUniform[_id].value[key])
+                            this.mapUniform[_id].value[key].unuse();
+                        this.mapUniform[_id].value[key] = null;
+                    }
+                }else{
+                    this.mapUniform[_id].value = {};
+                }
+                //this.mapUniform[_id].value = _texture;
+                for(var i=0 ; i<typeArr.length ; i++){
+                    let _texture = this.mapUniform[_id].value[typeArr[i]] = textures[i];
+                    if (_texture != null)
+                    {
+                        _texture.use();
+    
+                        //图片的尺寸信息(1/width,1/height,width,height)
+                        let _texelsizeName = _id + "_TexelSize" + `_${typeArr[i]}`;
+                        let _gltexture = _texture.glTexture;
+                        if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
+                        {
+                            this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                        }
+                    }
+                }
+            }
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.CubeTexture)
+            {
+                for(var i=0 ; i<typeArr.length ; i++){
+                    this.mapUniformTemp[_id].value[typeArr[i]] = textures[i];
+                }
+            }
+            else
+            {
+                for(var i=0 ; i<typeArr.length ; i++){
+                    this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.CubeTexture, textures[i]);
+                }
+            }
         }
         /**
          * @private
@@ -614,6 +636,29 @@ namespace gd3d.framework
                         else
                         {
                             pass.uniformTexture(id, null);
+                        }
+                        break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        let wrc = WebGLRenderingContext;
+                        if (value != null)
+                        {   
+                            pass.uniformCubeTexture(id,
+                                value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                value[wrc.TEXTURE_CUBE_MAP_POSITIVE_X]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                value[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z]? value[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null);
+                        }else if(defaultValue != null){
+                            pass.uniformCubeTexture(id,
+                                defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_X]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_Y]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null,
+                                defaultValue[wrc.TEXTURE_CUBE_MAP_POSITIVE_Z]? defaultValue[wrc.TEXTURE_CUBE_MAP_NEGATIVE_X].glTexture: null);
+                        }else{
+                            pass.uniformCubeTexture(id,null,null,null,null,null,null);
                         }
                         break;
                 }
