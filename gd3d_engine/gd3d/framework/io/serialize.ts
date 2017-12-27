@@ -939,17 +939,17 @@ namespace gd3d.io
                         case "number":
                         case "string":
                         case "boolean":
-                            if (baseType != serializedObj[key][newkey].type)
+                            if (baseType != serializedObj[key]["value"][newkey].type)
                             {
-                                throw new Error("反序列化失败，类型不匹配：" + baseType + " as " + serializedObj[key].type);
+                                throw new Error("反序列化失败，类型不匹配：" + baseType + " as " + serializedObj[key]["value"][newkey].type);
                             }
                             if (_isArray)
                             {
-                                instanceObj[key].push(serializedObj[key][newkey].value);
+                                instanceObj[key].push(serializedObj[key]["value"][newkey].value);
                             }
                             else
                             {
-                                instanceObj[key][newkey] = serializedObj[key][newkey].value;
+                                instanceObj[key][newkey] = serializedObj[key]["value"][newkey].value;
                             }
                             break;
                         default:

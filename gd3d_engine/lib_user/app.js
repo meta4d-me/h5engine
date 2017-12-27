@@ -3323,6 +3323,7 @@ var test_UI_Component = (function () {
         scroll_t.localTranslate.y = 30;
         var scroll_ = scroll_t.addComponent("scrollRect");
         var ct = new gd3d.framework.transform2D;
+        scroll_t.addChild(ct);
         ct.width = 120;
         ct.height = 120;
         scroll_.content = ct;

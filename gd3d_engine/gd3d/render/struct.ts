@@ -214,7 +214,7 @@ namespace gd3d.math
                 this.rawData = datas;
             }
             else
-                this.rawData = new Float32Array([1, 0, 0, 0, 1, 0]);
+                this.rawData = new Float32Array([1, 0, 0, 1, 0, 0]);
         }
         toString(): string
         {
