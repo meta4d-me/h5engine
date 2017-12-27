@@ -143,13 +143,13 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         PathAsset,
-         /**
-         * @public
-         * @language zh_CN
-         * 路径动画
-         * @version egret-gd3d 1.0
-         */
-        KeyFrameAnimaionAsset,        
+        /**
+        * @public
+        * @language zh_CN
+        * 路径动画
+        * @version egret-gd3d 1.0
+        */
+        KeyFrameAnimaionAsset,
         /**
          * @public
          * @language zh_CN
@@ -180,7 +180,7 @@ namespace gd3d.framework
         Scene = 0x00000040,
         Textasset = 0x00000080,
         Pvr = 0x00000100,
-        f14eff=0x00000200
+        f14eff = 0x00000200
     }
     /**
      * @public
@@ -442,7 +442,7 @@ namespace gd3d.framework
          * @param json 
          * @version egret-gd3d 1.0
          */
-        parse(json: any, totalLength:number = 0)
+        parse(json: any, totalLength: number = 0)
         {
             var files = json["files"];
             for (var i = 0; i < files.length; i++)
@@ -460,14 +460,16 @@ namespace gd3d.framework
                 {
                     this.packages.push(packes[i]);
                 }
-            }else {
+            } else
+            {
                 if (json["totalLength"] != undefined)
                 {
-                    if (totalLength == 0){                       
+                    if (totalLength == 0)
+                    {
                         this.totalLength = json["totalLength"];
-                    }                   
+                    }
                 }
-            }            
+            }
         }
         /**
          * @public
@@ -520,7 +522,7 @@ namespace gd3d.framework
             let pvrs: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let packs: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let f14effs: { url: string, type: AssetTypeEnum, asset: any }[] = [];
-            
+
 
             let asslist: any[] = [];
             let assstatelist: any[] = [];
@@ -529,12 +531,12 @@ namespace gd3d.framework
             asslist.push(packs, glvshaders, glfshaders,
                 shaders, prefabs, meshs,
                 materials, scenes, textures,
-                texturedescs, anclips, textassets, pvrs,f14effs);
+                texturedescs, anclips, textassets, pvrs, f14effs);
 
             assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None,
                 AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh,
                 AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None,
-                AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr,AssetBundleLoadState.f14eff);
+                AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff);
             let realTotal = 0;
             var mapPackes: { [id: string]: number } = {};
 
@@ -611,12 +613,15 @@ namespace gd3d.framework
                             pvrs.push({ url, type, asset: asset });
                             break;
                         case AssetTypeEnum.F14Effect:
-                            asset=new f14eff(fileName);
-                            f14effs.push({url,type,asset:asset});
+                            asset = new f14eff(fileName);
+                            f14effs.push({ url, type, asset: asset });
+                            break;
                     }
                     if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)    
                     {
+                        if (!asset)
+                            continue;
                         this.mapNamed[fileName] = asset.getGUID();
                         assetmgr.regRes(fileName, asset);
                     }
@@ -920,7 +925,7 @@ namespace gd3d.framework
          * 默认sprite资源
          * @version egret-gd3d 1.0
          */
-        mapDefaultSprite:{ [id:string] : sprite} = {};
+        mapDefaultSprite: { [id: string]: sprite } = {};
 
         /**
          * @public
@@ -1007,15 +1012,16 @@ namespace gd3d.framework
         getAssetByName(name: string, bundlename: string = null): IAsset
         {
             let id = null;
-            if (this.mapNamed[name] != null){
+            if (this.mapNamed[name] != null)
+            {
                 //id = this.mapNamed[name][0];
-                id = this.mapNamed[name][this.mapNamed[name].length -1];
+                id = this.mapNamed[name][this.mapNamed[name].length - 1];
             }
             if (bundlename != null)
             {
                 let assetbundle = this.mapBundle[bundlename] as assetBundle;
                 if (assetbundle != null)
-                    id = assetbundle.mapNamed[name];
+                    id = assetbundle.mapNamed[name] || id;
             }
 
             let flag: boolean = true;
@@ -1066,7 +1072,7 @@ namespace gd3d.framework
             {
                 return;
             }
-            if(!this.mapRes[id]) return;
+            if (!this.mapRes[id]) return;
 
             this.mapRes[id].refcount--;
             if (disposeNow && this.mapRes[id].refcount <= 0)
@@ -1123,7 +1129,8 @@ namespace gd3d.framework
                 }
             }
             this.mapRes[id].refcount++;
-            if(this.mapRes[id][this._loadingTag]){
+            if (this.mapRes[id][this._loadingTag])
+            {
                 delete this.mapRes[id][this._loadingTag];
             }
         }
@@ -1157,8 +1164,8 @@ namespace gd3d.framework
             {
                 if (this.mapRes[k].refcount <= 0)
                 {
-                    if(this.mapRes[k][this._loadingTag])continue;
-                    
+                    if (this.mapRes[k][this._loadingTag]) continue;
+
                     let name = this.mapRes[k].asset.getName();
                     if (this.mapNamed[name].length <= 1)
                     {
@@ -1299,9 +1306,9 @@ namespace gd3d.framework
             // this.regAssetFactory(AssetTypeEnum.PackTxt,new AssetFactory_PackTxt());
             this.regAssetFactory(AssetTypeEnum.PathAsset, new AssetFactory_PathAsset());
             this.regAssetFactory(AssetTypeEnum.PVR, new AssetFactory_PVR());
-            this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset,new AssetFactory_KeyframeAnimationPathAsset());
-            this.regAssetFactory(AssetTypeEnum.F14Effect,new AssetFactory_f14eff());
-            
+            this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new AssetFactory_KeyframeAnimationPathAsset());
+            this.regAssetFactory(AssetTypeEnum.F14Effect, new AssetFactory_f14eff());
+
         }
 
 
@@ -1322,7 +1329,7 @@ namespace gd3d.framework
         {
             if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1)
             {
-               // console.log("aaa");
+                // console.log("aaa");
             }
             let assetFactory: IAssetFactory = this.getAssetFactory(type);
             if (assetFactory != null)
@@ -1411,23 +1418,25 @@ namespace gd3d.framework
                     }
                     let json = JSON.parse(txt);
                     let filename = "";
-                    if (json["files"]){
+                    if (json["files"])
+                    {
                         filename = this.getFileName(url);
-                        
+
                         var ab = new assetBundle(url);
                         ab.name = filename;
                         ab.parse(JSON.parse(txt));
                         ab.load(this, onstate, state);
-                    }else{
+                    } else
+                    {
                         let loadurl = url.replace(".assetbundle.json", ".packs.txt");
                         filename = this.getFileName(url);
-    
+
                         var ab = new assetBundle(url);
                         ab.name = filename;
                         ab.totalLength = json["totalLength"];
                         ab.loadCompressBundle(loadurl, onstate, state, this);
                     }
-                  
+
 
                     this.mapBundle[filename] = ab;
                 });
@@ -1454,7 +1463,7 @@ namespace gd3d.framework
                     ab.totalLength = json["totalLength"];
                     ab.loadCompressBundle(loadurl, onstate, state, this);
                 });
-                
+
             }
             else
             {
@@ -1944,7 +1953,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.Font;
                 }
-                else if (extname == ".json" || extname == ".txt"||extname==".effect.json")
+                else if (extname == ".json" || extname == ".txt" || extname == ".effect.json")
                 {
                     return AssetTypeEnum.TextAsset;
                 }
@@ -1960,11 +1969,11 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.PathAsset;
                 }
-                else if (extname==".keyFrameAnimationPath.json")
+                else if (extname == ".keyFrameAnimationPath.json")
                 {
                     return AssetTypeEnum.KeyFrameAnimaionAsset;
                 }
-                else if(extname==".f14effect.json")
+                else if (extname == ".f14effect.json")
                 {
                     return AssetTypeEnum.F14Effect;
                 }

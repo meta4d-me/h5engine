@@ -5080,9 +5080,12 @@ var gd3d;
                             case AssetTypeEnum.F14Effect:
                                 asset = new framework.f14eff(fileName);
                                 f14effs.push({ url: url, type: type, asset: asset });
+                                break;
                         }
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                             && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
+                            if (!asset)
+                                continue;
                             this.mapNamed[fileName] = asset.getGUID();
                             assetmgr.regRes(fileName, asset);
                         }
@@ -5282,7 +5285,7 @@ var gd3d;
                 if (bundlename != null) {
                     var assetbundle = this.mapBundle[bundlename];
                     if (assetbundle != null)
-                        id = assetbundle.mapNamed[name];
+                        id = assetbundle.mapNamed[name] || id;
                 }
                 var flag = true;
                 if (id != null) {
@@ -8595,7 +8598,7 @@ var gd3d;
                     var _uniformType = jsonChild["type"];
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
-                            var _value = jsonChild["value"];
+                            var _value = jsonChild["value"].name.name;
                             var _texture = assetmgr.getAssetByName(_value, bundleName);
                             if (_texture == undefined) {
                                 _texture = assetmgr.getDefaultTexture("grid");
@@ -12710,6 +12713,10 @@ var gd3d;
             };
             meshcollider.prototype.clone = function () {
             };
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], meshcollider.prototype, "_colliderVisible", void 0);
             meshcollider = __decorate([
                 gd3d.reflect.nodeComponent,
                 gd3d.reflect.nodeMeshCollider
@@ -12885,6 +12892,14 @@ var gd3d;
                 gd3d.reflect.Field("vector4"),
                 __metadata("design:type", gd3d.math.vector4)
             ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], meshRenderer.prototype, "layer", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], meshRenderer.prototype, "renderLayer", void 0);
             meshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -16464,6 +16479,14 @@ var gd3d;
                             }
                         }
                     }
+                    if (clonedObj["waitDelArray"]) {
+                        var children = clonedObj[key];
+                        for (var _i = 0, _a = clonedObj["waitDelArray"]; _i < _a.length; _i++) {
+                            var index = _a[_i];
+                            children.splice(index, 1);
+                        }
+                        delete clonedObj["waitDelArray"];
+                    }
                 }
             }
         }
@@ -16509,7 +16532,13 @@ var gd3d;
                         }
                     }
                     else {
-                        fillCloneReference(instanceObj[key], clonedObj[key]);
+                        if (clonedObj[key])
+                            fillCloneReference(instanceObj[key], clonedObj[key]);
+                        else {
+                            if (!clonedParent["waitDelArray"])
+                                clonedParent["waitDelArray"] = [];
+                            clonedParent["waitDelArray"].push(parseInt(key));
+                        }
                     }
                 }
             }
@@ -16517,20 +16546,6 @@ var gd3d;
         io.fillCloneReferenceType = fillCloneReferenceType;
         function _cloneObj(instanceObj, clonedObj) {
             if (clonedObj === void 0) { clonedObj = undefined; }
-            var _flag = gd3d.framework.HideFlags.None;
-            var _type;
-            if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"]) {
-                _type = gd3d.reflect.getClassName(instanceObj);
-            }
-            if (_type == "transform") {
-                _flag = instanceObj["gameObject"].hideFlags;
-            }
-            else if (_type == "transform2D") {
-                _flag = instanceObj.hideFlags;
-            }
-            if ((_flag & gd3d.framework.HideFlags.DontSaveInBuild) || (_flag & gd3d.framework.HideFlags.DontSaveInEditor) || (_flag & gd3d.framework.HideFlags.HideInHierarchy)) {
-                return null;
-            }
             if (clonedObj == undefined) {
                 var insid = -1;
                 clonedObj = gd3d.reflect.createInstance(instanceObj, null);
@@ -16677,6 +16692,9 @@ var gd3d;
                             else {
                                 clonedObj[key] = _clonedObj;
                             }
+                        }
+                        else if (isArray_3) {
+                            clonedObj.push(null);
                         }
                     }
                 }
@@ -17550,11 +17568,15 @@ var gd3d;
         var valueInfo = (function () {
             function valueInfo(value, type, _parse) {
                 if (_parse === void 0) { _parse = "direct"; }
-                this.value = value;
-                this.type = type;
                 if (isAsset(type)) {
                     _parse = "nameonly";
+                    if (type == "material") {
+                        if (value.lastIndexOf(".mat.json") < 0)
+                            value += ".mat.json";
+                    }
                 }
+                this.value = value;
+                this.type = type;
                 this.parse = _parse;
             }
             return valueInfo;
@@ -25072,9 +25094,17 @@ var gd3d;
                 __metadata("design:type", Number)
             ], gameObject.prototype, "layer", void 0);
             __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], gameObject.prototype, "hideFlags", void 0);
+            __decorate([
                 gd3d.reflect.Field("nodeComponent[]"),
                 __metadata("design:type", Array)
             ], gameObject.prototype, "components", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object)
+            ], gameObject.prototype, "_visible", void 0);
             gameObject = __decorate([
                 gd3d.reflect.SerializeType
             ], gameObject);

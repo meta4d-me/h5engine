@@ -1142,12 +1142,17 @@ namespace gd3d.io
         parse: string;
         constructor(value: any, type: string, _parse: string = "direct")
         {
-            this.value = value;
-            this.type = type;
             if (isAsset(type))
             {
                 _parse = "nameonly";
+                if (type == "material")
+                {
+                    if (value.lastIndexOf(".mat.json") < 0)
+                        value += ".mat.json";                    
+                }
             }
+            this.value = value;
+            this.type = type;
             this.parse = _parse;
         }
     }
