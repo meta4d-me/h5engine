@@ -41,13 +41,13 @@ class test_pbr implements IState {
         mr.materials[0] = new gd3d.framework.material("testmat");
         // mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
         // mr.materials[0].setTexture("_MainTex",this.assetMgr.getDefaultTexture("grid"));
-        
+
         //pbr
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json") as gd3d.framework.shader);
         mr.materials[0].setTexture("brdf",this.assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture);
-        //mr.materials[0].setTexture("uv_Basecolor",this.assetMgr.getAssetByName(`basecolor.png`)as gd3d.framework.texture);
-        //mr.materials[0].setTexture("uv_Normal",this.assetMgr.getAssetByName(`normal.png`)as gd3d.framework.texture);
-        //mr.materials[0].setTexture("uv_MetallicRoughness",this.assetMgr.getAssetByName(`metallicRoughness.png`)as gd3d.framework.texture);
+        mr.materials[0].setTexture("uv_Basecolor",this.assetMgr.getAssetByName(`basecolor.png`)as gd3d.framework.texture);
+        mr.materials[0].setTexture("uv_Normal",this.assetMgr.getAssetByName(`normal.png`)as gd3d.framework.texture);
+        mr.materials[0].setTexture("uv_MetallicRoughness",this.assetMgr.getAssetByName(`metallicRoughness.png`)as gd3d.framework.texture);
         mr.materials[0].setTexture("uv_AO",this.assetMgr.getAssetByName(`AO.png`)as gd3d.framework.texture);
 
         //sky
@@ -64,11 +64,27 @@ class test_pbr implements IState {
         (skytex.glTexture as gd3d.render.glTextureCube).uploadImages(negx,negy,negz,posx,posy,posz);
         mr.materials[0].setCubeTexture("u_sky",skytex);
 
+
+        //cube sky
+        let cubesky = new gd3d.framework.transform();
+        cubesky.localScale.x=cubesky.localScale.y=cubesky.localScale.z= 200;
+        this.scene.addChild(cubesky);
+        let mf_c= cubesky.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+        mf_c.mesh = this.assetMgr.getDefaultMesh("cube");
+        let mr_c = cubesky.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        mr_c.materials[0] = new gd3d.framework.material("cubeskymat");
+        mr_c.materials[0].setShader(this.assetMgr.getAssetByName("skybox.shader.json") as gd3d.framework.shader);
+        // let pass = mr_c.materials[0].getShader().passes["base"][0];
+        // pass.state_showface = gd3d.render.ShowFaceStateEnum.CW;
+        mr_c.materials[0].setCubeTexture("u_sky",skytex);
+        //mr_c.materials[0].setTexture("_MainTex",this.assetMgr.getDefaultTexture("grid"));
+
+
         state.finish = true;
     }
 
     private PBRPath:string = "res/pbrRes/";
-    private material:string = this.PBRPath + "barrel1/";
+    private material:string = this.PBRPath + "meta3/";
     private skyName = "map";
     private iblPath:string = this.PBRPath + `IBL/${this.skyName}/`;
     private loadpbrRes(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate){

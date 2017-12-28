@@ -669,6 +669,18 @@
           "length":0
           },
       {
+          "name":"resources/project/skybox.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/skybox.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/skybox.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/streamlight.fs.glsl",
           "length":0
           },
