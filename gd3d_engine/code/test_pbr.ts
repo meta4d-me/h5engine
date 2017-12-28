@@ -21,6 +21,7 @@ class test_pbr implements IState {
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
         this.camera.far = 1000;
+        this.camera.backgroundColor = new gd3d.math.color(0,0,0,0);
         CameraController.instance().init(this.app, this.camera);
 
         //任务排队执行系统

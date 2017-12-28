@@ -1602,6 +1602,7 @@ var test_pbr = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 1000;
+        this.camera.backgroundColor = new gd3d.math.color(0, 0, 0, 0);
         CameraController.instance().init(this.app, this.camera);
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.loadpbrRes.bind(this));
