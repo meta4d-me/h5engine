@@ -5304,10 +5304,9 @@ declare namespace gd3d.render {
         private mirroredV;
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         private getExt(name);
+        img: HTMLImageElement;
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
-        cubeTextureMode: boolean;
-        TransferToCubeTextureMode(TEXTURE_CUBE_MAP_: number): void;
         webgl: WebGLRenderingContext;
         loaded: boolean;
         texture: WebGLTexture;

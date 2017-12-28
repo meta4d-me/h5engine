@@ -20,7 +20,8 @@ class test_pbr implements IState {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
-        this.camera.far = 10;
+        this.camera.far = 1000;
+        CameraController.instance().init(this.app, this.camera);
 
         //任务排队执行系统
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
@@ -34,7 +35,7 @@ class test_pbr implements IState {
         let temp1 = new gd3d.framework.transform();
         this.scene.addChild(temp1);
         let mf= temp1.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-        mf.mesh = this.assetMgr.getDefaultMesh("sphere");
+        mf.mesh = this.assetMgr.getDefaultMesh("sphere_quality");
         let mr = temp1.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
         mr.materials[0] = new gd3d.framework.material("testmat");
         // mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
@@ -43,6 +44,10 @@ class test_pbr implements IState {
         //pbr
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json") as gd3d.framework.shader);
         mr.materials[0].setTexture("brdf",this.assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture);
+        mr.materials[0].setTexture("uv_Basecolor",this.assetMgr.getAssetByName(`basecolor.png`)as gd3d.framework.texture);
+        //mr.materials[0].setTexture("uv_Normal",this.assetMgr.getAssetByName(`normal.png`)as gd3d.framework.texture);
+        mr.materials[0].setTexture("uv_MetallicRoughness",this.assetMgr.getAssetByName(`metallicRoughness.png`)as gd3d.framework.texture);
+        mr.materials[0].setTexture("uv_AO",this.assetMgr.getAssetByName(`AO.png`)as gd3d.framework.texture);
 
         //sky
         let negx = this.assetMgr.getAssetByName(`negx.jpg`)as gd3d.framework.texture;
@@ -151,6 +156,7 @@ class test_pbr implements IState {
     update(delta: number) {
         this.taskmgr.move(delta); //推进task
 
+        CameraController.instance().update(delta);
     }
 
 }

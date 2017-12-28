@@ -9,6 +9,7 @@ namespace gd3d.framework
             assetmgr.mapDefaultMesh["quad_particle"] = defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
             assetmgr.mapDefaultMesh["plane"] = defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
             assetmgr.mapDefaultMesh["sphere"] = defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["sphere_quality"] = defMesh.createDefaultMesh("sphere_quality", gd3d.render.meshData.genSphereCCW(2.58,40,40), assetmgr.webgl);
             assetmgr.mapDefaultMesh["pyramid"] = defMesh.createDefaultMesh("pyramid", gd3d.render.meshData.genPyramid(2,0.5), assetmgr.webgl);
             assetmgr.mapDefaultMesh["cylinder"] = defMesh.createDefaultMesh("cylinder", gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
             assetmgr.mapDefaultMesh["circleline"] = defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);

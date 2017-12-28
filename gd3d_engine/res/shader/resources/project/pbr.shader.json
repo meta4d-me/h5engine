@@ -3,7 +3,7 @@
     "passes": {
         "base": [
             {
-                "showface": "all",
+                "showface": "ccw",
                 "vs": "pbr",
                 "fs": "pbr"
             }

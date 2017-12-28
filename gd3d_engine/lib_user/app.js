@@ -1601,7 +1601,8 @@ var test_pbr = (function () {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
-        this.camera.far = 10;
+        this.camera.far = 1000;
+        CameraController.instance().init(this.app, this.camera);
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.loadpbrRes.bind(this));
         this.taskmgr.addTaskCall(this.init.bind(this));
@@ -1610,11 +1611,14 @@ var test_pbr = (function () {
         var temp1 = new gd3d.framework.transform();
         this.scene.addChild(temp1);
         var mf = temp1.gameObject.addComponent("meshFilter");
-        mf.mesh = this.assetMgr.getDefaultMesh("sphere");
+        mf.mesh = this.assetMgr.getDefaultMesh("sphere_quality");
         var mr = temp1.gameObject.addComponent("meshRenderer");
         mr.materials[0] = new gd3d.framework.material("testmat");
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json"));
         mr.materials[0].setTexture("brdf", this.assetMgr.getAssetByName("brdf.png"));
+        mr.materials[0].setTexture("uv_Basecolor", this.assetMgr.getAssetByName("basecolor.png"));
+        mr.materials[0].setTexture("uv_MetallicRoughness", this.assetMgr.getAssetByName("metallicRoughness.png"));
+        mr.materials[0].setTexture("uv_AO", this.assetMgr.getAssetByName("AO.png"));
         var negx = this.assetMgr.getAssetByName("negx.jpg");
         var negy = this.assetMgr.getAssetByName("negy.jpg");
         var negz = this.assetMgr.getAssetByName("negz.jpg");
@@ -1710,6 +1714,7 @@ var test_pbr = (function () {
     };
     test_pbr.prototype.update = function (delta) {
         this.taskmgr.move(delta);
+        CameraController.instance().update(delta);
     };
     return test_pbr;
 }());

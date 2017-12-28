@@ -431,7 +431,6 @@
                     {
                         let tex = u.value != null ? (u.value as ITexture).texture : null;
                         webgl.activeTexture(webglkit.GetTextureNumber(webgl, texindex));
-                        webgl.bindTexture(webgl.TEXTURE_2D, tex);
                         webgl.bindTexture(u.type == UniformTypeEnum.Texture? webgl.TEXTURE_2D: webgl.TEXTURE_CUBE_MAP, tex);
                         webgl.uniform1i(u.location, texindex);
                     }

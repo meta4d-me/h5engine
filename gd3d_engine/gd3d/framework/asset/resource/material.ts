@@ -171,6 +171,7 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Float4x4v:
                         total += value.byteLength;
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
                         if (value != null)
                         {
@@ -208,6 +209,7 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Float4x4v:
                         total += value.byteLength;
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
                         if (value != null)
                         {
@@ -545,13 +547,13 @@ namespace gd3d.framework
                     }
                 }
             }
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Texture)
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.CubeTexture)
             {
                 this.mapUniformTemp[_id].value = _texture;
             }
             else
             {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
+                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.CubeTexture, _texture);
             }
         }
         /**
@@ -785,13 +787,17 @@ namespace gd3d.framework
                 switch (_uniformType)
                 {
                     case render.UniformTypeEnum.Texture:
+                    case render.UniformTypeEnum.CubeTexture:
                         var _value: string = jsonChild["value"];
                         var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
                         if (_texture == undefined)
                         {
                             _texture = assetmgr.getDefaultTexture("grid");
                         }
-                        this.setTexture(i, _texture, _value);
+                        if(_uniformType == render.UniformTypeEnum.Texture)
+                            this.setTexture(i, _texture, _value);
+                        else
+                            this.setCubeTexture(i, _texture);
                         break;
                     case render.UniformTypeEnum.Float:
                         var _value: string = jsonChild["value"];
@@ -840,6 +846,9 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Texture:
                         mat.setTexture(i, data.value);
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        mat.setCubeTexture(i, data.value);
+                        break;    
                     case render.UniformTypeEnum.Float:
                         mat.setFloat(i, data.value);
                         break;

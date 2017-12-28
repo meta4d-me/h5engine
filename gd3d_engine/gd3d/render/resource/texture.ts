@@ -215,8 +215,10 @@
             }
             return null;
         }
+        img:HTMLImageElement;
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void
         {
+            this.img = img;
             this.width = img.width;
             this.height = img.height;
             this.mipmap = mipmap;
@@ -305,8 +307,6 @@
             }
             //this.img = null;
 
-
-            this.cubeTextureMode = false;
         }
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void
         {
@@ -398,49 +398,6 @@
                 this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
                 this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
             }
-
-            this.cubeTextureMode = false;
-        }
-
-        cubeTextureMode = false;
-        TransferToCubeTextureMode(TEXTURE_CUBE_MAP_:number){
-            let wrc = WebGLRenderingContext;
-            const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
-            let CubeTypeOk = false;
-            for(var i=0;i<typeArr.length ;i++){
-                if(typeArr.indexOf(TEXTURE_CUBE_MAP_) >= 0 ){
-                    CubeTypeOk = true;
-                    break;
-                }
-            }
-            if(!CubeTypeOk){
-                console.warn(`TEXTURE_CUBE_MAP_ is unlegal`);
-                return;
-            }
-
-            this.getReader();
-            if(this.reader.data){
-                console.warn(`getReader() fail`);
-                return ;
-            }
-            let formatGL = this.webgl.RGBA;
-            if (this.format == TextureFormatEnum.RGB)
-                formatGL = this.webgl.RGB;
-            else if (this.format == TextureFormatEnum.Gray)
-                formatGL = this.webgl.LUMINANCE;
-
-            this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
-            this.webgl.texImage2D(TEXTURE_CUBE_MAP_,
-                0,
-                formatGL,
-                this.width,
-                this.height,
-                0,
-                formatGL,
-                //最后这个type，可以管格式
-                this.webgl.UNSIGNED_BYTE
-                , this.reader.data);
-                this.cubeTextureMode = true;
         }
 
         webgl: WebGLRenderingContext;
@@ -608,7 +565,7 @@
     export class glTextureCube implements ITexture
     {
         public ext: any;
-        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGB, mipmap: boolean = false, linear: boolean = true)
+        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true)
         {
             this.webgl = webgl;
             this.format = format;
@@ -632,6 +589,7 @@
                         console.warn(`getReader() fail : ${textures[i].getName()}`);
                         return ;
                     }
+                    //this.upload((textures[i].glTexture as glTexture2D).img,reader.width,reader.height,typeArr[i]);
                     this.upload(reader.data,reader.width,reader.height,typeArr[i]);
                 }
         }
@@ -641,6 +599,8 @@
             this.width = width;
             this.height = height;
             this.loaded = true;
+            this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
+            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
 
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
             var formatGL = this.webgl.RGBA;
@@ -668,6 +628,87 @@
                     this.webgl.UNSIGNED_BYTE
                     , data);
             }
+            let gl = this.webgl;
+
+            
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+            let mipmap = true;
+            let linear = true;
+            let repeat = true;
+            let premultiply = true;
+            let mirroredU = false;
+            let mirroredV = false;
+            
+
+            // this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
+            // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+            // if (mipmap)
+            // {
+            //     //生成mipmap
+            //     this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
+
+            //     if (linear)
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR_MIPMAP_LINEAR);
+            //     }
+            //     else
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST_MIPMAP_NEAREST);
+
+            //     }
+            // }
+            // else
+            // {
+            //     if (linear)
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
+            //     }
+            //     else
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
+
+            //     }
+            // }
+            // //this.img = null;
+            
+            // if (repeat)
+            // {
+            //     if (mirroredU && mirroredV)
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+            //     }
+            //     else if (mirroredU)
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+            //     }
+            //     else if (mirroredV)
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+            //     }
+            //     else
+            //     {
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+            //     }
+            // }
+            // else
+            // {
+            //     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
+            //     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
+            // }
+
+
         }
 
         webgl: WebGLRenderingContext;
