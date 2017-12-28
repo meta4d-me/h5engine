@@ -2,7 +2,7 @@
 
 namespace gd3d.io
 {
-    
+
     /**
      * @public
      * @language zh_CN
@@ -90,8 +90,8 @@ namespace gd3d.io
                 for (var newkey in instanceObj[key])
                 {
                     let field = instanceObj[key][newkey];
-                   
-                    if (field&&field["__gdmeta__"])
+
+                    if (field && field["__gdmeta__"])
                     {
                         let _meta = field["__gdmeta__"];
                         if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && field.type == 3)
@@ -103,6 +103,14 @@ namespace gd3d.io
                             fillCloneReferenceType(instanceObj[key], clonedObj[key], newkey, instanceObj, clonedObj, key);
                         }
                     }
+                }
+                if (clonedObj["waitDelArray"])
+                {
+                    let children = clonedObj[key] as Array<any>;
+                    //清除 被过滤的 null 元素
+                    for (let index of clonedObj["waitDelArray"])
+                        children.splice(index, 1);
+                    delete clonedObj["waitDelArray"];
                 }
             }
         }
@@ -121,7 +129,7 @@ namespace gd3d.io
             let type: string = _meta["class"]["typename"];
             if (isAsset(type))
             {
-                
+
             }
             else
             {
@@ -166,7 +174,14 @@ namespace gd3d.io
                 }
                 else
                 {
-                    fillCloneReference(instanceObj[key], clonedObj[key]);
+                    if (clonedObj[key])
+                        fillCloneReference(instanceObj[key], clonedObj[key]);
+                    else
+                    {
+                        if (!clonedParent["waitDelArray"])
+                            clonedParent["waitDelArray"] = [];
+                        clonedParent["waitDelArray"].push(parseInt(key));
+                    }
                 }
 
             }
@@ -180,24 +195,24 @@ namespace gd3d.io
     export function _cloneObj(instanceObj: any, clonedObj: any = undefined): any
     {
         //过滤掉不需要序列化的对象
-        let _flag: gd3d.framework.HideFlags = gd3d.framework.HideFlags.None;
-        let _type: string;
-        if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"])
-        {
-            _type = reflect.getClassName(instanceObj);
-        }
-        if (_type == "transform")
-        {
-            _flag = instanceObj["gameObject"].hideFlags;
-        }
-        else if (_type == "transform2D")
-        {
-            _flag = instanceObj.hideFlags;
-        }
-        if ((_flag & gd3d.framework.HideFlags.DontSaveInBuild) || (_flag & gd3d.framework.HideFlags.DontSaveInEditor) || (_flag & gd3d.framework.HideFlags.HideInHierarchy))
-        {
-            return null;
-        }
+        // let _flag: gd3d.framework.HideFlags = gd3d.framework.HideFlags.None;
+        // let _type: string;
+        // if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"])
+        // {
+        //     _type = reflect.getClassName(instanceObj);
+        // }
+        // if (_type == "transform")
+        // {
+        //     _flag = instanceObj["gameObject"].hideFlags;
+        // }
+        // else if (_type == "transform2D")
+        // {
+        //     _flag = instanceObj.hideFlags;
+        // }
+        // if ((_flag & gd3d.framework.HideFlags.DontSaveInBuild) || (_flag & gd3d.framework.HideFlags.DontSaveInEditor) || (_flag & gd3d.framework.HideFlags.HideInHierarchy))
+        // {
+        //     return null;
+        // }
 
         if (clonedObj == undefined)
         {
@@ -269,8 +284,8 @@ namespace gd3d.io
                 for (var newkey in instanceObj[key])
                 {
                     let field = instanceObj[key][newkey];
-                   
-                    if (field&&field["__gdmeta__"])
+
+                    if (field && field["__gdmeta__"])
                     {
                         let _meta = field["__gdmeta__"];
                         if (_meta["class"] && _meta["class"]["typename"] == "UniformData" && field.type == 3)
@@ -326,8 +341,9 @@ namespace gd3d.io
             if (isAsset(type))
             {
                 let _defaultAsset: boolean = instanceObj[key].defaultAsset;
-                if(instanceObj[key].use){
-                    instanceObj[key].use();  
+                if (instanceObj[key].use)
+                {
+                    instanceObj[key].use();
                 }
 
                 if (isArray)
@@ -372,7 +388,7 @@ namespace gd3d.io
                     {
                         _clonedObj = _cloneObj(instanceObj[key], clonedObj[key]);
                     }
-
+                  
                     if (_clonedObj != null)
                     {
                         if (isArray)
@@ -402,6 +418,9 @@ namespace gd3d.io
                         {
                             clonedObj[key] = _clonedObj;
                         }
+                    }else if(isArray)
+                    {
+                        clonedObj.push(null);
                     }
                 }
 

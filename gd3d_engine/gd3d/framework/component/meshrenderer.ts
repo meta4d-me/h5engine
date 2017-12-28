@@ -58,6 +58,7 @@ namespace gd3d.framework
          * 场景渲染层级（common、transparent、overlay）
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         layer: RenderLayerEnum = RenderLayerEnum.Common;
         /**
          * @public
@@ -66,6 +67,7 @@ namespace gd3d.framework
          * 渲染mask层级（和相机相对应）
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         renderLayer: gd3d.framework.CullingMask = CullingMask.default;
         private issetq = false;
          /**

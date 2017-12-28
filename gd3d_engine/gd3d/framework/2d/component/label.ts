@@ -439,8 +439,10 @@ namespace gd3d.framework
         _uimat: material;
         private get uimat(){
             if (this.font  && this.font.texture ){
-                let matName = this.font.texture.getName()+"_fontmask";
+                let rectPostfix = this.transform.parentIsMask? `_(${this.transform.insId})`: ""; //when parentIsMask,can't multiplexing material
+                let matName = this.font.texture.getName()+"_fontmask" + rectPostfix;
                 let canvas = this.transform.canvas;
+                if(!canvas.assetmgr) return;
                 let mat = this._uimat;
                 if(!mat || mat.getName() != matName){
                     if(mat) mat.unuse(); 
@@ -452,11 +454,7 @@ namespace gd3d.framework
                     mat.setShader(canvas.assetmgr.getShader("shader/defmaskfont"));
                     mat.use();
                 }
-                if(this.transform.parentIsMask){
-                    mat.setFloat("MaskState",1);
-                }else{
-                    mat.setFloat("MaskState",0);
-                }
+                mat.setFloat("MaskState", this.transform.parentIsMask? 1 : 0);
                 this._uimat = mat;
             }
             return this._uimat;
@@ -490,6 +488,7 @@ namespace gd3d.framework
                 }
 
                 let mat = this.uimat;
+                if(!mat) return;
 
                 var img;
                 if (this._font != null)

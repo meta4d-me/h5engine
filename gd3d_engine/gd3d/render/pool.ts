@@ -490,8 +490,8 @@ namespace gd3d.math
                 v.rawData[0] = 1;
                 v.rawData[1] = 0;
                 v.rawData[2] = 0;
-                v.rawData[3] = 0;
-                v.rawData[4] = 1;
+                v.rawData[3] = 1;
+                v.rawData[4] = 0;
                 v.rawData[5] = 0;
                 pool.unused_matrix3x2.push(v);
             } else

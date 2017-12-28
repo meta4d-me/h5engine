@@ -135,6 +135,7 @@ var gd3d;
                 this.outcontainer = div;
                 var rotateDiv = document.createElement("div");
                 rotateDiv.className = "full";
+                rotateDiv.style.overflow = "hidden";
                 rotateDiv.style.position = "absolute";
                 rotateDiv.style.width = "100%";
                 rotateDiv.style.height = "100%";
@@ -1761,7 +1762,7 @@ var gd3d;
                     this.rawData = datas;
                 }
                 else
-                    this.rawData = new Float32Array([1, 0, 0, 0, 1, 0]);
+                    this.rawData = new Float32Array([1, 0, 0, 1, 0, 0]);
             }
             matrix3x2.prototype.toString = function () {
                 return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "],"
@@ -2498,6 +2499,20 @@ var gd3d;
                 gd3d.reflect.Field("C2DComponent[]"),
                 __metadata("design:type", Array)
             ], transform2D.prototype, "components", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], transform2D.prototype, "layoutState", null);
+            __decorate([
+                gd3d.reflect.Field("numberdic"),
+                __metadata("design:type", Object)
+            ], transform2D.prototype, "layoutValueMap", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], transform2D.prototype, "layoutPercentState", null);
             transform2D = __decorate([
                 gd3d.reflect.SerializeType
             ], transform2D);
@@ -2802,8 +2817,11 @@ var gd3d;
             Object.defineProperty(image2D.prototype, "uimat", {
                 get: function () {
                     if (this._sprite && this._sprite.texture) {
-                        var matName = this._sprite.texture.getName() + "_uimask";
+                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
+                        var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
                         var canvas_1 = this.transform.canvas;
+                        if (!canvas_1.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -2817,12 +2835,7 @@ var gd3d;
                             mat.setShader(canvas_1.assetmgr.getShader("shader/defmaskui"));
                             mat.use();
                         }
-                        if (this.transform.parentIsMask) {
-                            mat.setFloat("MaskState", 1);
-                        }
-                        else {
-                            mat.setFloat("MaskState", 0);
-                        }
+                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -2920,6 +2933,8 @@ var gd3d;
                     }
                 }
                 var mat = this.uimat;
+                if (!mat)
+                    return;
                 var img = null;
                 if (this._sprite != null && this._sprite.texture != null) {
                     img = this._sprite.texture;
@@ -4302,8 +4317,11 @@ var gd3d;
             Object.defineProperty(label.prototype, "uimat", {
                 get: function () {
                     if (this.font && this.font.texture) {
-                        var matName = this.font.texture.getName() + "_fontmask";
+                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
+                        var matName = this.font.texture.getName() + "_fontmask" + rectPostfix;
                         var canvas_2 = this.transform.canvas;
+                        if (!canvas_2.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -4317,12 +4335,7 @@ var gd3d;
                             mat.setShader(canvas_2.assetmgr.getShader("shader/defmaskfont"));
                             mat.use();
                         }
-                        if (this.transform.parentIsMask) {
-                            mat.setFloat("MaskState", 1);
-                        }
-                        else {
-                            mat.setFloat("MaskState", 0);
-                        }
+                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -4347,6 +4360,8 @@ var gd3d;
                         this.dirtyData = false;
                     }
                     var mat = this.uimat;
+                    if (!mat)
+                        return;
                     var img;
                     if (this._font != null) {
                         img = this._font.texture;
@@ -4502,8 +4517,11 @@ var gd3d;
             Object.defineProperty(rawImage2D.prototype, "uimat", {
                 get: function () {
                     if (this.image != null) {
-                        var matName = this._image.getName() + "_uimask";
+                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
+                        var matName = this._image.getName() + "_uimask" + rectPostfix;
                         var canvas_3 = this.transform.canvas;
+                        if (!canvas_3.assetmgr)
+                            return;
                         var mat = this._uimat;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
@@ -4517,12 +4535,7 @@ var gd3d;
                             mat.setShader(canvas_3.assetmgr.getShader("shader/defmaskui"));
                             mat.use();
                         }
-                        if (this.transform.parentIsMask) {
-                            mat.setFloat("MaskState", 1);
-                        }
-                        else {
-                            mat.setFloat("MaskState", 0);
-                        }
+                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -4533,6 +4546,8 @@ var gd3d;
             rawImage2D.prototype.render = function (canvas) {
                 var img = this.image;
                 var mat = this.uimat;
+                if (!mat)
+                    return;
                 if (img != null) {
                     if (this.needRefreshImg) {
                         mat.setTexture("_MainTex", img);
@@ -4637,8 +4652,6 @@ var gd3d;
                 },
                 set: function (content) {
                     this._content = content;
-                    if (content != null)
-                        this.transform.addChild(content);
                 },
                 enumerable: true,
                 configurable: true
@@ -4720,7 +4733,7 @@ var gd3d;
                 this.transform = null;
             };
             __decorate([
-                gd3d.reflect.Field("transform2D"),
+                gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.transform2D),
                 __metadata("design:paramtypes", [framework.transform2D])
             ], scrollRect.prototype, "content", null);
@@ -4996,9 +5009,11 @@ var gd3d;
                 var pvrs = [];
                 var packs = [];
                 var f14effs = [];
+                var fonts = [];
+                var atlass = [];
                 var asslist = [];
                 var assstatelist = [];
-                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs, f14effs);
+                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs, f14effs, fonts, atlass);
                 assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff);
                 var realTotal = 0;
                 var mapPackes = {};
@@ -5068,9 +5083,20 @@ var gd3d;
                             case AssetTypeEnum.F14Effect:
                                 asset = new framework.f14eff(fileName);
                                 f14effs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case AssetTypeEnum.Font:
+                                asset = new framework.font(fileName);
+                                fonts.push({ url: url, type: type, asset: asset });
+                                break;
+                            case AssetTypeEnum.Atlas:
+                                asset = new framework.atlas(fileName);
+                                atlass.push({ url: url, type: type, asset: asset });
+                                break;
                         }
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                             && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
+                            if (!asset)
+                                continue;
                             this.mapNamed[fileName] = asset.getGUID();
                             assetmgr.regRes(fileName, asset);
                         }
@@ -5270,7 +5296,7 @@ var gd3d;
                 if (bundlename != null) {
                     var assetbundle = this.mapBundle[bundlename];
                     if (assetbundle != null)
-                        id = assetbundle.mapNamed[name];
+                        id = assetbundle.mapNamed[name] || id;
                 }
                 var flag = true;
                 if (id != null) {
@@ -8583,7 +8609,7 @@ var gd3d;
                     var _uniformType = jsonChild["type"];
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
-                            var _value = jsonChild["value"];
+                            var _value = jsonChild["value"].name.name;
                             var _texture = assetmgr.getAssetByName(_value, bundleName);
                             if (_texture == undefined) {
                                 _texture = assetmgr.getDefaultTexture("grid");
@@ -11372,6 +11398,67 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var canvascontainer = (function () {
+            function canvascontainer() {
+                this.isCanvasinit = false;
+                this._renderMode = canvasRenderMode.ScreenSpaceOverlay;
+            }
+            Object.defineProperty(canvascontainer.prototype, "canvas", {
+                get: function () {
+                    return this._canvas;
+                },
+                set: function (canv) {
+                    this._canvas = canv;
+                    this.canvasInit();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            canvascontainer.prototype.canvasInit = function () {
+                if (!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene)
+                    return;
+                this._canvas.scene = this.gameObject.transform.scene;
+                this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
+                this.isCanvasinit = true;
+            };
+            canvascontainer.prototype.start = function () {
+            };
+            canvascontainer.prototype.update = function (delta) {
+                if (!this.isCanvasinit)
+                    this.canvasInit();
+            };
+            canvascontainer.prototype.remove = function () {
+            };
+            canvascontainer.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("reference"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.canvas])
+            ], canvascontainer.prototype, "canvas", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], canvascontainer.prototype, "_renderMode", void 0);
+            canvascontainer = __decorate([
+                gd3d.reflect.nodeComponent,
+                __metadata("design:paramtypes", [])
+            ], canvascontainer);
+            return canvascontainer;
+        }());
+        framework.canvascontainer = canvascontainer;
+        var canvasRenderMode;
+        (function (canvasRenderMode) {
+            canvasRenderMode[canvasRenderMode["ScreenSpaceOverlay"] = 0] = "ScreenSpaceOverlay";
+            canvasRenderMode[canvasRenderMode["ScreenSpaceCamera"] = 1] = "ScreenSpaceCamera";
+            canvasRenderMode[canvasRenderMode["WorldSpace"] = 2] = "WorldSpace";
+        })(canvasRenderMode = framework.canvasRenderMode || (framework.canvasRenderMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var effectSystem = (function () {
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
@@ -12637,6 +12724,10 @@ var gd3d;
             };
             meshcollider.prototype.clone = function () {
             };
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], meshcollider.prototype, "_colliderVisible", void 0);
             meshcollider = __decorate([
                 gd3d.reflect.nodeComponent,
                 gd3d.reflect.nodeMeshCollider
@@ -12812,6 +12903,14 @@ var gd3d;
                 gd3d.reflect.Field("vector4"),
                 __metadata("design:type", gd3d.math.vector4)
             ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], meshRenderer.prototype, "layer", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], meshRenderer.prototype, "renderLayer", void 0);
             meshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -16391,6 +16490,14 @@ var gd3d;
                             }
                         }
                     }
+                    if (clonedObj["waitDelArray"]) {
+                        var children = clonedObj[key];
+                        for (var _i = 0, _a = clonedObj["waitDelArray"]; _i < _a.length; _i++) {
+                            var index = _a[_i];
+                            children.splice(index, 1);
+                        }
+                        delete clonedObj["waitDelArray"];
+                    }
                 }
             }
         }
@@ -16436,7 +16543,13 @@ var gd3d;
                         }
                     }
                     else {
-                        fillCloneReference(instanceObj[key], clonedObj[key]);
+                        if (clonedObj[key])
+                            fillCloneReference(instanceObj[key], clonedObj[key]);
+                        else {
+                            if (!clonedParent["waitDelArray"])
+                                clonedParent["waitDelArray"] = [];
+                            clonedParent["waitDelArray"].push(parseInt(key));
+                        }
                     }
                 }
             }
@@ -16444,20 +16557,6 @@ var gd3d;
         io.fillCloneReferenceType = fillCloneReferenceType;
         function _cloneObj(instanceObj, clonedObj) {
             if (clonedObj === void 0) { clonedObj = undefined; }
-            var _flag = gd3d.framework.HideFlags.None;
-            var _type;
-            if (instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"]) {
-                _type = gd3d.reflect.getClassName(instanceObj);
-            }
-            if (_type == "transform") {
-                _flag = instanceObj["gameObject"].hideFlags;
-            }
-            else if (_type == "transform2D") {
-                _flag = instanceObj.hideFlags;
-            }
-            if ((_flag & gd3d.framework.HideFlags.DontSaveInBuild) || (_flag & gd3d.framework.HideFlags.DontSaveInEditor) || (_flag & gd3d.framework.HideFlags.HideInHierarchy)) {
-                return null;
-            }
             if (clonedObj == undefined) {
                 var insid = -1;
                 clonedObj = gd3d.reflect.createInstance(instanceObj, null);
@@ -16604,6 +16703,9 @@ var gd3d;
                             else {
                                 clonedObj[key] = _clonedObj;
                             }
+                        }
+                        else if (isArray_3) {
+                            clonedObj.push(null);
                         }
                     }
                 }
@@ -17337,14 +17439,14 @@ var gd3d;
                             case "number":
                             case "string":
                             case "boolean":
-                                if (baseType != serializedObj[key][newkey].type) {
-                                    throw new Error("反序列化失败，类型不匹配：" + baseType + " as " + serializedObj[key].type);
+                                if (baseType != serializedObj[key]["value"][newkey].type) {
+                                    throw new Error("反序列化失败，类型不匹配：" + baseType + " as " + serializedObj[key]["value"][newkey].type);
                                 }
                                 if (_isArray) {
-                                    instanceObj[key].push(serializedObj[key][newkey].value);
+                                    instanceObj[key].push(serializedObj[key]["value"][newkey].value);
                                 }
                                 else {
-                                    instanceObj[key][newkey] = serializedObj[key][newkey].value;
+                                    instanceObj[key][newkey] = serializedObj[key]["value"][newkey].value;
                                 }
                                 break;
                             default:
@@ -17477,11 +17579,15 @@ var gd3d;
         var valueInfo = (function () {
             function valueInfo(value, type, _parse) {
                 if (_parse === void 0) { _parse = "direct"; }
-                this.value = value;
-                this.type = type;
                 if (isAsset(type)) {
                     _parse = "nameonly";
+                    if (type == "material") {
+                        if (value.lastIndexOf(".mat.json") < 0)
+                            value += ".mat.json";
+                    }
                 }
+                this.value = value;
+                this.type = type;
                 this.parse = _parse;
             }
             return valueInfo;
@@ -18117,8 +18223,8 @@ var gd3d;
             var r1 = Math.acos(sx);
             var sxs = src.rawData[1] / scale.x;
             var r2 = Math.asin(sxs);
-            if (r2 < 0) {
-                r1 = r1 + Math.PI;
+            if (sxs < 0) {
+                r1 = 2 * Math.PI - r1;
             }
             rotation.v = r1;
             return true;
@@ -19901,11 +20007,15 @@ var gd3d;
                     if (s.isfinish) {
                         var data = app.getAssetMgr().getAssetByName(navMeshUrl.substring(navMeshUrl.lastIndexOf("/") + 1));
                         _this.navmeshLoaded(data.content, function () {
-                            onstate(s);
+                            if (onstate) {
+                                onstate(s);
+                            }
                         });
                     }
                     else if (s.iserror) {
-                        onstate(s);
+                        if (onstate) {
+                            onstate(s);
+                        }
                     }
                 });
             };
@@ -24999,9 +25109,17 @@ var gd3d;
                 __metadata("design:type", Number)
             ], gameObject.prototype, "layer", void 0);
             __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], gameObject.prototype, "hideFlags", void 0);
+            __decorate([
                 gd3d.reflect.Field("nodeComponent[]"),
                 __metadata("design:type", Array)
             ], gameObject.prototype, "components", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object)
+            ], gameObject.prototype, "_visible", void 0);
             gameObject = __decorate([
                 gd3d.reflect.SerializeType
             ], gameObject);
@@ -27650,8 +27768,8 @@ var gd3d;
                     v.rawData[0] = 1;
                     v.rawData[1] = 0;
                     v.rawData[2] = 0;
-                    v.rawData[3] = 0;
-                    v.rawData[4] = 1;
+                    v.rawData[3] = 1;
+                    v.rawData[4] = 0;
                     v.rawData[5] = 0;
                     pool.unused_matrix3x2.push(v);
                 }

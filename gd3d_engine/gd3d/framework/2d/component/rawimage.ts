@@ -71,8 +71,10 @@ namespace gd3d.framework
         _uimat: material;
         private get uimat(){
             if (this.image != null ){
-                let matName =this._image.getName() + "_uimask";
+                let rectPostfix = this.transform.parentIsMask? `_(${this.transform.insId})`: ""; //when parentIsMask,can't multiplexing material
+                let matName =this._image.getName() + "_uimask" + rectPostfix;
                 let canvas = this.transform.canvas;
+                if(!canvas.assetmgr) return;
                 let mat = this._uimat;
                 if(!mat || mat.getName() != matName){
                     if(mat) mat.unuse(); 
@@ -84,11 +86,7 @@ namespace gd3d.framework
                     mat.setShader(canvas.assetmgr.getShader("shader/defmaskui"));
                     mat.use();
                 }
-                if(this.transform.parentIsMask){
-                    mat.setFloat("MaskState",1);
-                }else{
-                    mat.setFloat("MaskState",0);
-                }
+                mat.setFloat("MaskState", this.transform.parentIsMask? 1 : 0);
                 this._uimat = mat;
             }
             return this._uimat;
@@ -101,7 +99,7 @@ namespace gd3d.framework
         {
             let img = this.image;
             let mat = this.uimat;
-
+            if(!mat) return;
             // if (img == null)
             // {
             //     var scene = this.transform.canvas.scene;
