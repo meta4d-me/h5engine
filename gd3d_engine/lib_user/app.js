@@ -1617,8 +1617,6 @@ var test_pbr = (function () {
         mr.materials[0] = new gd3d.framework.material("testmat");
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json"));
         mr.materials[0].setTexture("brdf", this.assetMgr.getAssetByName("brdf.png"));
-        mr.materials[0].setTexture("uv_Basecolor", this.assetMgr.getAssetByName("basecolor.png"));
-        mr.materials[0].setTexture("uv_MetallicRoughness", this.assetMgr.getAssetByName("metallicRoughness.png"));
         mr.materials[0].setTexture("uv_AO", this.assetMgr.getAssetByName("AO.png"));
         var negx = this.assetMgr.getAssetByName("negx.jpg");
         var negy = this.assetMgr.getAssetByName("negy.jpg");
