@@ -17,6 +17,14 @@ uniform sampler2D   uv_Basecolor;
 uniform sampler2D   uv_MetallicRoughness;
 uniform sampler2D   uv_AO;
 
+// Customize value
+uniform vec4        CustomBasecolor;
+uniform vec4        CustomMetallic;
+uniform float       CustomRoughness;
+uniform vec4        CustomAO;
+
+#define TEX_FORMAT_METALLIC     rgb
+#define TEX_FORMAT_ROUGHNESS    a
 
 varying vec3        v_normal;
 varying vec3        v_pos;
@@ -60,11 +68,11 @@ mat3 cotangent_frame(vec3 N, vec3 p, vec2 uv){
 
 void main () {
     // PBR Material
-    vec4 PBRBasecolor   = texture2D(uv_Basecolor, xlv_TEXCOORD0);
+    vec4 PBRBasecolor   = texture2D(uv_Basecolor, xlv_TEXCOORD0) + CustomBasecolor;
     vec4 PBRNormal      = texture2D(uv_Normal, xlv_TEXCOORD0);
-    vec3 PBRMetallic    = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).rgb;
-    float PBRRoughness  = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).a;
-    vec4 PBRAO          = texture2D(uv_AO, xlv_TEXCOORD0);
+    vec3 PBRMetallic    = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_METALLIC + CustomMetallic.xyz;
+    float PBRRoughness  = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS + CustomRoughness;
+    vec4 PBRAO          = texture2D(uv_AO, xlv_TEXCOORD0) + CustomAO;
 
     vec3 n = normalize(v_normal);
     vec3 v = normalize(glstate_eyepos.xyz - v_pos);
