@@ -10,7 +10,6 @@ precision mediump float;
 uniform samplerCube u_sky;      // IBL
 uniform sampler2D   brdf;       // BRDF LUT
 uniform vec4        glstate_eyepos;
-uniform highp mat4  glstate_matrix_world2object;
 
 // PBR 材质贴图
 uniform sampler2D   uv_Normal;
@@ -22,7 +21,6 @@ uniform sampler2D   uv_AO;
 varying vec3        v_normal;
 varying vec3        v_pos;
 varying vec2        xlv_TEXCOORD0;
-varying mat4        v_w2o;
 
 vec3 Fresnel(vec3 f0, float LoN, float roughness) {
     return f0 + (max(vec3(1.0 - roughness), f0) - f0) * pow(1.0 - LoN, 5.0);
@@ -79,7 +77,7 @@ void main () {
     vec3 f0 = vec3(0.04);
     f0 = mix(f0, PBRBasecolor.xyz, PBRMetallic);
 
-    vec3 envLight   = textureCube(u_sky, (glstate_matrix_world2object * vec4(reflect(-v,n), 1.0)).xyz).rgb;
+    vec3 envLight   = textureCube(u_sky, reflect(-v,n)).rgb;
     vec2 envBRDF    = texture2D(brdf, vec2(NdotV, PBRRoughness)).rg;
 
     vec3 F = Fresnel(f0, NdotV, PBRRoughness);

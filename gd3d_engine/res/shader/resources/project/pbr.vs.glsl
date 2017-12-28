@@ -9,10 +9,8 @@ uniform highp mat4      glstate_matrix_world2object;
 varying highp vec3      v_normal;
 varying highp vec3      v_pos;
 varying highp vec2      xlv_TEXCOORD0;
-varying highp mat4      v_w2o;
 
 void main () {
-    v_w2o           = glstate_matrix_world2object;
     v_pos           = (glstate_matrix_model * vec4(_glesVertex, 1.0)).xyz;
     v_normal        = normalize((glstate_matrix_world2object * vec4(_glesNormal, 0.0)).xyz);
     xlv_TEXCOORD0   = _glesMultiTexCoord0;
