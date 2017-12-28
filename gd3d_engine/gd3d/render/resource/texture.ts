@@ -215,10 +215,8 @@
             }
             return null;
         }
-        img:HTMLImageElement;
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void
         {
-            this.img = img;
             this.width = img.width;
             this.height = img.height;
             this.mipmap = mipmap;
@@ -564,12 +562,12 @@
 
     export class glTextureCube implements ITexture
     {
-        public ext: any;
         constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true)
         {
             this.webgl = webgl;
             this.format = format;
             this.mipmap = mipmap;
+            this.linear = linear;
 
             this.texture = webgl.createTexture();
         }
@@ -589,7 +587,6 @@
                         console.warn(`getReader() fail : ${textures[i].getName()}`);
                         return ;
                     }
-                    //this.upload((textures[i].glTexture as glTexture2D).img,reader.width,reader.height,typeArr[i]);
                     this.upload(reader.data,reader.width,reader.height,typeArr[i]);
                 }
         }
@@ -599,14 +596,15 @@
             this.width = width;
             this.height = height;
             this.loaded = true;
-            this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
-
+            let gl = this.webgl;
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
+            
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
-                formatGL = this.webgl.RGB;
+            formatGL = this.webgl.RGB;
             else if (this.format == TextureFormatEnum.Gray)
-                formatGL = this.webgl.LUMINANCE;
+            formatGL = this.webgl.LUMINANCE;
             if(data instanceof HTMLImageElement){
                 this.webgl.texImage2D(TEXTURE_CUBE_MAP_,
                     0,
@@ -615,68 +613,63 @@
                     //最后这个type，可以管格式
                     this.webgl.UNSIGNED_BYTE
                     , data);
-            }else{
-                this.webgl.texImage2D(TEXTURE_CUBE_MAP_,
-                    0,
-                    formatGL,
-                    width,
-                    height,
-                    0,
-                    formatGL,
-                    //最后这个type，可以管格式
-                    this.webgl.UNSIGNED_BYTE
-                    , data);
-            }
-            let gl = this.webgl;
-
-            
+                }else{
+                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_,
+                        0,
+                        formatGL,
+                        width,
+                        height,
+                        0,
+                        formatGL,
+                        //最后这个type，可以管格式
+                        this.webgl.UNSIGNED_BYTE
+                        , data);
+                    }
+                    
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-            let mipmap = true;
-            let linear = true;
-            let repeat = true;
-            let premultiply = true;
-            let mirroredU = false;
-            let mirroredV = false;
-            
+            let mipmap = this.mipmap;
+            let linear = this.linear;
+            // let repeat = true;
+            // let premultiply = true;
+            // let mirroredU = false;
+            // let mirroredV = false;
 
-            // this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-            // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-            // if (mipmap)
-            // {
-            //     //生成mipmap
-            //     this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
+            if (mipmap)
+            {
+                //生成mipmap
+                this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
 
-            //     if (linear)
-            //     {
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR_MIPMAP_LINEAR);
-            //     }
-            //     else
-            //     {
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST_MIPMAP_NEAREST);
+                if (linear)
+                {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR_MIPMAP_LINEAR);
+                }
+                else
+                {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST_MIPMAP_NEAREST);
 
-            //     }
-            // }
-            // else
-            // {
-            //     if (linear)
-            //     {
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
-            //     }
-            //     else
-            //     {
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
-            //         this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
+                }
+            }
+            else
+            {
+                if (linear)
+                {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
+                }
+                else
+                {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
 
-            //     }
-            // }
-            // //this.img = null;
+                }
+            }
+            //this.img = null;
             
             // if (repeat)
             // {
@@ -718,6 +711,7 @@
         width: number = 0;
         height: number = 0;
         mipmap: boolean = false;
+        linear: boolean = false;
         caclByteLength(): number
         {
             let pixellen = 1;

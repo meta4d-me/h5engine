@@ -5304,7 +5304,6 @@ declare namespace gd3d.render {
         private mirroredV;
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         private getExt(name);
-        img: HTMLImageElement;
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         webgl: WebGLRenderingContext;
@@ -5324,7 +5323,6 @@ declare namespace gd3d.render {
         static staticTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
     }
     class glTextureCube implements ITexture {
-        ext: any;
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture): void;
         private upload(data, width, height, TEXTURE_CUBE_MAP_);
@@ -5335,6 +5333,7 @@ declare namespace gd3d.render {
         width: number;
         height: number;
         mipmap: boolean;
+        linear: boolean;
         caclByteLength(): number;
         dispose(webgl: WebGLRenderingContext): void;
         isFrameBuffer(): boolean;
