@@ -35,7 +35,7 @@ namespace gd3d.framework
     
         public enableTexAnimation:boolean;
         public uvType:UVTypeEnum;
-        public tex_ST:math.vector4;
+        public tex_ST:math.vector4=new math.vector4();
     
     
         public rotationByEuler = new math.quaternion();
@@ -85,6 +85,7 @@ namespace gd3d.framework
             this.startAlpha = data.startAlpha.getValue(true);
             this.colorRate = data.colorRate;
             this.starTex_ST = data.start_tex_st;
+            //math.vec4Clone(data.start_tex_st,this.starTex_ST);
     
             this.movespeed = data.moveSpeed.getValue(true);
             this.sizeNodes = data.sizeNodes;
@@ -105,7 +106,7 @@ namespace gd3d.framework
             gd3d.math.vec3Clone(this.startScale,this.localScale);
             gd3d.math.vec3Clone(this.startColor,this.color);
             this.alpha = this.startAlpha;
-            this.tex_ST = this.starTex_ST;
+            //this.tex_ST = this.starTex_ST;
             gd3d.math.vec4Clone(this.starTex_ST,this.tex_ST);
         }
     
@@ -367,17 +368,21 @@ namespace gd3d.framework
             }
             else
             {
+                // let index = Math.floor(this.life01 * data.count);
+    
+                // let width = 1 / data.column;//width
+                // let height = 1 / data.row;//height
+                // let offsetx = width * (index % data.column);//offsetx
+                // let offsety = height * Math.floor(index / data.column);//offsety
+    
+                // this.tex_ST.x = width;
+                // this.tex_ST.y = height;
+                // this.tex_ST.z = offsetx;
+                // this.tex_ST.w = offsety;
+
                 let index = Math.floor(this.life01 * data.count);
-    
-                let width = 1 / data.column;//width
-                let height = 1 / data.row;//height
-                let offsetx = width * (index % data.column);//offsetx
-                let offsety = height * Math.floor(index / data.column);//offsety
-    
-                this.tex_ST.x = width;
-                this.tex_ST.y = height;
-                this.tex_ST.z = offsetx;
-                this.tex_ST.w = offsety;
+                gd3d.math.spriteAnimation(data.row,data.column,index,this.tex_ST);
+
             }
         }
     }
