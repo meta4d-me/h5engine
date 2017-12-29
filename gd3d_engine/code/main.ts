@@ -75,18 +75,19 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("example_newObject",()=>new test_NewGameObject);
         this.addBtn("example_changeMesh",()=>new test_ChangeMesh());
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
-        this.addBtn("example_Sound",()=>new test_Sound());      
+        this.addBtn("example_Sound",()=>new test_Sound());
         this.addBtn("demo_ScreenSplit",()=>new demo_ScreenSplit());
         //----------------------------------------------文档案例
 
         this.addBtn("test_liloadscene", () => new test_LiLoadScene());
         this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
-        this.addBtn("test_四分屏", () => new test_pick_4p());       
+        this.addBtn("test_四分屏", () => new test_pick_4p());
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
         this.addBtn("test_PBR 展示", () => new test_pbr());
-        
+        this.addBtn("test_PBR 场景", () => new test_pbr_scene());
+
 
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
@@ -96,7 +97,7 @@ class main implements gd3d.framework.IUserCode
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }
-    
+
     private x: number = 0;
     private y: number = 100;
     private btns: HTMLButtonElement[] = [];
