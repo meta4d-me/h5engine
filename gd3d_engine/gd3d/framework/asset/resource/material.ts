@@ -327,7 +327,7 @@ namespace gd3d.framework
         {
             return this.shader.layer;
         }
-        private queue:number=0;
+        private queue: number = 0;
         /**
          * @public
          * @language zh_CN
@@ -337,11 +337,11 @@ namespace gd3d.framework
          */
         getQueue()
         {
-            return this.shader.queue+this.queue;
+            return this.shader.queue + this.queue;
         }
-        setQueue(queue:number)
+        setQueue(queue: number)
         {
-            this.queue=queue;
+            this.queue = queue;
         }
         /**
          * @public
@@ -366,7 +366,7 @@ namespace gd3d.framework
         } = {};//参数
         private mapUniformTemp: {
             [id: string]: UniformData
-        }={};
+        } = {};
         /**
          * @private
          */
@@ -429,7 +429,7 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
             }
         }
-        
+
 
         /**
          * @private
@@ -670,7 +670,7 @@ namespace gd3d.framework
                             break;
                         case "glstate_fog_color":
                             this.setVector4(key, context.fog._Color);
-                            break; 
+                            break;
                     }
                 }
                 this.uploadUniform(pass);
@@ -715,16 +715,16 @@ namespace gd3d.framework
         Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
         {
             var shaderName = json["shader"];
-            var shader=assetmgr.getShader(shaderName) as gd3d.framework.shader;
-            if(shader==null)
+            var shader = assetmgr.getShader(shaderName) as gd3d.framework.shader;
+            if (shader == null)
             {
-                console.error("shader 为空！shadername："+shaderName+" bundleName: "+bundleName);
+                console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
             }
             this.setShader(shader);
-            var queue=json["queue"];
-            if(queue)
+            var queue = json["queue"];
+            if (queue)
             {
-                this.queue=queue;
+                this.queue = queue;
             }
 
             var mapUniform = json["mapUniform"];
@@ -734,18 +734,22 @@ namespace gd3d.framework
                 var _uniformType: render.UniformTypeEnum = jsonChild["type"] as render.UniformTypeEnum;
                 switch (_uniformType)
                 {
-                    case render.UniformTypeEnum.Texture:
-                        var _value: string = jsonChild["value"].name.name;
+                    case render.UniformTypeEnum.Texture: {
+                        let _value: any = jsonChild["value"];
+                        if (_value instanceof Object && jsonChild["value"].name)
+                            _value = jsonChild["value"].name.name;
                         var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
                         if (_texture == undefined)
                         {
                             _texture = assetmgr.getDefaultTexture("grid");
                         }
                         this.setTexture(i, _texture, _value);
+                    }
                         break;
-                    case render.UniformTypeEnum.Float:
-                        var _value: string = jsonChild["value"];
+                    case render.UniformTypeEnum.Float: {
+                        let _value: string = jsonChild["value"];
                         this.setFloat(i, parseFloat(_value));
+                    }
                         break;
                     case render.UniformTypeEnum.Float4:
                         var tempValue = jsonChild["value"];
