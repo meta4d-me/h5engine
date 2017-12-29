@@ -53,6 +53,11 @@ class test_pbr_scene implements IState {
 
         //pbr
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json") as gd3d.framework.shader);
+        let brdfimg = this.assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture;
+        let temp2d = (brdfimg.glTexture as gd3d.render.glTexture2D);
+        temp2d.getReader();
+        temp2d.uploadByteArray(true,false,temp2d.width,temp2d.height,temp2d.reader.data,true);
+
         mr.materials[0].setTexture("brdf",this.assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture);
         // User customize
         mr.materials[0].setVector4("CustomBasecolor", albedo);

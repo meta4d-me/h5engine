@@ -1620,6 +1620,10 @@ var test_pbr_scene = (function () {
         var mr = temp1.gameObject.addComponent("meshRenderer");
         mr.materials[0] = new gd3d.framework.material("testmat");
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json"));
+        var brdfimg = this.assetMgr.getAssetByName("brdf.png");
+        var temp2d = brdfimg.glTexture;
+        temp2d.getReader();
+        temp2d.uploadByteArray(true, false, temp2d.width, temp2d.height, temp2d.reader.data, true);
         mr.materials[0].setTexture("brdf", this.assetMgr.getAssetByName("brdf.png"));
         mr.materials[0].setVector4("CustomBasecolor", albedo);
         mr.materials[0].setFloat("CustomMetallic", metallic);

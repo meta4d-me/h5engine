@@ -85,7 +85,7 @@ void main () {
     f0 = mix(f0, PBRBasecolor.xyz, PBRMetallic);
 
     vec3 envLight   = textureCube(u_sky, reflect(-v,n)).rgb;
-    vec2 envBRDF    = texture2D(brdf, vec2(NdotV, PBRRoughness)).rg;
+    vec2 envBRDF    = texture2D(brdf, vec2(clamp(NdotV, 0.0, 0.9999999), clamp(1.0-PBRRoughness, 0.0, 0.9999999))).rg;
 
     vec3 F = Fresnel(f0, NdotV, PBRRoughness);
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g);
