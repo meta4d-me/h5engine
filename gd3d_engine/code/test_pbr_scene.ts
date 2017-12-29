@@ -30,10 +30,19 @@ class test_pbr_scene implements IState {
         this.taskmgr.addTaskCall(this.init.bind(this));
     }
 
-
-
-    private init(astState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+    private addSphere(
+        x: number,
+        y: number,
+        z: number,
+        IBL: gd3d.framework.texture,
+        albedo: gd3d.math.vector4,
+        metallic: number,
+        roughness: number
+    ) {
         let temp1 = new gd3d.framework.transform();
+        temp1.localTranslate.x = x;
+        temp1.localTranslate.y = y;
+        temp1.localTranslate.z = z;
         this.scene.addChild(temp1);
         let mf= temp1.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
         mf.mesh = this.assetMgr.getDefaultMesh("sphere_quality");
@@ -45,10 +54,19 @@ class test_pbr_scene implements IState {
         //pbr
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json") as gd3d.framework.shader);
         mr.materials[0].setTexture("brdf",this.assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture);
-        mr.materials[0].setTexture("uv_Basecolor",this.assetMgr.getAssetByName(`basecolor.png`)as gd3d.framework.texture);
-        mr.materials[0].setTexture("uv_Normal",this.assetMgr.getAssetByName(`normal.png`)as gd3d.framework.texture);
-        mr.materials[0].setTexture("uv_MetallicRoughness",this.assetMgr.getAssetByName(`metallicRoughness.png`)as gd3d.framework.texture);
-        mr.materials[0].setTexture("uv_AO",this.assetMgr.getAssetByName(`AO.png`)as gd3d.framework.texture);
+        // User customize
+        mr.materials[0].setVector4("CustomBasecolor", albedo);
+        mr.materials[0].setFloat("CustomMetallic", metallic);
+        mr.materials[0].setFloat("CustomRoughness", roughness);
+        // External texture
+        // mr.materials[0].setTexture("uv_Basecolor",this.assetMgr.getAssetByName(`basecolor.png`)as gd3d.framework.texture);
+        // mr.materials[0].setTexture("uv_Normal",this.assetMgr.getAssetByName(`normal.png`)as gd3d.framework.texture);
+        // mr.materials[0].setTexture("uv_MetallicRoughness",this.assetMgr.getAssetByName(`metallicRoughness.png`)as gd3d.framework.texture);
+        // mr.materials[0].setTexture("uv_AO",this.assetMgr.getAssetByName(`AO.png`)as gd3d.framework.texture);
+        mr.materials[0].setCubeTexture("u_sky",IBL);
+    }
+
+    private init(astState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
 
         //sky
         let negx = this.assetMgr.getAssetByName(`negx.jpg`)as gd3d.framework.texture;
@@ -62,7 +80,12 @@ class test_pbr_scene implements IState {
         skytex.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
         skytex.use();
         (skytex.glTexture as gd3d.render.glTextureCube).uploadImages(negx,negy,negz,posx,posy,posz);
-        mr.materials[0].setCubeTexture("u_sky",skytex);
+        for(let m = 1; m > 0; m-=0.2) {
+            for(let r = 1; r > 0; r-=0.2) {
+                this.addSphere(m*30, 0, r*30, skytex, new gd3d.math.vector4(1.0, 1.0, 1.0, 1.0), m, r);
+            }
+        }
+
 
 
         //cube sky
@@ -142,32 +165,6 @@ class test_pbr_scene implements IState {
                 });
             }
         });
-    }
-    private addCube() {
-        var cube = new gd3d.framework.transform();
-        cube.name = "cube";
-        cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
-        this.scene.addChild(cube);
-        var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
-        cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-        cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
-        this.cube = cube;
-        cube.markDirty();
-
-        var cube = new gd3d.framework.transform();
-        cube.name = "cube";
-        cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
-        cube.localTranslate.x = 1;
-        cube.localTranslate.z = 1;
-
-        this.scene.addChild(cube);
-        var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
-        cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-        cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
-        this.cube = cube;
-        cube.markDirty();
     }
 
     update(delta: number) {

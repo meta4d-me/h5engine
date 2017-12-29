@@ -6645,6 +6645,10 @@ var gd3d;
                 t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "gray");
                 t.defaultAsset = true;
                 assetmgr.mapDefaultTexture["gray"] = t;
+                var t = new framework.texture("normal");
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "normal");
+                t.defaultAsset = true;
+                assetmgr.mapDefaultTexture["normal"] = t;
                 var t = new framework.texture("grid");
                 t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "grid");
                 t.defaultAsset = true;
@@ -30128,6 +30132,12 @@ var gd3d;
                     data[0] = 0;
                     data[1] = 0;
                     data[2] = 0;
+                    data[3] = 255;
+                }
+                else if (name == "normal") {
+                    data[0] = 128;
+                    data[1] = 128;
+                    data[2] = 255;
                     data[3] = 255;
                 }
                 else if (name == "grid") {

@@ -1609,8 +1609,11 @@ var test_pbr_scene = (function () {
         this.taskmgr.addTaskCall(this.loadpbrRes.bind(this));
         this.taskmgr.addTaskCall(this.init.bind(this));
     };
-    test_pbr_scene.prototype.init = function (astState, state) {
+    test_pbr_scene.prototype.addSphere = function (x, y, z, IBL, albedo, metallic, roughness) {
         var temp1 = new gd3d.framework.transform();
+        temp1.localTranslate.x = x;
+        temp1.localTranslate.y = y;
+        temp1.localTranslate.z = z;
         this.scene.addChild(temp1);
         var mf = temp1.gameObject.addComponent("meshFilter");
         mf.mesh = this.assetMgr.getDefaultMesh("sphere_quality");
@@ -1618,10 +1621,12 @@ var test_pbr_scene = (function () {
         mr.materials[0] = new gd3d.framework.material("testmat");
         mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json"));
         mr.materials[0].setTexture("brdf", this.assetMgr.getAssetByName("brdf.png"));
-        mr.materials[0].setTexture("uv_Basecolor", this.assetMgr.getAssetByName("basecolor.png"));
-        mr.materials[0].setTexture("uv_Normal", this.assetMgr.getAssetByName("normal.png"));
-        mr.materials[0].setTexture("uv_MetallicRoughness", this.assetMgr.getAssetByName("metallicRoughness.png"));
-        mr.materials[0].setTexture("uv_AO", this.assetMgr.getAssetByName("AO.png"));
+        mr.materials[0].setVector4("CustomBasecolor", albedo);
+        mr.materials[0].setFloat("CustomMetallic", metallic);
+        mr.materials[0].setFloat("CustomRoughness", roughness);
+        mr.materials[0].setCubeTexture("u_sky", IBL);
+    };
+    test_pbr_scene.prototype.init = function (astState, state) {
         var negx = this.assetMgr.getAssetByName("negx.jpg");
         var negy = this.assetMgr.getAssetByName("negy.jpg");
         var negz = this.assetMgr.getAssetByName("negz.jpg");
@@ -1632,7 +1637,11 @@ var test_pbr_scene = (function () {
         skytex.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
         skytex.use();
         skytex.glTexture.uploadImages(negx, negy, negz, posx, posy, posz);
-        mr.materials[0].setCubeTexture("u_sky", skytex);
+        for (var m = 1; m > 0; m -= 0.2) {
+            for (var r = 1; r > 0; r -= 0.2) {
+                this.addSphere(m * 30, 0, r * 30, skytex, new gd3d.math.vector4(1.0, 1.0, 1.0, 1.0), m, r);
+            }
+        }
         var cubesky = new gd3d.framework.transform();
         cubesky.localScale.x = cubesky.localScale.y = cubesky.localScale.z = 200;
         this.scene.addChild(cubesky);
@@ -1699,30 +1708,6 @@ var test_pbr_scene = (function () {
                 });
             }
         });
-    };
-    test_pbr_scene.prototype.addCube = function () {
-        var cube = new gd3d.framework.transform();
-        cube.name = "cube";
-        cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
-        this.scene.addChild(cube);
-        var mesh = cube.gameObject.addComponent("meshFilter");
-        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
-        cube.gameObject.addComponent("meshRenderer");
-        cube.gameObject.addComponent("boxcollider");
-        this.cube = cube;
-        cube.markDirty();
-        var cube = new gd3d.framework.transform();
-        cube.name = "cube";
-        cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
-        cube.localTranslate.x = 1;
-        cube.localTranslate.z = 1;
-        this.scene.addChild(cube);
-        var mesh = cube.gameObject.addComponent("meshFilter");
-        mesh.mesh = (this.app.getAssetMgr()).getDefaultMesh("cube");
-        cube.gameObject.addComponent("meshRenderer");
-        cube.gameObject.addComponent("boxcollider");
-        this.cube = cube;
-        cube.markDirty();
     };
     test_pbr_scene.prototype.update = function (delta) {
         this.taskmgr.move(delta);
