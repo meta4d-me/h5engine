@@ -330,12 +330,20 @@ namespace gd3d.framework
          */
         play(animName: string, speed: number = 1.0, beRevert: boolean = false)
         {
+            if (animName.indexOf(this.getPlayName()) >= 0){
+                return;
+            }
             if (this.clipnames[animName] == null)
-            {
+            {                
                 console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                 return;
             }
             this.playByIndex(this.clipnames[animName], speed, beRevert);
+        }
+        
+        getPlayName(){
+            if (this.isPlay())
+            return this._playClip.getName();
         }
         /**
          * @public
@@ -350,6 +358,9 @@ namespace gd3d.framework
          */
         playCross(animName: string, crosstimer: number, speed: number = 1.0, beRevert: boolean = false)
         {
+            if (animName.indexOf(this.getPlayName()) >= 0){
+                return;
+            }
             if (this.clipnames[animName] == null)
             {
                 console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");

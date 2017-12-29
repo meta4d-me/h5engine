@@ -735,7 +735,7 @@ namespace gd3d.framework
                 switch (_uniformType)
                 {
                     case render.UniformTypeEnum.Texture:
-                        var _value: string = jsonChild["value"];
+                        var _value: string = jsonChild["value"].name.name;
                         var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
                         if (_texture == undefined)
                         {

@@ -172,7 +172,7 @@ namespace gd3d.framework
         private RealCameraNumber: number = 0;
         //这个函数后面还有别的过程，应该留给camera
         private _renderCamera(camindex: number)
-        {
+        {        
             //增加当前编辑器状态，管控场编相机
             //一个camera 不是一次单纯的绘制，camera 还有多个绘制遍
             var cam = this.renderCameras[camindex];
@@ -198,7 +198,7 @@ namespace gd3d.framework
             }
             else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
             {
-                context.updateCamera(this.app, cam);           
+                context.updateCamera(this.app, cam);
                 context.updateLights(this.renderLights);
                 cam.fillRenderer(this);
                 cam.renderScene(this, context);
@@ -230,7 +230,6 @@ namespace gd3d.framework
                     }
                 }
             }
-
         }
 
         private updateScene(node: transform, delta)

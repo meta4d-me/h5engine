@@ -50,6 +50,7 @@
          /**
          * @private
          */
+        @gd3d.reflect.Field("boolean")
         _colliderVisible: boolean = false;
          /**
          * @public

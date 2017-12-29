@@ -97,6 +97,7 @@ namespace gd3d.framework
         /**
          * @private
          */
+        @gd3d.reflect.Field("number")
         hideFlags: HideFlags = HideFlags.None;
         
         /**
@@ -155,6 +156,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         collider: ICollider;
+        @gd3d.reflect.Field("boolean")
         private _visible = true;
 
         /**

@@ -243,6 +243,7 @@ namespace gd3d.framework
          * 相机视窗
          * @version egret-gd3d 1.0
          */
+        // @gd3d.reflect.Field("rect")
         viewport: gd3d.math.rect = new gd3d.math.rect(0, 0, 1, 1);
         /**
          * @public
