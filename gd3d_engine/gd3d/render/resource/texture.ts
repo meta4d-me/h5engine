@@ -523,6 +523,13 @@
                 data[2] = 0;
                 data[3] = 255;
             }
+            else if (name == "normal")
+            {
+                data[0] = 128;
+                data[1] = 128;
+                data[2] = 255;
+                data[3] = 255;
+            }
             else if (name == "grid")
             {
                 width = 256;
@@ -598,7 +605,7 @@
             this.loaded = true;
             let gl = this.webgl;
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
-            
+
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
@@ -625,7 +632,7 @@
                         this.webgl.UNSIGNED_BYTE
                         , data);
                     }
-                    
+
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -670,7 +677,7 @@
             //     }
             // }
             //this.img = null;
-            
+
             // if (repeat)
             // {
             //     if (mirroredU && mirroredV)
