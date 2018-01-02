@@ -8,6 +8,12 @@ precision mediump float;
 #define PI          3.141592653589
 
 uniform samplerCube u_sky;      // IBL
+uniform samplerCube u_sky_1;    // IBL
+uniform samplerCube u_sky_2;    // IBL
+uniform samplerCube u_sky_3;    // IBL
+uniform samplerCube u_sky_4;    // IBL
+// uniform samplerCube u_sky_5;    // IBL
+
 uniform sampler2D   brdf;       // BRDF LUT
 uniform vec4        glstate_eyepos;
 
@@ -65,12 +71,24 @@ mat3 cotangent_frame(vec3 N, vec3 p, vec2 uv){
     return mat3( T * invmax, B * invmax, N );
 }
 
+vec3 getIBL(float roughness, vec3 r) {
+    float a = roughness * 4.0;
+
+    if ( a < 1.0)   return mix(textureCube(u_sky, r).rgb, textureCube(u_sky_1, r).rgb, a);
+    if ( a < 2.0)   return mix(textureCube(u_sky_1, r).rgb, textureCube(u_sky_2, r).rgb, a - 1.0);
+    if ( a < 3.0)   return mix(textureCube(u_sky_2, r).rgb, textureCube(u_sky_3, r).rgb, a - 2.0);
+    if ( a < 4.0)   return mix(textureCube(u_sky_3, r).rgb, textureCube(u_sky_4, r).rgb, a - 3.0);
+    // if ( a < 5.0)   return mix(textureCube(u_sky_4, r).rgb, textureCube(u_sky_5, r).rgb, a - 4.0);
+
+    return textureCube(u_sky_4,r).xyz;
+}
+
 void main () {
     // PBR Material
     vec4 PBRBasecolor   = texture2D(uv_Basecolor, xlv_TEXCOORD0) * CustomBasecolor;
     vec4 PBRNormal      = texture2D(uv_Normal, xlv_TEXCOORD0);
     vec3 PBRMetallic    = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_METALLIC * CustomMetallic;
-    float PBRRoughness  = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * CustomRoughness;
+    float PBRRoughness  = 1.0 - texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * CustomRoughness;
     vec4 PBRAO          = texture2D(uv_AO, xlv_TEXCOORD0);
 
     vec3 n = normalize(v_normal);
@@ -84,8 +102,9 @@ void main () {
     vec3 f0 = vec3(0.04);
     f0 = mix(f0, PBRBasecolor.xyz, PBRMetallic);
 
-    vec3 envLight   = textureCube(u_sky, reflect(-v,n)).rgb;
-    vec2 envBRDF    = texture2D(brdf, vec2(clamp(NdotV, 0.0, 0.9999999), clamp(1.0-PBRRoughness, 0.0, 0.9999999))).rg;
+    // vec3 envLight   = textureCube(u_sky, reflect(-v,n)).rgb;
+    vec3 envLight   = getIBL(PBRRoughness, reflect(-v,n));
+    vec2 envBRDF    = texture2D(brdf, vec2(clamp(NdotV, 0.0, 0.9999999), clamp(PBRRoughness, 0.0, 0.9999999))).rg;
 
     vec3 F = Fresnel(f0, NdotV, PBRRoughness);
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g);

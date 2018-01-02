@@ -207,13 +207,17 @@ declare class test_pbr_scene implements IState {
     cube: gd3d.framework.transform;
     static temp: gd3d.framework.transform2D;
     start(app: gd3d.framework.application): void;
-    private addSphere(x, y, z, IBL, albedo, metallic, roughness);
+    private addSphere(x, y, z, IBL, IBL_1, IBL_2, IBL_3, IBL_4, IBL_5, albedo, metallic, roughness);
     private init(astState, state);
     private PBRPath;
     private material;
     private skyName;
     private iblPath;
     private loadpbrRes(lastState, state);
+    private loadpbrRes1(lastState, state);
+    private loadpbrRes2(lastState, state);
+    private loadpbrRes3(lastState, state);
+    private loadpbrRes4(lastState, state);
     private loadTexture(lastState, state);
     update(delta: number): void;
 }
@@ -232,6 +236,10 @@ declare class test_pbr implements IState {
     private skyName;
     private iblPath;
     private loadpbrRes(lastState, state);
+    private loadpbrRes1(lastState, state);
+    private loadpbrRes2(lastState, state);
+    private loadpbrRes3(lastState, state);
+    private loadpbrRes4(lastState, state);
     private loadTexture(lastState, state);
     private addCube();
     update(delta: number): void;

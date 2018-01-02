@@ -1607,9 +1607,13 @@ var test_pbr_scene = (function () {
         CameraController.instance().init(this.app, this.camera);
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.loadpbrRes.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes1.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes2.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes3.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes4.bind(this));
         this.taskmgr.addTaskCall(this.init.bind(this));
     };
-    test_pbr_scene.prototype.addSphere = function (x, y, z, IBL, albedo, metallic, roughness) {
+    test_pbr_scene.prototype.addSphere = function (x, y, z, IBL, IBL_1, IBL_2, IBL_3, IBL_4, IBL_5, albedo, metallic, roughness) {
         var temp1 = new gd3d.framework.transform();
         temp1.localTranslate.x = x;
         temp1.localTranslate.y = y;
@@ -1629,6 +1633,10 @@ var test_pbr_scene = (function () {
         mr.materials[0].setFloat("CustomMetallic", metallic);
         mr.materials[0].setFloat("CustomRoughness", roughness);
         mr.materials[0].setCubeTexture("u_sky", IBL);
+        mr.materials[0].setCubeTexture("u_sky_1", IBL_1);
+        mr.materials[0].setCubeTexture("u_sky_2", IBL_2);
+        mr.materials[0].setCubeTexture("u_sky_3", IBL_3);
+        mr.materials[0].setCubeTexture("u_sky_4", IBL_4);
     };
     test_pbr_scene.prototype.init = function (astState, state) {
         var negx = this.assetMgr.getAssetByName("negx.jpg");
@@ -1637,13 +1645,59 @@ var test_pbr_scene = (function () {
         var posx = this.assetMgr.getAssetByName("posx.jpg");
         var posy = this.assetMgr.getAssetByName("posy.jpg");
         var posz = this.assetMgr.getAssetByName("posz.jpg");
+        var negx_1 = this.assetMgr.getAssetByName("negx_1.jpg");
+        var negy_1 = this.assetMgr.getAssetByName("negy_1.jpg");
+        var negz_1 = this.assetMgr.getAssetByName("negz_1.jpg");
+        var posx_1 = this.assetMgr.getAssetByName("posx_1.jpg");
+        var posy_1 = this.assetMgr.getAssetByName("posy_1.jpg");
+        var posz_1 = this.assetMgr.getAssetByName("posz_1.jpg");
+        var negx_2 = this.assetMgr.getAssetByName("negx_2.jpg");
+        var negy_2 = this.assetMgr.getAssetByName("negy_2.jpg");
+        var negz_2 = this.assetMgr.getAssetByName("negz_2.jpg");
+        var posx_2 = this.assetMgr.getAssetByName("posx_2.jpg");
+        var posy_2 = this.assetMgr.getAssetByName("posy_2.jpg");
+        var posz_2 = this.assetMgr.getAssetByName("posz_2.jpg");
+        var negx_3 = this.assetMgr.getAssetByName("negx_3.jpg");
+        var negy_3 = this.assetMgr.getAssetByName("negy_3.jpg");
+        var negz_3 = this.assetMgr.getAssetByName("negz_3.jpg");
+        var posx_3 = this.assetMgr.getAssetByName("posx_3.jpg");
+        var posy_3 = this.assetMgr.getAssetByName("posy_3.jpg");
+        var posz_3 = this.assetMgr.getAssetByName("posz_3.jpg");
+        var negx_4 = this.assetMgr.getAssetByName("negx_4.jpg");
+        var negy_4 = this.assetMgr.getAssetByName("negy_4.jpg");
+        var negz_4 = this.assetMgr.getAssetByName("negz_4.jpg");
+        var posx_4 = this.assetMgr.getAssetByName("posx_4.jpg");
+        var posy_4 = this.assetMgr.getAssetByName("posy_4.jpg");
+        var posz_4 = this.assetMgr.getAssetByName("posz_4.jpg");
+        var negx_5 = this.assetMgr.getAssetByName("negx_5.jpg");
+        var negy_5 = this.assetMgr.getAssetByName("negy_5.jpg");
+        var negz_5 = this.assetMgr.getAssetByName("negz_5.jpg");
+        var posx_5 = this.assetMgr.getAssetByName("posx_5.jpg");
+        var posy_5 = this.assetMgr.getAssetByName("posy_5.jpg");
+        var posz_5 = this.assetMgr.getAssetByName("posz_5.jpg");
         var skytex = new gd3d.framework.texture("skyCubeTex");
         skytex.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
         skytex.use();
         skytex.glTexture.uploadImages(negx, negy, negz, posx, posy, posz);
+        var skytex1 = new gd3d.framework.texture("skyCubeTex");
+        skytex1.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex1.use();
+        skytex1.glTexture.uploadImages(negx_1, negy_1, negz_1, posx_1, posy_1, posz_1);
+        var skytex2 = new gd3d.framework.texture("skyCubeTex");
+        skytex2.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex2.use();
+        skytex2.glTexture.uploadImages(negx_2, negy_2, negz_2, posx_2, posy_2, posz_2);
+        var skytex3 = new gd3d.framework.texture("skyCubeTex");
+        skytex3.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex3.use();
+        skytex3.glTexture.uploadImages(negx_3, negy_3, negz_3, posx_3, posy_3, posz_3);
+        var skytex4 = new gd3d.framework.texture("skyCubeTex");
+        skytex4.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex4.use();
+        skytex4.glTexture.uploadImages(negx_4, negy_4, negz_4, posx_4, posy_4, posz_4);
         for (var m = 1; m > 0; m -= 0.2) {
             for (var r = 1; r > 0; r -= 0.2) {
-                this.addSphere(m * 30, 0, r * 30, skytex, new gd3d.math.vector4(1.0, 1.0, 1.0, 1.0), m, r);
+                this.addSphere(m * 30, 0, r * 30, skytex, skytex1, skytex2, skytex3, skytex4, skytex4, new gd3d.math.vector4(0.8, 0.8, 0.8, 1.0), m, r);
             }
         }
         var cubesky = new gd3d.framework.transform();
@@ -1670,6 +1724,118 @@ var test_pbr_scene = (function () {
                                         _this.assetMgr.load(_this.iblPath + "posy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
                                             if (s4.isfinish) {
                                                 _this.assetMgr.load(_this.iblPath + "posz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr_scene.prototype.loadpbrRes1 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr_scene.prototype.loadpbrRes2 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr_scene.prototype.loadpbrRes3 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr_scene.prototype.loadpbrRes4 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
                                                     if (s5.isfinish) {
                                                         state.finish = true;
                                                     }
@@ -1742,6 +1908,10 @@ var test_pbr = (function () {
         CameraController.instance().init(this.app, this.camera);
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.loadpbrRes.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes1.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes2.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes3.bind(this));
+        this.taskmgr.addTaskCall(this.loadpbrRes4.bind(this));
         this.taskmgr.addTaskCall(this.init.bind(this));
     };
     test_pbr.prototype.init = function (astState, state) {
@@ -1763,11 +1933,55 @@ var test_pbr = (function () {
         var posx = this.assetMgr.getAssetByName("posx.jpg");
         var posy = this.assetMgr.getAssetByName("posy.jpg");
         var posz = this.assetMgr.getAssetByName("posz.jpg");
+        var negx_1 = this.assetMgr.getAssetByName("negx_1.jpg");
+        var negy_1 = this.assetMgr.getAssetByName("negy_1.jpg");
+        var negz_1 = this.assetMgr.getAssetByName("negz_1.jpg");
+        var posx_1 = this.assetMgr.getAssetByName("posx_1.jpg");
+        var posy_1 = this.assetMgr.getAssetByName("posy_1.jpg");
+        var posz_1 = this.assetMgr.getAssetByName("posz_1.jpg");
+        var negx_2 = this.assetMgr.getAssetByName("negx_2.jpg");
+        var negy_2 = this.assetMgr.getAssetByName("negy_2.jpg");
+        var negz_2 = this.assetMgr.getAssetByName("negz_2.jpg");
+        var posx_2 = this.assetMgr.getAssetByName("posx_2.jpg");
+        var posy_2 = this.assetMgr.getAssetByName("posy_2.jpg");
+        var posz_2 = this.assetMgr.getAssetByName("posz_2.jpg");
+        var negx_3 = this.assetMgr.getAssetByName("negx_3.jpg");
+        var negy_3 = this.assetMgr.getAssetByName("negy_3.jpg");
+        var negz_3 = this.assetMgr.getAssetByName("negz_3.jpg");
+        var posx_3 = this.assetMgr.getAssetByName("posx_3.jpg");
+        var posy_3 = this.assetMgr.getAssetByName("posy_3.jpg");
+        var posz_3 = this.assetMgr.getAssetByName("posz_3.jpg");
+        var negx_4 = this.assetMgr.getAssetByName("negx_4.jpg");
+        var negy_4 = this.assetMgr.getAssetByName("negy_4.jpg");
+        var negz_4 = this.assetMgr.getAssetByName("negz_4.jpg");
+        var posx_4 = this.assetMgr.getAssetByName("posx_4.jpg");
+        var posy_4 = this.assetMgr.getAssetByName("posy_4.jpg");
+        var posz_4 = this.assetMgr.getAssetByName("posz_4.jpg");
         var skytex = new gd3d.framework.texture("skyCubeTex");
         skytex.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
         skytex.use();
         skytex.glTexture.uploadImages(negx, negy, negz, posx, posy, posz);
+        var skytex1 = new gd3d.framework.texture("skyCubeTex");
+        skytex1.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex1.use();
+        skytex1.glTexture.uploadImages(negx_1, negy_1, negz_1, posx_1, posy_1, posz_1);
+        var skytex2 = new gd3d.framework.texture("skyCubeTex");
+        skytex2.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex2.use();
+        skytex2.glTexture.uploadImages(negx_2, negy_2, negz_2, posx_2, posy_2, posz_2);
+        var skytex3 = new gd3d.framework.texture("skyCubeTex");
+        skytex3.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex3.use();
+        skytex3.glTexture.uploadImages(negx_3, negy_3, negz_3, posx_3, posy_3, posz_3);
+        var skytex4 = new gd3d.framework.texture("skyCubeTex");
+        skytex4.glTexture = new gd3d.render.glTextureCube(this.app.webgl);
+        skytex4.use();
+        skytex4.glTexture.uploadImages(negx_4, negy_4, negz_4, posx_4, posy_4, posz_4);
         mr.materials[0].setCubeTexture("u_sky", skytex);
+        mr.materials[0].setCubeTexture("u_sky_1", skytex1);
+        mr.materials[0].setCubeTexture("u_sky_2", skytex2);
+        mr.materials[0].setCubeTexture("u_sky_3", skytex3);
+        mr.materials[0].setCubeTexture("u_sky_4", skytex4);
         var cubesky = new gd3d.framework.transform();
         cubesky.localScale.x = cubesky.localScale.y = cubesky.localScale.z = 200;
         this.scene.addChild(cubesky);
@@ -1792,6 +2006,118 @@ var test_pbr = (function () {
                                         _this.assetMgr.load(_this.iblPath + "posy.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
                                             if (s4.isfinish) {
                                                 _this.assetMgr.load(_this.iblPath + "posz.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr.prototype.loadpbrRes1 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_1.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr.prototype.loadpbrRes2 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_2.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr.prototype.loadpbrRes3 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_3.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
+                                                    if (s5.isfinish) {
+                                                        state.finish = true;
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    test_pbr.prototype.loadpbrRes4 = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load(this.iblPath + "negx_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s0) {
+            if (s0.isfinish) {
+                _this.assetMgr.load(_this.iblPath + "negy_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                    if (s1.isfinish) {
+                        _this.assetMgr.load(_this.iblPath + "negz_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                            if (s2.isfinish) {
+                                _this.assetMgr.load(_this.iblPath + "posx_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        _this.assetMgr.load(_this.iblPath + "posy_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s4) {
+                                            if (s4.isfinish) {
+                                                _this.assetMgr.load(_this.iblPath + "posz_4.jpg", gd3d.framework.AssetTypeEnum.Auto, function (s5) {
                                                     if (s5.isfinish) {
                                                         state.finish = true;
                                                     }
