@@ -83,32 +83,55 @@ vec3 getIBL(float roughness, vec3 r) {
     return textureCube(u_sky_4,r).xyz;
 }
 
-void main () {
+struct st_core {
+    vec3    f0;
+    float   Roughness;
+    vec4    Basecolor;
+    vec4    Normal;
+    vec3    Metallic;
+    vec4    AO;
+    vec3    N;
+    vec3    V;
+    vec3    L;
+    vec3    H;
+    vec3    R;
+    float   NdotV;
+    float   NdotL;
+    float   LdotH;
+};
+
+st_core init() {
+    st_core temp;
+
     // PBR Material
-    vec4 PBRBasecolor   = texture2D(uv_Basecolor, xlv_TEXCOORD0) * CustomBasecolor;
-    vec4 PBRNormal      = texture2D(uv_Normal, xlv_TEXCOORD0);
-    vec3 PBRMetallic    = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_METALLIC * CustomMetallic;
-    float PBRRoughness  = 1.0 - texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * CustomRoughness;
-    vec4 PBRAO          = texture2D(uv_AO, xlv_TEXCOORD0);
-
-    vec3 n = normalize(v_normal);
-    vec3 v = normalize(glstate_eyepos.xyz - v_pos);
-    mat3 TBN = cotangent_frame(n, v, xlv_TEXCOORD0);
-    vec3 normalAddation = PBRNormal.rgb * 2.0 - 1.0;
-    n = normalize(TBN * normalAddation);
-
-    float NdotV = abs(dot(n, v));
+    temp.Basecolor  = texture2D(uv_Basecolor, xlv_TEXCOORD0) * CustomBasecolor;
+    temp.Normal     = texture2D(uv_Normal, xlv_TEXCOORD0);
+    temp.Metallic   = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_METALLIC * CustomMetallic;
+    temp.Roughness  = 1.0 - texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * CustomRoughness;
+    temp.AO         = texture2D(uv_AO, xlv_TEXCOORD0);
 
     vec3 f0 = vec3(0.04);
-    f0 = mix(f0, PBRBasecolor.xyz, PBRMetallic);
+    temp.f0 = mix(f0, temp.Basecolor.xyz, temp.Metallic);
 
-    // vec3 envLight   = textureCube(u_sky, reflect(-v,n)).rgb;
-    vec3 envLight   = getIBL(PBRRoughness, reflect(-v,n));
-    vec2 envBRDF    = texture2D(brdf, vec2(clamp(NdotV, 0.0, 0.9999999), clamp(PBRRoughness, 0.0, 0.9999999))).rg;
+    temp.V = normalize(glstate_eyepos.xyz - v_pos);
+    temp.N = normalize(v_normal);
+    mat3 TBN = cotangent_frame(temp.N, temp.V, xlv_TEXCOORD0);
+    vec3 normalAddation = temp.Normal.rgb * 2.0 - 1.0;
+    temp.N = normalize(TBN * normalAddation);
+    temp.NdotV = abs(dot(temp.N, temp.V));
+    temp.R = reflect(-temp.V,temp.N);
 
-    vec3 F = Fresnel(f0, NdotV, PBRRoughness);
+    return temp;
+}
+
+void main () {
+    st_core c = init();
+
+    vec3 envLight   = getIBL(c.Roughness, c.R);
+    vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NdotV, 0.0, 0.9999999), clamp(c.Roughness, 0.0, 0.9999999))).rg;
+
+    vec3 F = Fresnel(c.f0, c.NdotV, c.Roughness);
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g);
-    // vec3 indirectSpecular = envLight * (f0 * envBRDF.r + envBRDF.g);
 
-    gl_FragColor = (vec4((1.0 - F) * (1.0 - PBRMetallic), 1.0) * PBRBasecolor + vec4(indirectSpecular, 1.0)) * PBRAO; // IBL+PBR
+    gl_FragColor = (vec4((1.0 - F) * (1.0 - c.Metallic), 1.0) * c.Basecolor + vec4(indirectSpecular, 1.0)) * c.AO; // IBL+PBR
 }
