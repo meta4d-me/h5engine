@@ -597,14 +597,13 @@ var main = (function () {
         this.app = app;
         this.addBtn("test_ui", function () { return new t.test_ui(); });
         this.addBtn("test_load", function () { return new test_load(); });
-        this.addBtn("test_loadimmediate", function () { return new testloadImmediate(); });
         this.addBtn("test_loadprefab", function () { return new test_loadprefab(); });
         this.addBtn("test_loadScene", function () { return new test_loadScene(); });
         this.addBtn("test_loadMulBundle", function () { return new test_loadMulBundle(); });
         this.addBtn("test_pick", function () { return new test_pick(); });
         this.addBtn("test_anim", function () { return new test_anim(); });
         this.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
-        this.addBtn("test_reload", function () { return new testReload(); });
+        this.addBtn("test_reload(换装)", function () { return new testReload(); });
         this.addBtn("test_uvroll", function () { return new t.test_uvroll(); });
         this.addBtn("test_light1", function () { return new t.test_light1(); });
         this.addBtn("test_light_d1", function () { return new t.light_d1(); });
@@ -621,9 +620,7 @@ var main = (function () {
         this.addBtn("test_metalModel", function () { return new t.test_metal(); });
         this.addBtn("test_tank", function () { return new demo.TankGame(); });
         this.addBtn("test_long", function () { return new demo.DragonTest(); });
-        this.addBtn("test_lookAt", function () { return new t.TestRotate(); });
         this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
-        this.addBtn("test_integratedrender", function () { return new t.test_integratedrender(); });
         this.addBtn("test_blend", function () { return new t.test_blend(); });
         this.addBtn("TestRotate", function () { return new t.TestRotate(); });
         this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
@@ -631,25 +628,18 @@ var main = (function () {
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
         this.addBtn("test_tex_uv", function () { return new test_texuv(); });
-        this.addBtn("test_uimove", function () { return new test_uimove(); });
         this.addBtn("post_景深", function () { return new t.test_posteffect_cc(); });
-        this.addBtn("test_effecteditor", function () { return new test_effecteditor(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
-        this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
         this.addBtn("test_liChange", function () { return new testLiChangeMesh(); });
-        this.addBtn("example_newScene", function () { return new test_NewScene(); });
         this.addBtn("example_newObject", function () { return new test_NewGameObject; });
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
         this.addBtn("example_Sound", function () { return new test_Sound(); });
         this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
-        this.addBtn("test_liloadscene", function () { return new test_LiLoadScene(); });
-        this.addBtn("test_RangeScreen", function () { return new test_RangeScreen(); });
         this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
         this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
-        this.addBtn("tesrtss", function () { return new dome.testCJ(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1224,7 +1214,7 @@ var testLiChangeMesh = (function () {
                         _aniplayer.autoplay = true;
                         _this.cube = role;
                         if (role1 != null) {
-                            _this.createChangeBtn(role, role1, o2d, "feet_01", "feet_002");
+                            _this.createChangeBtn(role, role1, o2d, "feet", "feet");
                         }
                     }
                 });
@@ -1233,7 +1223,7 @@ var testLiChangeMesh = (function () {
                         var _prefab = _this.app.getAssetMgr().getAssetByName("FS_002.prefab.json");
                         role1 = _prefab.getCloneTrans();
                         if (role != null) {
-                            _this.createChangeBtn(role, role1, o2d, "feet_01", "feet_002");
+                            _this.createChangeBtn(role, role1, o2d, "feet", "feet");
                         }
                     }
                 });
@@ -3577,6 +3567,7 @@ var test_uiPerfabLoad = (function () {
         inputh.style.position = "absolute";
         inputh.style.width = 100 + "px";
         inputh.style.height = 30 + "px";
+        inputh.value = "button_comb1";
         var btn = document.createElement("button");
         this.app.container.appendChild(btn);
         btn.textContent = "加载";
@@ -3613,7 +3604,6 @@ var test_uiPerfabLoad = (function () {
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
         this.bgui = bg_t;
         var prefabName = "button";
-        this.doLoad(prefabName);
         var inputMgr = this.app.getInputMgr();
         this.app.webgl.canvas.addEventListener("keydown", function (ev) {
             if (ev.keyCode == 81) {
@@ -3820,6 +3810,7 @@ var test_anim = (function () {
                         var renderer = trans.gameObject.addComponent("meshRenderer");
                         wingroot.addChild(trans);
                         trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
                         renderer.materials = [];
                         renderer.materials.push(new gd3d.framework.material());
                         renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
@@ -3891,6 +3882,8 @@ var test_loadAsiprefab = (function () {
 }());
 var test_assestmgr = (function () {
     function test_assestmgr() {
+        this.assetName = "elong";
+        this.count = 10;
         this.timer = 0;
         this.bere = false;
     }
@@ -3901,21 +3894,22 @@ var test_assestmgr = (function () {
         this.scene = this.app.getScene();
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
+        var assetName = this.assetName;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/baihu/baihu.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/prefabs/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         _this.baihu = [];
-                        _this._prefab = _this.app.getAssetMgr().getAssetByName("baihu.prefab.json");
-                        for (var i = 0; i < 100; i++) {
+                        _this._prefab = _this.app.getAssetMgr().getAssetByName(assetName + ".prefab.json");
+                        for (var i = 0; i < _this.count; i++) {
                             _this.baihu[i] = _this._prefab.getCloneTrans();
                             _this.scene.addChild(_this.baihu[i]);
-                            _this.baihu[i].localScale = new gd3d.math.vector3(10, 10, 10);
-                            _this.baihu[i].localTranslate = new gd3d.math.vector3(0.2 * (i - 50), 0, 0);
+                            _this.baihu[i].localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
+                            _this.baihu[i].localTranslate = new gd3d.math.vector3(i * 2, 0, 0);
                             _this.baihu[i].markDirty();
                             _this.scene.addChild(_this.baihu[i]);
                         }
-                        objCam.lookat(_this.baihu[50]);
+                        objCam.lookat(_this.baihu[_this.count / 2]);
                         objCam.markDirty();
                     }
                 });
@@ -3925,7 +3919,7 @@ var test_assestmgr = (function () {
         objCam.name = "sth.";
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
-        objCam.localTranslate = new gd3d.math.vector3(50, 82, -84);
+        objCam.localTranslate = new gd3d.math.vector3(50, 82, -500);
         objCam.lookat(this.cube);
         objCam.markDirty();
         this.cube.localTranslate = new gd3d.math.vector3(40, 0, 10);
@@ -3940,10 +3934,10 @@ var test_assestmgr = (function () {
         objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, -z2 * 10);
         if (this.timer > 20 && !this.bere) {
             this.bere = true;
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < this.count; i++) {
                 this.baihu[i].dispose();
             }
-            this.app.getAssetMgr().getAssetBundle("baihu.assetbundle.json").unload();
+            this.app.getAssetMgr().getAssetBundle(this.assetName + ".assetbundle.json").unload();
             this.app.getAssetMgr().releaseUnuseAsset();
         }
     };
@@ -4897,7 +4891,7 @@ var test_loadMulBundle = (function () {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.lookatPoint(new gd3d.math.vector3(100, 0, 100));
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
     };
@@ -4922,35 +4916,11 @@ var test_loadScene = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
-        var names = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        var names = ["MainCity_", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[0];
-        name = "1031_gonghuichuangguan_01_128";
-        var isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/scenes/1031_gonghuichuangguan_01_128/index.json.txt", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                    if (s1.isfinish) {
-                        var index = JSON.parse(_this.app.getAssetMgr().getAssetByName("index.json.txt").content);
-                        var totalLength_1 = index[name + ".assetbundle.json"];
-                        _this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json", function (s) {
-                            console.log(s.curtask + "/" + s.totaltask);
-                            console.log(s.curByteLength + "/" + totalLength_1);
-                            console.log(s.bundleLoadState);
-                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded) {
-                                isloaded = true;
-                                console.log(s.isfinish);
-                                var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
-                                var _root = _scene.getSceneRoot();
-                                _this.scene.addChild(_root);
-                                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                                _root.markDirty();
-                                _this.app.getScene().lightmaps = [];
-                                _scene.useLightMap(_this.app.getScene());
-                                _scene.useFog(_this.app.getScene());
-                            }
-                        });
-                    }
-                });
+                _this.loadScene(name);
             }
         });
         var objCam = new gd3d.framework.transform();
@@ -4958,9 +4928,39 @@ var test_loadScene = (function () {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 100));
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
+    };
+    test_loadScene.prototype.loadScene = function (assetName, isCompress) {
+        var _this = this;
+        if (isCompress === void 0) { isCompress = false; }
+        var addScene = function () {
+            var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+            var _root = _scene.getSceneRoot();
+            _this.scene.addChild(_root);
+            _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+            _root.markDirty();
+            _this.app.getScene().lightmaps = [];
+            _scene.useLightMap(_this.app.getScene());
+            _scene.useFog(_this.app.getScene());
+        };
+        if (isCompress) {
+            this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
+                if (s.isfinish) {
+                    {
+                        addScene();
+                    }
+                }
+            });
+        }
+        else {
+            this.app.getAssetMgr().load("res/scenes/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                if (s1.isfinish) {
+                    addScene();
+                }
+            });
+        }
     };
     test_loadScene.prototype.update = function (delta) {
         this.timer += delta;
@@ -5026,6 +5026,7 @@ var t;
                         });
                     }
                     var shaderMask = assetmgr.getShader("unlit_transparent.shader.json");
+                    debugger;
                     if (shaderMask != null) {
                         _this.imageRenderMask.materials = [];
                         _this.imageRenderMask.materials.push(new gd3d.framework.material());
@@ -5151,9 +5152,12 @@ var test_load = (function () {
         lighttran.localTranslate.x = 50;
         lighttran.localTranslate.y = 50;
         lighttran.markDirty();
+        var isSplitPcakge = true;
+        var mpath = "meshprefab/";
+        var tpath = "textures/";
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/baihu/resources/res_baihu_baihu.FBX_baihu.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/prefabs/baihu/" + (isSplitPcakge ? mpath : "") + "resources/res_baihu_baihu.FBX_baihu.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         var smesh1 = _this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin");
                         var mesh1 = baihu.gameObject.addComponent("meshFilter");
@@ -5171,28 +5175,16 @@ var test_load = (function () {
                         renderer.materials[1].setShader(sh);
                         renderer.materials[2].setShader(sh);
                         renderer.materials[3].setShader(sh);
-                        _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihu.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                        _this.app.getAssetMgr().load("res/prefabs/baihu/" + (isSplitPcakge ? tpath : "") + "resources/baihu.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
                             if (s2.isfinish) {
                                 var texture = _this.app.getAssetMgr().getAssetByName("baihu.imgdesc.json");
                                 renderer.materials[0].setTexture("_MainTex", texture);
                             }
                         });
-                        _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihuan.png", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
+                        _this.app.getAssetMgr().load("res/prefabs/baihu/" + (isSplitPcakge ? tpath : "") + "resources/baihuan.png", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
                             if (s2.isfinish) {
                                 var texture = _this.app.getAssetMgr().getAssetByName("baihuan.png");
                                 renderer.materials[1].setTexture("_MainTex", texture);
-                            }
-                        });
-                        _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihuya.png", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
-                            if (s2.isfinish) {
-                                var texture = _this.app.getAssetMgr().getAssetByName("baihuya.png");
-                                renderer.materials[2].setTexture("_MainTex", texture);
-                            }
-                        });
-                        _this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihumao.png", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
-                            if (s2.isfinish) {
-                                var texture = _this.app.getAssetMgr().getAssetByName("baihumao.png");
-                                renderer.materials[3].setTexture("_MainTex", texture);
                             }
                         });
                     }
@@ -5285,16 +5277,7 @@ var t;
                 }
             });
             c++;
-            this.app.getAssetMgr().load("res/prefabs/cube/resources/Cube.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    c--;
-                    if (c == 0)
-                        state.finish = true;
-                }
-                else {
-                    state.error = true;
-                }
-            });
+            state.finish = true;
         };
         test_metal.prototype.addcamandlight = function (laststate, state) {
             var objCam = new gd3d.framework.transform();
@@ -5402,7 +5385,7 @@ var t;
             this.taskmgr.addTaskCall(this.addAsiModel.bind(this));
             this.taskmgr.addTaskCall(this.addcamandlight.bind(this));
             this.addinput("260px", "0px", "diffuse", "string");
-            var input = this.addinput("260px", "100px", "1");
+            var input = this.addinput("260px", "100px", "0");
             this.addinput("300px", "0px", "emitpower", "string");
             var input1 = this.addinput("300px", "100px", "1");
             this.diffuse = input;
@@ -6981,10 +6964,11 @@ var test_loadprefab = (function () {
                                 _this.scene.addChild(_this.baihu);
                                 _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                                 _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
-                                objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
-                                objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                                objCam.localTranslate = new gd3d.math.vector3(0, 0, -2);
+                                objCam.lookat(_this.baihu);
                                 objCam.markDirty();
                                 var ani = _this.baihu.gameObject.getComponent("aniplayer");
+                                _this.refreshTexture(_this.baihu);
                                 _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_chuangjue_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                     if (s.isfinish) {
                                         _this.refreshAniclip(_this.baihu, "chuangjue_01.FBAni.aniclip.bin");
@@ -7002,8 +6986,9 @@ var test_loadprefab = (function () {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
-        this.camera.far = 100;
+        this.camera.far = 10000;
         this.camera.backgroundColor = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);
+        CameraController.instance().init(this.app, this.camera);
         objCam.markDirty();
     };
     test_loadprefab.prototype.changeShader = function () {
@@ -7046,10 +7031,7 @@ var test_loadprefab = (function () {
         var x2 = Math.sin(this.timer * 0.1);
         var z2 = Math.cos(this.timer * 0.1);
         var objCam = this.camera.gameObject.transform;
-        if (this.baihu) {
-            objCam.lookat(this.baihu);
-            objCam.markDirty();
-        }
+        CameraController.instance().update(delta);
     };
     return test_loadprefab;
 }());
@@ -7419,7 +7401,6 @@ var test_ShadowMap = (function () {
         viewCamObj.localTranslate = new gd3d.math.vector3(20, 20, 20);
         viewCamObj.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         this.viewcamera = viewCamObj.gameObject.addComponent("camera");
-        this.viewcamera.backgroundColor = new gd3d.math.color(1, 0.11, 0.11, 1.0);
         viewCamObj.markDirty();
         this.ShowUI();
     };
@@ -7652,11 +7633,9 @@ var t;
                         play.textContent = "play1";
                         play.onclick = function () {
                             _this.playAniAndEffect(ap, "attack_01", "fx_zs_male@attack_01", 0, 0);
-                            _this.playAniAndEffect(ap, "attack_02", "fx_zs_male@attack_02", 1000, 1000);
                             _this.playAniAndEffect(ap, "attack_04", "fx_zs_male@attack_03", 3000, 1000);
                             setInterval(function () {
                                 _this.playAniAndEffect(ap, "attack_01", "fx_zs_male@attack_01", 0, 0);
-                                _this.playAniAndEffect(ap, "attack_02", "fx_zs_male@attack_02", 1000, 1000);
                                 _this.playAniAndEffect(ap, "attack_04", "fx_zs_male@attack_03", 3000, 1000);
                             }, 6000);
                         };

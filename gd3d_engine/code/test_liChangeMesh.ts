@@ -33,7 +33,7 @@ class testLiChangeMesh implements IState
                         if (role1 != null)
                         {
                             // this.createChangeBtn(role, role1, o2d, "body_01", "body_002");
-                            this.createChangeBtn(role, role1, o2d, "feet_01", "feet_002");
+                            this.createChangeBtn(role, role1, o2d, "feet", "feet");
                             // this.createChangeBtn(role, role1, o2d, "hand_01", "hand_002");
                             // this.createChangeBtn(role, role1, o2d, "head_01", "head_002");
                             // this.createChangeBtn(role, role1, o2d, "Leg_01", "leg_002");
@@ -54,7 +54,7 @@ class testLiChangeMesh implements IState
                         if (role != null)
                         {
                             // this.createChangeBtn(role, role1, o2d, "body_01", "body_002");
-                            this.createChangeBtn(role, role1, o2d, "feet_01", "feet_002");
+                            this.createChangeBtn(role, role1, o2d, "feet", "feet");
                             // this.createChangeBtn(role, role1, o2d, "hand_01", "hand_002");
                             // this.createChangeBtn(role, role1, o2d, "head_01", "head_002");
                             // this.createChangeBtn(role, role1, o2d, "Leg_01", "leg_002");

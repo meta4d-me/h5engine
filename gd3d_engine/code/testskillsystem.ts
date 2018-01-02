@@ -126,11 +126,11 @@
                         play.onclick = () => {
                             // this.playAniAndEffect(ap, "attack_01", 0, 0);
                             this.playAniAndEffect(ap, "attack_01", "fx_zs_male@attack_01", 0, 0);
-                            this.playAniAndEffect(ap, "attack_02", "fx_zs_male@attack_02", 1000, 1000);
+                            //this.playAniAndEffect(ap, "attack_02", "fx_zs_male@attack_02", 1000, 1000);
                             this.playAniAndEffect(ap, "attack_04", "fx_zs_male@attack_03", 3000, 1000);
                             setInterval(() => {
                                 this.playAniAndEffect(ap, "attack_01", "fx_zs_male@attack_01", 0, 0);
-                                this.playAniAndEffect(ap, "attack_02", "fx_zs_male@attack_02", 1000, 1000);
+                                //this.playAniAndEffect(ap, "attack_02", "fx_zs_male@attack_02", 1000, 1000);
                                 this.playAniAndEffect(ap, "attack_04", "fx_zs_male@attack_03", 3000, 1000);
                             }, 6000);
                         }

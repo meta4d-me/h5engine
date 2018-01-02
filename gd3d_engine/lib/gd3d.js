@@ -8609,16 +8609,22 @@ var gd3d;
                     var _uniformType = jsonChild["type"];
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
-                            var _value = jsonChild["value"].name.name;
-                            var _texture = assetmgr.getAssetByName(_value, bundleName);
-                            if (_texture == undefined) {
-                                _texture = assetmgr.getDefaultTexture("grid");
+                            {
+                                var _value = jsonChild["value"];
+                                if (_value instanceof Object && jsonChild["value"].name)
+                                    _value = jsonChild["value"].name.name;
+                                var _texture = assetmgr.getAssetByName(_value, bundleName);
+                                if (_texture == undefined) {
+                                    _texture = assetmgr.getDefaultTexture("grid");
+                                }
+                                this.setTexture(i, _texture, _value);
                             }
-                            this.setTexture(i, _texture, _value);
                             break;
                         case gd3d.render.UniformTypeEnum.Float:
-                            var _value = jsonChild["value"];
-                            this.setFloat(i, parseFloat(_value));
+                            {
+                                var _value = jsonChild["value"];
+                                this.setFloat(i, parseFloat(_value));
+                            }
                             break;
                         case gd3d.render.UniformTypeEnum.Float4:
                             var tempValue = jsonChild["value"];
@@ -10188,15 +10194,25 @@ var gd3d;
             aniplayer.prototype.play = function (animName, speed, beRevert) {
                 if (speed === void 0) { speed = 1.0; }
                 if (beRevert === void 0) { beRevert = false; }
+                if (animName.indexOf(this.getPlayName()) >= 0) {
+                    return;
+                }
                 if (this.clipnames[animName] == null) {
                     console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                     return;
                 }
                 this.playByIndex(this.clipnames[animName], speed, beRevert);
             };
+            aniplayer.prototype.getPlayName = function () {
+                if (this.isPlay())
+                    return this._playClip.getName();
+            };
             aniplayer.prototype.playCross = function (animName, crosstimer, speed, beRevert) {
                 if (speed === void 0) { speed = 1.0; }
                 if (beRevert === void 0) { beRevert = false; }
+                if (animName.indexOf(this.getPlayName()) >= 0) {
+                    return;
+                }
                 if (this.clipnames[animName] == null) {
                     console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                     return;
@@ -14994,6 +15010,7 @@ var gd3d;
             function F14Particle(element, data) {
                 this.StartPos = new gd3d.math.vector3();
                 this.speedDir = new gd3d.math.vector3();
+                this.tex_ST = new gd3d.math.vector4();
                 this.rotationByEuler = new gd3d.math.quaternion();
                 this.rotationByShape = new gd3d.math.quaternion();
                 this.startRotation = new gd3d.math.quaternion();
@@ -15047,7 +15064,6 @@ var gd3d;
                 gd3d.math.vec3Clone(this.startScale, this.localScale);
                 gd3d.math.vec3Clone(this.startColor, this.color);
                 this.alpha = this.startAlpha;
-                this.tex_ST = this.starTex_ST;
                 gd3d.math.vec4Clone(this.starTex_ST, this.tex_ST);
             };
             F14Particle.prototype.update = function (deltaTime) {
@@ -15224,14 +15240,7 @@ var gd3d;
                 }
                 else {
                     var index = Math.floor(this.life01 * data.count);
-                    var width = 1 / data.column;
-                    var height = 1 / data.row;
-                    var offsetx = width * (index % data.column);
-                    var offsety = height * Math.floor(index / data.column);
-                    this.tex_ST.x = width;
-                    this.tex_ST.y = height;
-                    this.tex_ST.z = offsetx;
-                    this.tex_ST.w = offsety;
+                    gd3d.math.spriteAnimation(data.row, data.column, index, this.tex_ST);
                 }
             };
             return F14Particle;
@@ -19203,10 +19212,10 @@ var gd3d;
     var math;
     (function (math) {
         function spriteAnimation(row, column, index, out) {
-            var width = 1 / column;
-            var height = 1 / row;
+            var width = 1.0 / column;
+            var height = 1.0 / row;
             var offsetx = width * (index % column);
-            var offsety = height * Math.floor(index / column);
+            var offsety = height * (row - Math.floor(index / column) - 1);
             out.x = width;
             out.y = height;
             out.z = offsetx;

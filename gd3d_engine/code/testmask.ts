@@ -68,6 +68,7 @@ namespace t
                     }
 
                     let shaderMask = assetmgr.getShader("unlit_transparent.shader.json");
+                    debugger;
                     if (shaderMask != null)
                     {
                         this.imageRenderMask.materials = [];

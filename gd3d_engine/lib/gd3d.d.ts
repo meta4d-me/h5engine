@@ -1651,6 +1651,7 @@ declare namespace gd3d.framework {
         playByIndex(animIndex: number, speed?: number, beRevert?: boolean): void;
         playCrossByIndex(animIndex: number, crosstimer: number, speed?: number, beRevert?: boolean): void;
         play(animName: string, speed?: number, beRevert?: boolean): void;
+        getPlayName(): string;
         playCross(animName: string, crosstimer: number, speed?: number, beRevert?: boolean): void;
         private playAniamtion(index, speed?, beRevert?);
         updateAnimation(animIndex: number, _frame: number): void;

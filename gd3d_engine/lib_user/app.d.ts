@@ -482,6 +482,8 @@ declare class test_loadAsiprefab implements IState {
 declare class test_assestmgr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    assetName: string;
+    count: number;
     start(app: gd3d.framework.application): void;
     _prefab: gd3d.framework.prefab;
     baihu: gd3d.framework.transform[];
@@ -655,6 +657,7 @@ declare class test_loadScene implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     start(app: gd3d.framework.application): void;
+    loadScene(assetName: string, isCompress?: boolean): void;
     baihu: gd3d.framework.transform;
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;
