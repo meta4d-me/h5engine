@@ -151,7 +151,7 @@ void main () {
     st_core c = init();
 
     vec3 envLight   = getIBL(c.Roughness, c.R);
-    vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NdotV, 0.0, 0.9999999), clamp(1.0 - c.Roughness, 0.0, 0.9999999))).rg;
+    vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NdotV, 0.0, 0.9999999), clamp(c.Roughness, 0.0, 0.9999999))).rg;
 
     vec3 F = Fresnel(c.f0, c.NdotV, c.Roughness);
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g) * vec3(0.3, 0.4, 0.8);
