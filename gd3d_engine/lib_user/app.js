@@ -1587,10 +1587,13 @@ var demo;
 var test_pbr_scene = (function () {
     function test_pbr_scene() {
         this.taskmgr = new gd3d.framework.taskMgr();
+        this.lightPos1 = new gd3d.math.vector4(0.5, 0.5, 0.5, 1.0);
+        this.lightPos2 = new gd3d.math.vector4(10, 5, 0, 1.0);
         this.PBRPath = "res/pbrRes/";
         this.material = this.PBRPath + "meta3/";
         this.skyName = "map";
         this.iblPath = this.PBRPath + ("IBL/" + this.skyName + "/");
+        this.timer = 0;
     }
     test_pbr_scene.prototype.start = function (app) {
         this.app = app;
@@ -1632,6 +1635,8 @@ var test_pbr_scene = (function () {
         mr.materials[0].setVector4("CustomBasecolor", albedo);
         mr.materials[0].setFloat("CustomMetallic", metallic);
         mr.materials[0].setFloat("CustomRoughness", roughness);
+        mr.materials[0].setVector4("light_1", this.lightPos1);
+        mr.materials[0].setVector4("light_2", this.lightPos2);
         mr.materials[0].setCubeTexture("u_sky", IBL);
         mr.materials[0].setCubeTexture("u_sky_1", IBL_1);
         mr.materials[0].setCubeTexture("u_sky_2", IBL_2);
@@ -1697,7 +1702,7 @@ var test_pbr_scene = (function () {
         skytex4.glTexture.uploadImages(negx_4, negy_4, negz_4, posx_4, posy_4, posz_4);
         for (var m = 1; m > 0; m -= 0.1) {
             for (var r = 1; r > 0; r -= 0.1) {
-                this.addSphere(m * 60, 0, r * 60, skytex, skytex1, skytex2, skytex3, skytex4, skytex4, new gd3d.math.vector4(0.8, 0.8, 0.8, 1.0), m, r);
+                this.addSphere(m * 60, 0, r * 60, skytex, skytex1, skytex2, skytex3, skytex4, skytex4, new gd3d.math.vector4(0.5, 0.5, 0.5, 1.0), m, r);
             }
         }
         var cubesky = new gd3d.framework.transform();
@@ -1880,7 +1885,12 @@ var test_pbr_scene = (function () {
         });
     };
     test_pbr_scene.prototype.update = function (delta) {
+        this.timer += delta;
         this.taskmgr.move(delta);
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+        this.lightPos2.x += x;
+        this.lightPos2.z += z;
         CameraController.instance().update(delta);
     };
     return test_pbr_scene;

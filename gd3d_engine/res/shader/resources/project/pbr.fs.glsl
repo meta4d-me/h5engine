@@ -7,6 +7,9 @@ precision mediump float;
 
 #define PI          3.141592653589
 
+uniform vec4        light_1;
+uniform vec4        light_2;
+
 uniform samplerCube u_sky;      // IBL
 uniform samplerCube u_sky_1;    // IBL
 uniform samplerCube u_sky_2;    // IBL
@@ -154,7 +157,8 @@ void main () {
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g) * vec3(0.3, 0.4, 0.8);
 
     vec3 finalColor = vec3(0.0);
-    finalColor += lightBRDF(vec3(0.5), c) * vec3(0.6, 0.6, 0.4);
+    finalColor += lightBRDF(light_1.xyz, c) * vec3(0.6, 0.4, 0.6);
+    finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
     finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
 
     gl_FragColor = vec4(finalColor, 1.0);

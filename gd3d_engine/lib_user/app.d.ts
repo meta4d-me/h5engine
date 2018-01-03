@@ -207,6 +207,8 @@ declare class test_pbr_scene implements IState {
     cube: gd3d.framework.transform;
     static temp: gd3d.framework.transform2D;
     start(app: gd3d.framework.application): void;
+    private lightPos1;
+    private lightPos2;
     private addSphere(x, y, z, IBL, IBL_1, IBL_2, IBL_3, IBL_4, IBL_5, albedo, metallic, roughness);
     private init(astState, state);
     private PBRPath;
@@ -219,6 +221,7 @@ declare class test_pbr_scene implements IState {
     private loadpbrRes3(lastState, state);
     private loadpbrRes4(lastState, state);
     private loadTexture(lastState, state);
+    timer: number;
     update(delta: number): void;
 }
 declare class test_pbr implements IState {

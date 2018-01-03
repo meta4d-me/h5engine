@@ -33,6 +33,8 @@ class test_pbr_scene implements IState {
         this.taskmgr.addTaskCall(this.loadpbrRes4.bind(this));
         this.taskmgr.addTaskCall(this.init.bind(this));
     }
+    private lightPos1 = new gd3d.math.vector4(0.5, 0.5, 0.5, 1.0);
+    private lightPos2 = new gd3d.math.vector4(10, 5, 0, 1.0);
 
     private addSphere(
         x: number,
@@ -72,6 +74,10 @@ class test_pbr_scene implements IState {
         mr.materials[0].setVector4("CustomBasecolor", albedo);
         mr.materials[0].setFloat("CustomMetallic", metallic);
         mr.materials[0].setFloat("CustomRoughness", roughness);
+
+        // Light
+        mr.materials[0].setVector4("light_1", this.lightPos1);
+        mr.materials[0].setVector4("light_2", this.lightPos2);
         // External texture
         // mr.materials[0].setTexture("uv_Basecolor",this.assetMgr.getAssetByName(`basecolor.png`)as gd3d.framework.texture);
         // mr.materials[0].setTexture("uv_Normal",this.assetMgr.getAssetByName(`normal.png`)as gd3d.framework.texture);
@@ -159,7 +165,7 @@ class test_pbr_scene implements IState {
 
         for(let m = 1; m > 0; m-=0.1) {
             for(let r = 1; r > 0; r-=0.1) {
-                this.addSphere(m*60, 0, r*60, skytex, skytex1, skytex2, skytex3, skytex4, skytex4, new gd3d.math.vector4(0.8, 0.8, 0.8, 1.0), m, r);
+                this.addSphere(m*60, 0, r*60, skytex, skytex1, skytex2, skytex3, skytex4, skytex4, new gd3d.math.vector4(0.5, 0.5, 0.5, 1.0), m, r);
             }
         }
 
@@ -356,10 +362,16 @@ class test_pbr_scene implements IState {
             }
         });
     }
-
+    timer: number = 0;
     update(delta: number) {
+        this.timer += delta;
         this.taskmgr.move(delta); //推进task
 
+        var x = Math.sin(this.timer);
+        var z = Math.cos(this.timer);
+
+        this.lightPos2.x += x;
+        this.lightPos2.z += z;
         CameraController.instance().update(delta);
     }
 
