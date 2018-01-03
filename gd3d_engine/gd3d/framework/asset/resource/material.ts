@@ -100,6 +100,7 @@ namespace gd3d.framework
                 switch (this.mapUniform[id].type)
                 {
                     case render.UniformTypeEnum.Texture:
+                    case render.UniformTypeEnum.CubeTexture:
                         if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
                             this.mapUniform[id].value.unuse(true);
                         break;
@@ -170,6 +171,7 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Float4x4v:
                         total += value.byteLength;
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
                         if (value != null)
                         {
@@ -207,6 +209,7 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Float4x4v:
                         total += value.byteLength;
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
                         if (value != null)
                         {
@@ -265,6 +268,8 @@ namespace gd3d.framework
                     else if (u.type == render.UniformTypeEnum.Float4x4v)
                         this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
                     else if (u.type == render.UniformTypeEnum.Texture)
+                        this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
+                    else if (u.type == render.UniformTypeEnum.CubeTexture)
                         this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
                 }
             }
@@ -327,7 +332,7 @@ namespace gd3d.framework
         {
             return this.shader.layer;
         }
-        private queue: number = 0;
+        private queue:number=0;
         /**
          * @public
          * @language zh_CN
@@ -337,11 +342,11 @@ namespace gd3d.framework
          */
         getQueue()
         {
-            return this.shader.queue + this.queue;
+            return this.shader.queue+this.queue;
         }
-        setQueue(queue: number)
+        setQueue(queue:number)
         {
-            this.queue = queue;
+            this.queue=queue;
         }
         /**
          * @public
@@ -366,7 +371,7 @@ namespace gd3d.framework
         } = {};//参数
         private mapUniformTemp: {
             [id: string]: UniformData
-        } = {};
+        }={};
         /**
          * @private
          */
@@ -429,7 +434,7 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
             }
         }
-
+        
 
         /**
          * @private
@@ -518,6 +523,39 @@ namespace gd3d.framework
                 this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
             }
         }
+
+        /**
+         * @private
+         */
+        setCubeTexture(_id: string, _texture: gd3d.framework.texture) {
+            if (this.mapUniform[_id] != undefined)
+            {
+                if (this.mapUniform[_id].value)
+                {
+                    this.mapUniform[_id].value.unuse();
+                }
+                this.mapUniform[_id].value = _texture;
+                if (_texture != null)
+                {
+                    _texture.use();
+                    //图片的尺寸信息(1/width,1/height,width,height)
+                    let _texelsizeName = _id + "_TexelSize";
+                    let _gltexture = _texture.glTexture;
+                    if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
+                    {
+                        this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                    }
+                }
+            }
+            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.CubeTexture)
+            {
+                this.mapUniformTemp[_id].value = _texture;
+            }
+            else
+            {
+                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.CubeTexture, _texture);
+            }
+        }
         /**
          * @private
          */
@@ -569,6 +607,20 @@ namespace gd3d.framework
                         else
                         {
                             pass.uniformTexture(id, null);
+                        }
+                        break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        if (value != null)
+                        {
+                            pass.uniformCubeTexture(id, value.glTexture);
+                        }
+                        else if (defaultValue != null)
+                        {
+                            pass.uniformCubeTexture(id, defaultValue.glTexture);
+                        }
+                        else
+                        {
+                            pass.uniformCubeTexture(id, null);
                         }
                         break;
                 }
@@ -670,7 +722,7 @@ namespace gd3d.framework
                             break;
                         case "glstate_fog_color":
                             this.setVector4(key, context.fog._Color);
-                            break;
+                            break; 
                     }
                 }
                 this.uploadUniform(pass);
@@ -715,16 +767,16 @@ namespace gd3d.framework
         Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
         {
             var shaderName = json["shader"];
-            var shader = assetmgr.getShader(shaderName) as gd3d.framework.shader;
-            if (shader == null)
+            var shader=assetmgr.getShader(shaderName) as gd3d.framework.shader;
+            if(shader==null)
             {
-                console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
+                console.error("shader 为空！shadername："+shaderName+" bundleName: "+bundleName);
             }
             this.setShader(shader);
-            var queue = json["queue"];
-            if (queue)
+            var queue=json["queue"];
+            if(queue)
             {
-                this.queue = queue;
+                this.queue=queue;
             }
 
             var mapUniform = json["mapUniform"];
@@ -734,22 +786,22 @@ namespace gd3d.framework
                 var _uniformType: render.UniformTypeEnum = jsonChild["type"] as render.UniformTypeEnum;
                 switch (_uniformType)
                 {
-                    case render.UniformTypeEnum.Texture: {
-                        let _value: any = jsonChild["value"];
-                        if (_value instanceof Object && jsonChild["value"].name)
-                            _value = jsonChild["value"].name.name;
+                    case render.UniformTypeEnum.Texture:
+                    case render.UniformTypeEnum.CubeTexture:
+                        var _value: string = jsonChild["value"];
                         var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
                         if (_texture == undefined)
                         {
                             _texture = assetmgr.getDefaultTexture("grid");
                         }
-                        this.setTexture(i, _texture, _value);
-                    }
+                        if(_uniformType == render.UniformTypeEnum.Texture)
+                            this.setTexture(i, _texture, _value);
+                        else
+                            this.setCubeTexture(i, _texture);
                         break;
-                    case render.UniformTypeEnum.Float: {
-                        let _value: string = jsonChild["value"];
+                    case render.UniformTypeEnum.Float:
+                        var _value: string = jsonChild["value"];
                         this.setFloat(i, parseFloat(_value));
-                    }
                         break;
                     case render.UniformTypeEnum.Float4:
                         var tempValue = jsonChild["value"];
@@ -794,6 +846,9 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Texture:
                         mat.setTexture(i, data.value);
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        mat.setCubeTexture(i, data.value);
+                        break;    
                     case render.UniformTypeEnum.Float:
                         mat.setFloat(i, data.value);
                         break;

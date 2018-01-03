@@ -15,7 +15,8 @@ namespace gd3d.render
         Float4,
         Float4v,
         Float4x4,
-        Float4x4v
+        Float4x4v,
+        CubeTexture
     }
     /**
      * @private
@@ -108,6 +109,9 @@ namespace gd3d.render
                         {
                             info.type = UniformTypeEnum.Float4x4;
                             //info.defvalue = TSM.mat4.identity;
+                        }else if(t == "samplerCube")
+                        {
+                            info.type = UniformTypeEnum.CubeTexture;
                         }
                         else
                         {

@@ -285,10 +285,6 @@
           "length":0
           },
       {
-          "name":"resources/f14effect/particles_blend.shader.json",
-          "length":0
-          },
-      {
           "name":"resources/mu_shader/alpha_blend.shader.json",
           "length":0
           },
@@ -649,6 +645,18 @@
           "length":0
           },
       {
+          "name":"resources/project/pbr.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/pbr.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/pbr.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/rim_light_vf.fs.glsl",
           "length":0
           },
@@ -658,6 +666,18 @@
           },
       {
           "name":"resources/project/rim_light_vf.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/skybox.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/project/skybox.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/skybox.vs.glsl",
           "length":0
           },
       {

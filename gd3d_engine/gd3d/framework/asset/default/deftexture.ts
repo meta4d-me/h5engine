@@ -14,6 +14,10 @@ namespace gd3d.framework
             t.defaultAsset = true;
             assetmgr.mapDefaultTexture["gray"] = t;
 
+            var t = new texture("normal");
+            t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "normal");
+            t.defaultAsset = true;
+            assetmgr.mapDefaultTexture["normal"] = t;
 
             var t = new texture("grid");
             t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "grid");

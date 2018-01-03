@@ -69,6 +69,9 @@
                 if (this.program.mapUniform[key].type == UniformTypeEnum.Texture)
                 {
                     this.uniforms[key] = { change: false, location: loc, type: UniformTypeEnum.Texture, value: null };
+                }else if (this.program.mapUniform[key].type == UniformTypeEnum.CubeTexture)
+                {
+                    this.uniforms[key] = { change: false, location: loc, type: UniformTypeEnum.CubeTexture, value: null };
                 }
                 else if (this.program.mapUniform[key].type == UniformTypeEnum.Float4x4v)
                 {
@@ -255,6 +258,14 @@
             this.uniforms[name].value = tex;
             this.uniforms[name].change = true;
         }
+        uniformCubeTexture(name: string,tex: render.ITexture)
+        {
+            var v = this.uniforms[name];
+            if (v == null) throw new Error("do not have this uniform");
+            if (v.type != UniformTypeEnum.CubeTexture) throw new Error("wrong uniform type:" + v.type);
+            this.uniforms[name].value = tex;
+            this.uniforms[name].change = true;
+        }
         static textureID: number[] = null;
         //使用材质
         use(webgl: WebGLRenderingContext, applyUniForm: boolean = true)
@@ -414,13 +425,13 @@
             for (var key in this.uniforms)
             {
                 var u = this.uniforms[key];
-                if (u.type == UniformTypeEnum.Texture)
+                if (u.type == UniformTypeEnum.Texture || u.type == UniformTypeEnum.CubeTexture )
                 {
                     if (this.uniformallchange || u.change)
                     {
-                        var tex = u.value != null ? (u.value as ITexture).texture : null;
+                        let tex = u.value != null ? (u.value as ITexture).texture : null;
                         webgl.activeTexture(webglkit.GetTextureNumber(webgl, texindex));
-                        webgl.bindTexture(webgl.TEXTURE_2D, tex);
+                        webgl.bindTexture(u.type == UniformTypeEnum.Texture? webgl.TEXTURE_2D: webgl.TEXTURE_CUBE_MAP, tex);
                         webgl.uniform1i(u.location, texindex);
                     }
                     texindex++;

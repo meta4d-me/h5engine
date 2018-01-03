@@ -198,6 +198,55 @@ declare namespace demo {
         update(delta: number): void;
     }
 }
+declare class test_pbr_scene implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    cube: gd3d.framework.transform;
+    static temp: gd3d.framework.transform2D;
+    start(app: gd3d.framework.application): void;
+    private lightPos1;
+    private lightPos2;
+    private addSphere(x, y, z, IBL, IBL_1, IBL_2, IBL_3, IBL_4, IBL_5, albedo, metallic, roughness);
+    private init(astState, state);
+    private PBRPath;
+    private material;
+    private skyName;
+    private iblPath;
+    private loadpbrRes(lastState, state);
+    private loadpbrRes1(lastState, state);
+    private loadpbrRes2(lastState, state);
+    private loadpbrRes3(lastState, state);
+    private loadpbrRes4(lastState, state);
+    private loadTexture(lastState, state);
+    timer: number;
+    update(delta: number): void;
+}
+declare class test_pbr implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    cube: gd3d.framework.transform;
+    static temp: gd3d.framework.transform2D;
+    start(app: gd3d.framework.application): void;
+    private init(astState, state);
+    private PBRPath;
+    private material;
+    private skyName;
+    private iblPath;
+    private loadpbrRes(lastState, state);
+    private loadpbrRes1(lastState, state);
+    private loadpbrRes2(lastState, state);
+    private loadpbrRes3(lastState, state);
+    private loadpbrRes4(lastState, state);
+    private loadTexture(lastState, state);
+    private addCube();
+    update(delta: number): void;
+}
 declare class test_postCamera implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
