@@ -157,9 +157,9 @@ class test_pbr_scene implements IState {
         skytex4.use();
         (skytex4.glTexture as gd3d.render.glTextureCube).uploadImages(negx_4,negy_4,negz_4,posx_4,posy_4,posz_4);
 
-        for(let m = 1; m > 0; m-=0.2) {
-            for(let r = 1; r > 0; r-=0.2) {
-                this.addSphere(m*30, 0, r*30, skytex, skytex1, skytex2, skytex3, skytex4, skytex4, new gd3d.math.vector4(0.8, 0.8, 0.8, 1.0), m, r);
+        for(let m = 1; m > 0; m-=0.1) {
+            for(let r = 1; r > 0; r-=0.1) {
+                this.addSphere(m*60, 0, r*60, skytex, skytex1, skytex2, skytex3, skytex4, skytex4, new gd3d.math.vector4(0.8, 0.8, 0.8, 1.0), m, r);
             }
         }
 

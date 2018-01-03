@@ -107,7 +107,7 @@ st_core init() {
     temp.Basecolor  = texture2D(uv_Basecolor, xlv_TEXCOORD0) * CustomBasecolor;
     temp.Normal     = texture2D(uv_Normal, xlv_TEXCOORD0);
     temp.Metallic   = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_METALLIC * CustomMetallic;
-    temp.Roughness  = 1.0 - texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * CustomRoughness;
+    temp.Roughness  = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * CustomRoughness;
     temp.AO         = texture2D(uv_AO, xlv_TEXCOORD0);
 
     vec3 f0 = vec3(0.04);
@@ -124,14 +124,38 @@ st_core init() {
     return temp;
 }
 
+vec3 lightBRDF(vec3 L, st_core c) {
+    L = normalize(L);
+    vec3 H = normalize(c.V + L);
+
+    float LoH = max(0.0, dot(L, H));
+    float NoH = max(0.0, dot(c.N, H));
+    float NoL = max(0.001, dot(c.N, L));
+    float NoV = max(0.0, c.NdotV);
+    float roughness = clamp(c.Roughness, 0.05, 0.9999999);  // NOTE: in case roughness equal 0
+
+    vec3 diffuse = c.Basecolor.rgb * NoL / PI;
+
+    vec3 F = Fresnel(c.f0, LoH, roughness);
+    float D = Distribution(roughness, NoH);
+    float G = Geometric(roughness, NoL, NoV);
+
+    vec3 specular = D * F * G / (4.0 * NoL * NoV);
+    return max(vec3(0.0), diffuse + specular);
+}
+
 void main () {
     st_core c = init();
 
     vec3 envLight   = getIBL(c.Roughness, c.R);
     vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NdotV, 0.0, 0.9999999), clamp(c.Roughness, 0.0, 0.9999999))).rg;
 
-    vec3 F = Fresnel(c.f0, c.NdotV, c.Roughness);
-    vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g);
+    vec3 F = Fresnel(c.f0, c.NdotV, 1.0 - c.Roughness);
+    vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g) * vec3(0.3, 0.4, 0.8);
 
-    gl_FragColor = (vec4((1.0 - F) * (1.0 - c.Metallic), 1.0) * c.Basecolor + vec4(indirectSpecular, 1.0)) * c.AO; // IBL+PBR
+    vec3 finalColor = vec3(0.0);
+    finalColor += lightBRDF(vec3(0.5), c) * vec3(0.6, 0.6, 0.4);
+    finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
+
+    gl_FragColor = vec4(finalColor, 1.0);
 }
