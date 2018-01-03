@@ -607,7 +607,6 @@ var main = (function () {
         this.addBtn("test_uvroll", function () { return new t.test_uvroll(); });
         this.addBtn("test_light1", function () { return new t.test_light1(); });
         this.addBtn("test_light_d1", function () { return new t.light_d1(); });
-        this.addBtn("test_changeshader", function () { return new t.test_changeshader(); });
         this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
         this.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
         this.addBtn("test_posteffect", function () { return new t.test_posteffect(); });

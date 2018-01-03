@@ -33,7 +33,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_light1", () => new t.test_light1());
         this.addBtn("test_light_d1", () => new t.light_d1());
 
-        this.addBtn("test_changeshader", () => new t.test_changeshader());
+        //this.addBtn("test_changeshader", () => new t.test_changeshader());
         this.addBtn("test_normalmap", () => new t.Test_NormalMap());
         this.addBtn("test_assestmgr", () => new test_assestmgr());
 

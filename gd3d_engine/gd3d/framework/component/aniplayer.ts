@@ -330,7 +330,7 @@ namespace gd3d.framework
          */
         play(animName: string, speed: number = 1.0, beRevert: boolean = false)
         {
-            if (animName.indexOf(this.getPlayName()) >= 0){
+            if (animName.indexOf(this.getPlayName()) >= 0 && !this.isStop()){
                 return;
             }
             if (this.clipnames[animName] == null)
@@ -358,7 +358,7 @@ namespace gd3d.framework
          */
         playCross(animName: string, crosstimer: number, speed: number = 1.0, beRevert: boolean = false)
         {
-            if (animName.indexOf(this.getPlayName()) >= 0){
+            if (animName.indexOf(this.getPlayName()) >= 0 && !this.isStop()){
                 return;
             }
             if (this.clipnames[animName] == null)

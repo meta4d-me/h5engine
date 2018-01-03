@@ -10194,7 +10194,7 @@ var gd3d;
             aniplayer.prototype.play = function (animName, speed, beRevert) {
                 if (speed === void 0) { speed = 1.0; }
                 if (beRevert === void 0) { beRevert = false; }
-                if (animName.indexOf(this.getPlayName()) >= 0) {
+                if (animName.indexOf(this.getPlayName()) >= 0 && !this.isStop()) {
                     return;
                 }
                 if (this.clipnames[animName] == null) {
@@ -10210,7 +10210,7 @@ var gd3d;
             aniplayer.prototype.playCross = function (animName, crosstimer, speed, beRevert) {
                 if (speed === void 0) { speed = 1.0; }
                 if (beRevert === void 0) { beRevert = false; }
-                if (animName.indexOf(this.getPlayName()) >= 0) {
+                if (animName.indexOf(this.getPlayName()) >= 0 && !this.isStop()) {
                     return;
                 }
                 if (this.clipnames[animName] == null) {
