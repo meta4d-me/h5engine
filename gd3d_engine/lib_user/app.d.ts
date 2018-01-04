@@ -198,6 +198,34 @@ declare namespace demo {
         update(delta: number): void;
     }
 }
+declare class test_navMesh implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    navmeshMgr: gd3d.framework.NavMeshLoadManager;
+    inputMgr: gd3d.framework.inputMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    cubesize: number;
+    start(app: gd3d.framework.application): void;
+    loadScene(assetName: string, isCompress?: boolean): void;
+    private pos;
+    pickDown(): void;
+    private lastLine;
+    private drawLine(points);
+    private genMesh(points);
+    private createAllPoint(count);
+    private setPoint(index, x, y, z, color);
+    private points;
+    private generatePoint();
+    baihu: gd3d.framework.transform;
+    camera: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    cube2: gd3d.framework.transform;
+    cube3: gd3d.framework.transform;
+    timer: number;
+    bere: boolean;
+    private pointDown;
+    update(delta: number): void;
+}
 declare class test_pbr_scene implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -789,21 +817,6 @@ declare class test_multipleplayer_anim implements IState {
     timer: number;
     aniplayers: gd3d.framework.aniplayer[];
     update(delta: number): void;
-}
-declare class test_navmesh implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    navMeshLoader: gd3d.framework.NavMeshLoadManager;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    start(app: gd3d.framework.application): void;
-    timer: number;
-    movetarget: gd3d.math.vector3;
-    inputMgr: gd3d.framework.inputMgr;
-    pointDown: boolean;
-    update(delta: number): void;
-    pos: any[];
-    pickDown(): void;
 }
 declare namespace t {
     class Test_NormalMap implements IState {

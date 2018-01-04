@@ -86,6 +86,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
         this.addBtn("test_PBR 展示", () => new test_pbr());
         this.addBtn("test_PBR 场景", () => new test_pbr_scene());
+        this.addBtn("导航网格", () => new test_navMesh());
 
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());

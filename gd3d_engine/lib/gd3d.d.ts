@@ -5100,6 +5100,7 @@ declare namespace gd3d.render {
         vertexByteSize: number;
         ebos: WebGLBuffer[];
         indexCounts: number[];
+        lineMode: number;
         bindVboBuffer(webgl: WebGLRenderingContext): void;
         bindIndex: number;
         vertexFormat: VertexFormatMask;
