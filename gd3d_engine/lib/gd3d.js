@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000045";
+                this.build = "b000048";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -10238,9 +10238,6 @@ var gd3d;
             aniplayer.prototype.play = function (animName, speed, beRevert) {
                 if (speed === void 0) { speed = 1.0; }
                 if (beRevert === void 0) { beRevert = false; }
-                if (animName.indexOf(this.getPlayName()) >= 0 && !this.isStop()) {
-                    return;
-                }
                 if (this.clipnames[animName] == null) {
                     console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                     return;
@@ -10254,9 +10251,6 @@ var gd3d;
             aniplayer.prototype.playCross = function (animName, crosstimer, speed, beRevert) {
                 if (speed === void 0) { speed = 1.0; }
                 if (beRevert === void 0) { beRevert = false; }
-                if (animName.indexOf(this.getPlayName()) >= 0 && !this.isStop()) {
-                    return;
-                }
                 if (this.clipnames[animName] == null) {
                     console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                     return;
