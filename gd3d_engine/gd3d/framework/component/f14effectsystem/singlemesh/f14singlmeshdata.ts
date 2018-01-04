@@ -38,6 +38,9 @@ namespace gd3d.framework
         public row:number;
         public column:number;
         public count:number;
+
+            //-------------billboard
+        public beBillboard:boolean=false;
     
 
         //-----------------attline 计算插值
@@ -86,6 +89,11 @@ namespace gd3d.framework
                         break;
                 }
             }
+            if(json.beBillboard!=null)
+            {
+                this.beBillboard=json.beBillboard;
+            }
+            
 
         }
     
