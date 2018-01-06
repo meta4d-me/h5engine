@@ -6,7 +6,7 @@ class test_Rvo2 implements IState
     scene: gd3d.framework.scene;
     inputMgr:gd3d.framework.inputMgr;
     assetMgr: gd3d.framework.assetMgr;
-    sim = new RVO.Simulator(1, 50, 7, 10, 10, 1, 0.2, [0, 0]);
+    sim = new RVO.Simulator(1, 50, 17, 10, 10, 1, 0.2, [0, 0]);
     goals = [];
     size = 0.5;
     start(app: gd3d.framework.application)
@@ -22,7 +22,7 @@ class test_Rvo2 implements IState
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.far = 1000;
-        objCam.localTranslate = new gd3d.math.vector3(0, 50, 0);
+        objCam.localTranslate = new gd3d.math.vector3(0, 150, 0);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();//标记为需要刷新
         CameraController.instance().init(this.app, this.camera);
@@ -41,8 +41,8 @@ class test_Rvo2 implements IState
         mr.materials = [];
         mr.materials[0] = new gd3d.framework.material("sphere");
         mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
-        let count = 30;
-        let radius = 25;
+        let count = 50;
+        let radius = 55;
         let tempdir = gd3d.math.pool.new_vector3();
         for(var i=0; i< count ;i++){
             gd3d.math.vec3Set_One(tempdir);
@@ -57,9 +57,17 @@ class test_Rvo2 implements IState
             temps.markDirty();
             this.spheres.push(temps);
             this.sim.addAgent([temps.localTranslate.x,temps.localTranslate.z]);    // 添加 Agent
-            this.goals.push([0, 0]); // 保存对应的目标
+            this.goals.push([-temps.localTranslate.x, -temps.localTranslate.z]); // 保存对应的目标
 
         }
+        let c = 0;  // 障碍物位置
+        this.sim.addObstacle([
+            [5+c, -5+c],
+            [5+c, 5+c],
+            [-5+c, 5+c],
+            [-5+c, -5+c]
+        ]);
+        this.sim.processObstacles();
 
     }
 

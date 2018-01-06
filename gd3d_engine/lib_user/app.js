@@ -2639,9 +2639,110 @@ var test_RangeScreen = (function () {
     };
     return test_RangeScreen;
 }());
+var test_Rvo2_Ob = (function () {
+    function test_Rvo2_Ob() {
+        this.sim = Simulator.instance = new Simulator();
+        this.goals = [];
+        this.size = 0.5;
+        this.spheres = [];
+    }
+    ;
+    test_Rvo2_Ob.prototype.start = function (app) {
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.assetMgr = app.getAssetMgr();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.far = 1000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 150, 0);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+        this.init();
+    };
+    test_Rvo2_Ob.prototype.init = function () {
+        var sphere = new gd3d.framework.transform;
+        sphere.localTranslate.x = sphere.localTranslate.y = sphere.localTranslate.z = 0;
+        var mf = sphere.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh("sphere");
+        var mr = sphere.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material("sphere");
+        mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
+        var count = 70;
+        var radius = 55;
+        var tempdir = gd3d.math.pool.new_vector3();
+        this.sim.setTimeStep(0.25);
+        this.sim.setAgentDefaults(200, 30, 100, 100, 1, 2.0, new Vector2(0, 0));
+        for (var i = 0; i < count; i++) {
+            gd3d.math.vec3Set_One(tempdir);
+            var rate = i / count;
+            tempdir.x = Math.sin(rate * 2 * Math.PI);
+            tempdir.z = Math.cos(rate * 2 * Math.PI);
+            gd3d.math.vec3Normalize(tempdir, tempdir);
+            var temps = sphere.clone();
+            this.scene.addChild(temps);
+            gd3d.math.vec3ScaleByNum(tempdir, radius, tempdir);
+            gd3d.math.vec3Clone(tempdir, temps.localTranslate);
+            temps.markDirty();
+            this.spheres.push(temps);
+            this.sim.addAgent(new Vector2(temps.localTranslate.x, temps.localTranslate.z));
+            this.goals.push(new Vector2(0, 0));
+        }
+        this.sim.addGoals(this.goals);
+        var vertices = [];
+        for (var i = 0; i < 3; i++) {
+            var angle = i * (2 * Math.PI) / 3;
+            var x = Math.cos(angle) * 5;
+            var y = Math.sin(angle) * 5;
+            vertices.push(new Vector2(x, y));
+        }
+        this.sim.addObstacle(vertices);
+        this.sim.processObstacles();
+    };
+    test_Rvo2_Ob.prototype.update = function (delta) {
+        CameraController.instance().update(delta);
+        if (this.sim.reachedGoal()) {
+            console.error("sim end ");
+        }
+        this.setPreferredVelocities(this.sim);
+        this.sim.run();
+        this.updateVisualization(this.sim);
+    };
+    test_Rvo2_Ob.prototype.reachedGoals = function (sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i++) {
+            if (RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, goals[i])) > 1) {
+                return false;
+            }
+        }
+        return true;
+    };
+    test_Rvo2_Ob.prototype.setPreferredVelocities = function (sim) {
+        for (var i = 0, len = sim.getNumAgents(); i < len; i++) {
+            if (RVOMath.absSq(sim.getGoal(i).minus(sim.getAgentPosition(i))) < 0) {
+                sim.setAgentPrefVelocity(i, [0, 0]);
+            }
+            else {
+                sim.setAgentPrefVelocity(i, RVOMath.normalize(sim.getGoal(i).minus(sim.getAgentPosition(i))));
+            }
+        }
+    };
+    test_Rvo2_Ob.prototype.updateVisualization = function (sim) {
+        for (var i = 0; i < this.spheres.length; i++) {
+            this.spheres[i].localTranslate.x = sim.getAgentPosition(i).x;
+            this.spheres[i].localTranslate.z = sim.getAgentPosition(i).y;
+            this.spheres[i].markDirty();
+        }
+    };
+    return test_Rvo2_Ob;
+}());
 var test_Rvo2 = (function () {
     function test_Rvo2() {
-        this.sim = new RVO.Simulator(1, 50, 7, 10, 10, 1, 0.2, [0, 0]);
+        this.sim = new RVO.Simulator(1, 50, 17, 10, 10, 1, 0.2, [0, 0]);
         this.goals = [];
         this.size = 0.5;
         this.spheres = [];
@@ -2657,7 +2758,7 @@ var test_Rvo2 = (function () {
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.far = 1000;
-        objCam.localTranslate = new gd3d.math.vector3(0, 50, 0);
+        objCam.localTranslate = new gd3d.math.vector3(0, 150, 0);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
@@ -2672,8 +2773,8 @@ var test_Rvo2 = (function () {
         mr.materials = [];
         mr.materials[0] = new gd3d.framework.material("sphere");
         mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
-        var count = 30;
-        var radius = 25;
+        var count = 50;
+        var radius = 55;
         var tempdir = gd3d.math.pool.new_vector3();
         for (var i = 0; i < count; i++) {
             gd3d.math.vec3Set_One(tempdir);
@@ -2688,8 +2789,16 @@ var test_Rvo2 = (function () {
             temps.markDirty();
             this.spheres.push(temps);
             this.sim.addAgent([temps.localTranslate.x, temps.localTranslate.z]);
-            this.goals.push([0, 0]);
+            this.goals.push([-temps.localTranslate.x, -temps.localTranslate.z]);
         }
+        var c = 0;
+        this.sim.addObstacle([
+            [5 + c, -5 + c],
+            [5 + c, 5 + c],
+            [-5 + c, 5 + c],
+            [-5 + c, -5 + c]
+        ]);
+        this.sim.processObstacles();
     };
     test_Rvo2.prototype.update = function (delta) {
         CameraController.instance().update(delta);
