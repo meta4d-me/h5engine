@@ -642,6 +642,7 @@ var main = (function () {
         this.addBtn("test_PBR 展示", function () { return new test_pbr(); });
         this.addBtn("test_PBR 场景", function () { return new test_pbr_scene(); });
         this.addBtn("导航网格", function () { return new test_navMesh(); });
+        this.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1691,15 +1692,17 @@ var test_navMesh = (function () {
     test_navMesh.prototype.genMesh = function (points) {
         var meshD = new gd3d.render.meshData();
         meshD.pos = [];
+        meshD.color = [];
         meshD.trisindex = [];
         for (var i = 0; i < points.length; i++) {
             var pos = points[i];
             meshD.pos.push(new gd3d.math.vector3(pos.x, pos.y + (this.cubesize / 2), pos.z));
             meshD.trisindex.push(i);
+            meshD.color.push(new gd3d.math.color(1, 0, 0, 1));
         }
         var _mesh = new gd3d.framework.mesh();
         _mesh.data = meshD;
-        var vf = gd3d.render.VertexFormatMask.Position;
+        var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color;
         var v32 = _mesh.data.genVertexDataArray(vf);
         var i16 = _mesh.data.genIndexDataArray();
         _mesh.glMesh = new gd3d.render.glMesh();
@@ -2635,6 +2638,58 @@ var test_RangeScreen = (function () {
         var z2 = Math.cos(this.timer * 0.1);
     };
     return test_RangeScreen;
+}());
+var test_Rvo2 = (function () {
+    function test_Rvo2() {
+        this.size = 0.5;
+        this.spheres = [];
+    }
+    test_Rvo2.prototype.start = function (app) {
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.assetMgr = app.getAssetMgr();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.far = 1000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 50, 0);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+        this.init();
+    };
+    test_Rvo2.prototype.init = function () {
+        var sphere = new gd3d.framework.transform;
+        sphere.localTranslate.x = sphere.localTranslate.y = sphere.localTranslate.z = 0;
+        var mf = sphere.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh("sphere");
+        var mr = sphere.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material("sphere");
+        mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
+        var count = 6;
+        var radius = 15;
+        var tempdir = gd3d.math.pool.new_vector3();
+        for (var i = 0; i < count; i++) {
+            gd3d.math.vec3Set_One(tempdir);
+            var rate = i / count;
+            tempdir.x = Math.sin(rate * 2 * Math.PI);
+            tempdir.z = Math.cos(rate * 2 * Math.PI);
+            gd3d.math.vec3Normalize(tempdir, tempdir);
+            var temps = sphere.clone();
+            this.scene.addChild(temps);
+            gd3d.math.vec3ScaleByNum(tempdir, radius, tempdir);
+            gd3d.math.vec3Clone(tempdir, temps.localTranslate);
+            temps.markDirty();
+        }
+    };
+    test_Rvo2.prototype.update = function (delta) {
+        CameraController.instance().update(delta);
+    };
+    return test_Rvo2;
 }());
 var test_softCut = (function () {
     function test_softCut() {

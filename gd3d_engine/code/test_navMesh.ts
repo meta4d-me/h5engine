@@ -131,16 +131,18 @@ class test_navMesh implements IState
     private genMesh(points:gd3d.math.vector3[]){
         var meshD = new gd3d.render.meshData();
         meshD.pos = [];
+        meshD.color = [];
         meshD.trisindex = [];
         for(var i=0 ; i < points.length ; i++){
             let pos = points[i];
             meshD.pos.push(new gd3d.math.vector3(pos.x, pos.y+(this.cubesize /2), pos.z));
             meshD.trisindex.push(i);
+            meshD.color.push(new gd3d.math.color(1,0,0,1));
         }
 
         var _mesh = new gd3d.framework.mesh();
         _mesh.data = meshD;
-        var vf = gd3d.render.VertexFormatMask.Position;
+        var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color;
         var v32 = _mesh.data.genVertexDataArray(vf);
         var i16 = _mesh.data.genIndexDataArray();
 

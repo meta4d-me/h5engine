@@ -303,6 +303,19 @@ declare class test_RangeScreen implements IState {
     pointDown: boolean;
     update(delta: number): void;
 }
+declare var RVO: any;
+declare class test_Rvo2 implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    inputMgr: gd3d.framework.inputMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    size: number;
+    start(app: gd3d.framework.application): void;
+    spheres: gd3d.framework.transform[];
+    init(): void;
+    camera: gd3d.framework.camera;
+    update(delta: number): void;
+}
 declare class test_softCut implements IState {
     static temp: any;
     app: gd3d.framework.application;
