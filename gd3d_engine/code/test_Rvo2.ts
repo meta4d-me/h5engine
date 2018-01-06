@@ -6,6 +6,8 @@ class test_Rvo2 implements IState
     scene: gd3d.framework.scene;
     inputMgr:gd3d.framework.inputMgr;
     assetMgr: gd3d.framework.assetMgr;
+    sim = new RVO.Simulator(1, 50, 7, 10, 10, 1, 0.2, [0, 0]);
+    goals = [];
     size = 0.5;
     start(app: gd3d.framework.application)
     {
@@ -39,8 +41,8 @@ class test_Rvo2 implements IState
         mr.materials = [];
         mr.materials[0] = new gd3d.framework.material("sphere");
         mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
-        let count = 6;
-        let radius = 15;
+        let count = 30;
+        let radius = 25;
         let tempdir = gd3d.math.pool.new_vector3();
         for(var i=0; i< count ;i++){
             gd3d.math.vec3Set_One(tempdir);
@@ -53,6 +55,10 @@ class test_Rvo2 implements IState
             gd3d.math.vec3ScaleByNum(tempdir,radius,tempdir);
             gd3d.math.vec3Clone(tempdir,temps.localTranslate);
             temps.markDirty();
+            this.spheres.push(temps);
+            this.sim.addAgent([temps.localTranslate.x,temps.localTranslate.z]);    // 添加 Agent
+            this.goals.push([0, 0]); // 保存对应的目标
+
         }
 
     }
@@ -61,6 +67,46 @@ class test_Rvo2 implements IState
     update(delta: number)
     {
         CameraController.instance().update(delta);
-        
+
+
+        if (this.reachedGoals(this.sim, this.goals)) { // 如果所有小球都到达目标点
+          console.error("sim end ");
+        }
+        else {                                  // 如果有小球没有到达目标点
+          this.updateVisualization(this.sim);             // 刷新屏幕
+          this.setPreferredVelocities(this.sim, this.goals);   // 给所有小球分配新的速度
+          this.sim.doStep(); //走一步
+        }
+    }
+    reachedGoals(sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i ++) {
+            if (RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, goals[i])) > 1) {
+                  return false;
+            }
+        }
+        return true;
+    }
+    setPreferredVelocities(sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i ++) {
+        // 据当前目标重新获取目标方向向量
+        var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+        if (RVO.Vector.absSq(goalVector) > 1) {
+            goalVector = RVO.Vector.normalize(goalVector);
+        }
+            sim.agents[i].prefVelocity = goalVector; // 更新
+        }
+    }
+    updateVisualization (sim){
+        for(var i = 0 ; i<this.spheres.length; i++){
+            this.spheres[i].localTranslate.x = sim.agents[i].position[0];
+            this.spheres[i].localTranslate.z = sim.agents[i].position[1];
+            this.spheres[i].markDirty();
+        }
+
     }
 }
+
+
+
+
+

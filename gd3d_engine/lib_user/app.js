@@ -2641,6 +2641,8 @@ var test_RangeScreen = (function () {
 }());
 var test_Rvo2 = (function () {
     function test_Rvo2() {
+        this.sim = new RVO.Simulator(1, 50, 7, 10, 10, 1, 0.2, [0, 0]);
+        this.goals = [];
         this.size = 0.5;
         this.spheres = [];
     }
@@ -2670,8 +2672,8 @@ var test_Rvo2 = (function () {
         mr.materials = [];
         mr.materials[0] = new gd3d.framework.material("sphere");
         mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
-        var count = 6;
-        var radius = 15;
+        var count = 30;
+        var radius = 25;
         var tempdir = gd3d.math.pool.new_vector3();
         for (var i = 0; i < count; i++) {
             gd3d.math.vec3Set_One(tempdir);
@@ -2684,10 +2686,45 @@ var test_Rvo2 = (function () {
             gd3d.math.vec3ScaleByNum(tempdir, radius, tempdir);
             gd3d.math.vec3Clone(tempdir, temps.localTranslate);
             temps.markDirty();
+            this.spheres.push(temps);
+            this.sim.addAgent([temps.localTranslate.x, temps.localTranslate.z]);
+            this.goals.push([0, 0]);
         }
     };
     test_Rvo2.prototype.update = function (delta) {
         CameraController.instance().update(delta);
+        if (this.reachedGoals(this.sim, this.goals)) {
+            console.error("sim end ");
+        }
+        else {
+            this.updateVisualization(this.sim);
+            this.setPreferredVelocities(this.sim, this.goals);
+            this.sim.doStep();
+        }
+    };
+    test_Rvo2.prototype.reachedGoals = function (sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i++) {
+            if (RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, goals[i])) > 1) {
+                return false;
+            }
+        }
+        return true;
+    };
+    test_Rvo2.prototype.setPreferredVelocities = function (sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i++) {
+            var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+            if (RVO.Vector.absSq(goalVector) > 1) {
+                goalVector = RVO.Vector.normalize(goalVector);
+            }
+            sim.agents[i].prefVelocity = goalVector;
+        }
+    };
+    test_Rvo2.prototype.updateVisualization = function (sim) {
+        for (var i = 0; i < this.spheres.length; i++) {
+            this.spheres[i].localTranslate.x = sim.agents[i].position[0];
+            this.spheres[i].localTranslate.z = sim.agents[i].position[1];
+            this.spheres[i].markDirty();
+        }
     };
     return test_Rvo2;
 }());
