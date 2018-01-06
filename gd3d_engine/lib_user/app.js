@@ -2742,7 +2742,7 @@ var test_Rvo2_Ob = (function () {
 }());
 var test_Rvo2 = (function () {
     function test_Rvo2() {
-        this.sim = new RVO.Simulator(1, 50, 17, 10, 10, 1, 0.2, [0, 0]);
+        this.sim = new RVO.Simulator(1, 10, 5, 10, 10, 1, 0.2, [0, 0]);
         this.goals = [];
         this.size = 0.5;
         this.spheres = [];

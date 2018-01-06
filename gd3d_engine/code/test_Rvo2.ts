@@ -6,7 +6,7 @@ class test_Rvo2 implements IState
     scene: gd3d.framework.scene;
     inputMgr:gd3d.framework.inputMgr;
     assetMgr: gd3d.framework.assetMgr;
-    sim = new RVO.Simulator(1, 50, 17, 10, 10, 1, 0.2, [0, 0]);
+    sim = new RVO.Simulator(1, 10, 5, 10, 10, 1, 0.2, [0, 0]);
     goals = [];
     size = 0.5;
     start(app: gd3d.framework.application)
