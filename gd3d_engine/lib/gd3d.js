@@ -20127,7 +20127,8 @@ var gd3d;
                 }
                 return _mesh;
             };
-            NavMeshLoadManager.prototype.showNavmesh = function (isshow) {
+            NavMeshLoadManager.prototype.showNavmesh = function (isshow, material) {
+                if (material === void 0) { material = null; }
                 if (this.navTrans) {
                     if (!isshow) {
                         this.navTrans.gameObject.visible = isshow;
@@ -20136,8 +20137,13 @@ var gd3d;
                         return;
                     }
                     var compent = this.navTrans.gameObject.getComponent("meshRenderer");
-                    if (compent == null)
+                    if (compent == null) {
                         compent = this.navTrans.gameObject.addComponent("meshRenderer");
+                        if (material) {
+                            compent.materials = [];
+                            compent.materials[0] = material;
+                        }
+                    }
                     this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0);
                     this.navTrans.markDirty();
                 }

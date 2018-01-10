@@ -3281,7 +3281,7 @@ declare namespace gd3d.framework {
         loadNavMesh(navMeshUrl: string, app: gd3d.framework.application, onstate?: (state: stateLoad) => void): void;
         private navmeshLoaded(dataStr, callback);
         private createMesh(meshData, webgl);
-        showNavmesh(isshow: boolean): void;
+        showNavmesh(isshow: boolean, material?: gd3d.framework.material): void;
         dispose(): void;
         static readonly Instance: NavMeshLoadManager;
         moveToPoints(startPos: gd3d.math.vector3, endPos: gd3d.math.vector3): Array<gd3d.math.vector3>;
