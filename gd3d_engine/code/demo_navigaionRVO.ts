@@ -107,6 +107,7 @@ class demo_navigaionRVO implements IState
         }
     }
 
+    //----------- player 移动控制 ----------------
     private moveSpeed = 0.2;
     private playerwalking(){
         if(!this.player || !this.currGoal)  return;
@@ -143,6 +144,7 @@ class demo_navigaionRVO implements IState
         }
     }
 
+    //----------- 点击navmesh处理 ----------------
     pickDown():void{
         if(this.isAKeyDown){
             //添加 敌人
@@ -212,6 +214,7 @@ class demo_navigaionRVO implements IState
         }
     }
 
+    //----------- 绘制路径线段----------------
     private lastLine:gd3d.framework.transform;
     private drawLine(points:gd3d.math.vector3[]){
         if(this.lastLine){
