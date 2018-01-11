@@ -1,4 +1,5 @@
 //导航RVO_防挤Demo
+declare var RVO;
 class demo_navigaionRVO implements IState
 {
     app: gd3d.framework.application;
@@ -8,6 +9,9 @@ class demo_navigaionRVO implements IState
     assetMgr: gd3d.framework.assetMgr;
     cubesize = 0.5;
     player:gd3d.framework.transform;
+    sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
+    goals = [];
+    mods:gd3d.framework.transform[] = [];
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
@@ -44,9 +48,33 @@ class demo_navigaionRVO implements IState
         objCam.markDirty();//标记为需要刷新
         CameraController.instance().init(this.app, this.camera);
         this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
-        
+
+        // Add obstacle
+        this.sim.addObstacle(
+            [
+                [15, 9],
+                [28, 9],
+                [28, 16],
+                [15, 16]
+            ]
+        );
+
+        this.sim.addObstacle([
+                [-1, -8],
+                [8, -8],
+                [8, -6],
+                [-1, -6]
+        ]);
+        this.sim.addObstacle([
+                [-1, -13],
+                [8, -13],
+                [8, -11],
+                [-1, -11]
+        ]);
+        this.sim.processObstacles();
+
     }
-    
+
     private isInitPlayer = false;
     private initPlayer(x,y,z){
         if(this.isInitPlayer) return;
@@ -57,6 +85,15 @@ class demo_navigaionRVO implements IState
         this.player.localScale.x = this.player.localScale.z = 2;
         this.player.markDirty();
         this.isInitPlayer = true;
+
+        // Add agent
+        this.sim.addAgent([x, z]);
+        this.sim.agents[0].radius = 1;
+        this.sim.agents[0].maxSpeed = 0.2;
+        this.sim.agents[0].timeHorizon = 5;
+        this.sim.agents[0].timeHorizonObst = 20;
+        this.mods.push(this.player);
+        this.goals.push([x, z]);
     }
 
     private loadScene(assetName:string , isCompress = false){
@@ -100,7 +137,7 @@ class demo_navigaionRVO implements IState
         }else{
             this.app.getAssetMgr().load(`res/scenes/${assetName}/${assetName}.assetbundle.json`,gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
                 if(s1.isfinish)
-                {   
+                {
                     addScene();
                 }
             });
@@ -119,6 +156,59 @@ class demo_navigaionRVO implements IState
         gd3d.math.vec3Add(this.player.localTranslate,dir,this.player.localTranslate)
         this.player.markDirty();
     }
+    private RVO_walking(sim, goals) {
+        // 据当前目标重新获取目标方向向量
+        for (var i = 0, len = sim.agents.length; i < len; i ++) {
+            var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+            if (RVO.Vector.absSq(goalVector) > 1) {
+                goalVector = RVO.Vector.normalize(goalVector);
+            }
+            sim.agents[i].prefVelocity = goalVector; // 更新
+        }
+        sim.doStep();
+        for(let i = 0; i < sim.agents.length; i++) {
+            this.mods[i].localTranslate.x = sim.agents[i].position[0];
+            this.mods[i].localTranslate.z = sim.agents[i].position[1];
+            this.mods[i].markDirty();
+        }
+
+    }
+    private RVO_check(sim, goals) {
+
+        if(this.currGoal){
+            //达到目标点
+            if(this.player){
+                let dis = gd3d.math.vec3Distance(this.player.localTranslate,this.currGoal);
+                if(dis<0.1){
+                    if(this.currGoal){
+                        gd3d.math.pool.delete_vector3(this.currGoal);
+                        this.currGoal = null;
+                        goals[0] = sim.agents[0].position;
+                    }
+                    if(this.Goals && this.Goals.length >0) {
+                        this.currGoal = this.Goals.pop();
+                        goals[0] = [this.currGoal.x, this.currGoal.z];
+
+                    }
+                }
+            }
+        }else if(this.Goals && this.Goals.length >0){
+            //切换下一目标
+            this.currGoal = this.Goals.pop();
+            goals[0] = [this.currGoal.x, this.currGoal.z];
+        }
+
+        for (var i = 1, len = sim.agents.length; i < len; i ++) {
+            let range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
+            if (range < 3 || range > 400 ) {
+                // console.log(i + ' in position');
+                goals[i] = sim.agents[i].position;  // Stop
+            } else {
+                goals[i] = sim.agents[0].position;
+            }
+        }
+
+    }
 
     private currGoal:gd3d.math.vector3;
     private Goals:gd3d.math.vector3[] = [];
@@ -133,7 +223,7 @@ class demo_navigaionRVO implements IState
                         gd3d.math.pool.delete_vector3(this.currGoal);
                         this.currGoal = null;
                     }
-                    if(this.Goals && this.Goals.length >0) 
+                    if(this.Goals && this.Goals.length >0)
                         this.currGoal = this.Goals.pop();
                 }
             }
@@ -163,7 +253,7 @@ class demo_navigaionRVO implements IState
         console.error(pickinfo.hitposition);
         return pickinfo.hitposition;
     }
-    
+
     private enemys:gd3d.framework.transform[] = [];
     private addEnemy(){
         let endPos = this.rayNavMesh();
@@ -176,8 +266,12 @@ class demo_navigaionRVO implements IState
         trans.localTranslate.y = endPos.y;
         trans.localTranslate.z = endPos.z;
         trans.markDirty();
+        // Add agent
+        this.sim.addAgent([endPos.x, endPos.z]);
+        this.goals.push([endPos.x, endPos.z]);
+        this.mods.push(trans);
     }
-    
+
     private pos = [];
     private tryFindingPath(){
         let endPos = this.rayNavMesh();
@@ -231,7 +325,7 @@ class demo_navigaionRVO implements IState
         this.scene.addChild(this.lastLine);
         this.lastLine.markDirty();
     }
-    
+
     private genLineMesh(points:gd3d.math.vector3[]){
         var meshD = new gd3d.render.meshData();
         meshD.pos = [];
@@ -278,7 +372,7 @@ class demo_navigaionRVO implements IState
         if(need > 0) {
             for(var i=0;i<need ;i++){
                 let G3D = this.generateGeomtry("cube",new gd3d.math.vector4(0,0,1,1));
-                this.points.push(G3D); 
+                this.points.push(G3D);
                 G3D.localScale.x = G3D.localScale.y = G3D.localScale.z = this.cubesize;
             }
         }
@@ -345,8 +439,12 @@ class demo_navigaionRVO implements IState
 
         this.timer += delta;
         CameraController.instance().update(delta);
+        if(this.mods.length >=1) {
 
-        this.ckGoalsChange();
-        this.playerwalking();
+            this.RVO_check(this.sim, this.goals);
+            this.RVO_walking(this.sim, this.goals);
+        }
+        // this.ckGoalsChange();
+        // this.playerwalking();
     }
 }
