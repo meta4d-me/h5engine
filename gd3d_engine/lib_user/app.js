@@ -62,25 +62,6 @@ var demo_navigaionRVO = (function () {
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
         this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
-        this.sim.addObstacle([
-            [15, 9],
-            [28, 9],
-            [28, 16],
-            [15, 16]
-        ]);
-        this.sim.addObstacle([
-            [-1, -8],
-            [8, -8],
-            [8, -6],
-            [-1, -6]
-        ]);
-        this.sim.addObstacle([
-            [-1, -13],
-            [8, -13],
-            [8, -11],
-            [-1, -11]
-        ]);
-        this.sim.processObstacles();
     };
     demo_navigaionRVO.prototype.initPlayer = function (x, y, z) {
         if (this.isInitPlayer)
@@ -94,6 +75,7 @@ var demo_navigaionRVO = (function () {
         this.isInitPlayer = true;
         this.sim.addAgent([x, z]);
         this.sim.agents[0].radius = 1;
+        this.sim.agents[0].neighborDist = 0;
         this.sim.agents[0].maxSpeed = 0.2;
         this.sim.agents[0].timeHorizon = 5;
         this.sim.agents[0].timeHorizonObst = 20;
@@ -126,6 +108,21 @@ var demo_navigaionRVO = (function () {
                 var sdr = ass.getShader("diffuse.shader.json");
                 mtr.setShader(sdr);
                 _this.navmeshMgr.showNavmesh(true, mtr);
+                console.error(_this.navmeshMgr.navMesh);
+                var data = _this.navmeshMgr.navMesh.data;
+                if (data) {
+                    for (var i = 0; i < data.trisindex.length; i += 3) {
+                        var pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
+                        var pos2 = [data.pos[data.trisindex[i + 1]].x, data.pos[data.trisindex[i + 1]].z];
+                        var pos3 = [data.pos[data.trisindex[i + 2]].x, data.pos[data.trisindex[i + 2]].z];
+                        _this.sim.addObstacle([
+                            pos1,
+                            pos2,
+                            pos3
+                        ]);
+                    }
+                }
+                _this.sim.processObstacles();
             });
         };
         if (isCompress) {
@@ -181,10 +178,12 @@ var demo_navigaionRVO = (function () {
                         gd3d.math.pool.delete_vector3(this.currGoal);
                         this.currGoal = null;
                         goals[0] = sim.agents[0].position;
+                        sim.agents[0].radius = 1;
                     }
                     if (this.Goals && this.Goals.length > 0) {
                         this.currGoal = this.Goals.pop();
                         goals[0] = [this.currGoal.x, this.currGoal.z];
+                        sim.agents[0].radius = 0.1;
                     }
                 }
             }
@@ -192,6 +191,7 @@ var demo_navigaionRVO = (function () {
         else if (this.Goals && this.Goals.length > 0) {
             this.currGoal = this.Goals.pop();
             goals[0] = [this.currGoal.x, this.currGoal.z];
+            sim.agents[0].radius = 0.1;
         }
         for (var i = 1, len = sim.agents.length; i < len; i++) {
             var range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
@@ -3044,107 +3044,6 @@ var test_RangeScreen = (function () {
         var z2 = Math.cos(this.timer * 0.1);
     };
     return test_RangeScreen;
-}());
-var test_Rvo2_Ob = (function () {
-    function test_Rvo2_Ob() {
-        this.sim = Simulator.instance = new Simulator();
-        this.goals = [];
-        this.size = 0.5;
-        this.spheres = [];
-    }
-    ;
-    test_Rvo2_Ob.prototype.start = function (app) {
-        console.log("i am here.");
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.inputMgr = this.app.getInputMgr();
-        this.assetMgr = app.getAssetMgr();
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.far = 1000;
-        objCam.localTranslate = new gd3d.math.vector3(0, 150, 0);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        objCam.markDirty();
-        CameraController.instance().init(this.app, this.camera);
-        this.init();
-    };
-    test_Rvo2_Ob.prototype.init = function () {
-        var sphere = new gd3d.framework.transform;
-        sphere.localTranslate.x = sphere.localTranslate.y = sphere.localTranslate.z = 0;
-        var mf = sphere.gameObject.addComponent("meshFilter");
-        mf.mesh = this.assetMgr.getDefaultMesh("sphere");
-        var mr = sphere.gameObject.addComponent("meshRenderer");
-        mr.materials = [];
-        mr.materials[0] = new gd3d.framework.material("sphere");
-        mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
-        var count = 70;
-        var radius = 55;
-        var tempdir = gd3d.math.pool.new_vector3();
-        this.sim.setTimeStep(0.25);
-        this.sim.setAgentDefaults(200, 30, 100, 100, 1, 2.0, new Vector2(0, 0));
-        for (var i = 0; i < count; i++) {
-            gd3d.math.vec3Set_One(tempdir);
-            var rate = i / count;
-            tempdir.x = Math.sin(rate * 2 * Math.PI);
-            tempdir.z = Math.cos(rate * 2 * Math.PI);
-            gd3d.math.vec3Normalize(tempdir, tempdir);
-            var temps = sphere.clone();
-            this.scene.addChild(temps);
-            gd3d.math.vec3ScaleByNum(tempdir, radius, tempdir);
-            gd3d.math.vec3Clone(tempdir, temps.localTranslate);
-            temps.markDirty();
-            this.spheres.push(temps);
-            this.sim.addAgent(new Vector2(temps.localTranslate.x, temps.localTranslate.z));
-            this.goals.push(new Vector2(0, 0));
-        }
-        this.sim.addGoals(this.goals);
-        var vertices = [];
-        for (var i = 0; i < 3; i++) {
-            var angle = i * (2 * Math.PI) / 3;
-            var x = Math.cos(angle) * 5;
-            var y = Math.sin(angle) * 5;
-            vertices.push(new Vector2(x, y));
-        }
-        this.sim.addObstacle(vertices);
-        this.sim.processObstacles();
-    };
-    test_Rvo2_Ob.prototype.update = function (delta) {
-        CameraController.instance().update(delta);
-        if (this.sim.reachedGoal()) {
-            console.error("sim end ");
-        }
-        this.setPreferredVelocities(this.sim);
-        this.sim.run();
-        this.updateVisualization(this.sim);
-    };
-    test_Rvo2_Ob.prototype.reachedGoals = function (sim, goals) {
-        for (var i = 0, len = sim.agents.length; i < len; i++) {
-            if (RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, goals[i])) > 1) {
-                return false;
-            }
-        }
-        return true;
-    };
-    test_Rvo2_Ob.prototype.setPreferredVelocities = function (sim) {
-        for (var i = 0, len = sim.getNumAgents(); i < len; i++) {
-            if (RVOMath.absSq(sim.getGoal(i).minus(sim.getAgentPosition(i))) < 0) {
-                sim.setAgentPrefVelocity(i, [0, 0]);
-            }
-            else {
-                sim.setAgentPrefVelocity(i, RVOMath.normalize(sim.getGoal(i).minus(sim.getAgentPosition(i))));
-            }
-        }
-    };
-    test_Rvo2_Ob.prototype.updateVisualization = function (sim) {
-        for (var i = 0; i < this.spheres.length; i++) {
-            this.spheres[i].localTranslate.x = sim.getAgentPosition(i).x;
-            this.spheres[i].localTranslate.z = sim.getAgentPosition(i).y;
-            this.spheres[i].markDirty();
-        }
-    };
-    return test_Rvo2_Ob;
 }());
 var test_Rvo2 = (function () {
     function test_Rvo2() {

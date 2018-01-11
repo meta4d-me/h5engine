@@ -350,27 +350,6 @@ declare class test_RangeScreen implements IState {
     pointDown: boolean;
     update(delta: number): void;
 }
-declare var Simulator: any;
-declare var Vector2: any;
-declare var RVOMath: any;
-declare var RVO: any;
-declare class test_Rvo2_Ob implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    inputMgr: gd3d.framework.inputMgr;
-    assetMgr: gd3d.framework.assetMgr;
-    sim: any;
-    goals: any[];
-    size: number;
-    start(app: gd3d.framework.application): void;
-    spheres: gd3d.framework.transform[];
-    init(): void;
-    camera: gd3d.framework.camera;
-    update(delta: number): void;
-    reachedGoals(sim: any, goals: any): boolean;
-    setPreferredVelocities(sim: any): void;
-    updateVisualization(sim: any): void;
-}
 declare var RVO: any;
 declare class test_Rvo2 implements IState {
     app: gd3d.framework.application;

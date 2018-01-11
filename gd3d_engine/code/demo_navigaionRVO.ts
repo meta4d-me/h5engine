@@ -49,29 +49,50 @@ class demo_navigaionRVO implements IState
         CameraController.instance().init(this.app, this.camera);
         this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
 
-        // Add obstacle
-        this.sim.addObstacle(
-            [
-                [15, 9],
-                [28, 9],
-                [28, 16],
-                [15, 16]
-            ]
-        );
+        // this.sim.addObstacle([
+        //         [-14, -26],
+        //         [-14, 26],
+        //         [36, 26],
+        //         [36, -26]
+        // ]);
+        // // Add obstacle
+        // this.sim.addObstacle(
+        //     [
+        //         [15, 9],
+        //         [28, 9],
+        //         [28, 16],
+        //         [15, 16]
+        //     ]
+        // );
+        //
+        // this.sim.addObstacle([
+        //         [-1, -8],
+        //         [8, -8],
+        //         [8, -6],
+        //         [-1, -6]
+        // ]);
+        // this.sim.addObstacle([
+        //         [-1, -13],
+        //         [8, -13],
+        //         [8, -11],
+        //         [-1, -11]
+        // ]);
+        // let data = this.navmeshMgr.navMesh.data;
+        // if(data) {
+        //     for(let i = 0; i < data.trisindex.length; i += 3) {
+        //         let pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
+        //         let pos2 = [data.pos[data.trisindex[i+1]].x, data.pos[data.trisindex[i+1]].z];
+        //         let pos3 = [data.pos[data.trisindex[i+2]].x, data.pos[data.trisindex[i+2]].z];
+        //         this.sim.addObstacle([
+        //             pos1,
+        //             pos2,
+        //             pos3
+        //         ]);
+        //     }
+        // }
 
-        this.sim.addObstacle([
-                [-1, -8],
-                [8, -8],
-                [8, -6],
-                [-1, -6]
-        ]);
-        this.sim.addObstacle([
-                [-1, -13],
-                [8, -13],
-                [8, -11],
-                [-1, -11]
-        ]);
-        this.sim.processObstacles();
+
+        // this.sim.processObstacles();
 
     }
 
@@ -89,6 +110,7 @@ class demo_navigaionRVO implements IState
         // Add agent
         this.sim.addAgent([x, z]);
         this.sim.agents[0].radius = 1;
+        this.sim.agents[0].neighborDist = 0;    // 玩家不会被小怪挤
         this.sim.agents[0].maxSpeed = 0.2;
         this.sim.agents[0].timeHorizon = 5;
         this.sim.agents[0].timeHorizonObst = 20;
@@ -121,6 +143,22 @@ class demo_navigaionRVO implements IState
                 let sdr = ass.getShader("diffuse.shader.json");
                 mtr.setShader(sdr);
                 this.navmeshMgr.showNavmesh(true,mtr);
+                console.error(this.navmeshMgr.navMesh);
+
+                let data = this.navmeshMgr.navMesh.data;
+                if(data) {
+                    for(let i = 0; i < data.trisindex.length; i += 3) {
+                        let pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
+                        let pos2 = [data.pos[data.trisindex[i+1]].x, data.pos[data.trisindex[i+1]].z];
+                        let pos3 = [data.pos[data.trisindex[i+2]].x, data.pos[data.trisindex[i+2]].z];
+                        this.sim.addObstacle([
+                            pos1,
+                            pos2,
+                            pos3
+                        ]);
+                    }
+                }
+                this.sim.processObstacles();
             });
         }
 
@@ -185,10 +223,13 @@ class demo_navigaionRVO implements IState
                         gd3d.math.pool.delete_vector3(this.currGoal);
                         this.currGoal = null;
                         goals[0] = sim.agents[0].position;
+                        sim.agents[0].radius = 1;
                     }
                     if(this.Goals && this.Goals.length >0) {
                         this.currGoal = this.Goals.pop();
                         goals[0] = [this.currGoal.x, this.currGoal.z];
+                        sim.agents[0].radius = 0.1;
+
 
                     }
                 }
@@ -197,6 +238,8 @@ class demo_navigaionRVO implements IState
             //切换下一目标
             this.currGoal = this.Goals.pop();
             goals[0] = [this.currGoal.x, this.currGoal.z];
+            sim.agents[0].radius = 0.1;
+
         }
 
         for (var i = 1, len = sim.agents.length; i < len; i ++) {
