@@ -14,6 +14,472 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var demo_navigaionRVO = (function () {
+    function demo_navigaionRVO() {
+        this.cubesize = 0.5;
+        this.sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
+        this.goals = [];
+        this.mods = [];
+        this.isInitPlayer = false;
+        this.moveSpeed = 0.2;
+        this.Goals = [];
+        this.enemys = [];
+        this.pos = [];
+        this.points = [];
+        this.timer = 0;
+        this.bere = false;
+        this.isAKeyDown = false;
+        this.pointDown = false;
+    }
+    demo_navigaionRVO.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.assetMgr = app.getAssetMgr();
+        this.app.closeFps();
+        var descr = document.createElement("p");
+        descr.textContent = "\u63D0\u793A: \n \u6309\u4F4F\u952E\u76D8 A \u952E\uFF0C\u70B9\u51FB navmesh \u53EF\u6DFB\u52A0\u654C\u4EBA\uFF01";
+        descr.style.top = 0 + "px";
+        descr.style.left = 0 + "px";
+        descr.style.position = "absolute";
+        this.app.container.appendChild(descr);
+        var names = ["MainCity_", "testnav", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        var name = names[0];
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.loadScene(name);
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.far = 10000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 100, 0);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+        this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
+    };
+    demo_navigaionRVO.prototype.initPlayer = function (x, y, z) {
+        if (this.isInitPlayer)
+            return;
+        this.player = this.generateGeomtry("cylinder", new gd3d.math.vector4(0, 1, 0.2, 1));
+        this.player.localTranslate.x = x;
+        this.player.localTranslate.y = y;
+        this.player.localTranslate.z = z;
+        this.player.localScale.x = this.player.localScale.z = 2;
+        this.player.markDirty();
+        this.isInitPlayer = true;
+        this.sim.addAgent([x, z]);
+        this.sim.agents[0].radius = 1;
+        this.sim.agents[0].neighborDist = 0;
+        this.sim.agents[0].maxSpeed = 0.2;
+        this.sim.agents[0].timeHorizon = 5;
+        this.sim.agents[0].timeHorizonObst = 20;
+        this.mods.push(this.player);
+        this.goals.push([x, z]);
+    };
+    demo_navigaionRVO.prototype.loadScene = function (assetName, isCompress) {
+        var _this = this;
+        if (isCompress === void 0) { isCompress = false; }
+        var addScene = function () {
+            var beAddScene = true;
+            if (beAddScene) {
+                var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+                var _root = _scene.getSceneRoot();
+                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                _root.markDirty();
+                _this.app.getScene().lightmaps = [];
+                _scene.useLightMap(_this.app.getScene());
+                _this.scene.addChild(_root);
+            }
+            _this.navmeshMgr.loadNavMesh("res/navmesh/" + assetName + ".nav.json", _this.app, function (s) {
+                if (s.iserror) {
+                    console.error(" " + s.errs + " ");
+                    return;
+                }
+                console.error("scene navmesh : " + assetName + "  is loaded");
+                var mtr = new gd3d.framework.material("navmesh_mtr");
+                var ass = _this.app.getAssetMgr();
+                var sdr = ass.getShader("diffuse.shader.json");
+                mtr.setShader(sdr);
+                _this.navmeshMgr.showNavmesh(true, mtr);
+                console.error(_this.navmeshMgr.navMesh);
+                var data = _this.navmeshMgr.navMesh.data;
+                if (data) {
+                    var border = _this.navmesh2Border(data);
+                    console.log(border);
+                    for (var i = 0; i < border.length; i += 2) {
+                        var p1 = border[i];
+                        var p2 = border[i + 1];
+                        _this.sim.addObstacle([
+                            p1,
+                            p2,
+                            p2,
+                            p1
+                        ]);
+                    }
+                }
+                _this.sim.processObstacles();
+            });
+        };
+        if (isCompress) {
+            this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
+                if (s.isfinish) {
+                    {
+                        addScene();
+                    }
+                }
+            });
+        }
+        else {
+            this.app.getAssetMgr().load("res/scenes/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                if (s1.isfinish) {
+                    addScene();
+                }
+            });
+        }
+    };
+    demo_navigaionRVO.prototype.playerwalking = function () {
+        if (!this.player || !this.currGoal)
+            return;
+        var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
+        var step = dis < this.moveSpeed ? dis : this.moveSpeed;
+        var dir = gd3d.math.pool.new_vector3();
+        gd3d.math.vec3Subtract(this.currGoal, this.player.localTranslate, dir);
+        gd3d.math.vec3Normalize(dir, dir);
+        gd3d.math.vec3ScaleByNum(dir, step, dir);
+        gd3d.math.vec3Add(this.player.localTranslate, dir, this.player.localTranslate);
+        this.player.markDirty();
+    };
+    demo_navigaionRVO.prototype.RVO_walking = function (sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i++) {
+            var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+            if (RVO.Vector.absSq(goalVector) > 1) {
+                goalVector = RVO.Vector.normalize(goalVector);
+            }
+            sim.agents[i].prefVelocity = goalVector;
+        }
+        sim.doStep();
+        for (var i_1 = 0; i_1 < sim.agents.length; i_1++) {
+            this.mods[i_1].localTranslate.x = sim.agents[i_1].position[0];
+            this.mods[i_1].localTranslate.z = sim.agents[i_1].position[1];
+            this.mods[i_1].markDirty();
+        }
+    };
+    demo_navigaionRVO.prototype.RVO_check = function (sim, goals) {
+        if (this.currGoal) {
+            if (this.player) {
+                var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
+                if (dis < 0.1) {
+                    if (this.currGoal) {
+                        gd3d.math.pool.delete_vector3(this.currGoal);
+                        this.currGoal = null;
+                        goals[0] = sim.agents[0].position;
+                        sim.agents[0].radius = 1;
+                    }
+                    if (this.Goals && this.Goals.length > 0) {
+                        this.currGoal = this.Goals.pop();
+                        goals[0] = [this.currGoal.x, this.currGoal.z];
+                        sim.agents[0].radius = 0.1;
+                    }
+                }
+            }
+        }
+        else if (this.Goals && this.Goals.length > 0) {
+            this.currGoal = this.Goals.pop();
+            goals[0] = [this.currGoal.x, this.currGoal.z];
+            sim.agents[0].radius = 0.1;
+        }
+        for (var i = 1, len = sim.agents.length; i < len; i++) {
+            var range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
+            if (range < 3 || range > 400) {
+                goals[i] = sim.agents[i].position;
+            }
+            else {
+                goals[i] = sim.agents[0].position;
+            }
+        }
+    };
+    demo_navigaionRVO.prototype.navmesh2Border = function (data) {
+        var trie = [];
+        for (var i = 0; i < data.trisindex.length; i += 3) {
+            var a = data.trisindex[i];
+            var b = data.trisindex[i + 1];
+            var c = data.trisindex[i + 2];
+            if (trie[a] == null) {
+                trie[a] = [];
+                trie[a][b] = true;
+            }
+            else {
+                trie[a][b] = (trie[a][b] == null);
+            }
+            if (trie[b] == null) {
+                trie[b] = [];
+                trie[b][c] = true;
+            }
+            else {
+                trie[b][c] = trie[b][c] == null;
+            }
+            if (trie[c] == null) {
+                trie[c] = [];
+                trie[c][a] = true;
+            }
+            else {
+                trie[c][a] = trie[c][a] == null;
+            }
+            if (trie[b] == null) {
+                trie[b] = [];
+                trie[b][a] = true;
+            }
+            else {
+                trie[b][a] = trie[b][a] == null;
+            }
+            if (trie[c] == null) {
+                trie[c] = [];
+                trie[c][b] = true;
+            }
+            else {
+                trie[c][b] = trie[c][b] == null;
+            }
+            if (trie[a] == null) {
+                trie[a] = [];
+                trie[a][c] = true;
+            }
+            else {
+                trie[a][c] = trie[a][c] == null;
+            }
+        }
+        var border = [];
+        for (var i = 0; i < trie.length; i++) {
+            for (var ii = 0; ii < trie[i].length; ii++) {
+                if (trie[i][ii]) {
+                    border.push([data.pos[i].x, data.pos[i].z]);
+                    border.push([data.pos[ii].x, data.pos[ii].z]);
+                }
+            }
+        }
+        return border;
+    };
+    demo_navigaionRVO.prototype.ckGoalsChange = function () {
+        if (!this.player)
+            return;
+        if (this.currGoal) {
+            if (this.player) {
+                var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
+                if (dis < 0.1) {
+                    if (this.currGoal) {
+                        gd3d.math.pool.delete_vector3(this.currGoal);
+                        this.currGoal = null;
+                    }
+                    if (this.Goals && this.Goals.length > 0)
+                        this.currGoal = this.Goals.pop();
+                }
+            }
+        }
+        else if (this.Goals && this.Goals.length > 0) {
+            this.currGoal = this.Goals.pop();
+        }
+    };
+    demo_navigaionRVO.prototype.pickDown = function () {
+        if (this.isAKeyDown) {
+            this.addEnemy();
+        }
+        else {
+            this.tryFindingPath();
+        }
+    };
+    demo_navigaionRVO.prototype.rayNavMesh = function () {
+        var navTrans = this.navmeshMgr.navTrans;
+        var navmesh = this.navmeshMgr.navMesh;
+        if (navmesh == null)
+            return;
+        var inputMgr = this.app.getInputMgr();
+        var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
+        var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
+        if (!pickinfo)
+            return;
+        console.error(pickinfo.hitposition);
+        return pickinfo.hitposition;
+    };
+    demo_navigaionRVO.prototype.addEnemy = function () {
+        var endPos = this.rayNavMesh();
+        if (!endPos)
+            return;
+        var trans = this.generateGeomtry("cylinder", new gd3d.math.vector4(1, 0, 0, 1));
+        if (!trans)
+            return;
+        this.enemys.push(trans);
+        this.scene.addChild(trans);
+        trans.localTranslate.x = endPos.x;
+        trans.localTranslate.y = endPos.y;
+        trans.localTranslate.z = endPos.z;
+        trans.markDirty();
+        this.sim.addAgent([endPos.x, endPos.z]);
+        this.goals.push([endPos.x, endPos.z]);
+        this.mods.push(trans);
+    };
+    demo_navigaionRVO.prototype.tryFindingPath = function () {
+        var endPos = this.rayNavMesh();
+        if (!endPos)
+            return;
+        if (this.player) {
+            this.pos.push(this.player.localTranslate);
+        }
+        else {
+            if (!this.isInitPlayer)
+                this.initPlayer(endPos.x, endPos.y, endPos.z);
+        }
+        this.pos.push(endPos);
+        if (this.pos.length > 1) {
+            var arr = this.navmeshMgr.moveToPoints(this.pos.pop(), this.pos.pop());
+            if (!arr)
+                return;
+            this.pos.length = 0;
+            var color = new gd3d.math.color(1, 0, 0, 0.5);
+            this.createAllPoint(arr.length);
+            for (var i = 0; i < arr.length; i++) {
+                var p = arr[i];
+                this.setRoadPoint(i, p.x, p.y, p.z, color);
+            }
+            this.drawLine(arr);
+            if (this.Goals) {
+                this.Goals.forEach(function (g) {
+                    if (g)
+                        gd3d.math.pool.delete_vector3(g);
+                });
+            }
+            this.Goals.length = 0;
+            this.Goals = arr;
+            this.currGoal = this.Goals.pop();
+        }
+    };
+    demo_navigaionRVO.prototype.drawLine = function (points) {
+        if (this.lastLine) {
+            this.lastLine.gameObject.visible = false;
+            this.lastLine.markDirty();
+            if (this.lastLine.parent)
+                this.lastLine.parent.removeChild(this.lastLine);
+            this.lastLine.dispose();
+        }
+        var mesh = this.genLineMesh(points);
+        this.lastLine = new gd3d.framework.transform();
+        var mf = this.lastLine.gameObject.addComponent("meshFilter");
+        mf.mesh = mesh;
+        mesh.glMesh.lineMode = WebGLRenderingContext.LINE_STRIP;
+        this.lastLine.gameObject.addComponent("meshRenderer");
+        this.lastLine.localTranslate.x = this.lastLine.localTranslate.y = this.lastLine.localTranslate.z = 0;
+        this.scene.addChild(this.lastLine);
+        this.lastLine.markDirty();
+    };
+    demo_navigaionRVO.prototype.genLineMesh = function (points) {
+        var meshD = new gd3d.render.meshData();
+        meshD.pos = [];
+        meshD.color = [];
+        meshD.trisindex = [];
+        for (var i = 0; i < points.length; i++) {
+            var pos = points[i];
+            meshD.pos.push(new gd3d.math.vector3(pos.x, pos.y + (this.cubesize / 2), pos.z));
+            meshD.trisindex.push(i);
+            meshD.color.push(new gd3d.math.color(1, 0, 0, 1));
+        }
+        var _mesh = new gd3d.framework.mesh();
+        _mesh.data = meshD;
+        var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color;
+        var v32 = _mesh.data.genVertexDataArray(vf);
+        var i16 = _mesh.data.genIndexDataArray();
+        _mesh.glMesh = new gd3d.render.glMesh();
+        _mesh.glMesh.initBuffer(this.app.webgl, vf, _mesh.data.pos.length);
+        _mesh.glMesh.uploadVertexSubData(this.app.webgl, v32);
+        _mesh.glMesh.addIndex(this.app.webgl, i16.length);
+        _mesh.glMesh.uploadIndexSubData(this.app.webgl, 0, i16);
+        _mesh.submesh = [];
+        {
+            var sm = new gd3d.framework.subMeshInfo();
+            sm.matIndex = 0;
+            sm.useVertexIndex = 0;
+            sm.start = 0;
+            sm.size = i16.length;
+            sm.line = true;
+            _mesh.submesh.push(sm);
+        }
+        return _mesh;
+    };
+    demo_navigaionRVO.prototype.createAllPoint = function (count) {
+        this.points.forEach(function (element) {
+            if (element)
+                element.gameObject.visible = false;
+        });
+        var need = count - this.points.length;
+        if (need > 0) {
+            for (var i = 0; i < need; i++) {
+                var G3D = this.generateGeomtry("cube", new gd3d.math.vector4(0, 0, 1, 1));
+                this.points.push(G3D);
+                G3D.localScale.x = G3D.localScale.y = G3D.localScale.z = this.cubesize;
+            }
+        }
+    };
+    demo_navigaionRVO.prototype.setRoadPoint = function (index, x, y, z, color) {
+        var cube = this.points[index];
+        cube.localTranslate.x = x;
+        cube.localTranslate.y = y;
+        cube.localTranslate.z = z;
+        cube.markDirty();
+        var mf = cube.gameObject.getComponent("meshFilter");
+        if (mf.mesh.data.color == null)
+            mf.mesh.data.color = [];
+        mf.mesh.data.color.forEach(function (c) {
+            if (c) {
+                c.r = color.r;
+                c.g = color.g;
+                c.b = color.b;
+                c.a = color.a;
+            }
+        });
+        var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+        var v32 = mf.mesh.data.genVertexDataArray(vf);
+        mf.mesh.glMesh.uploadVertexSubData(this.app.webgl, v32);
+        cube.gameObject.visible = true;
+    };
+    demo_navigaionRVO.prototype.generateGeomtry = function (meshType, color) {
+        if (meshType === void 0) { meshType = "cube"; }
+        if (color === void 0) { color = null; }
+        var G3D = new gd3d.framework.transform;
+        var mf = G3D.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh(meshType);
+        var mr = G3D.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material("mat");
+        mr.materials[0].setShader(this.assetMgr.getShader("diffuse.shader.json"));
+        mr.materials[0].setTexture("_MainTex", this.assetMgr.getDefaultTexture("white"));
+        if (color)
+            mr.materials[0].setVector4("_MainColor", color);
+        this.scene.addChild(G3D);
+        return G3D;
+    };
+    demo_navigaionRVO.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            this.pickDown();
+        }
+        this.pointDown = this.inputMgr.point.touch;
+        if (this.inputMgr.keyboardMap[65]) {
+            this.isAKeyDown = true;
+        }
+        else {
+            this.isAKeyDown = false;
+        }
+        this.timer += delta;
+        CameraController.instance().update(delta);
+        if (this.mods.length >= 1) {
+            this.RVO_check(this.sim, this.goals);
+            this.RVO_walking(this.sim, this.goals);
+        }
+    };
+    return demo_navigaionRVO;
+}());
 var demo_ScreenSplit = (function () {
     function demo_ScreenSplit() {
         this.cameraCurseHover = 0;
@@ -641,8 +1107,9 @@ var main = (function () {
         this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
         this.addBtn("test_PBR 展示", function () { return new test_pbr(); });
         this.addBtn("test_PBR 场景", function () { return new test_pbr_scene(); });
-        this.addBtn("test_loadprefabdds", function () { return new test_loadprefabdds(); });
-        this.addBtn("test_ATC纹理", function () { return new t.test_ATC(); });
+        this.addBtn("导航网格", function () { return new test_navMesh(); });
+        this.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
+        this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -686,168 +1153,6 @@ var main = (function () {
 }());
 var t;
 (function (t_1) {
-    var test_ATC = (function () {
-        function test_ATC() {
-            this.taskmgr = new gd3d.framework.taskMgr();
-        }
-        test_ATC.prototype.start = function (app) {
-            this.app = app;
-            this.scene = this.app.getScene();
-            this.assetMgr = this.app.getAssetMgr();
-            var objCam = new gd3d.framework.transform();
-            objCam.name = "sth.";
-            this.scene.addChild(objCam);
-            this.camera = objCam.gameObject.addComponent("camera");
-            this.camera.near = 0.01;
-            this.camera.far = 10;
-            this.rooto2d = new gd3d.framework.overlay2D();
-            this.camera.addOverLay(this.rooto2d);
-            this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-            this.taskmgr.addTaskCall(this.createUI.bind(this));
-        };
-        test_ATC.prototype.createLabel = function (x, y, text) {
-            var label1 = new gd3d.framework.transform2D;
-            label1.width = 60;
-            label1.height = 14;
-            label1.localTranslate.x = x;
-            label1.localTranslate.y = y;
-            this.rooto2d.addChild(label1);
-            var a1 = label1.addComponent("label");
-            a1.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
-            a1.fontsize = 12;
-            a1.text = text;
-            a1.color = new gd3d.math.color(0, 0, 0, 1);
-            return label1;
-        };
-        test_ATC.prototype.createImage = function (x, y, texName) {
-            var image = new gd3d.framework.transform2D;
-            image.width = 60;
-            image.height = 60;
-            image.localTranslate.x = x;
-            image.localTranslate.y = y;
-            this.rooto2d.addChild(image);
-            var img = image.addComponent("rawImage2D");
-            var tex = this.assetMgr.getAssetByName(texName);
-            img.image = tex;
-        };
-        test_ATC.prototype.createUI = function (astState, state) {
-            var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
-            var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
-            var label1 = this.createLabel(10, 10, "shannon_dxt1.dds");
-            var label3 = this.createLabel(80, 10, "shannon_dxt3.dds");
-            var label5 = this.createLabel(150, 10, "shannon_dxt5.dds");
-            var labelAAI = this.createLabel(10, 200, "shannon_atc_rgb.dds");
-            var labelAAE = this.createLabel(80, 200, "shannon_atc_rgba_explicit.dds");
-            var labelARGB = this.createLabel(150, 200, "shannon_atc_rgba_interpolated.dds");
-            var image1 = this.createImage(10, 26, "shannon_dxt1.dds");
-            var image3 = this.createImage(80, 26, "shannon_dxt3.dds");
-            var image5 = this.createImage(150, 26, "shannon_dxt5.dds");
-            var imageAAI = this.createImage(10, 214, "shannon_atc_rgb.dds");
-            var imageAAE = this.createImage(80, 214, "shannon_atc_rgba_explicit.dds");
-            var imageARGB = this.createImage(150, 214, "shannon_atc_rgba_interpolated.dds");
-            var tran = this.assetMgr.getAssetByName("dragon");
-            if (tran instanceof gd3d.framework.transform) {
-                var dragon = tran;
-            }
-            state.finish = true;
-        };
-        test_ATC.prototype.loadTexture = function (lastState, state) {
-            var _this = this;
-            this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                        if (s.isfinish) {
-                            _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                if (s.isfinish) {
-                                    _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                        _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                            if (s.isfinish) {
-                                                var t_2 = 6;
-                                                _this.assetMgr.load("res/shannon_dxt1.dds", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
-                                                        t_2--;
-                                                        if (t_2 == 0) {
-                                                            state.finish = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        state.error = false;
-                                                    }
-                                                });
-                                                _this.assetMgr.load("res/shannon_dxt3.dds", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
-                                                        t_2--;
-                                                        if (t_2 == 0) {
-                                                            state.finish = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        state.error = false;
-                                                    }
-                                                });
-                                                _this.assetMgr.load("res/shannon_dxt5.dds", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
-                                                        t_2--;
-                                                        if (t_2 == 0) {
-                                                            state.finish = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        state.error = false;
-                                                    }
-                                                });
-                                                _this.assetMgr.load("res/shannon_atc_rgb.dds", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
-                                                        t_2--;
-                                                        if (t_2 == 0) {
-                                                            state.finish = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        state.error = false;
-                                                    }
-                                                });
-                                                _this.assetMgr.load("res/shannon_atc_rgba_explicit.dds", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
-                                                        t_2--;
-                                                        if (t_2 == 0) {
-                                                            state.finish = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        state.error = false;
-                                                    }
-                                                });
-                                                _this.assetMgr.load("res/shannon_atc_rgba_interpolated.dds", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                                    if (s.isfinish) {
-                                                        t_2--;
-                                                        if (t_2 == 0) {
-                                                            state.finish = true;
-                                                        }
-                                                    }
-                                                    else {
-                                                        state.error = false;
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        };
-        test_ATC.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
-        };
-        return test_ATC;
-    }());
-    t_1.test_ATC = test_ATC;
-})(t || (t = {}));
-var t;
-(function (t_3) {
     var test_blend = (function () {
         function test_blend() {
             this.timer = 0;
@@ -975,7 +1280,7 @@ var t;
         };
         return test_blend;
     }());
-    t_3.test_blend = test_blend;
+    t_1.test_blend = test_blend;
 })(t || (t = {}));
 var test_fakepbr = (function () {
     function test_fakepbr() {
@@ -1737,6 +2042,210 @@ var demo;
     }());
     demo.DragonTest = DragonTest;
 })(demo || (demo = {}));
+var test_navMesh = (function () {
+    function test_navMesh() {
+        this.cubesize = 0.5;
+        this.pos = [];
+        this.points = [];
+        this.timer = 0;
+        this.bere = false;
+        this.pointDown = false;
+    }
+    test_navMesh.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.assetMgr = app.getAssetMgr();
+        var names = ["MainCity_", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        var name = names[0];
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.loadScene(name);
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 100));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+        this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
+    };
+    test_navMesh.prototype.loadScene = function (assetName, isCompress) {
+        var _this = this;
+        if (isCompress === void 0) { isCompress = false; }
+        var addScene = function () {
+            var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+            var _root = _scene.getSceneRoot();
+            _this.scene.addChild(_root);
+            _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+            _root.markDirty();
+            _this.app.getScene().lightmaps = [];
+            _scene.useLightMap(_this.app.getScene());
+            _scene.useFog(_this.app.getScene());
+            _this.navmeshMgr.loadNavMesh("res/navmesh/" + assetName + ".nav.json", _this.app, function (s) {
+                if (s.iserror) {
+                    console.error(" " + s.errs + " ");
+                    return;
+                }
+                console.error("scene navmesh : " + assetName + "  is loaded");
+            });
+        };
+        if (isCompress) {
+            this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
+                if (s.isfinish) {
+                    {
+                        addScene();
+                    }
+                }
+            });
+        }
+        else {
+            this.app.getAssetMgr().load("res/scenes/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                if (s1.isfinish) {
+                    addScene();
+                }
+            });
+        }
+    };
+    test_navMesh.prototype.pickDown = function () {
+        var navTrans = this.navmeshMgr.navTrans;
+        var navmesh = this.navmeshMgr.navMesh;
+        if (navmesh == null)
+            return;
+        var inputMgr = this.app.getInputMgr();
+        var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
+        var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
+        if (!pickinfo)
+            return;
+        var endPos = pickinfo.hitposition;
+        console.error(endPos);
+        this.pos.push(endPos);
+        if (this.pos.length > 1) {
+            var arr = this.navmeshMgr.moveToPoints(this.pos.pop(), this.pos.pop());
+            console.error(arr);
+            this.pos.length = 0;
+            var color = new gd3d.math.color(1, 0, 0, 0.5);
+            this.createAllPoint(arr.length);
+            for (var i = 0; i < arr.length; i++) {
+                var p = arr[i];
+                this.setPoint(i, p.x, p.y, p.z, color);
+            }
+            this.drawLine(arr);
+        }
+    };
+    test_navMesh.prototype.drawLine = function (points) {
+        if (this.lastLine) {
+            this.lastLine.gameObject.visible = false;
+            this.lastLine.markDirty();
+            if (this.lastLine.parent)
+                this.lastLine.parent.removeChild(this.lastLine);
+            this.lastLine.dispose();
+        }
+        var mesh = this.genMesh(points);
+        this.lastLine = new gd3d.framework.transform();
+        var mf = this.lastLine.gameObject.addComponent("meshFilter");
+        mf.mesh = mesh;
+        mesh.glMesh.lineMode = WebGLRenderingContext.LINE_STRIP;
+        this.lastLine.gameObject.addComponent("meshRenderer");
+        this.lastLine.localTranslate.x = this.lastLine.localTranslate.y = this.lastLine.localTranslate.z = 0;
+        this.scene.addChild(this.lastLine);
+        this.lastLine.markDirty();
+    };
+    test_navMesh.prototype.genMesh = function (points) {
+        var meshD = new gd3d.render.meshData();
+        meshD.pos = [];
+        meshD.color = [];
+        meshD.trisindex = [];
+        for (var i = 0; i < points.length; i++) {
+            var pos = points[i];
+            meshD.pos.push(new gd3d.math.vector3(pos.x, pos.y + (this.cubesize / 2), pos.z));
+            meshD.trisindex.push(i);
+            meshD.color.push(new gd3d.math.color(1, 0, 0, 1));
+        }
+        var _mesh = new gd3d.framework.mesh();
+        _mesh.data = meshD;
+        var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color;
+        var v32 = _mesh.data.genVertexDataArray(vf);
+        var i16 = _mesh.data.genIndexDataArray();
+        _mesh.glMesh = new gd3d.render.glMesh();
+        _mesh.glMesh.initBuffer(this.app.webgl, vf, _mesh.data.pos.length);
+        _mesh.glMesh.uploadVertexSubData(this.app.webgl, v32);
+        _mesh.glMesh.addIndex(this.app.webgl, i16.length);
+        _mesh.glMesh.uploadIndexSubData(this.app.webgl, 0, i16);
+        _mesh.submesh = [];
+        {
+            var sm = new gd3d.framework.subMeshInfo();
+            sm.matIndex = 0;
+            sm.useVertexIndex = 0;
+            sm.start = 0;
+            sm.size = i16.length;
+            sm.line = true;
+            _mesh.submesh.push(sm);
+        }
+        return _mesh;
+    };
+    test_navMesh.prototype.createAllPoint = function (count) {
+        this.points.forEach(function (element) {
+            if (element)
+                element.gameObject.visible = false;
+        });
+        var need = count - this.points.length;
+        if (need > 0) {
+            for (var i = 0; i < need; i++) {
+                this.generatePoint();
+            }
+        }
+    };
+    test_navMesh.prototype.setPoint = function (index, x, y, z, color) {
+        var cube = this.points[index];
+        cube.localTranslate.x = x;
+        cube.localTranslate.y = y;
+        cube.localTranslate.z = z;
+        cube.markDirty();
+        var mf = cube.gameObject.getComponent("meshFilter");
+        if (mf.mesh.data.color == null)
+            mf.mesh.data.color = [];
+        mf.mesh.data.color.forEach(function (c) {
+            if (c) {
+                c.r = color.r;
+                c.g = color.g;
+                c.b = color.b;
+                c.a = color.a;
+            }
+        });
+        var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+        var v32 = mf.mesh.data.genVertexDataArray(vf);
+        mf.mesh.glMesh.uploadVertexSubData(this.app.webgl, v32);
+        cube.gameObject.visible = true;
+    };
+    test_navMesh.prototype.generatePoint = function () {
+        var cube = new gd3d.framework.transform;
+        var mf = cube.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh("cube").clone();
+        var mr = cube.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material("mat");
+        mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
+        mr.materials[0].setTexture("_MainTex", this.assetMgr.getDefaultTexture("white"));
+        this.points.push(cube);
+        this.scene.addChild(cube);
+        cube.localScale.x = cube.localScale.y = cube.localScale.z = this.cubesize;
+    };
+    test_navMesh.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            this.pickDown();
+        }
+        this.pointDown = this.inputMgr.point.touch;
+        this.timer += delta;
+        CameraController.instance().update(delta);
+    };
+    return test_navMesh;
+}());
 var test_pbr_scene = (function () {
     function test_pbr_scene() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -2596,6 +3105,103 @@ var test_RangeScreen = (function () {
         var z2 = Math.cos(this.timer * 0.1);
     };
     return test_RangeScreen;
+}());
+var test_Rvo2 = (function () {
+    function test_Rvo2() {
+        this.sim = new RVO.Simulator(1, 10, 5, 10, 10, 1, 0.2, [0, 0]);
+        this.goals = [];
+        this.size = 0.5;
+        this.spheres = [];
+    }
+    test_Rvo2.prototype.start = function (app) {
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.assetMgr = app.getAssetMgr();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.far = 1000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 150, 0);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+        this.init();
+    };
+    test_Rvo2.prototype.init = function () {
+        var sphere = new gd3d.framework.transform;
+        sphere.localTranslate.x = sphere.localTranslate.y = sphere.localTranslate.z = 0;
+        var mf = sphere.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh("sphere");
+        var mr = sphere.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material("sphere");
+        mr.materials[0].setShader(this.assetMgr.getShader("shader/def"));
+        var count = 50;
+        var radius = 55;
+        var tempdir = gd3d.math.pool.new_vector3();
+        for (var i = 0; i < count; i++) {
+            gd3d.math.vec3Set_One(tempdir);
+            var rate = i / count;
+            tempdir.x = Math.sin(rate * 2 * Math.PI);
+            tempdir.z = Math.cos(rate * 2 * Math.PI);
+            gd3d.math.vec3Normalize(tempdir, tempdir);
+            var temps = sphere.clone();
+            this.scene.addChild(temps);
+            gd3d.math.vec3ScaleByNum(tempdir, radius, tempdir);
+            gd3d.math.vec3Clone(tempdir, temps.localTranslate);
+            temps.markDirty();
+            this.spheres.push(temps);
+            this.sim.addAgent([temps.localTranslate.x, temps.localTranslate.z]);
+            this.goals.push([-temps.localTranslate.x, -temps.localTranslate.z]);
+        }
+        var c = 0;
+        this.sim.addObstacle([
+            [5 + c, -5 + c],
+            [5 + c, 5 + c],
+            [-5 + c, 5 + c],
+            [-5 + c, -5 + c]
+        ]);
+        this.sim.processObstacles();
+    };
+    test_Rvo2.prototype.update = function (delta) {
+        CameraController.instance().update(delta);
+        if (this.reachedGoals(this.sim, this.goals)) {
+            console.error("sim end ");
+        }
+        else {
+            this.updateVisualization(this.sim);
+            this.setPreferredVelocities(this.sim, this.goals);
+            this.sim.doStep();
+        }
+    };
+    test_Rvo2.prototype.reachedGoals = function (sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i++) {
+            if (RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, goals[i])) > 1) {
+                return false;
+            }
+        }
+        return true;
+    };
+    test_Rvo2.prototype.setPreferredVelocities = function (sim, goals) {
+        for (var i = 0, len = sim.agents.length; i < len; i++) {
+            var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+            if (RVO.Vector.absSq(goalVector) > 1) {
+                goalVector = RVO.Vector.normalize(goalVector);
+            }
+            sim.agents[i].prefVelocity = goalVector;
+        }
+    };
+    test_Rvo2.prototype.updateVisualization = function (sim) {
+        for (var i = 0; i < this.spheres.length; i++) {
+            this.spheres[i].localTranslate.x = sim.agents[i].position[0];
+            this.spheres[i].localTranslate.z = sim.agents[i].position[1];
+            this.spheres[i].markDirty();
+        }
+    };
+    return test_Rvo2;
 }());
 var test_softCut = (function () {
     function test_softCut() {
@@ -6297,78 +6903,6 @@ var test_multipleplayer_anim = (function () {
     };
     return test_multipleplayer_anim;
 }());
-var test_navmesh = (function () {
-    function test_navmesh() {
-        this.timer = 0;
-        this.movetarget = new gd3d.math.vector3();
-        this.pointDown = false;
-        this.pos = [];
-    }
-    test_navmesh.prototype.start = function (app) {
-        var _this = this;
-        console.log("i am here.");
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.inputMgr = this.app.getInputMgr();
-        this.navMeshLoader = gd3d.framework.NavMeshLoadManager.Instance;
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        this.navMeshLoader.loadNavMesh("res/navinfo.json", app, function (s) {
-            objCam.lookat(_this.navMeshLoader.navTrans);
-            objCam.markDirty();
-        });
-        var array = this.navMeshLoader.moveToPoints(new gd3d.math.vector3(-2.635004384225666, 0.033333320000000555, 2.331812147285282), new gd3d.math.vector3(3.2923403637954975, 0.03333331999999878, -1.158075981081689));
-        console.error(JSON.stringify(array));
-        var cuber;
-        this.cube = new gd3d.framework.transform();
-        this.cube.name = "cube";
-        this.cube.localScale.x = 1;
-        this.cube.localScale.y = 1;
-        this.cube.localScale.z = 1;
-        this.scene.addChild(this.cube);
-        var mesh = this.cube.gameObject.addComponent("meshFilter");
-        var smesh = this.app.getAssetMgr().getDefaultMesh("pyramid");
-        mesh.mesh = (this.app.getAssetMgr().getDefaultMesh("cube"));
-        var renderer = this.cube.gameObject.addComponent("meshRenderer");
-        var col = this.cube.gameObject.addComponent("boxcollider");
-        col.colliderVisible = true;
-        this.cube.markDirty();
-        cuber = renderer;
-        this.scene.addChild(this.cube);
-        var array = this.navMeshLoader.moveToPoints(new gd3d.math.vector3(-2.635004384225666, 0.033333320000000555, 2.331812147285282), new gd3d.math.vector3(3.2923403637954975, 0.03333331999999878, -1.158075981081689));
-        console.error(JSON.stringify(array));
-    };
-    test_navmesh.prototype.update = function (delta) {
-        if (this.pointDown == false && this.inputMgr.point.touch == true) {
-            this.pickDown();
-        }
-        this.pointDown = this.inputMgr.point.touch;
-    };
-    test_navmesh.prototype.pickDown = function () {
-        var navTrans = this.navMeshLoader.navTrans;
-        var navmesh = this.navMeshLoader.navMesh;
-        if (navmesh == null)
-            return;
-        var inputMgr = this.app.getInputMgr();
-        var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-        var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
-        if (!pickinfo)
-            return;
-        var endPos = pickinfo.hitposition;
-        console.error(endPos);
-        this.pos.push(endPos);
-        if (this.pos.length > 1) {
-            var a = this.navMeshLoader.moveToPoints(this.pos.pop(), this.pos.pop());
-            console.error(a);
-        }
-    };
-    return test_navmesh;
-}());
 var t;
 (function (t) {
     var Test_NormalMap = (function () {
@@ -6709,8 +7243,8 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = true;
                 }
-                for (var i_1 = 0; i_1 < _this.traillist.length; i_1++) {
-                    _this.traillist[i_1].play();
+                for (var i_2 = 0; i_2 < _this.traillist.length; i_2++) {
+                    _this.traillist[i_2].play();
                 }
                 _this.guippaths[0].play(2);
                 _this.guippaths[1].play();
@@ -6720,9 +7254,9 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = false;
                 }
-                for (var i_2 = 0; i_2 < _this.guippaths.length; i_2++) {
-                    _this.traillist[i_2].stop();
-                    _this.guippaths[i_2].stop();
+                for (var i_3 = 0; i_3 < _this.guippaths.length; i_3++) {
+                    _this.traillist[i_3].stop();
+                    _this.guippaths[i_3].stop();
                 }
             });
         };
@@ -7816,140 +8350,6 @@ var test_loadprefab = (function () {
         CameraController.instance().update(delta);
     };
     return test_loadprefab;
-}());
-var test_loadprefabdds = (function () {
-    function test_loadprefabdds() {
-        this.timer = 0;
-    }
-    test_loadprefabdds.prototype.refreshTexture = function (tran) {
-        var meshrenderer = tran.gameObject.getComponentsInChildren("meshRenderer");
-        var skinnmeshrenderer = tran.gameObject.getComponentsInChildren("skinnedMeshRenderer");
-        this.renderer = meshrenderer;
-        this.skinRenders = skinnmeshrenderer;
-        for (var i = 0; i < meshrenderer.length; i++) {
-            var v = meshrenderer[i];
-            for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
-                        v.materials[j].setTexture(k, textur);
-                    }
-                }
-            }
-        }
-        for (var i = 0; i < skinnmeshrenderer.length; i++) {
-            var v = skinnmeshrenderer[i];
-            for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
-                        v.materials[j].setTexture(k, textur);
-                    }
-                }
-            }
-        }
-    };
-    test_loadprefabdds.prototype.refreshAniclip = function (tran, name) {
-        var anipalyer = tran.gameObject.getComponentsInChildren("aniplayer");
-        for (var i = 0; i < anipalyer.length; i++) {
-            for (var key in anipalyer[i].clipnames) {
-                var j = anipalyer[i].clipnames[key];
-                var v = anipalyer[i].clips[j];
-                var clip = this.app.getAssetMgr().getAssetByName("gs_chuangjue_01_" + v.getName());
-                if (clip) {
-                    anipalyer[i].clips[j] = clip;
-                    if (anipalyer[i].clipnames[clip.getName()]) {
-                    }
-                    else {
-                        anipalyer[i].clipnames[clip.getName()] = j;
-                    }
-                }
-            }
-            anipalyer[i].playCross(name, 0.2);
-            anipalyer[i].playCross("gs_chuangjue_01_" + name, 0.2);
-        }
-    };
-    test_loadprefabdds.prototype.start = function (app) {
-        var _this = this;
-        console.log("i am here.");
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
-        var names = ["elongmul", "0060_duyanshou", "Cube", "0001_fashion", "193_meirenyu"];
-        var name = names[0];
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-            if (state.isfinish) {
-                name = "dragon";
-                _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
-                        _this.baihu = _prefab.getCloneTrans();
-                        _this.scene.addChild(_this.baihu);
-                        _this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        _this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
-                        objCam.localTranslate = new gd3d.math.vector3(0, 0, -2);
-                        objCam.lookat(_this.baihu);
-                        objCam.markDirty();
-                        var ani = _this.baihu.gameObject.getComponent("aniplayer");
-                        _this.refreshTexture(_this.baihu);
-                    }
-                });
-            }
-        });
-        this.changeShader();
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 10000;
-        this.camera.backgroundColor = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);
-        CameraController.instance().init(this.app, this.camera);
-        objCam.markDirty();
-    };
-    test_loadprefabdds.prototype.changeShader = function () {
-        var _this = this;
-        var btn = document.createElement("button");
-        btn.textContent = "切换Shader到：diffuse.shader.json";
-        btn.onclick = function () {
-            var sh = _this.app.getAssetMgr().getShader("diffuse.shader.json");
-            _this.change(sh);
-        };
-        btn.style.top = "160px";
-        btn.style.position = "absolute";
-        this.app.container.appendChild(btn);
-        var btn2 = document.createElement("button");
-        btn2.textContent = "切换Shader到：additive_alpha.shader.json";
-        btn2.onclick = function () {
-            var sh = _this.app.getAssetMgr().getShader("additive_alpha.shader.json");
-            _this.change(sh);
-        };
-        btn2.style.top = "124px";
-        btn2.style.position = "absolute";
-        this.app.container.appendChild(btn2);
-    };
-    test_loadprefabdds.prototype.change = function (sha) {
-        for (var j = 0; j < this.renderer.length; j++) {
-            for (var i = 0; i < this.renderer[j].materials.length; i++) {
-                this.renderer[j].materials[i].changeShader(sha);
-            }
-        }
-        for (var j = 0; j < this.skinRenders.length; j++) {
-            for (var i = 0; i < this.skinRenders[j].materials.length; i++) {
-                this.skinRenders[j].materials[i].changeShader(sha);
-            }
-        }
-    };
-    test_loadprefabdds.prototype.update = function (delta) {
-        this.timer += delta;
-        var x = Math.sin(this.timer);
-        var z = Math.cos(this.timer);
-        var x2 = Math.sin(this.timer * 0.1);
-        var z2 = Math.cos(this.timer * 0.1);
-        var objCam = this.camera.gameObject.transform;
-        CameraController.instance().update(delta);
-    };
-    return test_loadprefabdds;
 }());
 var testReload = (function () {
     function testReload() {
@@ -9262,13 +9662,13 @@ var t;
     t.test_trailrender = test_trailrender;
 })(t || (t = {}));
 var t;
-(function (t_4) {
+(function (t_2) {
     var enumcheck;
     (function (enumcheck) {
         enumcheck[enumcheck["AA"] = 0] = "AA";
         enumcheck[enumcheck["BB"] = 1] = "BB";
         enumcheck[enumcheck["CC"] = 2] = "CC";
-    })(enumcheck = t_4.enumcheck || (t_4.enumcheck = {}));
+    })(enumcheck = t_2.enumcheck || (t_2.enumcheck = {}));
     var enummap = {};
     var test_ui = (function () {
         function test_ui() {
@@ -9537,7 +9937,7 @@ var t;
         };
         return test_ui;
     }());
-    t_4.test_ui = test_ui;
+    t_2.test_ui = test_ui;
 })(t || (t = {}));
 var testUserCodeUpdate = (function () {
     function testUserCodeUpdate() {

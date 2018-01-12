@@ -20217,7 +20217,8 @@ var gd3d;
                 }
                 return _mesh;
             };
-            NavMeshLoadManager.prototype.showNavmesh = function (isshow) {
+            NavMeshLoadManager.prototype.showNavmesh = function (isshow, material) {
+                if (material === void 0) { material = null; }
                 if (this.navTrans) {
                     if (!isshow) {
                         this.navTrans.gameObject.visible = isshow;
@@ -20226,8 +20227,13 @@ var gd3d;
                         return;
                     }
                     var compent = this.navTrans.gameObject.getComponent("meshRenderer");
-                    if (compent == null)
+                    if (compent == null) {
                         compent = this.navTrans.gameObject.addComponent("meshRenderer");
+                        if (material) {
+                            compent.materials = [];
+                            compent.materials[0] = material;
+                        }
+                    }
                     this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0);
                     this.navTrans.markDirty();
                 }
@@ -28474,6 +28480,7 @@ var gd3d;
         render.drawInfo = drawInfo;
         var glMesh = (function () {
             function glMesh() {
+                this.lineMode = WebGLRenderingContext.LINES;
                 this.bindIndex = -1;
                 this.vertexFormat = VertexFormatMask.Position;
             }
@@ -28685,7 +28692,7 @@ var gd3d;
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawArrays(webgl.LINES, start, count);
+                webgl.drawArrays(this.lineMode, start, count);
             };
             glMesh.prototype.drawElementTris = function (webgl, start, count) {
                 if (start === void 0) { start = 0; }
@@ -28702,7 +28709,7 @@ var gd3d;
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+                webgl.drawElements(this.lineMode, count, webgl.UNSIGNED_SHORT, start * 2);
             };
             return glMesh;
         }());

@@ -134,7 +134,7 @@
         return _mesh;
     }
 
-    public showNavmesh(isshow: boolean) {
+    public showNavmesh(isshow: boolean , material:gd3d.framework.material = null) {
         if (this.navTrans) {
             if (!isshow) {
                 this.navTrans.gameObject.visible = isshow;
@@ -144,8 +144,13 @@
             }
 
             let compent: gd3d.framework.meshRenderer = this.navTrans.gameObject.getComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            if (compent == null)
+            if (compent == null){
                 compent = this.navTrans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+                if(material){
+                    compent.materials = [];
+                    compent.materials[0] = material;
+                }
+            }
             this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0)
             this.navTrans.markDirty();
         }
