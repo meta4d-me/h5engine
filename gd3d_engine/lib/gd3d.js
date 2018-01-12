@@ -141,6 +141,12 @@ var gd3d;
                 rotateDiv.style.height = "100%";
                 this.container = rotateDiv;
                 div.appendChild(rotateDiv);
+                var sc1 = document.createElement("script");
+                var sc2 = document.createElement("script");
+                sc1.src = "lib/webgl-util.js";
+                sc2.src = "lib/webgl-texture-util.js";
+                document.body.appendChild(sc1);
+                document.body.appendChild(sc2);
                 var canvas = document.createElement("canvas");
                 if (canvas == null) {
                     alert("Failed to create canvas at the application.start()");
@@ -4843,6 +4849,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["KeyFrameAnimaionAsset"] = 20] = "KeyFrameAnimaionAsset";
             AssetTypeEnum[AssetTypeEnum["PVR"] = 21] = "PVR";
             AssetTypeEnum[AssetTypeEnum["F14Effect"] = 22] = "F14Effect";
+            AssetTypeEnum[AssetTypeEnum["DDS"] = 23] = "DDS";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var AssetBundleLoadState;
         (function (AssetBundleLoadState) {
@@ -4857,6 +4864,7 @@ var gd3d;
             AssetBundleLoadState[AssetBundleLoadState["Textasset"] = 128] = "Textasset";
             AssetBundleLoadState[AssetBundleLoadState["Pvr"] = 256] = "Pvr";
             AssetBundleLoadState[AssetBundleLoadState["f14eff"] = 512] = "f14eff";
+            AssetBundleLoadState[AssetBundleLoadState["Dds"] = 1024] = "Dds";
         })(AssetBundleLoadState = framework.AssetBundleLoadState || (framework.AssetBundleLoadState = {}));
         var ResourceState = (function () {
             function ResourceState() {
@@ -5011,10 +5019,11 @@ var gd3d;
                 var f14effs = [];
                 var fonts = [];
                 var atlass = [];
+                var ddss = [];
                 var asslist = [];
                 var assstatelist = [];
-                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs, f14effs, fonts, atlass);
-                assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff);
+                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs, f14effs, fonts, atlass, ddss);
+                assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
                 var realTotal = 0;
                 var mapPackes = {};
                 for (var i = 0; i < this.packages.length; i++) {
@@ -5083,6 +5092,10 @@ var gd3d;
                             case AssetTypeEnum.F14Effect:
                                 asset = new framework.f14eff(fileName);
                                 f14effs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case AssetTypeEnum.DDS:
+                                asset = new framework.texture(fileName);
+                                ddss.push({ url: url, type: type, asset: asset });
                                 break;
                             case AssetTypeEnum.Font:
                                 asset = new framework.font(fileName);
@@ -5461,6 +5474,7 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.PVR, new framework.AssetFactory_PVR());
                 this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new framework.AssetFactory_KeyframeAnimationPathAsset());
                 this.regAssetFactory(AssetTypeEnum.F14Effect, new framework.AssetFactory_f14eff());
+                this.regAssetFactory(AssetTypeEnum.DDS, new framework.AssetFactory_DDS());
             };
             assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
                 if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1) {
@@ -5867,6 +5881,9 @@ var gd3d;
                     }
                     else if (extname == ".f14effect.json") {
                         return AssetTypeEnum.F14Effect;
+                    }
+                    else if (extname == ".dds" || extname == ".dds.bin") {
+                        return AssetTypeEnum.DDS;
                     }
                     i = file.indexOf(".", i + 1);
                 }
@@ -6738,6 +6755,43 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AssetFactory_DDS = (function () {
+            function AssetFactory_DDS() {
+            }
+            AssetFactory_DDS.prototype.newAsset = function () {
+                return null;
+            };
+            AssetFactory_DDS.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            };
+            AssetFactory_DDS.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _texture = asset ? asset : new framework.texture(filename);
+                    assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                    var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                    textureUtil.loadDDS(url, null, function (texture, error, stats) {
+                        var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                        t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                        t2d.texture = texture;
+                        _texture.glTexture = t2d;
+                    });
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            return AssetFactory_DDS;
+        }());
+        framework.AssetFactory_DDS = AssetFactory_DDS;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var AssetFactory_f14eff = (function () {
             function AssetFactory_f14eff() {
             }
@@ -7373,6 +7427,24 @@ var gd3d;
                             framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                         });
                     }
+                    else if (_textureSrc.indexOf(".dds.bin") >= 0) {
+                        gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
+                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                return;
+                            var _texture = asset ? asset : new framework.texture(filename);
+                            assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                            var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                            textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
+                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                                t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                                t2d.texture = texture;
+                                _texture.glTexture = t2d;
+                            });
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        }, function (loadedLength, totalLength) {
+                            framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                        });
+                    }
                     else {
                         gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
                             if (framework.AssetFactoryTools.catchError(_err, onstate, state))
@@ -7429,6 +7501,24 @@ var gd3d;
                         var pvr = new PvrParse(assetMgr.webgl);
                         console.log(_textureSrc);
                         _texture.glTexture = pvr.parse(_buffer);
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    }, function (loadedLength, totalLength) {
+                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                    });
+                }
+                else if (_textureSrc.indexOf(".dds.bin") >= 0) {
+                    gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _texture = asset ? asset : new framework.texture(filename);
+                        assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                        var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                        textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
+                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                            t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                            t2d.texture = texture;
+                            _texture.glTexture = t2d;
+                        });
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                     }, function (loadedLength, totalLength) {
                         framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
@@ -27968,6 +28058,7 @@ var gd3d;
                     webglkit.ONE_MINUS_DST_COLOR = webgl.ONE_MINUS_DST_COLOR;
                     webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
                     webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
+                    webglkit.caps.atcExtension = webgl.getExtension('WEBGL_compressed_texture_atc');
                 }
             };
             webglkit._maxVertexAttribArray = 0;

@@ -1,20 +1,15 @@
-namespace gd3d.framework
-{
-    export class AssetFactory_TextureDesc implements IAssetFactory
-    {
-        newAsset(): texture
-        {
+namespace gd3d.framework {
+    export class AssetFactory_TextureDesc implements IAssetFactory {
+        newAsset(): texture {
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
-        {
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture) {
             let filename = getFileName(url);
 
             state.resstate[filename] = new RefResourceState();
             gd3d.io.loadText(url,
-                (txt, err) =>
-                {
+                (txt, err) => {
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
@@ -24,9 +19,9 @@ namespace gd3d.framework
                     var _format: string = _texturedesc["format"];
                     var _mipmap: boolean = _texturedesc["mipmap"];
                     var _wrap: string = _texturedesc["wrap"];
-                    var _premultiplyAlpha:boolean = _texturedesc["premultiplyAlpha"];
+                    var _premultiplyAlpha: boolean = _texturedesc["premultiplyAlpha"];
 
-                    if(_premultiplyAlpha == undefined){
+                    if (_premultiplyAlpha == undefined) {
                         _premultiplyAlpha = true;
                     }
                     var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
@@ -45,11 +40,9 @@ namespace gd3d.framework
 
                     var _textureSrc: string = url.replace(filename, _name);
 
-                    if (_textureSrc.indexOf(".pvr.bin") >= 0)
-                    {
+                    if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                         gd3d.io.loadArrayBuffer(_textureSrc,
-                            (_buffer, err) =>
-                            {
+                            (_buffer, err) => {
                                 if (AssetFactoryTools.catchError(err, onstate, state))
                                     return;
 
@@ -59,16 +52,42 @@ namespace gd3d.framework
 
                                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                             },
-                            (loadedLength, totalLength) =>
-                            {
+                            (loadedLength, totalLength) => {
                                 AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                             });
-                    }
-                    else
-                    {
+                    } else if (_textureSrc.indexOf(".dds.bin") >= 0) {
+                        gd3d.io.loadArrayBuffer(_textureSrc,
+                            (_buffer, err) => {
+                                if (AssetFactoryTools.catchError(err, onstate, state))
+                                    return;
+                                let _texture = asset ? asset : new texture(filename);
+                                assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                                let textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                                textureUtil.loadDDS(_textureSrc, null, (texture, error, stats) => {
+                                    let t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                                    t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                                    t2d.texture = texture;
+                                    _texture.glTexture = t2d;
+                                    // if (stats != null) {
+
+                                    // }
+
+                                    // if (!error) {
+
+                                    // } else {
+
+                                    // }
+                                });
+
+                                AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                            },
+                            (loadedLength, totalLength) => {
+                                AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                            });
+
+                    } else {
                         gd3d.io.loadImg(_textureSrc,
-                            (_tex, _err) =>
-                            {
+                            (_tex, _err) => {
                                 if (AssetFactoryTools.catchError(_err, onstate, state))
                                     return;
 
@@ -81,21 +100,18 @@ namespace gd3d.framework
 
                                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                             },
-                            (loadedLength, totalLength) =>
-                            {
+                            (loadedLength, totalLength) => {
                                 AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                             });
                     }
                 },
-                (loadedLength, totalLength) =>
-                {
+                (loadedLength, totalLength) => {
                     AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 }
             );
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
-        {
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture) {
             let filename = getFileName(url);
 
             let txt = respack[filename];
@@ -106,30 +122,26 @@ namespace gd3d.framework
             var _format: string = _texturedesc["format"];
             var _mipmap: boolean = _texturedesc["mipmap"];
             var _wrap: string = _texturedesc["wrap"];
-            var _premultiplyAlpha:boolean = _texturedesc["premultiplyAlpha"];
-            
-            if(_premultiplyAlpha == undefined){
+            var _premultiplyAlpha: boolean = _texturedesc["premultiplyAlpha"];
+
+            if (_premultiplyAlpha == undefined) {
                 _premultiplyAlpha = true;
             }
             var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
-            if (_format == "RGB")
-            {
+            if (_format == "RGB") {
                 _textureFormat = render.TextureFormatEnum.RGB;
             }
-            else if (_format == "Gray")
-            {
+            else if (_format == "Gray") {
                 _textureFormat = render.TextureFormatEnum.Gray;
             }
 
             var _linear: boolean = true;
-            if (_filterMode.indexOf("linear") < 0)
-            {
+            if (_filterMode.indexOf("linear") < 0) {
                 _linear = false;
             }
 
             var _repeat: boolean = false;
-            if (_wrap.indexOf("Repeat") >= 0)
-            {
+            if (_wrap.indexOf("Repeat") >= 0) {
                 _repeat = true;
             }
 
@@ -137,11 +149,9 @@ namespace gd3d.framework
             var _textureSrc: string = url.replace(filename, _name);
 
             state.resstate[filename] = new ResourceState();
-            if (_textureSrc.indexOf(".pvr.bin") >= 0)
-            {
+            if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                 gd3d.io.loadArrayBuffer(_textureSrc,
-                    (_buffer, err) =>
-                    {
+                    (_buffer, err) => {
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;
 
@@ -152,16 +162,43 @@ namespace gd3d.framework
 
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                     },
-                    (loadedLength, totalLength) =>
-                    {
+                    (loadedLength, totalLength) => {
                         AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
+            }else if (_textureSrc.indexOf(".dds.bin") >= 0) {
+                gd3d.io.loadArrayBuffer(_textureSrc,
+                    (_buffer, err) => {
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        let _texture = asset ? asset : new texture(filename);
+                        assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                        let textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                        textureUtil.loadDDS(_textureSrc, null, (texture, error, stats) => {
+                            let t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                            t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                            t2d.texture = texture;
+                            _texture.glTexture = t2d;
+                            // if (stats != null) {
+
+                            // }
+
+                            // if (!error) {
+
+                            // } else {
+
+                            // }
+                        });
+
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    },
+                    (loadedLength, totalLength) => {
+                        AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                    });
+
             }
-            else
-            {
+            else {
                 gd3d.io.loadImg(_textureSrc,
-                    (_tex, _err) =>
-                    {
+                    (_tex, _err) => {
                         if (AssetFactoryTools.catchError(_err, onstate, state))
                             return;
                         let _texture = asset ? asset : new texture(filename);
@@ -173,8 +210,7 @@ namespace gd3d.framework
 
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                     },
-                    (loadedLength, totalLength) =>
-                    {
+                    (loadedLength, totalLength) => {
                         AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
             }

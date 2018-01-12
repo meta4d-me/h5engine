@@ -81,8 +81,9 @@ namespace gd3d.framework
         markAABBDirty()
         {
             this.aabbdirty = true;
-            this.markAABBChildDirty();//自己脏了 大aabb肯定脏了
+            this.markAABBChildDirty();//自己AABB变化了 整体的AABB（即包含所有子节点的AABB）肯定也需要改变
 
+            //自己的AABB变化了 ，包含自己节点的总AABB也需要改变
             var p = this.parent;
             while (p != null)
             {

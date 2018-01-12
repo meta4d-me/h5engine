@@ -780,6 +780,7 @@ declare namespace gd3d.framework {
         KeyFrameAnimaionAsset = 20,
         PVR = 21,
         F14Effect = 22,
+        DDS = 23,
     }
     enum AssetBundleLoadState {
         None = 0,
@@ -793,6 +794,7 @@ declare namespace gd3d.framework {
         Textasset = 128,
         Pvr = 256,
         f14eff = 512,
+        Dds = 1024,
     }
     class ResourceState {
         res: IAsset;
@@ -1023,6 +1025,14 @@ declare namespace gd3d.framework {
         newAsset(): atlas;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: atlas): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: atlas): void;
+    }
+}
+declare var WebGLTextureUtil: any;
+declare namespace gd3d.framework {
+    class AssetFactory_DDS implements IAssetFactory {
+        newAsset(): texture;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
     }
 }
 declare namespace gd3d.framework {
@@ -4953,6 +4963,7 @@ declare namespace gd3d.render {
         textureLOD: boolean;
         drawBuffersExtension: any;
         pvrtcExtension: any;
+        atcExtension: any;
     }
     class webglkit {
         private static _maxVertexAttribArray;
