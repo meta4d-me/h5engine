@@ -20,6 +20,7 @@ declare class demo_navigaionRVO implements IState {
     private playerwalking();
     private RVO_walking(sim, goals);
     private RVO_check(sim, goals);
+    private navmesh2Border(data);
     private currGoal;
     private Goals;
     private ckGoalsChange();

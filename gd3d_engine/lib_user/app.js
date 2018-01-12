@@ -46,7 +46,7 @@ var demo_navigaionRVO = (function () {
         descr.style.position = "absolute";
         this.app.container.appendChild(descr);
         var names = ["MainCity_", "testnav", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
-        var name = names[1];
+        var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.loadScene(name);
@@ -86,7 +86,7 @@ var demo_navigaionRVO = (function () {
         var _this = this;
         if (isCompress === void 0) { isCompress = false; }
         var addScene = function () {
-            var beAddScene = false;
+            var beAddScene = true;
             if (beAddScene) {
                 var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
                 var _root = _scene.getSceneRoot();
@@ -94,7 +94,6 @@ var demo_navigaionRVO = (function () {
                 _root.markDirty();
                 _this.app.getScene().lightmaps = [];
                 _scene.useLightMap(_this.app.getScene());
-                _scene.useFog(_this.app.getScene());
                 _this.scene.addChild(_root);
             }
             _this.navmeshMgr.loadNavMesh("res/navmesh/" + assetName + ".nav.json", _this.app, function (s) {
@@ -111,14 +110,16 @@ var demo_navigaionRVO = (function () {
                 console.error(_this.navmeshMgr.navMesh);
                 var data = _this.navmeshMgr.navMesh.data;
                 if (data) {
-                    for (var i = 0; i < data.trisindex.length; i += 3) {
-                        var pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
-                        var pos2 = [data.pos[data.trisindex[i + 1]].x, data.pos[data.trisindex[i + 1]].z];
-                        var pos3 = [data.pos[data.trisindex[i + 2]].x, data.pos[data.trisindex[i + 2]].z];
+                    var border = _this.navmesh2Border(data);
+                    console.log(border);
+                    for (var i = 0; i < border.length; i += 2) {
+                        var p1 = border[i];
+                        var p2 = border[i + 1];
                         _this.sim.addObstacle([
-                            pos1,
-                            pos2,
-                            pos3
+                            p1,
+                            p2,
+                            p2,
+                            p1
                         ]);
                     }
                 }
@@ -202,6 +203,66 @@ var demo_navigaionRVO = (function () {
                 goals[i] = sim.agents[0].position;
             }
         }
+    };
+    demo_navigaionRVO.prototype.navmesh2Border = function (data) {
+        var trie = [];
+        for (var i = 0; i < data.trisindex.length; i += 3) {
+            var a = data.trisindex[i];
+            var b = data.trisindex[i + 1];
+            var c = data.trisindex[i + 2];
+            if (trie[a] == null) {
+                trie[a] = [];
+                trie[a][b] = true;
+            }
+            else {
+                trie[a][b] = (trie[a][b] == null);
+            }
+            if (trie[b] == null) {
+                trie[b] = [];
+                trie[b][c] = true;
+            }
+            else {
+                trie[b][c] = trie[b][c] == null;
+            }
+            if (trie[c] == null) {
+                trie[c] = [];
+                trie[c][a] = true;
+            }
+            else {
+                trie[c][a] = trie[c][a] == null;
+            }
+            if (trie[b] == null) {
+                trie[b] = [];
+                trie[b][a] = true;
+            }
+            else {
+                trie[b][a] = trie[b][a] == null;
+            }
+            if (trie[c] == null) {
+                trie[c] = [];
+                trie[c][b] = true;
+            }
+            else {
+                trie[c][b] = trie[c][b] == null;
+            }
+            if (trie[a] == null) {
+                trie[a] = [];
+                trie[a][c] = true;
+            }
+            else {
+                trie[a][c] = trie[a][c] == null;
+            }
+        }
+        var border = [];
+        for (var i = 0; i < trie.length; i++) {
+            for (var ii = 0; ii < trie[i].length; ii++) {
+                if (trie[i][ii]) {
+                    border.push([data.pos[i].x, data.pos[i].z]);
+                    border.push([data.pos[ii].x, data.pos[ii].z]);
+                }
+            }
+        }
+        return border;
     };
     demo_navigaionRVO.prototype.ckGoalsChange = function () {
         if (!this.player)

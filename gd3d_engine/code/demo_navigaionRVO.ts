@@ -29,7 +29,7 @@ class demo_navigaionRVO implements IState
         this.app.container.appendChild(descr);
 
         let names: string[] = ["MainCity_","testnav","city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
-        let name = names[1];
+        let name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
@@ -58,10 +58,18 @@ class demo_navigaionRVO implements IState
         // // Add obstacle
         // this.sim.addObstacle(
         //     [
-        //         [15, 9],
-        //         [28, 9],
-        //         [28, 16],
-        //         [15, 16]
+        //         [11, 3],
+        //         [-7, 3],
+        //         [-7, 3],
+        //         [11, 3]
+        //     ]
+        // );
+        // this.sim.addObstacle(
+        //     [
+        //         [-7, 3],
+        //         [11, 3],
+        //         [11, 3],
+        //         [-7, 3]
         //     ]
         // );
         //
@@ -120,7 +128,7 @@ class demo_navigaionRVO implements IState
 
     private loadScene(assetName:string , isCompress = false){
         let addScene = ()=>{
-            let beAddScene = false;
+            let beAddScene = true;
             if(beAddScene){
                 var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(assetName + ".scene.json") as gd3d.framework.rawscene;
                 var _root = _scene.getSceneRoot();
@@ -128,7 +136,7 @@ class demo_navigaionRVO implements IState
                 _root.markDirty();
                 this.app.getScene().lightmaps = [];
                 _scene.useLightMap(this.app.getScene());
-                _scene.useFog(this.app.getScene());
+                // _scene.useFog(this.app.getScene());
                 this.scene.addChild(_root);
             }
 
@@ -147,17 +155,46 @@ class demo_navigaionRVO implements IState
 
                 let data = this.navmeshMgr.navMesh.data;
                 if(data) {
-                    for(let i = 0; i < data.trisindex.length; i += 3) {
-                        let pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
-                        let pos2 = [data.pos[data.trisindex[i+1]].x, data.pos[data.trisindex[i+1]].z];
-                        let pos3 = [data.pos[data.trisindex[i+2]].x, data.pos[data.trisindex[i+2]].z];
+                    let border = this.navmesh2Border(data);
+                    console.log(border);
+                    for(let i = 0; i < border.length; i+=2) {
+                        let p1 = border[i];
+                        let p2 = border[i+1];
+                        // let offset = 0.0;
+                        // if(p1[0] > p2[0]) {
+                        //     p1[0] += offset;
+                        //     p2[0] -= offset;
+                        // } else if(p1[0] < p2[0]) {
+                        //     p1[0] -= offset;
+                        //     p2[0] += offset;
+                        // }
+                        // if(p1[1] > p2[1]) {
+                        //     p1[1] += offset;
+                        //     p2[1] -= offset;
+                        // } else if(p1[1] < p2[1]) {
+                        //     p1[1] -= offset;
+                        //     p2[1] += offset;
+                        // }
                         this.sim.addObstacle([
-                            pos1,
-                            pos2,
-                            pos3
+                            p1,
+                            p2,
+                            p2,
+                            p1
                         ]);
                     }
                 }
+                // if(data) {
+                //     for(let i = 0; i < data.trisindex.length; i += 3) {
+                //         let pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
+                //         let pos2 = [data.pos[data.trisindex[i+1]].x, data.pos[data.trisindex[i+1]].z];
+                //         let pos3 = [data.pos[data.trisindex[i+2]].x, data.pos[data.trisindex[i+2]].z];
+                //         this.sim.addObstacle([
+                //             pos1,
+                //             pos2,
+                //             pos3
+                //         ]);
+                //     }
+                // }
                 this.sim.processObstacles();
             });
         }
@@ -208,7 +245,21 @@ class demo_navigaionRVO implements IState
         for(let i = 0; i < sim.agents.length; i++) {
             this.mods[i].localTranslate.x = sim.agents[i].position[0];
             this.mods[i].localTranslate.z = sim.agents[i].position[1];
-            this.mods[i].markDirty();
+            if(i == 0){
+                let pos = this.mods[i].localTranslate;
+                let ovc2 = gd3d.math.pool.new_vector2();
+                ovc2.x = pos.x ; ovc2.y = pos.z;
+                let tvc2 = gd3d.math.pool.new_vector2();
+                tvc2.x = this.currGoal.x ; tvc2.y = this.currGoal.z;
+                let odir = gd3d.math.pool.new_vector2();
+                gd3d.math.vec2Subtract(tvc2,ovc2,odir);
+                
+
+                //let tdir = gd3d.math.pool.new_vector2();
+            }
+
+
+            this.mods[i].markDirty;
         }
 
     }
@@ -252,6 +303,76 @@ class demo_navigaionRVO implements IState
             }
         }
 
+    }
+
+    private navmesh2Border(data: gd3d.render.meshData) {
+        // Build Trie-tree
+        let trie = [];
+        for(let i = 0; i < data.trisindex.length; i+=3) {
+            let a = data.trisindex[i];
+            let b = data.trisindex[i+1];
+            let c = data.trisindex[i+2];
+            // a-b b-c c-a
+            // b-a c-b a-c
+            if(trie[a] == null) {
+                trie[a] = [];
+                trie[a][b] = true;
+            } else {
+                // true     - 独立边
+                // false    - 公共边
+                // null     - 不存在
+                trie[a][b] = (trie[a][b] == null);
+                // 如果这条边不存在 则该节点为 true
+                // 如果这条边存在 则该节点为 false
+                // 如果这条边为共边 则该节点任然为 false
+            }
+
+            if(trie[b] == null) {
+                trie[b] = [];
+                trie[b][c] = true;
+            } else {
+                trie[b][c] = trie[b][c] == null;
+            }
+
+            if(trie[c] == null) {
+                trie[c] = [];
+                trie[c][a] = true;
+            } else {
+                trie[c][a] = trie[c][a] == null;
+            }
+
+            if(trie[b] == null) {
+                trie[b] = [];
+                trie[b][a] = true;
+            } else {
+                trie[b][a] = trie[b][a] == null;
+            }
+
+            if(trie[c] == null) {
+                trie[c] = [];
+                trie[c][b] = true;
+            } else {
+                trie[c][b] = trie[c][b] == null;
+            }
+
+            if(trie[a] == null) {
+                trie[a] = [];
+                trie[a][c] = true;
+            } else {
+                trie[a][c] = trie[a][c] == null;
+            }
+        }
+
+        let border = [];
+        for(let i = 0; i < trie.length; i++) {
+            for(let ii = 0; ii < trie[i].length; ii++) {
+                if(trie[i][ii]) {
+                    border.push([data.pos[i].x, data.pos[i].z]);
+                    border.push([data.pos[ii].x, data.pos[ii].z]);
+                }
+            }
+        }
+        return border;
     }
 
     private currGoal:gd3d.math.vector3;
