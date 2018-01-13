@@ -194,8 +194,12 @@ namespace gd3d.framework
             this.container = rotateDiv;
             div.appendChild(rotateDiv);
 
-
-
+            let sc1 =document.createElement("script") as HTMLScriptElement;
+            let sc2 =document.createElement("script") as HTMLScriptElement;
+            sc1.src = "lib/webgl-util.js";
+            sc2.src = "lib/webgl-texture-util.js";
+            document.body.appendChild(sc1);
+            document.body.appendChild(sc2);
             var canvas = document.createElement("canvas");
             if(canvas == null){
                 alert("Failed to create canvas at the application.start()");
