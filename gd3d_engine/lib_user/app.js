@@ -109,25 +109,28 @@ var demo_navigaionRVO = (function () {
                 mtr.setShader(sdr);
                 _this.navmeshMgr.showNavmesh(true, mtr);
                 console.error(_this.navmeshMgr.navMesh);
-                var cc = true;
+                var cc = false;
                 if (cc)
                     return;
                 var data = _this.navmeshMgr.navMesh.data;
                 if (data) {
                     var border = _this.navmesh2Border(data);
                     console.log(border);
-                    for (var i = 0; i < border.length; i += 2) {
-                        var p1 = border[i];
-                        var p2 = border[i + 1];
-                        _this.sim.addObstacle([
-                            p1,
-                            p2,
-                            p2,
-                            p1
-                        ]);
+                    var line = [];
+                    for (var iii = 0; iii < border[0].length; iii++) {
+                        var d = data.pos[border[0][iii]];
+                        line.push(data.pos[border[0][iii]]);
                     }
+                    _this.drawLine(line);
+                    for (var i = 0; i < border.length; i++) {
+                        var p = [];
+                        for (var ii = border[i].length - 1; ii > 0; ii--) {
+                            p.push([data.pos[border[i][ii]].x, data.pos[border[i][ii]].z]);
+                        }
+                        _this.sim.addObstacle(p);
+                    }
+                    _this.sim.processObstacles();
                 }
-                _this.sim.processObstacles();
             });
         };
         if (isCompress) {
@@ -245,59 +248,72 @@ var demo_navigaionRVO = (function () {
             var a = data.trisindex[i];
             var b = data.trisindex[i + 1];
             var c = data.trisindex[i + 2];
-            if (trie[a] == null) {
+            if (trie[a] == null)
                 trie[a] = [];
+            if (trie[b] == null)
+                trie[b] = [];
+            if (trie[c] == null)
+                trie[c] = [];
+            if (trie[b][a] == null) {
                 trie[a][b] = true;
             }
             else {
-                trie[a][b] = (trie[a][b] == null);
+                trie[b][a] = false;
             }
-            if (trie[b] == null) {
-                trie[b] = [];
+            if (trie[c][b] == null) {
                 trie[b][c] = true;
             }
             else {
-                trie[b][c] = trie[b][c] == null;
+                trie[c][b] = false;
             }
-            if (trie[c] == null) {
-                trie[c] = [];
+            if (trie[a][c] == null) {
                 trie[c][a] = true;
             }
             else {
-                trie[c][a] = trie[c][a] == null;
-            }
-            if (trie[b] == null) {
-                trie[b] = [];
-                trie[b][a] = true;
-            }
-            else {
-                trie[b][a] = trie[b][a] == null;
-            }
-            if (trie[c] == null) {
-                trie[c] = [];
-                trie[c][b] = true;
-            }
-            else {
-                trie[c][b] = trie[c][b] == null;
-            }
-            if (trie[a] == null) {
-                trie[a] = [];
-                trie[a][c] = true;
-            }
-            else {
-                trie[a][c] = trie[a][c] == null;
+                trie[a][c] = false;
             }
         }
         var border = [];
         for (var i = 0; i < trie.length; i++) {
             for (var ii = 0; ii < trie[i].length; ii++) {
                 if (trie[i][ii]) {
-                    border.push([data.pos[i].x, data.pos[i].z]);
-                    border.push([data.pos[ii].x, data.pos[ii].z]);
+                }
+                else {
+                    trie[i][ii] = null;
                 }
             }
         }
+        console.warn('Trie:');
+        console.log(trie);
+        for (var iii = 0; iii < trie.length; iii += 1) {
+            var a = iii;
+            if (trie[iii] != null) {
+                var result = [];
+                this.findLoopBorder(trie, iii, iii, result);
+                console.warn('result:');
+                console.log(result);
+                border.push(result);
+            }
+        }
         return border;
+    };
+    demo_navigaionRVO.prototype.findLoopBorder = function (trie, node, leaf, stack) {
+        if (trie[node] != null) {
+            for (var i = 0; i < trie[node].length; i++) {
+                if (trie[node][i]) {
+                    stack.push(node);
+                    if (i == leaf) {
+                        return;
+                    }
+                    else {
+                        trie[node] = null;
+                        this.findLoopBorder(trie, i, leaf, stack);
+                        trie[i] = null;
+                        break;
+                    }
+                }
+            }
+        }
     };
     demo_navigaionRVO.prototype.ckGoalsChange = function () {
         if (!this.player)

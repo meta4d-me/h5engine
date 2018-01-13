@@ -153,51 +153,30 @@ class demo_navigaionRVO implements IState
                 this.navmeshMgr.showNavmesh(true,mtr);
                 console.error(this.navmeshMgr.navMesh);
 
-                let cc = true;
+                let cc = false;
                 if(cc) return;
                 let data = this.navmeshMgr.navMesh.data;
                 if(data) {
                     let border = this.navmesh2Border(data);
                     console.log(border);
-                    for(let i = 0; i < border.length; i+=2) {
-                        let p1 = border[i];
-                        let p2 = border[i+1];
-                        // let offset = 0.0;
-                        // if(p1[0] > p2[0]) {
-                        //     p1[0] += offset;
-                        //     p2[0] -= offset;
-                        // } else if(p1[0] < p2[0]) {
-                        //     p1[0] -= offset;
-                        //     p2[0] += offset;
-                        // }
-                        // if(p1[1] > p2[1]) {
-                        //     p1[1] += offset;
-                        //     p2[1] -= offset;
-                        // } else if(p1[1] < p2[1]) {
-                        //     p1[1] -= offset;
-                        //     p2[1] += offset;
-                        // }
-                        this.sim.addObstacle([
-                            p1,
-                            p2,
-                            p2,
-                            p1
-                        ]);
+
+                    // draw lines
+                    let line:gd3d.math.vector3[] = [];
+                    for(let iii = 0; iii < border[0].length; iii++) {
+                        let d = data.pos[border[0][iii]];
+                        line.push(data.pos[border[0][iii]]);
                     }
+                    this.drawLine(line);
+
+                    for(let i = 0; i < border.length; i++) {
+                        let p = [];
+                        for(let ii = border[i].length-1; ii>0; ii--) {
+                            p.push([data.pos[border[i][ii]].x, data.pos[border[i][ii]].z]);
+                        }
+                        this.sim.addObstacle(p);
+                    }
+                    this.sim.processObstacles();
                 }
-                // if(data) {
-                //     for(let i = 0; i < data.trisindex.length; i += 3) {
-                //         let pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
-                //         let pos2 = [data.pos[data.trisindex[i+1]].x, data.pos[data.trisindex[i+1]].z];
-                //         let pos3 = [data.pos[data.trisindex[i+2]].x, data.pos[data.trisindex[i+2]].z];
-                //         this.sim.addObstacle([
-                //             pos1,
-                //             pos2,
-                //             pos3
-                //         ]);
-                //     }
-                // }
-                this.sim.processObstacles();
             });
         }
 
@@ -326,67 +305,86 @@ class demo_navigaionRVO implements IState
             let a = data.trisindex[i];
             let b = data.trisindex[i+1];
             let c = data.trisindex[i+2];
-            // a-b b-c c-a
-            // b-a c-b a-c
-            if(trie[a] == null) {
+            if(trie[a] == null)
                 trie[a] = [];
+            if(trie[b] == null)
+                trie[b] = [];
+            if(trie[c] == null)
+                trie[c] = [];
+            // a-b b-c c-a
+            // 如果这条边不存在 则该节点为 true
+            // 如果这条边存在 则该节点为 false
+            // 如果这条边为共边 则该节点任然为 false
+            // true     - 独立边
+            // false    - 公共边
+            // null     - 不存在
+            // a-b
+            if(trie[b][a] == null) {    // 边未注册
                 trie[a][b] = true;
             } else {
-                // true     - 独立边
-                // false    - 公共边
-                // null     - 不存在
-                trie[a][b] = (trie[a][b] == null);
-                // 如果这条边不存在 则该节点为 true
-                // 如果这条边存在 则该节点为 false
-                // 如果这条边为共边 则该节点任然为 false
+                trie[b][a] = false;
             }
 
-            if(trie[b] == null) {
-                trie[b] = [];
+            if(trie[c][b] == null) {    // 边未注册
                 trie[b][c] = true;
             } else {
-                trie[b][c] = trie[b][c] == null;
+                trie[c][b] = false;
             }
 
-            if(trie[c] == null) {
-                trie[c] = [];
+            if(trie[a][c] == null) {    // 边未注册
                 trie[c][a] = true;
             } else {
-                trie[c][a] = trie[c][a] == null;
-            }
-
-            if(trie[b] == null) {
-                trie[b] = [];
-                trie[b][a] = true;
-            } else {
-                trie[b][a] = trie[b][a] == null;
-            }
-
-            if(trie[c] == null) {
-                trie[c] = [];
-                trie[c][b] = true;
-            } else {
-                trie[c][b] = trie[c][b] == null;
-            }
-
-            if(trie[a] == null) {
-                trie[a] = [];
-                trie[a][c] = true;
-            } else {
-                trie[a][c] = trie[a][c] == null;
+                trie[a][c] = false;
             }
         }
+
+        // let result = [];
+        // this.findLoopBorder(trie, 0, 0, result);
 
         let border = [];
         for(let i = 0; i < trie.length; i++) {
             for(let ii = 0; ii < trie[i].length; ii++) {
                 if(trie[i][ii]) {
-                    border.push([data.pos[i].x, data.pos[i].z]);
-                    border.push([data.pos[ii].x, data.pos[ii].z]);
+                    // border.push([data.pos[i].x, data.pos[i].z]);
+                    // border.push([data.pos[ii].x, data.pos[ii].z]);
+                } else {
+                    trie[i][ii] = null;
                 }
             }
         }
+        console.warn('Trie:');
+        console.log(trie);
+        // 遍历树, 寻找封闭线段
+        for(let iii = 0; iii < trie.length; iii+=1) {
+            let a = iii;
+            if(trie[iii] != null) {
+                let result = [];
+                this.findLoopBorder(trie, iii, iii, result);
+                console.warn('result:');
+                console.log(result);
+                border.push(result);
+            }
+        }
+
         return border;
+    }
+
+    private findLoopBorder(trie, node, leaf, stack) {
+        if(trie[node] != null) {
+            for(let i = 0; i < trie[node].length; i++) {
+                if(trie[node][i]) { // 找到下一个点
+                    stack.push(node);
+                    if(i==leaf) {
+                        return;
+                    } else {
+                        trie[node] = null;
+                        this.findLoopBorder(trie, i, leaf, stack);
+                        trie[i] = null;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private currGoal:gd3d.math.vector3;
