@@ -3169,6 +3169,7 @@ declare namespace gd3d.math {
     function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
     function vec2Normalize(from: vector2, out: vector2): void;
     function vec2Multiply(a: vector2, b: vector2): number;
+    function vec2Dot(lhs: vector2, rhs: vector2): number;
     function vec2Equal(vector: vector2, vector2: vector2, threshold?: number): boolean;
 }
 declare namespace gd3d.math {

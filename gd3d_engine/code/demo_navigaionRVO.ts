@@ -128,7 +128,7 @@ class demo_navigaionRVO implements IState
 
     private loadScene(assetName:string , isCompress = false){
         let addScene = ()=>{
-            let beAddScene = true;
+            let beAddScene = false;
             if(beAddScene){
                 var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(assetName + ".scene.json") as gd3d.framework.rawscene;
                 var _root = _scene.getSceneRoot();
@@ -153,6 +153,8 @@ class demo_navigaionRVO implements IState
                 this.navmeshMgr.showNavmesh(true,mtr);
                 console.error(this.navmeshMgr.navMesh);
 
+                let cc = true;
+                if(cc) return;
                 let data = this.navmeshMgr.navMesh.data;
                 if(data) {
                     let border = this.navmesh2Border(data);
@@ -245,21 +247,18 @@ class demo_navigaionRVO implements IState
         for(let i = 0; i < sim.agents.length; i++) {
             this.mods[i].localTranslate.x = sim.agents[i].position[0];
             this.mods[i].localTranslate.z = sim.agents[i].position[1];
-            if(i == 0){
+            if(i == 0 && this.currGoal && this.lastGoal){
                 let pos = this.mods[i].localTranslate;
-                let ovc2 = gd3d.math.pool.new_vector2();
-                ovc2.x = pos.x ; ovc2.y = pos.z;
-                let tvc2 = gd3d.math.pool.new_vector2();
-                tvc2.x = this.currGoal.x ; tvc2.y = this.currGoal.z;
-                let odir = gd3d.math.pool.new_vector2();
-                gd3d.math.vec2Subtract(tvc2,ovc2,odir);
-                
-
-                //let tdir = gd3d.math.pool.new_vector2();
+                let nowDir = gd3d.math.pool.new_vector2();
+                this.cal2dDir(this.lastGoal,pos,nowDir);
+                let nowLen = gd3d.math.vec2Length(nowDir);
+                let tLen = gd3d.math.vec2Length(this.currMoveDir);
+                pos.y = gd3d.math.numberLerp(this.lastGoal.y,this.currGoal.y,nowLen/tLen);
+                //console.error(`nowLen/tLen :${nowLen}/${tLen}   ,  pos y:${pos.y}  ,lastGoal: ${this.lastGoal.x} ,${this.lastGoal.y} ,${this.lastGoal.z} `);
+                gd3d.math.pool.delete_vector2(nowDir);
             }
 
-
-            this.mods[i].markDirty;
+            this.mods[i].markDirty();
         }
 
     }
@@ -268,20 +267,24 @@ class demo_navigaionRVO implements IState
         if(this.currGoal){
             //达到目标点
             if(this.player){
-                let dis = gd3d.math.vec3Distance(this.player.localTranslate,this.currGoal);
-                if(dis<0.1){
+                let v2_0 = gd3d.math.pool.new_vector2();
+                v2_0.x = this.player.localTranslate.x; v2_0.y = this.player.localTranslate.z;
+                let v2_1 = gd3d.math.pool.new_vector2();
+                v2_1.x = this.currGoal.x; v2_1.y = this.currGoal.z;
+                let dis = gd3d.math.vec2Distance(v2_0,v2_1);
+                if(dis<0.01){
                     if(this.currGoal){
-                        gd3d.math.pool.delete_vector3(this.currGoal);
+                        if(this.lastGoal)   gd3d.math.pool.delete_vector3(this.lastGoal);
+                        this.lastGoal = this.currGoal;
                         this.currGoal = null;
                         goals[0] = sim.agents[0].position;
                         sim.agents[0].radius = 1;
                     }
                     if(this.Goals && this.Goals.length >0) {
                         this.currGoal = this.Goals.pop();
+                        this.cal2dDir(this.lastGoal,this.currGoal,this.currMoveDir);
                         goals[0] = [this.currGoal.x, this.currGoal.z];
                         sim.agents[0].radius = 0.1;
-
-
                     }
                 }
             }
@@ -303,6 +306,17 @@ class demo_navigaionRVO implements IState
             }
         }
 
+    }
+
+    private cal2dDir(oPos:gd3d.math.vector3,tPos:gd3d.math.vector3,out:gd3d.math.vector2){
+        if(!oPos || !tPos || !out)  return;
+        let ov2 = gd3d.math.pool.new_vector2();
+        ov2.x = oPos.x; ov2.y = oPos.z;
+        let tv2 = gd3d.math.pool.new_vector2();
+        tv2.x = tPos.x; tv2.y = tPos.z;
+        gd3d.math.vec2Subtract(tv2,ov2,out);
+        gd3d.math.pool.delete_vector2(ov2);
+        gd3d.math.pool.delete_vector2(tv2);
     }
 
     private navmesh2Border(data: gd3d.render.meshData) {
@@ -376,6 +390,8 @@ class demo_navigaionRVO implements IState
     }
 
     private currGoal:gd3d.math.vector3;
+    private lastGoal:gd3d.math.vector3;
+    private currMoveDir:gd3d.math.vector2 = new gd3d.math.vector2();
     private Goals:gd3d.math.vector3[] = [];
     private ckGoalsChange(){
         if(!this.player)    return;
@@ -383,7 +399,7 @@ class demo_navigaionRVO implements IState
             //达到目标点
             if(this.player){
                 let dis = gd3d.math.vec3Distance(this.player.localTranslate,this.currGoal);
-                if(dis<0.1){
+                if(dis<0.01){
                     if(this.currGoal){
                         gd3d.math.pool.delete_vector3(this.currGoal);
                         this.currGoal = null;
@@ -399,6 +415,17 @@ class demo_navigaionRVO implements IState
     }
 
     //----------- 点击navmesh处理 ----------------
+
+    private PosRayNavmesh(oPos:gd3d.math.vector3){
+        if(!this.navmeshMgr.navMesh || !this.navmeshMgr.navTrans) return;
+        var pickinfo: gd3d.framework.pickinfo;
+        let mesh = this.navmeshMgr.navMesh ;
+        let ray = new gd3d.framework.ray(new gd3d.math.vector3(oPos.x, oPos.y + 500, oPos.z), new gd3d.math.vector3(0, -1, 0));
+        pickinfo = mesh.intersects(ray, this.navmeshMgr.navTrans.getWorldMatrix());
+        if (!pickinfo) return;
+        return pickinfo.hitposition;
+    }
+
     pickDown():void{
         if(this.isAKeyDown){
             //添加 敌人
@@ -416,7 +443,7 @@ class demo_navigaionRVO implements IState
         let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
         let pickinfo: gd3d.framework.pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
         if (!pickinfo) return;
-        console.error(pickinfo.hitposition);
+        //console.error(pickinfo.hitposition);
         return pickinfo.hitposition;
     }
 
@@ -443,7 +470,13 @@ class demo_navigaionRVO implements IState
         let endPos = this.rayNavMesh();
         if(!endPos) return;
         if(this.player){
-            this.pos.push(this.player.localTranslate);
+            let v3 = gd3d.math.pool.new_vector3();
+            gd3d.math.vec3Clone(this.player.localTranslate,v3);
+            let temp = this.PosRayNavmesh(this.player.localTranslate);
+            if(temp){
+                gd3d.math.vec3Clone(temp,v3);
+            }
+            this.pos.push(v3);
         }else{
             //初始化玩家
             if(!this.isInitPlayer) this.initPlayer(endPos.x,endPos.y,endPos.z);

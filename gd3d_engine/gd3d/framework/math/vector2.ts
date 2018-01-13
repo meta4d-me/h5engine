@@ -68,6 +68,10 @@
     {
         return a.x * b.x + a.y * b.y;
     }
+    export function vec2Dot(lhs: vector2, rhs: vector2): number
+    {
+        return lhs.x * rhs.x + lhs.y * rhs.y;
+    }
 
     //阀值先写这里了，回头
     export function vec2Equal(vector: vector2, vector2: vector2, threshold = 0.00001): boolean {

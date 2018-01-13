@@ -22,6 +22,7 @@ var demo_navigaionRVO = (function () {
         this.mods = [];
         this.isInitPlayer = false;
         this.moveSpeed = 0.2;
+        this.currMoveDir = new gd3d.math.vector2();
         this.Goals = [];
         this.enemys = [];
         this.pos = [];
@@ -86,7 +87,7 @@ var demo_navigaionRVO = (function () {
         var _this = this;
         if (isCompress === void 0) { isCompress = false; }
         var addScene = function () {
-            var beAddScene = true;
+            var beAddScene = false;
             if (beAddScene) {
                 var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
                 var _root = _scene.getSceneRoot();
@@ -108,6 +109,9 @@ var demo_navigaionRVO = (function () {
                 mtr.setShader(sdr);
                 _this.navmeshMgr.showNavmesh(true, mtr);
                 console.error(_this.navmeshMgr.navMesh);
+                var cc = true;
+                if (cc)
+                    return;
                 var data = _this.navmeshMgr.navMesh.data;
                 if (data) {
                     var border = _this.navmesh2Border(data);
@@ -167,22 +171,40 @@ var demo_navigaionRVO = (function () {
         for (var i_1 = 0; i_1 < sim.agents.length; i_1++) {
             this.mods[i_1].localTranslate.x = sim.agents[i_1].position[0];
             this.mods[i_1].localTranslate.z = sim.agents[i_1].position[1];
+            if (i_1 == 0 && this.currGoal && this.lastGoal) {
+                var pos = this.mods[i_1].localTranslate;
+                var nowDir = gd3d.math.pool.new_vector2();
+                this.cal2dDir(this.lastGoal, pos, nowDir);
+                var nowLen = gd3d.math.vec2Length(nowDir);
+                var tLen = gd3d.math.vec2Length(this.currMoveDir);
+                pos.y = gd3d.math.numberLerp(this.lastGoal.y, this.currGoal.y, nowLen / tLen);
+                gd3d.math.pool.delete_vector2(nowDir);
+            }
             this.mods[i_1].markDirty();
         }
     };
     demo_navigaionRVO.prototype.RVO_check = function (sim, goals) {
         if (this.currGoal) {
             if (this.player) {
-                var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
-                if (dis < 0.1) {
+                var v2_0 = gd3d.math.pool.new_vector2();
+                v2_0.x = this.player.localTranslate.x;
+                v2_0.y = this.player.localTranslate.z;
+                var v2_1 = gd3d.math.pool.new_vector2();
+                v2_1.x = this.currGoal.x;
+                v2_1.y = this.currGoal.z;
+                var dis = gd3d.math.vec2Distance(v2_0, v2_1);
+                if (dis < 0.01) {
                     if (this.currGoal) {
-                        gd3d.math.pool.delete_vector3(this.currGoal);
+                        if (this.lastGoal)
+                            gd3d.math.pool.delete_vector3(this.lastGoal);
+                        this.lastGoal = this.currGoal;
                         this.currGoal = null;
                         goals[0] = sim.agents[0].position;
                         sim.agents[0].radius = 1;
                     }
                     if (this.Goals && this.Goals.length > 0) {
                         this.currGoal = this.Goals.pop();
+                        this.cal2dDir(this.lastGoal, this.currGoal, this.currMoveDir);
                         goals[0] = [this.currGoal.x, this.currGoal.z];
                         sim.agents[0].radius = 0.1;
                     }
@@ -203,6 +225,19 @@ var demo_navigaionRVO = (function () {
                 goals[i] = sim.agents[0].position;
             }
         }
+    };
+    demo_navigaionRVO.prototype.cal2dDir = function (oPos, tPos, out) {
+        if (!oPos || !tPos || !out)
+            return;
+        var ov2 = gd3d.math.pool.new_vector2();
+        ov2.x = oPos.x;
+        ov2.y = oPos.z;
+        var tv2 = gd3d.math.pool.new_vector2();
+        tv2.x = tPos.x;
+        tv2.y = tPos.z;
+        gd3d.math.vec2Subtract(tv2, ov2, out);
+        gd3d.math.pool.delete_vector2(ov2);
+        gd3d.math.pool.delete_vector2(tv2);
     };
     demo_navigaionRVO.prototype.navmesh2Border = function (data) {
         var trie = [];
@@ -270,7 +305,7 @@ var demo_navigaionRVO = (function () {
         if (this.currGoal) {
             if (this.player) {
                 var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
-                if (dis < 0.1) {
+                if (dis < 0.01) {
                     if (this.currGoal) {
                         gd3d.math.pool.delete_vector3(this.currGoal);
                         this.currGoal = null;
@@ -283,6 +318,17 @@ var demo_navigaionRVO = (function () {
         else if (this.Goals && this.Goals.length > 0) {
             this.currGoal = this.Goals.pop();
         }
+    };
+    demo_navigaionRVO.prototype.PosRayNavmesh = function (oPos) {
+        if (!this.navmeshMgr.navMesh || !this.navmeshMgr.navTrans)
+            return;
+        var pickinfo;
+        var mesh = this.navmeshMgr.navMesh;
+        var ray = new gd3d.framework.ray(new gd3d.math.vector3(oPos.x, oPos.y + 500, oPos.z), new gd3d.math.vector3(0, -1, 0));
+        pickinfo = mesh.intersects(ray, this.navmeshMgr.navTrans.getWorldMatrix());
+        if (!pickinfo)
+            return;
+        return pickinfo.hitposition;
     };
     demo_navigaionRVO.prototype.pickDown = function () {
         if (this.isAKeyDown) {
@@ -302,7 +348,6 @@ var demo_navigaionRVO = (function () {
         var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
         if (!pickinfo)
             return;
-        console.error(pickinfo.hitposition);
         return pickinfo.hitposition;
     };
     demo_navigaionRVO.prototype.addEnemy = function () {
@@ -327,7 +372,13 @@ var demo_navigaionRVO = (function () {
         if (!endPos)
             return;
         if (this.player) {
-            this.pos.push(this.player.localTranslate);
+            var v3 = gd3d.math.pool.new_vector3();
+            gd3d.math.vec3Clone(this.player.localTranslate, v3);
+            var temp = this.PosRayNavmesh(this.player.localTranslate);
+            if (temp) {
+                gd3d.math.vec3Clone(temp, v3);
+            }
+            this.pos.push(v3);
         }
         else {
             if (!this.isInitPlayer)

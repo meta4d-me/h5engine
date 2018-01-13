@@ -19364,6 +19364,10 @@ var gd3d;
             return a.x * b.x + a.y * b.y;
         }
         math.vec2Multiply = vec2Multiply;
+        function vec2Dot(lhs, rhs) {
+            return lhs.x * rhs.x + lhs.y * rhs.y;
+        }
+        math.vec2Dot = vec2Dot;
         function vec2Equal(vector, vector2, threshold) {
             if (threshold === void 0) { threshold = 0.00001; }
             if (Math.abs(vector.x - vector2.x) > threshold)
