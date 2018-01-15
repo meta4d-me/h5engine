@@ -4427,11 +4427,11 @@ declare namespace gd3d.framework {
         getChild(index: number): transform;
         getChildByName(name: string): transform;
         getRoot(): transform;
-        pickAll(ray: ray, isPickMesh?: boolean, root?: transform): Array<pickinfo>;
-        pick(ray: ray, isPickMesh?: boolean, root?: transform): pickinfo;
-        private doPick(ray, pickall, isPickMesh, root);
-        private pickMesh(ray, tran, pickedList);
-        private pickCollider(ray, tran, pickedList);
+        pickAll(ray: ray, isPickMesh?: boolean, root?: transform, layer?: number): Array<pickinfo>;
+        pick(ray: ray, isPickMesh?: boolean, root?: transform, layer?: number): pickinfo;
+        private doPick(ray, pickall, isPickMesh, root, layer?);
+        private pickMesh(ray, tran, pickedList, layer?);
+        private pickCollider(ray, tran, pickedList, layer?);
     }
 }
 declare namespace gd3d.framework {

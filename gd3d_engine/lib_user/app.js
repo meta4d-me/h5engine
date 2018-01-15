@@ -1163,6 +1163,7 @@ var main = (function () {
         this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
         this.addBtn("test_loadprefabdds", function () { return new test_loadprefabdds(); });
         this.addBtn("test_ATC纹理", function () { return new t.test_ATC(); });
+        this.addBtn("场景boxcollider_Pick", function () { return new test_pick_boxcollider(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -3077,6 +3078,155 @@ var test_pbr = (function () {
         CameraController.instance().update(delta);
     };
     return test_pbr;
+}());
+var test_pick_boxcollider = (function () {
+    function test_pick_boxcollider() {
+        this.cubesize = 0.5;
+        this.sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
+        this.goals = [];
+        this.mods = [];
+        this.colorMap = {};
+        this.balls = [];
+        this.pickLayer = 8;
+        this.points = [];
+        this.timer = 0;
+        this.bere = false;
+        this.isAKeyDown = false;
+        this.pointDown = false;
+    }
+    test_pick_boxcollider.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.assetMgr = app.getAssetMgr();
+        this.app.closeFps();
+        var descr = document.createElement("p");
+        descr.textContent = "\u63D0\u793A: \n \u6309\u4F4F\u952E\u76D8 A \u952E\uFF0C\u70B9\u51FB navmesh \u53EF\u6DFB\u52A0\u654C\u4EBA\uFF01";
+        descr.style.top = 0 + "px";
+        descr.style.left = 0 + "px";
+        descr.style.position = "absolute";
+        this.app.container.appendChild(descr);
+        var names = ["MainCity_", "testnav", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        var name = names[1];
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.loadScene(name);
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.far = 10000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 100, 0);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+    };
+    test_pick_boxcollider.prototype.loadScene = function (assetName, isCompress) {
+        var _this = this;
+        if (isCompress === void 0) { isCompress = false; }
+        var ShowBoxcollder = function (trans) {
+            if (!trans)
+                return;
+            var boxc = trans.gameObject.getComponent("boxcollider");
+            if (boxc)
+                boxc.colliderVisible = true;
+            console.error(" layer : " + trans.gameObject.layer + " ");
+            if (!trans.children)
+                return;
+            trans.children.forEach(function (sub) {
+                if (sub)
+                    ShowBoxcollder(sub);
+            });
+        };
+        var addScene = function () {
+            var beAddScene = true;
+            if (beAddScene) {
+                var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+                var _root = _scene.getSceneRoot();
+                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                _root.markDirty();
+                _this.app.getScene().lightmaps = [];
+                _scene.useLightMap(_this.app.getScene());
+                _this.scene.addChild(_root);
+                ShowBoxcollder(_root);
+            }
+        };
+        if (isCompress) {
+            this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
+                if (s.isfinish) {
+                    {
+                        addScene();
+                    }
+                }
+            });
+        }
+        else {
+            this.app.getAssetMgr().load("res/scenes/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                if (s1.isfinish) {
+                    addScene();
+                }
+            });
+        }
+    };
+    test_pick_boxcollider.prototype.getColor = function (r, g, b) {
+        var key = r + "_" + g + "_" + b;
+        if (!this.colorMap[key])
+            this.colorMap[key] = new gd3d.math.vector4(r, g, b, 1);
+        return this.colorMap[key];
+    };
+    test_pick_boxcollider.prototype.addBall = function (pos) {
+        var ball = this.generateGeomtry("sphere", this.getColor(1, 0, 0));
+        gd3d.math.vec3Clone(pos, ball.localTranslate);
+        this.scene.addChild(ball);
+        this.balls.push(ball);
+        ball.markDirty();
+    };
+    test_pick_boxcollider.prototype.pickDown = function () {
+        var v3 = this.rayCollider();
+        if (v3) {
+            this.addBall(v3.hitposition);
+        }
+    };
+    test_pick_boxcollider.prototype.rayCollider = function () {
+        var inputMgr = this.app.getInputMgr();
+        var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
+        return this.scene.pick(ray, false, this.scene.getRoot(), this.pickLayer);
+    };
+    test_pick_boxcollider.prototype.generateGeomtry = function (meshType, color) {
+        if (meshType === void 0) { meshType = "cube"; }
+        if (color === void 0) { color = null; }
+        var G3D = new gd3d.framework.transform;
+        var mf = G3D.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh(meshType);
+        var mr = G3D.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material("mat");
+        mr.materials[0].setShader(this.assetMgr.getShader("diffuse.shader.json"));
+        mr.materials[0].setTexture("_MainTex", this.assetMgr.getDefaultTexture("white"));
+        if (color)
+            mr.materials[0].setVector4("_MainColor", color);
+        this.scene.addChild(G3D);
+        return G3D;
+    };
+    test_pick_boxcollider.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            this.pickDown();
+        }
+        this.pointDown = this.inputMgr.point.touch;
+        if (this.inputMgr.keyboardMap[65]) {
+            this.isAKeyDown = true;
+        }
+        else {
+            this.isAKeyDown = false;
+        }
+        this.timer += delta;
+        CameraController.instance().update(delta);
+    };
+    return test_pick_boxcollider;
 }());
 var test_postCamera = (function () {
     function test_postCamera() {

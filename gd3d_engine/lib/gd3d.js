@@ -25578,29 +25578,32 @@ var gd3d;
             scene.prototype.getRoot = function () {
                 return this.rootNode;
             };
-            scene.prototype.pickAll = function (ray, isPickMesh, root) {
+            scene.prototype.pickAll = function (ray, isPickMesh, root, layer) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
                 if (root === void 0) { root = this.getRoot(); }
-                var picked = this.doPick(ray, true, isPickMesh, root);
+                if (layer === void 0) { layer = NaN; }
+                var picked = this.doPick(ray, true, isPickMesh, root, layer);
                 if (picked == null)
                     return null;
                 return picked;
             };
-            scene.prototype.pick = function (ray, isPickMesh, root) {
+            scene.prototype.pick = function (ray, isPickMesh, root, layer) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
                 if (root === void 0) { root = this.getRoot(); }
-                var pickinfo = this.doPick(ray, false, isPickMesh, root);
+                if (layer === void 0) { layer = NaN; }
+                var pickinfo = this.doPick(ray, false, isPickMesh, root, layer);
                 if (pickinfo == null)
                     return null;
                 return pickinfo;
             };
-            scene.prototype.doPick = function (ray, pickall, isPickMesh, root) {
+            scene.prototype.doPick = function (ray, pickall, isPickMesh, root, layer) {
+                if (layer === void 0) { layer = NaN; }
                 var pickedList = new Array();
                 if (isPickMesh) {
-                    this.pickMesh(ray, root, pickedList);
+                    this.pickMesh(ray, root, pickedList, layer);
                 }
                 else {
-                    this.pickCollider(ray, root, pickedList);
+                    this.pickCollider(ray, root, pickedList, layer);
                 }
                 if (pickedList.length == 0)
                     return null;
@@ -25616,23 +25619,54 @@ var gd3d;
                     return pickedList[index];
                 }
             };
-            scene.prototype.pickMesh = function (ray, tran, pickedList) {
+            scene.prototype.pickMesh = function (ray, tran, pickedList, layer) {
+                if (layer === void 0) { layer = NaN; }
                 if (tran.gameObject != null) {
                     if (!tran.gameObject.visible)
                         return;
-                    var meshFilter = tran.gameObject.getComponent("meshFilter");
-                    if (meshFilter != null) {
-                        var mesh = meshFilter.getMeshOutput();
-                        var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
-                        if (pickinfo) {
-                            pickedList.push(pickinfo);
-                            pickinfo.pickedtran = tran;
+                    var canDo = true;
+                    if (!isNaN(layer) && layer != tran.gameObject.layer)
+                        canDo = false;
+                    if (canDo) {
+                        var meshFilter = tran.gameObject.getComponent("meshFilter");
+                        if (meshFilter != null) {
+                            var mesh = meshFilter.getMeshOutput();
+                            var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
+                            if (pickinfo) {
+                                pickedList.push(pickinfo);
+                                pickinfo.pickedtran = tran;
+                            }
+                        }
+                        else {
+                            var skinmesh = tran.gameObject.getComponent("skinnedMeshRenderer");
+                            if (skinmesh != null) {
+                                var pickinfo = skinmesh.intersects(ray);
+                                if (pickinfo) {
+                                    pickedList.push(pickinfo);
+                                    pickinfo.pickedtran = tran;
+                                }
+                            }
                         }
                     }
-                    else {
-                        var skinmesh = tran.gameObject.getComponent("skinnedMeshRenderer");
-                        if (skinmesh != null) {
-                            var pickinfo = skinmesh.intersects(ray);
+                }
+                if (tran.children != null) {
+                    for (var i = 0; i < tran.children.length; i++) {
+                        this.pickMesh(ray, tran.children[i], pickedList, layer);
+                    }
+                }
+            };
+            scene.prototype.pickCollider = function (ray, tran, pickedList, layer) {
+                if (layer === void 0) { layer = NaN; }
+                if (tran.gameObject != null) {
+                    if (!tran.gameObject.visible)
+                        return;
+                    if (tran.gameObject.collider != null) {
+                        var canDo = true;
+                        if (!isNaN(layer) && layer != tran.gameObject.layer)
+                            canDo = false;
+                        console.error(tran.gameObject.layer + "  --  " + layer);
+                        if (canDo) {
+                            var pickinfo = ray.intersectCollider(tran);
                             if (pickinfo) {
                                 pickedList.push(pickinfo);
                                 pickinfo.pickedtran = tran;
@@ -25642,25 +25676,7 @@ var gd3d;
                 }
                 if (tran.children != null) {
                     for (var i = 0; i < tran.children.length; i++) {
-                        this.pickMesh(ray, tran.children[i], pickedList);
-                    }
-                }
-            };
-            scene.prototype.pickCollider = function (ray, tran, pickedList) {
-                if (tran.gameObject != null) {
-                    if (!tran.gameObject.visible)
-                        return;
-                    if (tran.gameObject.collider != null) {
-                        var pickinfo = ray.intersectCollider(tran);
-                        if (pickinfo) {
-                            pickedList.push(pickinfo);
-                            pickinfo.pickedtran = tran;
-                        }
-                    }
-                }
-                if (tran.children != null) {
-                    for (var i = 0; i < tran.children.length; i++) {
-                        this.pickCollider(ray, tran.children[i], pickedList);
+                        this.pickCollider(ray, tran.children[i], pickedList, layer);
                     }
                 }
             };
@@ -26112,13 +26128,13 @@ var gd3d;
                 var _collider = tran.gameObject.collider;
                 var pickinfo = null;
                 if (_collider instanceof framework.boxcollider) {
-                    var obb = _collider.getBound();
-                    if (!obb)
+                    var obb_1 = _collider.getBound();
+                    if (!obb_1)
                         return null;
                     var vecs = [];
-                    obb.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
+                    obb_1.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
                     var data = gd3d.render.meshData.genBoxByArray(vecs);
-                    for (var index = 0; index < data.pos.length; index += 3) {
+                    for (var index = 0; index < data.trisindex.length; index += 3) {
                         var p0 = data.pos[data.trisindex[index]];
                         var p1 = data.pos[data.trisindex[index + 1]];
                         var p2 = data.pos[data.trisindex[index + 2]];
@@ -26137,9 +26153,9 @@ var gd3d;
                     }
                 }
                 else if (_collider instanceof framework.meshcollider) {
-                    var mesh = _collider.getBound();
-                    if (mesh != null) {
-                        pickinfo = mesh.intersects(this, tran.getWorldMatrix());
+                    var mesh_3 = _collider.getBound();
+                    if (mesh_3 != null) {
+                        pickinfo = mesh_3.intersects(this, tran.getWorldMatrix());
                     }
                 }
                 else if (_collider instanceof framework.canvasRenderer) {

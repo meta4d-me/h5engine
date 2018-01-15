@@ -344,6 +344,36 @@ declare class test_pbr implements IState {
     private addCube();
     update(delta: number): void;
 }
+declare var RVO: any;
+declare class test_pick_boxcollider implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    navmeshMgr: gd3d.framework.NavMeshLoadManager;
+    inputMgr: gd3d.framework.inputMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    cubesize: number;
+    player: gd3d.framework.transform;
+    sim: any;
+    goals: any[];
+    mods: gd3d.framework.transform[];
+    start(app: gd3d.framework.application): void;
+    private loadScene(assetName, isCompress?);
+    private colorMap;
+    private getColor(r, g, b);
+    private balls;
+    private addBall(pos);
+    private pickLayer;
+    pickDown(): void;
+    private rayCollider();
+    private points;
+    private generateGeomtry(meshType?, color?);
+    camera: gd3d.framework.camera;
+    timer: number;
+    bere: boolean;
+    isAKeyDown: boolean;
+    private pointDown;
+    update(delta: number): void;
+}
 declare class test_postCamera implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
