@@ -1,6 +1,6 @@
 //导航RVO_防挤Demo
 declare var RVO;
-﻿namespace gd3d.framework {
+namespace gd3d.framework {
     export class RVOManager {
 
         public sim = new RVO.Simulator(1, 40, 10, 20, 5, 1.0, 0.1, [0, 0]);
@@ -103,7 +103,7 @@ declare var RVO;
                     }
                     if(goalQueue && goalQueue.length >0) {
                         currGoal = goalQueue.pop();
-                        this.cal2dDir(lastGoal,currGoal,this.currMoveDir);
+                        //this.cal2dDir(lastGoal,currGoal,this.currMoveDir);    //有报错先注释掉了
                         goals[0] = [currGoal.x, currGoal.z];
                         sim.agents[0].radius = 0.1;
                     }

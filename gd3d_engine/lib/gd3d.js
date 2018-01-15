@@ -20620,6 +20620,95 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var RVOManager = (function () {
+            function RVOManager() {
+                this.sim = new RVO.Simulator(1, 40, 10, 20, 5, 1.0, 0.1, [0, 0]);
+                this.transforms = [];
+                this.goals = [];
+                this.radius = [];
+                this.attackRadius = [];
+                this.speeds = [];
+            }
+            RVOManager.prototype.init = function (transforms, goals, radius, attackRadius, speeds) {
+                this.playerIndex = 0;
+                this.transforms = transforms;
+                this.goals = goals;
+                this.radius = radius;
+                this.attackRadius = attackRadius;
+                this.speeds = speeds;
+                for (var i in this.transforms) {
+                    var current_position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
+                    this.sim.addAgent(current_position);
+                    this.goals[i] = current_position;
+                    this.sim.agents[i].radius = this.radius[i];
+                    this.sim.agents[i].maxSpeed = this.speeds[i];
+                }
+                this.sim.agents[this.playerIndex].neighborDist = 0;
+                this.isRunning = true;
+            };
+            RVOManager.prototype.disable = function () {
+                this.isRunning = false;
+            };
+            RVOManager.prototype.enable = function () {
+                this.isRunning = true;
+                for (var i in this.transforms) {
+                    this.sim.agents[i].position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
+                }
+            };
+            RVOManager.prototype.update = function () {
+                if (this.isRunning) {
+                }
+            };
+            RVOManager.prototype.RVO_check = function (sim, goals, currGoal, lastGoal, goalQueue, currMoveDir) {
+                if (currGoal) {
+                    var player = this.transforms[0];
+                    var v2_0 = gd3d.math.pool.new_vector2();
+                    v2_0.x = player.localTranslate.x;
+                    v2_0.y = player.localTranslate.z;
+                    var v2_1 = gd3d.math.pool.new_vector2();
+                    v2_1.x = currGoal.x;
+                    v2_1.y = currGoal.z;
+                    var dis = gd3d.math.vec2Distance(v2_0, v2_1);
+                    if (dis < 0.01) {
+                        if (currGoal) {
+                            if (lastGoal)
+                                gd3d.math.pool.delete_vector3(lastGoal);
+                            lastGoal = currGoal;
+                            currGoal = null;
+                            goals[0] = sim.agents[0].position;
+                            sim.agents[0].radius = 1;
+                        }
+                        if (goalQueue && goalQueue.length > 0) {
+                            currGoal = goalQueue.pop();
+                            goals[0] = [currGoal.x, currGoal.z];
+                            sim.agents[0].radius = 0.1;
+                        }
+                    }
+                }
+                else if (goalQueue && goalQueue.length > 0) {
+                    currGoal = goalQueue.pop();
+                    goals[0] = [currGoal.x, currGoal.z];
+                    sim.agents[0].radius = 0.1;
+                }
+                for (var i = 1, len = sim.agents.length; i < len; i++) {
+                    var range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
+                    if (range < this.attackRadius[i]) {
+                        goals[i] = sim.agents[i].position;
+                    }
+                    else {
+                        goals[i] = sim.agents[0].position;
+                    }
+                }
+            };
+            return RVOManager;
+        }());
+        framework.RVOManager = RVOManager;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var EffectSystemData = (function () {
             function EffectSystemData() {
                 this.beLoop = false;

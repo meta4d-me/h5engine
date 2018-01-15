@@ -3307,6 +3307,24 @@ declare namespace gd3d.framework {
         static calcWayPoints(info: navMeshInfo, startPos: navVec3, endPos: navVec3, polyPath: number[], offset?: number): navVec3[];
     }
 }
+declare var RVO: any;
+declare namespace gd3d.framework {
+    class RVOManager {
+        sim: any;
+        transforms: gd3d.framework.transform[];
+        goals: any[];
+        radius: number[];
+        attackRadius: number[];
+        speeds: number[];
+        playerIndex: number;
+        isRunning: boolean;
+        init(transforms: gd3d.framework.transform[], goals: any, radius: number[], attackRadius: number[], speeds: number[]): void;
+        disable(): void;
+        enable(): void;
+        update(): void;
+        private RVO_check(sim, goals, currGoal, lastGoal, goalQueue, currMoveDir);
+    }
+}
 declare namespace gd3d.framework {
     class EffectSystemData {
         life: number;
