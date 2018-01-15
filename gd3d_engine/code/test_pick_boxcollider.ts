@@ -22,7 +22,7 @@ class test_pick_boxcollider implements IState
         this.app.closeFps();
         //说明
         var descr = document.createElement("p");
-        descr.textContent = `提示: \n 按住键盘 A 键，点击 navmesh 可添加敌人！`;
+        descr.textContent = `提示: \n 点击碰撞框 可发射小球到碰撞位置！`;
         descr.style.top = 0 + "px";
         descr.style.left = 0 + "px";
         descr.style.position = "absolute";
