@@ -33,6 +33,7 @@ var demo_navigaionRVO = (function () {
     }
     demo_navigaionRVO.prototype.start = function (app) {
         var _this = this;
+        demo_navigaionRVO.TestRVO = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
@@ -63,6 +64,14 @@ var demo_navigaionRVO = (function () {
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
         this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
+        this.addbtn("50px", "打开 RVO", function () {
+            _this.rvoMgr.enable();
+        });
+        this.addbtn("100px", "关闭 RVO", function () {
+            _this.rvoMgr.disable();
+        });
+        this.addbtn("150px", "删除元素", function () {
+        });
     };
     demo_navigaionRVO.prototype.initPlayer = function (x, y, z) {
         if (this.isInitPlayer)
@@ -74,7 +83,7 @@ var demo_navigaionRVO = (function () {
         this.player.localScale.x = this.player.localScale.z = 2;
         this.player.markDirty();
         this.isInitPlayer = true;
-        this.rvoMgr.addAgent(0, this.player, 1, 0, 0.2);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), this.player, 1, 0, 0.2);
         this.mods = this.rvoMgr.transforms;
         this.goals = this.rvoMgr.goals;
     };
@@ -374,7 +383,7 @@ var demo_navigaionRVO = (function () {
         trans.localTranslate.y = endPos.y;
         trans.localTranslate.z = endPos.z;
         trans.markDirty();
-        this.rvoMgr.addAgent(0, trans, 0.5, 3, 0.05);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), trans, 0.5, 3, 0.05);
     };
     demo_navigaionRVO.prototype.tryFindingPath = function () {
         var endPos = this.rayNavMesh();
@@ -414,7 +423,7 @@ var demo_navigaionRVO = (function () {
             }
             this.Goals.length = 0;
             this.Goals = arr;
-            this.currGoal = this.Goals.pop();
+            this.rvoMgr.currGoal = this.Goals.pop();
         }
     };
     demo_navigaionRVO.prototype.drawLine = function (points) {
@@ -535,9 +544,28 @@ var demo_navigaionRVO = (function () {
         CameraController.instance().update(delta);
         if (this.mods != null) {
             if (this.mods.length >= 1) {
-                this.rvoMgr.update(this.currGoal, this.lastGoal, this.Goals, this.currMoveDir);
+                this.rvoMgr.update(this.Goals, this.currMoveDir);
             }
         }
+    };
+    demo_navigaionRVO.prototype.addbtn = function (topOffset, textContent, func) {
+        var _this = this;
+        var btn = document.createElement("button");
+        btn.style.top = topOffset;
+        btn.style.position = "fixed";
+        btn.style.border = "none";
+        btn.style.height = "32px";
+        btn.style.borderRadius = "16px";
+        btn.style.cursor = "pointer";
+        btn.style.margin = "32px";
+        btn.style.minWidth = "80px";
+        this.app.container.appendChild(btn);
+        btn.textContent = textContent;
+        btn.onclick = function () {
+            _this.camera.postQueues = [];
+            func();
+            console.log("Handle Clicking..." + textContent);
+        };
     };
     return demo_navigaionRVO;
 }());

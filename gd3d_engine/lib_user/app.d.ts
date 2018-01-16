@@ -10,6 +10,7 @@ declare class demo_navigaionRVO implements IState {
     cubesize: number;
     player: gd3d.framework.transform;
     sim: any;
+    static TestRVO: demo_navigaionRVO;
     rvoMgr: gd3d.framework.RVOManager;
     mods: gd3d.framework.transform[];
     goals: any[];
@@ -53,6 +54,7 @@ declare class demo_navigaionRVO implements IState {
     isAKeyDown: boolean;
     private pointDown;
     update(delta: number): void;
+    private addbtn(topOffset, textContent, func);
 }
 declare class demo_ScreenSplit implements IState {
     app: gd3d.framework.application;
