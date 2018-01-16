@@ -3119,7 +3119,7 @@ var test_pick_boxcollider = (function () {
         this.assetMgr = app.getAssetMgr();
         this.app.closeFps();
         var descr = document.createElement("p");
-        descr.textContent = "\u63D0\u793A: \n \u6309\u4F4F\u952E\u76D8 A \u952E\uFF0C\u70B9\u51FB navmesh \u53EF\u6DFB\u52A0\u654C\u4EBA\uFF01";
+        descr.textContent = "\u63D0\u793A: \n \u70B9\u51FB\u78B0\u649E\u6846 \u53EF\u53D1\u5C04\u5C0F\u7403\u5230\u78B0\u649E\u4F4D\u7F6E\uFF01";
         descr.style.top = 0 + "px";
         descr.style.left = 0 + "px";
         descr.style.position = "absolute";
