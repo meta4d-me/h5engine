@@ -3317,15 +3317,18 @@ declare namespace gd3d.framework {
         attackRadius: number[];
         speeds: number[];
         private map;
-        isRunning: boolean;
+        private isRunning;
+        currGoal: gd3d.math.vector3;
+        private lastGoal;
         addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRadius: number, speed: number): void;
         removeAgent(key: number): void;
-        getTransformByKey(key: number): void;
+        reBuildHashMap(): void;
+        getTransformByKey(key: number): gd3d.framework.transform;
         disable(): void;
         enable(): void;
-        update(currGoal: gd3d.math.vector3, lastGoal: gd3d.math.vector3, goalQueue: gd3d.math.vector3[], currMoveDir: gd3d.math.vector2): void;
-        private RVO_walking(sim, goals, currGoal, lastGoal, currMoveDir);
-        private RVO_check(sim, goals, currGoal, lastGoal, goalQueue, currMoveDir);
+        update(goalQueue: gd3d.math.vector3[], currMoveDir: gd3d.math.vector2): void;
+        private RVO_walking(sim, goals, currMoveDir);
+        private RVO_check(sim, goals, goalQueue, currMoveDir);
         cal2dDir(oPos: gd3d.math.vector3, tPos: gd3d.math.vector3, out: gd3d.math.vector2): void;
     }
 }
