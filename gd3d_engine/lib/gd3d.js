@@ -20628,23 +20628,31 @@ var gd3d;
                 this.radius = [];
                 this.attackRadius = [];
                 this.speeds = [];
+                this.map = null;
+                this.isRunning = false;
             }
-            RVOManager.prototype.init = function (transforms, goals, radius, attackRadius, speeds) {
-                this.playerIndex = 0;
-                this.transforms = transforms;
-                this.goals = goals;
-                this.radius = radius;
-                this.attackRadius = attackRadius;
-                this.speeds = speeds;
-                for (var i in this.transforms) {
-                    var current_position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
-                    this.sim.addAgent(current_position);
-                    this.goals[i] = current_position;
-                    this.sim.agents[i].radius = this.radius[i];
-                    this.sim.agents[i].maxSpeed = this.speeds[i];
+            RVOManager.prototype.addAgent = function (key, transform, radius, attackRadius, speed) {
+                var index = this.sim.agents.length;
+                this.transforms.push(transform);
+                this.attackRadius.push(attackRadius);
+                this.radius.push(radius);
+                this.speeds.push(speed);
+                var current_position = [transform.localTranslate.x, transform.localTranslate.z];
+                this.sim.addAgent(current_position);
+                this.goals.push(current_position);
+                this.sim.agents[index].radius = radius;
+                this.sim.agents[index].maxSpeed = speed;
+                if (index == 0) {
+                    this.sim.agents[0].neighborDist = 0;
                 }
-                this.sim.agents[this.playerIndex].neighborDist = 0;
                 this.isRunning = true;
+            };
+            RVOManager.prototype.removeAgent = function (key) {
+                var offset = this.map[key];
+                this.sim.agents[offset] = null;
+                delete this.map[key];
+            };
+            RVOManager.prototype.getTransformByKey = function (key) {
             };
             RVOManager.prototype.disable = function () {
                 this.isRunning = false;
@@ -20655,8 +20663,36 @@ var gd3d;
                     this.sim.agents[i].position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
                 }
             };
-            RVOManager.prototype.update = function () {
-                if (this.isRunning) {
+            RVOManager.prototype.update = function (currGoal, lastGoal, goalQueue, currMoveDir) {
+                if (this.isRunning && (this.transforms.length >= 1)) {
+                    this.RVO_check(this.sim, this.goals, currGoal, lastGoal, goalQueue, currMoveDir);
+                    this.RVO_walking(this.sim, this.goals, currGoal, lastGoal, currMoveDir);
+                }
+            };
+            RVOManager.prototype.RVO_walking = function (sim, goals, currGoal, lastGoal, currMoveDir) {
+                for (var i = 0, len = sim.agents.length; i < len; i++) {
+                    if (sim.agents[i] != null) {
+                        var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+                        if (RVO.Vector.absSq(goalVector) > 1) {
+                            goalVector = RVO.Vector.normalize(goalVector);
+                        }
+                        sim.agents[i].prefVelocity = goalVector;
+                    }
+                }
+                sim.doStep();
+                for (var i_7 = 0; i_7 < sim.agents.length; i_7++) {
+                    this.transforms[i_7].localTranslate.x = sim.agents[i_7].position[0];
+                    this.transforms[i_7].localTranslate.z = sim.agents[i_7].position[1];
+                    if (i_7 == 0 && currGoal && lastGoal) {
+                        var pos = this.transforms[i_7].localTranslate;
+                        var nowDir = gd3d.math.pool.new_vector2();
+                        this.cal2dDir(lastGoal, pos, nowDir);
+                        var nowLen = gd3d.math.vec2Length(nowDir);
+                        var tLen = gd3d.math.vec2Length(currMoveDir);
+                        pos.y = gd3d.math.numberLerp(lastGoal.y, currGoal.y, nowLen / tLen);
+                        gd3d.math.pool.delete_vector2(nowDir);
+                    }
+                    this.transforms[i_7].markDirty();
                 }
             };
             RVOManager.prototype.RVO_check = function (sim, goals, currGoal, lastGoal, goalQueue, currMoveDir) {
@@ -20680,6 +20716,7 @@ var gd3d;
                         }
                         if (goalQueue && goalQueue.length > 0) {
                             currGoal = goalQueue.pop();
+                            this.cal2dDir(lastGoal, currGoal, currMoveDir);
                             goals[0] = [currGoal.x, currGoal.z];
                             sim.agents[0].radius = 0.1;
                         }
@@ -20692,13 +20729,26 @@ var gd3d;
                 }
                 for (var i = 1, len = sim.agents.length; i < len; i++) {
                     var range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
-                    if (range < this.attackRadius[i]) {
+                    if (range < 3) {
                         goals[i] = sim.agents[i].position;
                     }
                     else {
                         goals[i] = sim.agents[0].position;
                     }
                 }
+            };
+            RVOManager.prototype.cal2dDir = function (oPos, tPos, out) {
+                if (!oPos || !tPos || !out)
+                    return;
+                var ov2 = gd3d.math.pool.new_vector2();
+                ov2.x = oPos.x;
+                ov2.y = oPos.z;
+                var tv2 = gd3d.math.pool.new_vector2();
+                tv2.x = tPos.x;
+                tv2.y = tPos.z;
+                gd3d.math.vec2Subtract(tv2, ov2, out);
+                gd3d.math.pool.delete_vector2(ov2);
+                gd3d.math.pool.delete_vector2(tv2);
             };
             return RVOManager;
         }());
@@ -25264,8 +25314,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_7 = 0; obj.transform.children != undefined && i_7 < obj.transform.children.length; i_7++) {
-                    var _obj = obj.transform.children[i_7].gameObject;
+                for (var i_8 = 0; obj.transform.children != undefined && i_8 < obj.transform.children.length; i_8++) {
+                    var _obj = obj.transform.children[i_8].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };

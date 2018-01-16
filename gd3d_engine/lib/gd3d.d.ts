@@ -3316,13 +3316,17 @@ declare namespace gd3d.framework {
         radius: number[];
         attackRadius: number[];
         speeds: number[];
-        playerIndex: number;
+        private map;
         isRunning: boolean;
-        init(transforms: gd3d.framework.transform[], goals: any, radius: number[], attackRadius: number[], speeds: number[]): void;
+        addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRadius: number, speed: number): void;
+        removeAgent(key: number): void;
+        getTransformByKey(key: number): void;
         disable(): void;
         enable(): void;
-        update(): void;
+        update(currGoal: gd3d.math.vector3, lastGoal: gd3d.math.vector3, goalQueue: gd3d.math.vector3[], currMoveDir: gd3d.math.vector2): void;
+        private RVO_walking(sim, goals, currGoal, lastGoal, currMoveDir);
         private RVO_check(sim, goals, currGoal, lastGoal, goalQueue, currMoveDir);
+        cal2dDir(oPos: gd3d.math.vector3, tPos: gd3d.math.vector3, out: gd3d.math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
