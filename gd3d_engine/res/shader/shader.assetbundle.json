@@ -284,72 +284,12 @@
           "name":"resources/f14effect/particles_add.shader.json",
           "length":0
           },
+    {
+        "name":"resources/f14effect/particles_blend.shader.json",
+        "length":0
+    },
       {
           "name":"resources/mu_shader/alpha_blend.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/fog_particles_diffuse.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/particle/fog_particles_diffuse.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/particle/fog_particles_transparent.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/particle/fog_particles_transparent.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_additive.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_additive_premultiply.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_additive_zwriteon.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_blend.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_blend_premultiply.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_blend_renderall.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_blend_zwriteon.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_diffuse.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_diffuse.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_diffuse.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_transparent.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/particle/particles_transparent.vs.glsl",
           "length":0
           },
       {
