@@ -10,7 +10,7 @@ class demo_navigaionRVO implements IState
     cubesize = 0.5;
     player:gd3d.framework.transform;
     sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
-
+    static TestRVO: demo_navigaionRVO;
 
     rvoMgr: gd3d.framework.RVOManager;
     mods: gd3d.framework.transform[];
@@ -19,6 +19,7 @@ class demo_navigaionRVO implements IState
 
     start(app: gd3d.framework.application)
     {
+        demo_navigaionRVO.TestRVO = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
@@ -107,7 +108,14 @@ class demo_navigaionRVO implements IState
 
 
         // this.sim.processObstacles();
-
+        this.addbtn("50px","打开 RVO",()=>{
+            this.rvoMgr.enable();
+        })
+        this.addbtn("100px","关闭 RVO",()=>{
+            this.rvoMgr.disable();
+        })
+        this.addbtn("150px","删除元素",()=>{
+        })
     }
 
     private isInitPlayer = false;
@@ -122,7 +130,7 @@ class demo_navigaionRVO implements IState
         this.isInitPlayer = true;
 
         // Add agent
-        this.rvoMgr.addAgent(0, this.player, 1, 0, 0.2);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), this.player, 1, 0, 0.2);
 
         this.mods = this.rvoMgr.transforms;
         this.goals = this.rvoMgr.goals;
@@ -468,7 +476,7 @@ class demo_navigaionRVO implements IState
         trans.localTranslate.z = endPos.z;
         trans.markDirty();
         // Add agent
-        this.rvoMgr.addAgent(0, trans, 0.5, 3, 0.05);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), trans, 0.5, 3, 0.05);
         // this.sim.addAgent([endPos.x, endPos.z]);
         // this.goals.push([endPos.x, endPos.z]);
         // this.mods.push(trans);
@@ -510,7 +518,7 @@ class demo_navigaionRVO implements IState
             }
             this.Goals.length = 0;
             this.Goals = arr;
-            this.currGoal = this.Goals.pop();
+            this.rvoMgr.currGoal = this.Goals.pop();
         }
     }
 
@@ -650,7 +658,7 @@ class demo_navigaionRVO implements IState
         CameraController.instance().update(delta);
         if(this.mods != null) {
             if(this.mods.length >=1) {
-                this.rvoMgr.update(this.currGoal, this.lastGoal, this.Goals, this.currMoveDir);
+                this.rvoMgr.update(this.Goals, this.currMoveDir);
                 // this.RVO_check(this.sim, this.goals);
                 // this.RVO_walking(this.sim, this.goals);
             }
@@ -659,4 +667,29 @@ class demo_navigaionRVO implements IState
         // this.ckGoalsChange();
         // this.playerwalking();
     }
+
+    private addbtn(topOffset:string,textContent:string,func:()=>void)
+    {
+        var btn = document.createElement("button");
+        btn.style.top = topOffset;
+        btn.style.position = "fixed";
+        btn.style.border = "none";
+        btn.style.height = "32px";
+        btn.style.borderRadius = "16px";
+        btn.style.cursor = "pointer";
+        btn.style.margin = "32px";
+        btn.style.minWidth = "80px";
+
+
+        this.app.container.appendChild(btn);
+
+        btn.textContent = textContent;
+        btn.onclick = () =>
+        {
+            this.camera.postQueues = [];
+            func();
+            console.log("Handle Clicking..."+textContent);
+        }
+    }
+
 }
