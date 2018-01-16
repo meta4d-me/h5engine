@@ -20663,6 +20663,9 @@ var gd3d;
                 for (var i = 0; i < this.sim.agents.length; i++) {
                     this.map[this.sim.agents[i].id] = i;
                 }
+                this.sim.kdTree.agents = [];
+                this.sim.kdTree.agentTree = [];
+                this.sim.kdTree.obstacleTree = 0;
             };
             RVOManager.prototype.getTransformByKey = function (key) {
                 var offset = this.map[key];

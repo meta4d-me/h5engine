@@ -58,8 +58,10 @@ namespace gd3d.framework {
             for(let i = 0; i < this.sim.agents.length; i++) {
                 this.map[this.sim.agents[i].id] = i;
             }
-            this.sim.kdTree = new RVO.KdTree(this.sim);
 
+            this.sim.kdTree.agents = [];
+            this.sim.kdTree.agentTree = [];
+            this.sim.kdTree.obstacleTree = 0;
         }
 
         public getTransformByKey(key: number): gd3d.framework.transform {
@@ -168,7 +170,7 @@ namespace gd3d.framework {
 
         }
 
-        public cal2dDir(oPos:gd3d.math.vector3,tPos:gd3d.math.vector3,out:gd3d.math.vector2){
+        private cal2dDir(oPos:gd3d.math.vector3,tPos:gd3d.math.vector3,out:gd3d.math.vector2){
             if(!oPos || !tPos || !out)  return;
             let ov2 = gd3d.math.pool.new_vector2();
             ov2.x = oPos.x; ov2.y = oPos.z;
