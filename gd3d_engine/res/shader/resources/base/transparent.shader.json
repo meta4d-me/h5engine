@@ -1,7 +1,8 @@
 {
     "layer": "transparent",
 	"properties": [
-        "_MainTex('MainTex',Texture)='white'{}"
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_Alpha('Alpha', Range(0.0, 1.0)) = 1.0"
     ],
     "passes": {
         "base": [
