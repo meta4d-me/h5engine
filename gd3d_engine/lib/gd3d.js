@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000049";
+                this.build = "b000050";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
