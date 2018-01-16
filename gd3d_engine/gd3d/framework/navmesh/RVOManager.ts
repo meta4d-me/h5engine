@@ -8,7 +8,7 @@ namespace gd3d.framework {
         public transforms:gd3d.framework.transform[] = [];
         public goals = [];
         public radius: number[] = [];
-        public attackRadius: number[] = [];
+        public attackRanges: number[] = [];
         public speeds: number[] = [];
 
         private map: { [key: number]: number } = {};
@@ -17,12 +17,12 @@ namespace gd3d.framework {
         public currGoal:gd3d.math.vector3;
         private lastGoal:gd3d.math.vector3;
 
-        public addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRadius: number, speed: number) {
+        public addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRanges: number, speed: number) {
             let index = this.sim.agents.length;
             let current_position = [transform.localTranslate.x, transform.localTranslate.z];
 
             this.transforms.push(transform);
-            this.attackRadius.push(attackRadius);
+            this.attackRanges.push(attackRanges);
             this.radius.push(radius);
             this.speeds.push(speed);
             this.goals.push(current_position);
@@ -45,7 +45,7 @@ namespace gd3d.framework {
             let offset = this.map[key];
 
             this.transforms.splice(offset, 1);
-            this.attackRadius.splice(offset, 1);
+            this.attackRanges.splice(offset, 1);
             this.radius.splice(offset, 1);
             this.speeds.splice(offset, 1);
             this.goals.splice(offset, 1);
@@ -67,6 +67,19 @@ namespace gd3d.framework {
         public getTransformByKey(key: number): gd3d.framework.transform {
             let offset = this.map[key];
             return this.transforms[offset];
+        }
+
+        public setRadius(id: number, value: number) {
+            let i = this.map[id];
+            this.sim.agents[i].radius = value;
+        }
+        public setSpeed(id: number, value: number) {
+            let i = this.map[id];
+            this.sim.agents[i].maxSpeed = value;
+        }
+        public setAttackRange(id: number, value: number) {
+            let i = this.map[id];
+            this.attackRanges[i] = value;
         }
 
         public disable() {
@@ -161,7 +174,7 @@ namespace gd3d.framework {
             // 小怪的目标
             for (var i = 1, len = sim.agents.length; i < len; i ++) {
                 let range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
-                if (range < this.attackRadius[i] ) {
+                if (range < this.attackRanges[i] ) {
                     goals[i] = sim.agents[i].position;  // Stop
                 } else {
                     goals[i] = sim.agents[0].position;

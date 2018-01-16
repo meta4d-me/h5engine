@@ -20626,16 +20626,16 @@ var gd3d;
                 this.transforms = [];
                 this.goals = [];
                 this.radius = [];
-                this.attackRadius = [];
+                this.attackRanges = [];
                 this.speeds = [];
                 this.map = {};
                 this.isRunning = false;
             }
-            RVOManager.prototype.addAgent = function (key, transform, radius, attackRadius, speed) {
+            RVOManager.prototype.addAgent = function (key, transform, radius, attackRanges, speed) {
                 var index = this.sim.agents.length;
                 var current_position = [transform.localTranslate.x, transform.localTranslate.z];
                 this.transforms.push(transform);
-                this.attackRadius.push(attackRadius);
+                this.attackRanges.push(attackRanges);
                 this.radius.push(radius);
                 this.speeds.push(speed);
                 this.goals.push(current_position);
@@ -20652,7 +20652,7 @@ var gd3d;
             RVOManager.prototype.removeAgent = function (key) {
                 var offset = this.map[key];
                 this.transforms.splice(offset, 1);
-                this.attackRadius.splice(offset, 1);
+                this.attackRanges.splice(offset, 1);
                 this.radius.splice(offset, 1);
                 this.speeds.splice(offset, 1);
                 this.goals.splice(offset, 1);
@@ -20670,6 +20670,18 @@ var gd3d;
             RVOManager.prototype.getTransformByKey = function (key) {
                 var offset = this.map[key];
                 return this.transforms[offset];
+            };
+            RVOManager.prototype.setRadius = function (id, value) {
+                var i = this.map[id];
+                this.sim.agents[i].radius = value;
+            };
+            RVOManager.prototype.setSpeed = function (id, value) {
+                var i = this.map[id];
+                this.sim.agents[i].maxSpeed = value;
+            };
+            RVOManager.prototype.setAttackRange = function (id, value) {
+                var i = this.map[id];
+                this.attackRanges[i] = value;
             };
             RVOManager.prototype.disable = function () {
                 this.isRunning = false;
@@ -20749,7 +20761,7 @@ var gd3d;
                 }
                 for (var i = 1, len = sim.agents.length; i < len; i++) {
                     var range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
-                    if (range < this.attackRadius[i]) {
+                    if (range < this.attackRanges[i]) {
                         goals[i] = sim.agents[i].position;
                     }
                     else {
