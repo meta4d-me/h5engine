@@ -3,7 +3,7 @@ declare var RVO;
 namespace gd3d.framework {
     export class RVOManager {
 
-        public sim = new RVO.Simulator(1, 40, 10, 20, 5, 1.0, 0.1, [0, 0]);
+        public sim;
 
         public transforms:gd3d.framework.transform[] = [];
         public goals = [];
@@ -15,19 +15,18 @@ namespace gd3d.framework {
 
         public isRunning: boolean;
 
-        public init(transforms: gd3d.framework.transform[], goals, radius: number[], attackRadius: number[], speeds: number[]) {
+        public init(transforms: gd3d.framework.transform[], radius: number[], attackRadius: number[], speeds: number[]) {
+            this.sim            = new RVO.Simulator(1, 40, 10, 20, 5, 1.0, 0.1, [0, 0]);
             this.playerIndex    = 0;
             this.transforms     = transforms;
-            this.goals          = goals;
             this.radius         = radius;
             this.attackRadius   = attackRadius;
             this.speeds         = speeds;
-
 // (timeStep, neighborDist, maxNeighbors, timeHorizon, timeHorizonObst, radius, maxSpeed, velocity)
-            for (let i in this.transforms) {
+            for (let i = 0; i < this.transforms.length; i++) {
                 let current_position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
                 this.sim.addAgent(current_position);
-                this.goals[i] = current_position;
+                this.goals[i] = current_position;   // 初始化目标为当前位置
 
                 // Customize current agent
                 this.sim.agents[i].radius = this.radius[i];
@@ -50,41 +49,46 @@ namespace gd3d.framework {
             }
         }
 
-        public update() {
-            if(this.isRunning) {
-
+        public update(currGoal:gd3d.math.vector3, lastGoal:gd3d.math.vector3, goalQueue:gd3d.math.vector3[], currMoveDir:gd3d.math.vector2) {
+            if(this.isRunning && (this.transforms.length >= 1)) {
+                this.RVO_check(this.sim, this.goals, currGoal, lastGoal, goalQueue, currMoveDir);
+                this.RVO_walking(this.sim, this.goals, currGoal, lastGoal, currMoveDir);
             }
         }
 
-        // private RVO_walking(sim, goals) {
-        //     // 据当前目标重新获取目标方向向量
-        //     for (var i = 0, len = sim.agents.length; i < len; i ++) {
-        //         var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
-        //         if (RVO.Vector.absSq(goalVector) > 1) {
-        //             goalVector = RVO.Vector.normalize(goalVector);
-        //         }
-        //         sim.agents[i].prefVelocity = goalVector; // 更新
-        //     }
-        //     sim.doStep();
-        //     for(let i = 0; i < sim.agents.length; i++) {
-        //         this.mods[i].localTranslate.x = sim.agents[i].position[0];
-        //         this.mods[i].localTranslate.z = sim.agents[i].position[1];
-        //         if(i == 0 && currGoal && lastGoal){
-        //             let pos = this.mods[i].localTranslate;
-        //             let nowDir = gd3d.math.pool.new_vector2();
-        //             this.cal2dDir(lastGoal,pos,nowDir);
-        //             let nowLen = gd3d.math.vec2Length(nowDir);
-        //             let tLen = gd3d.math.vec2Length(this.currMoveDir);
-        //             pos.y = gd3d.math.numberLerp(lastGoal.y,currGoal.y,nowLen/tLen);
-        //             //console.error(`nowLen/tLen :${nowLen}/${tLen}   ,  pos y:${pos.y}  ,lastGoal: ${lastGoal.x} ,${lastGoal.y} ,${lastGoal.z} `);
-        //             gd3d.math.pool.delete_vector2(nowDir);
-        //         }
-        //
-        //         this.mods[i].markDirty();
-        //     }
-        //
-        // }
+        private RVO_walking(sim, goals, currGoal:gd3d.math.vector3, lastGoal:gd3d.math.vector3, currMoveDir:gd3d.math.vector2) {
+            // 据当前目标重新获取目标方向向量
+            for (var i = 0, len = sim.agents.length; i < len; i ++) {
+                var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+                if (RVO.Vector.absSq(goalVector) > 1) {
+                    goalVector = RVO.Vector.normalize(goalVector);
+                }
+                sim.agents[i].prefVelocity = goalVector; // 更新速度向量
+            }
+            sim.doStep();   // 移动一帧
+            for(let i = 0; i < sim.agents.length; i++) {
+                this.transforms[i].localTranslate.x = sim.agents[i].position[0];
+                this.transforms[i].localTranslate.z = sim.agents[i].position[1];
+                if(i == 0 && currGoal && lastGoal){
+                    let pos = this.transforms[i].localTranslate;
+                    let nowDir = gd3d.math.pool.new_vector2();
+                    this.cal2dDir(lastGoal,pos,nowDir);
+                    let nowLen = gd3d.math.vec2Length(nowDir);
+                    let tLen = gd3d.math.vec2Length(currMoveDir);
+                    pos.y = gd3d.math.numberLerp(lastGoal.y,currGoal.y,nowLen/tLen);
+                    //console.error(`nowLen/tLen :${nowLen}/${tLen}   ,  pos y:${pos.y}  ,lastGoal: ${lastGoal.x} ,${lastGoal.y} ,${lastGoal.z} `);
+                    gd3d.math.pool.delete_vector2(nowDir);
+                }
+
+                this.transforms[i].markDirty();
+            }
+
+        }
+
+
+
         private RVO_check(sim, goals, currGoal:gd3d.math.vector3, lastGoal:gd3d.math.vector3, goalQueue:gd3d.math.vector3[], currMoveDir:gd3d.math.vector2) {
+            // 玩家根据 NavMesh 切换目标
             if(currGoal){
                 let player = this.transforms[0];
                 //达到目标点
@@ -103,7 +107,7 @@ namespace gd3d.framework {
                     }
                     if(goalQueue && goalQueue.length >0) {
                         currGoal = goalQueue.pop();
-                        //this.cal2dDir(lastGoal,currGoal,this.currMoveDir);    //有报错先注释掉了
+                        this.cal2dDir(lastGoal, currGoal, currMoveDir);
                         goals[0] = [currGoal.x, currGoal.z];
                         sim.agents[0].radius = 0.1;
                     }
@@ -117,10 +121,10 @@ namespace gd3d.framework {
 
             }
 
+            // 小怪的目标
             for (var i = 1, len = sim.agents.length; i < len; i ++) {
                 let range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
                 if (range < this.attackRadius[i] ) {
-                    // console.log(i + ' in position');
                     goals[i] = sim.agents[i].position;  // Stop
                 } else {
                     goals[i] = sim.agents[0].position;
@@ -129,6 +133,16 @@ namespace gd3d.framework {
 
         }
 
+        public cal2dDir(oPos:gd3d.math.vector3,tPos:gd3d.math.vector3,out:gd3d.math.vector2){
+            if(!oPos || !tPos || !out)  return;
+            let ov2 = gd3d.math.pool.new_vector2();
+            ov2.x = oPos.x; ov2.y = oPos.z;
+            let tv2 = gd3d.math.pool.new_vector2();
+            tv2.x = tPos.x; tv2.y = tPos.z;
+            gd3d.math.vec2Subtract(tv2,ov2,out);
+            gd3d.math.pool.delete_vector2(ov2);
+            gd3d.math.pool.delete_vector2(tv2);
+        }
 
     }
 }
