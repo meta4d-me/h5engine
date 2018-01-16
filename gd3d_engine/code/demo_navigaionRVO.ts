@@ -10,8 +10,13 @@ class demo_navigaionRVO implements IState
     cubesize = 0.5;
     player:gd3d.framework.transform;
     sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
+
+
+    rvoMgr: gd3d.framework.RVOManager;
+    mods: gd3d.framework.transform[];
     goals = [];
-    mods:gd3d.framework.transform[] = [];
+
+
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
@@ -20,6 +25,7 @@ class demo_navigaionRVO implements IState
         this.inputMgr = this.app.getInputMgr();
         this.assetMgr = app.getAssetMgr();
         this.app.closeFps();
+        this.rvoMgr = new gd3d.framework.RVOManager();
         //说明
         var descr = document.createElement("p");
         descr.textContent = `提示: \n 按住键盘 A 键，点击 navmesh 可添加敌人！`;
@@ -116,14 +122,18 @@ class demo_navigaionRVO implements IState
         this.isInitPlayer = true;
 
         // Add agent
-        this.sim.addAgent([x, z]);
-        this.sim.agents[0].radius = 1;
-        this.sim.agents[0].neighborDist = 0;    // 玩家不会被小怪挤
-        this.sim.agents[0].maxSpeed = 0.2;
-        this.sim.agents[0].timeHorizon = 5;
-        this.sim.agents[0].timeHorizonObst = 20;
-        this.mods.push(this.player);
-        this.goals.push([x, z]);
+        this.rvoMgr.addAgent(0, this.player, 1, 0, 0.2);
+
+        this.mods = this.rvoMgr.transforms;
+        this.goals = this.rvoMgr.goals;
+        // this.sim.addAgent([x, z]);
+        // this.sim.agents[0].radius = 1;
+        // this.sim.agents[0].neighborDist = 0;    // 玩家不会被小怪挤
+        // this.sim.agents[0].maxSpeed = 0.2;
+        // this.sim.agents[0].timeHorizon = 5;
+        // this.sim.agents[0].timeHorizonObst = 20;
+        // this.mods.push(this.player);
+        // this.goals.push([x, z]);
     }
 
     private loadScene(assetName:string , isCompress = false){
@@ -458,9 +468,10 @@ class demo_navigaionRVO implements IState
         trans.localTranslate.z = endPos.z;
         trans.markDirty();
         // Add agent
-        this.sim.addAgent([endPos.x, endPos.z]);
-        this.goals.push([endPos.x, endPos.z]);
-        this.mods.push(trans);
+        this.rvoMgr.addAgent(0, trans, 0.5, 3, 0.05);
+        // this.sim.addAgent([endPos.x, endPos.z]);
+        // this.goals.push([endPos.x, endPos.z]);
+        // this.mods.push(trans);
     }
 
     private pos = [];
@@ -637,10 +648,13 @@ class demo_navigaionRVO implements IState
 
         this.timer += delta;
         CameraController.instance().update(delta);
-        if(this.mods.length >=1) {
+        if(this.mods != null) {
+            if(this.mods.length >=1) {
+                this.rvoMgr.update(this.currGoal, this.lastGoal, this.Goals, this.currMoveDir);
+                // this.RVO_check(this.sim, this.goals);
+                // this.RVO_walking(this.sim, this.goals);
+            }
 
-            this.RVO_check(this.sim, this.goals);
-            this.RVO_walking(this.sim, this.goals);
         }
         // this.ckGoalsChange();
         // this.playerwalking();

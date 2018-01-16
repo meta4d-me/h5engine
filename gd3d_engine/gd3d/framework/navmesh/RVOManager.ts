@@ -3,7 +3,7 @@ declare var RVO;
 namespace gd3d.framework {
     export class RVOManager {
 
-        public sim;
+        public sim = new RVO.Simulator(1, 40, 10, 20, 5, 1.0, 0.1, [0, 0]);
 
         public transforms:gd3d.framework.transform[] = [];
         public goals = [];
@@ -11,30 +11,62 @@ namespace gd3d.framework {
         public attackRadius: number[] = [];
         public speeds: number[] = [];
 
-        public playerIndex: number;
+        private map: { [key: number]: number } = null;
 
-        public isRunning: boolean;
+        public isRunning: boolean = false;
 
-        public init(transforms: gd3d.framework.transform[], radius: number[], attackRadius: number[], speeds: number[]) {
-            this.sim            = new RVO.Simulator(1, 40, 10, 20, 5, 1.0, 0.1, [0, 0]);
-            this.playerIndex    = 0;
-            this.transforms     = transforms;
-            this.radius         = radius;
-            this.attackRadius   = attackRadius;
-            this.speeds         = speeds;
-// (timeStep, neighborDist, maxNeighbors, timeHorizon, timeHorizonObst, radius, maxSpeed, velocity)
-            for (let i = 0; i < this.transforms.length; i++) {
-                let current_position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
-                this.sim.addAgent(current_position);
-                this.goals[i] = current_position;   // 初始化目标为当前位置
+//         public init(transforms: gd3d.framework.transform[], radius: number[], attackRadius: number[], speeds: number[]) {
+//             this.transforms     = transforms;
+//             this.radius         = radius;
+//             this.attackRadius   = attackRadius;
+//             this.speeds         = speeds;
+// // (timeStep, neighborDist, maxNeighbors, timeHorizon, timeHorizonObst, radius, maxSpeed, velocity)
+//             for (let i = 0; i < this.transforms.length; i++) {
+//                 let current_position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
+//                 this.sim.addAgent(current_position);
+//                 this.goals[i] = current_position;   // 初始化目标为当前位置
+//
+//                 // Customize current agent
+//                 if(this.radius[i] != null) {
+//                     this.sim.agents[i].radius = this.radius[i];
+//                 }
+//                 if(this.speeds[i] != null) {
+//                     this.sim.agents[i].maxSpeed = this.speeds[i];
+//                 }
+//             }
+//             // 玩家特殊定义
+//             this.sim.agents[0].neighborDist = 0; // 玩家不会让路
+//             this.isRunning = true;
+//         }
 
-                // Customize current agent
-                this.sim.agents[i].radius = this.radius[i];
-                this.sim.agents[i].maxSpeed = this.speeds[i];
+        public addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRadius: number, speed: number) {
+            let index = this.sim.agents.length;
+            // this.map[key] = index;
+            this.transforms.push(transform);
+            this.attackRadius.push(attackRadius);
+            this.radius.push(radius);
+            this.speeds.push(speed);
+
+            let current_position = [transform.localTranslate.x, transform.localTranslate.z];
+            this.sim.addAgent(current_position);
+            this.goals.push(current_position);
+
+            this.sim.agents[index].radius = radius;
+            this.sim.agents[index].maxSpeed = speed;
+            if(index == 0) {
+                this.sim.agents[0].neighborDist = 0;
             }
-            // 玩家特殊定义
-            this.sim.agents[this.playerIndex].neighborDist = 0; // 玩家不会让路
             this.isRunning = true;
+        }
+
+        public removeAgent(key: number) {
+            let offset = this.map[key];
+            this.sim.agents[offset] = null;
+            delete this.map[key];
+        }
+
+        public getTransformByKey(key: number) {
+
         }
 
         public disable() {
@@ -59,11 +91,13 @@ namespace gd3d.framework {
         private RVO_walking(sim, goals, currGoal:gd3d.math.vector3, lastGoal:gd3d.math.vector3, currMoveDir:gd3d.math.vector2) {
             // 据当前目标重新获取目标方向向量
             for (var i = 0, len = sim.agents.length; i < len; i ++) {
-                var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
-                if (RVO.Vector.absSq(goalVector) > 1) {
-                    goalVector = RVO.Vector.normalize(goalVector);
+                if(sim.agents[i] != null) {
+                    var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
+                    if (RVO.Vector.absSq(goalVector) > 1) {
+                        goalVector = RVO.Vector.normalize(goalVector);
+                    }
+                    sim.agents[i].prefVelocity = goalVector; // 更新速度向量
                 }
-                sim.agents[i].prefVelocity = goalVector; // 更新速度向量
             }
             sim.doStep();   // 移动一帧
             for(let i = 0; i < sim.agents.length; i++) {
@@ -103,7 +137,7 @@ namespace gd3d.framework {
                         lastGoal = currGoal;
                         currGoal = null;
                         goals[0] = sim.agents[0].position;
-                        sim.agents[0].radius = 1;
+                        sim.agents[0].radius = this.radius[0];
                     }
                     if(goalQueue && goalQueue.length >0) {
                         currGoal = goalQueue.pop();

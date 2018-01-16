@@ -10,8 +10,9 @@ declare class demo_navigaionRVO implements IState {
     cubesize: number;
     player: gd3d.framework.transform;
     sim: any;
-    goals: any[];
+    rvoMgr: gd3d.framework.RVOManager;
     mods: gd3d.framework.transform[];
+    goals: any[];
     start(app: gd3d.framework.application): void;
     private isInitPlayer;
     private initPlayer(x, y, z);

@@ -19,7 +19,6 @@ var demo_navigaionRVO = (function () {
         this.cubesize = 0.5;
         this.sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
         this.goals = [];
-        this.mods = [];
         this.isInitPlayer = false;
         this.moveSpeed = 0.2;
         this.currMoveDir = new gd3d.math.vector2();
@@ -40,6 +39,7 @@ var demo_navigaionRVO = (function () {
         this.inputMgr = this.app.getInputMgr();
         this.assetMgr = app.getAssetMgr();
         this.app.closeFps();
+        this.rvoMgr = new gd3d.framework.RVOManager();
         var descr = document.createElement("p");
         descr.textContent = "\u63D0\u793A: \n \u6309\u4F4F\u952E\u76D8 A \u952E\uFF0C\u70B9\u51FB navmesh \u53EF\u6DFB\u52A0\u654C\u4EBA\uFF01";
         descr.style.top = 0 + "px";
@@ -74,14 +74,9 @@ var demo_navigaionRVO = (function () {
         this.player.localScale.x = this.player.localScale.z = 2;
         this.player.markDirty();
         this.isInitPlayer = true;
-        this.sim.addAgent([x, z]);
-        this.sim.agents[0].radius = 1;
-        this.sim.agents[0].neighborDist = 0;
-        this.sim.agents[0].maxSpeed = 0.2;
-        this.sim.agents[0].timeHorizon = 5;
-        this.sim.agents[0].timeHorizonObst = 20;
-        this.mods.push(this.player);
-        this.goals.push([x, z]);
+        this.rvoMgr.addAgent(0, this.player, 1, 0, 0.2);
+        this.mods = this.rvoMgr.transforms;
+        this.goals = this.rvoMgr.goals;
     };
     demo_navigaionRVO.prototype.loadScene = function (assetName, isCompress) {
         var _this = this;
@@ -379,9 +374,7 @@ var demo_navigaionRVO = (function () {
         trans.localTranslate.y = endPos.y;
         trans.localTranslate.z = endPos.z;
         trans.markDirty();
-        this.sim.addAgent([endPos.x, endPos.z]);
-        this.goals.push([endPos.x, endPos.z]);
-        this.mods.push(trans);
+        this.rvoMgr.addAgent(0, trans, 0.5, 3, 0.05);
     };
     demo_navigaionRVO.prototype.tryFindingPath = function () {
         var endPos = this.rayNavMesh();
@@ -540,9 +533,10 @@ var demo_navigaionRVO = (function () {
         }
         this.timer += delta;
         CameraController.instance().update(delta);
-        if (this.mods.length >= 1) {
-            this.RVO_check(this.sim, this.goals);
-            this.RVO_walking(this.sim, this.goals);
+        if (this.mods != null) {
+            if (this.mods.length >= 1) {
+                this.rvoMgr.update(this.currGoal, this.lastGoal, this.Goals, this.currMoveDir);
+            }
         }
     };
     return demo_navigaionRVO;
@@ -3119,7 +3113,7 @@ var test_pick_boxcollider = (function () {
         this.assetMgr = app.getAssetMgr();
         this.app.closeFps();
         var descr = document.createElement("p");
-        descr.textContent = "\u63D0\u793A: \n \u6309\u4F4F\u952E\u76D8 A \u952E\uFF0C\u70B9\u51FB navmesh \u53EF\u6DFB\u52A0\u654C\u4EBA\uFF01";
+        descr.textContent = "\u63D0\u793A: \n \u70B9\u51FB\u78B0\u649E\u6846 \u53EF\u53D1\u5C04\u5C0F\u7403\u5230\u78B0\u649E\u4F4D\u7F6E\uFF01";
         descr.style.top = 0 + "px";
         descr.style.left = 0 + "px";
         descr.style.position = "absolute";
