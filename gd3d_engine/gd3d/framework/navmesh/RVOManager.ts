@@ -58,6 +58,8 @@ namespace gd3d.framework {
             for(let i = 0; i < this.sim.agents.length; i++) {
                 this.map[this.sim.agents[i].id] = i;
             }
+            this.sim.kdTree = new RVO.KdTree(this.sim);
+
         }
 
         public getTransformByKey(key: number): gd3d.framework.transform {
