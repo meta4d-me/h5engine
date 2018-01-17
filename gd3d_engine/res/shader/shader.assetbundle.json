@@ -284,10 +284,6 @@
           "name":"resources/f14effect/particles_add.shader.json",
           "length":0
           },
-    {
-        "name":"resources/f14effect/particles_blend.shader.json",
-        "length":0
-    },
       {
           "name":"resources/f14effect/particles_blend.shader.json",
           "length":0
