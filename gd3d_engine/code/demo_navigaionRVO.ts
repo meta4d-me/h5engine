@@ -9,12 +9,9 @@ class demo_navigaionRVO implements IState
     assetMgr: gd3d.framework.assetMgr;
     cubesize = 0.5;
     player:gd3d.framework.transform;
-    sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
     static TestRVO: demo_navigaionRVO;
 
-    rvoMgr: gd3d.framework.RVOManager;
-    mods: gd3d.framework.transform[];
-    goals = [];
+    rvoMgr: gd3d.framework.RVOManager = new gd3d.framework.RVOManager(); // RVO Manager
 
 
     start(app: gd3d.framework.application)
@@ -26,7 +23,6 @@ class demo_navigaionRVO implements IState
         this.inputMgr = this.app.getInputMgr();
         this.assetMgr = app.getAssetMgr();
         this.app.closeFps();
-        this.rvoMgr = new gd3d.framework.RVOManager();
         //说明
         var descr = document.createElement("p");
         descr.textContent = `提示: \n 按住键盘 A 键，点击 navmesh 可添加敌人！`;
@@ -56,63 +52,14 @@ class demo_navigaionRVO implements IState
         CameraController.instance().init(this.app, this.camera);
         this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
 
-        // this.sim.addObstacle([
-        //         [-14, -26],
-        //         [-14, 26],
-        //         [36, 26],
-        //         [36, -26]
-        // ]);
-        // // Add obstacle
-        // this.sim.addObstacle(
-        //     [
-        //         [11, 3],
-        //         [-7, 3],
-        //         [-7, 3],
-        //         [11, 3]
-        //     ]
-        // );
-        // this.sim.addObstacle(
-        //     [
-        //         [-7, 3],
-        //         [11, 3],
-        //         [11, 3],
-        //         [-7, 3]
-        //     ]
-        // );
-        //
-        // this.sim.addObstacle([
-        //         [-1, -8],
-        //         [8, -8],
-        //         [8, -6],
-        //         [-1, -6]
-        // ]);
-        // this.sim.addObstacle([
-        //         [-1, -13],
-        //         [8, -13],
-        //         [8, -11],
-        //         [-1, -11]
-        // ]);
-        // let data = this.navmeshMgr.navMesh.data;
-        // if(data) {
-        //     for(let i = 0; i < data.trisindex.length; i += 3) {
-        //         let pos1 = [data.pos[data.trisindex[i]].x, data.pos[data.trisindex[i]].z];
-        //         let pos2 = [data.pos[data.trisindex[i+1]].x, data.pos[data.trisindex[i+1]].z];
-        //         let pos3 = [data.pos[data.trisindex[i+2]].x, data.pos[data.trisindex[i+2]].z];
-        //         this.sim.addObstacle([
-        //             pos1,
-        //             pos2,
-        //             pos3
-        //         ]);
-        //     }
-        // }
 
 
         // this.sim.processObstacles();
         this.addbtn("50px","打开 RVO",()=>{
-            this.rvoMgr.enable();
+            this.rvoMgr.enable();   // 打开 RVO
         })
         this.addbtn("100px","关闭 RVO",()=>{
-            this.rvoMgr.disable();
+            this.rvoMgr.disable();  // 关闭 RVO
         })
         this.addbtn("150px","删除元素",()=>{
         })
@@ -130,10 +77,10 @@ class demo_navigaionRVO implements IState
         this.isInitPlayer = true;
 
         // Add agent
-        this.rvoMgr.addAgent(Math.round(Math.random() * 100), this.player, 1, 0, 0.2);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), this.player, 1, 0, 0.2);  // 添加玩家
 
-        this.mods = this.rvoMgr.transforms;
-        this.goals = this.rvoMgr.goals;
+        // this.mods = this.rvoMgr.transforms;
+        // this.goals = this.rvoMgr.goals;
         // this.sim.addAgent([x, z]);
         // this.sim.agents[0].radius = 1;
         // this.sim.agents[0].neighborDist = 0;    // 玩家不会被小怪挤
@@ -173,28 +120,6 @@ class demo_navigaionRVO implements IState
 
                 let cc = false;
                 if(cc) return;
-                let data = this.navmeshMgr.navMesh.data;
-                if(data) {
-                    let border = this.navmesh2Border(data);
-                    console.log(border);
-
-                    // draw lines
-                    let line:gd3d.math.vector3[] = [];
-                    for(let iii = 0; iii < border[0].length; iii++) {
-                        let d = data.pos[border[0][iii]];
-                        line.push(data.pos[border[0][iii]]);
-                    }
-                    this.drawLine(line);
-
-                    for(let i = 0; i < border.length; i++) {
-                        let p = [];
-                        for(let ii = border[i].length-1; ii>0; ii--) {
-                            p.push([data.pos[border[i][ii]].x, data.pos[border[i][ii]].z]);
-                        }
-                        this.sim.addObstacle(p);
-                    }
-                    this.sim.processObstacles();
-                }
             });
         }
 
@@ -220,90 +145,6 @@ class demo_navigaionRVO implements IState
 
     //----------- player 移动控制 ----------------
     private moveSpeed = 0.2;
-    private playerwalking(){
-        if(!this.player || !this.currGoal)  return;
-        let dis = gd3d.math.vec3Distance(this.player.localTranslate , this.currGoal);
-        let step = dis<this.moveSpeed ? dis: this.moveSpeed;
-        let dir = gd3d.math.pool.new_vector3();
-        gd3d.math.vec3Subtract(this.currGoal,this.player.localTranslate,dir);
-        gd3d.math.vec3Normalize(dir,dir);
-        gd3d.math.vec3ScaleByNum(dir,step,dir);
-        gd3d.math.vec3Add(this.player.localTranslate,dir,this.player.localTranslate)
-        this.player.markDirty();
-    }
-    private RVO_walking(sim, goals) {
-        // 据当前目标重新获取目标方向向量
-        for (var i = 0, len = sim.agents.length; i < len; i ++) {
-            var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
-            if (RVO.Vector.absSq(goalVector) > 1) {
-                goalVector = RVO.Vector.normalize(goalVector);
-            }
-            sim.agents[i].prefVelocity = goalVector; // 更新
-        }
-        sim.doStep();
-        for(let i = 0; i < sim.agents.length; i++) {
-            this.mods[i].localTranslate.x = sim.agents[i].position[0];
-            this.mods[i].localTranslate.z = sim.agents[i].position[1];
-            if(i == 0 && this.currGoal && this.lastGoal){
-                let pos = this.mods[i].localTranslate;
-                let nowDir = gd3d.math.pool.new_vector2();
-                this.cal2dDir(this.lastGoal,pos,nowDir);
-                let nowLen = gd3d.math.vec2Length(nowDir);
-                let tLen = gd3d.math.vec2Length(this.currMoveDir);
-                pos.y = gd3d.math.numberLerp(this.lastGoal.y,this.currGoal.y,nowLen/tLen);
-                //console.error(`nowLen/tLen :${nowLen}/${tLen}   ,  pos y:${pos.y}  ,lastGoal: ${this.lastGoal.x} ,${this.lastGoal.y} ,${this.lastGoal.z} `);
-                gd3d.math.pool.delete_vector2(nowDir);
-            }
-
-            this.mods[i].markDirty();
-        }
-
-    }
-    private RVO_check(sim, goals) {
-
-        if(this.currGoal){
-            //达到目标点
-            if(this.player){
-                let v2_0 = gd3d.math.pool.new_vector2();
-                v2_0.x = this.player.localTranslate.x; v2_0.y = this.player.localTranslate.z;
-                let v2_1 = gd3d.math.pool.new_vector2();
-                v2_1.x = this.currGoal.x; v2_1.y = this.currGoal.z;
-                let dis = gd3d.math.vec2Distance(v2_0,v2_1);
-                if(dis<0.01){
-                    if(this.currGoal){
-                        if(this.lastGoal)   gd3d.math.pool.delete_vector3(this.lastGoal);
-                        this.lastGoal = this.currGoal;
-                        this.currGoal = null;
-                        goals[0] = sim.agents[0].position;
-                        sim.agents[0].radius = 1;
-                    }
-                    if(this.Goals && this.Goals.length >0) {
-                        this.currGoal = this.Goals.pop();
-                        this.cal2dDir(this.lastGoal,this.currGoal,this.currMoveDir);
-                        goals[0] = [this.currGoal.x, this.currGoal.z];
-                        sim.agents[0].radius = 0.1;
-                    }
-                }
-            }
-        }else if(this.Goals && this.Goals.length >0){
-            //切换下一目标
-            this.currGoal = this.Goals.pop();
-            goals[0] = [this.currGoal.x, this.currGoal.z];
-            sim.agents[0].radius = 0.1;
-
-        }
-
-        for (var i = 1, len = sim.agents.length; i < len; i ++) {
-            let range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
-            if (range < 3 || range > 400 ) {
-                // console.log(i + ' in position');
-                goals[i] = sim.agents[i].position;  // Stop
-            } else {
-                goals[i] = sim.agents[0].position;
-            }
-        }
-
-    }
 
     private cal2dDir(oPos:gd3d.math.vector3,tPos:gd3d.math.vector3,out:gd3d.math.vector2){
         if(!oPos || !tPos || !out)  return;
@@ -316,119 +157,11 @@ class demo_navigaionRVO implements IState
         gd3d.math.pool.delete_vector2(tv2);
     }
 
-    private navmesh2Border(data: gd3d.render.meshData) {
-        // Build Trie-tree
-        let trie = [];
-        for(let i = 0; i < data.trisindex.length; i+=3) {
-            let a = data.trisindex[i];
-            let b = data.trisindex[i+1];
-            let c = data.trisindex[i+2];
-            if(trie[a] == null)
-                trie[a] = [];
-            if(trie[b] == null)
-                trie[b] = [];
-            if(trie[c] == null)
-                trie[c] = [];
-            // a-b b-c c-a
-            // 如果这条边不存在 则该节点为 true
-            // 如果这条边存在 则该节点为 false
-            // 如果这条边为共边 则该节点任然为 false
-            // true     - 独立边
-            // false    - 公共边
-            // null     - 不存在
-            // a-b
-            if(trie[b][a] == null) {    // 边未注册
-                trie[a][b] = true;
-            } else {
-                trie[b][a] = false;
-            }
-
-            if(trie[c][b] == null) {    // 边未注册
-                trie[b][c] = true;
-            } else {
-                trie[c][b] = false;
-            }
-
-            if(trie[a][c] == null) {    // 边未注册
-                trie[c][a] = true;
-            } else {
-                trie[a][c] = false;
-            }
-        }
-
-        // let result = [];
-        // this.findLoopBorder(trie, 0, 0, result);
-
-        let border = [];
-        for(let i = 0; i < trie.length; i++) {
-            for(let ii = 0; ii < trie[i].length; ii++) {
-                if(trie[i][ii]) {
-                    // border.push([data.pos[i].x, data.pos[i].z]);
-                    // border.push([data.pos[ii].x, data.pos[ii].z]);
-                } else {
-                    trie[i][ii] = null;
-                }
-            }
-        }
-        console.warn('Trie:');
-        console.log(trie);
-        // 遍历树, 寻找封闭线段
-        for(let iii = 0; iii < trie.length; iii+=1) {
-            let a = iii;
-            if(trie[iii] != null) {
-                let result = [];
-                this.findLoopBorder(trie, iii, iii, result);
-                console.warn('result:');
-                console.log(result);
-                border.push(result);
-            }
-        }
-
-        return border;
-    }
-
-    private findLoopBorder(trie, node, leaf, stack) {
-        if(trie[node] != null) {
-            for(let i = 0; i < trie[node].length; i++) {
-                if(trie[node][i]) { // 找到下一个点
-                    stack.push(node);
-                    if(i==leaf) {
-                        return;
-                    } else {
-                        trie[node] = null;
-                        this.findLoopBorder(trie, i, leaf, stack);
-                        trie[i] = null;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
     private currGoal:gd3d.math.vector3;
     private lastGoal:gd3d.math.vector3;
     private currMoveDir:gd3d.math.vector2 = new gd3d.math.vector2();
     private Goals:gd3d.math.vector3[] = [];
-    private ckGoalsChange(){
-        if(!this.player)    return;
-        if(this.currGoal){
-            //达到目标点
-            if(this.player){
-                let dis = gd3d.math.vec3Distance(this.player.localTranslate,this.currGoal);
-                if(dis<0.01){
-                    if(this.currGoal){
-                        gd3d.math.pool.delete_vector3(this.currGoal);
-                        this.currGoal = null;
-                    }
-                    if(this.Goals && this.Goals.length >0)
-                        this.currGoal = this.Goals.pop();
-                }
-            }
-        }else if(this.Goals && this.Goals.length >0){
-            //切换下一目标
-            this.currGoal = this.Goals.pop();
-        }
-    }
+
 
     //----------- 点击navmesh处理 ----------------
 
@@ -476,7 +209,7 @@ class demo_navigaionRVO implements IState
         trans.localTranslate.z = endPos.z;
         trans.markDirty();
         // Add agent
-        this.rvoMgr.addAgent(Math.round(Math.random() * 100), trans, 0.5, 3, 0.05);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), trans, 0.5, 3, 0.05); // 添加小怪
         // this.sim.addAgent([endPos.x, endPos.z]);
         // this.goals.push([endPos.x, endPos.z]);
         // this.mods.push(trans);
@@ -518,7 +251,7 @@ class demo_navigaionRVO implements IState
             }
             this.Goals.length = 0;
             this.Goals = arr;
-            this.rvoMgr.currGoal = this.Goals.pop();
+            this.rvoMgr.currGoal = this.Goals.pop(); // 初始化玩家当前目标点
         }
     }
 
@@ -656,16 +389,8 @@ class demo_navigaionRVO implements IState
 
         this.timer += delta;
         CameraController.instance().update(delta);
-        if(this.mods != null) {
-            if(this.mods.length >=1) {
-                this.rvoMgr.update(this.Goals, this.currMoveDir);
-                // this.RVO_check(this.sim, this.goals);
-                // this.RVO_walking(this.sim, this.goals);
-            }
 
-        }
-        // this.ckGoalsChange();
-        // this.playerwalking();
+        this.rvoMgr.update(this.Goals, this.currMoveDir); // 更新 Transform
     }
 
     private addbtn(topOffset:string,textContent:string,func:()=>void)
