@@ -144,21 +144,21 @@ class demo_navigaionRVO implements IState
     }
 
     //----------- player 移动控制 ----------------
-    private moveSpeed = 0.2;
+    // private moveSpeed = 0.2;
 
-    private cal2dDir(oPos:gd3d.math.vector3,tPos:gd3d.math.vector3,out:gd3d.math.vector2){
-        if(!oPos || !tPos || !out)  return;
-        let ov2 = gd3d.math.pool.new_vector2();
-        ov2.x = oPos.x; ov2.y = oPos.z;
-        let tv2 = gd3d.math.pool.new_vector2();
-        tv2.x = tPos.x; tv2.y = tPos.z;
-        gd3d.math.vec2Subtract(tv2,ov2,out);
-        gd3d.math.pool.delete_vector2(ov2);
-        gd3d.math.pool.delete_vector2(tv2);
-    }
+    // private cal2dDir(oPos:gd3d.math.vector3,tPos:gd3d.math.vector3,out:gd3d.math.vector2){
+    //     if(!oPos || !tPos || !out)  return;
+    //     let ov2 = gd3d.math.pool.new_vector2();
+    //     ov2.x = oPos.x; ov2.y = oPos.z;
+    //     let tv2 = gd3d.math.pool.new_vector2();
+    //     tv2.x = tPos.x; tv2.y = tPos.z;
+    //     gd3d.math.vec2Subtract(tv2,ov2,out);
+    //     gd3d.math.pool.delete_vector2(ov2);
+    //     gd3d.math.pool.delete_vector2(tv2);
+    // }
 
-    private currGoal:gd3d.math.vector3;
-    private lastGoal:gd3d.math.vector3;
+    // private currGoal:gd3d.math.vector3;
+    // private lastGoal:gd3d.math.vector3;
     private currMoveDir:gd3d.math.vector2 = new gd3d.math.vector2();
     private Goals:gd3d.math.vector3[] = [];
 
