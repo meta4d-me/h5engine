@@ -29,6 +29,14 @@
                 "fs": "transparent"
             }
         ],
+        "skin_fog": [
+            {
+                "blendmode": "blend",
+                "showface": "ccw",
+                "vs": "transparent",
+                "fs": "transparent"
+            }
+        ],
         "shadowgen": [],
         "bone": [],
         "shadowuse": []
