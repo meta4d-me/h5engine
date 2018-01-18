@@ -937,6 +937,7 @@ var main = (function () {
     main.prototype.onStart = function (app) {
         console.log("i am here.");
         this.app = app;
+        this.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
         this.addBtn("loadscene", function () { return new dome.test_loadScene(); });
         this.addBtn("test_ui", function () { return new t.test_ui(); });
         this.addBtn("test_load", function () { return new test_load(); });
@@ -10878,7 +10879,9 @@ var dome;
                 if (_state.isfinish) {
                     var eff = _this.app.getAssetMgr().getAssetByName(name + ".f14effect.json");
                     var f14node = eff.getCloneF14eff();
-                    _this.scene.addChild(f14node.trans);
+                    var obj = new gd3d.framework.transform();
+                    _this.scene.addChild(obj);
+                    obj.addChild(f14node.trans);
                     _this.f14eff = f14node.f14Effect;
                     _this.addButton();
                     _this.addButton2();
@@ -10952,6 +10955,7 @@ var dome;
                     _this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                         if (s.isfinish) {
                             var _scene = _this.app.getAssetMgr().getAssetByName(name + ".scene.json");
+                            var assetamg = _this.app.getAssetMgr();
                             var _root = _scene.getSceneRoot();
                             _this.scene.addChild(_root);
                             _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
@@ -11038,20 +11042,21 @@ var dome;
 })(dome || (dome = {}));
 var dome;
 (function (dome) {
-    var test_cj_shader = (function () {
-        function test_cj_shader() {
+    var loadPrefab = (function () {
+        function loadPrefab() {
             this.time = 0;
         }
-        test_cj_shader.prototype.loadShader = function (laststate, state) {
+        loadPrefab.prototype.loadShader = function (laststate, state) {
             this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     state.finish = true;
                 }
             });
         };
-        test_cj_shader.prototype.loadmesh = function (laststate, state) {
+        loadPrefab.prototype.loadmesh = function (laststate, state) {
             var _this = this;
             var name = "zs_chuangjue_01";
+            name = "cwc_001";
             this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
@@ -11059,12 +11064,11 @@ var dome;
                     _this.dragon.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
                     _this.scene.addChild(_this.dragon);
                     _this.dragon.markDirty();
-                    _this.cameraPoint = _this.dragon.find("Camera001");
                     state.finish = true;
                 }
             });
         };
-        test_cj_shader.prototype.loadweapon = function (laststate, state) {
+        loadPrefab.prototype.loadweapon = function (laststate, state) {
             var _this = this;
             var name = "Quad";
             name = "huoyan_uv";
@@ -11075,12 +11079,11 @@ var dome;
                     pp.localTranslate = new gd3d.math.vector3();
                     pp.localEulerAngles = new gd3d.math.vector3(90, 90, 0);
                     _this.scene.addChild(pp);
-                    _this.cameraPoint = pp.find("Camera001");
                     state.finish = true;
                 }
             });
         };
-        test_cj_shader.prototype.test = function (laststate, state) {
+        loadPrefab.prototype.test = function (laststate, state) {
             this.dragon = new gd3d.framework.transform();
             var mesh = this.assetMgr.getAssetByName("MU1.0----1.9_TeXiao_Guoyichen_Effect_Mesh_Plane_danxiangsuofang_01.FBX_Plane01.mesh.bin");
             var mat = this.assetMgr.getAssetByName("WuQi_zhenhong_02.mat.json");
@@ -11096,29 +11099,30 @@ var dome;
             this.scene.addChild(this.dragon);
             state.finish = true;
         };
-        test_cj_shader.prototype.addCamera = function (laststate, state) {
+        loadPrefab.prototype.addCamera = function (laststate, state) {
             var tranCam = new gd3d.framework.transform();
             tranCam.name = "Cam";
             this.scene.addChild(tranCam);
-            tranCam.localTranslate = new gd3d.math.vector3(0, 0, 0);
+            tranCam.localTranslate = new gd3d.math.vector3(0, 10, 10);
             this.camera = tranCam.gameObject.addComponent("camera");
             this.camera.near = 0.001;
             this.camera.far = 1000;
             this.camera.fov = Math.PI * 60.0 / 180.0;
             this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+            tranCam.lookat(this.dragon);
             tranCam.markDirty();
             state.finish = true;
         };
-        test_cj_shader.prototype.start = function (app) {
+        loadPrefab.prototype.start = function (app) {
             this.app = app;
             this.scene = this.app.getScene();
             this.assetMgr = this.app.getAssetMgr();
             this.taskmgr = new gd3d.framework.taskMgr();
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.addCamera.bind(this));
             this.taskmgr.addTaskCall(this.loadmesh.bind(this));
+            this.taskmgr.addTaskCall(this.addCamera.bind(this));
         };
-        test_cj_shader.prototype.update = function (delta) {
+        loadPrefab.prototype.update = function (delta) {
             this.taskmgr.move(delta);
             if (this.cameraPoint) {
                 this.cameraPoint.addChild(this.camera.gameObject.transform);
@@ -11127,9 +11131,9 @@ var dome;
                 this.camera.gameObject.transform.markDirty();
             }
         };
-        return test_cj_shader;
+        return loadPrefab;
     }());
-    dome.test_cj_shader = test_cj_shader;
+    dome.loadPrefab = loadPrefab;
 })(dome || (dome = {}));
 var dome;
 (function (dome) {
