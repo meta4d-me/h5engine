@@ -11,7 +11,7 @@
         color: gd3d.math.color[];
         colorex: gd3d.math.color[];
         uv: gd3d.math.vector2[];
-        uv2: gd3d.math.vector2[];
+        uv2: gd3d.math.vector2[];//lightmap
         normal: gd3d.math.vector3[];//法线
         tangent: gd3d.math.vector3[];//切线
         blendIndex: number4[];

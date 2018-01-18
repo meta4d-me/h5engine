@@ -1735,7 +1735,7 @@ namespace gd3d.framework
             let data = {};
             let mapUniform = {};
             let shader = mat.getShader();
-            let shaderPropertis = shader.defaultValue;
+            let shaderPropertis = shader.defaultMapUniform;
             data["shader"] = shader.getName();
             data["mapUniform"] = mapUniform;
 

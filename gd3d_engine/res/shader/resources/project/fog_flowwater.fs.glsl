@@ -9,6 +9,8 @@ varying mediump vec2 _base_uv;
 void main() 
 {
     lowp vec4 tmpvar_3 = texture2D(_MainTex, _base_uv)*_MainColor;
-    lowp vec3 afterFog = mix(glstate_fog_color.rgb, tmpvar_3.rgb, factor);
-    gl_FragData[0] = vec4(afterFog,_alpha);
+    tmpvar_3.a=_alpha;
+
+    lowp vec4 afterfog=mix(vec4(0,0,0,0), tmpvar_3, factor);
+    gl_FragData[0] = afterfog;
 }

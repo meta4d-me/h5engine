@@ -371,7 +371,7 @@ namespace gd3d.framework
                 p.state_showface = render.ShowFaceStateEnum.CCW;
                 p.setProgram(program);
                 p.setAlphaBlend(render.BlendModeEnum.Close);
-                p.uniformTexture("_MainTex", null);
+                //p.uniformTexture("_MainTex", null);
                 assetmgr.mapShader[sh.getName()] = sh;
             }
             {
@@ -387,7 +387,7 @@ namespace gd3d.framework
                 p.state_showface = render.ShowFaceStateEnum.CCW;
                 p.setProgram(programdiffuse);
                 p.setAlphaBlend(render.BlendModeEnum.Close);
-                p.uniformTexture("_MainTex", null);
+                //p.uniformTexture("_MainTex", null);
                 assetmgr.mapShader[sh.getName()] = sh;
             }
             {

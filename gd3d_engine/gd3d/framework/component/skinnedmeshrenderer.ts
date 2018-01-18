@@ -443,11 +443,13 @@ namespace gd3d.framework
                 {
                     if (this._efficient)
                     {
-                        this.materials[i].setVector4v("glstate_vec4_bones", this.cacheData);
+                        //this.materials[i].setVector4v("glstate_vec4_bones", this.cacheData);
+                        context.vec4_bones=this.cacheData;
                     }
                     else
                     {
-                        this.materials[i].setMatrixv("glstate_matrix_bones", this.cacheData);
+                        //this.materials[i].setMatrixv("glstate_matrix_bones", this.cacheData);
+                        context.matrix_bones=this.cacheData;
                     }
                     continue;
                 }
@@ -455,11 +457,15 @@ namespace gd3d.framework
                 {
                     if (this._efficient)
                     {
-                        this.materials[i].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
+                        //this.materials[i].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
+                        context.vec4_bones=this._skeletonMatrixData;
+                        
                     }
                     else
                     {
-                        this.materials[i].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
+                        //this.materials[i].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
+                        context.matrix_bones=this._skeletonMatrixData;
+                        
                     }
                 }
             }
@@ -519,9 +525,9 @@ namespace gd3d.framework
         {
             var matpasses: gd3d.render.glDrawPass[] = mat.getShader().passes["skin"];
             if (matpasses == null || matpasses.length == 0) return 0;
-            if (matpasses[0].uniforms["glstate_vec4_bones"] != null)
+            if (matpasses[0].mapuniforms["glstate_vec4_bones"] != null)
                 return 2;
-            else if (matpasses[0].uniforms["glstate_matrix_bones"] != null)
+            else if (matpasses[0].mapuniforms["glstate_matrix_bones"] != null)
                 return 1;
             return 0;
         }

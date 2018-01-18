@@ -6,7 +6,6 @@ uniform highp mat4 glstate_matrix_mvp;
 
 uniform mediump vec4 _MainTex_ST;
 uniform mediump vec4 _Mask_ST;
-uniform mediump vec4 _Main_Color;
 
 varying mediump vec2 _maintex_uv;
 varying mediump vec2 _mask_uv;

@@ -9,6 +9,6 @@ void main()
 {
     lowp vec4 tmpvar_3 = texture2D(_MainTex, _base_uv)*_MainColor;
     lowp float alpha=_alpha*tmpvar_3.a;
-    lowp vec3 afterFog = mix(glstate_fog_color.rgb, tmpvar_3.rgb, factor);
+    lowp vec3 afterFog = mix(vec3(0,0,0), tmpvar_3.rgb, factor);
     gl_FragData[0] = vec4(afterFog,alpha);
 }

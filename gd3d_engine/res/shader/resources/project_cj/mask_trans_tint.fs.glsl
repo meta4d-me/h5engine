@@ -1,7 +1,7 @@
 uniform sampler2D _MainTex; 
 uniform sampler2D _Mask; 
 uniform mediump vec4 _Main_Color;
-varying lowp vec4 v_color;
+
 varying mediump vec2 _maintex_uv;
 varying mediump vec2 _mask_uv;
 

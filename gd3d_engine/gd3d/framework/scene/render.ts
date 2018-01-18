@@ -9,6 +9,9 @@ namespace gd3d.framework
         {
             this.webgl = webgl;
         }
+
+
+
         drawtype: string; 
         webgl: WebGLRenderingContext;
         viewPortPixel: gd3d.math.rect = new gd3d.math.rect(0, 0, 0, 0);//像素的viewport
@@ -37,6 +40,10 @@ namespace gd3d.framework
         lightmapUV: number = 1;
         lightmapOffset: gd3d.math.vector4 = new gd3d.math.vector4(1, 1, 0, 0);
         fog:Fog;
+
+        //skin auto uniform
+        vec4_bones:Float32Array;
+        matrix_bones:Float32Array;
         updateCamera(app: application, camera: camera)
         {
             camera.calcViewPortPixel(app, this.viewPortPixel);

@@ -40,6 +40,7 @@ namespace gd3d.framework
      */
     export class application
     {
+
         /**
          * @public
          * @language zh_CN
@@ -252,6 +253,9 @@ namespace gd3d.framework
             this.initInputMgr();
 
             this.initScene();
+
+            this.initRender();
+            
             this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
             this.loop();
             gd3d.io.referenceInfo.regDefaultType();
@@ -509,6 +513,11 @@ namespace gd3d.framework
                 this._scene = new scene(this);
                 sceneMgr.scene = this._scene;
             }
+        }
+        private  initRender(): any {
+            uniformSetter.initAutouniform();
+            render.shaderUniform.webgl=this.webgl;
+            render.shaderUniform.initApplyUnifmFunc();
         }
         /**
          * @public

@@ -294,11 +294,12 @@ namespace gd3d.framework
                 let pass = this.lastMat.getShader().passes["base"][0];
 
                 //有一些自动参数要传进去
-                mat.setMatrix("glstate_matrix_mvp", this.context.matrixModelViewProject);
+                //mat.setMatrix("glstate_matrix_mvp", this.context.matrixModelViewProject);
 
-                mat.uploadUniform(pass);
+                //mat.uploadUniform(pass);
                 // //mvp 信号
                 pass.use(this.webgl);
+                mat.uploadUnifoms(pass,this.context);
 
                 // this.batcher.begin(context.webgl, pass);
 
@@ -316,7 +317,8 @@ namespace gd3d.framework
                         math.vec4Clone(rect,this.lastMaskV4);
                         this.batcher.end(this.webgl);
                         let pass = this.lastMat.getShader().passes["base"][0];
-                        mat.uploadUniform(pass);
+                        //mat.uploadUniform(pass);
+                        mat.uploadUnifoms(pass,this.context);
                     }
                 }
             }
