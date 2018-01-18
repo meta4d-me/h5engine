@@ -1529,7 +1529,7 @@ declare namespace gd3d.framework {
         parse(assetmgr: assetMgr, json: any): void;
         _parseProperties(assetmgr: assetMgr, properties: any): void;
         private _parsePass(assetmgr, json, type);
-        private fillUnDefUniform(pass);
+        fillUnDefUniform(pass: render.glDrawPass): void;
     }
 }
 declare namespace gd3d.framework {

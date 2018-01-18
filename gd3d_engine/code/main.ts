@@ -18,6 +18,8 @@ class main implements gd3d.framework.IUserCode
         this.app = app;
         //this.addBtn("test_loadScene",()=>new dome.test_loadScene());
         //this.addBtn("f14effect",()=>new dome.db_test_f14eff());
+        //this.addBtn("loadPrefab",()=>new dome.loadPrefab());
+        
         
         // this.addBtn("test_01", () => new test_01());//最早是做加载测试。现在已经没价值了
         this.addBtn("loadscene", () => new dome.test_loadScene());

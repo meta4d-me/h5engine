@@ -813,11 +813,11 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         initDefAsset() {
-            defShader.initDefaultShader(this);
             defMesh.initDefaultMesh(this);
             defTexture.initDefaultTexture(this);
-            defmaterial.initDefaultMaterial(this);
             defsprite.initDefaultSprite(this);
+            defShader.initDefaultShader(this);
+            defmaterial.initDefaultMaterial(this);
         }
         /**
          * @public

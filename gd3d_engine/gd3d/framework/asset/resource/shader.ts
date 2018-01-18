@@ -327,9 +327,8 @@ namespace gd3d.framework
             }
             return pass;
         }
-        private fillUnDefUniform(pass:render.glDrawPass)
+        fillUnDefUniform(pass:render.glDrawPass)
         {
-            pass.mapuniforms
             for(let key in pass.mapuniforms)
             {
                 let item=pass.mapuniforms[key];

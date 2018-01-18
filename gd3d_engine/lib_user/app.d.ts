@@ -1453,10 +1453,9 @@ declare namespace dome {
     }
 }
 declare namespace dome {
-    class test_cj_shader implements IState {
+    class loadPrefab implements IState {
         private loadShader(laststate, state);
         dragon: gd3d.framework.transform;
-        cameraPoint: gd3d.framework.transform;
         private loadmesh(laststate, state);
         private loadweapon(laststate, state);
         private test(laststate, state);
