@@ -983,7 +983,7 @@ namespace gd3d.framework {
             let flag: boolean = true;
             if (id != null) {
                 var r = this.mapRes[id];
-                if (r != null)
+                if (r != null && !r[this._loadingTag])
                     return r.asset;
             }
             if (flag) {
