@@ -8,115 +8,61 @@ class test_loadScene implements IState
         this.app = app;
         this.scene = this.app.getScene();
 
-        let names: string[] = ["city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        let names: string[] = ["MainCity_","city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         let name = names[0];
-        name="1031_gonghuichuangguan_01_128";
-        let isloaded = false;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load("res/scenes/1031_gonghuichuangguan_01_128/index.json.txt",gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
-                    if(s1.isfinish)
-                    {   
-                        let index = JSON.parse((this.app.getAssetMgr().getAssetByName("index.json.txt") as gd3d.framework.textasset).content);
-                        let totalLength = index[name + ".assetbundle.json"];
-
-                        this.app.getAssetMgr().loadCompressBundle("res/scenes/1031_gonghuichuangguan_01_128/" + name + ".assetbundle.json",
-                        // this.app.getAssetMgr().load("res/scenes/city/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                        (s) =>
-                        {
-                            console.log(s.curtask + "/" + s.totaltask);
-                            console.log(s.curByteLength+"/"+totalLength);
-                            console.log(s.bundleLoadState);
-                            // console.log(s.progress);
-                            // if(s.isfinish)
-                            if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded)
-                            {
-                                isloaded = true;
-                                console.log(s.isfinish);
-                                var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
-                                var _root = _scene.getSceneRoot();
-                                this.scene.addChild(_root);
-                                // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
-                                _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
-                                _root.markDirty();
-                                this.app.getScene().lightmaps = [];
-                                _scene.useLightMap(this.app.getScene());
-                                _scene.useFog(this.app.getScene());
-                            }
-                        });
-
-                    }
-                })
+                this.loadScene(name);
                 
             }
         });
-        // var name="Wing_11";
-        // this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-        // {
-        //     if (state.isfinish)
-        //     {
-        //         this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-        //             (s) =>
-        //             {
-        //                 if (s.isfinish)
-        //                 {
-        //                     var name="Wing_11";
-        //                     var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
-        //                     this.baihu = _prefab.getCloneTrans();
-        //                     this.baihu.name="chibang";
-        //                     this.baihu.localTranslate.y=50;
-        //                     this.baihu.markDirty();
-        //                     this.scene.addChild(this.baihu);
-        //                     this.camera.gameObject.transform.lookat(this.baihu);
-        //                     this.camera.gameObject.transform.markDirty();
-
-        //                     var name="MainCity";
-        //                     this.app.getAssetMgr().load("res/scenes/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-        //                         (s) =>
-        //                         {
-        //                             console.log(s.curtask + "/" + s.totaltask);
-        //                             console.log(s.progress);
-        //                             if (s.isfinish)
-        //                             {
-        //                                 var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(name + ".scene.json") as gd3d.framework.rawscene;
-        //                                 var _root = _scene.getSceneRoot();
-        //                                 _root.name="changjing";
-        //                                 this.scene.addChild(_root);
-        //                                 // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
-        //                                 _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
-        //                                 _root.markDirty();
-        //                                 this.app.getScene().lightmaps = [];
-        //                                 _scene.useLightMap(this.app.getScene());
-        //                                 _scene.useFog(this.app.getScene());
-
-
-        //                             }
-        //                         });
-        //                 }
-        //             });
-
-
-        //     }
-        // });
         //添加一个摄像机
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
-        //this.camera.postQueues.push(new gd3d.framework.cameraPostQueue_Depth());
-
-        // this.camera.near = 0.01;
-        // this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
-        // objCam.lookatPoint(new gd3d.math.vector3(133.6694, 97.87, 67));
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 100));
         objCam.markDirty();//标记为需要刷新
-
         CameraController.instance().init(this.app, this.camera);
     }
+
+    loadScene(assetName:string , isCompress = false){
+
+        let addScene = ()=>{
+            var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(assetName + ".scene.json") as gd3d.framework.rawscene;
+            var _root = _scene.getSceneRoot();
+            this.scene.addChild(_root);
+            // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);
+            _root.localEulerAngles = new gd3d.math.vector3(0,0,0);
+            _root.markDirty();
+            this.app.getScene().lightmaps = [];
+            _scene.useLightMap(this.app.getScene());
+            _scene.useFog(this.app.getScene());
+        }
+
+        if(isCompress){
+            this.app.getAssetMgr().loadCompressBundle(`res/scenes/${assetName}/${assetName}.packs.txt`,(s) =>
+            {
+                 if(s.isfinish){
+                     //if (s.bundleLoadState & gd3d.framework.AssetBundleLoadState.Scene && !isloaded)
+                     {
+                         addScene();
+                     }
+                 }
+                });
+        }else{
+            this.app.getAssetMgr().load(`res/scenes/${assetName}/${assetName}.assetbundle.json`,gd3d.framework.AssetTypeEnum.Auto,(s1)=>{
+                if(s1.isfinish)
+                {   
+                    addScene();
+                }
+            });
+        }
+    }
+
 
     baihu:gd3d.framework.transform;
     camera: gd3d.framework.camera;
@@ -137,24 +83,5 @@ class test_loadScene implements IState
         objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
         objCam.markDirty();//标记为需要刷新
 
-
-
-
-
-
-
-
-        // this.cube.markDirty();
-        // objCam.updateWorldTran();
-        // if (this.timer > 5)
-        // {
-        //     this.app.getScene().getRoot().dispose();
-        // }
-        // if (this.timer > 10 && !this.bere)
-        // {
-        //     this.bere = true;
-        //     this.app.getAssetMgr().unload("res/scenes/city/city.assetbundle.json");
-        //     this.app.getAssetMgr().releaseUnuseAsset();
-        // }
     }
 }

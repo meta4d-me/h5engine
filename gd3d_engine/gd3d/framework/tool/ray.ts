@@ -104,23 +104,23 @@
         */
         public intersectCollider(tran: transform): pickinfo
         {
-            var _collider: ICollider = tran.gameObject.collider;
+            let _collider: ICollider = tran.gameObject.collider;
 
-            var pickinfo = null;
+            let pickinfo = null;
             if (_collider instanceof boxcollider)
             {
-                var obb = _collider.getBound() as obb;
+                let obb = _collider.getBound() as obb;
                 if(!obb)    return null;
-                var vecs: gd3d.math.vector3[] = [];
+                let vecs: gd3d.math.vector3[] = [];
                 obb.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
-                var data = gd3d.render.meshData.genBoxByArray(vecs);
+                let data = gd3d.render.meshData.genBoxByArray(vecs);
 
-                for (var index = 0; index < data.pos.length; index += 3)
+                for (var index = 0; index < data.trisindex.length; index += 3)
                 {
                     var p0 = data.pos[data.trisindex[index]];
                     var p1 = data.pos[data.trisindex[index + 1]];
                     var p2 = data.pos[data.trisindex[index + 2]];
-
+                    
                     var result = this.intersectsTriangle(p0, p1, p2);
                     if (result)
                     {
@@ -138,7 +138,7 @@
             }
             else if (_collider instanceof meshcollider)
             {
-                var mesh = _collider.getBound();
+                let mesh = _collider.getBound();
                 if (mesh != null)
                 {
                     pickinfo = mesh.intersects(this, tran.getWorldMatrix());

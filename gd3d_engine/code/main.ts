@@ -16,13 +16,14 @@ class main implements gd3d.framework.IUserCode
 
         console.log("i am here.");
         this.app = app;
-
+        //this.addBtn("test_loadScene",()=>new dome.test_loadScene());
+        //this.addBtn("f14effect",()=>new dome.db_test_f14eff());
+        
         // this.addBtn("test_01", () => new test_01());//最早是做加载测试。现在已经没价值了
         this.addBtn("loadscene", () => new dome.test_loadScene());
         
         this.addBtn("test_ui", () => new t.test_ui());
         this.addBtn("test_load", () => new test_load());
-        this.addBtn("test_loadimmediate", () => new testloadImmediate());
         this.addBtn("test_loadprefab", () => new test_loadprefab());
         this.addBtn("test_loadScene", () => new test_loadScene());
         this.addBtn("test_loadMulBundle", () => new test_loadMulBundle());
@@ -30,13 +31,13 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("test_anim", () => new test_anim());
         this.addBtn("test_multipleplayer_anim", () => new test_multipleplayer_anim());
-        this.addBtn("test_reload", () => new testReload());
+        this.addBtn("test_reload(换装)", () => new testReload());
         this.addBtn("test_uvroll", () => new t.test_uvroll());
 
         this.addBtn("test_light1", () => new t.test_light1());
         this.addBtn("test_light_d1", () => new t.light_d1());
 
-        this.addBtn("test_changeshader", () => new t.test_changeshader());
+        //this.addBtn("test_changeshader", () => new t.test_changeshader());
         this.addBtn("test_normalmap", () => new t.Test_NormalMap());
         this.addBtn("test_assestmgr", () => new test_assestmgr());
 
@@ -52,9 +53,9 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_tank", () => new demo.TankGame());
         this.addBtn("test_long", () => new demo.DragonTest());
 
-        this.addBtn("test_lookAt", () => new t.TestRotate());
+        //this.addBtn("test_lookAt", () => new t.TestRotate());
         this.addBtn("test_skillsystem", () => new t.test_skillsystem());
-        this.addBtn("test_integratedrender", () => new t.test_integratedrender());
+        //this.addBtn("test_integratedrender", () => new t.test_integratedrender());
         this.addBtn("test_blend", () => new t.test_blend());
 
         this.addBtn("TestRotate", () => new t.TestRotate());
@@ -64,16 +65,16 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_Asi_prefab", () => new test_loadAsiprefab());
 
         this.addBtn("test_tex_uv", () => new test_texuv());
-        this.addBtn("test_uimove", () => new test_uimove());
+        //this.addBtn("test_uimove", () => new test_uimove());
 
         this.addBtn("post_景深", () => new t.test_posteffect_cc());
-        this.addBtn("test_effecteditor", () => new test_effecteditor());
+        //this.addBtn("test_effecteditor", () => new test_effecteditor());
         this.addBtn("test_shadowmap", () => new test_ShadowMap());
-        this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
+        //this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
         this.addBtn("test_liChange", () => new testLiChangeMesh());
 
         //----------------------------------------------文档案例
-        this.addBtn("example_newScene",() =>new test_NewScene());
+        //this.addBtn("example_newScene",() =>new test_NewScene());
         this.addBtn("example_newObject",()=>new test_NewGameObject);
         this.addBtn("example_changeMesh",()=>new test_ChangeMesh());
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
@@ -81,19 +82,27 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("demo_ScreenSplit",()=>new demo_ScreenSplit());
         //----------------------------------------------文档案例
 
-        this.addBtn("test_liloadscene", () => new test_LiLoadScene());
-        this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
+        //this.addBtn("test_liloadscene", () => new test_LiLoadScene());
+        //this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
         this.addBtn("test_四分屏", () => new test_pick_4p());       
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
+        this.addBtn("test_PBR 展示", () => new test_pbr());
+        this.addBtn("test_PBR 场景", () => new test_pbr_scene());
+        this.addBtn("导航网格", () => new test_navMesh());
+        this.addBtn("rvo2_驾驶行为", () => new test_Rvo2());
+        this.addBtn("导航RVO_防挤Demo", () => new demo_navigaionRVO());
         
 
+        this.addBtn("test_loadprefabdds",() => new test_loadprefabdds());
+        this.addBtn("test_ATC纹理",()=>new t.test_ATC());
+        this.addBtn("场景boxcollider_Pick", () => new test_pick_boxcollider());
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
         // this.addBtn("cj_zs",()=>new dome.testCJ());
         // this.addBtn("test_eff",()=>new dome.db_test_eff());
-        this.addBtn("tesrtss",()=>new dome.testCJ());
+        //this.addBtn("tesrtss",()=>new dome.testCJ());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }

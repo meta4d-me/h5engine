@@ -132,7 +132,7 @@
         vertexByteSize: number;
         ebos: WebGLBuffer[];
         indexCounts: number[];
-        
+        lineMode :number = WebGLRenderingContext.LINES;
         bindVboBuffer(webgl: WebGLRenderingContext)
         {
             webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
@@ -327,7 +327,7 @@
                 count = ((this.vertexCount / 2) | 0) * 2;
             drawInfo.ins.renderCount ++;
             //model
-            webgl.drawArrays(webgl.LINES, start, count);
+            webgl.drawArrays(this.lineMode, start, count);
         }
         drawElementTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1)
         {
@@ -342,7 +342,7 @@
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
             drawInfo.ins.renderCount ++;
-            webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+            webgl.drawElements(this.lineMode, count, webgl.UNSIGNED_SHORT, start * 2);
         }
 
 

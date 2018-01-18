@@ -4,6 +4,8 @@ class test_assestmgr implements IState
 {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
+    assetName = "elong";
+    count = 10;
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
@@ -12,7 +14,7 @@ class test_assestmgr implements IState
 
         this.cube = new gd3d.framework.transform();
         this.scene.addChild(this.cube);
-
+        let assetName = this.assetName;
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
@@ -29,24 +31,24 @@ class test_assestmgr implements IState
                 //         }
                 //     });
                     
-                this.app.getAssetMgr().load("res/prefabs/baihu/baihu.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
+                this.app.getAssetMgr().load(`res/prefabs/${assetName}/${assetName}.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto,
                     (s) =>
                     {
                         if (s.isfinish)
                         {
                             this.baihu = [];
-                            this._prefab = this.app.getAssetMgr().getAssetByName("baihu.prefab.json") as gd3d.framework.prefab;
-                            for(let i=0; i<100; i++)
+                            this._prefab = this.app.getAssetMgr().getAssetByName(`${assetName}.prefab.json`) as gd3d.framework.prefab;
+                            for(let i=0; i<this.count; i++)
                             {
                                 this.baihu[i] = this._prefab.getCloneTrans();
                                 this.scene.addChild(this.baihu[i]);
-                                this.baihu[i].localScale = new gd3d.math.vector3(10, 10, 10);
-                                this.baihu[i].localTranslate = new gd3d.math.vector3(0.2 * (i - 50), 0, 0);
+                                this.baihu[i].localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
+                                this.baihu[i].localTranslate = new gd3d.math.vector3(i*2, 0, 0);
                                 this.baihu[i].markDirty();
                                 this.scene.addChild(this.baihu[i]);
                             }
                             
-                            objCam.lookat(this.baihu[50]);
+                            objCam.lookat(this.baihu[this.count/2]);
                             objCam.markDirty();
                         }
                     });
@@ -64,7 +66,7 @@ class test_assestmgr implements IState
 
         // this.camera.near = 0.01;
         // this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(50, 82, -84);
+        objCam.localTranslate = new gd3d.math.vector3(50, 82, -500);
         objCam.lookat(this.cube);
         objCam.markDirty();//标记为需要刷新
         this.cube.localTranslate = new gd3d.math.vector3(40, 0, 10);
@@ -107,12 +109,12 @@ class test_assestmgr implements IState
         if (this.timer > 20 && !this.bere)
         {
             this.bere = true;
-            for(let i=0; i<100; i++)
+            for(let i=0; i<this.count; i++)
             {
                 this.baihu[i].dispose();
             }
             // this._prefab.unuse();
-            this.app.getAssetMgr().getAssetBundle("baihu.assetbundle.json").unload();
+            this.app.getAssetMgr().getAssetBundle(`${this.assetName}.assetbundle.json`).unload();
             this.app.getAssetMgr().releaseUnuseAsset();
 
         }

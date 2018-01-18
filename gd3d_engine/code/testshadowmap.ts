@@ -105,7 +105,6 @@ class test_ShadowMap implements IState
         viewCamObj.localTranslate = new gd3d.math.vector3(20,20,20);
         viewCamObj.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         this.viewcamera = viewCamObj.gameObject.addComponent("camera") as gd3d.framework.camera;
-        this.viewcamera.backgroundColor = new gd3d.math.color(1, 0.11, 0.11, 1.0);
 
         viewCamObj.markDirty();
         this.ShowUI();

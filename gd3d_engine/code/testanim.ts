@@ -78,6 +78,7 @@ class test_anim implements IState
                         var renderer = trans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
                         wingroot.addChild(trans);
                         trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        trans.localScale = new gd3d.math.vector3(0.3,0.3,0.3);
                         renderer.materials = [];
                         renderer.materials.push(new gd3d.framework.material());
                         renderer.materials[0].setShader(this.app.getAssetMgr().getShader("shader/def"));
