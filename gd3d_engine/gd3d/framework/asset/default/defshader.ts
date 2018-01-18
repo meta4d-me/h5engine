@@ -363,13 +363,14 @@ namespace gd3d.framework
                 sh.defaultAsset = true;
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
+                p.setProgram(program);
                 sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.shader0).properties);
+                sh.fillUnDefUniform(p);
+                //sh._parseProperties(assetmgr,JSON.parse(this.shader0).properties);
                 p.state_ztest = true;
                 p.state_ztest_method = render.webglkit.LEQUAL;
                 p.state_zwrite = true;
                 p.state_showface = render.ShowFaceStateEnum.CCW;
-                p.setProgram(program);
                 p.setAlphaBlend(render.BlendModeEnum.Close);
                 //p.uniformTexture("_MainTex", null);
                 assetmgr.mapShader[sh.getName()] = sh;
@@ -379,13 +380,14 @@ namespace gd3d.framework
                 sh.defaultAsset = true;
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
+                p.setProgram(programdiffuse);
                 sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.diffuseShader).properties);
+                sh.fillUnDefUniform(p);
+                //sh._parseProperties(assetmgr,JSON.parse(this.diffuseShader).properties);
                 p.state_ztest = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
                 p.state_zwrite = false;
                 p.state_showface = render.ShowFaceStateEnum.CCW;
-                p.setProgram(programdiffuse);
                 p.setAlphaBlend(render.BlendModeEnum.Close);
                 //p.uniformTexture("_MainTex", null);
                 assetmgr.mapShader[sh.getName()] = sh;
@@ -395,9 +397,10 @@ namespace gd3d.framework
                 sh.defaultAsset = true;
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
-                sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.setProgram(program2);
+                sh.passes["base"].push(p);
+                sh.fillUnDefUniform(p);
+                //sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
@@ -409,9 +412,10 @@ namespace gd3d.framework
                 sh.defaultAsset = true;
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
-                sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.setProgram(program2);
+                sh.passes["base"].push(p);
+                sh.fillUnDefUniform(p);
+                //sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
@@ -424,10 +428,10 @@ namespace gd3d.framework
                 sh.defaultAsset = true;
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
-                sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties);
-                
                 p.setProgram(programuifont);
+                sh.passes["base"].push(p);
+                sh.fillUnDefUniform(p);
+                //sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties); 
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
@@ -442,6 +446,7 @@ namespace gd3d.framework
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
                 p.setProgram(programline);
+                sh.fillUnDefUniform(p);                
                 p.state_ztest = true;
                 p.state_ztest_method = render.webglkit.LEQUAL;
                 p.state_zwrite = true;
@@ -455,8 +460,9 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.materialShader).properties);
+                //sh._parseProperties(assetmgr,JSON.parse(this.materialShader).properties);
                 p.setProgram(programmaterialcolor);
+                sh.fillUnDefUniform(p);                
                 p.state_ztest = false;
                 //p.state_ztest_method = render.webglkit.LEQUAL;
                 //p.state_zwrite = true;
@@ -473,6 +479,7 @@ namespace gd3d.framework
                 sh.passes["base"].push(p);
                 sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.setProgram(programMaskUI);
+                sh.fillUnDefUniform(p);                
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
@@ -486,9 +493,10 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties);
-                
+                sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties);                
                 p.setProgram(programMaskfont);
+                sh.fillUnDefUniform(p);
+                
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
