@@ -1352,27 +1352,24 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         uploadUnifoms(pass: render.glDrawPass, context: renderContext): void;
         setShader(shader: shader): void;
-        private _changeShaderMap;
-        changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         private queue;
         getQueue(): number;
         setQueue(queue: number): void;
         getShader(): shader;
         private shader;
-        mapUniform: {
-            [id: string]: UniformData;
-        };
         defaultMapUniform: {
             [key: string]: {
                 type: render.UniformTypeEnum;
                 value?: any;
+                becolor?: boolean;
+                min?: number;
+                max?: number;
             };
         };
         statedMapUniforms: {
             [id: string]: any;
         };
-        private mapUniformTemp;
         setFloat(_id: string, _number: number): void;
         setFloatv(_id: string, _numbers: Float32Array): void;
         setVector4(_id: string, _vector4: math.vector4): void;
@@ -1384,6 +1381,191 @@ declare namespace gd3d.framework {
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
         save(): string;
+    }
+}
+declare namespace gd3d.render {
+    enum TextureFormatEnum {
+        RGBA = 1,
+        RGB = 2,
+        Gray = 3,
+        PVRTC4_RGB = 4,
+        PVRTC4_RGBA = 4,
+        PVRTC2_RGB = 4,
+        PVRTC2_RGBA = 4,
+    }
+    class textureReader {
+        constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
+        width: number;
+        height: number;
+        data: Uint8Array;
+        gray: boolean;
+        getPixel(u: number, v: number): any;
+    }
+    interface ITexture {
+        texture: WebGLTexture;
+        width: number;
+        height: number;
+        isFrameBuffer(): boolean;
+        dispose(webgl: WebGLRenderingContext): any;
+        caclByteLength(): number;
+    }
+    class glRenderTarget implements ITexture {
+        width: number;
+        height: number;
+        constructor(webgl: WebGLRenderingContext, width: number, height: number, depth?: boolean, stencil?: boolean);
+        fbo: WebGLFramebuffer;
+        renderbuffer: WebGLRenderbuffer;
+        texture: WebGLTexture;
+        use(webgl: WebGLRenderingContext): void;
+        static useNull(webgl: WebGLRenderingContext): void;
+        dispose(webgl: WebGLRenderingContext): void;
+        caclByteLength(): number;
+        isFrameBuffer(): boolean;
+    }
+    class glTexture2D implements ITexture {
+        ext: any;
+        private linear;
+        private premultiply;
+        private repeat;
+        private mirroredU;
+        private mirroredV;
+        constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
+        private getExt(name);
+        uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
+        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
+        webgl: WebGLRenderingContext;
+        loaded: boolean;
+        texture: WebGLTexture;
+        format: TextureFormatEnum;
+        width: number;
+        height: number;
+        mipmap: boolean;
+        caclByteLength(): number;
+        reader: textureReader;
+        getReader(redOnly?: boolean): textureReader;
+        dispose(webgl: WebGLRenderingContext): void;
+        isFrameBuffer(): boolean;
+        private static mapTexture;
+        static formGrayArray(webgl: WebGLRenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
+        static staticTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
+    }
+    class glTextureCube implements ITexture {
+        constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
+        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture): void;
+        private upload(data, width, height, TEXTURE_CUBE_MAP_);
+        webgl: WebGLRenderingContext;
+        loaded: boolean;
+        texture: WebGLTexture;
+        format: TextureFormatEnum;
+        width: number;
+        height: number;
+        mipmap: boolean;
+        linear: boolean;
+        caclByteLength(): number;
+        dispose(webgl: WebGLRenderingContext): void;
+        isFrameBuffer(): boolean;
+    }
+    class WriteableTexture2D implements ITexture {
+        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum, width: number, height: number, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean);
+        linear: boolean;
+        premultiply: boolean;
+        repeat: boolean;
+        mirroredU: boolean;
+        mirroredV: boolean;
+        updateRect(data: Uint8Array, x: number, y: number, width: number, height: number): void;
+        updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
+        isFrameBuffer(): boolean;
+        webgl: WebGLRenderingContext;
+        texture: WebGLTexture;
+        format: TextureFormatEnum;
+        formatGL: number;
+        width: number;
+        height: number;
+        dispose(webgl: WebGLRenderingContext): void;
+        caclByteLength(): number;
+    }
+}
+declare namespace gd3d.render {
+    class glWindow {
+        renderTarget: gd3d.render.glRenderTarget;
+        clearop_Color: boolean;
+        backColor: gd3d.math.color;
+        clearop_Depth: boolean;
+        clearop_Stencil: boolean;
+        viewport: gd3d.math.rect;
+        use(webgl: WebGLRenderingContext): void;
+    }
+}
+declare namespace gd3d.render {
+    enum UniformTypeEnum {
+        Texture = 0,
+        Float = 1,
+        Floatv = 2,
+        Float4 = 3,
+        Float4v = 4,
+        Float4x4 = 5,
+        Float4x4v = 6,
+    }
+    class uniform {
+        name: string;
+        type: UniformTypeEnum;
+        location: WebGLUniformLocation;
+    }
+    enum ShaderTypeEnum {
+        VS = 0,
+        FS = 1,
+    }
+    class glShader {
+        constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string);
+        name: string;
+        type: ShaderTypeEnum;
+        shader: WebGLShader;
+    }
+    class glProgram {
+        constructor(vs: glShader, fs: glShader, program: WebGLProgram);
+        initAttribute(webgl: WebGLRenderingContext): void;
+        vs: glShader;
+        fs: glShader;
+        program: WebGLProgram;
+        posPos: number;
+        posNormal: number;
+        posTangent: number;
+        posColor: number;
+        posUV0: number;
+        posUV2: number;
+        posBlendIndex4: number;
+        posBlendWeight4: number;
+        posColorEx: number;
+        mapUniform: {
+            [id: string]: uniform;
+        };
+        use(webgl: WebGLRenderingContext): void;
+        initUniforms(webgl: WebGLRenderingContext): void;
+    }
+    class shaderPool {
+        mapVS: {
+            [id: string]: glShader;
+        };
+        mapFS: {
+            [id: string]: glShader;
+        };
+        mapProgram: {
+            [id: string]: glProgram;
+        };
+        disposeVS(webgl: WebGLRenderingContext, id: string): void;
+        disposeFS(webgl: WebGLRenderingContext, id: string): void;
+        disposeProgram(webgl: WebGLRenderingContext, id: string): void;
+        disposeAll(webgl: WebGLRenderingContext): void;
+        compileVS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
+        compileFS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
+        linkProgram(webgl: WebGLRenderingContext, nameVS: string, nameFS: string): glProgram;
+        mapVSString: {
+            [id: string]: string;
+        };
+        mapFSString: {
+            [id: string]: string;
+        };
+        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string): glProgram;
     }
 }
 declare namespace gd3d.framework {
@@ -1523,6 +1705,9 @@ declare namespace gd3d.framework {
             [key: string]: {
                 type: render.UniformTypeEnum;
                 value?: any;
+                becolor?: boolean;
+                min?: number;
+                max?: number;
             };
         };
         layer: RenderLayerEnum;
@@ -5210,190 +5395,5 @@ declare namespace gd3d.render {
         };
         static webgl: WebGLRenderingContext;
         static initApplyUnifmFunc(): void;
-    }
-}
-declare namespace gd3d.render {
-    class glWindow {
-        renderTarget: gd3d.render.glRenderTarget;
-        clearop_Color: boolean;
-        backColor: gd3d.math.color;
-        clearop_Depth: boolean;
-        clearop_Stencil: boolean;
-        viewport: gd3d.math.rect;
-        use(webgl: WebGLRenderingContext): void;
-    }
-}
-declare namespace gd3d.render {
-    enum UniformTypeEnum {
-        Texture = 0,
-        Float = 1,
-        Floatv = 2,
-        Float4 = 3,
-        Float4v = 4,
-        Float4x4 = 5,
-        Float4x4v = 6,
-    }
-    class uniform {
-        name: string;
-        type: UniformTypeEnum;
-        location: WebGLUniformLocation;
-    }
-    enum ShaderTypeEnum {
-        VS = 0,
-        FS = 1,
-    }
-    class glShader {
-        constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string);
-        name: string;
-        type: ShaderTypeEnum;
-        shader: WebGLShader;
-    }
-    class glProgram {
-        constructor(vs: glShader, fs: glShader, program: WebGLProgram);
-        initAttribute(webgl: WebGLRenderingContext): void;
-        vs: glShader;
-        fs: glShader;
-        program: WebGLProgram;
-        posPos: number;
-        posNormal: number;
-        posTangent: number;
-        posColor: number;
-        posUV0: number;
-        posUV2: number;
-        posBlendIndex4: number;
-        posBlendWeight4: number;
-        posColorEx: number;
-        mapUniform: {
-            [id: string]: uniform;
-        };
-        use(webgl: WebGLRenderingContext): void;
-        initUniforms(webgl: WebGLRenderingContext): void;
-    }
-    class shaderPool {
-        mapVS: {
-            [id: string]: glShader;
-        };
-        mapFS: {
-            [id: string]: glShader;
-        };
-        mapProgram: {
-            [id: string]: glProgram;
-        };
-        disposeVS(webgl: WebGLRenderingContext, id: string): void;
-        disposeFS(webgl: WebGLRenderingContext, id: string): void;
-        disposeProgram(webgl: WebGLRenderingContext, id: string): void;
-        disposeAll(webgl: WebGLRenderingContext): void;
-        compileVS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
-        compileFS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
-        linkProgram(webgl: WebGLRenderingContext, nameVS: string, nameFS: string): glProgram;
-        mapVSString: {
-            [id: string]: string;
-        };
-        mapFSString: {
-            [id: string]: string;
-        };
-        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string): glProgram;
-    }
-}
-declare namespace gd3d.render {
-    enum TextureFormatEnum {
-        RGBA = 1,
-        RGB = 2,
-        Gray = 3,
-        PVRTC4_RGB = 4,
-        PVRTC4_RGBA = 4,
-        PVRTC2_RGB = 4,
-        PVRTC2_RGBA = 4,
-    }
-    class textureReader {
-        constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
-        width: number;
-        height: number;
-        data: Uint8Array;
-        gray: boolean;
-        getPixel(u: number, v: number): any;
-    }
-    interface ITexture {
-        texture: WebGLTexture;
-        width: number;
-        height: number;
-        isFrameBuffer(): boolean;
-        dispose(webgl: WebGLRenderingContext): any;
-        caclByteLength(): number;
-    }
-    class glRenderTarget implements ITexture {
-        width: number;
-        height: number;
-        constructor(webgl: WebGLRenderingContext, width: number, height: number, depth?: boolean, stencil?: boolean);
-        fbo: WebGLFramebuffer;
-        renderbuffer: WebGLRenderbuffer;
-        texture: WebGLTexture;
-        use(webgl: WebGLRenderingContext): void;
-        static useNull(webgl: WebGLRenderingContext): void;
-        dispose(webgl: WebGLRenderingContext): void;
-        caclByteLength(): number;
-        isFrameBuffer(): boolean;
-    }
-    class glTexture2D implements ITexture {
-        ext: any;
-        private linear;
-        private premultiply;
-        private repeat;
-        private mirroredU;
-        private mirroredV;
-        constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
-        private getExt(name);
-        uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
-        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
-        webgl: WebGLRenderingContext;
-        loaded: boolean;
-        texture: WebGLTexture;
-        format: TextureFormatEnum;
-        width: number;
-        height: number;
-        mipmap: boolean;
-        caclByteLength(): number;
-        reader: textureReader;
-        getReader(redOnly?: boolean): textureReader;
-        dispose(webgl: WebGLRenderingContext): void;
-        isFrameBuffer(): boolean;
-        private static mapTexture;
-        static formGrayArray(webgl: WebGLRenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
-        static staticTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
-    }
-    class glTextureCube implements ITexture {
-        constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
-        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture): void;
-        private upload(data, width, height, TEXTURE_CUBE_MAP_);
-        webgl: WebGLRenderingContext;
-        loaded: boolean;
-        texture: WebGLTexture;
-        format: TextureFormatEnum;
-        width: number;
-        height: number;
-        mipmap: boolean;
-        linear: boolean;
-        caclByteLength(): number;
-        dispose(webgl: WebGLRenderingContext): void;
-        isFrameBuffer(): boolean;
-    }
-    class WriteableTexture2D implements ITexture {
-        constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum, width: number, height: number, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean);
-        linear: boolean;
-        premultiply: boolean;
-        repeat: boolean;
-        mirroredU: boolean;
-        mirroredV: boolean;
-        updateRect(data: Uint8Array, x: number, y: number, width: number, height: number): void;
-        updateRectImg(data: ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, x: number, y: number): void;
-        isFrameBuffer(): boolean;
-        webgl: WebGLRenderingContext;
-        texture: WebGLTexture;
-        format: TextureFormatEnum;
-        formatGL: number;
-        width: number;
-        height: number;
-        dispose(webgl: WebGLRenderingContext): void;
-        caclByteLength(): number;
     }
 }
