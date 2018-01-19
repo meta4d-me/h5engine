@@ -95,18 +95,17 @@ namespace gd3d.framework
          */
         dispose()
         {
-            for (let id in this.mapUniform)
+            for (let id in this.statedMapUniforms)
             {
-                switch (this.mapUniform[id].type)
+                switch (this.defaultMapUniform[id].type)
                 {
                     case render.UniformTypeEnum.Texture:
-                        if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
-                            this.mapUniform[id].value.unuse(true);
+                        if (this.statedMapUniforms[id] != null)
+                            this.statedMapUniforms[id].unuse(true);
                         break;
                 }
             }
-            delete this.mapUniform;
-            delete this.mapUniformTemp;
+            delete this.statedMapUniforms;
         }
         /**
          * @public
@@ -145,48 +144,11 @@ namespace gd3d.framework
             {
                 total += this.shader.caclByteLength();
             }
-            for (let k in this.mapUniform)
+            for (let k in this.statedMapUniforms)
             {
-                let type = this.mapUniform[k].type;
-                let value = this.mapUniform[k].value;
-                let defaultValue = this.mapUniform[k].defaultValue;
-                switch (type)
-                {
-                    case render.UniformTypeEnum.Float:
-                        total += 4;
-                        break;
-                    case render.UniformTypeEnum.Floatv:
-                        total += value.byteLength;
-                        break;
-                    case render.UniformTypeEnum.Float4:
-                        total += 16;
-                        break;
-                    case render.UniformTypeEnum.Float4v:
-                        total += value.byteLength;
-                        break;
-                    case render.UniformTypeEnum.Float4x4:
-                        total += 64;
-                        break;
-                    case render.UniformTypeEnum.Float4x4v:
-                        total += value.byteLength;
-                        break;
-                    case render.UniformTypeEnum.Texture:
-                        if (value != null)
-                        {
-                            total += value.caclByteLength();
-                        }
-                        else if (defaultValue != null)
-                        {
-                            total += defaultValue.caclByteLength();
-                        }
-                        break;
-                }
-            }
-            for (let k in this.mapUniformTemp)
-            {
-                let type = this.mapUniformTemp[k].type;
-                let value = this.mapUniformTemp[k].value;
-                let defaultValue = this.mapUniformTemp[k].defaultValue;
+                let type = this.defaultMapUniform[k].type;
+                let value = this.statedMapUniforms[k].value;
+                let defaultValue = this.defaultMapUniform[k].value;
                 switch (type)
                 {
                     case render.UniformTypeEnum.Float:
@@ -221,54 +183,6 @@ namespace gd3d.framework
             }
             return total;
         }
-        // /**
-        //  * @private
-        //  */
-        // initUniformData(passes: render.glDrawPass[])
-        // {
-        //     if (passes == null)
-        //         return;
-        //     for (var i = 0; i < passes.length; i++)
-        //     {
-        //         var p = passes[i];
-        //         for (var key in p.uniforms)
-        //         {
-        //             var u = p.uniforms[key];
-        //             var defv = this.shader.defaultMapUniform[key];
-        //             if (defv != null)
-        //             {
-        //                 this.mapUniform[key] = new UniformData(u.type, defv.value, defv.defaultValue);
-        //                 continue;
-        //             }
-        //             if (this.mapUniform[key] != null)
-        //             {
-        //                 continue;
-        //             }
-        //             if (u.type == render.UniformTypeEnum.Float)
-        //                 this.mapUniform[key] = new UniformData(u.type, u.value);//{ type: u.type, value: u.value };
-        //             else if (u.type == render.UniformTypeEnum.Floatv)
-        //                 this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
-        //             else if (u.type == render.UniformTypeEnum.Float4)
-        //             {
-        //                 let _v4 = new gd3d.math.vector4();
-        //                 if (key.indexOf("_ST") > 0)
-        //                 {
-        //                     _v4.x = 1;
-        //                     _v4.y = 1;
-        //                 }
-        //                 this.mapUniform[key] = new UniformData(u.type, _v4);//{ type: u.type, value: new gd3d.math.vector4() };
-        //             }
-        //             else if (u.type == render.UniformTypeEnum.Float4v)
-        //                 this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
-        //             else if (u.type == render.UniformTypeEnum.Float4x4)
-        //                 this.mapUniform[key] = new UniformData(u.type, new gd3d.math.matrix());//{ type: u.type, value: new gd3d.math.matrix() };
-        //             else if (u.type == render.UniformTypeEnum.Float4x4v)
-        //                 this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
-        //             else if (u.type == render.UniformTypeEnum.Texture)
-        //                 this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
-        //         }
-        //     }
-        // }
 
         uploadUnifoms(pass:render.glDrawPass,context:renderContext)
         {
@@ -312,37 +226,37 @@ namespace gd3d.framework
             this.shader = shader;
             this.defaultMapUniform=shader.defaultMapUniform;
         }
-        private _changeShaderMap: { [name: string]: material } = {};
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 修改shader 保留原有数据
-         * @param shader shader实例
-         * @version egret-gd3d 1.0
-         */
-        changeShader(shader: shader)
-        {
-            let map: { [id: string]: UniformData };
-            if (this._changeShaderMap[shader.getName()] != undefined)
-            {
-                map = this._changeShaderMap[shader.getName()].mapUniform;
-            }
-            else
-            {
-                let mat: material = this.clone();
-                map = mat.mapUniform;
-                this._changeShaderMap[shader.getName()] = mat;
-            }
-            this.setShader(shader);
-            for (let key in map)
-            {
-                if (this.mapUniform[key] != undefined)
-                {
-                    this.mapUniform[key] = map[key];
-                }
-            }
-        }
+        // private _changeShaderMap: { [name: string]: material } = {};
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 修改shader 保留原有数据
+        //  * @param shader shader实例
+        //  * @version egret-gd3d 1.0
+        //  */
+        // changeShader(shader: shader)
+        // {
+        //     let map: { [id: string]: UniformData };
+        //     if (this._changeShaderMap[shader.getName()] != undefined)
+        //     {
+        //         map = this._changeShaderMap[shader.getName()].mapUniform;
+        //     }
+        //     else
+        //     {
+        //         let mat: material = this.clone();
+        //         map = mat.mapUniform;
+        //         this._changeShaderMap[shader.getName()] = mat;
+        //     }
+        //     this.setShader(shader);
+        //     for (let key in map)
+        //     {
+        //         if (this.mapUniform[key] != undefined)
+        //         {
+        //             this.mapUniform[key] = map[key];
+        //         }
+        //     }
+        // }
         /**
          * @public
          * @language zh_CN
@@ -387,11 +301,11 @@ namespace gd3d.framework
         /**
          * @private
          */
-        @gd3d.reflect.Field("UniformDataDic")
-        mapUniform: {[id: string]: UniformData} = {};//参数
-        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any} };
+        //@gd3d.reflect.Field("UniformDataDic")
+        //mapUniform: {[id: string]: UniformData} = {};//参数
+        defaultMapUniform:{ [key: string]: { type: render.UniformTypeEnum, value?: any,becolor?:boolean,min?:number,max?:number}};
         statedMapUniforms:{[id:string]:any}={};
-        private mapUniformTemp: {[id: string]: UniformData}={};
+        //private mapUniformTemp: {[id: string]: UniformData}={};
         /**
          * @private
          */
@@ -524,85 +438,6 @@ namespace gd3d.framework
             for (var i = 0; i < drawPasses.length; i++)
             {
                 var pass = drawPasses[i];
-
-                // //auto uniforms
-                // for (var key in pass.uniforms)
-                // {
-                //     switch (key)
-                //     {
-                //         case "glstate_matrix_model":
-                //             this.setMatrix(key, context.matrixModel);
-                //             break;
-                //         case "glstate_matrix_world2object":
-                //             this.setMatrix(key, context.matrixWorld2Object);
-                //             break;
-                //         case "glstate_matrix_view":
-                //             this.setMatrix(key, context.matrixView);
-                //             break;
-                //         case "glstate_matrix_project":
-                //             this.setMatrix(key, context.matrixProject);
-                //             break;
-                //         case "glstate_matrix_modelview":
-                //             this.setMatrix(key, context.matrixModelView);
-                //             break;
-                //         case "glstate_matrix_viewproject":
-                //             this.setMatrix(key, context.matrixViewProject);
-                //             break;
-                //         case "glstate_matrix_mvp":
-                //             this.setMatrix(key, context.matrixModelViewProject);
-                //             break;
-                //         case "glstate_timer":
-                //             this.setFloat(key, context.floatTimer);
-                //             break;
-                //         case "glstate_lightcount":
-                //             this.setFloat(key, context.intLightCount);
-                //             break;
-                //         case "glstate_vec4_lightposs":
-                //             if (context.vec4LightPos.length > 0)
-                //             {
-                //                 this.setVector4v(key, context.vec4LightPos);
-                //             }
-                //             break;
-                //         case "glstate_vec4_lightdirs":
-                //             if (context.vec4LightDir.length > 0)
-                //             {
-                //                 this.setVector4v(key, context.vec4LightDir);
-                //             }
-                //             break;
-                //         case "glstate_float_spotangelcoss":
-                //             if (context.floatLightSpotAngleCos.length > 0)
-                //             {
-                //                 this.setFloatv(key, context.floatLightSpotAngleCos);
-                //             }
-                //             break;
-                //         case "glstate_eyepos":
-                //             this.setVector4(key, context.eyePos);
-                //             break;
-                //         case "_LightmapTex":
-                //             if (useGLobalLightMap)
-                //             {
-                //                 this.setTexture(key, context.lightmap);
-                //             }
-                //             break;
-                //         case "glstate_lightmapOffset":
-                //             this.setVector4(key, context.lightmapOffset);
-                //             break;
-                //         //-------shader 中直接舍弃
-                //         case "glstate_lightmapUV":
-                //             this.setFloat(key, context.lightmapUV);
-                //             break;
-                //         case "glstate_fog_start":
-                //             this.setFloat(key, context.fog._Start);
-                //             break;
-                //         case "glstate_fog_end":
-                //             this.setFloat(key, context.fog._End);
-                //             break;
-                //         case "glstate_fog_color":
-                //             this.setVector4(key, context.fog._Color);
-                //             break; 
-                //     }
-                // }
-                //this.uploadUniform(pass);
                 pass.use(context.webgl);
                 this.uploadUnifoms(pass,context);
 
@@ -630,7 +465,6 @@ namespace gd3d.framework
                     }
                 }
             }
-            //this.mapUniformTemp = {};
         }
 
         /**
@@ -716,20 +550,20 @@ namespace gd3d.framework
         {
             let mat: material = new material(this.getName());
             mat.setShader(this.shader);
-            for (var i in this.mapUniform)
+            for (var i in this.statedMapUniforms)
             {
-                var data: UniformData = this.mapUniform[i];
-                var _uniformType: render.UniformTypeEnum = data.type;
+                var _uniformType: render.UniformTypeEnum = this.statedMapUniforms[i].type;
+                let value=this.statedMapUniforms[i];
                 switch (_uniformType)
                 {
                     case render.UniformTypeEnum.Texture:
-                        mat.setTexture(i, data.value);
+                        mat.setTexture(i, value);
                         break;
                     case render.UniformTypeEnum.Float:
-                        mat.setFloat(i, data.value);
+                        mat.setFloat(i, value);
                         break;
                     case render.UniformTypeEnum.Float4:
-                        mat.setVector4(i, data.value);
+                        mat.setVector4(i, value);
                         break;
                     default:
                         break;
@@ -741,26 +575,26 @@ namespace gd3d.framework
         public save(): string
         {
             let obj: any = {};
-            obj["shader"] = this.shader.getName();
-            obj["srcshader"] = "";
-            obj["mapUniform"] = {};
-            for (let key in this.mapUniform)
-            {
-                let data = {};
-                data["type"] = this.mapUniform[key].type;
-                data["value"] = this.mapUniform[key].value;
-                obj["mapUniform"][key] = data;
-            }
-            if (this.mapUniformTemp != undefined)
-            {
-                for (let key in this.mapUniformTemp)
-                {
-                    let data = {};
-                    data["type"] = this.mapUniformTemp[key].type;
-                    data["value"] = this.mapUniformTemp[key].value;
-                    obj["mapUniform"][key] = data;
-                }
-            }
+            // obj["shader"] = this.shader.getName();
+            // obj["srcshader"] = "";
+            // obj["mapUniform"] = {};
+            // for (let key in this.mapUniform)
+            // {
+            //     let data = {};
+            //     data["type"] = this.mapUniform[key].type;
+            //     data["value"] = this.mapUniform[key].value;
+            //     obj["mapUniform"][key] = data;
+            // }
+            // if (this.mapUniformTemp != undefined)
+            // {
+            //     for (let key in this.mapUniformTemp)
+            //     {
+            //         let data = {};
+            //         data["type"] = this.mapUniformTemp[key].type;
+            //         data["value"] = this.mapUniformTemp[key].value;
+            //         obj["mapUniform"][key] = data;
+            //     }
+            // }
             return JSON.stringify(obj);
         }
     }

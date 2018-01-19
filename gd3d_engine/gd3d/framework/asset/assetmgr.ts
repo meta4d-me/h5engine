@@ -1602,25 +1602,25 @@ namespace gd3d.framework {
             data["shader"] = shader.getName();
             data["mapUniform"] = mapUniform;
 
-            for (let key in shaderPropertis) {
-                if (mat.mapUniform[key] != undefined) {
-                    let propertyDdata = {};
-                    let uniformData = mat.mapUniform[key];
-                    propertyDdata["type"] = uniformData.type;
-                    switch (uniformData.type) {
-                        case gd3d.render.UniformTypeEnum.Texture:
-                            propertyDdata["value"] = uniformData.value != null ? uniformData.value.name.name : "";
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4:
-                            propertyDdata["value"] = uniformData.value;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float:
-                            propertyDdata["value"] = uniformData.value;
-                            break;
-                    }
-                    mapUniform[key] = propertyDdata;
-                }
-            }
+            // for (let key in shaderPropertis) {
+            //     if (mat.mapUniform[key] != undefined) {
+            //         let propertyDdata = {};
+            //         let uniformData = mat.mapUniform[key];
+            //         propertyDdata["type"] = uniformData.type;
+            //         switch (uniformData.type) {
+            //             case gd3d.render.UniformTypeEnum.Texture:
+            //                 propertyDdata["value"] = uniformData.value != null ? uniformData.value.name.name : "";
+            //                 break;
+            //             case gd3d.render.UniformTypeEnum.Float4:
+            //                 propertyDdata["value"] = uniformData.value;
+            //                 break;
+            //             case gd3d.render.UniformTypeEnum.Float:
+            //                 propertyDdata["value"] = uniformData.value;
+            //                 break;
+            //         }
+            //         mapUniform[key] = propertyDdata;
+            //     }
+            // }
             let url = this.getAssetUrl(mat);
             info.files[url] = JSON.stringify(data);
             fun(info);

@@ -40,7 +40,7 @@ namespace gd3d.io
                 SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
             if (asset instanceof gd3d.framework.material)
             {
-                let _mapUniform = (asset as gd3d.framework.material).mapUniform;
+                let _mapUniform = (asset as gd3d.framework.material).defaultMapUniform;
                 if (!_mapUniform)
                     return;
                 for (let newKey in _mapUniform)
