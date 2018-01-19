@@ -512,10 +512,9 @@ namespace gd3d.framework {
             let assstatelist: any[] = [];
 
             //这里定义了加载顺序
-            asslist.push(packs, glvshaders, glfshaders,
-                shaders, prefabs, meshs,
-                materials, scenes, textures,
-                texturedescs, anclips, textassets, pvrs, f14effs, fonts, atlass, ddss);
+            asslist.push(packs, glvshaders, glfshaders,shaders,textassets,meshs,
+                textures,pvrs,ddss,texturedescs,fonts, atlass,
+                materials, anclips, f14effs,prefabs,scenes);
 
             assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None,
                 AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh,
