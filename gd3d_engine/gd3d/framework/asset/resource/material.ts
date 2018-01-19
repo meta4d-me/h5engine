@@ -270,32 +270,32 @@ namespace gd3d.framework
         //     }
         // }
 
-        uploadUnifoms(pass:render.glDrawPass,context:renderContext)
+        uploadUnifoms(pass: render.glDrawPass, context: renderContext)
         {
-            render.shaderUniform.texindex=0;            
-            for(let key in pass.mapuniforms)
+            render.shaderUniform.texindex = 0;
+            for (let key in pass.mapuniforms)
             {
-                let unifom=pass.mapuniforms[key];
-                let func=render.shaderUniform.applyuniformFunc[unifom.type];
-                let unifomValue:any;
-                if(uniformSetter.autoUniformDic[unifom.name]!=null)
+                let unifom = pass.mapuniforms[key];
+                let func = render.shaderUniform.applyuniformFunc[unifom.type];
+                let unifomValue: any;
+                if (uniformSetter.autoUniformDic[unifom.name] != null)
                 {
-                    let autoFunc=uniformSetter.autoUniformDic[unifom.name];
-                    unifomValue=autoFunc(context);
-                }else
+                    let autoFunc = uniformSetter.autoUniformDic[unifom.name];
+                    unifomValue = autoFunc(context);
+                } else
                 {
-                    if(this.statedMapUniforms[unifom.name]!=null)
+                    if (this.statedMapUniforms[unifom.name] != null)
                     {
-                        unifomValue=this.statedMapUniforms[unifom.name];
-                    }else if(this.defaultMapUniform[unifom.name])
+                        unifomValue = this.statedMapUniforms[unifom.name];
+                    } else if (this.defaultMapUniform[unifom.name])
                     {
-                        unifomValue=this.defaultMapUniform[unifom.name].value;
-                    }else
+                        unifomValue = this.defaultMapUniform[unifom.name].value;
+                    } else
                     {
-                        console.error("Uniform don't be setted or have def value. uniform:"+unifom.name+ "mat:"+this.getName());
+                        console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                     }
                 }
-                func(unifom.location,unifomValue);
+                func(unifom.location, unifomValue);
             }
         }
 
@@ -310,7 +310,7 @@ namespace gd3d.framework
         setShader(shader: shader)
         {
             this.shader = shader;
-            this.defaultMapUniform=shader.defaultMapUniform;
+            this.defaultMapUniform = shader.defaultMapUniform;
         }
         private _changeShaderMap: { [name: string]: material } = {};
         /**
@@ -354,7 +354,7 @@ namespace gd3d.framework
         {
             return this.shader.layer;
         }
-        private queue:number=0;
+        private queue: number = 0;
         /**
          * @public
          * @language zh_CN
@@ -366,9 +366,9 @@ namespace gd3d.framework
         {
             return this.queue;
         }
-        setQueue(queue:number)
+        setQueue(queue: number)
         {
-            this.queue=queue;
+            this.queue = queue;
         }
         /**
          * @public
@@ -388,21 +388,21 @@ namespace gd3d.framework
          * @private
          */
         @gd3d.reflect.Field("UniformDataDic")
-        mapUniform: {[id: string]: UniformData} = {};//参数
-        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any} };
-        statedMapUniforms:{[id:string]:any}={};
-        private mapUniformTemp: {[id: string]: UniformData}={};
+        mapUniform: { [id: string]: UniformData } = {};//参数
+        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any } };
+        statedMapUniforms: { [id: string]: any } = {};
+        private mapUniformTemp: { [id: string]: UniformData } = {};
         /**
          * @private
          */
         setFloat(_id: string, _number: number)
         {
-            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float)
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float)
             {
-                this.statedMapUniforms[_id]=_number;
-            }else
+                this.statedMapUniforms[_id] = _number;
+            } else
             {
-                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
@@ -410,12 +410,12 @@ namespace gd3d.framework
          */
         setFloatv(_id: string, _numbers: Float32Array)
         {
-            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Floatv)
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv)
             {
-                this.statedMapUniforms[_id]=_numbers;
-            }else
+                this.statedMapUniforms[_id] = _numbers;
+            } else
             {
-                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
@@ -423,12 +423,12 @@ namespace gd3d.framework
          */
         setVector4(_id: string, _vector4: math.vector4)
         {
-            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4)
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4)
             {
-                this.statedMapUniforms[_id]=_vector4;
-            }else
+                this.statedMapUniforms[_id] = _vector4;
+            } else
             {
-                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
@@ -436,12 +436,12 @@ namespace gd3d.framework
          */
         setVector4v(_id: string, _vector4v: Float32Array)
         {
-            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4v)
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v)
             {
-                this.statedMapUniforms[_id]=_vector4v;
-            }else
+                this.statedMapUniforms[_id] = _vector4v;
+            } else
             {
-                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
@@ -449,12 +449,12 @@ namespace gd3d.framework
          */
         setMatrix(_id: string, _matrix: math.matrix)
         {
-            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4x4)
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4)
             {
-                this.statedMapUniforms[_id]=_matrix;
-            }else
+                this.statedMapUniforms[_id] = _matrix;
+            } else
             {
-                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
@@ -462,12 +462,12 @@ namespace gd3d.framework
          */
         setMatrixv(_id: string, _matrixv: Float32Array)
         {
-            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4x4v)
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v)
             {
-                this.statedMapUniforms[_id]=_matrixv;
-            }else
+                this.statedMapUniforms[_id] = _matrixv;
+            } else
             {
-                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
         /**
@@ -475,16 +475,16 @@ namespace gd3d.framework
          */
         setTexture(_id: string, _texture: gd3d.framework.texture, resname: string = "")
         {
-            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Texture)
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture)
             {
-                if(this.statedMapUniforms[_id]!=null&&(!this.statedMapUniforms[_id].defaultAsset))
+                if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset))
                 {
                     this.statedMapUniforms[_id].unuse();
                 }
-                this.statedMapUniforms[_id]=_texture;
+                this.statedMapUniforms[_id] = _texture;
                 if (_texture != null)
                 {
-                    if(!_texture.defaultAsset)
+                    if (!_texture.defaultAsset)
                     {
                         _texture.use();
                     }
@@ -496,9 +496,9 @@ namespace gd3d.framework
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
-            }else
+            } else
             {
-                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
         }
@@ -604,7 +604,7 @@ namespace gd3d.framework
                 // }
                 //this.uploadUniform(pass);
                 pass.use(context.webgl);
-                this.uploadUnifoms(pass,context);
+                this.uploadUnifoms(pass, context);
 
                 mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
                 if (sm.useVertexIndex < 0)
@@ -645,16 +645,16 @@ namespace gd3d.framework
         Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
         {
             var shaderName = json["shader"];
-            var shader=assetmgr.getShader(shaderName) as gd3d.framework.shader;
-            if(shader==null)
+            var shader = assetmgr.getShader(shaderName) as gd3d.framework.shader;
+            if (shader == null)
             {
-                console.error("shader 为空！shadername："+shaderName+" bundleName: "+bundleName);
+                console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
             }
             this.setShader(shader);
-            var queue=json["queue"];
-            if(queue)
+            var queue = json["queue"];
+            if (queue)
             {
-                this.queue=queue;
+                this.queue = queue;
             }
 
             var mapUniform = json["mapUniform"];
@@ -662,7 +662,7 @@ namespace gd3d.framework
             {
                 var jsonChild = mapUniform[i];
                 var _uniformType: render.UniformTypeEnum = jsonChild["type"] as render.UniformTypeEnum;
-                if(_uniformType==null) continue;
+                if (_uniformType == null) continue;
                 switch (_uniformType)
                 {
                     case render.UniformTypeEnum.Texture:
@@ -670,9 +670,9 @@ namespace gd3d.framework
                         var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
                         if (_texture == null)
                         {
-                            console.error("Material Mapuniform Texture 无效("+_value+")！shadername："+shaderName+" bundleName: "+bundleName);
+                            console.error("Material Mapuniform Texture 无效(" + _value + ")！shadername：" + shaderName + " bundleName: " + bundleName);
                             //_texture = assetmgr.getDefaultTexture("grid");
-                        }else
+                        } else
                         {
                             this.setTexture(i, _texture, _value);
                         }
@@ -695,11 +695,11 @@ namespace gd3d.framework
                         catch (e)
                         {
                             //数据不合法就不提交了
-                            console.error("Material Mapuniform float4 无效:value ("+tempValue+")！shadername："+shaderName+" bundleName: "+bundleName);
+                            console.error("Material Mapuniform float4 无效:value (" + tempValue + ")！shadername：" + shaderName + " bundleName: " + bundleName);
                         }
                         break;
                     default:
-                        console.error("Material Mapuniform 无效: 未识别类型("+jsonChild["type"]+")！shadername："+shaderName+" bundleName: "+bundleName);
+                        console.error("Material Mapuniform 无效: 未识别类型(" + jsonChild["type"] + ")！shadername：" + shaderName + " bundleName: " + bundleName);
                         break;
                 }
             }
@@ -744,22 +744,27 @@ namespace gd3d.framework
             obj["shader"] = this.shader.getName();
             obj["srcshader"] = "";
             obj["mapUniform"] = {};
-            for (let key in this.mapUniform)
+            for (let item in this.statedMapUniforms)
             {
-                let data = {};
-                data["type"] = this.mapUniform[key].type;
-                data["value"] = this.mapUniform[key].value;
-                obj["mapUniform"][key] = data;
-            }
-            if (this.mapUniformTemp != undefined)
-            {
-                for (let key in this.mapUniformTemp)
+                let __type = this.defaultMapUniform[item].type;
+                let val = this.statedMapUniforms;
+                let jsonValue;
+                switch (__type)
                 {
-                    let data = {};
-                    data["type"] = this.mapUniformTemp[key].type;
-                    data["value"] = this.mapUniformTemp[key].value;
-                    obj["mapUniform"][key] = data;
+                    case render.UniformTypeEnum.Texture:
+                        jsonValue = `${val.name.name}`;
+                        break;
+                    case render.UniformTypeEnum.Float4:
+                        jsonValue = `(${val.x},${val.y},${val.z},${val.w})`;
+                        break;
+                    case render.UniformTypeEnum.Float:
+                        jsonValue = val;
+                        break;
+                    default:
+                        console.warn(`无法存储未解析类型:${__type},${item}`);
+                        continue;
                 }
+                obj["mapUniform"][item] = jsonValue;
             }
             return JSON.stringify(obj);
         }
