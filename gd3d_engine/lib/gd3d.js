@@ -5027,7 +5027,7 @@ var gd3d;
                 var ddss = [];
                 var asslist = [];
                 var assstatelist = [];
-                asslist.push(packs, glvshaders, glfshaders, shaders, prefabs, meshs, materials, scenes, textures, texturedescs, anclips, textassets, pvrs, f14effs, fonts, atlass, ddss);
+                asslist.push(packs, glvshaders, glfshaders, shaders, textassets, meshs, textures, pvrs, ddss, texturedescs, fonts, atlass, materials, anclips, f14effs, prefabs, scenes);
                 assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
                 var realTotal = 0;
                 var mapPackes = {};
@@ -5319,7 +5319,7 @@ var gd3d;
                 var flag = true;
                 if (id != null) {
                     var r = this.mapRes[id];
-                    if (r != null)
+                    if (r != null && !r[this._loadingTag])
                         return r.asset;
                 }
                 if (flag) {
