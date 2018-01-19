@@ -151,7 +151,15 @@ namespace gd3d.framework
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+1]= this.tempos.y;
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+2]= this.tempos.z;
     
-                    math.colorMultiply(this.element.colorArr[i],this.Color,this.temcolor);
+                    //math.colorMultiply(this.element.colorArr[i],this.Color,this.temcolor);
+                    if(this.element.colorArr)
+                    {
+                        math.colorMultiply(this.element.colorArr[i],this.Color,this.temcolor);
+                    }else
+                    {
+                        math.colorClone(this.Color,this.temcolor);
+                    }
+
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+3]= this.temcolor.r;
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+4]= this.temcolor.g;
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+5]= this.temcolor.b;
