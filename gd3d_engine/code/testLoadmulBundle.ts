@@ -118,7 +118,7 @@ class test_loadMulBundle implements IState
         // this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(-20, 50, -20);
         // objCam.lookatPoint(new gd3d.math.vector3(133.6694, 97.87, 67));
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.lookatPoint(new gd3d.math.vector3(100, 0, 100));
 
         objCam.markDirty();//标记为需要刷新
 

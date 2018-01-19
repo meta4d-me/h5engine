@@ -110,8 +110,9 @@ namespace gd3d.framework
         // @gd3d.reflect.Field("UniformData")
         /**
          * @private
+         * shader mapunifrom 默认值
          */
-        defaultValue: { [key: string]: { type: string, value?: any, defaultValue?: any, min?: number, max?: number } } = {};
+        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any} } = {};
         /**
          * @public
          * @language zh_CN
@@ -120,10 +121,10 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
-        /**
-         * @private
-         */
-        queue: number = 0;
+        // /**
+        //  * @private
+        //  */
+        // queue: number = 0;
         /**
          * @public
          * @language zh_CN
@@ -146,10 +147,10 @@ namespace gd3d.framework
                 else if (layer == "common")
                     this.layer = RenderLayerEnum.Common;
             }
-            if (json.queue)
-            {
-                this.queue = json.queue;
-            }
+            // if (json.queue)
+            // {
+            //     this.queue = json.queue;
+            // }
             var passes = json.passes;
             this.passes = {};
             for (var key in passes)
@@ -173,18 +174,19 @@ namespace gd3d.framework
                 this.passes[key] = [];
                 for (var i = 0; i < passbass.length; i++)
                 {
-                    this.passes[key].push(this._parsePass(assetmgr, passbass[i]));
+                    this.passes[key].push(this._parsePass(assetmgr, passbass[i],key));
                 }
             }
             if (this.passes["base"] == undefined)
             {
                 throw new Error("do not have base passgroup.");
             }
+            this.fillUnDefUniform(this.passes["base"][0]);
         }
 
         public _parseProperties(assetmgr: assetMgr, properties: any)
         {
-            this.defaultValue = {};
+            this.defaultMapUniform = {};
             for (var index in properties)
             {
                 let property = properties[index] as string;
@@ -212,18 +214,20 @@ namespace gd3d.framework
                     switch (type)
                     {
                         case "float":
-                            this.defaultValue[key] = { type: type, value: parseFloat(words[4]) };
+                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float, value: parseFloat(words[4]) };
                             break;
                         case "range":
-                            this.defaultValue[key] = { type: type, min: parseFloat(words[4]), max: parseFloat(words[5]), value: parseFloat(words[6]) };
+                            //this.defaultValue[key] = { type: render.UniformTypeEnum.Float, min: parseFloat(words[4]), max: parseFloat(words[5]), value: parseFloat(words[6]) };
+                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float, value: parseFloat(words[6]) };
+                            
                             break;
                         case "vector":
                         case "color":
                             let _vector = new gd3d.math.vector4(parseFloat(words[4]), parseFloat(words[5]), parseFloat(words[6]), parseFloat(words[7]));
-                            this.defaultValue[key] = { type: type, value: _vector };
+                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float4, value: _vector };
                             break;
                         case "texture":
-                            this.defaultValue[key] = { type: type, defaultValue: assetmgr.getDefaultTexture(words[4]) };
+                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Texture, value: assetmgr.getDefaultTexture(words[4]) };
                             break;
                         default:
                             alert(this.getName() + " property error! unknown type : " + type);
@@ -232,7 +236,7 @@ namespace gd3d.framework
                 }
             }
         }
-        private _parsePass(assetmgr: assetMgr, json: any): render.glDrawPass
+        private _parsePass(assetmgr: assetMgr, json: any,type:string): render.glDrawPass
         {
             var pass = new render.glDrawPass();
 
@@ -311,7 +315,8 @@ namespace gd3d.framework
             }
             pass.setAlphaBlend(blendmode);
 
-            var program = assetmgr.shaderPool.linkProgram(assetmgr.webgl, vs, fs);
+            //var program = assetmgr.shaderPool.linkProgram(assetmgr.webgl, vs, fs);
+            var program = assetmgr.shaderPool.linkProgrambyPassType(assetmgr.webgl,type,vs, fs);
             pass.setProgram(program);
 
             if (this.layer == RenderLayerEnum.Overlay)
@@ -322,45 +327,46 @@ namespace gd3d.framework
             }
             return pass;
         }
-
-
-        private static mapUniformGlobal: {
-            [id: string]: UniformData
-        };
-
-        private static setGlobal(key:string,value:any,type:render.UniformTypeEnum)
+        fillUnDefUniform(pass:render.glDrawPass)
         {
-            if (shader.mapUniformGlobal == undefined)
-                shader.mapUniformGlobal = {};
-            if (shader.mapUniformGlobal[key] != undefined)
-                shader.mapUniformGlobal[key].value = value;
-            else
-                shader.mapUniformGlobal[key] = new UniformData(type, value);
-        }
-
-        static setGlobalFloat(key: string, value: number)
-        {
-            shader.setGlobal(key,value,render.UniformTypeEnum.Float);
-        }
-
-        static setGlobalVector4(key: string, value: math.vector4)
-        {
-            shader.setGlobal(key,value,render.UniformTypeEnum.Float4);
-        }
-
-        static setGlobalMatrix(key: string, value: math.matrix)
-        {
-            shader.setGlobal(key,value,render.UniformTypeEnum.Float4x4);
-        }
-
-        static setGlobalTexture(key: string, value: texture)
-        {
-            shader.setGlobal(key,value,render.UniformTypeEnum.Texture);
-        }
-
-        static getGlobalMapUniform():{[id: string]: UniformData}
-        {
-            return shader.mapUniformGlobal;
+            for(let key in pass.mapuniforms)
+            {
+                let item=pass.mapuniforms[key];
+                if(uniformSetter.autoUniformDic[item.name]==null&&this.defaultMapUniform[item.name]==null)
+                {
+                    switch(item.type)
+                    {
+                        case render.UniformTypeEnum.Float:
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float,value:0};
+                            break;
+                        case render.UniformTypeEnum.Floatv:
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float4x4v,value:null};
+                            break;
+                        case render.UniformTypeEnum.Float4:
+                            if(item.name.indexOf("_ST")>=0||item.name.indexOf("_st")>=0)
+                            {
+                                this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float4,value:new gd3d.math.vector4(1,1,0,0)};
+                            }else
+                            {
+                                this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float4,value:new gd3d.math.vector4(1,1,1,1)};
+                            }
+                            break;
+                        case render.UniformTypeEnum.Float4v:
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float4v,value:null};
+                            break;
+                        case render.UniformTypeEnum.Float4x4:
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float4x4,value:null};
+                            break;
+                        case render.UniformTypeEnum.Float4x4v:
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Float4x4v,value:null};
+                            break;
+                        case render.UniformTypeEnum.Texture:
+                            let tex=sceneMgr.app.getAssetMgr().getDefaultTexture("white");
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Texture,value:tex};
+                            break;
+                    }
+                }
+            }
         }
     }
 }

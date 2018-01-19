@@ -19,12 +19,15 @@ class test_load implements IState
         lighttran.localTranslate.x=50;
         lighttran.localTranslate.y=50;
         lighttran.markDirty();
+        let isSplitPcakge = true;
+        let mpath = "meshprefab/";
+        let tpath = "textures/";
 
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json" , gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {
-                this.app.getAssetMgr().load("res/prefabs/baihu/resources/res_baihu_baihu.FBX_baihu.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge ? mpath:""}resources/res_baihu_baihu.FBX_baihu.mesh.bin`, gd3d.framework.AssetTypeEnum.Auto, (s) =>
                 {
                     if (s.isfinish)
                     {
@@ -44,7 +47,7 @@ class test_load implements IState
                         renderer.materials[1].setShader(sh);
                         renderer.materials[2].setShader(sh);
                         renderer.materials[3].setShader(sh);
-                        this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihu.imgdesc.json", gd3d.framework.AssetTypeEnum.Auto, (s2) =>
+                        this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihu.imgdesc.json`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
                         {
                             if (s2.isfinish)
                             {
@@ -52,7 +55,7 @@ class test_load implements IState
                                 renderer.materials[0].setTexture("_MainTex", texture);
                             }
                         });
-                        this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihuan.png", gd3d.framework.AssetTypeEnum.Auto, (s2) =>
+                        this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihuan.png`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
                         {
                             if (s2.isfinish)
                             {
@@ -60,23 +63,22 @@ class test_load implements IState
                                 renderer.materials[1].setTexture("_MainTex", texture);
                             }
                         });
-                        this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihuya.png", gd3d.framework.AssetTypeEnum.Auto, (s2) =>
-                        {
-                            if (s2.isfinish)
-                            {
-                                let texture = this.app.getAssetMgr().getAssetByName("baihuya.png") as gd3d.framework.texture;
-                                renderer.materials[2].setTexture("_MainTex", texture);
-                            }
-                        });
-                        this.app.getAssetMgr().load("res/prefabs/baihu/resources/baihumao.png", gd3d.framework.AssetTypeEnum.Auto, (s2) =>
-                        {
-                            if (s2.isfinish)
-                            {
-                                let texture = this.app.getAssetMgr().getAssetByName("baihumao.png") as gd3d.framework.texture;
-                                renderer.materials[3].setTexture("_MainTex", texture);
-                            }
-                        });
-
+                        // this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihuya.png`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
+                        // {
+                        //     if (s2.isfinish)
+                        //     {
+                        //         let texture = this.app.getAssetMgr().getAssetByName("baihuya.png") as gd3d.framework.texture;
+                        //         renderer.materials[2].setTexture("_MainTex", texture);
+                        //     }
+                        // });
+                        // this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihumao.png`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
+                        // {
+                        //     if (s2.isfinish)
+                        //     {
+                        //         let texture = this.app.getAssetMgr().getAssetByName("baihumao.png") as gd3d.framework.texture;
+                        //         renderer.materials[3].setTexture("_MainTex", texture);
+                        //     }
+                        // });
                     }
                 });
             }

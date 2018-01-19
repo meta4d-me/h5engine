@@ -37,6 +37,7 @@ class test_uiPerfabLoad implements IState {
         inputh.style.position = "absolute";
         inputh.style.width = 100 + "px";
         inputh.style.height = 30 + "px";
+        inputh.value = "button_comb1";
         
         let btn = document.createElement("button");
         this.app.container.appendChild(btn);
@@ -82,7 +83,7 @@ class test_uiPerfabLoad implements IState {
         this.bgui = bg_t;
 
         let prefabName = "button";
-        this.doLoad(prefabName);
+        //this.doLoad(prefabName);
 
         //key dwon test
         let inputMgr = this.app.getInputMgr();

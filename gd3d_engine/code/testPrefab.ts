@@ -139,12 +139,13 @@ class test_loadprefab implements IState
                                 this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
                                 this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
         
-                                objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
-                                objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                                objCam.localTranslate = new gd3d.math.vector3(0, 0, -2);
+                                objCam.lookat(this.baihu);
                                 objCam.markDirty();
         
                                 let ani = this.baihu.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
                                 // ani.clipnames;
+                                this.refreshTexture(this.baihu);
 
                                 this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_chuangjue_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
                                 (s) => 
@@ -212,9 +213,10 @@ class test_loadprefab implements IState
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
-        this.camera.far = 100;
+        this.camera.far = 10000;
         this.camera.backgroundColor = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);
         // objCam.localTranslate = new gd3d.math.vector3(0, 0, -30);
+        CameraController.instance().init(this.app,this.camera);
         objCam.markDirty();//标记为需要刷新
 
     }
@@ -275,10 +277,8 @@ class test_loadprefab implements IState
         var z2 = Math.cos(this.timer * 0.1);
         var objCam = this.camera.gameObject.transform;
         // objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
-        if (this.baihu)
-        {
-            objCam.lookat(this.baihu);
-            objCam.markDirty();//标记为需要刷新
-        }
+        
+        
+       CameraController.instance().update(delta);
     }
 }

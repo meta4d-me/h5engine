@@ -11,7 +11,6 @@ void main()
     lowp vec4 basecolor = texture2D(_MainTex, _base_uv);
     lowp vec4 emission=basecolor*attcolor;
 
-    lowp vec3 afterFog = mix(glstate_fog_color.rgb, emission.rgb, factor);
-
-    gl_FragData[0] = vec4(afterFog,emission.a);
+    lowp vec4 afterfog=mix(vec4(0,0,0,0), emission, factor);
+    gl_FragData[0] = afterfog;
 }

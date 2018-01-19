@@ -113,7 +113,7 @@ namespace gd3d.framework
             {
                 this.refreshCurTex_ST(frame,deltaTime,fps);
             }
-            
+            this.updateRotByBillboard();
             this.refreshTargetMatrix();
         }
 
@@ -125,7 +125,7 @@ namespace gd3d.framework
         targetMat:math.matrix=new math.matrix();
         public refreshTargetMatrix()
         {
-            math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
+            // math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
             math.matrixMakeTransformRTS(this.position,this.scale,this.localRotate,this.targetMat);
             //return Matrix4x4.TRS(this.position, Quaternion.Euler(this.euler.x, this.euler.y, this.euler.z),this.scale);
         }
@@ -186,6 +186,32 @@ namespace gd3d.framework
                 let lerp = (curframe - this.startFrame) /(this.endFrame - this.startFrame);
                 let spritindex =Math.floor(lerp * this.baseddata.count);
                 gd3d.math.spriteAnimation(this.baseddata.row,this.baseddata.column,spritindex,this.tex_ST);
+            }
+        }
+        //----------tempt
+        private eulerRot=new math.quaternion();
+        private worldpos=new math.vector3();
+        private worldRot=new math.quaternion();
+        private inverseRot=new math.quaternion();
+        public updateRotByBillboard()
+        {
+            if(this.baseddata.beBillboard)
+            {
+                let mat=this.effect.gameObject.transform.getWorldMatrix();
+                gd3d.math.matrixTransformVector3(this.position,mat,this.worldpos);
+                let targetpos=this.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                gd3d.math.quatLookat(this.worldpos,targetpos,this.worldRot);
+                
+                
+                let parentRot = this.effect.gameObject.transform.getWorldRotate();
+                math.quatInverse(parentRot,this.inverseRot);
+                gd3d.math.quatMultiply(this.inverseRot,this.worldRot,this.localRotate);
+                gd3d.math.quatFromAxisAngle(math.pool.vector3_forward,this.euler.z,this.eulerRot);
+                gd3d.math.quatMultiply(this.localRotate,this.eulerRot,this.localRotate);
+    
+            }else
+            {
+                math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
             }
         }
 

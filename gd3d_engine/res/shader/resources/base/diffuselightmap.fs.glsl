@@ -1,6 +1,8 @@
 uniform lowp sampler2D _MainTex;
 uniform lowp sampler2D _LightmapTex;
 uniform lowp float _AlphaCut;
+uniform lowp vec4 _MainColor;
+
 varying mediump vec2 xlv_TEXCOORD0;
 varying mediump vec2 xlv_TEXCOORD1;
 lowp vec3 decode_hdr(lowp vec4 data)
@@ -15,5 +17,5 @@ void main()
         discard;
     lowp vec4 lightmap = texture2D(_LightmapTex, xlv_TEXCOORD1);
     outColor.xyz *= decode_hdr(lightmap);
-    gl_FragData[0] = outColor;
+    gl_FragData[0] = outColor*_MainColor;
 }

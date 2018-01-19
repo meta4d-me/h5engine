@@ -1,4 +1,4 @@
-uniform lowp sampler2D _Splat0;
+     uniform lowp sampler2D _Splat0;
 uniform lowp sampler2D _Splat1;
 uniform lowp sampler2D _Splat2;
 uniform lowp sampler2D _Splat3;

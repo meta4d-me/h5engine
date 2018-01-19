@@ -221,52 +221,81 @@ namespace gd3d.framework
             }
             return total;
         }
-        /**
-         * @private
-         */
-        initUniformData(passes: render.glDrawPass[])
+        // /**
+        //  * @private
+        //  */
+        // initUniformData(passes: render.glDrawPass[])
+        // {
+        //     if (passes == null)
+        //         return;
+        //     for (var i = 0; i < passes.length; i++)
+        //     {
+        //         var p = passes[i];
+        //         for (var key in p.uniforms)
+        //         {
+        //             var u = p.uniforms[key];
+        //             var defv = this.shader.defaultMapUniform[key];
+        //             if (defv != null)
+        //             {
+        //                 this.mapUniform[key] = new UniformData(u.type, defv.value, defv.defaultValue);
+        //                 continue;
+        //             }
+        //             if (this.mapUniform[key] != null)
+        //             {
+        //                 continue;
+        //             }
+        //             if (u.type == render.UniformTypeEnum.Float)
+        //                 this.mapUniform[key] = new UniformData(u.type, u.value);//{ type: u.type, value: u.value };
+        //             else if (u.type == render.UniformTypeEnum.Floatv)
+        //                 this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
+        //             else if (u.type == render.UniformTypeEnum.Float4)
+        //             {
+        //                 let _v4 = new gd3d.math.vector4();
+        //                 if (key.indexOf("_ST") > 0)
+        //                 {
+        //                     _v4.x = 1;
+        //                     _v4.y = 1;
+        //                 }
+        //                 this.mapUniform[key] = new UniformData(u.type, _v4);//{ type: u.type, value: new gd3d.math.vector4() };
+        //             }
+        //             else if (u.type == render.UniformTypeEnum.Float4v)
+        //                 this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
+        //             else if (u.type == render.UniformTypeEnum.Float4x4)
+        //                 this.mapUniform[key] = new UniformData(u.type, new gd3d.math.matrix());//{ type: u.type, value: new gd3d.math.matrix() };
+        //             else if (u.type == render.UniformTypeEnum.Float4x4v)
+        //                 this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
+        //             else if (u.type == render.UniformTypeEnum.Texture)
+        //                 this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
+        //         }
+        //     }
+        // }
+
+        uploadUnifoms(pass:render.glDrawPass,context:renderContext)
         {
-            if (passes == null)
-                return;
-            for (var i = 0; i < passes.length; i++)
+            render.shaderUniform.texindex=0;            
+            for(let key in pass.mapuniforms)
             {
-                var p = passes[i];
-                for (var key in p.uniforms)
+                let unifom=pass.mapuniforms[key];
+                let func=render.shaderUniform.applyuniformFunc[unifom.type];
+                let unifomValue:any;
+                if(uniformSetter.autoUniformDic[unifom.name]!=null)
                 {
-                    var u = p.uniforms[key];
-                    var defv = this.shader.defaultValue[key];
-                    if (defv != null)
+                    let autoFunc=uniformSetter.autoUniformDic[unifom.name];
+                    unifomValue=autoFunc(context);
+                }else
+                {
+                    if(this.statedMapUniforms[unifom.name]!=null)
                     {
-                        this.mapUniform[key] = new UniformData(u.type, defv.value, defv.defaultValue);
-                        continue;
-                    }
-                    if (this.mapUniform[key] != null)
+                        unifomValue=this.statedMapUniforms[unifom.name];
+                    }else if(this.defaultMapUniform[unifom.name])
                     {
-                        continue;
-                    }
-                    if (u.type == render.UniformTypeEnum.Float)
-                        this.mapUniform[key] = new UniformData(u.type, u.value);//{ type: u.type, value: u.value };
-                    else if (u.type == render.UniformTypeEnum.Floatv)
-                        this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
-                    else if (u.type == render.UniformTypeEnum.Float4)
+                        unifomValue=this.defaultMapUniform[unifom.name].value;
+                    }else
                     {
-                        let _v4 = new gd3d.math.vector4();
-                        if (key.indexOf("_ST") > 0)
-                        {
-                            _v4.x = 1;
-                            _v4.y = 1;
-                        }
-                        this.mapUniform[key] = new UniformData(u.type, _v4);//{ type: u.type, value: new gd3d.math.vector4() };
+                        console.error("Uniform don't be setted or have def value. uniform:"+unifom.name+ "mat:"+this.getName());
                     }
-                    else if (u.type == render.UniformTypeEnum.Float4v)
-                        this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
-                    else if (u.type == render.UniformTypeEnum.Float4x4)
-                        this.mapUniform[key] = new UniformData(u.type, new gd3d.math.matrix());//{ type: u.type, value: new gd3d.math.matrix() };
-                    else if (u.type == render.UniformTypeEnum.Float4x4v)
-                        this.mapUniform[key] = new UniformData(u.type, new Float32Array(0));
-                    else if (u.type == render.UniformTypeEnum.Texture)
-                        this.mapUniform[key] = new UniformData(u.type, null);//{ type: u.type, value: null };
                 }
+                func(unifom.location,unifomValue);
             }
         }
 
@@ -281,9 +310,7 @@ namespace gd3d.framework
         setShader(shader: shader)
         {
             this.shader = shader;
-            this.mapUniform = {};
-
-            this.initUniformData(this.shader.passes["base"]);
+            this.defaultMapUniform=shader.defaultMapUniform;
         }
         private _changeShaderMap: { [name: string]: material } = {};
         /**
@@ -327,7 +354,7 @@ namespace gd3d.framework
         {
             return this.shader.layer;
         }
-        private queue: number = 0;
+        private queue:number=0;
         /**
          * @public
          * @language zh_CN
@@ -337,11 +364,11 @@ namespace gd3d.framework
          */
         getQueue()
         {
-            return this.shader.queue + this.queue;
+            return this.queue;
         }
-        setQueue(queue: number)
+        setQueue(queue:number)
         {
-            this.queue = queue;
+            this.queue=queue;
         }
         /**
          * @public
@@ -361,43 +388,34 @@ namespace gd3d.framework
          * @private
          */
         @gd3d.reflect.Field("UniformDataDic")
-        mapUniform: {
-            [id: string]: UniformData
-        } = {};//参数
-        private mapUniformTemp: {
-            [id: string]: UniformData
-        } = {};
+        mapUniform: {[id: string]: UniformData} = {};//参数
+        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any} };
+        statedMapUniforms:{[id:string]:any}={};
+        private mapUniformTemp: {[id: string]: UniformData}={};
         /**
          * @private
          */
         setFloat(_id: string, _number: number)
         {
-            if (this.mapUniform[_id] != undefined)
-                this.mapUniform[_id].value = _number;
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float)
+            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float)
             {
-                this.mapUniformTemp[_id].value = _number;
-            }
-            else
+                this.statedMapUniforms[_id]=_number;
+            }else
             {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float, _number);
+                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
             }
-
         }
         /**
          * @private
          */
         setFloatv(_id: string, _numbers: Float32Array)
         {
-            if (this.mapUniform[_id] != undefined)
-                this.mapUniform[_id].value = _numbers;
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Floatv)
+            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Floatv)
             {
-                this.mapUniformTemp[_id].value = _numbers;
-            }
-            else
+                this.statedMapUniforms[_id]=_numbers;
+            }else
             {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Floatv, _numbers);
+                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
             }
         }
         /**
@@ -405,46 +423,25 @@ namespace gd3d.framework
          */
         setVector4(_id: string, _vector4: math.vector4)
         {
-            if (this.mapUniform[_id] != undefined)
-                this.mapUniform[_id].value = _vector4;
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4)
+            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4)
             {
-                this.mapUniformTemp[_id].value = _vector4;
-            }
-            else
+                this.statedMapUniforms[_id]=_vector4;
+            }else
             {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
+                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
             }
         }
-        setColor(_id: string, _vector4: math.color)
-        {
-            if (this.mapUniform[_id] != undefined)
-                this.mapUniform[_id].value = _vector4;
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4)
-            {
-                this.mapUniformTemp[_id].value = _vector4;
-            }
-            else
-            {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4, _vector4);
-            }
-        }
-
-
         /**
          * @private
          */
         setVector4v(_id: string, _vector4v: Float32Array)
         {
-            if (this.mapUniform[_id] != undefined)
-                this.mapUniform[_id].value = _vector4v;
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4v)
+            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4v)
             {
-                this.mapUniformTemp[_id].value = _vector4v;
-            }
-            else
+                this.statedMapUniforms[_id]=_vector4v;
+            }else
             {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4v, _vector4v);
+                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
             }
         }
         /**
@@ -452,32 +449,25 @@ namespace gd3d.framework
          */
         setMatrix(_id: string, _matrix: math.matrix)
         {
-            if (this.mapUniform[_id] != undefined)
-                this.mapUniform[_id].value = _matrix;
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4x4)
+            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4x4)
             {
-                this.mapUniformTemp[_id].value = _matrix;
-            }
-            else
+                this.statedMapUniforms[_id]=_matrix;
+            }else
             {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4x4, _matrix);
+                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
             }
-
         }
         /**
          * @private
          */
         setMatrixv(_id: string, _matrixv: Float32Array)
         {
-            if (this.mapUniform[_id] != undefined)
-                this.mapUniform[_id].value = _matrixv;
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Float4x4v)
+            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Float4x4v)
             {
-                this.mapUniformTemp[_id].value = _matrixv;
-            }
-            else
+                this.statedMapUniforms[_id]=_matrixv;
+            }else
             {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Float4x4v, _matrixv);
+                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
             }
         }
         /**
@@ -485,94 +475,32 @@ namespace gd3d.framework
          */
         setTexture(_id: string, _texture: gd3d.framework.texture, resname: string = "")
         {
-            if (this.mapUniform[_id] != undefined)
+            if(this.defaultMapUniform[_id]!=null&&this.defaultMapUniform[_id].type==render.UniformTypeEnum.Texture)
             {
-                if (this.mapUniform[_id].value)
+                if(this.statedMapUniforms[_id]!=null&&(!this.statedMapUniforms[_id].defaultAsset))
                 {
-                    this.mapUniform[_id].value.unuse();
+                    this.statedMapUniforms[_id].unuse();
                 }
-                this.mapUniform[_id].value = _texture;
-                if (resname != "")
-                {
-                    this.mapUniform[_id].resname = resname;
-                }
+                this.statedMapUniforms[_id]=_texture;
                 if (_texture != null)
                 {
-                    _texture.use();
-
+                    if(!_texture.defaultAsset)
+                    {
+                        _texture.use();
+                    }
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (this.mapUniform[_texelsizeName] != undefined && _gltexture != undefined)
+                    if (this.statedMapUniforms[_texelsizeName] != null && _gltexture != null)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
-            }
-            else if (this.mapUniformTemp[_id] != undefined && this.mapUniformTemp[_id].type == render.UniformTypeEnum.Texture)
+            }else
             {
-                this.mapUniformTemp[_id].value = _texture;
+                console.log("Set wrong uniform value. Mat Name: "+this.getName()+" Unifom :"+_id);
             }
-            else
-            {
-                this.mapUniformTemp[_id] = new UniformData(render.UniformTypeEnum.Texture, _texture);
-            }
-        }
-        /**
-         * @private
-         */
-        uploadUniform(pass: render.glDrawPass)
-        {
-            this.uploadMapUniform(pass, this.mapUniform);
-            this.uploadMapUniform(pass, this.mapUniformTemp);
-            this.uploadMapUniform(pass, shader.getGlobalMapUniform());
-        }
 
-        private uploadMapUniform(pass: render.glDrawPass, mapUniform: { [id: string]: UniformData })
-        {
-            for (let id in mapUniform)
-            {
-                let type = mapUniform[id].type;
-                let value = mapUniform[id].value;
-                let defaultValue = mapUniform[id].defaultValue;
-                var target = pass.uniforms[id];
-                if (target == null) continue;
-                switch (type)
-                {
-                    case render.UniformTypeEnum.Float:
-                        pass.uniformFloat(id, value);
-                        break;
-                    case render.UniformTypeEnum.Floatv:
-                        pass.uniformFloatv(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4:
-                        pass.uniformVec4(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4v:
-                        pass.uniformVec4v(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4x4:
-                        pass.uniformMatrix(id, value);
-                        break;
-                    case render.UniformTypeEnum.Float4x4v:
-                        pass.uniformMatrixV(id, value);
-                        break;
-                    case render.UniformTypeEnum.Texture:
-                        if (value != null)
-                        {
-                            pass.uniformTexture(id, value.glTexture);
-                        }
-                        else if (defaultValue != null)
-                        {
-                            pass.uniformTexture(id, defaultValue.glTexture);
-                        }
-                        else
-                        {
-                            pass.uniformTexture(id, null);
-                        }
-                        break;
-                }
-            }
         }
 
         /**
@@ -597,84 +525,86 @@ namespace gd3d.framework
             {
                 var pass = drawPasses[i];
 
-                //auto uniforms
-                for (var key in pass.uniforms)
-                {
-                    switch (key)
-                    {
-                        case "glstate_matrix_model":
-                            this.setMatrix(key, context.matrixModel);
-                            break;
-                        case "glstate_matrix_world2object":
-                            this.setMatrix(key, context.matrixWorld2Object);
-                            break;
-                        case "glstate_matrix_view":
-                            this.setMatrix(key, context.matrixView);
-                            break;
-                        case "glstate_matrix_project":
-                            this.setMatrix(key, context.matrixProject);
-                            break;
-                        case "glstate_matrix_modelview":
-                            this.setMatrix(key, context.matrixModelView);
-                            break;
-                        case "glstate_matrix_viewproject":
-                            this.setMatrix(key, context.matrixViewProject);
-                            break;
-                        case "glstate_matrix_mvp":
-                            this.setMatrix(key, context.matrixModelViewProject);
-                            break;
-                        case "glstate_timer":
-                            this.setFloat(key, context.floatTimer);
-                            break;
-                        case "glstate_lightcount":
-                            this.setFloat(key, context.intLightCount);
-                            break;
-                        case "glstate_vec4_lightposs":
-                            if (context.vec4LightPos.length > 0)
-                            {
-                                this.setVector4v(key, context.vec4LightPos);
-                            }
-                            break;
-                        case "glstate_vec4_lightdirs":
-                            if (context.vec4LightDir.length > 0)
-                            {
-                                this.setVector4v(key, context.vec4LightDir);
-                            }
-                            break;
-                        case "glstate_float_spotangelcoss":
-                            if (context.floatLightSpotAngleCos.length > 0)
-                            {
-                                this.setFloatv(key, context.floatLightSpotAngleCos);
-                            }
-                            break;
-                        case "glstate_eyepos":
-                            this.setVector4(key, context.eyePos);
-                            break;
-                        case "_LightmapTex":
-                            if (useGLobalLightMap)
-                            {
-                                this.setTexture(key, context.lightmap);
-                            }
-                            break;
-                        case "glstate_lightmapOffset":
-                            this.setVector4(key, context.lightmapOffset);
-                            break;
-                        case "glstate_lightmapUV":
-                            this.setFloat(key, context.lightmapUV);
-                            break;
-                        case "glstate_fog_start":
-                            this.setFloat(key, context.fog._Start);
-                            break;
-                        case "glstate_fog_end":
-                            this.setFloat(key, context.fog._End);
-                            break;
-                        case "glstate_fog_color":
-                            this.setVector4(key, context.fog._Color);
-                            break;
-                    }
-                }
-                this.uploadUniform(pass);
+                // //auto uniforms
+                // for (var key in pass.uniforms)
+                // {
+                //     switch (key)
+                //     {
+                //         case "glstate_matrix_model":
+                //             this.setMatrix(key, context.matrixModel);
+                //             break;
+                //         case "glstate_matrix_world2object":
+                //             this.setMatrix(key, context.matrixWorld2Object);
+                //             break;
+                //         case "glstate_matrix_view":
+                //             this.setMatrix(key, context.matrixView);
+                //             break;
+                //         case "glstate_matrix_project":
+                //             this.setMatrix(key, context.matrixProject);
+                //             break;
+                //         case "glstate_matrix_modelview":
+                //             this.setMatrix(key, context.matrixModelView);
+                //             break;
+                //         case "glstate_matrix_viewproject":
+                //             this.setMatrix(key, context.matrixViewProject);
+                //             break;
+                //         case "glstate_matrix_mvp":
+                //             this.setMatrix(key, context.matrixModelViewProject);
+                //             break;
+                //         case "glstate_timer":
+                //             this.setFloat(key, context.floatTimer);
+                //             break;
+                //         case "glstate_lightcount":
+                //             this.setFloat(key, context.intLightCount);
+                //             break;
+                //         case "glstate_vec4_lightposs":
+                //             if (context.vec4LightPos.length > 0)
+                //             {
+                //                 this.setVector4v(key, context.vec4LightPos);
+                //             }
+                //             break;
+                //         case "glstate_vec4_lightdirs":
+                //             if (context.vec4LightDir.length > 0)
+                //             {
+                //                 this.setVector4v(key, context.vec4LightDir);
+                //             }
+                //             break;
+                //         case "glstate_float_spotangelcoss":
+                //             if (context.floatLightSpotAngleCos.length > 0)
+                //             {
+                //                 this.setFloatv(key, context.floatLightSpotAngleCos);
+                //             }
+                //             break;
+                //         case "glstate_eyepos":
+                //             this.setVector4(key, context.eyePos);
+                //             break;
+                //         case "_LightmapTex":
+                //             if (useGLobalLightMap)
+                //             {
+                //                 this.setTexture(key, context.lightmap);
+                //             }
+                //             break;
+                //         case "glstate_lightmapOffset":
+                //             this.setVector4(key, context.lightmapOffset);
+                //             break;
+                //         //-------shader 中直接舍弃
+                //         case "glstate_lightmapUV":
+                //             this.setFloat(key, context.lightmapUV);
+                //             break;
+                //         case "glstate_fog_start":
+                //             this.setFloat(key, context.fog._Start);
+                //             break;
+                //         case "glstate_fog_end":
+                //             this.setFloat(key, context.fog._End);
+                //             break;
+                //         case "glstate_fog_color":
+                //             this.setVector4(key, context.fog._Color);
+                //             break; 
+                //     }
+                // }
+                //this.uploadUniform(pass);
                 pass.use(context.webgl);
+                this.uploadUnifoms(pass,context);
 
                 mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
                 if (sm.useVertexIndex < 0)
@@ -715,16 +645,16 @@ namespace gd3d.framework
         Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
         {
             var shaderName = json["shader"];
-            var shader = assetmgr.getShader(shaderName) as gd3d.framework.shader;
-            if (shader == null)
+            var shader=assetmgr.getShader(shaderName) as gd3d.framework.shader;
+            if(shader==null)
             {
-                console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
+                console.error("shader 为空！shadername："+shaderName+" bundleName: "+bundleName);
             }
             this.setShader(shader);
-            var queue = json["queue"];
-            if (queue)
+            var queue=json["queue"];
+            if(queue)
             {
-                this.queue = queue;
+                this.queue=queue;
             }
 
             var mapUniform = json["mapUniform"];
@@ -732,24 +662,24 @@ namespace gd3d.framework
             {
                 var jsonChild = mapUniform[i];
                 var _uniformType: render.UniformTypeEnum = jsonChild["type"] as render.UniformTypeEnum;
+                if(_uniformType==null) continue;
                 switch (_uniformType)
                 {
-                    case render.UniformTypeEnum.Texture: {
-                        let _value: any = jsonChild["value"];
-                        if (_value instanceof Object && jsonChild["value"].name)
-                            _value = jsonChild["value"].name.name;
+                    case render.UniformTypeEnum.Texture:
+                        var _value: string = jsonChild["value"];
                         var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
-                        if (_texture == undefined)
+                        if (_texture == null)
                         {
-                            _texture = assetmgr.getDefaultTexture("grid");
+                            console.error("Material Mapuniform Texture 无效("+_value+")！shadername："+shaderName+" bundleName: "+bundleName);
+                            //_texture = assetmgr.getDefaultTexture("grid");
+                        }else
+                        {
+                            this.setTexture(i, _texture, _value);
                         }
-                        this.setTexture(i, _texture, _value);
-                    }
                         break;
-                    case render.UniformTypeEnum.Float: {
-                        let _value: string = jsonChild["value"];
+                    case render.UniformTypeEnum.Float:
+                        var _value: string = jsonChild["value"];
                         this.setFloat(i, parseFloat(_value));
-                    }
                         break;
                     case render.UniformTypeEnum.Float4:
                         var tempValue = jsonChild["value"];
@@ -765,10 +695,11 @@ namespace gd3d.framework
                         catch (e)
                         {
                             //数据不合法就不提交了
+                            console.error("Material Mapuniform float4 无效:value ("+tempValue+")！shadername："+shaderName+" bundleName: "+bundleName);
                         }
                         break;
                     default:
-                        //console.log("materialJson的mapuniform中的某type：" + jsonChild["type"] + "不符合范围（0-2）")
+                        console.error("Material Mapuniform 无效: 未识别类型("+jsonChild["type"]+")！shadername："+shaderName+" bundleName: "+bundleName);
                         break;
                 }
             }

@@ -9,13 +9,13 @@ namespace gd3d.render
      */
     export enum UniformTypeEnum
     {
-        Texture,
-        Float,
-        Floatv,
-        Float4,
-        Float4v,
-        Float4x4,
-        Float4x4v
+        Texture=0,
+        Float=1,
+        Floatv=2,
+        Float4=3,
+        Float4v=4,
+        Float4x4=5,
+        Float4x4v=6
     }
     /**
      * @private
@@ -45,78 +45,78 @@ namespace gd3d.render
             this.name = name;
             this.type = type;
             this.shader = shader;
-            this._scanUniform(code);
+            //this._scanUniform(code);
         }
         name: string;
         type: ShaderTypeEnum;
         shader: WebGLShader;
-        mapUniform: { [id: string]: { name: string, type: UniformTypeEnum } } = {};
+        //mapUniform: { [id: string]: { name: string, type: UniformTypeEnum } } = {};
 
-        private _scanUniform(txt: string)
-        {
-            var lines1 = txt.split(";");
-            for (var ii in lines1)
-            {
-                var lines = lines1[ii].split("\n");
+        // private _scanUniform(txt: string)
+        // {
+        //     var lines1 = txt.split(";");
+        //     for (var ii in lines1)
+        //     {
+        //         var lines = lines1[ii].split("\n");
 
-                for (var i in lines)
-                {
-                    var line = lines[i];
+        //         for (var i in lines)
+        //         {
+        //             var line = lines[i];
 
-                    var words = line.match(new RegExp("([_a-zA-Z0-9]+)|([/=;]+)", "g"));
-                    if (words != null && words.length >= 3 && words[0] == "uniform")
-                    {
-                        var t = words[1];
-                        var n = words[2];
+        //             var words = line.match(new RegExp("([_a-zA-Z0-9]+)|([/=;]+)", "g"));
+        //             if (words != null && words.length >= 3 && words[0] == "uniform")
+        //             {
+        //                 var t = words[1];
+        //                 var n = words[2];
 
-                        if (t == "highp" || t == "lowp" || t == "mediump")
-                        {
-                            t = words[2];
-                            n = words[3];
-                        }
-                        var info: { name: string, type: UniformTypeEnum } = { name: n, type: UniformTypeEnum.Float };
-                        this.mapUniform[n] = info;
-                        //info.name = n;
-                        if (t == "sampler2D")
-                        {
-                            info.type = UniformTypeEnum.Texture;
-                            //info.defvalue = null;
-                        }
-                        else if (t == "float" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
-                        {
-                            info.type = UniformTypeEnum.Floatv;
-                        }
-                        else if (t == "float")
-                        {
-                            info.type = UniformTypeEnum.Float;
-                            //info.defvalue = 0;
-                        }
-                        else if (t == "vec4" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
-                        {
-                            info.type = UniformTypeEnum.Float4v;
-                        }
-                        else if (t == "vec4")
-                        {
-                            info.type = UniformTypeEnum.Float4;
-                            //info.defvalue = new TSM.vec4(0, 0, 0, 0);
-                        }
-                        else if (t == "mat4" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
-                        {
-                            info.type = UniformTypeEnum.Float4x4v;
-                        }
-                        else if (t == "mat4")
-                        {
-                            info.type = UniformTypeEnum.Float4x4;
-                            //info.defvalue = TSM.mat4.identity;
-                        }
-                        else
-                        {
-                            throw new Error("uniform type:"+t+" not defined.");
-                        }
-                    }
-                }
-            }
-        }
+        //                 if (t == "highp" || t == "lowp" || t == "mediump")
+        //                 {
+        //                     t = words[2];
+        //                     n = words[3];
+        //                 }
+        //                 var info: { name: string, type: UniformTypeEnum } = { name: n, type: UniformTypeEnum.Float };
+        //                 this.mapUniform[n] = info;
+        //                 //info.name = n;
+        //                 if (t == "sampler2D")
+        //                 {
+        //                     info.type = UniformTypeEnum.Texture;
+        //                     //info.defvalue = null;
+        //                 }
+        //                 else if (t == "float" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
+        //                 {
+        //                     info.type = UniformTypeEnum.Floatv;
+        //                 }
+        //                 else if (t == "float")
+        //                 {
+        //                     info.type = UniformTypeEnum.Float;
+        //                     //info.defvalue = 0;
+        //                 }
+        //                 else if (t == "vec4" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
+        //                 {
+        //                     info.type = UniformTypeEnum.Float4v;
+        //                 }
+        //                 else if (t == "vec4")
+        //                 {
+        //                     info.type = UniformTypeEnum.Float4;
+        //                     //info.defvalue = new TSM.vec4(0, 0, 0, 0);
+        //                 }
+        //                 else if (t == "mat4" && line.indexOf("[") >= 0 && line.indexOf("]") >= 0)
+        //                 {
+        //                     info.type = UniformTypeEnum.Float4x4v;
+        //                 }
+        //                 else if (t == "mat4")
+        //                 {
+        //                     info.type = UniformTypeEnum.Float4x4;
+        //                     //info.defvalue = TSM.mat4.identity;
+        //                 }
+        //                 else
+        //                 {
+        //                     throw new Error("uniform type:"+t+" not defined.");
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
     }
     /**
@@ -142,7 +142,6 @@ namespace gd3d.render
             this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");//未测试
             this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");//未测试
             this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
-
         }
         vs: glShader;
         fs: glShader;
@@ -166,6 +165,57 @@ namespace gd3d.render
         use(webgl: WebGLRenderingContext)
         {
             webgl.useProgram(this.program);
+        }
+
+        initUniforms(webgl: WebGLRenderingContext)
+        {
+            var numUniforms = webgl.getProgramParameter(this.program, webgl.ACTIVE_UNIFORMS);
+            for (var i = 0; i < numUniforms; i++) 
+            {
+                var uniformInfo = webgl.getActiveUniform(this.program, i);
+                if (!uniformInfo) break;
+
+                var name = uniformInfo.name;
+                // remove the array suffix.
+                if (name.substr(-3) === "[0]") 
+                {
+                  name = name.substr(0, name.length - 3);
+                }
+
+                var location = webgl.getUniformLocation(this.program, uniformInfo.name);
+                var type = uniformInfo.type;
+                var isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === "[0]");
+
+                let _uniform=new uniform();
+                _uniform.name=name;
+                _uniform.location=location;
+                this.mapUniform[name]=_uniform;
+                
+                if (type === webgl.FLOAT && isArray) {
+                    _uniform.type=UniformTypeEnum.Floatv;
+                }
+                else if (type === webgl.FLOAT) {
+                    _uniform.type=UniformTypeEnum.Float;
+                }
+                else if (type === webgl.FLOAT_VEC4 && isArray) {
+                    _uniform.type=UniformTypeEnum.Float4v;
+                }
+                else if (type === webgl.FLOAT_VEC4) {
+                    _uniform.type=UniformTypeEnum.Float4;
+                }
+                else if (type === webgl.FLOAT_MAT4 && isArray) {
+                    _uniform.type=UniformTypeEnum.Float4x4v;
+                }
+                else if (type === webgl.FLOAT_MAT4) {
+                    _uniform.type=UniformTypeEnum.Float4x4;
+                }
+                else if (type === webgl.SAMPLER_2D) {
+                    _uniform.type=UniformTypeEnum.Texture;
+                }else
+                {
+                    console.log("Unifrom parse Erorr : not have this type!");
+                }
+            }
         }
     }
 
@@ -266,27 +316,69 @@ namespace gd3d.render
             }
             var name = nameVS + "_" + nameFS;
             var glp = new glProgram(this.mapVS[nameVS], this.mapFS[nameFS], program);
-            //合并uniform
-            for (var key in this.mapVS[nameVS].mapUniform)
-            {
-                var u = this.mapVS[nameVS].mapUniform[key];
-                glp.mapUniform[key] = { name: u.name, type: u.type, location: null };
-            }
-            for (var key in this.mapFS[nameFS].mapUniform)
-            {
-                var u = this.mapFS[nameFS].mapUniform[key];
-                glp.mapUniform[key] = { name: u.name, type: u.type, location: null };
-            }
+            // //合并uniform
+            // for (var key in this.mapVS[nameVS].mapUniform)
+            // {
+            //     var u = this.mapVS[nameVS].mapUniform[key];
+            //     glp.mapUniform[key] = { name: u.name, type: u.type, location: null };
+            // }
+            // for (var key in this.mapFS[nameFS].mapUniform)
+            // {
+            //     var u = this.mapFS[nameFS].mapUniform[key];
+            //     glp.mapUniform[key] = { name: u.name, type: u.type, location: null };
+            // }
 
-            for (var key in glp.mapUniform)
-            {
-                glp.mapUniform[key].location = webgl.getUniformLocation(program, key);
-            }
+            // for (var key in glp.mapUniform)
+            // {
+            //     glp.mapUniform[key].location = webgl.getUniformLocation(program, key);
+            // }
+            //----------
+            glp.initUniforms(webgl);
             glp.initAttribute(webgl);
             this.mapProgram[name] = glp;
             return glp;
 
         }
+        //--------------------------------------shader 版本2
+        mapVSString: { [id: string]: string } = {};
+        mapFSString: { [id: string]: string } = {};
+        
+        linkProgrambyPassType(webgl: WebGLRenderingContext, type:string,nameVS: string, nameFS: string):glProgram
+        {
+            let vsStr=this.mapVSString[nameVS];
+            let fsStr=this.mapFSString[nameFS];
+
+            if(type=="base")
+            {
+                
+            }else if(type=="base_fog"||type=="fog")
+            {
+                vsStr="#define FOG \n"+vsStr;
+                fsStr="#define FOG \n"+fsStr;
+            }else if(type=="skin")
+            {
+                vsStr="#define SKIN \n"+vsStr;
+                fsStr="#define SKIN \n"+fsStr;   
+            }else if(type=="skin_fog")
+            {
+                vsStr="#define SKIN \n"+"#define FOG \n"+vsStr;
+                fsStr="#define SKIN \n"+"#define FOG \n"+fsStr;  
+            }else if(type=="lightmap")
+            {
+                vsStr="#define LIGHTMAP \n"+vsStr;
+                fsStr="#define LIGHTMAP \n"+fsStr;     
+            }else if(type=="lightmap_fog")
+            {
+                vsStr="#define LIGHTMAP \n"+"#define FOG \n"+vsStr;
+                fsStr="#define LIGHTMAP \n"+"#define FOG \n"+fsStr;    
+            }
+            this.compileVS(webgl,nameVS+type,vsStr);
+            this.compileFS(webgl,nameFS+type,fsStr);
+            
+            let pro=this.linkProgram(webgl,nameVS+type,nameFS+type);
+            return pro;
+        }
+
     }
 
 }

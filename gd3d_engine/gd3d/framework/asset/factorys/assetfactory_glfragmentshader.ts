@@ -21,7 +21,8 @@ namespace gd3d.framework
                 state.resstate[filename].state = 1;//完成
 
                 state.logs.push("load a glshader:" + filename);
-                assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
+                assetMgr.shaderPool.mapFSString[name]=txt;
+                // assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
                 onstate(state);
             },
                 (loadedLength, totalLength) =>
@@ -41,7 +42,8 @@ namespace gd3d.framework
             state.resstate[filename].state = 1;//完成
 
             state.logs.push("load a glshader:" + filename);
-            assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
+            assetMgr.shaderPool.mapFSString[name]=txt;
+            //assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
             onstate(state);
         }
     }

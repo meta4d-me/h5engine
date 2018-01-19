@@ -82,20 +82,21 @@ namespace t
             }
             );
             c++;
-            this.app.getAssetMgr().load("res/prefabs/cube/resources/Cube.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, (s) =>
-            {
-                if (s.isfinish)
-                {
-                    c--;
-                    if (c == 0)
-                        state.finish = true;
-                }
-                else
-                {
-                    state.error = true;
-                }
-            }
-            );
+            state.finish = true;
+            // this.app.getAssetMgr().load("res/prefabs/cube/resources/Cube.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            // {
+            //     if (s.isfinish)
+            //     {
+            //         c--;
+            //         if (c == 0)
+            //             state.finish = true;
+            //     }
+            //     else
+            //     {
+            //         state.error = true;
+            //     }
+            // }
+            // );
 
         }
         private addcamandlight(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
@@ -237,7 +238,7 @@ namespace t
             this.taskmgr.addTaskCall(this.addcamandlight.bind(this));
 
             this.addinput("260px","0px","diffuse","string");      
-            var input=this.addinput("260px","100px","1");
+            var input=this.addinput("260px","100px","0");
             this.addinput("300px","0px","emitpower","string");
             var input1=this.addinput("300px","100px","1");
 
