@@ -40,16 +40,17 @@ namespace gd3d.io
                 SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
             if (asset instanceof gd3d.framework.material)
             {
-                let _mapUniform = (asset as gd3d.framework.material).defaultMapUniform;
-                if (!_mapUniform)
-                    return;
-                for (let newKey in _mapUniform)
+                // let _mapUniform = (asset as gd3d.framework.material).statedMapUniforms;
+                let ass = (asset as gd3d.framework.material);
+
+
+                for (let newKey in ass.statedMapUniforms)
                 {
-                    if (!_mapUniform[newKey])
+                    if (!ass.statedMapUniforms[newKey])
                         continue;
-                    if (_mapUniform[newKey].type != render.UniformTypeEnum.Texture)
+                    if (ass.defaultMapUniform[newKey].type != render.UniformTypeEnum.Texture)
                         continue;
-                    let _texture = _mapUniform[newKey].value;
+                    let _texture = ass.statedMapUniforms[newKey];
                     if (!_texture)
                         continue;
                     url = assetMgr.getAssetUrl(_texture);

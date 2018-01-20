@@ -1531,10 +1531,11 @@ namespace gd3d.framework {
 
             let info: SaveInfo = new SaveInfo();
             let _scene = {};
-            let _rootNode = io.serializeObj(this.app.getScene().getRoot(), null, this);
+            let scene = this.app.getScene();
+            let _rootNode = io.serializeObj(scene.getRoot(), null, this);
 
             let _lightmaps = [];
-            let lightmaps = this.app.getScene().lightmaps;
+            let lightmaps = scene.lightmaps;
             for (var str in lightmaps) {
                 let _lightmap = {};
                 _lightmap["name"] = lightmaps[str].getName();
@@ -1546,10 +1547,11 @@ namespace gd3d.framework {
 
             _scene["rootNode"] = _rootNode;
             _scene["lightmap"] = _lightmaps;
+            _scene["fog"] = scene.fog;
 
             let _sceneStr = JSON.stringify(_scene);
 
-            var _rawscene: rawscene = this.getAssetByName(this.app.getScene().name) as rawscene;
+            var _rawscene: rawscene = this.getAssetByName(scene.name) as rawscene;
             _rawscene.Parse(_sceneStr, this);
             let url = this.getAssetUrl(_rawscene);
 
