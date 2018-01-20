@@ -14,8 +14,28 @@ namespace gd3d.framework {
         private map: { [key: number]: number } = {};
 
         private isRunning: boolean = false;
-        public currGoal:gd3d.math.vector3;
+        private currGoal:gd3d.math.vector3;
         private lastGoal:gd3d.math.vector3;
+        private currMoveDir:gd3d.math.vector2 = new gd3d.math.vector2();
+
+        private _RoadPoints:gd3d.math.vector3[] = [];
+        public setRoadPoints(goalQueue:gd3d.math.vector3[]){
+            if(!goalQueue || goalQueue.length<1) return;
+            //clear history
+            this._RoadPoints.forEach(sub=>{
+                if(sub && sub != this.lastGoal) gd3d.math.pool.delete_vector3(sub);
+            });
+            this._RoadPoints.length = 0;
+
+            for(var i=0 ;i< goalQueue.length ;i++){
+                let v3 = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Clone(goalQueue[i],v3);
+                this._RoadPoints.push(v3);
+            }
+            this.currGoal = this._RoadPoints.pop();
+            this.goals[0][0] = this.currGoal.x;
+            this.goals[0][1] = this.currGoal.z;
+        }
 
         public addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRanges: number, speed: number) {
             let index = this.sim.agents.length;
@@ -54,7 +74,7 @@ namespace gd3d.framework {
             this.reBuildHashMap();
         }
 
-        public reBuildHashMap() {
+        private reBuildHashMap() {
             for(let i = 0; i < this.sim.agents.length; i++) {
                 this.map[this.sim.agents[i].id] = i;
             }
@@ -94,14 +114,14 @@ namespace gd3d.framework {
             }
         }
 
-        public update(goalQueue:gd3d.math.vector3[], currMoveDir:gd3d.math.vector2) {
+        public update() {
             if(this.isRunning && (this.transforms.length >= 1)) {
-                this.RVO_check(this.sim, this.goals, goalQueue, currMoveDir);
-                this.RVO_walking(this.sim, this.goals, currMoveDir);
+                this.RVO_check(this.sim, this.goals);
+                this.RVO_walking(this.sim, this.goals);
             }
         }
 
-        private RVO_walking(sim, goals, currMoveDir:gd3d.math.vector2) {
+        private RVO_walking(sim, goals) {
             // 据当前目标重新获取目标方向向量
             for (var i = 0, len = sim.agents.length; i < len; i ++) {
                 if(sim.agents[i] != null) {
@@ -121,7 +141,7 @@ namespace gd3d.framework {
                     let nowDir = gd3d.math.pool.new_vector2();
                     this.cal2dDir(this.lastGoal,pos,nowDir);
                     let nowLen = gd3d.math.vec2Length(nowDir);
-                    let tLen = gd3d.math.vec2Length(currMoveDir);
+                    let tLen = gd3d.math.vec2Length(this.currMoveDir);
                     let y = gd3d.math.numberLerp(this.lastGoal.y,this.currGoal.y,nowLen/tLen);
                     if(!isNaN(y)) {
                         pos.y = gd3d.math.numberLerp(this.lastGoal.y,this.currGoal.y,nowLen/tLen);
@@ -137,7 +157,7 @@ namespace gd3d.framework {
 
 
 
-        private RVO_check(sim, goals, goalQueue:gd3d.math.vector3[], currMoveDir:gd3d.math.vector2) {
+        private RVO_check(sim, goals) {
             // 玩家根据 NavMesh 切换目标
             if(this.currGoal){
                 let player = this.transforms[0];
@@ -155,17 +175,17 @@ namespace gd3d.framework {
                         goals[0] = sim.agents[0].position;
                         sim.agents[0].radius = this.radius[0];
                     }
-                    if(goalQueue && goalQueue.length >0) {
-                        this.currGoal = goalQueue.pop();
-                        this.cal2dDir(this.lastGoal, this.currGoal, currMoveDir);
+                    if(this._RoadPoints && this._RoadPoints.length >0) {
+                        this.currGoal = this._RoadPoints.pop();
+                        this.cal2dDir(this.lastGoal, this.currGoal, this.currMoveDir);
                         goals[0] = [this.currGoal.x, this.currGoal.z];
                         sim.agents[0].radius = 0.1;
                     }
                 }
 
-            }else if(goalQueue && goalQueue.length >0){
+            }else if(this._RoadPoints && this._RoadPoints.length >0){
                 //切换下一目标
-                this.currGoal = goalQueue.pop();
+                this.currGoal = this._RoadPoints.pop();
                 goals[0] = [this.currGoal.x, this.currGoal.z];
                 sim.agents[0].radius = 0.1;
 

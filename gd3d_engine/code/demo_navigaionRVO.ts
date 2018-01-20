@@ -159,7 +159,6 @@ class demo_navigaionRVO implements IState
 
     // private currGoal:gd3d.math.vector3;
     // private lastGoal:gd3d.math.vector3;
-    private currMoveDir:gd3d.math.vector2 = new gd3d.math.vector2();
     private Goals:gd3d.math.vector3[] = [];
 
 
@@ -249,9 +248,10 @@ class demo_navigaionRVO implements IState
                     if(g)gd3d.math.pool.delete_vector3(g);
                 });
             }
-            this.Goals.length = 0;
-            this.Goals = arr;
-            this.rvoMgr.currGoal = this.Goals.pop(); // 初始化玩家当前目标点
+            // this.Goals.length = 0;
+            // this.Goals = arr;
+            // this.rvoMgr.currGoal = this.Goals.pop(); // 初始化玩家当前目标点
+            this.rvoMgr.setRoadPoints(arr);
         }
     }
 
@@ -390,7 +390,7 @@ class demo_navigaionRVO implements IState
         this.timer += delta;
         CameraController.instance().update(delta);
 
-        this.rvoMgr.update(this.Goals, this.currMoveDir); // 更新 Transform
+        this.rvoMgr.update(); // 更新 Transform
     }
 
     private addbtn(topOffset:string,textContent:string,func:()=>void)
