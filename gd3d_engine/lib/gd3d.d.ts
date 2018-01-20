@@ -1243,8 +1243,7 @@ declare namespace gd3d.framework {
         dispose(): void;
         caclByteLength(): number;
         f14data: F14EffectData;
-        trans: transform;
-        f14Effect: f14EffectSystem;
+        delayTime: number;
         Parse(jsonStr: string, assetmgr: assetMgr): void;
         getCloneF14eff(): f14node;
     }
@@ -1352,27 +1351,24 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         uploadUnifoms(pass: render.glDrawPass, context: renderContext): void;
         setShader(shader: shader): void;
-        private _changeShaderMap;
-        changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         private queue;
         getQueue(): number;
         setQueue(queue: number): void;
         getShader(): shader;
         private shader;
-        mapUniform: {
-            [id: string]: UniformData;
-        };
         defaultMapUniform: {
             [key: string]: {
                 type: render.UniformTypeEnum;
                 value?: any;
+                becolor?: boolean;
+                min?: number;
+                max?: number;
             };
         };
         statedMapUniforms: {
             [id: string]: any;
         };
-        private mapUniformTemp;
         setFloat(_id: string, _number: number): void;
         setFloatv(_id: string, _numbers: Float32Array): void;
         setVector4(_id: string, _vector4: math.vector4): void;
@@ -1523,6 +1519,9 @@ declare namespace gd3d.framework {
             [key: string]: {
                 type: render.UniformTypeEnum;
                 value?: any;
+                becolor?: boolean;
+                min?: number;
+                max?: number;
             };
         };
         layer: RenderLayerEnum;
@@ -2314,6 +2313,10 @@ declare namespace gd3d.framework {
         layers: F14Layer[];
         VF: number;
         webgl: WebGLRenderingContext;
+        private _f14eff;
+        f14eff: f14eff;
+        private _delayTime;
+        delay: number;
         setData(data: F14EffectData): void;
         private elements;
         renderBatch: F14Basebatch[];
@@ -3318,20 +3321,23 @@ declare namespace gd3d.framework {
         speeds: number[];
         private map;
         private isRunning;
-        currGoal: gd3d.math.vector3;
+        private currGoal;
         private lastGoal;
+        private currMoveDir;
+        private _RoadPoints;
+        setRoadPoints(goalQueue: gd3d.math.vector3[]): void;
         addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRanges: number, speed: number): void;
         removeAgent(key: number): void;
-        reBuildHashMap(): void;
+        private reBuildHashMap();
         getTransformByKey(key: number): gd3d.framework.transform;
         setRadius(id: number, value: number): void;
         setSpeed(id: number, value: number): void;
         setAttackRange(id: number, value: number): void;
         disable(): void;
         enable(): void;
-        update(goalQueue: gd3d.math.vector3[], currMoveDir: gd3d.math.vector2): void;
-        private RVO_walking(sim, goals, currMoveDir);
-        private RVO_check(sim, goals, goalQueue, currMoveDir);
+        update(): void;
+        private RVO_walking(sim, goals);
+        private RVO_check(sim, goals);
         private cal2dDir(oPos, tPos, out);
     }
 }

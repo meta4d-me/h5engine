@@ -115,7 +115,7 @@ namespace gd3d.framework
                 {
                     let lightmapName = this.lightmapData[i].name;
                     let lightmap = assetmgr.getAssetByName(lightmapName) as texture;
-                    if(lightmap)
+                    if (lightmap)
                         lightmap.use();
                     this.lightmaps.push(lightmap);
                 }
@@ -152,7 +152,7 @@ namespace gd3d.framework
                 {
                     let lightmapName = this.lightmapData[i].name;
                     let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
-                    if(lightmap)
+                    if (lightmap)
                         lightmap.use();
                     this.lightmaps.push(lightmap);
                 }
@@ -164,13 +164,18 @@ namespace gd3d.framework
                 this.fog = new Fog();
                 this.fog._Start = <number>fogData["_Start"];
                 this.fog._End = <number>fogData["_End"];
+
                 let cor: string = fogData["_Color"];
-                let array: string[] = cor.split(",");
-                this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                if (typeof (cor) == "string")
+                {
+                    let array: string[] = cor.split(",");
+                    this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                } else
+                    this.fog._Color = cor;
                 this.fog._Density = <number>fogData["_Density"];
             }
         }
-        
+
         /**
          * @public
          * @language zh_CN

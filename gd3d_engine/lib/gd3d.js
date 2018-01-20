@@ -186,10 +186,10 @@ var gd3d;
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
                 this._canvasClientHeight = this.webgl.canvas.clientHeight;
                 gd3d.render.webglkit.initConst(this.webgl);
+                this.initRender();
                 this.initAssetMgr();
                 this.initInputMgr();
                 this.initScene();
-                this.initRender();
                 this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
                 this.loop();
                 gd3d.io.referenceInfo.regDefaultType();
@@ -1046,8 +1046,8 @@ var gd3d;
                     this.batcher.begin(this.webgl, pass);
                 }
                 else {
-                    var msta = mat.mapUniform["MaskState"];
-                    var mr = mat.mapUniform["_maskRect"];
+                    var msta = mat.statedMapUniforms["MaskState"];
+                    var mr = mat.statedMapUniforms["_maskRect"];
                     if (msta != null && msta.value != null && mr != null && mr.value != null) {
                         var rect = mr.value;
                         if (this.lastMaskV4 == null)
@@ -5689,9 +5689,10 @@ var gd3d;
                 gd3d.io.SerializeDependent.resourseDatas = [];
                 var info = new SaveInfo();
                 var _scene = {};
-                var _rootNode = gd3d.io.serializeObj(this.app.getScene().getRoot(), null, this);
+                var scene = this.app.getScene();
+                var _rootNode = gd3d.io.serializeObj(scene.getRoot(), null, this);
                 var _lightmaps = [];
-                var lightmaps = this.app.getScene().lightmaps;
+                var lightmaps = scene.lightmaps;
                 for (var str in lightmaps) {
                     var _lightmap = {};
                     _lightmap["name"] = lightmaps[str].getName();
@@ -5701,8 +5702,9 @@ var gd3d;
                 }
                 _scene["rootNode"] = _rootNode;
                 _scene["lightmap"] = _lightmaps;
+                _scene["fog"] = scene.fog;
                 var _sceneStr = JSON.stringify(_scene);
-                var _rawscene = this.getAssetByName(this.app.getScene().name);
+                var _rawscene = this.getAssetByName(scene.name);
                 _rawscene.Parse(_sceneStr, this);
                 var url = this.getAssetUrl(_rawscene);
                 info.files[url] = _sceneStr;
@@ -5726,25 +5728,6 @@ var gd3d;
                 var shaderPropertis = shader.defaultMapUniform;
                 data["shader"] = shader.getName();
                 data["mapUniform"] = mapUniform;
-                for (var key in shaderPropertis) {
-                    if (mat.mapUniform[key] != undefined) {
-                        var propertyDdata = {};
-                        var uniformData = mat.mapUniform[key];
-                        propertyDdata["type"] = uniformData.type;
-                        switch (uniformData.type) {
-                            case gd3d.render.UniformTypeEnum.Texture:
-                                propertyDdata["value"] = uniformData.value != null ? uniformData.value.name.name : "";
-                                break;
-                            case gd3d.render.UniformTypeEnum.Float4:
-                                propertyDdata["value"] = uniformData.value;
-                                break;
-                            case gd3d.render.UniformTypeEnum.Float:
-                                propertyDdata["value"] = uniformData.value;
-                                break;
-                        }
-                        mapUniform[key] = propertyDdata;
-                    }
-                }
                 var url = this.getAssetUrl(mat);
                 info.files[url] = JSON.stringify(data);
                 fun(info);
@@ -7933,9 +7916,6 @@ var gd3d;
                 var json = JSON.parse(jsonStr);
                 this.f14data = new framework.F14EffectData();
                 this.f14data.parsejson(json, assetmgr, this.assetbundle);
-                this.trans = new gd3d.framework.transform();
-                this.f14Effect = this.trans.gameObject.addComponent("f14EffectSystem");
-                this.f14Effect.setData(this.f14data);
             };
             f14eff.prototype.getCloneF14eff = function () {
                 var f14node = new gd3d.framework.f14node();
@@ -8266,11 +8246,8 @@ var gd3d;
                 this.name = null;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
-                this._changeShaderMap = {};
                 this.queue = 0;
-                this.mapUniform = {};
                 this.statedMapUniforms = {};
-                this.mapUniformTemp = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
                 }
@@ -8288,16 +8265,15 @@ var gd3d;
                 return this.id.getID();
             };
             material.prototype.dispose = function () {
-                for (var id in this.mapUniform) {
-                    switch (this.mapUniform[id].type) {
+                for (var id in this.statedMapUniforms) {
+                    switch (this.defaultMapUniform[id].type) {
                         case gd3d.render.UniformTypeEnum.Texture:
-                            if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
-                                this.mapUniform[id].value.unuse(true);
+                            if (this.statedMapUniforms[id] != null)
+                                this.statedMapUniforms[id].unuse(true);
                             break;
                     }
                 }
-                delete this.mapUniform;
-                delete this.mapUniformTemp;
+                delete this.statedMapUniforms;
             };
             material.prototype.use = function () {
                 framework.sceneMgr.app.getAssetMgr().use(this);
@@ -8311,43 +8287,10 @@ var gd3d;
                 if (this.shader) {
                     total += this.shader.caclByteLength();
                 }
-                for (var k in this.mapUniform) {
-                    var type = this.mapUniform[k].type;
-                    var value = this.mapUniform[k].value;
-                    var defaultValue = this.mapUniform[k].defaultValue;
-                    switch (type) {
-                        case gd3d.render.UniformTypeEnum.Float:
-                            total += 4;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Floatv:
-                            total += value.byteLength;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4:
-                            total += 16;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4v:
-                            total += value.byteLength;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4x4:
-                            total += 64;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4x4v:
-                            total += value.byteLength;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Texture:
-                            if (value != null) {
-                                total += value.caclByteLength();
-                            }
-                            else if (defaultValue != null) {
-                                total += defaultValue.caclByteLength();
-                            }
-                            break;
-                    }
-                }
-                for (var k in this.mapUniformTemp) {
-                    var type = this.mapUniformTemp[k].type;
-                    var value = this.mapUniformTemp[k].value;
-                    var defaultValue = this.mapUniformTemp[k].defaultValue;
+                for (var k in this.statedMapUniforms) {
+                    var type = this.defaultMapUniform[k].type;
+                    var value = this.statedMapUniforms[k].value;
+                    var defaultValue = this.defaultMapUniform[k].value;
                     switch (type) {
                         case gd3d.render.UniformTypeEnum.Float:
                             total += 4;
@@ -8406,23 +8349,6 @@ var gd3d;
             material.prototype.setShader = function (shader) {
                 this.shader = shader;
                 this.defaultMapUniform = shader.defaultMapUniform;
-            };
-            material.prototype.changeShader = function (shader) {
-                var map;
-                if (this._changeShaderMap[shader.getName()] != undefined) {
-                    map = this._changeShaderMap[shader.getName()].mapUniform;
-                }
-                else {
-                    var mat = this.clone();
-                    map = mat.mapUniform;
-                    this._changeShaderMap[shader.getName()] = mat;
-                }
-                this.setShader(shader);
-                for (var key in map) {
-                    if (this.mapUniform[key] != undefined) {
-                        this.mapUniform[key] = map[key];
-                    }
-                }
             };
             material.prototype.getLayer = function () {
                 return this.shader.layer;
@@ -8592,18 +8518,18 @@ var gd3d;
             material.prototype.clone = function () {
                 var mat = new material_1(this.getName());
                 mat.setShader(this.shader);
-                for (var i in this.mapUniform) {
-                    var data = this.mapUniform[i];
-                    var _uniformType = data.type;
+                for (var i in this.statedMapUniforms) {
+                    var _uniformType = this.statedMapUniforms[i].type;
+                    var value = this.statedMapUniforms[i];
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
-                            mat.setTexture(i, data.value);
+                            mat.setTexture(i, value);
                             break;
                         case gd3d.render.UniformTypeEnum.Float:
-                            mat.setFloat(i, data.value);
+                            mat.setFloat(i, value);
                             break;
                         case gd3d.render.UniformTypeEnum.Float4:
-                            mat.setVector4(i, data.value);
+                            mat.setVector4(i, value);
                             break;
                         default:
                             break;
@@ -8616,19 +8542,25 @@ var gd3d;
                 obj["shader"] = this.shader.getName();
                 obj["srcshader"] = "";
                 obj["mapUniform"] = {};
-                for (var key in this.mapUniform) {
-                    var data = {};
-                    data["type"] = this.mapUniform[key].type;
-                    data["value"] = this.mapUniform[key].value;
-                    obj["mapUniform"][key] = data;
-                }
-                if (this.mapUniformTemp != undefined) {
-                    for (var key in this.mapUniformTemp) {
-                        var data = {};
-                        data["type"] = this.mapUniformTemp[key].type;
-                        data["value"] = this.mapUniformTemp[key].value;
-                        obj["mapUniform"][key] = data;
+                for (var item in this.statedMapUniforms) {
+                    var __type = this.defaultMapUniform[item].type;
+                    var val = this.statedMapUniforms;
+                    var jsonValue = void 0;
+                    switch (__type) {
+                        case gd3d.render.UniformTypeEnum.Texture:
+                            jsonValue = "" + val.name.name;
+                            break;
+                        case gd3d.render.UniformTypeEnum.Float4:
+                            jsonValue = "(" + val.x + "," + val.y + "," + val.z + "," + val.w + ")";
+                            break;
+                        case gd3d.render.UniformTypeEnum.Float:
+                            jsonValue = val;
+                            break;
+                        default:
+                            console.warn("\u65E0\u6CD5\u5B58\u50A8\u672A\u89E3\u6790\u7C7B\u578B:" + __type + "," + item);
+                            continue;
                     }
+                    obj["mapUniform"][item] = jsonValue;
                 }
                 return JSON.stringify(obj);
             };
@@ -8640,10 +8572,6 @@ var gd3d;
                 gd3d.reflect.Field("shader"),
                 __metadata("design:type", framework.shader)
             ], material.prototype, "shader", void 0);
-            __decorate([
-                gd3d.reflect.Field("UniformDataDic"),
-                __metadata("design:type", Object)
-            ], material.prototype, "mapUniform", void 0);
             material = material_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -9401,8 +9329,12 @@ var gd3d;
                     this.fog._Start = fogData["_Start"];
                     this.fog._End = fogData["_End"];
                     var cor = fogData["_Color"];
-                    var array = cor.split(",");
-                    this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                    if (typeof (cor) == "string") {
+                        var array = cor.split(",");
+                        this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                    }
+                    else
+                        this.fog._Color = cor;
                     this.fog._Density = fogData["_Density"];
                 }
             };
@@ -9535,12 +9467,15 @@ var gd3d;
                                 this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float, value: parseFloat(words[4]) };
                                 break;
                             case "range":
-                                this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float, value: parseFloat(words[6]) };
+                                this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float, value: parseFloat(words[6]), min: parseFloat(words[4]), max: parseFloat(words[5]) };
                                 break;
                             case "vector":
-                            case "color":
                                 var _vector = new gd3d.math.vector4(parseFloat(words[4]), parseFloat(words[5]), parseFloat(words[6]), parseFloat(words[7]));
                                 this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float4, value: _vector };
+                                break;
+                            case "color":
+                                var _color = new gd3d.math.vector4(parseFloat(words[4]), parseFloat(words[5]), parseFloat(words[6]), parseFloat(words[7]));
+                                this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float4, value: _color, becolor: true };
                                 break;
                             case "texture":
                                 this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Texture, value: assetmgr.getDefaultTexture(words[4]) };
@@ -13914,6 +13849,7 @@ var gd3d;
                 this.fps = 60;
                 this.layers = [];
                 this.VF = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                this._delayTime = -1;
                 this.elements = [];
                 this.renderBatch = [];
                 this.loopCount = 0;
@@ -13923,6 +13859,38 @@ var gd3d;
             }
             f14EffectSystem.prototype.start = function () { };
             f14EffectSystem.prototype.remove = function () { };
+            Object.defineProperty(f14EffectSystem.prototype, "f14eff", {
+                get: function () {
+                    return this._f14eff;
+                },
+                set: function (data) {
+                    if (this._f14eff != null) {
+                        this._f14eff.unuse();
+                    }
+                    this._f14eff = data;
+                    if (this._f14eff != null) {
+                        this._f14eff.use();
+                        this.setData(this._f14eff.f14data);
+                        this._f14eff.delayTime = this._delayTime;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(f14EffectSystem.prototype, "delay", {
+                get: function () {
+                    if (this._f14eff && this._f14eff.delayTime != null)
+                        this._delayTime = this._f14eff.delayTime;
+                    return this._delayTime;
+                },
+                set: function (deley) {
+                    this._delayTime = deley;
+                    if (this._f14eff)
+                        this._f14eff.delayTime = deley;
+                },
+                enumerable: true,
+                configurable: true
+            });
             f14EffectSystem.prototype.setData = function (data) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.data = data;
@@ -14064,6 +14032,17 @@ var gd3d;
             };
             f14EffectSystem.prototype.clone = function () {
             };
+            __decorate([
+                gd3d.reflect.Field("f14eff"),
+                gd3d.reflect.UIStyle("WidgetDragSelect"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.f14eff])
+            ], f14EffectSystem.prototype, "f14eff", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], f14EffectSystem.prototype, "delay", null);
             f14EffectSystem = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
@@ -15040,7 +15019,12 @@ var gd3d;
                         batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 0] = this.tempos.x;
                         batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 1] = this.tempos.y;
                         batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 2] = this.tempos.z;
-                        gd3d.math.colorMultiply(this.element.colorArr[i], this.Color, this.temcolor);
+                        if (this.element.colorArr) {
+                            gd3d.math.colorMultiply(this.element.colorArr[i], this.Color, this.temcolor);
+                        }
+                        else {
+                            gd3d.math.colorClone(this.Color, this.temcolor);
+                        }
                         batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 3] = this.temcolor.r;
                         batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 4] = this.temcolor.g;
                         batch.dataForVbo[i * batch.vertexLength + batch.curRealVboCount + 5] = this.temcolor.b;
@@ -16762,22 +16746,24 @@ var gd3d;
                 else
                     SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
                 if (asset instanceof gd3d.framework.material) {
-                    var _mapUniform = asset.mapUniform;
-                    if (!_mapUniform)
-                        return;
-                    for (var newKey in _mapUniform) {
-                        if (!_mapUniform[newKey])
+                    var ass = asset;
+                    for (var newKey in ass.statedMapUniforms) {
+                        if (!ass.statedMapUniforms[newKey])
                             continue;
-                        if (_mapUniform[newKey].type != gd3d.render.UniformTypeEnum.Texture)
+                        if (ass.defaultMapUniform[newKey].type != gd3d.render.UniformTypeEnum.Texture)
                             continue;
-                        var _texture = _mapUniform[newKey].value;
+                        var _texture = ass.statedMapUniforms[newKey];
                         if (!_texture)
                             continue;
                         url = assetMgr.getAssetUrl(_texture);
                         if (url)
                             SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                         else {
-                            SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(_texture));
+                            if (_texture.defaultAsset == true)
+                                continue;
+                            var content = SerializeDependent.GetAssetContent(_texture);
+                            if (content)
+                                SerializeDependent.resourseDatas.push(content);
                             continue;
                         }
                         if (url.indexOf(".imgdesc.json") < 0)
@@ -17547,7 +17533,7 @@ var gd3d;
         function isAsset(type) {
             if (type == "mesh" || type == "texture" || type == "shader" ||
                 type == "material" || type == "animationClip" || type == "atlas" ||
-                type == "font" || type == "prefab" || type == "sprite" || type == "textasset")
+                type == "font" || type == "prefab" || type == "sprite" || type == "textasset" || type == "f14eff")
                 return true;
             return false;
         }
@@ -17606,6 +17592,7 @@ var gd3d;
                 referenceInfo.regType("animationclip");
                 referenceInfo.regType("constText");
                 referenceInfo.regType("UniformData");
+                referenceInfo.regType("f14eff");
             };
             referenceInfo.regType = function (type) {
                 referenceInfo.regtypelist.push(type);
@@ -20474,7 +20461,27 @@ var gd3d;
                 this.speeds = [];
                 this.map = {};
                 this.isRunning = false;
+                this.currMoveDir = new gd3d.math.vector2();
+                this._RoadPoints = [];
             }
+            RVOManager.prototype.setRoadPoints = function (goalQueue) {
+                var _this = this;
+                if (!goalQueue || goalQueue.length < 1)
+                    return;
+                this._RoadPoints.forEach(function (sub) {
+                    if (sub && sub != _this.lastGoal)
+                        gd3d.math.pool.delete_vector3(sub);
+                });
+                this._RoadPoints.length = 0;
+                for (var i = 0; i < goalQueue.length; i++) {
+                    var v3 = gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Clone(goalQueue[i], v3);
+                    this._RoadPoints.push(v3);
+                }
+                this.currGoal = this._RoadPoints.pop();
+                this.goals[0][0] = this.currGoal.x;
+                this.goals[0][1] = this.currGoal.z;
+            };
             RVOManager.prototype.addAgent = function (key, transform, radius, attackRanges, speed) {
                 var index = this.sim.agents.length;
                 var current_position = [transform.localTranslate.x, transform.localTranslate.z];
@@ -20536,13 +20543,13 @@ var gd3d;
                     this.sim.agents[i].position = [this.transforms[i].localTranslate.x, this.transforms[i].localTranslate.z];
                 }
             };
-            RVOManager.prototype.update = function (goalQueue, currMoveDir) {
+            RVOManager.prototype.update = function () {
                 if (this.isRunning && (this.transforms.length >= 1)) {
-                    this.RVO_check(this.sim, this.goals, goalQueue, currMoveDir);
-                    this.RVO_walking(this.sim, this.goals, currMoveDir);
+                    this.RVO_check(this.sim, this.goals);
+                    this.RVO_walking(this.sim, this.goals);
                 }
             };
-            RVOManager.prototype.RVO_walking = function (sim, goals, currMoveDir) {
+            RVOManager.prototype.RVO_walking = function (sim, goals) {
                 for (var i = 0, len = sim.agents.length; i < len; i++) {
                     if (sim.agents[i] != null) {
                         var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
@@ -20561,7 +20568,7 @@ var gd3d;
                         var nowDir = gd3d.math.pool.new_vector2();
                         this.cal2dDir(this.lastGoal, pos, nowDir);
                         var nowLen = gd3d.math.vec2Length(nowDir);
-                        var tLen = gd3d.math.vec2Length(currMoveDir);
+                        var tLen = gd3d.math.vec2Length(this.currMoveDir);
                         var y = gd3d.math.numberLerp(this.lastGoal.y, this.currGoal.y, nowLen / tLen);
                         if (!isNaN(y)) {
                             pos.y = gd3d.math.numberLerp(this.lastGoal.y, this.currGoal.y, nowLen / tLen);
@@ -20571,7 +20578,7 @@ var gd3d;
                     this.transforms[i_7].markDirty();
                 }
             };
-            RVOManager.prototype.RVO_check = function (sim, goals, goalQueue, currMoveDir) {
+            RVOManager.prototype.RVO_check = function (sim, goals) {
                 if (this.currGoal) {
                     var player = this.transforms[0];
                     var v2_0 = gd3d.math.pool.new_vector2();
@@ -20590,16 +20597,16 @@ var gd3d;
                             goals[0] = sim.agents[0].position;
                             sim.agents[0].radius = this.radius[0];
                         }
-                        if (goalQueue && goalQueue.length > 0) {
-                            this.currGoal = goalQueue.pop();
-                            this.cal2dDir(this.lastGoal, this.currGoal, currMoveDir);
+                        if (this._RoadPoints && this._RoadPoints.length > 0) {
+                            this.currGoal = this._RoadPoints.pop();
+                            this.cal2dDir(this.lastGoal, this.currGoal, this.currMoveDir);
                             goals[0] = [this.currGoal.x, this.currGoal.z];
                             sim.agents[0].radius = 0.1;
                         }
                     }
                 }
-                else if (goalQueue && goalQueue.length > 0) {
-                    this.currGoal = goalQueue.pop();
+                else if (this._RoadPoints && this._RoadPoints.length > 0) {
+                    this.currGoal = this._RoadPoints.pop();
                     goals[0] = [this.currGoal.x, this.currGoal.z];
                     sim.agents[0].radius = 0.1;
                 }

@@ -19,6 +19,50 @@ namespace gd3d.framework
         public VF:number=gd3d.render.VertexFormatMask.Position | render.VertexFormatMask.Color | render.VertexFormatMask.UV0;
         public webgl:WebGLRenderingContext;
 
+        private _f14eff: f14eff;
+        
+        /**
+         * f14eff 资源
+         * @private
+         */
+        @gd3d.reflect.Field("f14eff")
+        @gd3d.reflect.UIStyle("WidgetDragSelect")
+        get f14eff()
+        {
+            return this._f14eff;
+        }
+        set f14eff(data: f14eff)
+        {
+            if (this._f14eff != null)
+            {
+                this._f14eff.unuse();
+            }
+            this._f14eff = data;
+            if (this._f14eff != null)
+            {
+                this._f14eff.use();
+                this.setData(this._f14eff.f14data);
+                this._f14eff.delayTime = this._delayTime;
+            }
+        }
+
+        private _delayTime:number=-1;
+        /**
+         * delaytime
+         * @private
+         */
+        @gd3d.reflect.Field("number")
+        get delay(){
+            if(this._f14eff && this._f14eff.delayTime!= null) 
+                this._delayTime = this._f14eff.delayTime;
+            return this._delayTime;
+        }
+        set delay(deley:number){
+            this._delayTime = deley;
+            if(this._f14eff)
+                this._f14eff.delayTime = deley;
+        }
+
         public setData(data:F14EffectData)
         {
             //-------------------准备各种需要访问

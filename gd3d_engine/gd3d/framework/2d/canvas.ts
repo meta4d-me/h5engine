@@ -307,8 +307,8 @@ namespace gd3d.framework
                 // this.batcher.end(context.webgl);
                 this.batcher.begin(this.webgl, pass);
             }else{
-                let msta = mat.mapUniform["MaskState"]; 
-                let mr = mat.mapUniform["_maskRect"];
+                let msta = mat.statedMapUniforms["MaskState"]; 
+                let mr = mat.statedMapUniforms["_maskRect"];
                 if(msta != null && msta.value != null && mr != null && mr.value != null){
                     let rect = mr.value as math.vector4;
                     if(this.lastMaskV4 == null) this.lastMaskV4 = new math.vector4();
