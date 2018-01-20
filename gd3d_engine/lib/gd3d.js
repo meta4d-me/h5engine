@@ -186,10 +186,10 @@ var gd3d;
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
                 this._canvasClientHeight = this.webgl.canvas.clientHeight;
                 gd3d.render.webglkit.initConst(this.webgl);
+                this.initRender();
                 this.initAssetMgr();
                 this.initInputMgr();
                 this.initScene();
-                this.initRender();
                 this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
                 this.loop();
                 gd3d.io.referenceInfo.regDefaultType();
@@ -5726,25 +5726,6 @@ var gd3d;
                 var shaderPropertis = shader.defaultMapUniform;
                 data["shader"] = shader.getName();
                 data["mapUniform"] = mapUniform;
-                for (var key in shaderPropertis) {
-                    if (mat.mapUniform[key] != undefined) {
-                        var propertyDdata = {};
-                        var uniformData = mat.mapUniform[key];
-                        propertyDdata["type"] = uniformData.type;
-                        switch (uniformData.type) {
-                            case gd3d.render.UniformTypeEnum.Texture:
-                                propertyDdata["value"] = uniformData.value != null ? uniformData.value.name.name : "";
-                                break;
-                            case gd3d.render.UniformTypeEnum.Float4:
-                                propertyDdata["value"] = uniformData.value;
-                                break;
-                            case gd3d.render.UniformTypeEnum.Float:
-                                propertyDdata["value"] = uniformData.value;
-                                break;
-                        }
-                        mapUniform[key] = propertyDdata;
-                    }
-                }
                 var url = this.getAssetUrl(mat);
                 info.files[url] = JSON.stringify(data);
                 fun(info);
@@ -8266,11 +8247,8 @@ var gd3d;
                 this.name = null;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
-                this._changeShaderMap = {};
                 this.queue = 0;
-                this.mapUniform = {};
                 this.statedMapUniforms = {};
-                this.mapUniformTemp = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
                 }
@@ -8288,16 +8266,15 @@ var gd3d;
                 return this.id.getID();
             };
             material.prototype.dispose = function () {
-                for (var id in this.mapUniform) {
-                    switch (this.mapUniform[id].type) {
+                for (var id in this.statedMapUniforms) {
+                    switch (this.defaultMapUniform[id].type) {
                         case gd3d.render.UniformTypeEnum.Texture:
-                            if (this.mapUniform[id] != null && this.mapUniform[id].value != null)
-                                this.mapUniform[id].value.unuse(true);
+                            if (this.statedMapUniforms[id] != null)
+                                this.statedMapUniforms[id].unuse(true);
                             break;
                     }
                 }
-                delete this.mapUniform;
-                delete this.mapUniformTemp;
+                delete this.statedMapUniforms;
             };
             material.prototype.use = function () {
                 framework.sceneMgr.app.getAssetMgr().use(this);
@@ -8311,43 +8288,10 @@ var gd3d;
                 if (this.shader) {
                     total += this.shader.caclByteLength();
                 }
-                for (var k in this.mapUniform) {
-                    var type = this.mapUniform[k].type;
-                    var value = this.mapUniform[k].value;
-                    var defaultValue = this.mapUniform[k].defaultValue;
-                    switch (type) {
-                        case gd3d.render.UniformTypeEnum.Float:
-                            total += 4;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Floatv:
-                            total += value.byteLength;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4:
-                            total += 16;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4v:
-                            total += value.byteLength;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4x4:
-                            total += 64;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4x4v:
-                            total += value.byteLength;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Texture:
-                            if (value != null) {
-                                total += value.caclByteLength();
-                            }
-                            else if (defaultValue != null) {
-                                total += defaultValue.caclByteLength();
-                            }
-                            break;
-                    }
-                }
-                for (var k in this.mapUniformTemp) {
-                    var type = this.mapUniformTemp[k].type;
-                    var value = this.mapUniformTemp[k].value;
-                    var defaultValue = this.mapUniformTemp[k].defaultValue;
+                for (var k in this.statedMapUniforms) {
+                    var type = this.defaultMapUniform[k].type;
+                    var value = this.statedMapUniforms[k].value;
+                    var defaultValue = this.defaultMapUniform[k].value;
                     switch (type) {
                         case gd3d.render.UniformTypeEnum.Float:
                             total += 4;
@@ -8406,23 +8350,6 @@ var gd3d;
             material.prototype.setShader = function (shader) {
                 this.shader = shader;
                 this.defaultMapUniform = shader.defaultMapUniform;
-            };
-            material.prototype.changeShader = function (shader) {
-                var map;
-                if (this._changeShaderMap[shader.getName()] != undefined) {
-                    map = this._changeShaderMap[shader.getName()].mapUniform;
-                }
-                else {
-                    var mat = this.clone();
-                    map = mat.mapUniform;
-                    this._changeShaderMap[shader.getName()] = mat;
-                }
-                this.setShader(shader);
-                for (var key in map) {
-                    if (this.mapUniform[key] != undefined) {
-                        this.mapUniform[key] = map[key];
-                    }
-                }
             };
             material.prototype.getLayer = function () {
                 return this.shader.layer;
@@ -8592,18 +8519,18 @@ var gd3d;
             material.prototype.clone = function () {
                 var mat = new material_1(this.getName());
                 mat.setShader(this.shader);
-                for (var i in this.mapUniform) {
-                    var data = this.mapUniform[i];
-                    var _uniformType = data.type;
+                for (var i in this.statedMapUniforms) {
+                    var _uniformType = this.statedMapUniforms[i].type;
+                    var value = this.statedMapUniforms[i];
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
-                            mat.setTexture(i, data.value);
+                            mat.setTexture(i, value);
                             break;
                         case gd3d.render.UniformTypeEnum.Float:
-                            mat.setFloat(i, data.value);
+                            mat.setFloat(i, value);
                             break;
                         case gd3d.render.UniformTypeEnum.Float4:
-                            mat.setVector4(i, data.value);
+                            mat.setVector4(i, value);
                             break;
                         default:
                             break;
@@ -8616,19 +8543,25 @@ var gd3d;
                 obj["shader"] = this.shader.getName();
                 obj["srcshader"] = "";
                 obj["mapUniform"] = {};
-                for (var key in this.mapUniform) {
-                    var data = {};
-                    data["type"] = this.mapUniform[key].type;
-                    data["value"] = this.mapUniform[key].value;
-                    obj["mapUniform"][key] = data;
-                }
-                if (this.mapUniformTemp != undefined) {
-                    for (var key in this.mapUniformTemp) {
-                        var data = {};
-                        data["type"] = this.mapUniformTemp[key].type;
-                        data["value"] = this.mapUniformTemp[key].value;
-                        obj["mapUniform"][key] = data;
+                for (var item in this.statedMapUniforms) {
+                    var __type = this.defaultMapUniform[item].type;
+                    var val = this.statedMapUniforms;
+                    var jsonValue = void 0;
+                    switch (__type) {
+                        case gd3d.render.UniformTypeEnum.Texture:
+                            jsonValue = "" + val.name.name;
+                            break;
+                        case gd3d.render.UniformTypeEnum.Float4:
+                            jsonValue = "(" + val.x + "," + val.y + "," + val.z + "," + val.w + ")";
+                            break;
+                        case gd3d.render.UniformTypeEnum.Float:
+                            jsonValue = val;
+                            break;
+                        default:
+                            console.warn("\u65E0\u6CD5\u5B58\u50A8\u672A\u89E3\u6790\u7C7B\u578B:" + __type + "," + item);
+                            continue;
                     }
+                    obj["mapUniform"][item] = jsonValue;
                 }
                 return JSON.stringify(obj);
             };
@@ -8640,10 +8573,6 @@ var gd3d;
                 gd3d.reflect.Field("shader"),
                 __metadata("design:type", framework.shader)
             ], material.prototype, "shader", void 0);
-            __decorate([
-                gd3d.reflect.Field("UniformDataDic"),
-                __metadata("design:type", Object)
-            ], material.prototype, "mapUniform", void 0);
             material = material_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -8653,6 +8582,851 @@ var gd3d;
         }());
         framework.material = material;
     })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var render;
+    (function (render) {
+        var TextureFormatEnum;
+        (function (TextureFormatEnum) {
+            TextureFormatEnum[TextureFormatEnum["RGBA"] = 1] = "RGBA";
+            TextureFormatEnum[TextureFormatEnum["RGB"] = 2] = "RGB";
+            TextureFormatEnum[TextureFormatEnum["Gray"] = 3] = "Gray";
+            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGB"] = 4] = "PVRTC4_RGB";
+            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGBA"] = 4] = "PVRTC4_RGBA";
+            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGB"] = 4] = "PVRTC2_RGB";
+            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGBA"] = 4] = "PVRTC2_RGBA";
+        })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
+        var textureReader = (function () {
+            function textureReader(webgl, texRGBA, width, height, gray) {
+                if (gray === void 0) { gray = true; }
+                this.gray = gray;
+                this.width = width;
+                this.height = height;
+                var fbo = webgl.createFramebuffer();
+                var fbold = webgl.getParameter(webgl.FRAMEBUFFER_BINDING);
+                webgl.bindFramebuffer(webgl.FRAMEBUFFER, fbo);
+                webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, texRGBA, 0);
+                var readData = new Uint8Array(this.width * this.height * 4);
+                readData[0] = 2;
+                webgl.readPixels(0, 0, this.width, this.height, webgl.RGBA, webgl.UNSIGNED_BYTE, readData);
+                webgl.deleteFramebuffer(fbo);
+                webgl.bindFramebuffer(webgl.FRAMEBUFFER, fbold);
+                if (gray) {
+                    this.data = new Uint8Array(this.width * this.height);
+                    for (var i = 0; i < width * height; i++) {
+                        this.data[i] = readData[i * 4];
+                    }
+                }
+                else {
+                    this.data = readData;
+                }
+            }
+            textureReader.prototype.getPixel = function (u, v) {
+                var x = (u * this.width) | 0;
+                var y = (v * this.height) | 0;
+                if (x < 0 || x >= this.width || y < 0 || y >= this.height)
+                    return 0;
+                if (this.gray) {
+                    return this.data[y * this.width + x];
+                }
+                else {
+                    var i = (y * this.width + x) * 4;
+                    return new gd3d.math.color(this.data[i], this.data[i + 1], this.data[i + 2], this.data[i + 3]);
+                }
+            };
+            return textureReader;
+        }());
+        render.textureReader = textureReader;
+        var glRenderTarget = (function () {
+            function glRenderTarget(webgl, width, height, depth, stencil) {
+                if (depth === void 0) { depth = false; }
+                if (stencil === void 0) { stencil = false; }
+                this.width = width;
+                this.height = height;
+                this.fbo = webgl.createFramebuffer();
+                webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
+                if (depth || stencil) {
+                    this.renderbuffer = webgl.createRenderbuffer();
+                    webgl.bindRenderbuffer(webgl.RENDERBUFFER, this.renderbuffer);
+                    if (depth && stencil) {
+                        webgl.renderbufferStorage(webgl.RENDERBUFFER, webgl.DEPTH_STENCIL, width, height);
+                        webgl.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.DEPTH_STENCIL_ATTACHMENT, webgl.RENDERBUFFER, this.renderbuffer);
+                    }
+                    else if (depth) {
+                        webgl.renderbufferStorage(webgl.RENDERBUFFER, webgl.DEPTH_COMPONENT16, width, height);
+                        webgl.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.DEPTH_ATTACHMENT, webgl.RENDERBUFFER, this.renderbuffer);
+                    }
+                    else {
+                        webgl.renderbufferStorage(webgl.RENDERBUFFER, webgl.STENCIL_INDEX8, width, height);
+                        webgl.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.STENCIL_ATTACHMENT, webgl.RENDERBUFFER, this.renderbuffer);
+                    }
+                }
+                this.texture = webgl.createTexture();
+                this.fbo["width"] = width;
+                this.fbo["height"] = height;
+                webgl.bindTexture(webgl.TEXTURE_2D, this.texture);
+                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
+                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR);
+                webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, width, height, 0, webgl.RGBA, webgl.UNSIGNED_BYTE, null);
+                webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, this.texture, 0);
+            }
+            glRenderTarget.prototype.use = function (webgl) {
+                webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
+                webgl.bindRenderbuffer(webgl.RENDERBUFFER, this.renderbuffer);
+                webgl.bindTexture(webgl.TEXTURE_2D, this.texture);
+            };
+            glRenderTarget.useNull = function (webgl) {
+                webgl.bindFramebuffer(webgl.FRAMEBUFFER, null);
+                webgl.bindRenderbuffer(webgl.RENDERBUFFER, null);
+            };
+            glRenderTarget.prototype.dispose = function (webgl) {
+                if (this.texture != null) {
+                    webgl.deleteFramebuffer(this.renderbuffer);
+                    this.renderbuffer = null;
+                    webgl.deleteTexture(this.texture);
+                    this.texture = null;
+                }
+            };
+            glRenderTarget.prototype.caclByteLength = function () {
+                return this.width * this.height * 4;
+            };
+            glRenderTarget.prototype.isFrameBuffer = function () {
+                return true;
+            };
+            return glRenderTarget;
+        }());
+        render.glRenderTarget = glRenderTarget;
+        var glTexture2D = (function () {
+            function glTexture2D(webgl, format, mipmap, linear) {
+                if (format === void 0) { format = TextureFormatEnum.RGBA; }
+                if (mipmap === void 0) { mipmap = false; }
+                if (linear === void 0) { linear = true; }
+                this.linear = true;
+                this.premultiply = true;
+                this.repeat = true;
+                this.mirroredU = true;
+                this.mirroredV = true;
+                this.loaded = false;
+                this.width = 0;
+                this.height = 0;
+                this.mipmap = false;
+                this.webgl = webgl;
+                this.format = format;
+                this.linear = linear;
+                this.mipmap = mipmap;
+                this.texture = webgl.createTexture();
+                var extname = "WEBGL_compressed_texture_pvrtc";
+                this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
+            }
+            glTexture2D.prototype.getExt = function (name) {
+                var browserPrefixes = [
+                    "",
+                    "MOZ_",
+                    "OP_",
+                    "WEBKIT_"
+                ];
+                for (var ii = 0; ii < browserPrefixes.length; ++ii) {
+                    var prefixedName = browserPrefixes[ii] + name;
+                    var ext = this.webgl.getExtension(prefixedName);
+                    if (ext) {
+                        return ext;
+                    }
+                }
+                return null;
+            };
+            glTexture2D.prototype.uploadImage = function (img, mipmap, linear, premultiply, repeat, mirroredU, mirroredV) {
+                if (premultiply === void 0) { premultiply = true; }
+                if (repeat === void 0) { repeat = false; }
+                if (mirroredU === void 0) { mirroredU = false; }
+                if (mirroredV === void 0) { mirroredV = false; }
+                this.width = img.width;
+                this.height = img.height;
+                this.mipmap = mipmap;
+                this.linear = linear;
+                this.premultiply = premultiply;
+                this.repeat = repeat;
+                this.mirroredU = mirroredU;
+                this.mirroredV = mirroredV;
+                this.loaded = true;
+                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                var formatGL = this.webgl.RGBA;
+                if (this.format == TextureFormatEnum.RGB)
+                    formatGL = this.webgl.RGB;
+                else if (this.format == TextureFormatEnum.Gray)
+                    formatGL = this.webgl.LUMINANCE;
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, formatGL, this.webgl.UNSIGNED_BYTE, img);
+                if (mipmap) {
+                    this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
+                    if (linear) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR_MIPMAP_LINEAR);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST_MIPMAP_NEAREST);
+                    }
+                }
+                else {
+                    if (linear) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
+                    }
+                }
+                if (repeat) {
+                    if (mirroredU && mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else if (mirroredU) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                    else if (mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                }
+                else {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
+                }
+            };
+            glTexture2D.prototype.uploadByteArray = function (mipmap, linear, width, height, data, repeat, mirroredU, mirroredV) {
+                if (repeat === void 0) { repeat = false; }
+                if (mirroredU === void 0) { mirroredU = false; }
+                if (mirroredV === void 0) { mirroredV = false; }
+                this.width = width;
+                this.height = height;
+                this.mipmap = mipmap;
+                this.linear = linear;
+                this.repeat = repeat;
+                this.mirroredU = mirroredU;
+                this.mirroredV = mirroredV;
+                this.loaded = true;
+                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                var formatGL = this.webgl.RGBA;
+                if (this.format == TextureFormatEnum.RGB)
+                    formatGL = this.webgl.RGB;
+                else if (this.format == TextureFormatEnum.Gray)
+                    formatGL = this.webgl.LUMINANCE;
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
+                if (mipmap) {
+                    this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
+                    if (linear) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR_MIPMAP_LINEAR);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST_MIPMAP_NEAREST);
+                    }
+                }
+                else {
+                    if (linear) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
+                    }
+                }
+                if (repeat) {
+                    if (mirroredU && mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else if (mirroredU) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                    else if (mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                }
+                else {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
+                }
+            };
+            glTexture2D.prototype.caclByteLength = function () {
+                var pixellen = 1;
+                if (this.format == TextureFormatEnum.RGBA) {
+                    pixellen = 4;
+                }
+                else if (this.format == TextureFormatEnum.RGB) {
+                    pixellen = 3;
+                }
+                var len = this.width * this.height * pixellen;
+                if (this.mipmap) {
+                    len = len * (1 - Math.pow(0.25, 10)) / 0.75;
+                }
+                return len;
+            };
+            glTexture2D.prototype.getReader = function (redOnly) {
+                if (redOnly === void 0) { redOnly = false; }
+                if (this.reader != null) {
+                    if (this.reader.gray != redOnly)
+                        throw new Error("get param diff with this.reader");
+                    return this.reader;
+                }
+                if (this.format != TextureFormatEnum.RGBA)
+                    throw new Error("only rgba texture can read");
+                if (this.texture == null)
+                    return null;
+                if (this.reader == null)
+                    this.reader = new textureReader(this.webgl, this.texture, this.width, this.height, redOnly);
+                return this.reader;
+            };
+            glTexture2D.prototype.dispose = function (webgl) {
+                if (this.texture != null) {
+                    webgl.deleteTexture(this.texture);
+                    this.texture = null;
+                }
+            };
+            glTexture2D.prototype.isFrameBuffer = function () {
+                return false;
+            };
+            glTexture2D.formGrayArray = function (webgl, array, width, height) {
+                var mipmap = false;
+                var linear = true;
+                var t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
+                var data = new Uint8Array(array.length * 4);
+                for (var y = 0; y < width; y++) {
+                    for (var x = 0; x < width; x++) {
+                        var fi = y * 512 + x;
+                        var i = y * width + x;
+                        data[fi * 4] = array[i] * 255;
+                        data[fi * 4 + 1] = array[i] * 255;
+                        data[fi * 4 + 2] = array[i] * 255;
+                        data[fi * 4 + 3] = 255;
+                    }
+                }
+                t.uploadByteArray(mipmap, linear, 512, 512, data);
+                return t;
+            };
+            glTexture2D.staticTexture = function (webgl, name) {
+                var t = glTexture2D.mapTexture[name];
+                if (t != undefined)
+                    return t;
+                var mipmap = false;
+                var linear = true;
+                t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
+                var data = new Uint8Array(4);
+                var width = 1;
+                var height = 1;
+                data[0] = 128;
+                data[1] = 0;
+                data[2] = 128;
+                data[3] = 255;
+                if (name == "gray") {
+                    data[0] = 128;
+                    data[1] = 128;
+                    data[2] = 128;
+                    data[3] = 255;
+                }
+                else if (name == "white") {
+                    data[0] = 255;
+                    data[1] = 255;
+                    data[2] = 255;
+                    data[3] = 255;
+                }
+                else if (name == "black") {
+                    data[0] = 0;
+                    data[1] = 0;
+                    data[2] = 0;
+                    data[3] = 255;
+                }
+                else if (name == "normal") {
+                    data[0] = 128;
+                    data[1] = 128;
+                    data[2] = 255;
+                    data[3] = 255;
+                }
+                else if (name == "grid") {
+                    width = 256;
+                    height = 256;
+                    data = new Uint8Array(width * width * 4);
+                    for (var y = 0; y < height; y++) {
+                        for (var x = 0; x < width; x++) {
+                            var seek = (y * width + x) * 4;
+                            if (((x - width * 0.5) * (y - height * 0.5)) > 0) {
+                                data[seek] = 0;
+                                data[seek + 1] = 0;
+                                data[seek + 2] = 0;
+                                data[seek + 3] = 255;
+                            }
+                            else {
+                                data[seek] = 255;
+                                data[seek + 1] = 255;
+                                data[seek + 2] = 255;
+                                data[seek + 3] = 255;
+                            }
+                        }
+                    }
+                }
+                t.uploadByteArray(mipmap, linear, width, height, data);
+                glTexture2D.mapTexture[name] = t;
+                return t;
+            };
+            glTexture2D.mapTexture = {};
+            return glTexture2D;
+        }());
+        render.glTexture2D = glTexture2D;
+        var glTextureCube = (function () {
+            function glTextureCube(webgl, format, mipmap, linear) {
+                if (format === void 0) { format = TextureFormatEnum.RGBA; }
+                if (mipmap === void 0) { mipmap = false; }
+                if (linear === void 0) { linear = true; }
+                this.loaded = false;
+                this.width = 0;
+                this.height = 0;
+                this.mipmap = false;
+                this.linear = false;
+                this.webgl = webgl;
+                this.format = format;
+                this.mipmap = mipmap;
+                this.linear = linear;
+                this.texture = webgl.createTexture();
+            }
+            glTextureCube.prototype.uploadImages = function (Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
+                var wrc = WebGLRenderingContext;
+                var textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
+                var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+                for (var i = 0; i < typeArr.length; i++) {
+                    var reader = textures[i].glTexture.getReader();
+                    if (!reader) {
+                        console.warn("getReader() fail : " + textures[i].getName());
+                        return;
+                    }
+                    this.upload(reader.data, reader.width, reader.height, typeArr[i]);
+                }
+            };
+            glTextureCube.prototype.upload = function (data, width, height, TEXTURE_CUBE_MAP_) {
+                this.width = width;
+                this.height = height;
+                this.loaded = true;
+                var gl = this.webgl;
+                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+                this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
+                var formatGL = this.webgl.RGBA;
+                if (this.format == TextureFormatEnum.RGB)
+                    formatGL = this.webgl.RGB;
+                else if (this.format == TextureFormatEnum.Gray)
+                    formatGL = this.webgl.LUMINANCE;
+                if (data instanceof HTMLImageElement) {
+                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, formatGL, this.webgl.UNSIGNED_BYTE, data);
+                }
+                else {
+                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
+                }
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                var mipmap = this.mipmap;
+                var linear = this.linear;
+            };
+            glTextureCube.prototype.caclByteLength = function () {
+                var pixellen = 1;
+                if (this.format == TextureFormatEnum.RGBA) {
+                    pixellen = 4;
+                }
+                else if (this.format == TextureFormatEnum.RGB) {
+                    pixellen = 3;
+                }
+                var len = this.width * this.height * pixellen * 6;
+                if (this.mipmap) {
+                    len = len * (1 - Math.pow(0.25, 10)) / 0.75;
+                }
+                return len;
+            };
+            glTextureCube.prototype.dispose = function (webgl) {
+                if (this.texture != null) {
+                    webgl.deleteTexture(this.texture);
+                    this.texture = null;
+                }
+            };
+            glTextureCube.prototype.isFrameBuffer = function () {
+                return false;
+            };
+            return glTextureCube;
+        }());
+        render.glTextureCube = glTextureCube;
+        var WriteableTexture2D = (function () {
+            function WriteableTexture2D(webgl, format, width, height, linear, premultiply, repeat, mirroredU, mirroredV) {
+                if (format === void 0) { format = TextureFormatEnum.RGBA; }
+                if (premultiply === void 0) { premultiply = true; }
+                if (repeat === void 0) { repeat = false; }
+                if (mirroredU === void 0) { mirroredU = false; }
+                if (mirroredV === void 0) { mirroredV = false; }
+                this.premultiply = true;
+                this.repeat = false;
+                this.mirroredU = false;
+                this.mirroredV = false;
+                this.width = 0;
+                this.height = 0;
+                this.webgl = webgl;
+                this.texture = webgl.createTexture();
+                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
+                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                this.format = format;
+                this.formatGL = this.webgl.RGBA;
+                if (format == TextureFormatEnum.RGB)
+                    this.formatGL = this.webgl.RGB;
+                else if (format == TextureFormatEnum.Gray)
+                    this.formatGL = this.webgl.LUMINANCE;
+                var data = null;
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, this.formatGL, width, height, 0, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
+                if (linear) {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
+                }
+                else {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
+                }
+                if (repeat) {
+                    if (mirroredU && mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else if (mirroredU) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                    else if (mirroredV) {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
+                    }
+                    else {
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
+                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
+                    }
+                }
+                else {
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
+                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
+                }
+            }
+            WriteableTexture2D.prototype.updateRect = function (data, x, y, width, height) {
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, width, height, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
+            };
+            WriteableTexture2D.prototype.updateRectImg = function (data, x, y) {
+                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
+                this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
+            };
+            WriteableTexture2D.prototype.isFrameBuffer = function () {
+                return false;
+            };
+            WriteableTexture2D.prototype.dispose = function (webgl) {
+                if (this.texture != null) {
+                    webgl.deleteTexture(this.texture);
+                    this.texture = null;
+                }
+            };
+            WriteableTexture2D.prototype.caclByteLength = function () {
+                var pixellen = 1;
+                if (this.format == TextureFormatEnum.RGBA) {
+                    pixellen = 4;
+                }
+                else if (this.format == TextureFormatEnum.RGB) {
+                    pixellen = 3;
+                }
+                var len = this.width * this.height * pixellen;
+                return len;
+            };
+            return WriteableTexture2D;
+        }());
+        render.WriteableTexture2D = WriteableTexture2D;
+    })(render = gd3d.render || (gd3d.render = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var render;
+    (function (render) {
+        var glWindow = (function () {
+            function glWindow() {
+                this.clearop_Color = false;
+                this.backColor = new gd3d.math.color(1, 0, 1, 1);
+                this.clearop_Depth = false;
+                this.clearop_Stencil = false;
+                this.viewport = new gd3d.math.rect(0, 0, 1, 1);
+            }
+            glWindow.prototype.use = function (webgl) {
+                if (this.renderTarget != null) {
+                    this.renderTarget.use(webgl);
+                }
+                else {
+                    gd3d.render.glRenderTarget.useNull(webgl);
+                }
+                if (this.backColor != null)
+                    webgl.clearColor(this.backColor.r, this.backColor.g, this.backColor.b, this.backColor.a);
+                var n = 0;
+                if (this.clearop_Color)
+                    n |= webgl.COLOR_BUFFER_BIT;
+                if (this.clearop_Depth)
+                    n |= webgl.DEPTH_BUFFER_BIT;
+                if (this.clearop_Stencil)
+                    n |= webgl.STENCIL_BUFFER_BIT;
+                webgl.clear(n);
+                if (this.renderTarget != null) {
+                    webgl.viewport(this.renderTarget.width * this.viewport.x, this.renderTarget.height * this.viewport.y, this.renderTarget.width * this.viewport.w, this.renderTarget.height * this.viewport.h);
+                }
+                else {
+                    webgl.viewport(webgl.canvas.width * this.viewport.x, webgl.canvas.height * this.viewport.y, webgl.canvas.width * this.viewport.w, webgl.canvas.height * this.viewport.h);
+                }
+            };
+            return glWindow;
+        }());
+        render.glWindow = glWindow;
+    })(render = gd3d.render || (gd3d.render = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var render;
+    (function (render) {
+        var UniformTypeEnum;
+        (function (UniformTypeEnum) {
+            UniformTypeEnum[UniformTypeEnum["Texture"] = 0] = "Texture";
+            UniformTypeEnum[UniformTypeEnum["Float"] = 1] = "Float";
+            UniformTypeEnum[UniformTypeEnum["Floatv"] = 2] = "Floatv";
+            UniformTypeEnum[UniformTypeEnum["Float4"] = 3] = "Float4";
+            UniformTypeEnum[UniformTypeEnum["Float4v"] = 4] = "Float4v";
+            UniformTypeEnum[UniformTypeEnum["Float4x4"] = 5] = "Float4x4";
+            UniformTypeEnum[UniformTypeEnum["Float4x4v"] = 6] = "Float4x4v";
+        })(UniformTypeEnum = render.UniformTypeEnum || (render.UniformTypeEnum = {}));
+        var uniform = (function () {
+            function uniform() {
+            }
+            return uniform;
+        }());
+        render.uniform = uniform;
+        var ShaderTypeEnum;
+        (function (ShaderTypeEnum) {
+            ShaderTypeEnum[ShaderTypeEnum["VS"] = 0] = "VS";
+            ShaderTypeEnum[ShaderTypeEnum["FS"] = 1] = "FS";
+        })(ShaderTypeEnum = render.ShaderTypeEnum || (render.ShaderTypeEnum = {}));
+        var glShader = (function () {
+            function glShader(name, type, shader, code) {
+                this.name = name;
+                this.type = type;
+                this.shader = shader;
+            }
+            return glShader;
+        }());
+        render.glShader = glShader;
+        var glProgram = (function () {
+            function glProgram(vs, fs, program) {
+                this.posPos = -1;
+                this.posNormal = -1;
+                this.posTangent = -1;
+                this.posColor = -1;
+                this.posUV0 = -1;
+                this.posUV2 = -1;
+                this.posBlendIndex4 = -1;
+                this.posBlendWeight4 = -1;
+                this.posColorEx = -1;
+                this.mapUniform = {};
+                this.vs = vs;
+                this.fs = fs;
+                this.program = program;
+            }
+            glProgram.prototype.initAttribute = function (webgl) {
+                this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
+                this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
+                this.posUV0 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord0");
+                this.posUV2 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord1");
+                this.posNormal = webgl.getAttribLocation(this.program, "_glesNormal");
+                this.posTangent = webgl.getAttribLocation(this.program, "_glesTangent");
+                this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");
+                this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");
+                this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
+            };
+            glProgram.prototype.use = function (webgl) {
+                webgl.useProgram(this.program);
+            };
+            glProgram.prototype.initUniforms = function (webgl) {
+                var numUniforms = webgl.getProgramParameter(this.program, webgl.ACTIVE_UNIFORMS);
+                for (var i = 0; i < numUniforms; i++) {
+                    var uniformInfo = webgl.getActiveUniform(this.program, i);
+                    if (!uniformInfo)
+                        break;
+                    var name = uniformInfo.name;
+                    if (name.substr(-3) === "[0]") {
+                        name = name.substr(0, name.length - 3);
+                    }
+                    var location = webgl.getUniformLocation(this.program, uniformInfo.name);
+                    var type = uniformInfo.type;
+                    var isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === "[0]");
+                    var _uniform = new uniform();
+                    _uniform.name = name;
+                    _uniform.location = location;
+                    this.mapUniform[name] = _uniform;
+                    if (type === webgl.FLOAT && isArray) {
+                        _uniform.type = UniformTypeEnum.Floatv;
+                    }
+                    else if (type === webgl.FLOAT) {
+                        _uniform.type = UniformTypeEnum.Float;
+                    }
+                    else if (type === webgl.FLOAT_VEC4 && isArray) {
+                        _uniform.type = UniformTypeEnum.Float4v;
+                    }
+                    else if (type === webgl.FLOAT_VEC4) {
+                        _uniform.type = UniformTypeEnum.Float4;
+                    }
+                    else if (type === webgl.FLOAT_MAT4 && isArray) {
+                        _uniform.type = UniformTypeEnum.Float4x4v;
+                    }
+                    else if (type === webgl.FLOAT_MAT4) {
+                        _uniform.type = UniformTypeEnum.Float4x4;
+                    }
+                    else if (type === webgl.SAMPLER_2D) {
+                        _uniform.type = UniformTypeEnum.Texture;
+                    }
+                    else {
+                        console.log("Unifrom parse Erorr : not have this type!");
+                    }
+                }
+            };
+            return glProgram;
+        }());
+        render.glProgram = glProgram;
+        var shaderPool = (function () {
+            function shaderPool() {
+                this.mapVS = {};
+                this.mapFS = {};
+                this.mapProgram = {};
+                this.mapVSString = {};
+                this.mapFSString = {};
+            }
+            shaderPool.prototype.disposeVS = function (webgl, id) {
+                webgl.deleteShader(this.mapVS[id].shader);
+            };
+            shaderPool.prototype.disposeFS = function (webgl, id) {
+                webgl.deleteShader(this.mapFS[id].shader);
+            };
+            shaderPool.prototype.disposeProgram = function (webgl, id) {
+                webgl.deleteProgram(this.mapProgram[id].program);
+            };
+            shaderPool.prototype.disposeAll = function (webgl) {
+                for (var key in this.mapVS) {
+                    this.disposeVS(webgl, key);
+                }
+                for (var key in this.mapFS) {
+                    this.disposeFS(webgl, key);
+                }
+                for (var key in this.mapProgram) {
+                    this.disposeProgram(webgl, key);
+                }
+                this.mapVS = {};
+                this.mapFS = {};
+                this.mapProgram = {};
+            };
+            shaderPool.prototype.compileVS = function (webgl, name, code) {
+                var vs = webgl.createShader(webgl.VERTEX_SHADER);
+                webgl.shaderSource(vs, code);
+                webgl.compileShader(vs);
+                var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
+                if (r1 == false) {
+                    if (confirm("a vs:" + name + " error!!!" + webgl.getShaderInfoLog(vs) + "\n" + "did you want see the code?")) {
+                        webgl.deleteShader(vs);
+                        alert(code);
+                    }
+                    return null;
+                }
+                var s = new glShader(name, ShaderTypeEnum.VS, vs, code);
+                this.mapVS[name] = s;
+                return s;
+            };
+            shaderPool.prototype.compileFS = function (webgl, name, code) {
+                var fs = webgl.createShader(webgl.FRAGMENT_SHADER);
+                webgl.shaderSource(fs, code);
+                webgl.compileShader(fs);
+                var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
+                if (r1 == false) {
+                    if (confirm("a fs:" + name + " error!!!" + webgl.getShaderInfoLog(fs) + "\n" + "did you want see the code?")) {
+                        webgl.deleteShader(fs);
+                        alert(code);
+                    }
+                    return null;
+                }
+                var s = new glShader(name, ShaderTypeEnum.FS, fs, code);
+                this.mapFS[name] = s;
+                return s;
+            };
+            shaderPool.prototype.linkProgram = function (webgl, nameVS, nameFS) {
+                var program = webgl.createProgram();
+                webgl.attachShader(program, this.mapVS[nameVS].shader);
+                webgl.attachShader(program, this.mapFS[nameFS].shader);
+                webgl.linkProgram(program);
+                var r3 = webgl.getProgramParameter(program, webgl.LINK_STATUS);
+                if (r3 == false) {
+                    alert("vs:" + nameVS + "   fs:" + nameFS + "a webgl program error:" + webgl.getProgramInfoLog(program));
+                    webgl.deleteProgram(program);
+                    return null;
+                }
+                var name = nameVS + "_" + nameFS;
+                var glp = new glProgram(this.mapVS[nameVS], this.mapFS[nameFS], program);
+                glp.initUniforms(webgl);
+                glp.initAttribute(webgl);
+                this.mapProgram[name] = glp;
+                return glp;
+            };
+            shaderPool.prototype.linkProgrambyPassType = function (webgl, type, nameVS, nameFS) {
+                var vsStr = this.mapVSString[nameVS];
+                var fsStr = this.mapFSString[nameFS];
+                if (type == "base") {
+                }
+                else if (type == "base_fog" || type == "fog") {
+                    vsStr = "#define FOG \n" + vsStr;
+                    fsStr = "#define FOG \n" + fsStr;
+                }
+                else if (type == "skin") {
+                    vsStr = "#define SKIN \n" + vsStr;
+                    fsStr = "#define SKIN \n" + fsStr;
+                }
+                else if (type == "skin_fog") {
+                    vsStr = "#define SKIN \n" + "#define FOG \n" + vsStr;
+                    fsStr = "#define SKIN \n" + "#define FOG \n" + fsStr;
+                }
+                else if (type == "lightmap") {
+                    vsStr = "#define LIGHTMAP \n" + vsStr;
+                    fsStr = "#define LIGHTMAP \n" + fsStr;
+                }
+                else if (type == "lightmap_fog") {
+                    vsStr = "#define LIGHTMAP \n" + "#define FOG \n" + vsStr;
+                    fsStr = "#define LIGHTMAP \n" + "#define FOG \n" + fsStr;
+                }
+                this.compileVS(webgl, nameVS + type, vsStr);
+                this.compileFS(webgl, nameFS + type, fsStr);
+                var pro = this.linkProgram(webgl, nameVS + type, nameFS + type);
+                return pro;
+            };
+            return shaderPool;
+        }());
+        render.shaderPool = shaderPool;
+    })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
@@ -9535,12 +10309,15 @@ var gd3d;
                                 this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float, value: parseFloat(words[4]) };
                                 break;
                             case "range":
-                                this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float, value: parseFloat(words[6]) };
+                                this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float, value: parseFloat(words[6]), min: parseFloat(words[4]), max: parseFloat(words[5]) };
                                 break;
                             case "vector":
-                            case "color":
                                 var _vector = new gd3d.math.vector4(parseFloat(words[4]), parseFloat(words[5]), parseFloat(words[6]), parseFloat(words[7]));
                                 this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float4, value: _vector };
+                                break;
+                            case "color":
+                                var _color = new gd3d.math.vector4(parseFloat(words[4]), parseFloat(words[5]), parseFloat(words[6]), parseFloat(words[7]));
+                                this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Float4, value: _color, becolor: true };
                                 break;
                             case "texture":
                                 this.defaultMapUniform[key] = { type: gd3d.render.UniformTypeEnum.Texture, value: assetmgr.getDefaultTexture(words[4]) };
@@ -16767,7 +17544,7 @@ var gd3d;
                 else
                     SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
                 if (asset instanceof gd3d.framework.material) {
-                    var _mapUniform = asset.mapUniform;
+                    var _mapUniform = asset.defaultMapUniform;
                     if (!_mapUniform)
                         return;
                     for (var newKey in _mapUniform) {
@@ -16782,7 +17559,11 @@ var gd3d;
                         if (url)
                             SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                         else {
-                            SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(_texture));
+                            if (_texture.defaultAsset == true)
+                                continue;
+                            var content = SerializeDependent.GetAssetContent(_texture);
+                            if (content)
+                                SerializeDependent.resourseDatas.push(content);
                             continue;
                         }
                         if (url.indexOf(".imgdesc.json") < 0)
@@ -29626,851 +30407,6 @@ var gd3d;
             return shaderUniform;
         }());
         render.shaderUniform = shaderUniform;
-    })(render = gd3d.render || (gd3d.render = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var render;
-    (function (render) {
-        var glWindow = (function () {
-            function glWindow() {
-                this.clearop_Color = false;
-                this.backColor = new gd3d.math.color(1, 0, 1, 1);
-                this.clearop_Depth = false;
-                this.clearop_Stencil = false;
-                this.viewport = new gd3d.math.rect(0, 0, 1, 1);
-            }
-            glWindow.prototype.use = function (webgl) {
-                if (this.renderTarget != null) {
-                    this.renderTarget.use(webgl);
-                }
-                else {
-                    gd3d.render.glRenderTarget.useNull(webgl);
-                }
-                if (this.backColor != null)
-                    webgl.clearColor(this.backColor.r, this.backColor.g, this.backColor.b, this.backColor.a);
-                var n = 0;
-                if (this.clearop_Color)
-                    n |= webgl.COLOR_BUFFER_BIT;
-                if (this.clearop_Depth)
-                    n |= webgl.DEPTH_BUFFER_BIT;
-                if (this.clearop_Stencil)
-                    n |= webgl.STENCIL_BUFFER_BIT;
-                webgl.clear(n);
-                if (this.renderTarget != null) {
-                    webgl.viewport(this.renderTarget.width * this.viewport.x, this.renderTarget.height * this.viewport.y, this.renderTarget.width * this.viewport.w, this.renderTarget.height * this.viewport.h);
-                }
-                else {
-                    webgl.viewport(webgl.canvas.width * this.viewport.x, webgl.canvas.height * this.viewport.y, webgl.canvas.width * this.viewport.w, webgl.canvas.height * this.viewport.h);
-                }
-            };
-            return glWindow;
-        }());
-        render.glWindow = glWindow;
-    })(render = gd3d.render || (gd3d.render = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var render;
-    (function (render) {
-        var UniformTypeEnum;
-        (function (UniformTypeEnum) {
-            UniformTypeEnum[UniformTypeEnum["Texture"] = 0] = "Texture";
-            UniformTypeEnum[UniformTypeEnum["Float"] = 1] = "Float";
-            UniformTypeEnum[UniformTypeEnum["Floatv"] = 2] = "Floatv";
-            UniformTypeEnum[UniformTypeEnum["Float4"] = 3] = "Float4";
-            UniformTypeEnum[UniformTypeEnum["Float4v"] = 4] = "Float4v";
-            UniformTypeEnum[UniformTypeEnum["Float4x4"] = 5] = "Float4x4";
-            UniformTypeEnum[UniformTypeEnum["Float4x4v"] = 6] = "Float4x4v";
-        })(UniformTypeEnum = render.UniformTypeEnum || (render.UniformTypeEnum = {}));
-        var uniform = (function () {
-            function uniform() {
-            }
-            return uniform;
-        }());
-        render.uniform = uniform;
-        var ShaderTypeEnum;
-        (function (ShaderTypeEnum) {
-            ShaderTypeEnum[ShaderTypeEnum["VS"] = 0] = "VS";
-            ShaderTypeEnum[ShaderTypeEnum["FS"] = 1] = "FS";
-        })(ShaderTypeEnum = render.ShaderTypeEnum || (render.ShaderTypeEnum = {}));
-        var glShader = (function () {
-            function glShader(name, type, shader, code) {
-                this.name = name;
-                this.type = type;
-                this.shader = shader;
-            }
-            return glShader;
-        }());
-        render.glShader = glShader;
-        var glProgram = (function () {
-            function glProgram(vs, fs, program) {
-                this.posPos = -1;
-                this.posNormal = -1;
-                this.posTangent = -1;
-                this.posColor = -1;
-                this.posUV0 = -1;
-                this.posUV2 = -1;
-                this.posBlendIndex4 = -1;
-                this.posBlendWeight4 = -1;
-                this.posColorEx = -1;
-                this.mapUniform = {};
-                this.vs = vs;
-                this.fs = fs;
-                this.program = program;
-            }
-            glProgram.prototype.initAttribute = function (webgl) {
-                this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
-                this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
-                this.posUV0 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord0");
-                this.posUV2 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord1");
-                this.posNormal = webgl.getAttribLocation(this.program, "_glesNormal");
-                this.posTangent = webgl.getAttribLocation(this.program, "_glesTangent");
-                this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");
-                this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");
-                this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
-            };
-            glProgram.prototype.use = function (webgl) {
-                webgl.useProgram(this.program);
-            };
-            glProgram.prototype.initUniforms = function (webgl) {
-                var numUniforms = webgl.getProgramParameter(this.program, webgl.ACTIVE_UNIFORMS);
-                for (var i = 0; i < numUniforms; i++) {
-                    var uniformInfo = webgl.getActiveUniform(this.program, i);
-                    if (!uniformInfo)
-                        break;
-                    var name = uniformInfo.name;
-                    if (name.substr(-3) === "[0]") {
-                        name = name.substr(0, name.length - 3);
-                    }
-                    var location = webgl.getUniformLocation(this.program, uniformInfo.name);
-                    var type = uniformInfo.type;
-                    var isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === "[0]");
-                    var _uniform = new uniform();
-                    _uniform.name = name;
-                    _uniform.location = location;
-                    this.mapUniform[name] = _uniform;
-                    if (type === webgl.FLOAT && isArray) {
-                        _uniform.type = UniformTypeEnum.Floatv;
-                    }
-                    else if (type === webgl.FLOAT) {
-                        _uniform.type = UniformTypeEnum.Float;
-                    }
-                    else if (type === webgl.FLOAT_VEC4 && isArray) {
-                        _uniform.type = UniformTypeEnum.Float4v;
-                    }
-                    else if (type === webgl.FLOAT_VEC4) {
-                        _uniform.type = UniformTypeEnum.Float4;
-                    }
-                    else if (type === webgl.FLOAT_MAT4 && isArray) {
-                        _uniform.type = UniformTypeEnum.Float4x4v;
-                    }
-                    else if (type === webgl.FLOAT_MAT4) {
-                        _uniform.type = UniformTypeEnum.Float4x4;
-                    }
-                    else if (type === webgl.SAMPLER_2D) {
-                        _uniform.type = UniformTypeEnum.Texture;
-                    }
-                    else {
-                        console.log("Unifrom parse Erorr : not have this type!");
-                    }
-                }
-            };
-            return glProgram;
-        }());
-        render.glProgram = glProgram;
-        var shaderPool = (function () {
-            function shaderPool() {
-                this.mapVS = {};
-                this.mapFS = {};
-                this.mapProgram = {};
-                this.mapVSString = {};
-                this.mapFSString = {};
-            }
-            shaderPool.prototype.disposeVS = function (webgl, id) {
-                webgl.deleteShader(this.mapVS[id].shader);
-            };
-            shaderPool.prototype.disposeFS = function (webgl, id) {
-                webgl.deleteShader(this.mapFS[id].shader);
-            };
-            shaderPool.prototype.disposeProgram = function (webgl, id) {
-                webgl.deleteProgram(this.mapProgram[id].program);
-            };
-            shaderPool.prototype.disposeAll = function (webgl) {
-                for (var key in this.mapVS) {
-                    this.disposeVS(webgl, key);
-                }
-                for (var key in this.mapFS) {
-                    this.disposeFS(webgl, key);
-                }
-                for (var key in this.mapProgram) {
-                    this.disposeProgram(webgl, key);
-                }
-                this.mapVS = {};
-                this.mapFS = {};
-                this.mapProgram = {};
-            };
-            shaderPool.prototype.compileVS = function (webgl, name, code) {
-                var vs = webgl.createShader(webgl.VERTEX_SHADER);
-                webgl.shaderSource(vs, code);
-                webgl.compileShader(vs);
-                var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
-                if (r1 == false) {
-                    if (confirm("a vs:" + name + " error!!!" + webgl.getShaderInfoLog(vs) + "\n" + "did you want see the code?")) {
-                        webgl.deleteShader(vs);
-                        alert(code);
-                    }
-                    return null;
-                }
-                var s = new glShader(name, ShaderTypeEnum.VS, vs, code);
-                this.mapVS[name] = s;
-                return s;
-            };
-            shaderPool.prototype.compileFS = function (webgl, name, code) {
-                var fs = webgl.createShader(webgl.FRAGMENT_SHADER);
-                webgl.shaderSource(fs, code);
-                webgl.compileShader(fs);
-                var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
-                if (r1 == false) {
-                    if (confirm("a fs:" + name + " error!!!" + webgl.getShaderInfoLog(fs) + "\n" + "did you want see the code?")) {
-                        webgl.deleteShader(fs);
-                        alert(code);
-                    }
-                    return null;
-                }
-                var s = new glShader(name, ShaderTypeEnum.FS, fs, code);
-                this.mapFS[name] = s;
-                return s;
-            };
-            shaderPool.prototype.linkProgram = function (webgl, nameVS, nameFS) {
-                var program = webgl.createProgram();
-                webgl.attachShader(program, this.mapVS[nameVS].shader);
-                webgl.attachShader(program, this.mapFS[nameFS].shader);
-                webgl.linkProgram(program);
-                var r3 = webgl.getProgramParameter(program, webgl.LINK_STATUS);
-                if (r3 == false) {
-                    alert("vs:" + nameVS + "   fs:" + nameFS + "a webgl program error:" + webgl.getProgramInfoLog(program));
-                    webgl.deleteProgram(program);
-                    return null;
-                }
-                var name = nameVS + "_" + nameFS;
-                var glp = new glProgram(this.mapVS[nameVS], this.mapFS[nameFS], program);
-                glp.initUniforms(webgl);
-                glp.initAttribute(webgl);
-                this.mapProgram[name] = glp;
-                return glp;
-            };
-            shaderPool.prototype.linkProgrambyPassType = function (webgl, type, nameVS, nameFS) {
-                var vsStr = this.mapVSString[nameVS];
-                var fsStr = this.mapFSString[nameFS];
-                if (type == "base") {
-                }
-                else if (type == "base_fog" || type == "fog") {
-                    vsStr = "#define FOG \n" + vsStr;
-                    fsStr = "#define FOG \n" + fsStr;
-                }
-                else if (type == "skin") {
-                    vsStr = "#define SKIN \n" + vsStr;
-                    fsStr = "#define SKIN \n" + fsStr;
-                }
-                else if (type == "skin_fog") {
-                    vsStr = "#define SKIN \n" + "#define FOG \n" + vsStr;
-                    fsStr = "#define SKIN \n" + "#define FOG \n" + fsStr;
-                }
-                else if (type == "lightmap") {
-                    vsStr = "#define LIGHTMAP \n" + vsStr;
-                    fsStr = "#define LIGHTMAP \n" + fsStr;
-                }
-                else if (type == "lightmap_fog") {
-                    vsStr = "#define LIGHTMAP \n" + "#define FOG \n" + vsStr;
-                    fsStr = "#define LIGHTMAP \n" + "#define FOG \n" + fsStr;
-                }
-                this.compileVS(webgl, nameVS + type, vsStr);
-                this.compileFS(webgl, nameFS + type, fsStr);
-                var pro = this.linkProgram(webgl, nameVS + type, nameFS + type);
-                return pro;
-            };
-            return shaderPool;
-        }());
-        render.shaderPool = shaderPool;
-    })(render = gd3d.render || (gd3d.render = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var render;
-    (function (render) {
-        var TextureFormatEnum;
-        (function (TextureFormatEnum) {
-            TextureFormatEnum[TextureFormatEnum["RGBA"] = 1] = "RGBA";
-            TextureFormatEnum[TextureFormatEnum["RGB"] = 2] = "RGB";
-            TextureFormatEnum[TextureFormatEnum["Gray"] = 3] = "Gray";
-            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGB"] = 4] = "PVRTC4_RGB";
-            TextureFormatEnum[TextureFormatEnum["PVRTC4_RGBA"] = 4] = "PVRTC4_RGBA";
-            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGB"] = 4] = "PVRTC2_RGB";
-            TextureFormatEnum[TextureFormatEnum["PVRTC2_RGBA"] = 4] = "PVRTC2_RGBA";
-        })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
-        var textureReader = (function () {
-            function textureReader(webgl, texRGBA, width, height, gray) {
-                if (gray === void 0) { gray = true; }
-                this.gray = gray;
-                this.width = width;
-                this.height = height;
-                var fbo = webgl.createFramebuffer();
-                var fbold = webgl.getParameter(webgl.FRAMEBUFFER_BINDING);
-                webgl.bindFramebuffer(webgl.FRAMEBUFFER, fbo);
-                webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, texRGBA, 0);
-                var readData = new Uint8Array(this.width * this.height * 4);
-                readData[0] = 2;
-                webgl.readPixels(0, 0, this.width, this.height, webgl.RGBA, webgl.UNSIGNED_BYTE, readData);
-                webgl.deleteFramebuffer(fbo);
-                webgl.bindFramebuffer(webgl.FRAMEBUFFER, fbold);
-                if (gray) {
-                    this.data = new Uint8Array(this.width * this.height);
-                    for (var i = 0; i < width * height; i++) {
-                        this.data[i] = readData[i * 4];
-                    }
-                }
-                else {
-                    this.data = readData;
-                }
-            }
-            textureReader.prototype.getPixel = function (u, v) {
-                var x = (u * this.width) | 0;
-                var y = (v * this.height) | 0;
-                if (x < 0 || x >= this.width || y < 0 || y >= this.height)
-                    return 0;
-                if (this.gray) {
-                    return this.data[y * this.width + x];
-                }
-                else {
-                    var i = (y * this.width + x) * 4;
-                    return new gd3d.math.color(this.data[i], this.data[i + 1], this.data[i + 2], this.data[i + 3]);
-                }
-            };
-            return textureReader;
-        }());
-        render.textureReader = textureReader;
-        var glRenderTarget = (function () {
-            function glRenderTarget(webgl, width, height, depth, stencil) {
-                if (depth === void 0) { depth = false; }
-                if (stencil === void 0) { stencil = false; }
-                this.width = width;
-                this.height = height;
-                this.fbo = webgl.createFramebuffer();
-                webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
-                if (depth || stencil) {
-                    this.renderbuffer = webgl.createRenderbuffer();
-                    webgl.bindRenderbuffer(webgl.RENDERBUFFER, this.renderbuffer);
-                    if (depth && stencil) {
-                        webgl.renderbufferStorage(webgl.RENDERBUFFER, webgl.DEPTH_STENCIL, width, height);
-                        webgl.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.DEPTH_STENCIL_ATTACHMENT, webgl.RENDERBUFFER, this.renderbuffer);
-                    }
-                    else if (depth) {
-                        webgl.renderbufferStorage(webgl.RENDERBUFFER, webgl.DEPTH_COMPONENT16, width, height);
-                        webgl.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.DEPTH_ATTACHMENT, webgl.RENDERBUFFER, this.renderbuffer);
-                    }
-                    else {
-                        webgl.renderbufferStorage(webgl.RENDERBUFFER, webgl.STENCIL_INDEX8, width, height);
-                        webgl.framebufferRenderbuffer(webgl.FRAMEBUFFER, webgl.STENCIL_ATTACHMENT, webgl.RENDERBUFFER, this.renderbuffer);
-                    }
-                }
-                this.texture = webgl.createTexture();
-                this.fbo["width"] = width;
-                this.fbo["height"] = height;
-                webgl.bindTexture(webgl.TEXTURE_2D, this.texture);
-                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MAG_FILTER, webgl.LINEAR);
-                webgl.texParameteri(webgl.TEXTURE_2D, webgl.TEXTURE_MIN_FILTER, webgl.LINEAR);
-                webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, width, height, 0, webgl.RGBA, webgl.UNSIGNED_BYTE, null);
-                webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, this.texture, 0);
-            }
-            glRenderTarget.prototype.use = function (webgl) {
-                webgl.bindFramebuffer(webgl.FRAMEBUFFER, this.fbo);
-                webgl.bindRenderbuffer(webgl.RENDERBUFFER, this.renderbuffer);
-                webgl.bindTexture(webgl.TEXTURE_2D, this.texture);
-            };
-            glRenderTarget.useNull = function (webgl) {
-                webgl.bindFramebuffer(webgl.FRAMEBUFFER, null);
-                webgl.bindRenderbuffer(webgl.RENDERBUFFER, null);
-            };
-            glRenderTarget.prototype.dispose = function (webgl) {
-                if (this.texture != null) {
-                    webgl.deleteFramebuffer(this.renderbuffer);
-                    this.renderbuffer = null;
-                    webgl.deleteTexture(this.texture);
-                    this.texture = null;
-                }
-            };
-            glRenderTarget.prototype.caclByteLength = function () {
-                return this.width * this.height * 4;
-            };
-            glRenderTarget.prototype.isFrameBuffer = function () {
-                return true;
-            };
-            return glRenderTarget;
-        }());
-        render.glRenderTarget = glRenderTarget;
-        var glTexture2D = (function () {
-            function glTexture2D(webgl, format, mipmap, linear) {
-                if (format === void 0) { format = TextureFormatEnum.RGBA; }
-                if (mipmap === void 0) { mipmap = false; }
-                if (linear === void 0) { linear = true; }
-                this.linear = true;
-                this.premultiply = true;
-                this.repeat = true;
-                this.mirroredU = true;
-                this.mirroredV = true;
-                this.loaded = false;
-                this.width = 0;
-                this.height = 0;
-                this.mipmap = false;
-                this.webgl = webgl;
-                this.format = format;
-                this.linear = linear;
-                this.mipmap = mipmap;
-                this.texture = webgl.createTexture();
-                var extname = "WEBGL_compressed_texture_pvrtc";
-                this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
-            }
-            glTexture2D.prototype.getExt = function (name) {
-                var browserPrefixes = [
-                    "",
-                    "MOZ_",
-                    "OP_",
-                    "WEBKIT_"
-                ];
-                for (var ii = 0; ii < browserPrefixes.length; ++ii) {
-                    var prefixedName = browserPrefixes[ii] + name;
-                    var ext = this.webgl.getExtension(prefixedName);
-                    if (ext) {
-                        return ext;
-                    }
-                }
-                return null;
-            };
-            glTexture2D.prototype.uploadImage = function (img, mipmap, linear, premultiply, repeat, mirroredU, mirroredV) {
-                if (premultiply === void 0) { premultiply = true; }
-                if (repeat === void 0) { repeat = false; }
-                if (mirroredU === void 0) { mirroredU = false; }
-                if (mirroredV === void 0) { mirroredV = false; }
-                this.width = img.width;
-                this.height = img.height;
-                this.mipmap = mipmap;
-                this.linear = linear;
-                this.premultiply = premultiply;
-                this.repeat = repeat;
-                this.mirroredU = mirroredU;
-                this.mirroredV = mirroredV;
-                this.loaded = true;
-                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
-                var formatGL = this.webgl.RGBA;
-                if (this.format == TextureFormatEnum.RGB)
-                    formatGL = this.webgl.RGB;
-                else if (this.format == TextureFormatEnum.Gray)
-                    formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, formatGL, this.webgl.UNSIGNED_BYTE, img);
-                if (mipmap) {
-                    this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
-                    if (linear) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR_MIPMAP_LINEAR);
-                    }
-                    else {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST_MIPMAP_NEAREST);
-                    }
-                }
-                else {
-                    if (linear) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
-                    }
-                    else {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
-                    }
-                }
-                if (repeat) {
-                    if (mirroredU && mirroredV) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
-                    }
-                    else if (mirroredU) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
-                    }
-                    else if (mirroredV) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
-                    }
-                    else {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
-                    }
-                }
-                else {
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
-                }
-            };
-            glTexture2D.prototype.uploadByteArray = function (mipmap, linear, width, height, data, repeat, mirroredU, mirroredV) {
-                if (repeat === void 0) { repeat = false; }
-                if (mirroredU === void 0) { mirroredU = false; }
-                if (mirroredV === void 0) { mirroredV = false; }
-                this.width = width;
-                this.height = height;
-                this.mipmap = mipmap;
-                this.linear = linear;
-                this.repeat = repeat;
-                this.mirroredU = mirroredU;
-                this.mirroredV = mirroredV;
-                this.loaded = true;
-                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
-                var formatGL = this.webgl.RGBA;
-                if (this.format == TextureFormatEnum.RGB)
-                    formatGL = this.webgl.RGB;
-                else if (this.format == TextureFormatEnum.Gray)
-                    formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
-                if (mipmap) {
-                    this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
-                    if (linear) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR_MIPMAP_LINEAR);
-                    }
-                    else {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST_MIPMAP_NEAREST);
-                    }
-                }
-                else {
-                    if (linear) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
-                    }
-                    else {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
-                    }
-                }
-                if (repeat) {
-                    if (mirroredU && mirroredV) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
-                    }
-                    else if (mirroredU) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
-                    }
-                    else if (mirroredV) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
-                    }
-                    else {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
-                    }
-                }
-                else {
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
-                }
-            };
-            glTexture2D.prototype.caclByteLength = function () {
-                var pixellen = 1;
-                if (this.format == TextureFormatEnum.RGBA) {
-                    pixellen = 4;
-                }
-                else if (this.format == TextureFormatEnum.RGB) {
-                    pixellen = 3;
-                }
-                var len = this.width * this.height * pixellen;
-                if (this.mipmap) {
-                    len = len * (1 - Math.pow(0.25, 10)) / 0.75;
-                }
-                return len;
-            };
-            glTexture2D.prototype.getReader = function (redOnly) {
-                if (redOnly === void 0) { redOnly = false; }
-                if (this.reader != null) {
-                    if (this.reader.gray != redOnly)
-                        throw new Error("get param diff with this.reader");
-                    return this.reader;
-                }
-                if (this.format != TextureFormatEnum.RGBA)
-                    throw new Error("only rgba texture can read");
-                if (this.texture == null)
-                    return null;
-                if (this.reader == null)
-                    this.reader = new textureReader(this.webgl, this.texture, this.width, this.height, redOnly);
-                return this.reader;
-            };
-            glTexture2D.prototype.dispose = function (webgl) {
-                if (this.texture != null) {
-                    webgl.deleteTexture(this.texture);
-                    this.texture = null;
-                }
-            };
-            glTexture2D.prototype.isFrameBuffer = function () {
-                return false;
-            };
-            glTexture2D.formGrayArray = function (webgl, array, width, height) {
-                var mipmap = false;
-                var linear = true;
-                var t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
-                var data = new Uint8Array(array.length * 4);
-                for (var y = 0; y < width; y++) {
-                    for (var x = 0; x < width; x++) {
-                        var fi = y * 512 + x;
-                        var i = y * width + x;
-                        data[fi * 4] = array[i] * 255;
-                        data[fi * 4 + 1] = array[i] * 255;
-                        data[fi * 4 + 2] = array[i] * 255;
-                        data[fi * 4 + 3] = 255;
-                    }
-                }
-                t.uploadByteArray(mipmap, linear, 512, 512, data);
-                return t;
-            };
-            glTexture2D.staticTexture = function (webgl, name) {
-                var t = glTexture2D.mapTexture[name];
-                if (t != undefined)
-                    return t;
-                var mipmap = false;
-                var linear = true;
-                t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
-                var data = new Uint8Array(4);
-                var width = 1;
-                var height = 1;
-                data[0] = 128;
-                data[1] = 0;
-                data[2] = 128;
-                data[3] = 255;
-                if (name == "gray") {
-                    data[0] = 128;
-                    data[1] = 128;
-                    data[2] = 128;
-                    data[3] = 255;
-                }
-                else if (name == "white") {
-                    data[0] = 255;
-                    data[1] = 255;
-                    data[2] = 255;
-                    data[3] = 255;
-                }
-                else if (name == "black") {
-                    data[0] = 0;
-                    data[1] = 0;
-                    data[2] = 0;
-                    data[3] = 255;
-                }
-                else if (name == "normal") {
-                    data[0] = 128;
-                    data[1] = 128;
-                    data[2] = 255;
-                    data[3] = 255;
-                }
-                else if (name == "grid") {
-                    width = 256;
-                    height = 256;
-                    data = new Uint8Array(width * width * 4);
-                    for (var y = 0; y < height; y++) {
-                        for (var x = 0; x < width; x++) {
-                            var seek = (y * width + x) * 4;
-                            if (((x - width * 0.5) * (y - height * 0.5)) > 0) {
-                                data[seek] = 0;
-                                data[seek + 1] = 0;
-                                data[seek + 2] = 0;
-                                data[seek + 3] = 255;
-                            }
-                            else {
-                                data[seek] = 255;
-                                data[seek + 1] = 255;
-                                data[seek + 2] = 255;
-                                data[seek + 3] = 255;
-                            }
-                        }
-                    }
-                }
-                t.uploadByteArray(mipmap, linear, width, height, data);
-                glTexture2D.mapTexture[name] = t;
-                return t;
-            };
-            glTexture2D.mapTexture = {};
-            return glTexture2D;
-        }());
-        render.glTexture2D = glTexture2D;
-        var glTextureCube = (function () {
-            function glTextureCube(webgl, format, mipmap, linear) {
-                if (format === void 0) { format = TextureFormatEnum.RGBA; }
-                if (mipmap === void 0) { mipmap = false; }
-                if (linear === void 0) { linear = true; }
-                this.loaded = false;
-                this.width = 0;
-                this.height = 0;
-                this.mipmap = false;
-                this.linear = false;
-                this.webgl = webgl;
-                this.format = format;
-                this.mipmap = mipmap;
-                this.linear = linear;
-                this.texture = webgl.createTexture();
-            }
-            glTextureCube.prototype.uploadImages = function (Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
-                var wrc = WebGLRenderingContext;
-                var textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
-                var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
-                for (var i = 0; i < typeArr.length; i++) {
-                    var reader = textures[i].glTexture.getReader();
-                    if (!reader) {
-                        console.warn("getReader() fail : " + textures[i].getName());
-                        return;
-                    }
-                    this.upload(reader.data, reader.width, reader.height, typeArr[i]);
-                }
-            };
-            glTextureCube.prototype.upload = function (data, width, height, TEXTURE_CUBE_MAP_) {
-                this.width = width;
-                this.height = height;
-                this.loaded = true;
-                var gl = this.webgl;
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-                this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
-                var formatGL = this.webgl.RGBA;
-                if (this.format == TextureFormatEnum.RGB)
-                    formatGL = this.webgl.RGB;
-                else if (this.format == TextureFormatEnum.Gray)
-                    formatGL = this.webgl.LUMINANCE;
-                if (data instanceof HTMLImageElement) {
-                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, formatGL, this.webgl.UNSIGNED_BYTE, data);
-                }
-                else {
-                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
-                }
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                var mipmap = this.mipmap;
-                var linear = this.linear;
-            };
-            glTextureCube.prototype.caclByteLength = function () {
-                var pixellen = 1;
-                if (this.format == TextureFormatEnum.RGBA) {
-                    pixellen = 4;
-                }
-                else if (this.format == TextureFormatEnum.RGB) {
-                    pixellen = 3;
-                }
-                var len = this.width * this.height * pixellen * 6;
-                if (this.mipmap) {
-                    len = len * (1 - Math.pow(0.25, 10)) / 0.75;
-                }
-                return len;
-            };
-            glTextureCube.prototype.dispose = function (webgl) {
-                if (this.texture != null) {
-                    webgl.deleteTexture(this.texture);
-                    this.texture = null;
-                }
-            };
-            glTextureCube.prototype.isFrameBuffer = function () {
-                return false;
-            };
-            return glTextureCube;
-        }());
-        render.glTextureCube = glTextureCube;
-        var WriteableTexture2D = (function () {
-            function WriteableTexture2D(webgl, format, width, height, linear, premultiply, repeat, mirroredU, mirroredV) {
-                if (format === void 0) { format = TextureFormatEnum.RGBA; }
-                if (premultiply === void 0) { premultiply = true; }
-                if (repeat === void 0) { repeat = false; }
-                if (mirroredU === void 0) { mirroredU = false; }
-                if (mirroredV === void 0) { mirroredV = false; }
-                this.premultiply = true;
-                this.repeat = false;
-                this.mirroredU = false;
-                this.mirroredV = false;
-                this.width = 0;
-                this.height = 0;
-                this.webgl = webgl;
-                this.texture = webgl.createTexture();
-                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 0);
-                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
-                this.format = format;
-                this.formatGL = this.webgl.RGBA;
-                if (format == TextureFormatEnum.RGB)
-                    this.formatGL = this.webgl.RGB;
-                else if (format == TextureFormatEnum.Gray)
-                    this.formatGL = this.webgl.LUMINANCE;
-                var data = null;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, this.formatGL, width, height, 0, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
-                if (linear) {
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.LINEAR);
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.LINEAR);
-                }
-                else {
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MAG_FILTER, this.webgl.NEAREST);
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_MIN_FILTER, this.webgl.NEAREST);
-                }
-                if (repeat) {
-                    if (mirroredU && mirroredV) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
-                    }
-                    else if (mirroredU) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.MIRRORED_REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
-                    }
-                    else if (mirroredV) {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.MIRRORED_REPEAT);
-                    }
-                    else {
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.REPEAT);
-                        this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.REPEAT);
-                    }
-                }
-                else {
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_S, this.webgl.CLAMP_TO_EDGE);
-                    this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
-                }
-            }
-            WriteableTexture2D.prototype.updateRect = function (data, x, y, width, height) {
-                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
-                this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, width, height, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
-            };
-            WriteableTexture2D.prototype.updateRectImg = function (data, x, y) {
-                this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
-                this.webgl.texSubImage2D(this.webgl.TEXTURE_2D, 0, x, y, this.formatGL, this.webgl.UNSIGNED_BYTE, data);
-            };
-            WriteableTexture2D.prototype.isFrameBuffer = function () {
-                return false;
-            };
-            WriteableTexture2D.prototype.dispose = function (webgl) {
-                if (this.texture != null) {
-                    webgl.deleteTexture(this.texture);
-                    this.texture = null;
-                }
-            };
-            WriteableTexture2D.prototype.caclByteLength = function () {
-                var pixellen = 1;
-                if (this.format == TextureFormatEnum.RGBA) {
-                    pixellen = 4;
-                }
-                else if (this.format == TextureFormatEnum.RGB) {
-                    pixellen = 3;
-                }
-                var len = this.width * this.height * pixellen;
-                return len;
-            };
-            return WriteableTexture2D;
-        }());
-        render.WriteableTexture2D = WriteableTexture2D;
     })(render = gd3d.render || (gd3d.render = {}));
 })(gd3d || (gd3d = {}));
 //# sourceMappingURL=gd3d.js.map

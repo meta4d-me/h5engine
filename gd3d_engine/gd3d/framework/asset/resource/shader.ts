@@ -112,7 +112,7 @@ namespace gd3d.framework
          * @private
          * shader mapunifrom 默认值
          */
-        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any} } = {};
+        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any,becolor?:boolean,min?:number,max?:number} } = {};
         /**
          * @public
          * @language zh_CN
@@ -218,13 +218,15 @@ namespace gd3d.framework
                             break;
                         case "range":
                             //this.defaultValue[key] = { type: render.UniformTypeEnum.Float, min: parseFloat(words[4]), max: parseFloat(words[5]), value: parseFloat(words[6]) };
-                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float, value: parseFloat(words[6]) };
-                            
+                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float, value: parseFloat(words[6]),min:parseFloat(words[4]),max:parseFloat(words[5])};
                             break;
                         case "vector":
-                        case "color":
                             let _vector = new gd3d.math.vector4(parseFloat(words[4]), parseFloat(words[5]), parseFloat(words[6]), parseFloat(words[7]));
-                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float4, value: _vector };
+                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float4, value: _vector};
+                            break;
+                        case "color":
+                            let _color = new gd3d.math.vector4(parseFloat(words[4]), parseFloat(words[5]), parseFloat(words[6]), parseFloat(words[7]));
+                            this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Float4, value: _color,becolor:true};
                             break;
                         case "texture":
                             this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Texture, value: assetmgr.getDefaultTexture(words[4]) };

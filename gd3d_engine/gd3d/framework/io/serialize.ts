@@ -40,16 +40,17 @@ namespace gd3d.io
                 SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
             if (asset instanceof gd3d.framework.material)
             {
-                let _mapUniform = (asset as gd3d.framework.material).mapUniform;
-                if (!_mapUniform)
-                    return;
-                for (let newKey in _mapUniform)
+                // let _mapUniform = (asset as gd3d.framework.material).statedMapUniforms;
+                let ass = (asset as gd3d.framework.material);
+
+
+                for (let newKey in ass.statedMapUniforms)
                 {
-                    if (!_mapUniform[newKey])
+                    if (!ass.statedMapUniforms[newKey])
                         continue;
-                    if (_mapUniform[newKey].type != render.UniformTypeEnum.Texture)
+                    if (ass.defaultMapUniform[newKey].type != render.UniformTypeEnum.Texture)
                         continue;
-                    let _texture = _mapUniform[newKey].value;
+                    let _texture = ass.statedMapUniforms[newKey];
                     if (!_texture)
                         continue;
                     url = assetMgr.getAssetUrl(_texture);
@@ -60,7 +61,11 @@ namespace gd3d.io
                         SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                     else
                     {
-                        SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(_texture));
+                        if ((_texture as gd3d.framework.texture).defaultAsset == true)
+                            continue;
+                        let content = SerializeDependent.GetAssetContent(_texture);
+                        if (content)
+                            SerializeDependent.resourseDatas.push(content);
                         continue;
                     }
                     if (url.indexOf(".imgdesc.json") < 0)
@@ -1148,7 +1153,7 @@ namespace gd3d.io
                 if (type == "material")
                 {
                     if (value.lastIndexOf(".mat.json") < 0)
-                        value += ".mat.json";                    
+                        value += ".mat.json";
                 }
             }
             this.value = value;

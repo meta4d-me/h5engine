@@ -253,12 +253,12 @@ namespace gd3d.framework
             this._canvasClientWidth = this.webgl.canvas.clientWidth;
             this._canvasClientHeight = this.webgl.canvas.clientHeight;
             gd3d.render.webglkit.initConst(this.webgl);
+            this.initRender();
             this.initAssetMgr();
             this.initInputMgr();
 
             this.initScene();
 
-            this.initRender();
             
             this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
             this.loop();
