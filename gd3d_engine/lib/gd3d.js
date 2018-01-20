@@ -7916,9 +7916,6 @@ var gd3d;
                 var json = JSON.parse(jsonStr);
                 this.f14data = new framework.F14EffectData();
                 this.f14data.parsejson(json, assetmgr, this.assetbundle);
-                this.trans = new gd3d.framework.transform();
-                this.f14Effect = this.trans.gameObject.addComponent("f14EffectSystem");
-                this.f14Effect.setData(this.f14data);
             };
             f14eff.prototype.getCloneF14eff = function () {
                 var f14node = new gd3d.framework.f14node();
@@ -13852,6 +13849,7 @@ var gd3d;
                 this.fps = 60;
                 this.layers = [];
                 this.VF = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                this._delayTime = -1;
                 this.elements = [];
                 this.renderBatch = [];
                 this.loopCount = 0;
@@ -13861,6 +13859,38 @@ var gd3d;
             }
             f14EffectSystem.prototype.start = function () { };
             f14EffectSystem.prototype.remove = function () { };
+            Object.defineProperty(f14EffectSystem.prototype, "f14eff", {
+                get: function () {
+                    return this._f14eff;
+                },
+                set: function (data) {
+                    if (this._f14eff != null) {
+                        this._f14eff.unuse();
+                    }
+                    this._f14eff = data;
+                    if (this._f14eff != null) {
+                        this._f14eff.use();
+                        this.setData(this._f14eff.f14data);
+                        this._f14eff.delayTime = this._delayTime;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(f14EffectSystem.prototype, "delay", {
+                get: function () {
+                    if (this._f14eff && this._f14eff.delayTime != null)
+                        this._delayTime = this._f14eff.delayTime;
+                    return this._delayTime;
+                },
+                set: function (deley) {
+                    this._delayTime = deley;
+                    if (this._f14eff)
+                        this._f14eff.delayTime = deley;
+                },
+                enumerable: true,
+                configurable: true
+            });
             f14EffectSystem.prototype.setData = function (data) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.data = data;
@@ -14002,6 +14032,17 @@ var gd3d;
             };
             f14EffectSystem.prototype.clone = function () {
             };
+            __decorate([
+                gd3d.reflect.Field("f14eff"),
+                gd3d.reflect.UIStyle("WidgetDragSelect"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.f14eff])
+            ], f14EffectSystem.prototype, "f14eff", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], f14EffectSystem.prototype, "delay", null);
             f14EffectSystem = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
@@ -17492,7 +17533,7 @@ var gd3d;
         function isAsset(type) {
             if (type == "mesh" || type == "texture" || type == "shader" ||
                 type == "material" || type == "animationClip" || type == "atlas" ||
-                type == "font" || type == "prefab" || type == "sprite" || type == "textasset")
+                type == "font" || type == "prefab" || type == "sprite" || type == "textasset" || type == "f14eff")
                 return true;
             return false;
         }
@@ -17551,6 +17592,7 @@ var gd3d;
                 referenceInfo.regType("animationclip");
                 referenceInfo.regType("constText");
                 referenceInfo.regType("UniformData");
+                referenceInfo.regType("f14eff");
             };
             referenceInfo.regType = function (type) {
                 referenceInfo.regtypelist.push(type);

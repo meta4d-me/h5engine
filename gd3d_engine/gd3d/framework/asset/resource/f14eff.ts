@@ -44,17 +44,18 @@ namespace gd3d.framework
             return 0;
         }
         f14data:F14EffectData;
-        trans:transform;
-        f14Effect:f14EffectSystem;
+        delayTime:number;
+        // trans:transform;
+        // f14Effect:f14EffectSystem;
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
             let json=JSON.parse(jsonStr);
             this.f14data=new F14EffectData();
             this.f14data.parsejson(json,assetmgr,this.assetbundle);
             
-            this.trans=new gd3d.framework.transform();
-            this.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
-            this.f14Effect.setData(this.f14data);
+            // this.trans=new gd3d.framework.transform();
+            // this.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
+            // this.f14Effect.setData(this.f14data);
         }
 
         getCloneF14eff():f14node

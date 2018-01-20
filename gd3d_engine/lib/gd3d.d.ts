@@ -1243,8 +1243,7 @@ declare namespace gd3d.framework {
         dispose(): void;
         caclByteLength(): number;
         f14data: F14EffectData;
-        trans: transform;
-        f14Effect: f14EffectSystem;
+        delayTime: number;
         Parse(jsonStr: string, assetmgr: assetMgr): void;
         getCloneF14eff(): f14node;
     }
@@ -2314,6 +2313,10 @@ declare namespace gd3d.framework {
         layers: F14Layer[];
         VF: number;
         webgl: WebGLRenderingContext;
+        private _f14eff;
+        f14eff: f14eff;
+        private _delayTime;
+        delay: number;
         setData(data: F14EffectData): void;
         private elements;
         renderBatch: F14Basebatch[];

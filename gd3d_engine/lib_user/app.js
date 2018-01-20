@@ -934,7 +934,6 @@ var main = (function () {
     main.prototype.onStart = function (app) {
         console.log("i am here.");
         this.app = app;
-        this.addBtn("loadscene", function () { return new dome.test_loadScene(); });
         this.addBtn("test_ui", function () { return new t.test_ui(); });
         this.addBtn("test_load", function () { return new test_load(); });
         this.addBtn("test_loadprefab", function () { return new test_loadprefab(); });
@@ -5136,6 +5135,7 @@ var test_uiPerfabLoad = (function () {
         this.camera.far = 10;
         this.rooto2d = new gd3d.framework.overlay2D();
         this.camera.addOverLay(this.rooto2d);
+        this.taskmgr.addTaskCall(this.loadShaders.bind(this));
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
         var inputh = document.createElement("input");
@@ -5205,6 +5205,13 @@ var test_uiPerfabLoad = (function () {
                 t2d.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
                 t2d.markDirty();
                 _this.targetui = t2d;
+            }
+        });
+    };
+    test_uiPerfabLoad.prototype.loadShaders = function (lastState, state) {
+        this.assetMgr.load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                state.finish = true;
             }
         });
     };

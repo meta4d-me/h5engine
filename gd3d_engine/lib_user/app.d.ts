@@ -625,6 +625,7 @@ declare class test_uiPerfabLoad implements IState {
     private createUI(astState, state);
     targetui: gd3d.framework.transform2D;
     private doLoad(name);
+    private loadShaders(lastState, state);
     private loadTexture(lastState, state);
     update(delta: number): void;
 }
