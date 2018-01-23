@@ -2,7 +2,8 @@
     "layer": "transparent",
 	"properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_Alpha('Alpha', Range(0.0, 1.0)) = 1.0"
+        "_Alpha('Alpha', Range(0.0, 1.0)) = 1.0",
+        "_Superimposition('Superimposition', Range(0.0, 7.0)) = 1.0"
     ],
     "passes": {
         "base": [
