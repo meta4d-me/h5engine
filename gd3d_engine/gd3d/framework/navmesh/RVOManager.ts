@@ -116,9 +116,56 @@ namespace gd3d.framework {
 
         public update() {
             if(this.isRunning && (this.transforms.length >= 1)) {
+                // // 模拟运算
+                // while(this.isAlmostStatic() == false) {
+                //     this.RVO_check(this.sim, this.goals);
+                //     this.RVO_walking(this.sim, this.goals);
+                // }
+                // console.warn("Peace!");
+                // for(let i = 1; i < this.sim.agents.length; i++) {
+                //     this.goals[i] = this.sim.agents[i].position;
+                // }
+                // this.enable();
+                // if(this.isAlmostStatic()) {
+                //     for(let i = 1; i < this.sim.agents.length; i++) {
+                //         this.goals[i] = this.sim.agents[i].position;
+                //     }
+                // }
+                this.RVO_check(this.sim, this.goals);
+                this.RVO_walking(this.sim, this.goals);
+                this.updateTransform(this.sim);
+
+            }
+        }
+
+        private isAlmostStatic():boolean {
+            let threshold = 0.1;
+            let amount = 0;
+            for(let i = 0; i < this.sim.agents.length; i++) {
+                if(this.sim.agents[i].prefVelocity != null) {
+                    if(this.sim.agents[i].prefVelocity[0] < 0.01 && this.sim.agents[i].prefVelocity[1] < 0.01) {
+                        amount++;
+                    }
+                }
+            }
+            if(amount/this.sim.agents.length >= threshold) {
+                return true;
+            }
+            return false;
+        }
+
+        private simulation() {
+            // 模拟运算
+            this.sim.agents[0].radius = this.radius[0];
+            while(this.isAlmostStatic() == false) {
                 this.RVO_check(this.sim, this.goals);
                 this.RVO_walking(this.sim, this.goals);
             }
+            console.warn("Peace!");
+            for(let i = 1; i < this.sim.agents.length; i++) {
+                this.goals[i] = this.sim.agents[i].position;
+            }
+            this.enable();
         }
 
         private RVO_walking(sim, goals) {
@@ -133,6 +180,9 @@ namespace gd3d.framework {
                 }
             }
             sim.doStep();   // 移动一帧
+        }
+
+        private updateTransform(sim) {
             for(let i = 0; i < sim.agents.length; i++) {
                 this.transforms[i].localTranslate.x = sim.agents[i].position[0];
                 this.transforms[i].localTranslate.z = sim.agents[i].position[1];
@@ -152,9 +202,7 @@ namespace gd3d.framework {
 
                 this.transforms[i].markDirty();
             }
-
         }
-
 
 
         private RVO_check(sim, goals) {
@@ -179,6 +227,7 @@ namespace gd3d.framework {
                         this.currGoal = this._RoadPoints.pop();
                         this.cal2dDir(this.lastGoal, this.currGoal, this.currMoveDir);
                         goals[0] = [this.currGoal.x, this.currGoal.z];
+                        this.simulation();
                         sim.agents[0].radius = 0.1;
                     }
                 }
@@ -187,6 +236,7 @@ namespace gd3d.framework {
                 //切换下一目标
                 this.currGoal = this._RoadPoints.pop();
                 goals[0] = [this.currGoal.x, this.currGoal.z];
+                this.simulation();
                 sim.agents[0].radius = 0.1;
 
             }
