@@ -1,0 +1,32 @@
+{
+    "layer": "transparent",
+	"properties": [
+        "_MainTex('MainTex',Texture)='white'{}"
+    ],
+    "passes": {
+        "base": [
+            {
+                "blendmode": "blend",
+                "vs": "transparent",
+                "fs": "transparent"
+            }
+        ],
+        "base_fog": [
+            {
+                "blendmode": "blend",
+                "vs": "transparent",
+                "fs": "transparent"
+            }
+        ],
+        "skin": [
+            {
+                "blendmode": "blend",
+                "vs": "transparent",
+                "fs": "transparent"
+            }
+        ],
+        "shadowgen": [],
+        "bone": [],
+        "shadowuse": []
+    }
+}
