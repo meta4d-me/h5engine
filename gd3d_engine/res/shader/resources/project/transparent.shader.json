@@ -1,12 +1,15 @@
 {
     "layer": "transparent",
 	"properties": [
-        "_MainTex('MainTex',Texture)='white'{}"
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_Alpha('Alpha', Range(0.0, 1.0)) = 1.0",
+        "_Superimposition('Superimposition', Range(0.0, 7.0)) = 1.0"
     ],
     "passes": {
         "base": [
             {
                 "blendmode": "blend",
+                "showface": "ccw",
                 "vs": "transparent",
                 "fs": "transparent"
             }
@@ -14,6 +17,7 @@
         "base_fog": [
             {
                 "blendmode": "blend",
+                "showface": "ccw",
                 "vs": "transparent",
                 "fs": "transparent"
             }
@@ -21,6 +25,15 @@
         "skin": [
             {
                 "blendmode": "blend",
+                "showface": "ccw",
+                "vs": "transparent",
+                "fs": "transparent"
+            }
+        ],
+        "skin_fog": [
+            {
+                "blendmode": "blend",
+                "showface": "ccw",
                 "vs": "transparent",
                 "fs": "transparent"
             }
