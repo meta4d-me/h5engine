@@ -12,7 +12,7 @@ namespace gd3d.framework
         gameObject: gameObject;
         remove() {}
         
-        private fps:number=60;
+        private fps:number=30;
         public data:F14EffectData;
         public layers:F14Layer[] =[];
         //--------------------------------------------------------------------
@@ -20,7 +20,6 @@ namespace gd3d.framework
         public webgl:WebGLRenderingContext;
 
         private _f14eff: f14eff;
-        
         /**
          * f14eff 资源
          * @private
@@ -31,39 +30,29 @@ namespace gd3d.framework
         {
             return this._f14eff;
         }
-        set f14eff(data: f14eff)
+        set f14eff(asset: f14eff)
         {
             if (this._f14eff != null)
             {
                 this._f14eff.unuse();
             }
-            this._f14eff = data;
-            if (this._f14eff != null)
-            {
-                this._f14eff.use();
-                this.setData(this._f14eff.f14data);
-                this._f14eff.delayTime = this._delayTime;
-            }
+            this._f14eff = asset;
+            this.setData(asset.data);
         }
-
-        private _delayTime:number=-1;
+        private _delayTime:number=0;
         /**
          * delaytime
          * @private
          */
         @gd3d.reflect.Field("number")
         get delay(){
-            if(this._f14eff && this._f14eff.delayTime!= null) 
-                this._delayTime = this._f14eff.delayTime;
             return this._delayTime;
         }
         set delay(deley:number){
             this._delayTime = deley;
-            if(this._f14eff)
-                this._f14eff.delayTime = deley;
         }
 
-        public setData(data:F14EffectData)
+        setData(data:F14EffectData)
         {
             //-------------------准备各种需要访问
             this.webgl=gd3d.framework.sceneMgr.app.webgl;
@@ -87,11 +76,14 @@ namespace gd3d.framework
         public renderBatch:F14Basebatch[] =[];
 
         private loopCount:number=0;
+        private allTime:number=0;
         public update(deltaTime:number)
         {
             if(!this.active) return;
             if (this.data == null) return;
-            this.totalTime+=deltaTime;
+            this.allTime+=deltaTime;
+            this.totalTime=this.allTime-this._delayTime;
+            if(this.totalTime<=0) return;
             this.totalFrame=this.totalTime*this.fps;
             this.restartFrame = this.totalFrame % this.data.lifeTime;
             this.restartFrame=Math.floor(this.restartFrame);
@@ -245,7 +237,8 @@ namespace gd3d.framework
         }
         reset()
         {
-            this.totalTime=0;
+            this.allTime=0;
+            //this.totalTime=0;
             for (let i = 0; i < this.elements.length; i++)
             {
                 this.elements[i].reset();

@@ -91,6 +91,22 @@
         {
             "name":"resources/using/particles_blend.shader.json",
             "length":0
+            },
+        {
+            "name":"resources/using/par_mask_tint.vs.glsl",
+            "length":0
+            },
+        {
+            "name":"resources/using/par_mask_tint.fs.glsl",
+            "length":0
+            },
+        {
+            "name":"resources/using/particle_mask_blend_tint.shader.json",
+            "length":0
+            },
+        {
+            "name":"resources/using/particle_mask_add_tint.shader.json",
+            "length":0
             }
         ]
 }
