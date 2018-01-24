@@ -186,7 +186,8 @@ namespace gd3d.framework
                 this.lerpFunc(from, to,lerp,out);
             }else if(frame>=this.frameList[this.frameList.length-1])
             {
-                out=this.line[this.frameList[this.frameList.length - 1]];
+                //out=this.line[this.frameList[this.frameList.length - 1]];
+                this.cloneFunc(this.line[this.frameList[this.frameList.length - 1]],out);
             }else
             {
                 for (let i=0;i<this.frameList.length;i++)
