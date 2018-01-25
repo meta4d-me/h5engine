@@ -227,13 +227,16 @@ namespace gd3d.framework
         private active:boolean=false;
         public play()
         {
-            this.reset();
+            if(this.active)
+            {
+                this.reset();
+            }
             this.active=true;
         }
         public stop()
         {
             this.active=false;
-            // this.reset();
+            this.reset();
         }
         reset()
         {
