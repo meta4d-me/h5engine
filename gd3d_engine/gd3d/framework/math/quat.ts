@@ -298,8 +298,11 @@
     export function quat2LookRotation(pos: vector3, targetpos: vector3, upwards: vector3, out: quaternion) {
         let dir = gd3d.math.pool.new_vector3();
         math.vec3Subtract(targetpos, pos, dir);
-        math.vec3Normalize(dir, dir);
+        math.quatLookRotation(dir,upwards,out);
+    }
 
+    export function quatLookRotation(dir:vector3, upwards: vector3, out: quaternion){
+        math.vec3Normalize(dir, dir);
         let ab = math.vec3Dot(dir, gd3d.math.pool.vector3_forward);
         let an_dz = Math.acos(ab);
 
@@ -309,13 +312,9 @@
         an_dz = 180 / Math.PI * an_dz;
         quatFromAxisAngle(cdz, -an_dz, out);
 
-
-
         let y = gd3d.math.pool.new_vector3();
         quatTransformVector(out, gd3d.math.pool.vector3_up, y);
-
         let cyw = cdz;
-
         vec3Cross(dir, upwards, cyw);
 
         math.vec3Normalize(y, y);
