@@ -110,9 +110,10 @@ namespace gd3d.framework
             gd3d.math.vec4Clone(this.starTex_ST,this.tex_ST);
 
             //--strechbillboard
-            if(data.rendermodel == RenderModelEnum.VerticalBillBoard)
+            if(data.rendermodel == RenderModelEnum.StretchedBillBoard)
             {
                 this.emissionMatToWorld=this.element.getWorldMatrix();
+                math.matrixTransformNormal(this.speedDir,this.emissionMatToWorld,this.worldspeeddir);                
                 math.matrixTransformVector3(this.StartPos,this.emissionMatToWorld,this.worldStartPos);
             }
             // Vector3 worldStartPos = this.getElementMatToWorld() * this.StartPos;
@@ -329,14 +330,21 @@ namespace gd3d.framework
                 math.matrixTransformVector3(this.localTranslate,this.emissionMatToWorld,this.worldpos);
                 let campos =this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
                 math.vec3Subtract(campos,this.worldpos,this.lookDir);
-                math.vec3ScaleByNum(this.speedDir,math.vec3Dot(this.speedDir,this.lookDir),this.lookDir);
-                math.vec3Add(this.lookDir,this.worldStartPos,this.lookDir);
-                math.vec3Subtract(this.lookDir,campos,this.lookDir);
+                math.vec3Normalize(this.lookDir,this.lookDir);
+                math.vec3Cross(this.worldspeeddir,this.lookDir,this.temptx);
+                math.vec3Cross(this.temptx,this.worldspeeddir,this.lookDir);
+                math.unitxyzToRotation(this.temptx,this.worldspeeddir,this.lookDir,this.worldRotation);
+                
+
+                // math.vec3ScaleByNum(this.speedDir,math.vec3Dot(this.speedDir,this.lookDir),this.lookDir);
+                // math.vec3Add(this.lookDir,this.worldStartPos,this.lookDir);
+                // math.vec3Subtract(campos,this.lookDir,this.lookDir);
+                // math.quatLookRotation(this.lookDir,this.worldspeeddir,this.worldRotation);
                 //math.vec3Normalize(this.lookDir,this.lookDir);
                 
-                math.matrixTransformNormal(this.speedDir,this.emissionMatToWorld,this.worldspeeddir);
-                math.myLookRotation(this.lookDir,this.worldRotation,this.worldspeeddir);
-
+                //math.myLookRotation(this.lookDir,this.worldRotation,this.worldspeeddir);
+                //math.vec3Add(this.lookDir,this.worldpos,this.tarWorldpos);
+                
                 // math.vec3Cross(this.worldspeeddir,this.lookDir,this.temptx);
                 // math.vec3Cross(this.temptx,this.worldspeeddir,this.lookDir);
                 // math.vec3Add(this.worldpos,this.lookDir,this.tarWorldpos);
