@@ -150,7 +150,7 @@ namespace gd3d.framework
                 this.renderCameras.sort((a, b) =>
                 {
                     return a.order - b.order;
-                })
+                });
             }
 
 

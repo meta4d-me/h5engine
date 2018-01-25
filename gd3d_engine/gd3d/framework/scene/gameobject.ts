@@ -293,7 +293,7 @@ namespace gd3d.framework
             let add = true;
 
             if (reflect.getClassTag(comp["__proto__"], "renderer") == "1" || reflect.getClassTag(comp["__proto__"], "effectbatcher") == "1")
-            {//这货是个渲染器
+            {//comp是个渲染器
 
                 if (this.renderer == null)
                 {
@@ -309,7 +309,7 @@ namespace gd3d.framework
                 }
             }
             if (reflect.getClassTag(comp["__proto__"], "camera") == "1")
-            {//这货是个摄像机
+            {//comp是个摄像机
                 if (this.camera == null)
                 {
                     this.camera = comp as any;
@@ -323,7 +323,7 @@ namespace gd3d.framework
                 }
             }
             if (reflect.getClassTag(comp["__proto__"], "light") == "1")
-            {//这货是个light
+            {//comp是个light
                 if (this.light == null)
                 {
                     this.light = comp as any;
@@ -337,7 +337,7 @@ namespace gd3d.framework
                 }
             }
             if (reflect.getClassTag(comp["__proto__"], "boxcollider") == "1" || reflect.getClassTag(comp["__proto__"], "meshcollider") == "1" || reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
-            {//这货是个collider
+            {//comp是个collider
                 if (this.collider == null)
                 {
                     this.collider = comp as any;

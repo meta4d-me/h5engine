@@ -63,14 +63,14 @@ namespace t {
             let atlasComp = this.assetMgr.getAssetByName("comp.atlas.json") as gd3d.framework.atlas;
             let tex_0 = this.assetMgr.getAssetByName("zg03_256.png") as gd3d.framework.texture;
 
-            let label1 = this.createLabel(10, 10, "shannon_dxt1.dds");
+            let label1 = this.createLabel(10, 10, "shannon.pvr.bin");
             let label3 = this.createLabel(80, 10, "shannon_dxt3.dds");
             let label5 = this.createLabel(150, 10, "shannon_dxt5.dds");
             let labelAAI = this.createLabel(10, 200, "shannon_atc_rgb.dds");
             let labelAAE = this.createLabel(80, 200, "shannon_atc_rgba_explicit.dds");
             let labelARGB = this.createLabel(150, 200, "shannon_atc_rgba_interpolated.dds");
 
-            let image1 = this.createImage(10, 26, "shannon_dxt1.dds");
+            let image1 = this.createImage(10, 26, "shannon.pvr.bin");
             let image3 = this.createImage(80, 26, "shannon_dxt3.dds");
             let image5 = this.createImage(150, 26, "shannon_dxt5.dds");
             let imageAAI = this.createImage(10, 214, "shannon_atc_rgb.dds");
@@ -101,7 +101,7 @@ namespace t {
 
                                                 let t = 6;
 
-                                                this.assetMgr.load("res/shannon_dxt1.dds", gd3d.framework.AssetTypeEnum.Auto, (s) => {
+                                                this.assetMgr.load("res/shannon.pvr.bin", gd3d.framework.AssetTypeEnum.Auto, (s) => {
                                                     if (s.isfinish) {
                                                         t--;
                                                         if (t == 0) {

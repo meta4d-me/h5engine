@@ -49,7 +49,7 @@ class test_Sound implements IState
         this.camera.near=0.01;
         this.camera.far=100;
         objCam.localTranslate=new gd3d.math.vector3(0,0,-10);
-        objCam.lookatPoint(new gd3d.math.vector3(0,0,0));
+        objCam.lookat(this.cube);
         objCam.markDirty();   
 
         state.finish=true;
@@ -94,8 +94,9 @@ class test_Sound implements IState
 
         this.taskmgr.addTaskCall(this.loadShader.bind(this));
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskmgr.addTaskCall(this.addCam.bind(this));
         this.taskmgr.addTaskCall(this.addCube.bind(this));
+        this.taskmgr.addTaskCall(this.addCam.bind(this));
+        
     }
 
 
@@ -106,6 +107,7 @@ class test_Sound implements IState
 
         if(this.cube!=null)
         {
+
             var cubeTrans=this.cube.gameObject.transform;
             let yRoate=(this.time*30)%360;
             let yQuaternion=gd3d.math.pool.new_quaternion();

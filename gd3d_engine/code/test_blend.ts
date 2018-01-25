@@ -63,7 +63,7 @@ namespace t {
             this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
             this.camera.near = 0.01;
             this.camera.far = 120;
-            objCam.localTranslate = new gd3d.math.vector3(0, 0, 10);
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, 10);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();//标记为需要刷新
             state.finish = true;
@@ -78,6 +78,7 @@ namespace t {
                     background.name = "background";
                     background.localScale.x = background.localScale.y = 5;
                     background.localTranslate.z =-1;
+                    console.log(background);
                     this.scene.addChild(background);
                     background.markDirty();
                     background.updateWorldTran();

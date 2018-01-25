@@ -121,7 +121,7 @@ class test_loadprefabdds implements IState
                 //         });
                 //     }
                 // });
-                name = "dragon";
+                name = "Quad";
                 // this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_idle_none.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
                 // (s) => 
                 // {

@@ -1,8 +1,6 @@
-﻿namespace gd3d.math
-{
+﻿namespace gd3d.math {
 
-    export function quatNormalize(src: quaternion, out: quaternion)
-    {
+    export function quatNormalize(src: quaternion, out: quaternion) {
         var mag: number = 1 / Math.sqrt(src.x * src.x + src.y * src.y + src.z * src.z + src.w * src.w);
 
         out.x *= mag;
@@ -11,8 +9,7 @@
         out.w *= mag;
     }
 
-    export function quatTransformVector(src: quaternion, vector: vector3, out: vector3)
-    {
+    export function quatTransformVector(src: quaternion, vector: vector3, out: vector3) {
         var x1: number, y1: number, z1: number, w1: number;
         var x2: number = vector.x, y2: number = vector.y, z2: number = vector.z;
 
@@ -26,8 +23,7 @@
         out.z = -w1 * src.z - x1 * src.y + y1 * src.x + z1 * src.w;
 
     }
-    export function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3)
-    {
+    export function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3) {
         var x1: number, y1: number, z1: number, w1: number;
         var x2: number = vector.x, y2: number = vector.y, z2: number = vector.z;
         var srcx = src[srcseek]; var srcy = src[srcseek + 1]; var srcz = src[srcseek + 2]; var srcw = src[srcseek + 3];
@@ -42,20 +38,17 @@
         out.z = -w1 * srcz - x1 * srcy + y1 * srcx + z1 * srcw;
 
     }
-    export function quatMagnitude(src: quaternion): number
-    {
+    export function quatMagnitude(src: quaternion): number {
         return Math.sqrt(src.w * src.w + src.x * src.x + src.y * src.y + src.z * src.z);
     }
 
-    export function quatClone(src: quaternion, out: quaternion)
-    {
+    export function quatClone(src: quaternion, out: quaternion) {
         out.x = src.x;
         out.y = src.y;
         out.z = src.z;
         out.w = src.w;
     }
-    export function quatToMatrix(src: quaternion, out: matrix)
-    {
+    export function quatToMatrix(src: quaternion, out: matrix) {
         var xy2: number = 2.0 * src.x * src.y, xz2: number = 2.0 * src.x * src.z, xw2: number = 2.0 * src.x * src.w;
         var yz2: number = 2.0 * src.y * src.z, yw2: number = 2.0 * src.y * src.w, zw2: number = 2.0 * src.z * src.w;
         var xx: number = src.x * src.x, yy: number = src.y * src.y, zz: number = src.z * src.z, ww: number = src.w * src.w;
@@ -78,12 +71,10 @@
         out.rawData[15] = 1;
     }
 
-    export function quatInverse(src: quaternion, out: quaternion)
-    {
+    export function quatInverse(src: quaternion, out: quaternion) {
         var norm: number = src.w * src.w + src.x * src.x + src.y * src.y + src.z * src.z;
 
-        if (norm > 0.0)
-        {
+        if (norm > 0.0) {
             var invNorm = 1.0 / norm;
             out.w = src.w * invNorm;
             out.x = -src.x * invNorm;
@@ -92,8 +83,7 @@
         }
     }
 
-    export function quatFromYawPitchRoll(yaw: number, pitch: number, roll: number, result: quaternion): void 
-    {
+    export function quatFromYawPitchRoll(yaw: number, pitch: number, roll: number, result: quaternion): void {
         // Produces a quaternion from Euler angles in the z-y-x orientation (Tait-Bryan angles)
         var halfRoll = roll * 0.5;
         var halfPitch = pitch * 0.5;
@@ -111,8 +101,7 @@
         result.z = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);
         result.w = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);
     }
-    export function quatMultiply(srca: quaternion, srcb: quaternion, out: quaternion)
-    {
+    export function quatMultiply(srca: quaternion, srcb: quaternion, out: quaternion) {
         var w1: number = srca.w, x1: number = srca.x, y1: number = srca.y, z1: number = srca.z;
         var w2: number = srcb.w, x2: number = srcb.x, y2: number = srcb.y, z2: number = srcb.z;
 
@@ -127,8 +116,7 @@
         // out.y = -x1 * z2 + y1 * w2 + z1 * x2 + w1 * y2;
         // out.z = x1 * y2 - y1 * x2 + z1 * w2 + w1 * z2;
     }
-    export function quatMultiplyDataAndQuat(srca: Float32Array, srcaseek: number, srcb: quaternion, out: quaternion)
-    {
+    export function quatMultiplyDataAndQuat(srca: Float32Array, srcaseek: number, srcb: quaternion, out: quaternion) {
         var w1: number = srca[srcaseek + 3], x1: number = srca[srcaseek + 0], y1: number = srca[srcaseek + 1], z1: number = srca[srcaseek + 2];
         var w2: number = srcb.w, x2: number = srcb.x, y2: number = srcb.y, z2: number = srcb.z;
 
@@ -143,8 +131,7 @@
         // out.y = -x1 * z2 + y1 * w2 + z1 * x2 + w1 * y2;
         // out.z = x1 * y2 - y1 * x2 + z1 * w2 + w1 * z2;
     }
-    export function quatMultiplyVector(vector: vector3, scr: quaternion, out: quaternion)
-    {
+    export function quatMultiplyVector(vector: vector3, scr: quaternion, out: quaternion) {
         var x2: number = vector.x;
         var y2: number = vector.y;
         var z2: number = vector.z;
@@ -155,13 +142,11 @@
         out.z = scr.w * z2 + scr.x * y2 - scr.y * x2;
     }
 
-    export function quatLerp(srca: quaternion, srcb: quaternion, out: quaternion, t: number)
-    {
+    export function quatLerp(srca: quaternion, srcb: quaternion, out: quaternion, t: number) {
         var w1: number = srca.w, x1: number = srca.x, y1: number = srca.y, z1: number = srca.z;
         var w2: number = srcb.w, x2: number = srcb.x, y2: number = srcb.y, z2: number = srcb.z;
 
-        if (w1 * w2 + x1 * x2 + y1 * y2 + z1 * z2 < 0)
-        {
+        if (w1 * w2 + x1 * x2 + y1 * y2 + z1 * z2 < 0) {
             w2 = -w2;
             x2 = -x2;
             y2 = -y2;
@@ -180,8 +165,7 @@
         out.z *= len;
     }
 
-    export function quatFromAxisAngle(axis: vector3, angle: number, out: quaternion)
-    {
+    export function quatFromAxisAngle(axis: vector3, angle: number, out: quaternion) {
         angle *= Math.PI / 180.0;
         var halfAngle: number = angle * 0.5;
         var sin_a: number = Math.sin(halfAngle);
@@ -194,20 +178,17 @@
         math.quatNormalize(out, out);
     }
 
-    export function quatToAxisAngle(src: quaternion, axis: vector3): number
-    {
+    export function quatToAxisAngle(src: quaternion, axis: vector3): number {
         var sqrLength: number = src.x * src.x + src.y * src.y + src.z * src.z;
         var angle: number = 0;
-        if (sqrLength > 0.0)
-        {
+        if (sqrLength > 0.0) {
             angle = 2.0 * Math.acos(src.w);
             sqrLength = 1.0 / Math.sqrt(sqrLength);
             axis.x = src.x * sqrLength;
             axis.y = src.y * sqrLength;
             axis.z = src.z * sqrLength;
         }
-        else
-        {
+        else {
             angle = 0;
             axis.x = 1.0;
             axis.y = 0;
@@ -217,8 +198,7 @@
         return angle;
     }
 
-    export function quatFromEulerAngles(ax: number, ay: number, az: number, out: quaternion)
-    {
+    export function quatFromEulerAngles(ax: number, ay: number, az: number, out: quaternion) {
         ax *= Math.PI / 180;
         ay *= Math.PI / 180;
         az *= Math.PI / 180;
@@ -235,8 +215,7 @@
 
         math.quatNormalize(out, out);
     }
-    export function quatToEulerAngles(src: quaternion, out: vector3)
-    {
+    export function quatToEulerAngles(src: quaternion, out: vector3) {
         var temp: number = 2.0 * (src.w * src.x - src.y * src.z);
         temp = math.floatClamp(temp, -1.0, 1.0);
         out.x = Math.asin(temp);
@@ -249,16 +228,14 @@
         out.y /= Math.PI / 180;
         out.z /= Math.PI / 180;
     }
-    export function quatReset(src: quaternion)
-    {
+    export function quatReset(src: quaternion) {
         src.x = 0;
         src.y = 0;
         src.z = 0;
         src.w = 1;
     }
     //获取一个注视目标的四元数
-    export function quatLookat(pos: vector3, targetpos: vector3, out: quaternion)
-    {
+    export function quatLookat(pos: vector3, targetpos: vector3, out: quaternion) {
         var dir = new vector3();
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
@@ -268,8 +245,7 @@
         math.vec3Normalize(dirxz, dirxz);
 
         var yaw = Math.acos(dirxz.z);// / Math.PI * 180;
-        if (dirxz.x < 0)
-        {
+        if (dirxz.x < 0) {
             yaw = -yaw;
         }
         //dir在xz面上的投影
@@ -280,44 +256,111 @@
         if (v3length < -0.999)
             v3length = -1;
         var pitch = Math.acos(v3length);// / Math.PI * 180;
-        if (dir.y > 0)
-        {
+        if (dir.y > 0) {
             pitch = -pitch;
         }
         quatFromYawPitchRoll(yaw, pitch, 0, out);
         math.quatNormalize(out, out);
     }
 
-    export function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion,updir:gd3d.math.vector3=gd3d.math.pool.vector3_up)
-    {
+    export function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir: gd3d.math.vector3 = gd3d.math.pool.vector3_up) {
         var dir = gd3d.math.pool.new_vector3();
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
         var dot = gd3d.math.vec3Dot(gd3d.math.pool.vector3_forward, dir);
         dot = gd3d.math.floatClamp(dot, -1, 1);
-        var rotangle = Math.acos(dot)*180/Math.PI;
-        
-        if (rotangle< 0.01)
-        {
-            out.x=0;
-            out.y=0;
-            out.z=0;
-            out.w=1;
+        var rotangle = Math.acos(dot) * 180 / Math.PI;
+
+        if (rotangle < 0.01) {
+            out.x = 0;
+            out.y = 0;
+            out.z = 0;
+            out.w = 1;
             return;
         }
-        if (rotangle >179.9)
-        {
-            gd3d.math.quatFromAxisAngle(updir,180,out);
+        if (rotangle > 179.9) {
+            gd3d.math.quatFromAxisAngle(updir, 180, out);
             return;
         }
         var rotAxis = gd3d.math.pool.new_vector3();
         gd3d.math.vec3Cross(gd3d.math.pool.vector3_forward, dir, rotAxis);
-        gd3d.math.vec3Normalize(rotAxis,rotAxis);
+        gd3d.math.vec3Normalize(rotAxis, rotAxis);
         gd3d.math.quatFromAxisAngle(rotAxis, rotangle, out);
     }
 
-    export function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion)
-    {
+    export function quat2LookRotation(pos: vector3, targetpos: vector3, upwards: vector3, out: quaternion) {
+        let dir = gd3d.math.pool.new_vector3();
+        math.vec3Subtract(targetpos, pos, dir);
+        math.vec3Normalize(dir, dir);
+  
+        let z = gd3d.math.pool.new_vector3();
+        z.x = 0; z.y = 0; z.z = 1;
+        let ab = math.vec3Dot(dir, z);
+
+        let an_dz = Math.acos(ab);
+
+
+        let cdz = gd3d.math.pool.new_vector3();
+        vec3Cross(dir, z, cdz);
+        math.vec3Normalize(cdz, cdz);
+        an_dz = 180 / Math.PI * an_dz;
+        quatFromAxisAngle(cdz, -an_dz, out);
+
+
+
+        let y = z;
+        y.x = 0;
+        y.y = 1;
+        y.z = 0;
+
+        quatTransformVector(out, y, y);
+
+        let cyw = cdz;
+
+        vec3Cross(dir, upwards, cyw);
+
+        math.vec3Normalize(y, y);
+        math.vec3Normalize(cyw, cyw);
+        let cos2Y = vec3Dot(cyw, y);
+        //vec3Normalize(upwards,upwards);
+
+        
+        let sin2Y = Math.sqrt(1 - cos2Y * cos2Y);
+
+        if(vec3Dot(y,upwards)<0){
+            sin2Y=-sin2Y;
+        }
+
+        let siny = Math.sqrt((1 - sin2Y) / 2);
+        let cosy = -Math.sqrt((sin2Y + 1) / 2);
+
+        if (cos2Y < 0){
+            cosy = -cosy;
+        }
+
+        let yq = gd3d.math.pool.new_quaternion();
+        yq.x = 0;
+        yq.y = 0;
+        yq.z = siny;
+        yq.w = cosy;
+
+ 
+        quatMultiply(yq, out, out);
+        // if()<0){
+        //     yq.z = -siny;
+        //     quatMultiply(yq, out1, out);
+        // }
+            
+
+        gd3d.math.pool.delete_vector3(dir);
+        gd3d.math.pool.delete_vector3(z);
+        gd3d.math.pool.delete_vector3(cdz);
+        gd3d.math.pool.delete_quaternion(yq);
+
+
+    }
+
+    export function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion) {
         var dir = new vector3();
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
@@ -327,8 +370,7 @@
         math.vec3Normalize(dirxz, dirxz);
 
         var yaw = Math.acos(dirxz.z);// / Math.PI * 180;
-        if (dirxz.x < 0)
-        {
+        if (dirxz.x < 0) {
             yaw = -yaw;
         }
         // //dir在xz面上的投影

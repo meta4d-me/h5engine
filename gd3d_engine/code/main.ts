@@ -93,6 +93,7 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("test_loadprefabdds",() => new test_loadprefabdds());
         this.addBtn("test_ATC纹理",()=>new t.test_ATC());
+        this.addBtn("test_LookRotation",() => new test_LookRotation());
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
         // this.addBtn("cj_zs",()=>new dome.testCJ());
