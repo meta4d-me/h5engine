@@ -17,11 +17,8 @@ var __extends = (this && this.__extends) || (function () {
 var demo_navigaionRVO = (function () {
     function demo_navigaionRVO() {
         this.cubesize = 0.5;
-        this.sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
-        this.goals = [];
-        this.mods = [];
+        this.rvoMgr = new gd3d.framework.RVOManager();
         this.isInitPlayer = false;
-        this.moveSpeed = 0.2;
         this.Goals = [];
         this.enemys = [];
         this.pos = [];
@@ -33,6 +30,7 @@ var demo_navigaionRVO = (function () {
     }
     demo_navigaionRVO.prototype.start = function (app) {
         var _this = this;
+        demo_navigaionRVO.TestRVO = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
@@ -62,6 +60,14 @@ var demo_navigaionRVO = (function () {
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
         this.navmeshMgr = gd3d.framework.NavMeshLoadManager.Instance;
+        this.addbtn("50px", "打开 RVO", function () {
+            _this.rvoMgr.enable();
+        });
+        this.addbtn("100px", "关闭 RVO", function () {
+            _this.rvoMgr.disable();
+        });
+        this.addbtn("150px", "删除元素", function () {
+        });
     };
     demo_navigaionRVO.prototype.initPlayer = function (x, y, z) {
         if (this.isInitPlayer)
@@ -73,20 +79,13 @@ var demo_navigaionRVO = (function () {
         this.player.localScale.x = this.player.localScale.z = 2;
         this.player.markDirty();
         this.isInitPlayer = true;
-        this.sim.addAgent([x, z]);
-        this.sim.agents[0].radius = 1;
-        this.sim.agents[0].neighborDist = 0;
-        this.sim.agents[0].maxSpeed = 0.2;
-        this.sim.agents[0].timeHorizon = 5;
-        this.sim.agents[0].timeHorizonObst = 20;
-        this.mods.push(this.player);
-        this.goals.push([x, z]);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), this.player, 1, 0, 0.2);
     };
     demo_navigaionRVO.prototype.loadScene = function (assetName, isCompress) {
         var _this = this;
         if (isCompress === void 0) { isCompress = false; }
         var addScene = function () {
-            var beAddScene = true;
+            var beAddScene = false;
             if (beAddScene) {
                 var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
                 var _root = _scene.getSceneRoot();
@@ -108,22 +107,9 @@ var demo_navigaionRVO = (function () {
                 mtr.setShader(sdr);
                 _this.navmeshMgr.showNavmesh(true, mtr);
                 console.error(_this.navmeshMgr.navMesh);
-                var data = _this.navmeshMgr.navMesh.data;
-                if (data) {
-                    var border = _this.navmesh2Border(data);
-                    console.log(border);
-                    for (var i = 0; i < border.length; i += 2) {
-                        var p1 = border[i];
-                        var p2 = border[i + 1];
-                        _this.sim.addObstacle([
-                            p1,
-                            p2,
-                            p2,
-                            p1
-                        ]);
-                    }
-                }
-                _this.sim.processObstacles();
+                var cc = false;
+                if (cc)
+                    return;
             });
         };
         if (isCompress) {
@@ -143,157 +129,16 @@ var demo_navigaionRVO = (function () {
             });
         }
     };
-    demo_navigaionRVO.prototype.playerwalking = function () {
-        if (!this.player || !this.currGoal)
+    demo_navigaionRVO.prototype.PosRayNavmesh = function (oPos) {
+        if (!this.navmeshMgr.navMesh || !this.navmeshMgr.navTrans)
             return;
-        var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
-        var step = dis < this.moveSpeed ? dis : this.moveSpeed;
-        var dir = gd3d.math.pool.new_vector3();
-        gd3d.math.vec3Subtract(this.currGoal, this.player.localTranslate, dir);
-        gd3d.math.vec3Normalize(dir, dir);
-        gd3d.math.vec3ScaleByNum(dir, step, dir);
-        gd3d.math.vec3Add(this.player.localTranslate, dir, this.player.localTranslate);
-        this.player.markDirty();
-    };
-    demo_navigaionRVO.prototype.RVO_walking = function (sim, goals) {
-        for (var i = 0, len = sim.agents.length; i < len; i++) {
-            var goalVector = RVO.Vector.subtract(goals[i], sim.agents[i].position);
-            if (RVO.Vector.absSq(goalVector) > 1) {
-                goalVector = RVO.Vector.normalize(goalVector);
-            }
-            sim.agents[i].prefVelocity = goalVector;
-        }
-        sim.doStep();
-        for (var i_1 = 0; i_1 < sim.agents.length; i_1++) {
-            this.mods[i_1].localTranslate.x = sim.agents[i_1].position[0];
-            this.mods[i_1].localTranslate.z = sim.agents[i_1].position[1];
-            if (i_1 == 0) {
-                var pos = this.mods[i_1].localTranslate;
-                var ovc2 = gd3d.math.pool.new_vector2();
-                ovc2.x = pos.x;
-                ovc2.y = pos.z;
-                var tvc2 = gd3d.math.pool.new_vector2();
-                tvc2.x = this.currGoal.x;
-                tvc2.y = this.currGoal.z;
-                var odir = gd3d.math.pool.new_vector2();
-                gd3d.math.vec2Subtract(tvc2, ovc2, odir);
-            }
-            this.mods[i_1].markDirty;
-        }
-    };
-    demo_navigaionRVO.prototype.RVO_check = function (sim, goals) {
-        if (this.currGoal) {
-            if (this.player) {
-                var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
-                if (dis < 0.1) {
-                    if (this.currGoal) {
-                        gd3d.math.pool.delete_vector3(this.currGoal);
-                        this.currGoal = null;
-                        goals[0] = sim.agents[0].position;
-                        sim.agents[0].radius = 1;
-                    }
-                    if (this.Goals && this.Goals.length > 0) {
-                        this.currGoal = this.Goals.pop();
-                        goals[0] = [this.currGoal.x, this.currGoal.z];
-                        sim.agents[0].radius = 0.1;
-                    }
-                }
-            }
-        }
-        else if (this.Goals && this.Goals.length > 0) {
-            this.currGoal = this.Goals.pop();
-            goals[0] = [this.currGoal.x, this.currGoal.z];
-            sim.agents[0].radius = 0.1;
-        }
-        for (var i = 1, len = sim.agents.length; i < len; i++) {
-            var range = RVO.Vector.absSq(RVO.Vector.subtract(sim.agents[i].position, sim.agents[0].position));
-            if (range < 3 || range > 400) {
-                goals[i] = sim.agents[i].position;
-            }
-            else {
-                goals[i] = sim.agents[0].position;
-            }
-        }
-    };
-    demo_navigaionRVO.prototype.navmesh2Border = function (data) {
-        var trie = [];
-        for (var i = 0; i < data.trisindex.length; i += 3) {
-            var a = data.trisindex[i];
-            var b = data.trisindex[i + 1];
-            var c = data.trisindex[i + 2];
-            if (trie[a] == null) {
-                trie[a] = [];
-                trie[a][b] = true;
-            }
-            else {
-                trie[a][b] = (trie[a][b] == null);
-            }
-            if (trie[b] == null) {
-                trie[b] = [];
-                trie[b][c] = true;
-            }
-            else {
-                trie[b][c] = trie[b][c] == null;
-            }
-            if (trie[c] == null) {
-                trie[c] = [];
-                trie[c][a] = true;
-            }
-            else {
-                trie[c][a] = trie[c][a] == null;
-            }
-            if (trie[b] == null) {
-                trie[b] = [];
-                trie[b][a] = true;
-            }
-            else {
-                trie[b][a] = trie[b][a] == null;
-            }
-            if (trie[c] == null) {
-                trie[c] = [];
-                trie[c][b] = true;
-            }
-            else {
-                trie[c][b] = trie[c][b] == null;
-            }
-            if (trie[a] == null) {
-                trie[a] = [];
-                trie[a][c] = true;
-            }
-            else {
-                trie[a][c] = trie[a][c] == null;
-            }
-        }
-        var border = [];
-        for (var i = 0; i < trie.length; i++) {
-            for (var ii = 0; ii < trie[i].length; ii++) {
-                if (trie[i][ii]) {
-                    border.push([data.pos[i].x, data.pos[i].z]);
-                    border.push([data.pos[ii].x, data.pos[ii].z]);
-                }
-            }
-        }
-        return border;
-    };
-    demo_navigaionRVO.prototype.ckGoalsChange = function () {
-        if (!this.player)
+        var pickinfo;
+        var mesh = this.navmeshMgr.navMesh;
+        var ray = new gd3d.framework.ray(new gd3d.math.vector3(oPos.x, oPos.y + 500, oPos.z), new gd3d.math.vector3(0, -1, 0));
+        pickinfo = mesh.intersects(ray, this.navmeshMgr.navTrans.getWorldMatrix());
+        if (!pickinfo)
             return;
-        if (this.currGoal) {
-            if (this.player) {
-                var dis = gd3d.math.vec3Distance(this.player.localTranslate, this.currGoal);
-                if (dis < 0.1) {
-                    if (this.currGoal) {
-                        gd3d.math.pool.delete_vector3(this.currGoal);
-                        this.currGoal = null;
-                    }
-                    if (this.Goals && this.Goals.length > 0)
-                        this.currGoal = this.Goals.pop();
-                }
-            }
-        }
-        else if (this.Goals && this.Goals.length > 0) {
-            this.currGoal = this.Goals.pop();
-        }
+        return pickinfo.hitposition;
     };
     demo_navigaionRVO.prototype.pickDown = function () {
         if (this.isAKeyDown) {
@@ -313,7 +158,6 @@ var demo_navigaionRVO = (function () {
         var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
         if (!pickinfo)
             return;
-        console.error(pickinfo.hitposition);
         return pickinfo.hitposition;
     };
     demo_navigaionRVO.prototype.addEnemy = function () {
@@ -329,16 +173,20 @@ var demo_navigaionRVO = (function () {
         trans.localTranslate.y = endPos.y;
         trans.localTranslate.z = endPos.z;
         trans.markDirty();
-        this.sim.addAgent([endPos.x, endPos.z]);
-        this.goals.push([endPos.x, endPos.z]);
-        this.mods.push(trans);
+        this.rvoMgr.addAgent(Math.round(Math.random() * 100), trans, 0.5, 3, 0.05);
     };
     demo_navigaionRVO.prototype.tryFindingPath = function () {
         var endPos = this.rayNavMesh();
         if (!endPos)
             return;
         if (this.player) {
-            this.pos.push(this.player.localTranslate);
+            var v3 = gd3d.math.pool.new_vector3();
+            gd3d.math.vec3Clone(this.player.localTranslate, v3);
+            var temp = this.PosRayNavmesh(this.player.localTranslate);
+            if (temp) {
+                gd3d.math.vec3Clone(temp, v3);
+            }
+            this.pos.push(v3);
         }
         else {
             if (!this.isInitPlayer)
@@ -363,9 +211,7 @@ var demo_navigaionRVO = (function () {
                         gd3d.math.pool.delete_vector3(g);
                 });
             }
-            this.Goals.length = 0;
-            this.Goals = arr;
-            this.currGoal = this.Goals.pop();
+            this.rvoMgr.setRoadPoints(arr);
         }
     };
     demo_navigaionRVO.prototype.drawLine = function (points) {
@@ -484,10 +330,26 @@ var demo_navigaionRVO = (function () {
         }
         this.timer += delta;
         CameraController.instance().update(delta);
-        if (this.mods.length >= 1) {
-            this.RVO_check(this.sim, this.goals);
-            this.RVO_walking(this.sim, this.goals);
-        }
+        this.rvoMgr.update();
+    };
+    demo_navigaionRVO.prototype.addbtn = function (topOffset, textContent, func) {
+        var _this = this;
+        var btn = document.createElement("button");
+        btn.style.top = topOffset;
+        btn.style.position = "fixed";
+        btn.style.border = "none";
+        btn.style.height = "32px";
+        btn.style.borderRadius = "16px";
+        btn.style.cursor = "pointer";
+        btn.style.margin = "32px";
+        btn.style.minWidth = "80px";
+        this.app.container.appendChild(btn);
+        btn.textContent = textContent;
+        btn.onclick = function () {
+            _this.camera.postQueues = [];
+            func();
+            console.log("Handle Clicking..." + textContent);
+        };
     };
     return demo_navigaionRVO;
 }());
@@ -1123,6 +985,7 @@ var main = (function () {
         this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
         this.addBtn("test_loadprefabdds", function () { return new test_loadprefabdds(); });
         this.addBtn("test_ATC纹理", function () { return new t.test_ATC(); });
+        this.addBtn("场景boxcollider_Pick", function () { return new test_pick_boxcollider(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -3037,6 +2900,155 @@ var test_pbr = (function () {
         CameraController.instance().update(delta);
     };
     return test_pbr;
+}());
+var test_pick_boxcollider = (function () {
+    function test_pick_boxcollider() {
+        this.cubesize = 0.5;
+        this.sim = new RVO.Simulator(1, 40, 10, 20, 5, 0.5, 0.05, [0, 0]);
+        this.goals = [];
+        this.mods = [];
+        this.colorMap = {};
+        this.balls = [];
+        this.pickLayer = 8;
+        this.points = [];
+        this.timer = 0;
+        this.bere = false;
+        this.isAKeyDown = false;
+        this.pointDown = false;
+    }
+    test_pick_boxcollider.prototype.start = function (app) {
+        var _this = this;
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.inputMgr = this.app.getInputMgr();
+        this.assetMgr = app.getAssetMgr();
+        this.app.closeFps();
+        var descr = document.createElement("p");
+        descr.textContent = "\u63D0\u793A: \n \u70B9\u51FB\u78B0\u649E\u6846 \u53EF\u53D1\u5C04\u5C0F\u7403\u5230\u78B0\u649E\u4F4D\u7F6E\uFF01";
+        descr.style.top = 0 + "px";
+        descr.style.left = 0 + "px";
+        descr.style.position = "absolute";
+        this.app.container.appendChild(descr);
+        var names = ["MainCity_", "testnav", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        var name = names[1];
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                _this.loadScene(name);
+            }
+        });
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.far = 10000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 100, 0);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
+    };
+    test_pick_boxcollider.prototype.loadScene = function (assetName, isCompress) {
+        var _this = this;
+        if (isCompress === void 0) { isCompress = false; }
+        var ShowBoxcollder = function (trans) {
+            if (!trans)
+                return;
+            var boxc = trans.gameObject.getComponent("boxcollider");
+            if (boxc)
+                boxc.colliderVisible = true;
+            console.error(" layer : " + trans.gameObject.layer + " ");
+            if (!trans.children)
+                return;
+            trans.children.forEach(function (sub) {
+                if (sub)
+                    ShowBoxcollder(sub);
+            });
+        };
+        var addScene = function () {
+            var beAddScene = true;
+            if (beAddScene) {
+                var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+                var _root = _scene.getSceneRoot();
+                _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                _root.markDirty();
+                _this.app.getScene().lightmaps = [];
+                _scene.useLightMap(_this.app.getScene());
+                _this.scene.addChild(_root);
+                ShowBoxcollder(_root);
+            }
+        };
+        if (isCompress) {
+            this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
+                if (s.isfinish) {
+                    {
+                        addScene();
+                    }
+                }
+            });
+        }
+        else {
+            this.app.getAssetMgr().load("res/scenes/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+                if (s1.isfinish) {
+                    addScene();
+                }
+            });
+        }
+    };
+    test_pick_boxcollider.prototype.getColor = function (r, g, b) {
+        var key = r + "_" + g + "_" + b;
+        if (!this.colorMap[key])
+            this.colorMap[key] = new gd3d.math.vector4(r, g, b, 1);
+        return this.colorMap[key];
+    };
+    test_pick_boxcollider.prototype.addBall = function (pos) {
+        var ball = this.generateGeomtry("sphere", this.getColor(1, 0, 0));
+        gd3d.math.vec3Clone(pos, ball.localTranslate);
+        this.scene.addChild(ball);
+        this.balls.push(ball);
+        ball.markDirty();
+    };
+    test_pick_boxcollider.prototype.pickDown = function () {
+        var v3 = this.rayCollider();
+        if (v3) {
+            this.addBall(v3.hitposition);
+        }
+    };
+    test_pick_boxcollider.prototype.rayCollider = function () {
+        var inputMgr = this.app.getInputMgr();
+        var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
+        return this.scene.pick(ray, false, this.scene.getRoot(), this.pickLayer);
+    };
+    test_pick_boxcollider.prototype.generateGeomtry = function (meshType, color) {
+        if (meshType === void 0) { meshType = "cube"; }
+        if (color === void 0) { color = null; }
+        var G3D = new gd3d.framework.transform;
+        var mf = G3D.gameObject.addComponent("meshFilter");
+        mf.mesh = this.assetMgr.getDefaultMesh(meshType);
+        var mr = G3D.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material("mat");
+        mr.materials[0].setShader(this.assetMgr.getShader("diffuse.shader.json"));
+        mr.materials[0].setTexture("_MainTex", this.assetMgr.getDefaultTexture("white"));
+        if (color)
+            mr.materials[0].setVector4("_MainColor", color);
+        this.scene.addChild(G3D);
+        return G3D;
+    };
+    test_pick_boxcollider.prototype.update = function (delta) {
+        if (this.pointDown == false && this.inputMgr.point.touch == true) {
+            this.pickDown();
+        }
+        this.pointDown = this.inputMgr.point.touch;
+        if (this.inputMgr.keyboardMap[65]) {
+            this.isAKeyDown = true;
+        }
+        else {
+            this.isAKeyDown = false;
+        }
+        this.timer += delta;
+        CameraController.instance().update(delta);
+    };
+    return test_pick_boxcollider;
 }());
 var test_postCamera = (function () {
     function test_postCamera() {
@@ -5123,6 +5135,7 @@ var test_uiPerfabLoad = (function () {
         this.camera.far = 10;
         this.rooto2d = new gd3d.framework.overlay2D();
         this.camera.addOverLay(this.rooto2d);
+        this.taskmgr.addTaskCall(this.loadShaders.bind(this));
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
         var inputh = document.createElement("input");
@@ -5192,6 +5205,13 @@ var test_uiPerfabLoad = (function () {
                 t2d.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
                 t2d.markDirty();
                 _this.targetui = t2d;
+            }
+        });
+    };
+    test_uiPerfabLoad.prototype.loadShaders = function (lastState, state) {
+        this.assetMgr.load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                state.finish = true;
             }
         });
     };
@@ -7418,8 +7438,8 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = true;
                 }
-                for (var i_2 = 0; i_2 < _this.traillist.length; i_2++) {
-                    _this.traillist[i_2].play();
+                for (var i_1 = 0; i_1 < _this.traillist.length; i_1++) {
+                    _this.traillist[i_1].play();
                 }
                 _this.guippaths[0].play(2);
                 _this.guippaths[1].play();
@@ -7429,9 +7449,9 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = false;
                 }
-                for (var i_3 = 0; i_3 < _this.guippaths.length; i_3++) {
-                    _this.traillist[i_3].stop();
-                    _this.guippaths[i_3].stop();
+                for (var i_2 = 0; i_2 < _this.guippaths.length; i_2++) {
+                    _this.traillist[i_2].stop();
+                    _this.guippaths[i_2].stop();
                 }
             });
         };

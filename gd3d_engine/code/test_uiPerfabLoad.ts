@@ -28,6 +28,7 @@ class test_uiPerfabLoad implements IState {
 
 
         //任务排队执行系统
+        this.taskmgr.addTaskCall(this.loadShaders.bind(this));
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
 
@@ -120,6 +121,14 @@ class test_uiPerfabLoad implements IState {
                 t2d.markDirty();
                 this.targetui = t2d;
         }
+        });
+    }
+
+    private loadShaders(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate){
+        this.assetMgr.load("res/shader/shader.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
+            if(s.isfinish){
+                state.finish = true;
+            }
         });
     }
 

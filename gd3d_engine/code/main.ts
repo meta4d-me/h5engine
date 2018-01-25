@@ -16,8 +16,14 @@ class main implements gd3d.framework.IUserCode
 
         console.log("i am here.");
         this.app = app;
-
+        //this.addBtn("test_loadScene",()=>new dome.test_loadScene());
+        //this.addBtn("f14effect",()=>new dome.db_test_f14eff());
+        //this.addBtn("loadPrefab",()=>new dome.loadPrefab());
+        
+        
         // this.addBtn("test_01", () => new test_01());//最早是做加载测试。现在已经没价值了
+        //this.addBtn("loadscene", () => new dome.test_loadScene());
+        
         this.addBtn("test_ui", () => new t.test_ui());
         this.addBtn("test_load", () => new test_load());
         this.addBtn("test_loadprefab", () => new test_loadprefab());
@@ -80,10 +86,10 @@ class main implements gd3d.framework.IUserCode
 
         //this.addBtn("test_liloadscene", () => new test_LiLoadScene());
         //this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
-        this.addBtn("test_四分屏", () => new test_pick_4p());       
+        this.addBtn("test_四分�, () => new test_pick_4p());       
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
-        this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
+        this.addBtn("test_UI预设体加�, () => new test_uiPerfabLoad());
         this.addBtn("test_PBR 展示", () => new test_pbr());
         this.addBtn("test_PBR 场景", () => new test_pbr_scene());
         this.addBtn("导航网格", () => new test_navMesh());

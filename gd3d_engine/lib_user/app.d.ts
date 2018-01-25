@@ -9,21 +9,14 @@ declare class demo_navigaionRVO implements IState {
     assetMgr: gd3d.framework.assetMgr;
     cubesize: number;
     player: gd3d.framework.transform;
-    sim: any;
-    goals: any[];
-    mods: gd3d.framework.transform[];
+    static TestRVO: demo_navigaionRVO;
+    rvoMgr: gd3d.framework.RVOManager;
     start(app: gd3d.framework.application): void;
     private isInitPlayer;
     private initPlayer(x, y, z);
     private loadScene(assetName, isCompress?);
-    private moveSpeed;
-    private playerwalking();
-    private RVO_walking(sim, goals);
-    private RVO_check(sim, goals);
-    private navmesh2Border(data);
-    private currGoal;
     private Goals;
-    private ckGoalsChange();
+    private PosRayNavmesh(oPos);
     pickDown(): void;
     private rayNavMesh();
     private enemys;
@@ -47,6 +40,7 @@ declare class demo_navigaionRVO implements IState {
     isAKeyDown: boolean;
     private pointDown;
     update(delta: number): void;
+    private addbtn(topOffset, textContent, func);
 }
 declare class demo_ScreenSplit implements IState {
     app: gd3d.framework.application;
@@ -340,6 +334,36 @@ declare class test_pbr implements IState {
     private addCube();
     update(delta: number): void;
 }
+declare var RVO: any;
+declare class test_pick_boxcollider implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    navmeshMgr: gd3d.framework.NavMeshLoadManager;
+    inputMgr: gd3d.framework.inputMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    cubesize: number;
+    player: gd3d.framework.transform;
+    sim: any;
+    goals: any[];
+    mods: gd3d.framework.transform[];
+    start(app: gd3d.framework.application): void;
+    private loadScene(assetName, isCompress?);
+    private colorMap;
+    private getColor(r, g, b);
+    private balls;
+    private addBall(pos);
+    private pickLayer;
+    pickDown(): void;
+    private rayCollider();
+    private points;
+    private generateGeomtry(meshType?, color?);
+    camera: gd3d.framework.camera;
+    timer: number;
+    bere: boolean;
+    isAKeyDown: boolean;
+    private pointDown;
+    update(delta: number): void;
+}
 declare class test_postCamera implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -601,6 +625,7 @@ declare class test_uiPerfabLoad implements IState {
     private createUI(astState, state);
     targetui: gd3d.framework.transform2D;
     private doLoad(name);
+    private loadShaders(lastState, state);
     private loadTexture(lastState, state);
     update(delta: number): void;
 }

@@ -512,10 +512,9 @@ namespace gd3d.framework {
             let assstatelist: any[] = [];
 
             //这里定义了加载顺序
-            asslist.push(packs, glvshaders, glfshaders,
-                shaders, prefabs, meshs,
-                materials, scenes, textures,
-                texturedescs, anclips, textassets, pvrs, f14effs, fonts, atlass, ddss);
+            asslist.push(packs, glvshaders, glfshaders,shaders,textassets,meshs,
+                textures,pvrs,ddss,texturedescs,fonts, atlass,
+                materials, anclips, f14effs,prefabs,scenes);
 
             assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None,
                 AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh,
@@ -813,11 +812,11 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         initDefAsset() {
-            defShader.initDefaultShader(this);
             defMesh.initDefaultMesh(this);
             defTexture.initDefaultTexture(this);
-            defmaterial.initDefaultMaterial(this);
             defsprite.initDefaultSprite(this);
+            defShader.initDefaultShader(this);
+            defmaterial.initDefaultMaterial(this);
         }
         /**
          * @public
@@ -983,7 +982,7 @@ namespace gd3d.framework {
             let flag: boolean = true;
             if (id != null) {
                 var r = this.mapRes[id];
-                if (r != null)
+                if (r != null && !r[this._loadingTag])
                     return r.asset;
             }
             if (flag) {
@@ -1532,10 +1531,11 @@ namespace gd3d.framework {
 
             let info: SaveInfo = new SaveInfo();
             let _scene = {};
-            let _rootNode = io.serializeObj(this.app.getScene().getRoot(), null, this);
+            let scene = this.app.getScene();
+            let _rootNode = io.serializeObj(scene.getRoot(), null, this);
 
             let _lightmaps = [];
-            let lightmaps = this.app.getScene().lightmaps;
+            let lightmaps = scene.lightmaps;
             for (var str in lightmaps) {
                 let _lightmap = {};
                 _lightmap["name"] = lightmaps[str].getName();
@@ -1547,10 +1547,11 @@ namespace gd3d.framework {
 
             _scene["rootNode"] = _rootNode;
             _scene["lightmap"] = _lightmaps;
+            _scene["fog"] = scene.fog;
 
             let _sceneStr = JSON.stringify(_scene);
 
-            var _rawscene: rawscene = this.getAssetByName(this.app.getScene().name) as rawscene;
+            var _rawscene: rawscene = this.getAssetByName(scene.name) as rawscene;
             _rawscene.Parse(_sceneStr, this);
             let url = this.getAssetUrl(_rawscene);
 
@@ -1599,29 +1600,29 @@ namespace gd3d.framework {
             let data = {};
             let mapUniform = {};
             let shader = mat.getShader();
-            let shaderPropertis = shader.defaultValue;
+            let shaderPropertis = shader.defaultMapUniform;
             data["shader"] = shader.getName();
             data["mapUniform"] = mapUniform;
 
-            for (let key in shaderPropertis) {
-                if (mat.mapUniform[key] != undefined) {
-                    let propertyDdata = {};
-                    let uniformData = mat.mapUniform[key];
-                    propertyDdata["type"] = uniformData.type;
-                    switch (uniformData.type) {
-                        case gd3d.render.UniformTypeEnum.Texture:
-                            propertyDdata["value"] = uniformData.value != null ? uniformData.value.name.name : "";
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float4:
-                            propertyDdata["value"] = uniformData.value;
-                            break;
-                        case gd3d.render.UniformTypeEnum.Float:
-                            propertyDdata["value"] = uniformData.value;
-                            break;
-                    }
-                    mapUniform[key] = propertyDdata;
-                }
-            }
+            // for (let key in shaderPropertis) {
+            //     if (mat.mapUniform[key] != undefined) {
+            //         let propertyDdata = {};
+            //         let uniformData = mat.mapUniform[key];
+            //         propertyDdata["type"] = uniformData.type;
+            //         switch (uniformData.type) {
+            //             case gd3d.render.UniformTypeEnum.Texture:
+            //                 propertyDdata["value"] = uniformData.value != null ? uniformData.value.name.name : "";
+            //                 break;
+            //             case gd3d.render.UniformTypeEnum.Float4:
+            //                 propertyDdata["value"] = uniformData.value;
+            //                 break;
+            //             case gd3d.render.UniformTypeEnum.Float:
+            //                 propertyDdata["value"] = uniformData.value;
+            //                 break;
+            //         }
+            //         mapUniform[key] = propertyDdata;
+            //     }
+            // }
             let url = this.getAssetUrl(mat);
             info.files[url] = JSON.stringify(data);
             fun(info);

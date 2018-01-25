@@ -108,6 +108,14 @@ namespace gd3d.framework
             this.alpha = this.startAlpha;
             //this.tex_ST = this.starTex_ST;
             gd3d.math.vec4Clone(this.starTex_ST,this.tex_ST);
+
+            //--strechbillboard
+            if(data.rendermodel == RenderModelEnum.VerticalBillBoard)
+            {
+                this.emissionMatToWorld=this.element.getWorldMatrix();
+                math.matrixTransformVector3(this.StartPos,this.emissionMatToWorld,this.worldStartPos);
+            }
+            // Vector3 worldStartPos = this.getElementMatToWorld() * this.StartPos;
         }
     
         public update(deltaTime:number)
@@ -151,7 +159,15 @@ namespace gd3d.framework
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+1]= this.tempos.y;
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+2]= this.tempos.z;
     
-                    math.colorMultiply(this.element.colorArr[i],this.Color,this.temcolor);
+                    //math.colorMultiply(this.element.colorArr[i],this.Color,this.temcolor);
+                    if(this.element.colorArr)
+                    {
+                        math.colorMultiply(this.element.colorArr[i],this.Color,this.temcolor);
+                    }else
+                    {
+                        math.colorClone(this.Color,this.temcolor);
+                    }
+
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+3]= this.temcolor.r;
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+4]= this.temcolor.g;
                     batch.dataForVbo[i*batch.vertexLength+batch.curRealVboCount+5]= this.temcolor.b;
@@ -237,10 +253,13 @@ namespace gd3d.framework
         private angleRot:math.quaternion=new math.quaternion();
         private worldpos=new math.vector3();
         private tarWorldpos=new math.vector3();
+        private worldspeeddir=new math.vector3();
         private lookDir=new math.vector3();
+        private temptx=new math.vector3();
         private worldRotation=new math.quaternion();
         private invParWorldRot=new math.quaternion();
-
+                
+        private worldStartPos=new math.vector3();
         private updateRot()
         {
             if (this.data.rendermodel == RenderModelEnum.Mesh)
@@ -281,7 +300,8 @@ namespace gd3d.framework
             {
                 this.emissionMatToWorld=this.element.getWorldMatrix();
                 math.matrixTransformVector3(this.localTranslate,this.emissionMatToWorld,this.worldpos);
-                this.tarWorldpos=this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                let campos=this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                gd3d.math.vec3Clone(campos, this.tarWorldpos);
                 this.tarWorldpos.y=this.worldpos.y;
                 gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
                 
@@ -301,9 +321,31 @@ namespace gd3d.framework
                 // Vector3 dir = targetpos - worldStartPos;
                 // Vector3 lookdir=(Vector3.Dot(this.speedDir, dir) * this.speedDir + worldStartPos)-targetpos;
     
-                // Quaternion worldRot = Quaternion.LookRotation(lookdir,this.speedDir);
+                //Quaternion worldRot = Quaternion.LookRotation(lookdir,this.speedDir);
                 // Quaternion parentRot = this.getElementQuat();
                 // this.localRotation = Quaternion.Inverse(parentRot) * worldRot;
+
+                this.emissionMatToWorld=this.element.getWorldMatrix();
+                math.matrixTransformVector3(this.localTranslate,this.emissionMatToWorld,this.worldpos);
+                let campos =this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                math.vec3Subtract(campos,this.worldpos,this.lookDir);
+                math.vec3ScaleByNum(this.speedDir,math.vec3Dot(this.speedDir,this.lookDir),this.lookDir);
+                math.vec3Add(this.lookDir,this.worldStartPos,this.lookDir);
+                math.vec3Subtract(this.lookDir,campos,this.lookDir);
+                //math.vec3Normalize(this.lookDir,this.lookDir);
+                
+                math.matrixTransformNormal(this.speedDir,this.emissionMatToWorld,this.worldspeeddir);
+                math.myLookRotation(this.lookDir,this.worldRotation,this.worldspeeddir);
+
+                // math.vec3Cross(this.worldspeeddir,this.lookDir,this.temptx);
+                // math.vec3Cross(this.temptx,this.worldspeeddir,this.lookDir);
+                // math.vec3Add(this.worldpos,this.lookDir,this.tarWorldpos);
+                //gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
+
+                this.emissionWorldRotation=this.element.getWorldRotation();
+                math.quatInverse(this.emissionWorldRotation,this.invParWorldRot);
+                gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
+                
             }
         }   
         private updateColor()

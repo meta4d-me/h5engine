@@ -65,6 +65,7 @@ declare namespace gd3d.framework {
         private loop();
         private _scene;
         private initScene();
+        private initRender();
         getScene(): scene;
         private _assetmgr;
         private initAssetMgr();
@@ -1242,8 +1243,7 @@ declare namespace gd3d.framework {
         dispose(): void;
         caclByteLength(): number;
         f14data: F14EffectData;
-        trans: transform;
-        f14Effect: f14EffectSystem;
+        delayTime: number;
         Parse(jsonStr: string, assetmgr: assetMgr): void;
         getCloneF14eff(): f14node;
     }
@@ -1349,31 +1349,33 @@ declare namespace gd3d.framework {
         use(): void;
         unuse(disposeNow?: boolean): void;
         caclByteLength(): number;
-        initUniformData(passes: render.glDrawPass[]): void;
+        uploadUnifoms(pass: render.glDrawPass, context: renderContext): void;
         setShader(shader: shader): void;
-        private _changeShaderMap;
-        changeShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         private queue;
         getQueue(): number;
         setQueue(queue: number): void;
         getShader(): shader;
         private shader;
-        mapUniform: {
-            [id: string]: UniformData;
+        defaultMapUniform: {
+            [key: string]: {
+                type: render.UniformTypeEnum;
+                value?: any;
+                becolor?: boolean;
+                min?: number;
+                max?: number;
+            };
         };
-        private mapUniformTemp;
+        statedMapUniforms: {
+            [id: string]: any;
+        };
         setFloat(_id: string, _number: number): void;
         setFloatv(_id: string, _numbers: Float32Array): void;
         setVector4(_id: string, _vector4: math.vector4): void;
-        setColor(_id: string, _vector4: math.color): void;
         setVector4v(_id: string, _vector4v: Float32Array): void;
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
-        setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
-        uploadUniform(pass: render.glDrawPass): void;
-        private uploadMapUniform(pass, mapUniform);
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
@@ -1513,29 +1515,20 @@ declare namespace gd3d.framework {
         passes: {
             [id: string]: gd3d.render.glDrawPass[];
         };
-        defaultValue: {
+        defaultMapUniform: {
             [key: string]: {
-                type: string;
+                type: render.UniformTypeEnum;
                 value?: any;
-                defaultValue?: any;
+                becolor?: boolean;
                 min?: number;
                 max?: number;
             };
         };
         layer: RenderLayerEnum;
-        queue: number;
         parse(assetmgr: assetMgr, json: any): void;
         _parseProperties(assetmgr: assetMgr, properties: any): void;
-        private _parsePass(assetmgr, json);
-        private static mapUniformGlobal;
-        private static setGlobal(key, value, type);
-        static setGlobalFloat(key: string, value: number): void;
-        static setGlobalVector4(key: string, value: math.vector4): void;
-        static setGlobalMatrix(key: string, value: math.matrix): void;
-        static setGlobalTexture(key: string, value: texture): void;
-        static getGlobalMapUniform(): {
-            [id: string]: UniformData;
-        };
+        private _parsePass(assetmgr, json, type);
+        fillUnDefUniform(pass: render.glDrawPass): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2320,6 +2313,10 @@ declare namespace gd3d.framework {
         layers: F14Layer[];
         VF: number;
         webgl: WebGLRenderingContext;
+        private _f14eff;
+        f14eff: f14eff;
+        private _delayTime;
+        delay: number;
         setData(data: F14EffectData): void;
         private elements;
         renderBatch: F14Basebatch[];
@@ -2741,6 +2738,11 @@ declare namespace gd3d.framework {
         private temUv;
         uploadMeshdata(): void;
         refreshCurTex_ST(curframe: number, detalTime: number, fps: number): void;
+        private eulerRot;
+        private worldpos;
+        private worldRot;
+        private inverseRot;
+        updateRotByBillboard(): void;
         reset(): void;
     }
 }
@@ -2805,6 +2807,7 @@ declare namespace gd3d.framework {
         row: number;
         column: number;
         count: number;
+        beBillboard: boolean;
         firtstFrame: number;
         constructor(firstFrame: number);
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
@@ -3179,6 +3182,7 @@ declare namespace gd3d.math {
     function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
     function vec2Normalize(from: vector2, out: vector2): void;
     function vec2Multiply(a: vector2, b: vector2): number;
+    function vec2Dot(lhs: vector2, rhs: vector2): number;
     function vec2Equal(vector: vector2, vector2: vector2, threshold?: number): boolean;
 }
 declare namespace gd3d.math {
@@ -3304,6 +3308,37 @@ declare namespace gd3d.framework {
         private static NearAngle(a, b);
         static FindPath(info: navMeshInfo, startPos: navVec3, endPos: navVec3, offset?: number): navVec3[];
         static calcWayPoints(info: navMeshInfo, startPos: navVec3, endPos: navVec3, polyPath: number[], offset?: number): navVec3[];
+    }
+}
+declare var RVO: any;
+declare namespace gd3d.framework {
+    class RVOManager {
+        sim: any;
+        transforms: gd3d.framework.transform[];
+        goals: any[];
+        radius: number[];
+        attackRanges: number[];
+        speeds: number[];
+        private map;
+        private isRunning;
+        private currGoal;
+        private lastGoal;
+        private currMoveDir;
+        private _RoadPoints;
+        setRoadPoints(goalQueue: gd3d.math.vector3[]): void;
+        addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRanges: number, speed: number): void;
+        removeAgent(key: number): void;
+        private reBuildHashMap();
+        getTransformByKey(key: number): gd3d.framework.transform;
+        setRadius(id: number, value: number): void;
+        setSpeed(id: number, value: number): void;
+        setAttackRange(id: number, value: number): void;
+        disable(): void;
+        enable(): void;
+        update(): void;
+        private RVO_walking(sim, goals);
+        private RVO_check(sim, goals);
+        private cal2dDir(oPos, tPos, out);
     }
 }
 declare namespace gd3d.framework {
@@ -4367,6 +4402,8 @@ declare namespace gd3d.framework {
         lightmapUV: number;
         lightmapOffset: gd3d.math.vector4;
         fog: Fog;
+        vec4_bones: Float32Array;
+        matrix_bones: Float32Array;
         updateCamera(app: application, camera: camera): void;
         updateLights(lights: light[]): void;
         updateOverlay(): void;
@@ -4426,11 +4463,19 @@ declare namespace gd3d.framework {
         getChild(index: number): transform;
         getChildByName(name: string): transform;
         getRoot(): transform;
-        pickAll(ray: ray, isPickMesh?: boolean, root?: transform): Array<pickinfo>;
-        pick(ray: ray, isPickMesh?: boolean, root?: transform): pickinfo;
-        private doPick(ray, pickall, isPickMesh, root);
-        private pickMesh(ray, tran, pickedList);
-        private pickCollider(ray, tran, pickedList);
+        pickAll(ray: ray, isPickMesh?: boolean, root?: transform, layer?: number): Array<pickinfo>;
+        pick(ray: ray, isPickMesh?: boolean, root?: transform, layer?: number): pickinfo;
+        private doPick(ray, pickall, isPickMesh, root, layer?);
+        private pickMesh(ray, tran, pickedList, layer?);
+        private pickCollider(ray, tran, pickedList, layer?);
+    }
+}
+declare namespace gd3d.framework {
+    class uniformSetter {
+        static autoUniformDic: {
+            [name: string]: (context: renderContext) => any;
+        };
+        static initAutouniform(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -5033,39 +5078,16 @@ declare namespace gd3d.render {
         state_blendDestRGB: number;
         state_blendSrcAlpha: number;
         state_blendDestALpha: number;
-        uniforms: {
-            [id: string]: {
-                change: boolean;
-                location: WebGLUniformLocation;
-                type: UniformTypeEnum;
-                value: any;
-            };
+        mapuniforms: {
+            [id: string]: uniform;
         };
-        uniformallchange: boolean;
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
+        use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
+        draw(webgl: WebGLRenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
         private getCurDrawState();
         private getCurBlendVal();
         private formate(str, out);
-        uniformFloat(name: string, number: number): void;
-        uniformFloatv(name: string, numbers: Float32Array): void;
-        uniformVec4(name: string, vec: math.vector4): void;
-        uniformVec4v(name: string, vecdata: Float32Array): void;
-        uniformMatrix(name: string, mat: math.matrix): void;
-        uniformMatrixV(name: string, matdata: Float32Array): void;
-        uniformTexture(name: string, tex: render.ITexture): void;
-        uniformCubeTexture(name: string, tex: render.ITexture): void;
-        static textureID: number[];
-        use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
-        applyUniformSaved(webgl: WebGLRenderingContext): void;
-        applyUniform_Float(webgl: WebGLRenderingContext, key: string, value: number): void;
-        applyUniform_Floatv(webgl: WebGLRenderingContext, key: string, value: Float32Array): void;
-        applyUniform_Float4(webgl: WebGLRenderingContext, key: string, value: math.vector4): void;
-        applyUniform_Float4v(webgl: WebGLRenderingContext, key: string, values: Float32Array): void;
-        applyUniform_Float4x4(webgl: WebGLRenderingContext, key: string, value: math.matrix): void;
-        applyUniform_Float4x4v(webgl: WebGLRenderingContext, key: string, values: Float32Array): void;
-        applyUniform_FloatTexture(webgl: WebGLRenderingContext, texindex: number, key: string, value: ITexture): void;
-        draw(webgl: WebGLRenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
     }
 }
 declare namespace gd3d.render {
@@ -5187,6 +5209,16 @@ declare namespace gd3d.render {
     }
 }
 declare namespace gd3d.render {
+    class shaderUniform {
+        static texindex: number;
+        static applyuniformFunc: {
+            [type: number]: (location, value) => void;
+        };
+        static webgl: WebGLRenderingContext;
+        static initApplyUnifmFunc(): void;
+    }
+}
+declare namespace gd3d.render {
     class glWindow {
         renderTarget: gd3d.render.glRenderTarget;
         clearop_Color: boolean;
@@ -5206,7 +5238,6 @@ declare namespace gd3d.render {
         Float4v = 4,
         Float4x4 = 5,
         Float4x4v = 6,
-        CubeTexture = 7,
     }
     class uniform {
         name: string;
@@ -5222,13 +5253,6 @@ declare namespace gd3d.render {
         name: string;
         type: ShaderTypeEnum;
         shader: WebGLShader;
-        mapUniform: {
-            [id: string]: {
-                name: string;
-                type: UniformTypeEnum;
-            };
-        };
-        private _scanUniform(txt);
     }
     class glProgram {
         constructor(vs: glShader, fs: glShader, program: WebGLProgram);
@@ -5249,6 +5273,7 @@ declare namespace gd3d.render {
             [id: string]: uniform;
         };
         use(webgl: WebGLRenderingContext): void;
+        initUniforms(webgl: WebGLRenderingContext): void;
     }
     class shaderPool {
         mapVS: {
@@ -5267,6 +5292,13 @@ declare namespace gd3d.render {
         compileVS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
         compileFS(webgl: WebGLRenderingContext, name: string, code: string): glShader;
         linkProgram(webgl: WebGLRenderingContext, nameVS: string, nameFS: string): glProgram;
+        mapVSString: {
+            [id: string]: string;
+        };
+        mapFSString: {
+            [id: string]: string;
+        };
+        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string): glProgram;
     }
 }
 declare namespace gd3d.render {

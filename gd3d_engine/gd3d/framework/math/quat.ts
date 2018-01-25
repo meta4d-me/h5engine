@@ -1,4 +1,11 @@
 ﻿namespace gd3d.math {
+    export function quatIdentity(src:quaternion)
+    {
+        src.x=0;
+        src.y=0;
+        src.z=0;
+        src.w=1;
+    }
 
     export function quatNormalize(src: quaternion, out: quaternion) {
         var mag: number = 1 / Math.sqrt(src.x * src.x + src.y * src.y + src.z * src.z + src.w * src.w);
@@ -387,5 +394,65 @@
         // }
         quatFromYawPitchRoll(yaw, 0, 0, out);
         math.quatNormalize(out, out);
+    }
+
+    export function rotationTo(from: vector3, to: vector3,out: quaternion)
+    {
+        var tmpvec3 =new vector3();
+        var xUnitVec3 = pool.vector3_right;
+        var yUnitVec3 = pool.vector3_up;
+
+        //var dot = vec3.dot(from, to);
+        let dot=vec3Dot(from,to);
+        if (dot < -0.999999) {
+            //vec3.cross(tmpvec3, xUnitVec3, from);
+            vec3Cross(xUnitVec3,from,tmpvec3);
+            if (vec3Length(tmpvec3) < 0.000001)
+            {
+                //vec3.cross(tmpvec3, yUnitVec3, from);
+                vec3Cross(yUnitVec3,from,tmpvec3);
+            } 
+            // vec3.normalize(tmpvec3, tmpvec3);
+            // quat.AxisAngle(tmpvec3, Math.PI,out);
+            vec3Normalize(tmpvec3,tmpvec3);
+            quatFromAxisAngle(tmpvec3,180,out);
+        } else if (dot > 0.999999) {
+            out[0] = 0;
+            out[1] = 0;
+            out[2] = 0;
+            out[3] = 1;
+        } else {
+            //vec3.cross(tmpvec3, from, to);
+            vec3Cross(from, to,tmpvec3);
+            out[0] = tmpvec3[0];
+            out[1] = tmpvec3[1];
+            out[2] = tmpvec3[2];
+            out[3] = 1 + dot;
+            quatNormalize(out,out);
+            //return quat.normalize(out, out);
+        }
+    }
+    export function myLookRotation(dir:vector3, out:quaternion,up:vector3=pool.vector3_up)
+    {
+        if(vec3Equal(dir,pool.vector3_zero))
+        {
+            console.log("Zero direction in MyLookRotation");
+            quatIdentity(out);
+            return;
+        }
+        if (!vec3Equal(dir,up)) {
+
+            let tempv=new vector3();
+            vec3ScaleByNum(up,vec3Dot(up,dir),tempv);
+            vec3Subtract(dir,tempv,tempv);
+            let qu=new quaternion();
+            this.rotationTo(pool.vector3_forward,tempv,qu);
+            let qu2=new quaternion();
+            this.rotationTo(tempv,dir,qu2);
+            quatMultiply(qu,qu2,out);
+        }
+        else {
+            this.rotationTo(pool.vector3_forward,dir,out);
+        }
     }
 }

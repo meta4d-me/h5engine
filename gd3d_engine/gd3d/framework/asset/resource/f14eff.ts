@@ -43,28 +43,28 @@ namespace gd3d.framework
         caclByteLength(): number {
             return 0;
         }
-        f14data:F14EffectData;
-        trans:transform;
-        f14Effect:f14EffectSystem;
+        data:F14EffectData;
+        delayTime:number;
+        // trans:transform;
+        // f14Effect:f14EffectSystem;
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
             let json=JSON.parse(jsonStr);
-            this.f14data=new F14EffectData();
-            this.f14data.parsejson(json,assetmgr,this.assetbundle);
+            this.data=new F14EffectData();
+            this.data.parsejson(json,assetmgr,this.assetbundle);
             
-            this.trans=new gd3d.framework.transform();
-            this.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
-            this.f14Effect.setData(this.f14data);
+            // this.trans=new gd3d.framework.transform();
+            // this.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
+            // this.f14Effect.setData(this.f14data);
         }
-
-        getCloneF14eff():f14node
-        {
-            let f14node=new gd3d.framework.f14node();
-            f14node.trans=new gd3d.framework.transform();
-            f14node.f14Effect=f14node.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
-            f14node.f14Effect.setData(this.f14data);
-            return f14node;
-        }
+        // getCloneF14eff():f14node
+        // {
+        //     let f14node=new gd3d.framework.f14node();
+        //     f14node.trans=new gd3d.framework.transform();
+        //     f14node.f14Effect=f14node.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
+        //     f14node.f14Effect.setData(this.f14data);
+        //     return f14node;
+        // }
     }
 
 

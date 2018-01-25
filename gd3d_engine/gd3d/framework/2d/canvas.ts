@@ -294,11 +294,12 @@ namespace gd3d.framework
                 let pass = this.lastMat.getShader().passes["base"][0];
 
                 //有一些自动参数要传进去
-                mat.setMatrix("glstate_matrix_mvp", this.context.matrixModelViewProject);
+                //mat.setMatrix("glstate_matrix_mvp", this.context.matrixModelViewProject);
 
-                mat.uploadUniform(pass);
+                //mat.uploadUniform(pass);
                 // //mvp 信号
                 pass.use(this.webgl);
+                mat.uploadUnifoms(pass,this.context);
 
                 // this.batcher.begin(context.webgl, pass);
 
@@ -306,8 +307,8 @@ namespace gd3d.framework
                 // this.batcher.end(context.webgl);
                 this.batcher.begin(this.webgl, pass);
             }else{
-                let msta = mat.mapUniform["MaskState"]; 
-                let mr = mat.mapUniform["_maskRect"];
+                let msta = mat.statedMapUniforms["MaskState"]; 
+                let mr = mat.statedMapUniforms["_maskRect"];
                 if(msta != null && msta.value != null && mr != null && mr.value != null){
                     let rect = mr.value as math.vector4;
                     if(this.lastMaskV4 == null) this.lastMaskV4 = new math.vector4();
@@ -316,7 +317,8 @@ namespace gd3d.framework
                         math.vec4Clone(rect,this.lastMaskV4);
                         this.batcher.end(this.webgl);
                         let pass = this.lastMat.getShader().passes["base"][0];
-                        mat.uploadUniform(pass);
+                        //mat.uploadUniform(pass);
+                        mat.uploadUnifoms(pass,this.context);
                     }
                 }
             }
