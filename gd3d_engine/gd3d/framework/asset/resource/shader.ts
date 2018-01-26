@@ -366,6 +366,10 @@ namespace gd3d.framework
                             let tex=sceneMgr.app.getAssetMgr().getDefaultTexture("white");
                             this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.Texture,value:tex};
                             break;
+                        case render.UniformTypeEnum.CubeTexture:
+                            let cubetex=sceneMgr.app.getAssetMgr().getDefaultCubeTexture("white");
+                            this.defaultMapUniform[item.name]={type:render.UniformTypeEnum.CubeTexture,value:cubetex};
+                            break;
                     }
                 }
             }

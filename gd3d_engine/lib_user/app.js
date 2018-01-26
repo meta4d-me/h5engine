@@ -985,7 +985,7 @@ var main = (function () {
         this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
         this.addBtn("test_loadprefabdds", function () { return new test_loadprefabdds(); });
         this.addBtn("test_ATC纹理", function () { return new t.test_ATC(); });
-        this.addBtn("场景boxcollider_Pick", function () { return new test_pick_boxcollider(); });
+        this.addBtn("test_LookRotation", function () { return new test_LookRotation(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1076,13 +1076,13 @@ var t;
         test_ATC.prototype.createUI = function (astState, state) {
             var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
             var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
-            var label1 = this.createLabel(10, 10, "shannon_dxt1.dds");
+            var label1 = this.createLabel(10, 10, "shannon.pvr.bin");
             var label3 = this.createLabel(80, 10, "shannon_dxt3.dds");
             var label5 = this.createLabel(150, 10, "shannon_dxt5.dds");
             var labelAAI = this.createLabel(10, 200, "shannon_atc_rgb.dds");
             var labelAAE = this.createLabel(80, 200, "shannon_atc_rgba_explicit.dds");
             var labelARGB = this.createLabel(150, 200, "shannon_atc_rgba_interpolated.dds");
-            var image1 = this.createImage(10, 26, "shannon_dxt1.dds");
+            var image1 = this.createImage(10, 26, "shannon.pvr.bin");
             var image3 = this.createImage(80, 26, "shannon_dxt3.dds");
             var image5 = this.createImage(150, 26, "shannon_dxt5.dds");
             var imageAAI = this.createImage(10, 214, "shannon_atc_rgb.dds");
@@ -1106,7 +1106,7 @@ var t;
                                         _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                             if (s.isfinish) {
                                                 var t_2 = 6;
-                                                _this.assetMgr.load("res/shannon_dxt1.dds", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                                _this.assetMgr.load("res/shannon.pvr.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                                     if (s.isfinish) {
                                                         t_2--;
                                                         if (t_2 == 0) {
@@ -1239,7 +1239,7 @@ var t;
             this.camera = objCam.gameObject.addComponent("camera");
             this.camera.near = 0.01;
             this.camera.far = 120;
-            objCam.localTranslate = new gd3d.math.vector3(0, 0, 10);
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, 10);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
             state.finish = true;
@@ -1251,6 +1251,7 @@ var t;
                     background.name = "background";
                     background.localScale.x = background.localScale.y = 5;
                     background.localTranslate.z = -1;
+                    console.log(background);
                     this.scene.addChild(background);
                     background.markDirty();
                     background.updateWorldTran();
@@ -2080,6 +2081,87 @@ var demo;
     }());
     demo.DragonTest = DragonTest;
 })(demo || (demo = {}));
+var test_LookRotation = (function () {
+    function test_LookRotation() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.time = 0;
+    }
+    test_LookRotation.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_LookRotation.prototype.loadTexture = function (laststate, state) {
+        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+            else {
+                state.error = true;
+            }
+        });
+    };
+    test_LookRotation.prototype.addCam = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "Main Camera";
+        this.scene.addChild(objCam);
+        this.camere = objCam.gameObject.addComponent("camera");
+        this.camere.near = 0.01;
+        this.camere.far = 100;
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.updateWorldTran();
+        gd3d.math.quat2LookRotation(objCam.getWorldTranslate(), new gd3d.math.vector3(0, 0, 0), new gd3d.math.vector3(1, 1, 0), objCam.localRotate);
+        this.objCam = objCam;
+        objCam.markDirty();
+        state.finish = true;
+    };
+    test_LookRotation.prototype.addCube = function (laststate, state) {
+        var objCube = new gd3d.framework.transform();
+        objCube.name = "Cube";
+        this.scene.addChild(objCube);
+        objCube.localScale.x = objCube.localScale.y = objCube.localScale.z = 1;
+        objCube.localTranslate = new gd3d.math.vector3(0, 0, 0);
+        var mesh = objCube.gameObject.addComponent("meshFilter");
+        var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        mesh.mesh = smesh;
+        var render = objCube.gameObject.addComponent("meshRenderer");
+        var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+        if (sh != null) {
+            render.materials = [];
+            render.materials.push(new gd3d.framework.material());
+            render.materials[0].setShader(sh);
+            var texture0 = this.app.getAssetMgr().getAssetByName("zg256.png");
+            render.materials[0].setTexture("_MainTex", texture0);
+        }
+        this.cube = objCube;
+        this.cube.markDirty();
+        state.finish = true;
+    };
+    test_LookRotation.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.addCam.bind(this));
+        this.taskmgr.addTaskCall(this.addCube.bind(this));
+    };
+    test_LookRotation.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+        this.time += delta;
+        if (this.objCam != null) {
+            var cam = this.objCam.gameObject.transform;
+            var yRoate = (this.time * 30) % 360;
+            gd3d.math.quat2LookRotation(cam.getWorldTranslate(), new gd3d.math.vector3(0, 0, 0), new gd3d.math.vector3(Math.sin(yRoate * Math.PI / 180), Math.cos(yRoate * Math.PI / 180), 0), cam.localRotate);
+            cam.markDirty();
+        }
+    };
+    return test_LookRotation;
+}());
 var test_navMesh = (function () {
     function test_navMesh() {
         this.cubesize = 0.5;
@@ -8608,7 +8690,7 @@ var test_loadprefabdds = (function () {
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                name = "dragon";
+                name = "Quad";
                 _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
@@ -11032,7 +11114,7 @@ var test_Sound = (function () {
         this.camera.near = 0.01;
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.lookat(this.cube);
         objCam.markDirty();
         state.finish = true;
     };
@@ -11065,8 +11147,8 @@ var test_Sound = (function () {
         this.scene = this.app.getScene();
         this.taskmgr.addTaskCall(this.loadShader.bind(this));
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskmgr.addTaskCall(this.addCam.bind(this));
         this.taskmgr.addTaskCall(this.addCube.bind(this));
+        this.taskmgr.addTaskCall(this.addCam.bind(this));
     };
     test_Sound.prototype.update = function (delta) {
         this.taskmgr.move(delta);

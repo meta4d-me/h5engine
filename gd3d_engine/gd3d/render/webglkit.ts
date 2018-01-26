@@ -81,6 +81,12 @@ namespace gd3d.render
                 webglkit._texNumber.push(webgl.TEXTURE7);
                 webglkit._texNumber.push(webgl.TEXTURE8);
                 webglkit._texNumber.push(webgl.TEXTURE9);
+                webglkit._texNumber.push(webgl.TEXTURE10);
+                webglkit._texNumber.push(webgl.TEXTURE11);
+                webglkit._texNumber.push(webgl.TEXTURE12);
+                webglkit._texNumber.push(webgl.TEXTURE13);
+                webglkit._texNumber.push(webgl.TEXTURE14);
+                webglkit._texNumber.push(webgl.TEXTURE15);
 
                 webglkit.LEQUAL = webgl.LEQUAL;
                 webglkit.NEVER = webgl.NEVER;

@@ -257,6 +257,21 @@ declare namespace demo {
         update(delta: number): void;
     }
 }
+declare class test_LookRotation implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    taskmgr: gd3d.framework.taskMgr;
+    camere: gd3d.framework.camera;
+    cube: gd3d.framework.transform;
+    time: number;
+    objCam: gd3d.framework.transform;
+    private loadShader(laststate, state);
+    private loadTexture(laststate, state);
+    private addCam(laststate, state);
+    private addCube(laststate, state);
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare class test_navMesh implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
