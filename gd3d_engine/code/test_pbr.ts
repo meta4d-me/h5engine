@@ -47,7 +47,7 @@ class test_pbr implements IState {
         // mr.materials[0].setTexture("_MainTex",this.assetMgr.getDefaultTexture("grid"));
 
         //pbr
-        mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json") as gd3d.framework.shader);
+        mr.materials[0].setShader(this.assetMgr.getAssetByName("pbr.shader.json")as gd3d.framework.shader);
         mr.materials[0].setTexture("brdf",this.assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture);
         mr.materials[0].setTexture("uv_Basecolor",this.assetMgr.getAssetByName(`basecolor.png`)as gd3d.framework.texture);
         mr.materials[0].setTexture("uv_Normal",this.assetMgr.getAssetByName(`normal.png`)as gd3d.framework.texture);
@@ -290,7 +290,7 @@ class test_pbr implements IState {
 
     private loadTexture(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
         //加载图片资源
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
         {
             if (s1.isfinish){
                 this.assetMgr.load(this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, (s2) => {
