@@ -8358,6 +8358,7 @@ var t;
                     var sh = _this.scene.app.getAssetMgr().getShader("mosaic.shader.json");
                     post.material.setShader(sh);
                     var textcolor = new gd3d.framework.texture("_color");
+                    0;
                     textcolor.glTexture = color.renderTarget;
                     post.material.setTexture("_MainTex", textcolor);
                     _this.camera.postQueues.push(post);
