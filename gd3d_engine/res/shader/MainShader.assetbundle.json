@@ -1,6 +1,26 @@
 {
   "files":[
       {
+          "name":"resources/posteffect/blur.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/blur.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/mosaic.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/mosaic.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/quad.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/transparent.shader.json",
           "length":0
           },

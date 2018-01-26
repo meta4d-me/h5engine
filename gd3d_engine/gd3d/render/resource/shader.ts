@@ -374,6 +374,10 @@ namespace gd3d.render
             {
                 vsStr="#define LIGHTMAP \n"+"#define FOG \n"+vsStr;
                 fsStr="#define LIGHTMAP \n"+"#define FOG \n"+fsStr;    
+            }else if(type=="quad")
+            {
+                vsStr="#define QUAD \n"+vsStr;
+                fsStr="#define QUAD \n"+fsStr; 
             }
             this.compileVS(webgl,nameVS+type,vsStr);
             this.compileFS(webgl,nameFS+type,fsStr);

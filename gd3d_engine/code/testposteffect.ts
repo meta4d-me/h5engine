@@ -6,7 +6,7 @@
         scene: gd3d.framework.scene;
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
+            this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
             {
                 if (_state.isfinish) 
                 {
@@ -51,7 +51,8 @@
                     var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
                     let cuber = renderer;
 
-                    var sh = this.app.getAssetMgr().getShader("light1.shader.json");
+                    //var sh = this.app.getAssetMgr().getShader("light1.shader.json");
+                    var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
                     if (sh != null)
                     {
                         cuber.materials = [];
@@ -87,65 +88,84 @@
 
             //set post effect 
             {
-                                //color 2 rt
+                //                 //color 2 rt
+                // var color = new gd3d.framework.cameraPostQueue_Color();
+                // color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                // this.camera.postQueues.push(color);
+
+
+                // //depth 2 rt 
+                // var depth = new gd3d.framework.cameraPostQueue_Depth();
+                // depth.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                // this.camera.postQueues.push(depth);
+
+                // var post = new gd3d.framework.cameraPostQueue_Quad();
+                // post.material.setShader(this.scene.app.getAssetMgr().getShader("diffuse.shader.json"));
+                
+                // var text = new gd3d.framework.texture("_depth");
+                // text.glTexture = depth.renderTarget;
+                
+                // var textcolor = new gd3d.framework.texture("_color");
+                // textcolor.glTexture = color.renderTarget;
+                
+                // post.material.setTexture("_MainTex", textcolor);
+                // post.material.setTexture("_DepthTex", text);
+                // this.camera.postQueues.push(post);
+
+            }
+
+            {
                 var color = new gd3d.framework.cameraPostQueue_Color();
                 color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
                 this.camera.postQueues.push(color);
 
-
-                //depth 2 rt 
-                var depth = new gd3d.framework.cameraPostQueue_Depth();
-                depth.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
-                this.camera.postQueues.push(depth);
-
                 var post = new gd3d.framework.cameraPostQueue_Quad();
-                post.material.setShader(this.scene.app.getAssetMgr().getShader("diffuse.shader.json"));
-                
-                var text = new gd3d.framework.texture("_depth");
-                text.glTexture = depth.renderTarget;
+                post.material.setShader(this.scene.app.getAssetMgr().getShader("blur.shader.json"));
                 
                 var textcolor = new gd3d.framework.texture("_color");
                 textcolor.glTexture = color.renderTarget;
                 
                 post.material.setTexture("_MainTex", textcolor);
-                post.material.setTexture("_DepthTex", text);
+                post.material.setFloat("_BlurGap",3);
                 this.camera.postQueues.push(post);
-
+                console.log("均值模糊");
             }
-            var lighttran = new gd3d.framework.transform();
-            this.scene.addChild(lighttran);
-            this.light = lighttran.gameObject.addComponent("light") as gd3d.framework.light;
-            lighttran.localTranslate.x = 2;
-            lighttran.localTranslate.z = 1;
-            lighttran.localTranslate.y = 3;
-            lighttran.markDirty();
 
-            {
-                var cube = new gd3d.framework.transform();
-                cube.name = "cube";
-                cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
+            //灯光
+            // var lighttran = new gd3d.framework.transform();
+            // this.scene.addChild(lighttran);
+            // this.light = lighttran.gameObject.addComponent("light") as gd3d.framework.light;
+            // lighttran.localTranslate.x = 2;
+            // lighttran.localTranslate.z = 1;
+            // lighttran.localTranslate.y = 3;
+            // lighttran.markDirty();
 
-                lighttran.addChild(cube);
-                var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            // {
+            //     var cube = new gd3d.framework.transform();
+            //     cube.name = "cube";
+            //     cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
 
-                var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                mesh.mesh = (smesh);
-                var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-                let cuber = renderer;
+            //     lighttran.addChild(cube);
+            //     var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
 
-                var sh = this.app.getAssetMgr().getShader("light1.shader.json");
-                if (sh != null)
-                {
-                    cuber.materials = [];
-                    cuber.materials.push(new gd3d.framework.material());
-                    cuber.materials[0].setShader(sh);//----------------使用shader
-                    //cuber.materials[0].setVector4("_Color", new gd3d.math.vector4(0.4, 0.4, 0.2, 1.0));
+            //     var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+            //     mesh.mesh = (smesh);
+            //     var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            //     let cuber = renderer;
 
-                    let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
-                    cuber.materials[0].setTexture("_MainTex", texture);
+            //     var sh = this.app.getAssetMgr().getShader("light1.shader.json");
+            //     if (sh != null)
+            //     {
+            //         cuber.materials = [];
+            //         cuber.materials.push(new gd3d.framework.material());
+            //         cuber.materials[0].setShader(sh);//----------------使用shader
+            //         //cuber.materials[0].setVector4("_Color", new gd3d.math.vector4(0.4, 0.4, 0.2, 1.0));
 
-                }
-            }
+            //         let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
+            //         cuber.materials[0].setTexture("_MainTex", texture);
+
+            //     }
+            // }
             state.finish = true;
 
         }
@@ -240,9 +260,10 @@
                     this.camera.postQueues.push(color);
 
                     var post = new gd3d.framework.cameraPostQueue_Quad();
-                    post.material.setShader(this.scene.app.getAssetMgr().getShader("mask.shader.json"));
+                    let sh = this.scene.app.getAssetMgr().getShader("mosaic.shader.json");
+                    post.material.setShader(sh);
                     
-                    var textcolor = new gd3d.framework.texture("_color");
+                    var textcolor = new gd3d.framework.texture("_color");0
                     textcolor.glTexture = color.renderTarget;
                     
                     post.material.setTexture("_MainTex", textcolor);
@@ -357,6 +378,7 @@
             var z = Math.cos(this.timer);
             var x2 = Math.sin(this.timer * 0.1);
             var z2 = Math.cos(this.timer * 0.1);
+            
             if (this.camera != null)
             {
                 var objCam = this.camera.gameObject.transform;
@@ -366,6 +388,10 @@
                 objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
                 //objCam.markDirty();
             }
+            
+            let isbreak = true;
+            if(isbreak) return;
+
             if (this.light != null)
             {
                 var objlight = this.light.gameObject.transform;
