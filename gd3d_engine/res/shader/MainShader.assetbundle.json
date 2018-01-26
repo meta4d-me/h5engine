@@ -25,11 +25,35 @@
           "length":0
           },
       {
+          "name":"resources/posteffect/barrel_blur.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/barrel_blur.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/posteffect/blur.fs.glsl",
           "length":0
           },
       {
           "name":"resources/posteffect/blur.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/contort.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/contort.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/gaussianBlur.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/gaussianBlur.shader.json",
           "length":0
           },
       {
@@ -41,7 +65,31 @@
           "length":0
           },
       {
+          "name":"resources/posteffect/outline.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/outline.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/post_depth.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/post_depth.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/posteffect/quad.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/radial_blur.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/radial_blur.shader.json",
           "length":0
           },
       {

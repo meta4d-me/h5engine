@@ -2,21 +2,23 @@
     "layer": "geometry",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_MosaicSize('MosaicSize',float)=5"
+        "_Level('Level',Range(0,100))=20",
+        "_CenterX ('CenterX', Range(0.0,1.0))=0.5",
+        "_CenterY ('CenterY', Range(0.0,1.0))=0.5"
     ],
     "passes": {
         "base": [
             {
                 "showface": "ccw",
                 "vs": "quad",
-                "fs": "mosaic"
+                "fs": "radial_blur"
             }
         ],
         "quad": [
             {
                 "showface": "ccw",
                 "vs": "quad",
-                "fs": "mosaic"
+                "fs": "radial_blur"
             }
         ]
     }

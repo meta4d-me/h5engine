@@ -2,8 +2,7 @@
     "layer": "geometry",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_BlurGap('_BlurGap',float)=1.0",
-        "_MainTex_ST('MainTex_ST',Vector) = (1,1,0,0)"
+        "_BlurGap('_BlurGap',float)=1.0"
     ],
     "passes": {
         "base": [

@@ -88,48 +88,32 @@
 
             //set post effect 
             {
-                //                 //color 2 rt
-                // var color = new gd3d.framework.cameraPostQueue_Color();
-                // color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
-                // this.camera.postQueues.push(color);
-
-
-                // //depth 2 rt 
-                // var depth = new gd3d.framework.cameraPostQueue_Depth();
-                // depth.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
-                // this.camera.postQueues.push(depth);
-
-                // var post = new gd3d.framework.cameraPostQueue_Quad();
-                // post.material.setShader(this.scene.app.getAssetMgr().getShader("diffuse.shader.json"));
-                
-                // var text = new gd3d.framework.texture("_depth");
-                // text.glTexture = depth.renderTarget;
-                
-                // var textcolor = new gd3d.framework.texture("_color");
-                // textcolor.glTexture = color.renderTarget;
-                
-                // post.material.setTexture("_MainTex", textcolor);
-                // post.material.setTexture("_DepthTex", text);
-                // this.camera.postQueues.push(post);
-
-            }
-
-            {
+                                //color 2 rt
                 var color = new gd3d.framework.cameraPostQueue_Color();
                 color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
                 this.camera.postQueues.push(color);
 
+
+                //depth 2 rt 
+                var depth = new gd3d.framework.cameraPostQueue_Depth();
+                depth.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                this.camera.postQueues.push(depth);
+
                 var post = new gd3d.framework.cameraPostQueue_Quad();
-                post.material.setShader(this.scene.app.getAssetMgr().getShader("blur.shader.json"));
+                post.material.setShader(this.scene.app.getAssetMgr().getShader("outline.shader.json"));
+                
+                var text = new gd3d.framework.texture("_depth");
+                text.glTexture = depth.renderTarget;
                 
                 var textcolor = new gd3d.framework.texture("_color");
                 textcolor.glTexture = color.renderTarget;
                 
                 post.material.setTexture("_MainTex", textcolor);
-                post.material.setFloat("_BlurGap",3);
+                post.material.setTexture("_DepthTex", text);
                 this.camera.postQueues.push(post);
-                console.log("均值模糊");
+
             }
+
 
             //灯光
             // var lighttran = new gd3d.framework.transform();
@@ -240,7 +224,7 @@
                     this.camera.postQueues.push(depth);
 
                     var post = new gd3d.framework.cameraPostQueue_Quad();
-                    post.material.setShader(this.scene.app.getAssetMgr().getShader("diffuse.shader.json"));
+                    post.material.setShader(this.scene.app.getAssetMgr().getShader("outline.shader.json"));
                     
                     var text = new gd3d.framework.texture("_depth");
                     text.glTexture = depth.renderTarget;
@@ -294,7 +278,7 @@
                     this.camera.postQueues.push(color);
 
                     var post = new gd3d.framework.cameraPostQueue_Quad();
-                    post.material.setShader(this.scene.app.getAssetMgr().getShader("GaussianBlur.shader.json"));
+                    post.material.setShader(this.scene.app.getAssetMgr().getShader("gaussianBlur.shader.json"));
                     
                     var textcolor = new gd3d.framework.texture("_color");
                     textcolor.glTexture = color.renderTarget;

@@ -2,21 +2,21 @@
     "layer": "geometry",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_MosaicSize('MosaicSize',float)=5"
+        "_Power('Power',Float)=0.5"
     ],
     "passes": {
         "base": [
             {
                 "showface": "ccw",
                 "vs": "quad",
-                "fs": "mosaic"
+                "fs": "barrel_blur"
             }
         ],
         "quad": [
             {
                 "showface": "ccw",
                 "vs": "quad",
-                "fs": "mosaic"
+                "fs": "barrel_blur"
             }
         ]
     }

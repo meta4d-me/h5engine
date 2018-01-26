@@ -2,21 +2,21 @@
     "layer": "geometry",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_MosaicSize('MosaicSize',float)=5"
+        "_DepthTex('DepthTex',Texture)='white'{}"
     ],
     "passes": {
         "base": [
             {
                 "showface": "ccw",
                 "vs": "quad",
-                "fs": "mosaic"
+                "fs": "outline"
             }
         ],
         "quad": [
             {
                 "showface": "ccw",
                 "vs": "quad",
-                "fs": "mosaic"
+                "fs": "outline"
             }
         ]
     }
