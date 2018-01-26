@@ -2640,7 +2640,7 @@ var test_pbr_scene = (function () {
     };
     test_pbr_scene.prototype.loadTexture = function (lastState, state) {
         var _this = this;
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+        this.app.getAssetMgr().load("res/shader/MainShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
             if (s1.isfinish) {
                 _this.assetMgr.load(_this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
                     if (s2.isfinish) {

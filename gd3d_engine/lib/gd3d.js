@@ -14052,11 +14052,14 @@ var gd3d;
             f14EffectSystem.prototype.dispose = function () {
             };
             f14EffectSystem.prototype.play = function () {
-                this.reset();
+                if (this.active) {
+                    this.reset();
+                }
                 this.active = true;
             };
             f14EffectSystem.prototype.stop = function () {
                 this.active = false;
+                this.reset();
             };
             f14EffectSystem.prototype.reset = function () {
                 this.allTime = 0;
@@ -15029,8 +15032,9 @@ var gd3d;
                 gd3d.math.vec3Clone(this.startColor, this.color);
                 this.alpha = this.startAlpha;
                 gd3d.math.vec4Clone(this.starTex_ST, this.tex_ST);
-                if (data.rendermodel == framework.RenderModelEnum.VerticalBillBoard) {
+                if (data.rendermodel == framework.RenderModelEnum.StretchedBillBoard) {
                     this.emissionMatToWorld = this.element.getWorldMatrix();
+                    gd3d.math.matrixTransformNormal(this.speedDir, this.emissionMatToWorld, this.worldspeeddir);
                     gd3d.math.matrixTransformVector3(this.StartPos, this.emissionMatToWorld, this.worldStartPos);
                 }
             };
@@ -15168,11 +15172,10 @@ var gd3d;
                     gd3d.math.matrixTransformVector3(this.localTranslate, this.emissionMatToWorld, this.worldpos);
                     var campos = this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
                     gd3d.math.vec3Subtract(campos, this.worldpos, this.lookDir);
-                    gd3d.math.vec3ScaleByNum(this.speedDir, gd3d.math.vec3Dot(this.speedDir, this.lookDir), this.lookDir);
-                    gd3d.math.vec3Add(this.lookDir, this.worldStartPos, this.lookDir);
-                    gd3d.math.vec3Subtract(this.lookDir, campos, this.lookDir);
-                    gd3d.math.matrixTransformNormal(this.speedDir, this.emissionMatToWorld, this.worldspeeddir);
-                    gd3d.math.myLookRotation(this.lookDir, this.worldRotation, this.worldspeeddir);
+                    gd3d.math.vec3Normalize(this.lookDir, this.lookDir);
+                    gd3d.math.vec3Cross(this.worldspeeddir, this.lookDir, this.temptx);
+                    gd3d.math.vec3Cross(this.temptx, this.worldspeeddir, this.lookDir);
+                    gd3d.math.unitxyzToRotation(this.temptx, this.worldspeeddir, this.lookDir, this.worldRotation);
                     this.emissionWorldRotation = this.element.getWorldRotation();
                     gd3d.math.quatInverse(this.emissionWorldRotation, this.invParWorldRot);
                     gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
@@ -18289,6 +18292,42 @@ var gd3d;
             }
         }
         math.matrix2Quaternion = matrix2Quaternion;
+        function unitxyzToRotation(xAxis, yAxis, zAxis, out) {
+            var m11 = xAxis.x, m12 = yAxis.x, m13 = zAxis.x;
+            var m21 = xAxis.y, m22 = yAxis.y, m23 = zAxis.y;
+            var m31 = xAxis.z, m32 = yAxis.z, m33 = zAxis.z;
+            var trace = m11 + m22 + m33;
+            var s;
+            if (trace > 0) {
+                s = 0.5 / Math.sqrt(trace + 1.0);
+                out.w = 0.25 / s;
+                out.x = (m32 - m23) * s;
+                out.y = (m13 - m31) * s;
+                out.z = (m21 - m12) * s;
+            }
+            else if (m11 > m22 && m11 > m33) {
+                s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
+                out.w = (m32 - m23) / s;
+                out.x = 0.25 * s;
+                out.y = (m12 + m21) / s;
+                out.z = (m13 + m31) / s;
+            }
+            else if (m22 > m33) {
+                s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
+                out.w = (m13 - m31) / s;
+                out.x = (m12 + m21) / s;
+                out.y = 0.25 * s;
+                out.z = (m23 + m32) / s;
+            }
+            else {
+                s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
+                out.w = (m21 - m12) / s;
+                out.x = (m13 + m31) / s;
+                out.y = (m23 + m32) / s;
+                out.z = 0.25 * s;
+            }
+        }
+        math.unitxyzToRotation = unitxyzToRotation;
         function matrixClone(src, out) {
             for (var i = 0; i < 16; i++) {
                 out.rawData[i] = src.rawData[i];
@@ -19153,23 +19192,20 @@ var gd3d;
         function quat2LookRotation(pos, targetpos, upwards, out) {
             var dir = gd3d.math.pool.new_vector3();
             math.vec3Subtract(targetpos, pos, dir);
+            math.quatLookRotation(dir, upwards, out);
+        }
+        math.quat2LookRotation = quat2LookRotation;
+        function quatLookRotation(dir, upwards, out) {
             math.vec3Normalize(dir, dir);
-            var z = gd3d.math.pool.new_vector3();
-            z.x = 0;
-            z.y = 0;
-            z.z = 1;
-            var ab = math.vec3Dot(dir, z);
+            var ab = math.vec3Dot(dir, gd3d.math.pool.vector3_forward);
             var an_dz = Math.acos(ab);
             var cdz = gd3d.math.pool.new_vector3();
-            math.vec3Cross(dir, z, cdz);
+            math.vec3Cross(dir, gd3d.math.pool.vector3_forward, cdz);
             math.vec3Normalize(cdz, cdz);
             an_dz = 180 / Math.PI * an_dz;
             quatFromAxisAngle(cdz, -an_dz, out);
-            var y = z;
-            y.x = 0;
-            y.y = 1;
-            y.z = 0;
-            quatTransformVector(out, y, y);
+            var y = gd3d.math.pool.new_vector3();
+            quatTransformVector(out, gd3d.math.pool.vector3_up, y);
             var cyw = cdz;
             math.vec3Cross(dir, upwards, cyw);
             math.vec3Normalize(y, y);
@@ -19191,11 +19227,11 @@ var gd3d;
             yq.w = cosy;
             quatMultiply(yq, out, out);
             gd3d.math.pool.delete_vector3(dir);
-            gd3d.math.pool.delete_vector3(z);
+            gd3d.math.pool.delete_vector3(y);
             gd3d.math.pool.delete_vector3(cdz);
             gd3d.math.pool.delete_quaternion(yq);
         }
-        math.quat2LookRotation = quat2LookRotation;
+        math.quatLookRotation = quatLookRotation;
         function quatYAxis(pos, targetpos, out) {
             var dir = new math.vector3();
             math.vec3Subtract(targetpos, pos, dir);

@@ -1,6 +1,30 @@
 {
   "files":[
       {
+          "name":"resources/advanced/pbr.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/pbr.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/pbr.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/skybox.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/skybox.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/skybox.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/project/transparent.shader.json",
           "length":0
           },

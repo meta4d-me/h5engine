@@ -3097,6 +3097,7 @@ declare namespace gd3d.math {
     }
     function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
     function matrix2Quaternion(matrix: matrix, result: quaternion): void;
+    function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
     function matrixClone(src: matrix, out: matrix): void;
     function matrix3x2Clone(src: matrix3x2, out: matrix3x2): void;
     function matrixMakeIdentity(out: matrix): void;
@@ -3165,6 +3166,7 @@ declare namespace gd3d.math {
     function quatLookat(pos: vector3, targetpos: vector3, out: quaternion): void;
     function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir?: gd3d.math.vector3): void;
     function quat2LookRotation(pos: vector3, targetpos: vector3, upwards: vector3, out: quaternion): void;
+    function quatLookRotation(dir: vector3, upwards: vector3, out: quaternion): void;
     function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion): void;
     function rotationTo(from: vector3, to: vector3, out: quaternion): void;
     function myLookRotation(dir: vector3, out: quaternion, up?: vector3): void;
