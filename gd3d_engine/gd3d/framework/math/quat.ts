@@ -298,73 +298,47 @@
     export function quat2LookRotation(pos: vector3, targetpos: vector3, upwards: vector3, out: quaternion) {
         let dir = gd3d.math.pool.new_vector3();
         math.vec3Subtract(targetpos, pos, dir);
-        math.vec3Normalize(dir, dir);
-  
-        let z = gd3d.math.pool.new_vector3();
-        z.x = 0; z.y = 0; z.z = 1;
-        let ab = math.vec3Dot(dir, z);
+        math.quatLookRotation(dir,upwards,out);
+    }
 
+    export function quatLookRotation(dir:vector3, upwards: vector3, out: quaternion){
+        math.vec3Normalize(dir, dir);
+        let ab = math.vec3Dot(dir, gd3d.math.pool.vector3_forward);
         let an_dz = Math.acos(ab);
 
-
         let cdz = gd3d.math.pool.new_vector3();
-        vec3Cross(dir, z, cdz);
+        vec3Cross(dir, gd3d.math.pool.vector3_forward, cdz);
         math.vec3Normalize(cdz, cdz);
         an_dz = 180 / Math.PI * an_dz;
         quatFromAxisAngle(cdz, -an_dz, out);
 
-
-
-        let y = z;
-        y.x = 0;
-        y.y = 1;
-        y.z = 0;
-
-        quatTransformVector(out, y, y);
-
+        let y = gd3d.math.pool.new_vector3();
+        quatTransformVector(out, gd3d.math.pool.vector3_up, y);
         let cyw = cdz;
-
         vec3Cross(dir, upwards, cyw);
 
         math.vec3Normalize(y, y);
         math.vec3Normalize(cyw, cyw);
         let cos2Y = vec3Dot(cyw, y);
-        //vec3Normalize(upwards,upwards);
-
-        
         let sin2Y = Math.sqrt(1 - cos2Y * cos2Y);
-
         if(vec3Dot(y,upwards)<0){
             sin2Y=-sin2Y;
         }
-
         let siny = Math.sqrt((1 - sin2Y) / 2);
         let cosy = -Math.sqrt((sin2Y + 1) / 2);
-
         if (cos2Y < 0){
             cosy = -cosy;
         }
-
         let yq = gd3d.math.pool.new_quaternion();
         yq.x = 0;
         yq.y = 0;
         yq.z = siny;
         yq.w = cosy;
-
- 
         quatMultiply(yq, out, out);
-        // if()<0){
-        //     yq.z = -siny;
-        //     quatMultiply(yq, out1, out);
-        // }
-            
-
         gd3d.math.pool.delete_vector3(dir);
-        gd3d.math.pool.delete_vector3(z);
+        gd3d.math.pool.delete_vector3(y);
         gd3d.math.pool.delete_vector3(cdz);
         gd3d.math.pool.delete_quaternion(yq);
-
-
     }
 
     export function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion) {
