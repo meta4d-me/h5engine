@@ -6,7 +6,7 @@
         scene: gd3d.framework.scene;
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
-            this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
+            this.app.getAssetMgr().load("res/Mainshader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (_state) =>
             {
                 if (_state.isfinish) 
                 {
@@ -79,7 +79,7 @@
             this.scene.addChild(objCam);
             this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
             this.camera.near = 1;
-            this.camera.far = 15;
+            this.camera.far = 100;
             this.camera.fov = Math.PI * 0.3;
             objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
