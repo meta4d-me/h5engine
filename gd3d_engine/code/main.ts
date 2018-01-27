@@ -43,7 +43,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_normalmap", () => new t.Test_NormalMap());
         this.addBtn("test_assestmgr", () => new test_assestmgr());
 
-        this.addBtn("test_posteffect", () => new t.test_posteffect());
+        this.addBtn("test_posteffect(后期效果)", () => new t.test_posteffect());
         this.addBtn("test_streamlight", () => new test_streamlight());
 
         this.addBtn("test_trailRender", () => new t.test_trailrender());
@@ -69,7 +69,6 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_tex_uv", () => new test_texuv());
         //this.addBtn("test_uimove", () => new test_uimove());
 
-        this.addBtn("post_景深", () => new t.test_posteffect_cc());
         //this.addBtn("test_effecteditor", () => new test_effecteditor());
         this.addBtn("test_shadowmap", () => new test_ShadowMap());
         //this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());

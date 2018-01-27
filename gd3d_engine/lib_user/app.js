@@ -948,7 +948,7 @@ var main = (function () {
         this.addBtn("test_light_d1", function () { return new t.light_d1(); });
         this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
         this.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
-        this.addBtn("test_posteffect", function () { return new t.test_posteffect(); });
+        this.addBtn("test_posteffect(后期效果)", function () { return new t.test_posteffect(); });
         this.addBtn("test_streamlight", function () { return new test_streamlight(); });
         this.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
         this.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
@@ -966,7 +966,6 @@ var main = (function () {
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
         this.addBtn("test_tex_uv", function () { return new test_texuv(); });
-        this.addBtn("post_景深", function () { return new t.test_posteffect_cc(); });
         this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
         this.addBtn("test_liChange", function () { return new testLiChangeMesh(); });
         this.addBtn("example_newObject", function () { return new test_NewGameObject; });
@@ -7975,239 +7974,6 @@ var t;
 })(t || (t = {}));
 var t;
 (function (t) {
-    var test_posteffect_cc = (function () {
-        function test_posteffect_cc() {
-            this.timer = 0;
-            this.taskmgr = new gd3d.framework.taskMgr();
-        }
-        test_posteffect_cc.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-                if (_state.isfinish) {
-                    state.finish = true;
-                }
-            });
-        };
-        test_posteffect_cc.prototype.loadText = function (laststate, state) {
-            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                if (s.isfinish) {
-                    state.finish = true;
-                }
-                else {
-                    state.error = true;
-                }
-            });
-        };
-        test_posteffect_cc.prototype.addcube = function (laststate, state) {
-            for (var i = -4; i < 5; i++) {
-                for (var j = -4; j < 5; j++) {
-                    var cube = new gd3d.framework.transform();
-                    cube.name = "cube";
-                    cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
-                    cube.localTranslate.x = i;
-                    cube.localTranslate.z = j;
-                    this.scene.addChild(cube);
-                    var mesh = cube.gameObject.addComponent("meshFilter");
-                    var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                    mesh.mesh = (smesh);
-                    var renderer = cube.gameObject.addComponent("meshRenderer");
-                    var cuber = renderer;
-                    var sh = this.app.getAssetMgr().getShader("light1.shader.json");
-                    if (sh != null) {
-                        cuber.materials = [];
-                        cuber.materials.push(new gd3d.framework.material());
-                        cuber.materials[0].setShader(sh);
-                        var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
-                        cuber.materials[0].setTexture("_MainTex", texture);
-                    }
-                }
-            }
-            state.finish = true;
-        };
-        test_posteffect_cc.prototype.addcamandlight = function (laststate, state) {
-            var objCam = new gd3d.framework.transform();
-            objCam.name = "sth.";
-            this.scene.addChild(objCam);
-            this.camera = objCam.gameObject.addComponent("camera");
-            this.camera.near = 1;
-            this.camera.far = 15;
-            this.camera.fov = Math.PI * 0.3;
-            objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
-            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-            objCam.markDirty();
-            var lighttran = new gd3d.framework.transform();
-            this.scene.addChild(lighttran);
-            this.light = lighttran.gameObject.addComponent("light");
-            lighttran.localTranslate.x = 2;
-            lighttran.localTranslate.z = 1;
-            lighttran.localTranslate.y = 3;
-            lighttran.markDirty();
-            {
-                var cube = new gd3d.framework.transform();
-                cube.name = "cube";
-                cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
-                lighttran.addChild(cube);
-                var mesh = cube.gameObject.addComponent("meshFilter");
-                var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                mesh.mesh = (smesh);
-                var renderer = cube.gameObject.addComponent("meshRenderer");
-                var cuber = renderer;
-                var sh = this.app.getAssetMgr().getShader("light1.shader.json");
-                if (sh != null) {
-                    cuber.materials = [];
-                    cuber.materials.push(new gd3d.framework.material());
-                    cuber.materials[0].setShader(sh);
-                    var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
-                    cuber.materials[0].setTexture("_MainTex", texture);
-                }
-            }
-            state.finish = true;
-        };
-        test_posteffect_cc.prototype.start = function (app) {
-            var _this = this;
-            console.log("i am here.");
-            this.app = app;
-            this.scene = this.app.getScene();
-            var btn = document.createElement("button");
-            btn.textContent = "切换光源类型";
-            btn.style.left = "50px";
-            btn.style.position = "absolute";
-            this.app.container.appendChild(btn);
-            btn.onclick = function () {
-                if (_this.light != null) {
-                    if (_this.light.type == gd3d.framework.LightTypeEnum.Direction) {
-                        _this.light.type = gd3d.framework.LightTypeEnum.Point;
-                        console.log("点光源");
-                    }
-                    else if (_this.light.type == gd3d.framework.LightTypeEnum.Point) {
-                        _this.light.type = gd3d.framework.LightTypeEnum.Spot;
-                        _this.light.spotAngelCos = Math.cos(0.2 * Math.PI);
-                        console.log("聚光灯");
-                    }
-                    else {
-                        _this.light.type = gd3d.framework.LightTypeEnum.Direction;
-                        console.log("方向光");
-                    }
-                }
-            };
-            this.addbtn("50px", "normal", function () {
-                _this.camera.postQueues = [];
-            });
-            this.addbtn("150px", "模糊", function () {
-                _this.camera.postQueues = [];
-                var color = new gd3d.framework.cameraPostQueue_Color();
-                color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
-                _this.camera.postQueues.push(color);
-                var textcolor = new gd3d.framework.texture("_color");
-                textcolor.glTexture = color.renderTarget;
-                var texsize = 512;
-                var post = new gd3d.framework.cameraPostQueue_Quad();
-                post.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
-                post.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
-                post.material.setTexture("_MainTex", textcolor);
-                post.material.setVector4("sample_offsets", new gd3d.math.vector4(0, 1.0, 0, -1.0));
-                post.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
-                _this.camera.postQueues.push(post);
-                var texBlur0 = new gd3d.framework.texture("_blur0");
-                texBlur0.glTexture = post.renderTarget;
-                var post1 = new gd3d.framework.cameraPostQueue_Quad();
-                post1.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
-                post1.material.setTexture("_MainTex", texBlur0);
-                post1.material.setVector4("sample_offsets", new gd3d.math.vector4(1.0, 0, -1.0, 0));
-                post1.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
-                _this.camera.postQueues.push(post1);
-            });
-            this.addbtn("250px", "深度图", function () {
-                _this.camera.postQueues = [];
-                var depth = new gd3d.framework.cameraPostQueue_Depth();
-                _this.camera.postQueues.push(depth);
-            });
-            this.addbtn("350px", "景深", function () {
-                _this.camera.postQueues = [];
-                var color = new gd3d.framework.cameraPostQueue_Color();
-                color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
-                _this.camera.postQueues.push(color);
-                var textcolor = new gd3d.framework.texture("_color");
-                textcolor.glTexture = color.renderTarget;
-                var depth = new gd3d.framework.cameraPostQueue_Depth();
-                depth.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
-                _this.camera.postQueues.push(depth);
-                var depthcolor = new gd3d.framework.texture("_depthcolor");
-                depthcolor.glTexture = depth.renderTarget;
-                var texsize = 512;
-                var post = new gd3d.framework.cameraPostQueue_Quad();
-                post.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
-                post.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
-                post.material.setTexture("_MainTex", textcolor);
-                post.material.setVector4("sample_offsets", new gd3d.math.vector4(0, 1.0, 0, -1.0));
-                post.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
-                _this.camera.postQueues.push(post);
-                var texBlur0 = new gd3d.framework.texture("_blur0");
-                texBlur0.glTexture = post.renderTarget;
-                var post1 = new gd3d.framework.cameraPostQueue_Quad();
-                post1.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
-                post1.material.setShader(_this.scene.app.getAssetMgr().getShader("separate_blur.shader.json"));
-                post1.material.setTexture("_MainTex", texBlur0);
-                post1.material.setVector4("sample_offsets", new gd3d.math.vector4(1.0, 0, -1.0, 0));
-                post1.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1.0 / texsize, 1.0 / texsize, texsize, texsize));
-                _this.camera.postQueues.push(post1);
-                var texBlur = new gd3d.framework.texture("_blur");
-                texBlur.glTexture = post1.renderTarget;
-                var post2 = new gd3d.framework.cameraPostQueue_Quad();
-                post2.material.setShader(_this.scene.app.getAssetMgr().getShader("dof.shader.json"));
-                post2.material.setTexture("_MainTex", textcolor);
-                post2.material.setTexture("_BlurTex", texBlur);
-                post2.material.setTexture("_DepthTex", depthcolor);
-                var focalDistance = 0.96;
-                post2.material.setFloat("_focalDistance", focalDistance);
-                _this.camera.postQueues.push(post2);
-            });
-            this.addbtn("450px", "bloom", function () {
-                var bloomctr = _this.scene.mainCamera.gameObject.addComponent("bloomctr");
-            });
-            this.taskmgr.addTaskCall(this.loadShader.bind(this));
-            this.taskmgr.addTaskCall(this.loadText.bind(this));
-            this.taskmgr.addTaskCall(this.addcube.bind(this));
-            this.taskmgr.addTaskCall(this.addcamandlight.bind(this));
-        };
-        test_posteffect_cc.prototype.addbtn = function (topOffset, textContent, func) {
-            var _this = this;
-            var btn = document.createElement("button");
-            btn.style.top = topOffset;
-            btn.style.position = "absolute";
-            this.app.container.appendChild(btn);
-            btn.textContent = textContent;
-            btn.onclick = function () {
-                _this.camera.postQueues = [];
-                func();
-                console.log("Handle Clicking..." + textContent);
-            };
-        };
-        test_posteffect_cc.prototype.update = function (delta) {
-            this.taskmgr.move(delta);
-            this.timer += delta;
-            var x = Math.sin(this.timer);
-            var z = Math.cos(this.timer);
-            var x2 = Math.sin(this.timer * 0.1);
-            var z2 = Math.cos(this.timer * 0.1);
-            if (this.camera != null) {
-                var objCam = this.camera.gameObject.transform;
-                objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 2.25, -z2 * 10);
-                objCam.updateWorldTran();
-                objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-            }
-            if (this.light != null) {
-                var objlight = this.light.gameObject.transform;
-                objlight.localTranslate = new gd3d.math.vector3(x * 5, 3, z * 5);
-                objlight.updateWorldTran();
-                objlight.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-            }
-        };
-        return test_posteffect_cc;
-    }());
-    t.test_posteffect_cc = test_posteffect_cc;
-})(t || (t = {}));
-var t;
-(function (t) {
     var test_posteffect = (function () {
         function test_posteffect() {
             this.timer = 0;
@@ -8320,7 +8086,9 @@ var t;
                 "高斯模糊",
                 "径向模糊",
                 "旋转扭曲",
-                "桶模糊"
+                "桶模糊",
+                "bloom",
+                "景深"
             ];
             var select = document.createElement("select");
             select.style.top = "240px";
@@ -8431,11 +8199,73 @@ var t;
                     _this.camera.postQueues.push(post);
                     console.log("桶模糊");
                 }
+                else if (select.value == "7") {
+                    var bloomctr = _this.scene.mainCamera.gameObject.addComponent("bloomctr");
+                    console.log("bloom");
+                }
+                else if (select.value == "8") {
+                    _this.camera.postQueues = [];
+                    var color = new gd3d.framework.cameraPostQueue_Color();
+                    color.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                    _this.camera.postQueues.push(color);
+                    var textcolor = new gd3d.framework.texture("_color");
+                    textcolor.glTexture = color.renderTarget;
+                    var depth = new gd3d.framework.cameraPostQueue_Depth();
+                    depth.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, 1024, 1024, true, false);
+                    _this.camera.postQueues.push(depth);
+                    var depthcolor = new gd3d.framework.texture("_depthcolor");
+                    depthcolor.glTexture = depth.renderTarget;
+                    var texsize = 1024;
+                    var post = new gd3d.framework.cameraPostQueue_Quad();
+                    post.renderTarget = new gd3d.render.glRenderTarget(_this.scene.webgl, texsize, texsize, true, false);
+                    var isGaussianblur = false;
+                    if (isGaussianblur) {
+                        post.material.setShader(_this.scene.app.getAssetMgr().getShader("gaussianBlur.shader.json"));
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_BlurGap", 2);
+                        post.material.setFloat("_BlurSigma", 6);
+                        post.material.setFloat("_BlurLayer", 10);
+                    }
+                    else {
+                        post.material.setShader(_this.scene.app.getAssetMgr().getShader("blur.shader.json"));
+                        post.material.setTexture("_MainTex", textcolor);
+                    }
+                    _this.camera.postQueues.push(post);
+                    var texBlur = new gd3d.framework.texture("_blur");
+                    texBlur.glTexture = post.renderTarget;
+                    var post2 = new gd3d.framework.cameraPostQueue_Quad();
+                    post2.material.setShader(_this.scene.app.getAssetMgr().getShader("dof.shader.json"));
+                    post2.material.setTexture("_MainTex", textcolor);
+                    post2.material.setTexture("_BlurTex", texBlur);
+                    post2.material.setTexture("_DepthTex", depthcolor);
+                    var focalDistance = 0.96;
+                    post2.material.setFloat("_focalDistance", focalDistance);
+                    _this.camera.postQueues.push(post2);
+                    console.log("景深");
+                }
             };
+            this.addbtn("60px", "深度图", function () {
+                _this.camera.postQueues = [];
+                var depth = new gd3d.framework.cameraPostQueue_Depth();
+                _this.camera.postQueues.push(depth);
+            });
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this));
             this.taskmgr.addTaskCall(this.addcamandlight.bind(this));
+        };
+        test_posteffect.prototype.addbtn = function (topOffset, textContent, func) {
+            var _this = this;
+            var btn = document.createElement("button");
+            btn.style.top = topOffset;
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+            btn.textContent = textContent;
+            btn.onclick = function () {
+                _this.camera.postQueues = [];
+                func();
+                console.log("Handle Clicking..." + textContent);
+            };
         };
         test_posteffect.prototype.update = function (delta) {
             this.taskmgr.move(delta);

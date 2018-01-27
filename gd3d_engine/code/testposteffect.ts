@@ -194,7 +194,9 @@
                 "高斯模糊",
                 "径向模糊",
                 "旋转扭曲",
-                "桶模糊"
+                "桶模糊",
+                "bloom",
+                "景深"
             ];
 
             var select = document.createElement("select");
@@ -338,14 +340,86 @@
                     post.material.setTexture("_MainTex", textcolor);
                     this.camera.postQueues.push(post);
                     console.log("桶模糊");
+                }else if (select.value == "7")
+                {
+                    let bloomctr = this.scene.mainCamera.gameObject.addComponent("bloomctr") as gd3d.framework.bloomctr;
+
+                    console.log("bloom");
+                }else if (select.value == "8")
+                {
+                    this.camera.postQueues=[];
+                    var color = new gd3d.framework.cameraPostQueue_Color();
+                    color.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                    this.camera.postQueues.push(color);
+                    var textcolor = new gd3d.framework.texture("_color");
+                    textcolor.glTexture = color.renderTarget;
+    
+                    var depth = new gd3d.framework.cameraPostQueue_Depth();
+                    depth.renderTarget=new gd3d.render.glRenderTarget(this.scene.webgl, 1024, 1024, true, false);
+                    this.camera.postQueues.push(depth);
+                    var depthcolor = new gd3d.framework.texture("_depthcolor");
+                    depthcolor.glTexture = depth.renderTarget;
+    
+                    var texsize:number=1024;
+                    var post = new gd3d.framework.cameraPostQueue_Quad();
+                    post.renderTarget = new gd3d.render.glRenderTarget(this.scene.webgl,texsize, texsize, true, false);
+                    let isGaussianblur = false; //高斯模糊 和普通模糊
+                    if(isGaussianblur){
+                        post.material.setShader(this.scene.app.getAssetMgr().getShader("gaussianBlur.shader.json"));
+                        post.material.setTexture("_MainTex", textcolor);
+                        post.material.setFloat("_BlurGap", 2);
+                        post.material.setFloat("_BlurSigma", 6);
+                        post.material.setFloat("_BlurLayer", 10);
+                    }else{
+                        post.material.setShader(this.scene.app.getAssetMgr().getShader("blur.shader.json"));
+                        post.material.setTexture("_MainTex", textcolor);
+                    }
+                    this.camera.postQueues.push(post);
+    
+                    var texBlur= new gd3d.framework.texture("_blur");
+                    texBlur.glTexture = post.renderTarget;
+    
+                    var post2 = new gd3d.framework.cameraPostQueue_Quad();
+                    post2.material.setShader(this.scene.app.getAssetMgr().getShader("dof.shader.json"));
+                    post2.material.setTexture("_MainTex",textcolor);
+                    post2.material.setTexture("_BlurTex",texBlur);
+                    post2.material.setTexture("_DepthTex",depthcolor);
+                    //var focalDistance=(10-this.camera.near)/(this.camera.far-this.camera.near);
+                    var focalDistance=0.96;
+                    post2.material.setFloat("_focalDistance",focalDistance);
+                    this.camera.postQueues.push(post2);
+                    console.log("景深");
                 }
+
             }
+
+            this.addbtn("60px","深度图",()=>{
+                this.camera.postQueues=[];
+                var depth = new gd3d.framework.cameraPostQueue_Depth();
+                this.camera.postQueues.push(depth);
+            });
 
             //任务排队执行系统
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
             this.taskmgr.addTaskCall(this.loadText.bind(this));
             this.taskmgr.addTaskCall(this.addcube.bind(this));
             this.taskmgr.addTaskCall(this.addcamandlight.bind(this));
+        }
+
+        private addbtn(topOffset:string,textContent:string,func:()=>void)
+        {
+            var btn = document.createElement("button");
+            btn.style.top = topOffset;
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+
+            btn.textContent = textContent;
+            btn.onclick = () =>
+            {
+                this.camera.postQueues = [];
+                func();
+                console.log("Handle Clicking..."+textContent);
+            }
         }
 
         camera: gd3d.framework.camera;
