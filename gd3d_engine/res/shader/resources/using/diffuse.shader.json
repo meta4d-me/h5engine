@@ -49,6 +49,13 @@
                 "vs": "diffuse",
                 "fs": "diffuse"
             }
+        ],
+        "base_depth": [
+            {
+                "showface": "ccw",
+                "vs": "post_depth",
+                "fs": "post_depth"
+            }
         ]
     }
 }

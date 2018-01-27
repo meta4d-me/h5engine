@@ -100,6 +100,7 @@ namespace gd3d.framework
                 switch (this.defaultMapUniform[id].type)
                 {
                     case render.UniformTypeEnum.Texture:
+                    case render.UniformTypeEnum.CubeTexture:
                         if (this.statedMapUniforms[id] != null)
                             this.statedMapUniforms[id].unuse(true);
                         break;
@@ -170,6 +171,7 @@ namespace gd3d.framework
                         total += value.byteLength;
                         break;
                     case render.UniformTypeEnum.Texture:
+                    case render.UniformTypeEnum.CubeTexture:
                         if (value != null)
                         {
                             total += value.caclByteLength();
@@ -398,6 +400,9 @@ namespace gd3d.framework
                 this.statedMapUniforms[_id] = _texture;
                 if (_texture != null)
                 {
+                    if(_texture.getName() == "_color" ){
+                        _texture;
+                    }
                     if (!_texture.defaultAsset)
                     {
                         _texture.use();
@@ -405,7 +410,7 @@ namespace gd3d.framework
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (this.statedMapUniforms[_texelsizeName] != null && _gltexture != null)
+                    if (_gltexture != null)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
@@ -415,6 +420,34 @@ namespace gd3d.framework
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
+        }
+
+        setCubeTexture(_id: string, _texture: gd3d.framework.texture) {
+            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.CubeTexture)
+            {
+                if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset))
+                {
+                    this.statedMapUniforms[_id].unuse();
+                }
+                this.statedMapUniforms[_id] = _texture;
+                if (_texture != null)
+                {
+                    if (!_texture.defaultAsset)
+                    {
+                        _texture.use();
+                    }
+                    //图片的尺寸信息(1/width,1/height,width,height)
+                    let _texelsizeName = _id + "_TexelSize";
+                    let _gltexture = _texture.glTexture;
+                    if ( _gltexture != null)
+                    {
+                        this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                    }
+                }
+            } else
+            {
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            }
         }
 
         /**
@@ -429,7 +462,7 @@ namespace gd3d.framework
          */
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", useGLobalLightMap: boolean = true)
         {
-
+            
             let drawPasses = this.shader.passes[basetype + context.drawtype];
             if (drawPasses == undefined)
                 drawPasses = this.shader.passes["base" + context.drawtype];
@@ -500,6 +533,7 @@ namespace gd3d.framework
                 switch (_uniformType)
                 {
                     case render.UniformTypeEnum.Texture:
+                    case render.UniformTypeEnum.CubeTexture:
                         var _value: string = jsonChild["value"];
                         var _texture: gd3d.framework.texture = assetmgr.getAssetByName(_value, bundleName) as gd3d.framework.texture;
                         if (_texture == null)
@@ -559,6 +593,9 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Texture:
                         mat.setTexture(i, value);
                         break;
+                    case render.UniformTypeEnum.CubeTexture:
+                        mat.setCubeTexture(i, value);
+                        break;
                     case render.UniformTypeEnum.Float:
                         mat.setFloat(i, value);
                         break;
@@ -585,6 +622,7 @@ namespace gd3d.framework
                 let jsonValue;
                 switch (__type)
                 {
+                    case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
                         jsonValue = `${val.name.name}`;
                         break;

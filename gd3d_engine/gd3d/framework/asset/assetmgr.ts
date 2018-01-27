@@ -883,6 +883,27 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
+         * 默认cube贴图资源
+         * @version egret-gd3d 1.0
+         */
+        mapDefaultCubeTexture: { [id: string]: texture } = {};
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 通过name获取默认cube贴图资源
+         * @param name
+         * @version egret-gd3d 1.0
+         */
+        getDefaultCubeTexture(name: string): texture {
+            return this.mapDefaultCubeTexture[name];
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 默认sprite资源
          * @version egret-gd3d 1.0
          */

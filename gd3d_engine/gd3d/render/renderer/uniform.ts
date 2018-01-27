@@ -29,9 +29,16 @@ namespace gd3d.render
                 this.webgl.uniformMatrix4fv(location,false,value);
             };
             this.applyuniformFunc[UniformTypeEnum.Texture]=(location,value)=>{//texture
-                var tex = value.glTexture.texture
+                var tex = value.glTexture.texture;
                 this.webgl.activeTexture(render.webglkit.GetTextureNumber(this.webgl, this.texindex));
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, tex);
+                this.webgl.uniform1i(location, this.texindex);
+                this.texindex++;
+            };
+            this.applyuniformFunc[UniformTypeEnum.CubeTexture]=(location,value)=>{//cubetexture
+                var tex = value.glTexture.texture;
+                this.webgl.activeTexture(render.webglkit.GetTextureNumber(this.webgl, this.texindex));
+                this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, tex);
                 this.webgl.uniform1i(location, this.texindex);
                 this.texindex++;
             };
