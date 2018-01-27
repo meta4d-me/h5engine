@@ -2306,6 +2306,25 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class vignettingCtr implements INodeComponent {
+        private app;
+        private scene;
+        private camera;
+        private material;
+        private material_1;
+        private material_2;
+        private material_3;
+        private readonly tag;
+        gameObject: gameObject;
+        private _init;
+        private init();
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     class f14EffectSystem implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: CullingMask;

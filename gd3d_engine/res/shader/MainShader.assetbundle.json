@@ -109,6 +109,26 @@
           "length":0
           },
       {
+          "name":"resources/posteffect/separate_blur.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/separate_blur.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/separate_blur.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/vignetting.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/vignetting.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/project/transparent.shader.json",
           "length":0
           },
