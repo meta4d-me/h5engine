@@ -8088,7 +8088,8 @@ var t;
                 "旋转扭曲",
                 "桶模糊",
                 "bloom",
-                "景深"
+                "景深",
+                "Vignetting"
             ];
             var select = document.createElement("select");
             select.style.top = "240px";
@@ -8242,6 +8243,10 @@ var t;
                     post2.material.setFloat("_focalDistance", focalDistance);
                     _this.camera.postQueues.push(post2);
                     console.log("景深");
+                }
+                else if (select.value == "9") {
+                    var actr = _this.scene.mainCamera.gameObject.addComponent("vignettingCtr");
+                    console.log("Vignetting");
                 }
             };
             this.addbtn("60px", "深度图", function () {
