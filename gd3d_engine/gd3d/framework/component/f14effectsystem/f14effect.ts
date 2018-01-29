@@ -77,13 +77,16 @@ namespace gd3d.framework
 
         private loopCount:number=0;
         private allTime:number=0;
+        private renderActive:boolean=false;
         public update(deltaTime:number)
         {
+            this.renderActive=false;
             if(!this.active) return;
             if (this.data == null) return;
             this.allTime+=deltaTime;
             this.totalTime=this.allTime-this._delayTime;
             if(this.totalTime<=0) return;
+            this.renderActive=true;//上面return了应该不再render 
             this.totalFrame=this.totalTime*this.fps;
             this.restartFrame = this.totalFrame % this.data.lifeTime;
             this.restartFrame=Math.floor(this.restartFrame);
@@ -123,7 +126,7 @@ namespace gd3d.framework
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number=0)
         {
-            if(!this.active) return;            
+            if(!this.renderActive) return;            
             this._renderCamera=camera;
             let curCount = 0;
             context.updateModel(this.gameObject.transform);

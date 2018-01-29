@@ -25,110 +25,6 @@
           "length":0
           },
       {
-          "name":"resources/base/diffuse.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/diffuse.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/base/diffuse.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/post_depth.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/post_depth.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/transparent.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/transparent.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/base/transparent.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/fakepbr.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/fakepbr.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/fakepbr.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light1.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light1.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light1.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light2.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light2.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light2.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light3.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light3.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/light3.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/normalmap.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/normalmap.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/normalmap.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/shadowmap.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/shadowmap.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/experiment/shadowmap.vs.glsl",
-          "length":0
-          },
-      {
           "name":"resources/posteffect/barrel_blur.fs.glsl",
           "length":0
           },
@@ -169,31 +65,11 @@
           "length":0
           },
       {
-          "name":"resources/posteffect/filter_quad.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/posteffect/filter_quad.shader.json",
-          "length":0
-          },
-      {
           "name":"resources/posteffect/gaussianBlur.fs.glsl",
           "length":0
           },
       {
           "name":"resources/posteffect/gaussianBlur.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/posteffect/hdr_quad.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/posteffect/hdr_quad_0.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/posteffect/hdr_quad_1.fs.glsl",
           "length":0
           },
       {
@@ -210,6 +86,14 @@
           },
       {
           "name":"resources/posteffect/outline.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/post_depth.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/post_depth.vs.glsl",
           "length":0
           },
       {
@@ -242,6 +126,34 @@
           },
       {
           "name":"resources/posteffect/vignetting.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/project/transparent.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/using/asi.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/using/asi.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/using/asi.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/using/diffuse.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/using/diffuse.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/using/diffuse.vs.glsl",
           "length":0
           },
       {
@@ -326,6 +238,14 @@
           },
       {
           "name":"resources/using/terrain.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/using/transparent.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/using/transparent.vs.glsl",
           "length":0
           }
       ]
