@@ -698,7 +698,7 @@ namespace demo
                 else if (select.value == "1")
                 {
                     this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
-                    this.postQuad.material.setShader(this.scene.app.getAssetMgr().getShader("mask.shader.json"));
+                    this.postQuad.material.setShader(this.scene.app.getAssetMgr().getShader("mosaic.shader.json"));
                     this.postQuad.material.setTexture("_MainTex", textcolor);
                     this.camera.postQueues.push(this.postQuad);
                 }

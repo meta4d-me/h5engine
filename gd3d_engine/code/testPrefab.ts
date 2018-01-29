@@ -15,11 +15,11 @@ class test_loadprefab implements IState
             let v = meshrenderer[i];
             for(let j=0; j<v.materials.length; j++)
             {
-                for(let k in v.materials[j].mapUniform)
+                for(let k in v.materials[j].statedMapUniforms)
                 {
-                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    if(v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture)
                     {
-                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname) as gd3d.framework.texture;
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -31,11 +31,11 @@ class test_loadprefab implements IState
             let v = skinnmeshrenderer[i];
             for(let j=0; j<v.materials.length; j++)
             {
-                for(let k in v.materials[j].mapUniform)
+                for(let k in v.materials[j].statedMapUniforms)
                 {
-                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    if(v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture)
                     {
-                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname) as gd3d.framework.texture;
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -121,8 +121,8 @@ class test_loadprefab implements IState
                 //         });
                 //     }
                 // });
-                name = "gs_chuangjue_01";
-                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_idle_none.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
+                name = "pc1";
+                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "pc1_wait_idle1.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
                 (s) => 
                 {
                     if (s.isfinish){
@@ -147,11 +147,11 @@ class test_loadprefab implements IState
                                 // ani.clipnames;
                                 this.refreshTexture(this.baihu);
 
-                                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_chuangjue_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
+                                this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "pc1_wait_idle1.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
                                 (s) => 
                                 {
                                     if (s.isfinish){
-                                        this.refreshAniclip(this.baihu, "chuangjue_01.FBAni.aniclip.bin");
+                                        this.refreshAniclip(this.baihu, "pc1_wait_idle1.FBAni.aniclip.bin");
                                     }
                                 });  
                             }                                
@@ -252,7 +252,7 @@ class test_loadprefab implements IState
         {
             for (let i = 0; i < this.renderer[j].materials.length; i++)
             {
-                this.renderer[j].materials[i].changeShader(sha);
+                this.renderer[j].materials[i].setShader(sha);
                 // this.renderer[j].materials[i].setVector4("_TintColor", new gd3d.math.vector4(0,1,0,1));
             }
         }
@@ -260,7 +260,7 @@ class test_loadprefab implements IState
         {
             for (let i = 0; i < this.skinRenders[j].materials.length; i++)
             {
-                this.skinRenders[j].materials[i].changeShader(sha);
+                this.skinRenders[j].materials[i].setShader(sha);
                 // this.renderer[j].materials[i].setVector4("_TintColor", new gd3d.math.vector4(0,1,0,1));
             }
         }

@@ -1126,7 +1126,12 @@ declare class test_ShadowMap implements IState {
     scene: gd3d.framework.scene;
     renderer: gd3d.framework.meshRenderer[];
     skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    assetmgr: gd3d.framework.assetMgr;
     start(app: gd3d.framework.application): void;
+    private shadowSh;
+    private mats;
+    private collectMat();
+    private setmat(key, value);
     lightcamera: gd3d.framework.camera;
     depthTexture: gd3d.framework.texture;
     viewcamera: gd3d.framework.camera;

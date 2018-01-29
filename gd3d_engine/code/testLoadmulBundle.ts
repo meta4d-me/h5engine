@@ -11,11 +11,11 @@ class test_loadMulBundle implements IState
             let v = meshrenderer[i];
             for(let j=0; j<v.materials.length; j++)
             {
-                for(let k in v.materials[j].mapUniform)
+                for(let k in v.materials[j].statedMapUniforms)
                 {
-                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    if(v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture)
                     {
-                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname) as gd3d.framework.texture;
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -27,11 +27,11 @@ class test_loadMulBundle implements IState
             let v = skinnmeshrenderer[i];
             for(let j=0; j<v.materials.length; j++)
             {
-                for(let k in v.materials[j].mapUniform)
+                for(let k in v.materials[j].statedMapUniforms)
                 {
-                    if(v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture)
+                    if(v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture)
                     {
-                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname) as gd3d.framework.texture;
+                        let textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname) as gd3d.framework.texture;
                         v.materials[j].setTexture(k, textur);
                     }
                 }

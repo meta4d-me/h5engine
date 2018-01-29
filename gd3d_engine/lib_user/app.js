@@ -4218,7 +4218,7 @@ var demo;
                 }
                 else if (select.value == "1") {
                     _this.postQuad = new gd3d.framework.cameraPostQueue_Quad();
-                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("mask.shader.json"));
+                    _this.postQuad.material.setShader(_this.scene.app.getAssetMgr().getShader("mosaic.shader.json"));
                     _this.postQuad.material.setTexture("_MainTex", textcolor);
                     _this.camera.postQueues.push(_this.postQuad);
                 }
@@ -5677,7 +5677,7 @@ var t;
             var materials = this.skinrender.materials;
             for (var i = 0; i < materials.length; i++) {
                 materials[i] = materials[i].clone();
-                materials[i].changeShader(sha);
+                materials[i].setShader(sha);
             }
         };
         test_changeshader.prototype.update = function (delta) {
@@ -6482,9 +6482,9 @@ var test_loadMulBundle = (function () {
         for (var i = 0; i < meshrenderer.length; i++) {
             var v = meshrenderer[i];
             for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
+                for (var k in v.materials[j].statedMapUniforms) {
+                    if (v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture) {
+                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname);
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -6493,9 +6493,9 @@ var test_loadMulBundle = (function () {
         for (var i = 0; i < skinnmeshrenderer.length; i++) {
             var v = skinnmeshrenderer[i];
             for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
+                for (var k in v.materials[j].statedMapUniforms) {
+                    if (v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture) {
+                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname);
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -7980,7 +7980,7 @@ var t;
             this.taskmgr = new gd3d.framework.taskMgr();
         }
         test_posteffect.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/Mainshader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
                 if (_state.isfinish) {
                     state.finish = true;
                 }
@@ -8010,7 +8010,7 @@ var t;
                     mesh.mesh = (smesh);
                     var renderer = cube.gameObject.addComponent("meshRenderer");
                     var cuber = renderer;
-                    var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+                    var sh = this.app.getAssetMgr().getShader("light1.shader.json");
                     if (sh != null) {
                         cuber.materials = [];
                         cuber.materials.push(new gd3d.framework.material());
@@ -8049,6 +8049,32 @@ var t;
                 post.material.setTexture("_MainTex", textcolor);
                 post.material.setTexture("_DepthTex", text);
                 this.camera.postQueues.push(post);
+            }
+            var lighttran = new gd3d.framework.transform();
+            this.scene.addChild(lighttran);
+            this.light = lighttran.gameObject.addComponent("light");
+            lighttran.localTranslate.x = 2;
+            lighttran.localTranslate.z = 1;
+            lighttran.localTranslate.y = 3;
+            lighttran.markDirty();
+            {
+                var cube = new gd3d.framework.transform();
+                cube.name = "cube";
+                cube.localScale.x = cube.localScale.y = cube.localScale.z = 0.5;
+                lighttran.addChild(cube);
+                var mesh = cube.gameObject.addComponent("meshFilter");
+                var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                mesh.mesh = (smesh);
+                var renderer = cube.gameObject.addComponent("meshRenderer");
+                var cuber = renderer;
+                var sh = this.app.getAssetMgr().getShader("light1.shader.json");
+                if (sh != null) {
+                    cuber.materials = [];
+                    cuber.materials.push(new gd3d.framework.material());
+                    cuber.materials[0].setShader(sh);
+                    var texture = this.app.getAssetMgr().getAssetByName("zg256.png");
+                    cuber.materials[0].setTexture("_MainTex", texture);
+                }
             }
             state.finish = true;
         };
@@ -8284,8 +8310,9 @@ var t;
                 objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 2.25, -z2 * 10);
                 objCam.updateWorldTran();
                 objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                objCam.markDirty();
             }
-            var isbreak = true;
+            var isbreak = false;
             if (isbreak)
                 return;
             if (this.light != null) {
@@ -8293,6 +8320,7 @@ var t;
                 objlight.localTranslate = new gd3d.math.vector3(x * 5, 3, z * 5);
                 objlight.updateWorldTran();
                 objlight.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                objlight.markDirty();
             }
         };
         return test_posteffect;
@@ -8311,9 +8339,9 @@ var test_loadprefab = (function () {
         for (var i = 0; i < meshrenderer.length; i++) {
             var v = meshrenderer[i];
             for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
+                for (var k in v.materials[j].statedMapUniforms) {
+                    if (v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture) {
+                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname);
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -8322,9 +8350,9 @@ var test_loadprefab = (function () {
         for (var i = 0; i < skinnmeshrenderer.length; i++) {
             var v = skinnmeshrenderer[i];
             for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
+                for (var k in v.materials[j].statedMapUniforms) {
+                    if (v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture) {
+                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname);
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -8361,8 +8389,8 @@ var test_loadprefab = (function () {
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                name = "gs_chuangjue_01";
-                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_idle_none.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                name = "pc1";
+                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "pc1_wait_idle1.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         _this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                             if (s.isfinish) {
@@ -8376,9 +8404,9 @@ var test_loadprefab = (function () {
                                 objCam.markDirty();
                                 var ani = _this.baihu.gameObject.getComponent("aniplayer");
                                 _this.refreshTexture(_this.baihu);
-                                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "gs_chuangjue_01_chuangjue_01.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                _this.app.getAssetMgr().load("res/prefabs/" + name + "/resources/" + "pc1_wait_idle1.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                     if (s.isfinish) {
-                                        _this.refreshAniclip(_this.baihu, "chuangjue_01.FBAni.aniclip.bin");
+                                        _this.refreshAniclip(_this.baihu, "pc1_wait_idle1.FBAni.aniclip.bin");
                                     }
                                 });
                             }
@@ -8422,12 +8450,12 @@ var test_loadprefab = (function () {
     test_loadprefab.prototype.change = function (sha) {
         for (var j = 0; j < this.renderer.length; j++) {
             for (var i = 0; i < this.renderer[j].materials.length; i++) {
-                this.renderer[j].materials[i].changeShader(sha);
+                this.renderer[j].materials[i].setShader(sha);
             }
         }
         for (var j = 0; j < this.skinRenders.length; j++) {
             for (var i = 0; i < this.skinRenders[j].materials.length; i++) {
-                this.skinRenders[j].materials[i].changeShader(sha);
+                this.skinRenders[j].materials[i].setShader(sha);
             }
         }
     };
@@ -8454,9 +8482,9 @@ var test_loadprefabdds = (function () {
         for (var i = 0; i < meshrenderer.length; i++) {
             var v = meshrenderer[i];
             for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
+                for (var k in v.materials[j].statedMapUniforms) {
+                    if (v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture) {
+                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname);
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -8465,9 +8493,9 @@ var test_loadprefabdds = (function () {
         for (var i = 0; i < skinnmeshrenderer.length; i++) {
             var v = skinnmeshrenderer[i];
             for (var j = 0; j < v.materials.length; j++) {
-                for (var k in v.materials[j].mapUniform) {
-                    if (v.materials[j].mapUniform[k].type == gd3d.render.UniformTypeEnum.Texture) {
-                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].mapUniform[k].resname);
+                for (var k in v.materials[j].statedMapUniforms) {
+                    if (v.materials[j].statedMapUniforms[k].type == gd3d.render.UniformTypeEnum.Texture) {
+                        var textur = this.app.getAssetMgr().getAssetByName(v.materials[j].statedMapUniforms[k].resname);
                         v.materials[j].setTexture(k, textur);
                     }
                 }
@@ -8556,12 +8584,12 @@ var test_loadprefabdds = (function () {
     test_loadprefabdds.prototype.change = function (sha) {
         for (var j = 0; j < this.renderer.length; j++) {
             for (var i = 0; i < this.renderer[j].materials.length; i++) {
-                this.renderer[j].materials[i].changeShader(sha);
+                this.renderer[j].materials[i].setShader(sha);
             }
         }
         for (var j = 0; j < this.skinRenders.length; j++) {
             for (var i = 0; i < this.skinRenders[j].materials.length; i++) {
-                this.skinRenders[j].materials[i].changeShader(sha);
+                this.skinRenders[j].materials[i].setShader(sha);
             }
         }
     };
@@ -8889,6 +8917,8 @@ var t;
 })(t || (t = {}));
 var test_ShadowMap = (function () {
     function test_ShadowMap() {
+        this.shadowSh = "shadowmap.shader.json";
+        this.mats = [];
         this.timer = 0;
         this.posToUV = new gd3d.math.matrix();
         this.lightProjection = new gd3d.math.matrix();
@@ -8898,6 +8928,7 @@ var test_ShadowMap = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
+        this.assetmgr = this.app.getAssetMgr();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         var name = "baihu";
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
@@ -8906,6 +8937,7 @@ var test_ShadowMap = (function () {
                     if (s.isfinish) {
                         var _scene = _this.app.getAssetMgr().getAssetByName("testshadowmap.scene.json");
                         var _root = _scene.getSceneRoot();
+                        var assetmgr = _this.app.getAssetMgr();
                         _this.scene.addChild(_root);
                         _root.markDirty();
                         _root.updateTran(false);
@@ -8920,10 +8952,14 @@ var test_ShadowMap = (function () {
                             _this.lightcamera.postQueues.push(depth);
                             _this.depthTexture = new gd3d.framework.texture("_depth");
                             _this.depthTexture.glTexture = depth.renderTarget;
-                            gd3d.framework.shader.setGlobalTexture("_Light_Depth", _this.depthTexture);
                         }
                         {
                         }
+                        _this.collectMat();
+                        _this.mats.forEach(function (element) {
+                            if (element)
+                                element.setTexture("_Light_Depth", _this.depthTexture);
+                        });
                     }
                 });
             }
@@ -8945,7 +8981,31 @@ var test_ShadowMap = (function () {
         viewCamObj.markDirty();
         this.ShowUI();
     };
+    test_ShadowMap.prototype.collectMat = function () {
+        if (!this.assetmgr)
+            return;
+        var resmap = this.assetmgr.mapRes;
+        for (var key in resmap) {
+            var asset = resmap[key];
+            if (!asset["asset"] || !(asset["asset"] instanceof gd3d.framework.material))
+                continue;
+            var mat = asset["asset"];
+            if (!mat["shader"] || mat["shader"].getName() != this.shadowSh)
+                continue;
+            this.mats.push(mat);
+        }
+    };
+    test_ShadowMap.prototype.setmat = function (key, value) {
+        var _this = this;
+        if (!this.mats)
+            return;
+        this.mats.forEach(function (element) {
+            if (element)
+                element.setTexture("_Light_Depth", _this.depthTexture);
+        });
+    };
     test_ShadowMap.prototype.update = function (delta) {
+        var _this = this;
         this.posToUV.rawData[0] = 0.5;
         this.posToUV.rawData[1] = 0.0;
         this.posToUV.rawData[2] = 0.0;
@@ -8971,8 +9031,13 @@ var test_ShadowMap = (function () {
         this.lightcamera.calcProjectMatrix(this.asp, projection);
         gd3d.math.matrixMultiply(projection, worldToView, this.lightProjection);
         gd3d.math.matrixMultiply(this.posToUV, this.lightProjection, this.lightProjection);
-        gd3d.framework.shader.setGlobalMatrix("_LightProjection", this.lightProjection);
-        gd3d.framework.shader.setGlobalFloat("_bias", 0.001);
+        this.mats.forEach(function (element) {
+            if (element) {
+                element.setMatrix("_LightProjection", _this.lightProjection);
+                if (element)
+                    element.setFloat("_bias", 0.001);
+            }
+        });
     };
     test_ShadowMap.prototype.FitToScene = function (lightCamera, aabb) {
         lightCamera.gameObject.transform.setWorldPosition(new gd3d.math.vector3(aabb.center.x, aabb.center.y, aabb.center.z));

@@ -163,7 +163,7 @@ namespace t
             for(var i=0;i<materials.length;i++)
             {
                 materials[i]=materials[i].clone();
-                materials[i].changeShader(sha);
+                materials[i].setShader(sha);
             }
         }
 

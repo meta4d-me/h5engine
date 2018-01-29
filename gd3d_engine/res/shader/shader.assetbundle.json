@@ -1,23 +1,23 @@
 {
   "files":[
       {
-          "name":"resources/using/diffuse.vs.glsl",
+          "name":"resources/base/diffuse.vs.glsl",
           "length":0
           },
       {
-          "name":"resources/posteffect/post_depth.vs.glsl",
+          "name":"resources/base/post_depth.vs.glsl",
           "length":0
           },
       {
-          "name":"resources/using/diffuse.fs.glsl",
+          "name":"resources/base/diffuse.fs.glsl",
           "length":0
           },
       {
-          "name":"resources/posteffect/post_depth.fs.glsl",
+          "name":"resources/base/post_depth.fs.glsl",
           "length":0
           },
       {
-          "name":"resources/using/diffuse.shader.json",
+          "name":"resources/base/diffuse.shader.json",
           "length":0
           },
       {
@@ -89,15 +89,15 @@
           "length":0
           },
       {
-          "name":"resources/using/transparent.vs.glsl",
+          "name":"resources/base/transparent.vs.glsl",
           "length":0
           },
       {
-          "name":"resources/using/transparent.fs.glsl",
+          "name":"resources/base/transparent.fs.glsl",
           "length":0
           },
       {
-          "name":"resources/project/transparent.shader.json",
+          "name":"resources/base/transparent.shader.json",
           "length":0
           },
       {
