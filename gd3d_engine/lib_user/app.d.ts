@@ -115,23 +115,6 @@ declare class main implements gd3d.framework.IUserCode {
     isClosed(): boolean;
 }
 declare namespace t {
-    class test_ATC implements IState {
-        app: gd3d.framework.application;
-        scene: gd3d.framework.scene;
-        camera: gd3d.framework.camera;
-        taskmgr: gd3d.framework.taskMgr;
-        assetMgr: gd3d.framework.assetMgr;
-        rooto2d: gd3d.framework.overlay2D;
-        static temp: gd3d.framework.transform2D;
-        start(app: gd3d.framework.application): void;
-        private createLabel(x, y, text);
-        private createImage(x, y, texName);
-        private createUI(astState, state);
-        private loadTexture(lastState, state);
-        update(delta: number): void;
-    }
-}
-declare namespace t {
     class test_blend implements IState {
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
@@ -256,21 +239,6 @@ declare namespace demo {
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
     }
-}
-declare class test_LookRotation implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    taskmgr: gd3d.framework.taskMgr;
-    camere: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    time: number;
-    objCam: gd3d.framework.transform;
-    private loadShader(laststate, state);
-    private loadTexture(laststate, state);
-    private addCam(laststate, state);
-    private addCube(laststate, state);
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
 }
 declare class test_navMesh implements IState {
     app: gd3d.framework.application;
@@ -1051,21 +1019,6 @@ declare namespace t {
     }
 }
 declare class test_loadprefab implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    renderer: gd3d.framework.meshRenderer[];
-    skinRenders: gd3d.framework.skinnedMeshRenderer[];
-    refreshTexture(tran: gd3d.framework.transform): void;
-    refreshAniclip(tran: gd3d.framework.transform, name: string): void;
-    start(app: gd3d.framework.application): void;
-    private changeShader();
-    change(sha: gd3d.framework.shader): void;
-    camera: gd3d.framework.camera;
-    baihu: gd3d.framework.transform;
-    timer: number;
-    update(delta: number): void;
-}
-declare class test_loadprefabdds implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     renderer: gd3d.framework.meshRenderer[];

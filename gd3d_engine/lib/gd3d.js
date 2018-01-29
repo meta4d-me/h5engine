@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000050";
+                this.build = "b000053";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -14010,6 +14010,7 @@ var gd3d;
                 this.renderBatch = [];
                 this.loopCount = 0;
                 this.allTime = 0;
+                this.renderActive = false;
                 this.totalTime = 0;
                 this.totalFrame = 0;
                 this.active = false;
@@ -14054,6 +14055,7 @@ var gd3d;
                 }
             };
             f14EffectSystem.prototype.update = function (deltaTime) {
+                this.renderActive = false;
                 if (!this.active)
                     return;
                 if (this.data == null)
@@ -14062,6 +14064,7 @@ var gd3d;
                 this.totalTime = this.allTime - this._delayTime;
                 if (this.totalTime <= 0)
                     return;
+                this.renderActive = true;
                 this.totalFrame = this.totalTime * this.fps;
                 this.restartFrame = this.totalFrame % this.data.lifeTime;
                 this.restartFrame = Math.floor(this.restartFrame);
@@ -14093,7 +14096,7 @@ var gd3d;
             });
             f14EffectSystem.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 if (Effqueue === void 0) { Effqueue = 0; }
-                if (!this.active)
+                if (!this.renderActive)
                     return;
                 this._renderCamera = camera;
                 var curCount = 0;
@@ -19320,6 +19323,9 @@ var gd3d;
             var cdz = gd3d.math.pool.new_vector3();
             math.vec3Cross(dir, gd3d.math.pool.vector3_forward, cdz);
             math.vec3Normalize(cdz, cdz);
+            if (math.vec3Dot(cdz, gd3d.math.pool.vector3_forward) < 0) {
+                an_dz = 2 * Math.PI - an_dz;
+            }
             an_dz = 180 / Math.PI * an_dz;
             quatFromAxisAngle(cdz, -an_dz, out);
             var y = gd3d.math.pool.new_vector3();
@@ -19330,11 +19336,13 @@ var gd3d;
             math.vec3Normalize(cyw, cyw);
             var cos2Y = math.vec3Dot(cyw, y);
             var sin2Y = Math.sqrt(1 - cos2Y * cos2Y);
-            if (math.vec3Dot(y, upwards) < 0) {
+            console.log(math.vec3Dot(y, upwards));
+            if (math.vec3Dot(y, upwards) <= 0) {
                 sin2Y = -sin2Y;
             }
             var siny = Math.sqrt((1 - sin2Y) / 2);
             var cosy = -Math.sqrt((sin2Y + 1) / 2);
+            console.log(cos2Y);
             if (cos2Y < 0) {
                 cosy = -cosy;
             }
@@ -19343,11 +19351,9 @@ var gd3d;
             yq.y = 0;
             yq.z = siny;
             yq.w = cosy;
-            quatMultiply(yq, out, out);
+            quatMultiply(out, yq, out);
             gd3d.math.pool.delete_vector3(dir);
-            gd3d.math.pool.delete_vector3(y);
             gd3d.math.pool.delete_vector3(cdz);
-            gd3d.math.pool.delete_quaternion(yq);
         }
         math.quatLookRotation = quatLookRotation;
         function quatYAxis(pos, targetpos, out) {
@@ -26750,6 +26756,7 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.tempWorldMatrix = new gd3d.math.matrix();
                 this._beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
@@ -27035,17 +27042,27 @@ var gd3d;
                 return this.worldRotate;
             };
             transform.prototype.getLocalMatrix = function () {
+                if (this.dirty)
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 return this.localMatrix;
             };
             transform.prototype.getWorldMatrix = function () {
-                return this.worldMatrix;
+                if (this.dirty) {
+                    if (!this.parent)
+                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
+                    else
+                        gd3d.math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
+                    return this.tempWorldMatrix;
+                }
+                else
+                    return this.worldMatrix;
             };
             transform.prototype.getForwardInWorld = function (out) {
                 var forward = gd3d.math.pool.new_vector3();
                 forward.x = 0;
                 forward.y = 0;
                 forward.z = 1;
-                gd3d.math.matrixTransformNormal(forward, this.worldMatrix, out);
+                gd3d.math.matrixTransformNormal(forward, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
                 gd3d.math.pool.delete_vector3(forward);
             };
@@ -27054,7 +27071,7 @@ var gd3d;
                 right.x = 1;
                 right.y = 0;
                 right.z = 0;
-                gd3d.math.matrixTransformNormal(right, this.worldMatrix, out);
+                gd3d.math.matrixTransformNormal(right, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
                 gd3d.math.pool.delete_vector3(right);
             };
@@ -27063,7 +27080,7 @@ var gd3d;
                 up.x = 0;
                 up.y = 1;
                 up.z = 0;
-                gd3d.math.matrixTransformNormal(up, this.worldMatrix, out);
+                gd3d.math.matrixTransformNormal(up, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
                 gd3d.math.pool.delete_vector3(up);
             };
