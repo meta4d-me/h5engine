@@ -335,7 +335,7 @@ class test_pbr_scene implements IState {
 
     private loadTexture(lastState: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
         //加载图片资源
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
+        this.app.getAssetMgr().load("res/shader/MainShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s1) =>
         {
             if (s1.isfinish){
                 this.assetMgr.load(this.PBRPath + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, (s2) => {

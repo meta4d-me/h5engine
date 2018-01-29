@@ -864,6 +864,10 @@ declare namespace gd3d.framework {
             [id: string]: texture;
         };
         getDefaultTexture(name: string): texture;
+        mapDefaultCubeTexture: {
+            [id: string]: texture;
+        };
+        getDefaultCubeTexture(name: string): texture;
         mapDefaultSprite: {
             [id: string]: sprite;
         };
@@ -1012,6 +1016,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class defTexture {
         static initDefaultTexture(assetmgr: assetMgr): void;
+        private static initDefaultCubeTexture(assetmgr);
     }
 }
 declare namespace gd3d.framework {
@@ -1242,10 +1247,9 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         dispose(): void;
         caclByteLength(): number;
-        f14data: F14EffectData;
+        data: F14EffectData;
         delayTime: number;
         Parse(jsonStr: string, assetmgr: assetMgr): void;
-        getCloneF14eff(): f14node;
     }
 }
 declare namespace gd3d.framework {
@@ -1376,6 +1380,7 @@ declare namespace gd3d.framework {
         setMatrix(_id: string, _matrix: math.matrix): void;
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
+        setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
         clone(): material;
@@ -2301,6 +2306,25 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class vignettingCtr implements INodeComponent {
+        private app;
+        private scene;
+        private camera;
+        private material;
+        private material_1;
+        private material_2;
+        private material_3;
+        private readonly tag;
+        gameObject: gameObject;
+        private _init;
+        private init();
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     class f14EffectSystem implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: CullingMask;
@@ -2321,6 +2345,7 @@ declare namespace gd3d.framework {
         private elements;
         renderBatch: F14Basebatch[];
         private loopCount;
+        private allTime;
         update(deltaTime: number): void;
         private OnEndOnceLoop();
         private _renderCamera;
@@ -2659,9 +2684,12 @@ declare namespace gd3d.framework {
         private angleRot;
         private worldpos;
         private tarWorldpos;
+        private worldspeeddir;
         private lookDir;
+        private temptx;
         private worldRotation;
         private invParWorldRot;
+        private worldStartPos;
         private updateRot();
         private updateColor();
         private updateUV();
@@ -3088,6 +3116,7 @@ declare namespace gd3d.math {
     }
     function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
     function matrix2Quaternion(matrix: matrix, result: quaternion): void;
+    function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
     function matrixClone(src: matrix, out: matrix): void;
     function matrix3x2Clone(src: matrix3x2, out: matrix3x2): void;
     function matrixMakeIdentity(out: matrix): void;
@@ -3135,6 +3164,7 @@ declare namespace gd3d.math {
     }
 }
 declare namespace gd3d.math {
+    function quatIdentity(src: quaternion): void;
     function quatNormalize(src: quaternion, out: quaternion): void;
     function quatTransformVector(src: quaternion, vector: vector3, out: vector3): void;
     function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3): void;
@@ -3154,7 +3184,11 @@ declare namespace gd3d.math {
     function quatReset(src: quaternion): void;
     function quatLookat(pos: vector3, targetpos: vector3, out: quaternion): void;
     function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir?: gd3d.math.vector3): void;
+    function quat2LookRotation(pos: vector3, targetpos: vector3, upwards: vector3, out: quaternion): void;
+    function quatLookRotation(dir: vector3, upwards: vector3, out: quaternion): void;
     function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion): void;
+    function rotationTo(from: vector3, to: vector3, out: quaternion): void;
+    function myLookRotation(dir: vector3, out: quaternion, up?: vector3): void;
 }
 declare namespace gd3d.math {
     function rectSet_One(out: rect): void;
@@ -3336,7 +3370,9 @@ declare namespace gd3d.framework {
         disable(): void;
         enable(): void;
         update(): void;
+        private isAlmostStatic();
         private RVO_walking(sim, goals);
+        private updateTransform(sim);
         private RVO_check(sim, goals);
         private cal2dDir(oPos, tPos, out);
     }
@@ -5238,6 +5274,7 @@ declare namespace gd3d.render {
         Float4v = 4,
         Float4x4 = 5,
         Float4x4v = 6,
+        CubeTexture = 7,
     }
     class uniform {
         name: string;

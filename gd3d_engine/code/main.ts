@@ -43,7 +43,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_normalmap", () => new t.Test_NormalMap());
         this.addBtn("test_assestmgr", () => new test_assestmgr());
 
-        this.addBtn("test_posteffect", () => new t.test_posteffect());
+        this.addBtn("test_posteffect(后期效果)", () => new t.test_posteffect());
         this.addBtn("test_streamlight", () => new test_streamlight());
 
         this.addBtn("test_trailRender", () => new t.test_trailrender());
@@ -69,7 +69,6 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_tex_uv", () => new test_texuv());
         //this.addBtn("test_uimove", () => new test_uimove());
 
-        this.addBtn("post_景深", () => new t.test_posteffect_cc());
         //this.addBtn("test_effecteditor", () => new test_effecteditor());
         this.addBtn("test_shadowmap", () => new test_ShadowMap());
         //this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
@@ -86,20 +85,16 @@ class main implements gd3d.framework.IUserCode
 
         //this.addBtn("test_liloadscene", () => new test_LiLoadScene());
         //this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
-        this.addBtn("test_四分�", () => new test_pick_4p());       
+        this.addBtn("test_四分屏", () => new test_pick_4p());       
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
-        this.addBtn("test_UI预设体加�", () => new test_uiPerfabLoad());
+        this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
         this.addBtn("test_PBR 展示", () => new test_pbr());
         this.addBtn("test_PBR 场景", () => new test_pbr_scene());
         this.addBtn("导航网格", () => new test_navMesh());
         this.addBtn("rvo2_驾驶行为", () => new test_Rvo2());
         this.addBtn("导航RVO_防挤Demo", () => new demo_navigaionRVO());
         
-
-        this.addBtn("test_loadprefabdds",() => new test_loadprefabdds());
-        this.addBtn("test_ATC纹理",()=>new t.test_ATC());
-        this.addBtn("test_LookRotation",() => new test_LookRotation());
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
         // this.addBtn("cj_zs",()=>new dome.testCJ());

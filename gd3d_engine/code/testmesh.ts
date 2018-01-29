@@ -23,7 +23,7 @@ class test_load implements IState
         let mpath = "meshprefab/";
         let tpath = "textures/";
 
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json" , gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json" , gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {

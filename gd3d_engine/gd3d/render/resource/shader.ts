@@ -15,7 +15,8 @@ namespace gd3d.render
         Float4=3,
         Float4v=4,
         Float4x4=5,
-        Float4x4v=6
+        Float4x4v=6,
+        CubeTexture=7
     }
     /**
      * @private
@@ -211,8 +212,10 @@ namespace gd3d.render
                 }
                 else if (type === webgl.SAMPLER_2D) {
                     _uniform.type=UniformTypeEnum.Texture;
-                }else
-                {
+                }
+                else if (type === webgl.SAMPLER_CUBE) {
+                    _uniform.type=UniformTypeEnum.CubeTexture;
+                }else{
                     console.log("Unifrom parse Erorr : not have this type!");
                 }
             }
@@ -371,6 +374,10 @@ namespace gd3d.render
             {
                 vsStr="#define LIGHTMAP \n"+"#define FOG \n"+vsStr;
                 fsStr="#define LIGHTMAP \n"+"#define FOG \n"+fsStr;    
+            }else if(type=="quad")
+            {
+                vsStr="#define QUAD \n"+vsStr;
+                fsStr="#define QUAD \n"+fsStr; 
             }
             this.compileVS(webgl,nameVS+type,vsStr);
             this.compileFS(webgl,nameFS+type,fsStr);

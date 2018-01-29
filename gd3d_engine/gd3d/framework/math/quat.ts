@@ -309,7 +309,12 @@
         let cdz = gd3d.math.pool.new_vector3();
         vec3Cross(dir, gd3d.math.pool.vector3_forward, cdz);
         math.vec3Normalize(cdz, cdz);
+        if(vec3Dot(cdz, gd3d.math.pool.vector3_forward)<0)
+        {
+            an_dz = 2*Math.PI -an_dz;
+        }
         an_dz = 180 / Math.PI * an_dz;
+        
         quatFromAxisAngle(cdz, -an_dz, out);
 
         let y = gd3d.math.pool.new_vector3();
@@ -320,12 +325,25 @@
         math.vec3Normalize(y, y);
         math.vec3Normalize(cyw, cyw);
         let cos2Y = vec3Dot(cyw, y);
+        // if(cos2Y>1){
+        //     cos2Y=1;
+        // }
+        // if(cos2Y<-1){
+        //     cos2Y=-1;
+        // }
+        // if(cos2Y>-0.001&&cos2Y<0.001){
+        //     cos2Y=0;
+        // }
+        
         let sin2Y = Math.sqrt(1 - cos2Y * cos2Y);
-        if(vec3Dot(y,upwards)<0){
+        console.log(vec3Dot(y,upwards));
+        if(vec3Dot(y,upwards)<=0){
             sin2Y=-sin2Y;
         }
+        
         let siny = Math.sqrt((1 - sin2Y) / 2);
         let cosy = -Math.sqrt((sin2Y + 1) / 2);
+        console.log(cos2Y);
         if (cos2Y < 0){
             cosy = -cosy;
         }
@@ -334,11 +352,11 @@
         yq.y = 0;
         yq.z = siny;
         yq.w = cosy;
-        quatMultiply(yq, out, out);
+        quatMultiply(out, yq,  out);
         gd3d.math.pool.delete_vector3(dir);
-        gd3d.math.pool.delete_vector3(y);
         gd3d.math.pool.delete_vector3(cdz);
-        gd3d.math.pool.delete_quaternion(yq);
+        // gd3d.math.pool.delete_vector3(y);
+        // gd3d.math.pool.delete_quaternion(yq);
     }
 
     export function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion) {
