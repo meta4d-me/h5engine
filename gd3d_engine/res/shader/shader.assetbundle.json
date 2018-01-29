@@ -115,18 +115,6 @@
       {
           "name":"resources/using/particle_mask_blend_tint.shader.json",
           "length":0
-          },
-      {
-          "name":"resources/using/asi.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/using/asi.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/using/asi.shader.json",
-          "length":0
           }
       ]
   }
