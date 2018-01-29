@@ -334,22 +334,6 @@ namespace gd3d.framework
                 math.vec3Cross(this.worldspeeddir,this.lookDir,this.temptx);
                 math.vec3Cross(this.temptx,this.worldspeeddir,this.lookDir);
                 math.unitxyzToRotation(this.temptx,this.worldspeeddir,this.lookDir,this.worldRotation);
-                
-
-                // math.vec3ScaleByNum(this.speedDir,math.vec3Dot(this.speedDir,this.lookDir),this.lookDir);
-                // math.vec3Add(this.lookDir,this.worldStartPos,this.lookDir);
-                // math.vec3Subtract(campos,this.lookDir,this.lookDir);
-                // math.quatLookRotation(this.lookDir,this.worldspeeddir,this.worldRotation);
-                //math.vec3Normalize(this.lookDir,this.lookDir);
-                
-                //math.myLookRotation(this.lookDir,this.worldRotation,this.worldspeeddir);
-                //math.vec3Add(this.lookDir,this.worldpos,this.tarWorldpos);
-                
-                // math.vec3Cross(this.worldspeeddir,this.lookDir,this.temptx);
-                // math.vec3Cross(this.temptx,this.worldspeeddir,this.lookDir);
-                // math.vec3Add(this.worldpos,this.lookDir,this.tarWorldpos);
-                //gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
-
                 this.emissionWorldRotation=this.element.getWorldRotation();
                 math.quatInverse(this.emissionWorldRotation,this.invParWorldRot);
                 gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
