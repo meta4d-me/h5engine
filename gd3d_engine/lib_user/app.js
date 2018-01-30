@@ -982,7 +982,6 @@ var main = (function () {
         this.addBtn("导航网格", function () { return new test_navMesh(); });
         this.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
         this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
-        this.addBtn("Collider碰撞", function () { return new test_pick_boxcollider(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;

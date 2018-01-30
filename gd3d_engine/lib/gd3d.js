@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000050";
+                this.build = "b000053";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -26756,6 +26756,7 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.tempWorldMatrix = new gd3d.math.matrix();
                 this._beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
@@ -27041,17 +27042,27 @@ var gd3d;
                 return this.worldRotate;
             };
             transform.prototype.getLocalMatrix = function () {
+                if (this.dirty)
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 return this.localMatrix;
             };
             transform.prototype.getWorldMatrix = function () {
-                return this.worldMatrix;
+                if (this.dirty) {
+                    if (!this.parent)
+                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
+                    else
+                        gd3d.math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
+                    return this.tempWorldMatrix;
+                }
+                else
+                    return this.worldMatrix;
             };
             transform.prototype.getForwardInWorld = function (out) {
                 var forward = gd3d.math.pool.new_vector3();
                 forward.x = 0;
                 forward.y = 0;
                 forward.z = 1;
-                gd3d.math.matrixTransformNormal(forward, this.worldMatrix, out);
+                gd3d.math.matrixTransformNormal(forward, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
                 gd3d.math.pool.delete_vector3(forward);
             };
@@ -27060,7 +27071,7 @@ var gd3d;
                 right.x = 1;
                 right.y = 0;
                 right.z = 0;
-                gd3d.math.matrixTransformNormal(right, this.worldMatrix, out);
+                gd3d.math.matrixTransformNormal(right, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
                 gd3d.math.pool.delete_vector3(right);
             };
@@ -27069,7 +27080,7 @@ var gd3d;
                 up.x = 0;
                 up.y = 1;
                 up.z = 0;
-                gd3d.math.matrixTransformNormal(up, this.worldMatrix, out);
+                gd3d.math.matrixTransformNormal(up, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
                 gd3d.math.pool.delete_vector3(up);
             };
