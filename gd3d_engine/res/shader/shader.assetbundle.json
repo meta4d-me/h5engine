@@ -115,6 +115,14 @@
       {
           "name":"resources/using/particle_mask_blend_tint.shader.json",
           "length":0
+          },
+      {
+          "name":"resources/posteffect/quad.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/bloom.shader.json",
+          "length":0
           }
       ]
   }
