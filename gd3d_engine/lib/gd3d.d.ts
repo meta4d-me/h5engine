@@ -2346,6 +2346,7 @@ declare namespace gd3d.framework {
         renderBatch: F14Basebatch[];
         private loopCount;
         private allTime;
+        private renderActive;
         update(deltaTime: number): void;
         private OnEndOnceLoop();
         private _renderCamera;

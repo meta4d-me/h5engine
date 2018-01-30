@@ -14010,6 +14010,7 @@ var gd3d;
                 this.renderBatch = [];
                 this.loopCount = 0;
                 this.allTime = 0;
+                this.renderActive = false;
                 this.totalTime = 0;
                 this.totalFrame = 0;
                 this.active = false;
@@ -14054,6 +14055,7 @@ var gd3d;
                 }
             };
             f14EffectSystem.prototype.update = function (deltaTime) {
+                this.renderActive = false;
                 if (!this.active)
                     return;
                 if (this.data == null)
@@ -14062,6 +14064,7 @@ var gd3d;
                 this.totalTime = this.allTime - this._delayTime;
                 if (this.totalTime <= 0)
                     return;
+                this.renderActive = true;
                 this.totalFrame = this.totalTime * this.fps;
                 this.restartFrame = this.totalFrame % this.data.lifeTime;
                 this.restartFrame = Math.floor(this.restartFrame);
@@ -14093,7 +14096,7 @@ var gd3d;
             });
             f14EffectSystem.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 if (Effqueue === void 0) { Effqueue = 0; }
-                if (!this.active)
+                if (!this.renderActive)
                     return;
                 this._renderCamera = camera;
                 var curCount = 0;
@@ -19320,6 +19323,9 @@ var gd3d;
             var cdz = gd3d.math.pool.new_vector3();
             math.vec3Cross(dir, gd3d.math.pool.vector3_forward, cdz);
             math.vec3Normalize(cdz, cdz);
+            if (math.vec3Dot(cdz, gd3d.math.pool.vector3_forward) < 0) {
+                an_dz = 2 * Math.PI - an_dz;
+            }
             an_dz = 180 / Math.PI * an_dz;
             quatFromAxisAngle(cdz, -an_dz, out);
             var y = gd3d.math.pool.new_vector3();
@@ -19330,11 +19336,13 @@ var gd3d;
             math.vec3Normalize(cyw, cyw);
             var cos2Y = math.vec3Dot(cyw, y);
             var sin2Y = Math.sqrt(1 - cos2Y * cos2Y);
-            if (math.vec3Dot(y, upwards) < 0) {
+            console.log(math.vec3Dot(y, upwards));
+            if (math.vec3Dot(y, upwards) <= 0) {
                 sin2Y = -sin2Y;
             }
             var siny = Math.sqrt((1 - sin2Y) / 2);
             var cosy = -Math.sqrt((sin2Y + 1) / 2);
+            console.log(cos2Y);
             if (cos2Y < 0) {
                 cosy = -cosy;
             }
@@ -19343,11 +19351,9 @@ var gd3d;
             yq.y = 0;
             yq.z = siny;
             yq.w = cosy;
-            quatMultiply(yq, out, out);
+            quatMultiply(out, yq, out);
             gd3d.math.pool.delete_vector3(dir);
-            gd3d.math.pool.delete_vector3(y);
             gd3d.math.pool.delete_vector3(cdz);
-            gd3d.math.pool.delete_quaternion(yq);
         }
         math.quatLookRotation = quatLookRotation;
         function quatYAxis(pos, targetpos, out) {
