@@ -19,11 +19,11 @@ class main implements gd3d.framework.IUserCode
         //this.addBtn("test_loadScene",()=>new dome.test_loadScene());
         //this.addBtn("f14effect",()=>new dome.db_test_f14eff());
         //this.addBtn("loadPrefab",()=>new dome.loadPrefab());
-        
-        
+
+
         // this.addBtn("test_01", () => new test_01());//最早是做加载测试。现在已经没价值了
         //this.addBtn("loadscene", () => new dome.test_loadScene());
-        
+
         this.addBtn("test_ui", () => new t.test_ui());
         this.addBtn("test_load", () => new test_load());
         this.addBtn("test_loadprefab", () => new test_loadprefab());
@@ -79,13 +79,13 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("example_newObject",()=>new test_NewGameObject);
         this.addBtn("example_changeMesh",()=>new test_ChangeMesh());
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
-        this.addBtn("example_Sound",()=>new test_Sound());      
+        this.addBtn("example_Sound",()=>new test_Sound());
         this.addBtn("demo_ScreenSplit",()=>new demo_ScreenSplit());
         //----------------------------------------------文档案例
 
         //this.addBtn("test_liloadscene", () => new test_LiLoadScene());
         //this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
-        this.addBtn("test_四分屏", () => new test_pick_4p());       
+        this.addBtn("test_四分屏", () => new test_pick_4p());
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
@@ -95,7 +95,8 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("rvo2_驾驶行为", () => new test_Rvo2());
         this.addBtn("导航RVO_防挤Demo", () => new demo_navigaionRVO());
         this.addBtn("Collider碰撞", () => new test_pick_boxcollider());
-        
+        this.addBtn("SSSSS", () => new test_sssss());
+
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
         // this.addBtn("cj_zs",()=>new dome.testCJ());
@@ -104,7 +105,7 @@ class main implements gd3d.framework.IUserCode
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }
-    
+
     private x: number = 0;
     private y: number = 100;
     private btns: HTMLButtonElement[] = [];

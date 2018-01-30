@@ -406,6 +406,20 @@ declare class test_softCut implements IState {
     private loadTexture(lastState, state);
     update(delta: number): void;
 }
+declare class test_sssss implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    renderer: gd3d.framework.meshRenderer[];
+    skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    taskmgr: gd3d.framework.taskMgr;
+    start(app: gd3d.framework.application): void;
+    private loadpbrRes(lastState, state);
+    private loadIBL(lastState, state);
+    camera: gd3d.framework.camera;
+    baihu: gd3d.framework.transform;
+    timer: number;
+    update(delta: number): void;
+}
 declare enum ShockType {
     Vertical = 0,
     Horizontal = 1,

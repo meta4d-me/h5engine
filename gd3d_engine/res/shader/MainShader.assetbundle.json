@@ -13,6 +13,18 @@
           "length":0
           },
       {
+          "name":"resources/advanced/pbr_sss.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/pbr_sss.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/pbr_sss.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/advanced/skybox.fs.glsl",
           "length":0
           },
@@ -234,6 +246,18 @@
           },
       {
           "name":"resources/posteffect/separate_blur.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/sssss.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/sssss.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/sssss.vs.glsl",
           "length":0
           },
       {
