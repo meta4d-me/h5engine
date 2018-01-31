@@ -4,11 +4,13 @@ class test_ShadowMap implements IState
     scene: gd3d.framework.scene;
     renderer: gd3d.framework.meshRenderer[];
     skinRenders: gd3d.framework.skinnedMeshRenderer[];
+    assetmgr:gd3d.framework.assetMgr;
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
+        this.assetmgr = this.app.getAssetMgr();
         this.scene.getRoot().localTranslate = new gd3d.math.vector3(0, 0, 0);
         let name = "baihu";
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
@@ -22,6 +24,7 @@ class test_ShadowMap implements IState
                         {
                             var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName("testshadowmap.scene.json") as gd3d.framework.rawscene;
                             var _root = _scene.getSceneRoot();
+                            let assetmgr = this.app.getAssetMgr();
                             this.scene.addChild(_root);
                             // this.scene.getRoot().markDirty();
                             _root.markDirty();
@@ -41,7 +44,7 @@ class test_ShadowMap implements IState
                                 
                                 this.depthTexture = new gd3d.framework.texture("_depth");
                                 this.depthTexture.glTexture = depth.renderTarget;
-                                gd3d.framework.shader.setGlobalTexture ("_Light_Depth",this.depthTexture);
+                                // gd3d.framework.shader.setGlobalTexture ("_Light_Depth",this.depthTexture);
                             }
 
                             {
@@ -83,6 +86,11 @@ class test_ShadowMap implements IState
                                 // this.depthTexTrans.markDirty();
 
                             }
+
+                            this.collectMat();
+                            this.mats.forEach(element => {
+                                if(element) element.setTexture("_Light_Depth",this.depthTexture);
+                            });
                         }
                     });
             }
@@ -108,6 +116,27 @@ class test_ShadowMap implements IState
 
         viewCamObj.markDirty();
         this.ShowUI();
+    }
+
+    private shadowSh = "shadowmap.shader.json" ;
+    private mats:gd3d.framework.material[] = [];
+    private collectMat(){
+        if(!this.assetmgr) return 
+        let resmap = this.assetmgr.mapRes;
+        for(let key in resmap){
+            let asset = resmap[key];
+            if(!asset["asset"] || !(asset["asset"] instanceof gd3d.framework.material)) continue;
+            let mat = asset["asset"] as gd3d.framework.material;
+            if(!mat["shader"] || mat["shader"].getName() != this.shadowSh) continue;
+            this.mats.push(mat);
+        }
+    }
+
+    private setmat(key:string,value:any){
+        if(!this.mats) return;
+        this.mats.forEach(element => {
+            if(element) element.setTexture("_Light_Depth",this.depthTexture);
+        });
     }
 
     lightcamera: gd3d.framework.camera;//方向光的camera
@@ -156,8 +185,14 @@ class test_ShadowMap implements IState
 
         gd3d.math.matrixMultiply(projection,worldToView,this.lightProjection);
         gd3d.math.matrixMultiply(this.posToUV,this.lightProjection,this.lightProjection);
-        gd3d.framework.shader.setGlobalMatrix("_LightProjection", this.lightProjection);
-        gd3d.framework.shader.setGlobalFloat("_bias",0.001);
+        // gd3d.framework.shader.setGlobalMatrix("_LightProjection", this.lightProjection);
+        // gd3d.framework.shader.setGlobalFloat("_bias",0.001);
+            this.mats.forEach(element => {
+                if(element){
+                    element.setMatrix("_LightProjection",this.lightProjection);
+                    if(element) element.setFloat("_bias",0.001);
+                }
+            });
     }
 
     FitToScene(lightCamera:gd3d.framework.camera,aabb:gd3d.framework.aabb)
