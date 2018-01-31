@@ -117,6 +117,18 @@
           "length":0
           },
       {
+          "name":"resources/using/asi.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/using/asi.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/using/asi.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/posteffect/quad.vs.glsl",
           "length":0
           },
