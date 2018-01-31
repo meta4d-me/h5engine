@@ -17653,7 +17653,11 @@ var gd3d;
                     _asset = assetMgr.getAssetByName(assetName, bundlename);
                 }
                 if (_asset == null && type == "animationClip") {
-                    _asset = new gd3d.framework.animationClip(assetName);
+                    _asset = assetMgr.getAssetByName(assetName);
+                    if (!_asset) {
+                        _asset = new gd3d.framework.animationClip(assetName);
+                        _asset.use();
+                    }
                 }
                 {
                     if (instanceObj instanceof Array) {
