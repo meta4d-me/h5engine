@@ -49,9 +49,20 @@ namespace gd3d.framework
         @reflect.Field("number")
         private _renderMode:canvasRenderMode = canvasRenderMode.ScreenSpaceOverlay;
 
+        private styleToMode(){
+            switch(this._renderMode){
+                case canvasRenderMode.ScreenSpaceOverlay:
+                    if(!this._canvas || !this._canvas.overlay2d) return;
+                    let scene =this.gameObject.getScene();
+                    scene.addScreenSpaceOverlay(this._canvas.overlay2d);
+                break;
+            }
+
+        }
+
         start()
         {
-
+            this.styleToMode();
         }
         update(delta: number)
         {   

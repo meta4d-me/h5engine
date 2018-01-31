@@ -303,7 +303,7 @@ class demo_ScreenSplit implements IState
             this.app.container.appendChild(button1);
         }
 
-
+this.cube.localTranslate
     }
     
     camera: gd3d.framework.camera;

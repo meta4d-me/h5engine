@@ -1362,9 +1362,12 @@ var gd3d;
                 this.init = false;
                 this.autoAsp = true;
                 this.canvas = new framework.canvas();
+                this.canvas.overlay2d = this;
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
             overlay2D.prototype.start = function (camera) {
+                if (camera == this.camera)
+                    return;
                 this.camera = camera;
                 this.app = camera.gameObject.getScene().app;
                 this.canvas.scene = camera.gameObject.getScene();
@@ -2472,6 +2475,9 @@ var gd3d;
                     value = this.layoutValueMap[opation];
                 }
                 return value;
+            };
+            transform2D.prototype.clone = function () {
+                return gd3d.io.cloneObj(this);
             };
             __decorate([
                 gd3d.reflect.Field("string"),
@@ -11361,7 +11367,18 @@ var gd3d;
                 this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
                 this.isCanvasinit = true;
             };
+            canvascontainer.prototype.styleToMode = function () {
+                switch (this._renderMode) {
+                    case canvasRenderMode.ScreenSpaceOverlay:
+                        if (!this._canvas || !this._canvas.overlay2d)
+                            return;
+                        var scene_1 = this.gameObject.getScene();
+                        scene_1.addScreenSpaceOverlay(this._canvas.overlay2d);
+                        break;
+                }
+            };
             canvascontainer.prototype.start = function () {
+                this.styleToMode();
             };
             canvascontainer.prototype.update = function (delta) {
                 if (!this.isCanvasinit)
@@ -14010,6 +14027,7 @@ var gd3d;
                 this.renderBatch = [];
                 this.loopCount = 0;
                 this.allTime = 0;
+                this.renderActive = false;
                 this.totalTime = 0;
                 this.totalFrame = 0;
                 this.active = false;
@@ -14054,6 +14072,7 @@ var gd3d;
                 }
             };
             f14EffectSystem.prototype.update = function (deltaTime) {
+                this.renderActive = false;
                 if (!this.active)
                     return;
                 if (this.data == null)
@@ -14062,6 +14081,7 @@ var gd3d;
                 this.totalTime = this.allTime - this._delayTime;
                 if (this.totalTime <= 0)
                     return;
+                this.renderActive = true;
                 this.totalFrame = this.totalTime * this.fps;
                 this.restartFrame = this.totalFrame % this.data.lifeTime;
                 this.restartFrame = Math.floor(this.restartFrame);
@@ -14093,7 +14113,7 @@ var gd3d;
             });
             f14EffectSystem.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 if (Effqueue === void 0) { Effqueue = 0; }
-                if (!this.active)
+                if (!this.renderActive)
                     return;
                 this._renderCamera = camera;
                 var curCount = 0;
@@ -19320,6 +19340,9 @@ var gd3d;
             var cdz = gd3d.math.pool.new_vector3();
             math.vec3Cross(dir, gd3d.math.pool.vector3_forward, cdz);
             math.vec3Normalize(cdz, cdz);
+            if (math.vec3Dot(cdz, gd3d.math.pool.vector3_forward) < 0) {
+                an_dz = 2 * Math.PI - an_dz;
+            }
             an_dz = 180 / Math.PI * an_dz;
             quatFromAxisAngle(cdz, -an_dz, out);
             var y = gd3d.math.pool.new_vector3();
@@ -19330,11 +19353,13 @@ var gd3d;
             math.vec3Normalize(cyw, cyw);
             var cos2Y = math.vec3Dot(cyw, y);
             var sin2Y = Math.sqrt(1 - cos2Y * cos2Y);
-            if (math.vec3Dot(y, upwards) < 0) {
+            console.log(math.vec3Dot(y, upwards));
+            if (math.vec3Dot(y, upwards) <= 0) {
                 sin2Y = -sin2Y;
             }
             var siny = Math.sqrt((1 - sin2Y) / 2);
             var cosy = -Math.sqrt((sin2Y + 1) / 2);
+            console.log(cos2Y);
             if (cos2Y < 0) {
                 cosy = -cosy;
             }
@@ -19343,11 +19368,9 @@ var gd3d;
             yq.y = 0;
             yq.z = siny;
             yq.w = cosy;
-            quatMultiply(yq, out, out);
+            quatMultiply(out, yq, out);
             gd3d.math.pool.delete_vector3(dir);
-            gd3d.math.pool.delete_vector3(y);
             gd3d.math.pool.delete_vector3(cdz);
-            gd3d.math.pool.delete_quaternion(yq);
         }
         math.quatLookRotation = quatLookRotation;
         function quatYAxis(pos, targetpos, out) {
@@ -25774,6 +25797,15 @@ var gd3d;
                 this.rootNode.scene = this;
                 this.renderList = new framework.renderList();
             }
+            scene.prototype.addScreenSpaceOverlay = function (overlay) {
+                if (!overlay)
+                    return;
+                if (!this._overlay2d)
+                    this._overlay2d = [];
+                if (this._overlay2d.indexOf(overlay) != -1)
+                    return;
+                this._overlay2d.push(overlay);
+            };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
                     if (this._mainCamera == null) {
@@ -25785,6 +25817,7 @@ var gd3d;
                     for (var i in this.renderCameras) {
                         if (this.renderCameras[i] == _camera) {
                             this._mainCamera = _camera;
+                            console.error("camera swtich :" + _camera.gameObject.getName());
                         }
                     }
                 },
@@ -25808,12 +25841,51 @@ var gd3d;
                 for (var i = 0; i < this.renderCameras.length; i++) {
                     this._renderCamera(i);
                 }
+                this.updateSceneOverLay(delta);
                 if (this.RealCameraNumber == 0) {
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
                 }
                 this.webgl.flush();
+            };
+            scene.prototype.updateSceneOverLay = function (delta) {
+                var _this = this;
+                if (this.name == "testhe") {
+                    this.name;
+                }
+                var targetcamera = this.mainCamera;
+                if (!this._overlay2d || !targetcamera)
+                    return;
+                var mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                if (mainCamIdx == -1) {
+                    var cname = targetcamera.gameObject.getName();
+                    var oktag = false;
+                    for (var i = 0; i < this.renderCameras.length; i++) {
+                        var cam = this.renderCameras[i];
+                        if (cam && cam.gameObject.getName() == cname) {
+                            targetcamera = this.mainCamera = cam;
+                            oktag = true;
+                            break;
+                        }
+                    }
+                    if (!oktag) {
+                        this._mainCamera = null;
+                        targetcamera = this.mainCamera;
+                    }
+                }
+                mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                if (!targetcamera)
+                    return;
+                if (this._overlay2d) {
+                    this._overlay2d.forEach(function (overlay) {
+                        if (overlay) {
+                            overlay.start(targetcamera);
+                            overlay.update(delta);
+                            overlay.render(_this.renderContext[mainCamIdx], _this.assetmgr, targetcamera);
+                        }
+                    });
+                }
             };
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];

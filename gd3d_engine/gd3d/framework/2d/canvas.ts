@@ -38,6 +38,15 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * overlay 容器对象
+         * @version egret-gd3d 1.0
+         */
+        overlay2d:overlay2D;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 如果是在canvasrenderer下，这里可以获取到canvasrenderer所在的transform节点
          * @version egret-gd3d 1.0
          */
