@@ -4660,6 +4660,7 @@ declare namespace gd3d.framework {
         getWorldScale(): math.vector3;
         getWorldRotate(): math.quaternion;
         getLocalMatrix(): gd3d.math.matrix;
+        private tempWorldMatrix;
         getWorldMatrix(): gd3d.math.matrix;
         getForwardInWorld(out: gd3d.math.vector3): void;
         getRightInWorld(out: gd3d.math.vector3): void;

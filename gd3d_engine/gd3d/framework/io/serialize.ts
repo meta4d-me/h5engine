@@ -1039,7 +1039,11 @@ namespace gd3d.io
             // else
             if (_asset == null && type == "animationClip")
             {
-                _asset = new framework.animationClip(assetName);
+                _asset = assetMgr.getAssetByName(assetName); //资源可能不在同一个包
+                if(!_asset){
+                    _asset = new framework.animationClip(assetName);
+                    (_asset as framework.IAsset).use();
+                }
             }
             {
                 if (instanceObj instanceof Array)
