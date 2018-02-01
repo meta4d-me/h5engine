@@ -57,11 +57,17 @@ namespace gd3d.framework
             {
                 this.noBatch=true;
                 this.mesh.glMesh = new gd3d.render.glMesh();
-                this.dataForVbo=this.meshlist[0].dataforvbo;
-                this.dataForEbo=this.meshlist[0].dataforebo;
+                //this.dataForVbo=this.meshlist[0].dataforvbo;
+                this.dataForVbo=this.meshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
+                
+                //this.dataForEbo=this.meshlist[0].dataforebo;
+                this.dataForEbo=this.meshlist[0].baseddata.mesh.data.genIndexDataArray();
 
                 this.mesh.glMesh.initBuffer(this.effect.webgl,this.effect.VF,this.meshlist[0].baseddata.mesh.data.pos.length,render.MeshTypeEnum.Static);
+                this.mesh.glMesh.uploadVertexData(this.effect.webgl, this.dataForVbo);
                 this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
+                this.mesh.glMesh.uploadIndexData(this.effect.webgl, 0, this.dataForEbo);
+                
                 this.mesh.submesh = [];
                 {
                     var sm = new subMeshInfo();
@@ -128,6 +134,7 @@ namespace gd3d.framework
 
         private mat:math.matrix=new math.matrix();
         private defST:math.vector4=new math.vector4(1,1,0,0);
+        private temptColorv4:math.vector4=new math.vector4();
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number)
         {
             //----------------------------找出draw active 的element----------------------------------
@@ -143,6 +150,19 @@ namespace gd3d.framework
 
             if (this.activemeshlist.length < 1) return;
             this.ElementMat.setQueue(Effqueue);
+            if(this.activemeshlist.length==1)
+            {
+                this.temptColorv4.x=this.activemeshlist[0].color.r;
+                this.temptColorv4.y=this.activemeshlist[0].color.g;
+                this.temptColorv4.z=this.activemeshlist[0].color.b;
+                this.temptColorv4.w=this.activemeshlist[0].color.a;
+                let basemesh=this.activemeshlist[0].baseddata.mesh;
+                this.ElementMat.setVector4("_Main_Color",this.temptColorv4);
+                this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
+                //this.ElementMat.setMatrix("_mat",this.activemeshlist[0].targetMat);
+                math.matrixMultiply(context.matrixModelViewProject,this.activemeshlist[0].targetMat,context.matrixModelViewProject);
+                this.ElementMat.draw(context, this.mesh,this.mesh.submesh[0]);  
+            }
             // if(this.noBatch)
             // {
             //     this.ElementMat.setColor("_Main_Color",this.activemeshlist[0].color);
@@ -150,6 +170,7 @@ namespace gd3d.framework
             //     this.ElementMat.setMatrix("_mat",this.activemeshlist[0].targetMat);
             //     this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
             // }else
+            else
             {
                 //---------------------集合数据
                 this.curIndexCount=0;
@@ -168,7 +189,7 @@ namespace gd3d.framework
                 this.mesh.submesh[0].size=this.curIndexCount;
 
                 this.ElementMat.setVector4("_Main_Color",new math.vector4(1,1,1,1));
-                //this.ElementMat.setVector4("_Main_Tex_ST",new math.vector4(1,1,0,0) );
+                this.ElementMat.setVector4("_Main_Tex_ST",new math.vector4(1,1,0,0));
                 this.ElementMat.draw(context,this.mesh,this.mesh.submesh[0]);
             }
 
