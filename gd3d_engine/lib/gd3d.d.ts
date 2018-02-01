@@ -201,6 +201,7 @@ declare namespace gd3d.framework {
     class canvas {
         constructor();
         is2dUI: boolean;
+        overlay2d: overlay2D;
         parentTrans: transform;
         batcher: batcher2D;
         webgl: WebGLRenderingContext;
@@ -494,6 +495,7 @@ declare namespace gd3d.framework {
         private lastPivot;
         private refreshLayout();
         private getLayValue(opation);
+        clone(): transform2D;
     }
     class t2dInfo {
         pivot: math.vector2;
@@ -1881,6 +1883,7 @@ declare namespace gd3d.framework {
         private isCanvasinit;
         private canvasInit();
         private _renderMode;
+        private styleToMode();
         start(): void;
         update(delta: number): void;
         remove(): void;
@@ -4479,6 +4482,8 @@ declare namespace gd3d.framework {
         private rootNode;
         renderList: renderList;
         private assetmgr;
+        private _overlay2d;
+        addScreenSpaceOverlay(overlay: overlay2D): void;
         renderCameras: camera[];
         private _mainCamera;
         mainCamera: camera;
@@ -4487,6 +4492,7 @@ declare namespace gd3d.framework {
         lightmaps: texture[];
         fog: Fog;
         update(delta: number): void;
+        private updateSceneOverLay(delta);
         private RealCameraNumber;
         private _renderCamera(camindex);
         private updateScene(node, delta);

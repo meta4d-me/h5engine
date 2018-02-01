@@ -57,7 +57,20 @@ namespace gd3d.framework
          */
         renderList: renderList;
         private assetmgr: assetMgr;
-
+        private _overlay2d:Array<overlay2D>;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 添加ScreenSpaceOverlay
+         * @version egret-gd3d 1.0
+         */
+        addScreenSpaceOverlay(overlay:overlay2D){
+            if(!overlay) return;
+            if(!this._overlay2d) this._overlay2d = [];
+            if(this._overlay2d.indexOf(overlay) != -1) return;
+            this._overlay2d.push(overlay);
+        }
         /**
          * @public
          * @language zh_CN
@@ -143,6 +156,7 @@ namespace gd3d.framework
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
 
+            
             //排序
             //排序camera 并绘制
             if (this.renderCameras.length > 1)
@@ -160,6 +174,8 @@ namespace gd3d.framework
                 this._renderCamera(i);
             }
 
+            this.updateSceneOverLay(delta);
+
             if (this.RealCameraNumber == 0)
             {
                 this.webgl.clearColor(0, 0, 0, 1);
@@ -167,6 +183,45 @@ namespace gd3d.framework
                 this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
             }
             this.webgl.flush();
+        }
+
+        //更新和渲染 scene overlayers
+        private updateSceneOverLay(delta:number){
+            if(this.name == "testhe"){
+
+                this.name;
+            } 
+
+            let targetcamera = this.mainCamera;
+            if(!this._overlay2d || !targetcamera) return;
+             let mainCamIdx = this.renderCameras.indexOf(targetcamera);
+             if(mainCamIdx == -1 ){
+                let cname = targetcamera.gameObject.getName();
+                let oktag = false;
+                for(var i=0;i<this.renderCameras.length;i++){
+                    let cam = this.renderCameras[i];
+                    if(cam && cam.gameObject.getName() == cname){
+                        targetcamera = this.mainCamera = cam;
+                        oktag = true;
+                        break;
+                    }
+                }
+                if(!oktag) {
+                    this._mainCamera = null;
+                    targetcamera = this.mainCamera;
+                }
+             }
+             mainCamIdx = this.renderCameras.indexOf(targetcamera);
+             if(!targetcamera) return;
+             if(this._overlay2d){
+                this._overlay2d.forEach(overlay=>{
+                    if(overlay){
+                        overlay.start( targetcamera);
+                        overlay.update(delta);
+                        overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                    }
+                });
+            }
         }
 
         private RealCameraNumber: number = 0;

@@ -22,6 +22,7 @@ namespace gd3d.framework
         constructor()
         {
             this.canvas = new canvas();
+            this.canvas.overlay2d = this;
             sceneMgr.app.markNotify(this.canvas.getRoot(), NotifyType.AddChild);
         }
 
@@ -43,6 +44,7 @@ namespace gd3d.framework
          */
         start(camera: camera)
         {
+            if(camera == this.camera) return;
             this.camera = camera;
             this.app = camera.gameObject.getScene().app;
             this.canvas.scene = camera.gameObject.getScene();

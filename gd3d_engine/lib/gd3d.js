@@ -1362,9 +1362,12 @@ var gd3d;
                 this.init = false;
                 this.autoAsp = true;
                 this.canvas = new framework.canvas();
+                this.canvas.overlay2d = this;
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
             overlay2D.prototype.start = function (camera) {
+                if (camera == this.camera)
+                    return;
                 this.camera = camera;
                 this.app = camera.gameObject.getScene().app;
                 this.canvas.scene = camera.gameObject.getScene();
@@ -2472,6 +2475,9 @@ var gd3d;
                     value = this.layoutValueMap[opation];
                 }
                 return value;
+            };
+            transform2D.prototype.clone = function () {
+                return gd3d.io.cloneObj(this);
             };
             __decorate([
                 gd3d.reflect.Field("string"),
@@ -11361,7 +11367,18 @@ var gd3d;
                 this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
                 this.isCanvasinit = true;
             };
+            canvascontainer.prototype.styleToMode = function () {
+                switch (this._renderMode) {
+                    case canvasRenderMode.ScreenSpaceOverlay:
+                        if (!this._canvas || !this._canvas.overlay2d)
+                            return;
+                        var scene_1 = this.gameObject.getScene();
+                        scene_1.addScreenSpaceOverlay(this._canvas.overlay2d);
+                        break;
+                }
+            };
             canvascontainer.prototype.start = function () {
+                this.styleToMode();
             };
             canvascontainer.prototype.update = function (delta) {
                 if (!this.isCanvasinit)
@@ -17653,7 +17670,11 @@ var gd3d;
                     _asset = assetMgr.getAssetByName(assetName, bundlename);
                 }
                 if (_asset == null && type == "animationClip") {
-                    _asset = new gd3d.framework.animationClip(assetName);
+                    _asset = assetMgr.getAssetByName(assetName);
+                    if (!_asset) {
+                        _asset = new gd3d.framework.animationClip(assetName);
+                        _asset.use();
+                    }
                 }
                 {
                     if (instanceObj instanceof Array) {
@@ -25780,6 +25801,15 @@ var gd3d;
                 this.rootNode.scene = this;
                 this.renderList = new framework.renderList();
             }
+            scene.prototype.addScreenSpaceOverlay = function (overlay) {
+                if (!overlay)
+                    return;
+                if (!this._overlay2d)
+                    this._overlay2d = [];
+                if (this._overlay2d.indexOf(overlay) != -1)
+                    return;
+                this._overlay2d.push(overlay);
+            };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
                     if (this._mainCamera == null) {
@@ -25791,6 +25821,7 @@ var gd3d;
                     for (var i in this.renderCameras) {
                         if (this.renderCameras[i] == _camera) {
                             this._mainCamera = _camera;
+                            console.error("camera swtich :" + _camera.gameObject.getName());
                         }
                     }
                 },
@@ -25814,12 +25845,51 @@ var gd3d;
                 for (var i = 0; i < this.renderCameras.length; i++) {
                     this._renderCamera(i);
                 }
+                this.updateSceneOverLay(delta);
                 if (this.RealCameraNumber == 0) {
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
                 }
                 this.webgl.flush();
+            };
+            scene.prototype.updateSceneOverLay = function (delta) {
+                var _this = this;
+                if (this.name == "testhe") {
+                    this.name;
+                }
+                var targetcamera = this.mainCamera;
+                if (!this._overlay2d || !targetcamera)
+                    return;
+                var mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                if (mainCamIdx == -1) {
+                    var cname = targetcamera.gameObject.getName();
+                    var oktag = false;
+                    for (var i = 0; i < this.renderCameras.length; i++) {
+                        var cam = this.renderCameras[i];
+                        if (cam && cam.gameObject.getName() == cname) {
+                            targetcamera = this.mainCamera = cam;
+                            oktag = true;
+                            break;
+                        }
+                    }
+                    if (!oktag) {
+                        this._mainCamera = null;
+                        targetcamera = this.mainCamera;
+                    }
+                }
+                mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                if (!targetcamera)
+                    return;
+                if (this._overlay2d) {
+                    this._overlay2d.forEach(function (overlay) {
+                        if (overlay) {
+                            overlay.start(targetcamera);
+                            overlay.update(delta);
+                            overlay.render(_this.renderContext[mainCamIdx], _this.assetmgr, targetcamera);
+                        }
+                    });
+                }
             };
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];

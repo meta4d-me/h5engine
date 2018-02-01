@@ -1249,6 +1249,18 @@ namespace gd3d.framework
             
             return value;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前transform2D的克隆
+         * @version egret-gd3d 1.0
+         */
+        clone(): transform2D
+        {
+            return io.cloneObj(this) as transform2D;
+        }
     }
 
     export class t2dInfo
