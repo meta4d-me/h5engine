@@ -135,6 +135,7 @@ namespace gd3d.framework
         private mat:math.matrix=new math.matrix();
         private defST:math.vector4=new math.vector4(1,1,0,0);
         private temptColorv4:math.vector4=new math.vector4();
+        private uploadData:boolean=false;
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number)
         {
             //----------------------------找出draw active 的element----------------------------------
@@ -149,19 +150,27 @@ namespace gd3d.framework
             }
 
             if (this.activemeshlist.length < 1) return;
+            
             this.ElementMat.setQueue(Effqueue);
-            if(this.activemeshlist.length==1)
+            if(this.noBatch)
             {
+                gd3d.math.matrixMultiply(this.effect.mvpMat, this.activemeshlist[0].targetMat, context.matrixModelViewProject);
+                if(!this.uploadData)
+                {
+                    this.dataForVbo=this.activemeshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
+                    this.dataForEbo=this.activemeshlist[0].baseddata.mesh.data.genIndexDataArray();
+                    this.mesh.glMesh.uploadVertexData(context.webgl,this.dataForVbo);
+                    this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
+                    this.mesh.submesh[0].size=this.dataForEbo.length;
+                }
                 this.temptColorv4.x=this.activemeshlist[0].color.r;
                 this.temptColorv4.y=this.activemeshlist[0].color.g;
                 this.temptColorv4.z=this.activemeshlist[0].color.b;
                 this.temptColorv4.w=this.activemeshlist[0].color.a;
-                let basemesh=this.activemeshlist[0].baseddata.mesh;
+                // let basemesh=this.activemeshlist[0].baseddata.mesh;
                 this.ElementMat.setVector4("_Main_Color",this.temptColorv4);
                 this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
-                //this.ElementMat.setMatrix("_mat",this.activemeshlist[0].targetMat);
-                math.matrixMultiply(context.matrixModelViewProject,this.activemeshlist[0].targetMat,context.matrixModelViewProject);
-                this.ElementMat.draw(context, this.mesh,this.mesh.submesh[0]);  
+                this.ElementMat.draw(context, this.mesh,this.mesh.submesh[0]);
             }
             // if(this.noBatch)
             // {
@@ -172,6 +181,7 @@ namespace gd3d.framework
             // }else
             else
             {
+                gd3d.math.matrixMultiply(this.effect.mvpMat,gd3d.math.pool.identityMat, context.matrixModelViewProject);
                 //---------------------集合数据
                 this.curIndexCount=0;
                 this.curVertexcount=0;

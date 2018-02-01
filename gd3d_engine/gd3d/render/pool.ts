@@ -541,6 +541,7 @@ namespace gd3d.math
                 v.rawData[i] = src.rawData[i];
             return v;
         }
+        static readonly identityMat:matrix=new matrix();
         /**
         * @public
         * @language zh_CN
