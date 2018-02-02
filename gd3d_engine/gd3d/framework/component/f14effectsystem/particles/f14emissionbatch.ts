@@ -103,6 +103,8 @@ namespace gd3d.framework
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number)
         {
+            gd3d.math.matrixMultiply(this.effect.mvpMat,gd3d.math.pool.identityMat, context.matrixModelViewProject);
+
             this.mat.setQueue(Effqueue);
             //---------------------集合数据
             this.curIndexCount=0;

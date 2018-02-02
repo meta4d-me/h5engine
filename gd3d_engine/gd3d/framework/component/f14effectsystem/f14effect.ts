@@ -123,6 +123,7 @@ namespace gd3d.framework
                 return gd3d.framework.sceneMgr.app.getScene().mainCamera;
             }
         }
+        public mvpMat:math.matrix=new math.matrix();
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number=0)
         {
@@ -130,6 +131,7 @@ namespace gd3d.framework
             this._renderCamera=camera;
             let curCount = 0;
             context.updateModel(this.gameObject.transform);
+            math.matrixClone(context.matrixModelViewProject,this.mvpMat);
             for (let i = 0; i < this.renderBatch.length; i++)
             {
                 this.renderBatch[i].render(context,assetmgr,camera,Effqueue+curCount);
