@@ -67,6 +67,16 @@ namespace gd3d.framework
         @gd3d.reflect.Field("boolean")
         autoAsp: boolean = true;
 
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染排序
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("number")
+        sortOrder:number = 0;
+
         /**
          * @public
          * @language zh_CN

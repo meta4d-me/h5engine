@@ -187,40 +187,58 @@ namespace gd3d.framework
 
         //更新和渲染 scene overlayers
         private updateSceneOverLay(delta:number){
+            //if(1) return;
             if(this.name == "testhe"){
-
                 this.name;
-            } 
+            }
+            if(!this._overlay2d || this._overlay2d.length < 1) return;
 
-            let targetcamera = this.mainCamera;
-            if(!this._overlay2d || !targetcamera) return;
-             let mainCamIdx = this.renderCameras.indexOf(targetcamera);
-             if(mainCamIdx == -1 ){
-                let cname = targetcamera.gameObject.getName();
-                let oktag = false;
-                for(var i=0;i<this.renderCameras.length;i++){
-                    let cam = this.renderCameras[i];
-                    if(cam && cam.gameObject.getName() == cname){
-                        targetcamera = this.mainCamera = cam;
-                        oktag = true;
-                        break;
-                    }
+            // let targetcamera = this.mainCamera;
+            // targetcamera = this.renderCameras[0];
+            // if(!this._overlay2d || !targetcamera) return;
+            //  let mainCamIdx = this.renderCameras.indexOf(targetcamera);
+            //  if(mainCamIdx == -1 ){
+            //     let cname = targetcamera.gameObject.getName();
+            //     let oktag = false;
+            //     for(var i=0;i<this.renderCameras.length;i++){
+            //         let cam = this.renderCameras[i];
+            //         if(cam && cam.gameObject.getName() == cname){
+            //             targetcamera = this.mainCamera = cam;
+            //             oktag = true;
+            //             break;
+            //         }
+            //     }
+            //     if(!oktag) {
+            //         this._mainCamera = null;
+            //         targetcamera = this.mainCamera;
+            //     }
+            //  }
+            //  mainCamIdx = this.renderCameras.indexOf(targetcamera);
+            //  if(!targetcamera) return;
+            //  if(this._overlay2d){
+            //     this._overlay2d.forEach(overlay=>{
+            //         if(overlay){
+            //             overlay.start( targetcamera);
+            //             overlay.update(delta);
+            //             overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+            //         }
+            //     });
+            // }
+
+            //test----
+            for(var i=0;i< this.renderCameras.length;i++){
+                let cam = this.renderCameras[i];
+                let contx = this.renderContext[i];
+                if(!cam || !contx) return;
+                if(this._overlay2d){
+                    this._overlay2d.forEach(overlay=>{
+                        if(overlay){
+                            overlay.start( cam);
+                            overlay.update(delta);
+                            overlay.render(contx, this.assetmgr, cam);
+                        }
+                    });
                 }
-                if(!oktag) {
-                    this._mainCamera = null;
-                    targetcamera = this.mainCamera;
-                }
-             }
-             mainCamIdx = this.renderCameras.indexOf(targetcamera);
-             if(!targetcamera) return;
-             if(this._overlay2d){
-                this._overlay2d.forEach(overlay=>{
-                    if(overlay){
-                        overlay.start( targetcamera);
-                        overlay.update(delta);
-                        overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
-                    }
-                });
             }
         }
 
@@ -243,6 +261,7 @@ namespace gd3d.framework
 
                 // //还有overlay
                 let overLays: IOverLay[] = cam.getOverLays();
+                this.sortOverLays(overLays);
                 for (var i = 0; i < overLays.length; i++)
                 {
                     if (cam.CullingMask & CullingMask.ui)
@@ -262,6 +281,7 @@ namespace gd3d.framework
                 if (this.app.be2dstate)
                 {
                     let overLays: IOverLay[] = cam.getOverLays();
+                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++)
                     {
                         if (cam.CullingMask & CullingMask.ui)
@@ -276,6 +296,7 @@ namespace gd3d.framework
                 if (camindex == this.app.curcameraindex)
                 {
                     let overLays: IOverLay[] = cam.getOverLays();
+                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++)
                     {
                         if (cam.CullingMask & CullingMask.ui)
@@ -285,6 +306,14 @@ namespace gd3d.framework
                     }
                 }
             }
+        }
+
+        private sortOverLays(lays:IOverLay[]){
+            if(!lays || lays.length<1)return;
+            lays.sort((a, b) =>
+            {
+                return a.sortOrder - b.sortOrder;
+            });
         }
 
         private updateScene(node: transform, delta)

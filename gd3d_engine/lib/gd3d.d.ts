@@ -307,6 +307,7 @@ declare namespace gd3d.framework {
         start(camera: camera): void;
         canvas: canvas;
         autoAsp: boolean;
+        sortOrder: number;
         addChild(node: transform2D): void;
         removeChild(node: transform2D): void;
         getChildren(): transform2D[];
@@ -1810,6 +1811,7 @@ declare namespace gd3d.framework {
     }
     interface IOverLay {
         init: boolean;
+        sortOrder: number;
         start(camera: camera): any;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
         update(delta: number): any;
@@ -1880,9 +1882,12 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         private _canvas;
         canvas: canvas;
+        sortOrder: number;
         private isCanvasinit;
         private canvasInit();
+        private _lastMode;
         private _renderMode;
+        renderMode: canvasRenderMode;
         private styleToMode();
         start(): void;
         update(delta: number): void;
@@ -4495,6 +4500,7 @@ declare namespace gd3d.framework {
         private updateSceneOverLay(delta);
         private RealCameraNumber;
         private _renderCamera(camindex);
+        private sortOverLays(lays);
         private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);

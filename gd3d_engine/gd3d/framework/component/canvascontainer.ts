@@ -38,6 +38,16 @@ namespace gd3d.framework
             this._canvas = canv;
             this.canvasInit();
         }
+
+        //渲染排序
+        get sortOrder(){
+            return this._canvas && this._canvas.overlay2d ? this._canvas.overlay2d.sortOrder: 0;         
+        }
+        set sortOrder(order:number){
+            if(this._canvas && this._canvas.overlay2d)
+                this._canvas.overlay2d.sortOrder = order;
+        }
+
         private isCanvasinit = false;
         private canvasInit(){
             if(!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene) return; 
@@ -46,8 +56,23 @@ namespace gd3d.framework
             this.isCanvasinit = true;
         }
 
-        @reflect.Field("number")
+        private _lastMode:canvasRenderMode = canvasRenderMode.ScreenSpaceOverlay;
         private _renderMode:canvasRenderMode = canvasRenderMode.ScreenSpaceOverlay;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * renderMode UI render模式
+         * @version egret-gd3d 1.0
+         */
+        @reflect.Field("number")
+        get renderMode(){return this._renderMode;}
+        set renderMode(mode:canvasRenderMode){ 
+            if(this._renderMode == mode) return;
+            this._lastMode = this._renderMode;
+            this._renderMode = mode;
+            this.styleToMode();
+        }
 
         private styleToMode(){
             switch(this._renderMode){

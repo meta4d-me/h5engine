@@ -1361,6 +1361,7 @@ var gd3d;
             function overlay2D() {
                 this.init = false;
                 this.autoAsp = true;
+                this.sortOrder = 0;
                 this.canvas = new framework.canvas();
                 this.canvas.overlay2d = this;
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
@@ -1500,6 +1501,10 @@ var gd3d;
                 gd3d.reflect.Field("boolean"),
                 __metadata("design:type", Boolean)
             ], overlay2D.prototype, "autoAsp", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], overlay2D.prototype, "sortOrder", void 0);
             overlay2D = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [])
@@ -2048,8 +2053,9 @@ var gd3d;
                 var i = this.children.indexOf(node);
                 if (i >= 0) {
                     this.children.splice(i, 1);
+                    node.parent = null;
+                    framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
                 }
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
             };
             transform2D.prototype.removeAllChild = function () {
                 while (this.children.length > 0) {
@@ -11347,6 +11353,7 @@ var gd3d;
         var canvascontainer = (function () {
             function canvascontainer() {
                 this.isCanvasinit = false;
+                this._lastMode = canvasRenderMode.ScreenSpaceOverlay;
                 this._renderMode = canvasRenderMode.ScreenSpaceOverlay;
             }
             Object.defineProperty(canvascontainer.prototype, "canvas", {
@@ -11360,6 +11367,17 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(canvascontainer.prototype, "sortOrder", {
+                get: function () {
+                    return this._canvas && this._canvas.overlay2d ? this._canvas.overlay2d.sortOrder : 0;
+                },
+                set: function (order) {
+                    if (this._canvas && this._canvas.overlay2d)
+                        this._canvas.overlay2d.sortOrder = order;
+                },
+                enumerable: true,
+                configurable: true
+            });
             canvascontainer.prototype.canvasInit = function () {
                 if (!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene)
                     return;
@@ -11367,6 +11385,18 @@ var gd3d;
                 this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
                 this.isCanvasinit = true;
             };
+            Object.defineProperty(canvascontainer.prototype, "renderMode", {
+                get: function () { return this._renderMode; },
+                set: function (mode) {
+                    if (this._renderMode == mode)
+                        return;
+                    this._lastMode = this._renderMode;
+                    this._renderMode = mode;
+                    this.styleToMode();
+                },
+                enumerable: true,
+                configurable: true
+            });
             canvascontainer.prototype.styleToMode = function () {
                 switch (this._renderMode) {
                     case canvasRenderMode.ScreenSpaceOverlay:
@@ -11395,8 +11425,9 @@ var gd3d;
             ], canvascontainer.prototype, "canvas", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], canvascontainer.prototype, "_renderMode", void 0);
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], canvascontainer.prototype, "renderMode", null);
             canvascontainer = __decorate([
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
@@ -25821,7 +25852,6 @@ var gd3d;
                     for (var i in this.renderCameras) {
                         if (this.renderCameras[i] == _camera) {
                             this._mainCamera = _camera;
-                            console.error("camera swtich :" + _camera.gameObject.getName());
                         }
                     }
                 },
@@ -25858,37 +25888,28 @@ var gd3d;
                 if (this.name == "testhe") {
                     this.name;
                 }
-                var targetcamera = this.mainCamera;
-                if (!this._overlay2d || !targetcamera)
+                if (!this._overlay2d || this._overlay2d.length < 1)
                     return;
-                var mainCamIdx = this.renderCameras.indexOf(targetcamera);
-                if (mainCamIdx == -1) {
-                    var cname = targetcamera.gameObject.getName();
-                    var oktag = false;
-                    for (var i = 0; i < this.renderCameras.length; i++) {
-                        var cam = this.renderCameras[i];
-                        if (cam && cam.gameObject.getName() == cname) {
-                            targetcamera = this.mainCamera = cam;
-                            oktag = true;
-                            break;
-                        }
+                var _loop_1 = function () {
+                    var cam = this_1.renderCameras[i];
+                    var contx = this_1.renderContext[i];
+                    if (!cam || !contx)
+                        return { value: void 0 };
+                    if (this_1._overlay2d) {
+                        this_1._overlay2d.forEach(function (overlay) {
+                            if (overlay) {
+                                overlay.start(cam);
+                                overlay.update(delta);
+                                overlay.render(contx, _this.assetmgr, cam);
+                            }
+                        });
                     }
-                    if (!oktag) {
-                        this._mainCamera = null;
-                        targetcamera = this.mainCamera;
-                    }
-                }
-                mainCamIdx = this.renderCameras.indexOf(targetcamera);
-                if (!targetcamera)
-                    return;
-                if (this._overlay2d) {
-                    this._overlay2d.forEach(function (overlay) {
-                        if (overlay) {
-                            overlay.start(targetcamera);
-                            overlay.update(delta);
-                            overlay.render(_this.renderContext[mainCamIdx], _this.assetmgr, targetcamera);
-                        }
-                    });
+                };
+                var this_1 = this;
+                for (var i = 0; i < this.renderCameras.length; i++) {
+                    var state_2 = _loop_1();
+                    if (typeof state_2 === "object")
+                        return state_2.value;
                 }
             };
             scene.prototype._renderCamera = function (camindex) {
@@ -25901,6 +25922,7 @@ var gd3d;
                     cam.renderScene(this, context);
                     this.RealCameraNumber++;
                     var overLays = cam.getOverLays();
+                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++) {
                         if (cam.CullingMask & framework.CullingMask.ui) {
                             overLays[i].render(context, this.assetmgr, cam);
@@ -25915,6 +25937,7 @@ var gd3d;
                     this.RealCameraNumber++;
                     if (this.app.be2dstate) {
                         var overLays = cam.getOverLays();
+                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
@@ -25925,6 +25948,7 @@ var gd3d;
                 if (!this.app.bePlay && this.app.be2dstate) {
                     if (camindex == this.app.curcameraindex) {
                         var overLays = cam.getOverLays();
+                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
@@ -25932,6 +25956,13 @@ var gd3d;
                         }
                     }
                 }
+            };
+            scene.prototype.sortOverLays = function (lays) {
+                if (!lays || lays.length < 1)
+                    return;
+                lays.sort(function (a, b) {
+                    return a.sortOrder - b.sortOrder;
+                });
             };
             scene.prototype.updateScene = function (node, delta) {
                 if (this.app.bePlay) {

@@ -581,6 +581,7 @@ var demo_ScreenSplit = (function () {
             button1.style.position = "absolute";
             this.app.container.appendChild(button1);
         }
+        this.cube.localTranslate;
     };
     demo_ScreenSplit.prototype.update = function (delta) {
         Test_CameraController.instance().update(delta);
