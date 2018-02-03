@@ -70,6 +70,7 @@ namespace gd3d.framework
             if(!this._overlay2d) this._overlay2d = [];
             if(this._overlay2d.indexOf(overlay) != -1) return;
             this._overlay2d.push(overlay);
+            this.sortOverLays(this._overlay2d);
         }
         /**
          * @public
@@ -193,53 +194,53 @@ namespace gd3d.framework
             }
             if(!this._overlay2d || this._overlay2d.length < 1) return;
 
-            // let targetcamera = this.mainCamera;
-            // targetcamera = this.renderCameras[0];
-            // if(!this._overlay2d || !targetcamera) return;
-            //  let mainCamIdx = this.renderCameras.indexOf(targetcamera);
-            //  if(mainCamIdx == -1 ){
-            //     let cname = targetcamera.gameObject.getName();
-            //     let oktag = false;
-            //     for(var i=0;i<this.renderCameras.length;i++){
-            //         let cam = this.renderCameras[i];
-            //         if(cam && cam.gameObject.getName() == cname){
-            //             targetcamera = this.mainCamera = cam;
-            //             oktag = true;
-            //             break;
-            //         }
-            //     }
-            //     if(!oktag) {
-            //         this._mainCamera = null;
-            //         targetcamera = this.mainCamera;
-            //     }
-            //  }
-            //  mainCamIdx = this.renderCameras.indexOf(targetcamera);
-            //  if(!targetcamera) return;
-            //  if(this._overlay2d){
-            //     this._overlay2d.forEach(overlay=>{
-            //         if(overlay){
-            //             overlay.start( targetcamera);
-            //             overlay.update(delta);
-            //             overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
-            //         }
-            //     });
-            // }
+            let targetcamera = this.mainCamera;
+            targetcamera = this.renderCameras[1];
+            if(!this._overlay2d || !targetcamera) return;
+             let mainCamIdx = this.renderCameras.indexOf(targetcamera);
+             if(mainCamIdx == -1 ){
+                let cname = targetcamera.gameObject.getName();
+                let oktag = false;
+                for(var i=0;i<this.renderCameras.length;i++){
+                    let cam = this.renderCameras[i];
+                    if(cam && cam.gameObject.getName() == cname){
+                        targetcamera = this.mainCamera = cam;
+                        oktag = true;
+                        break;
+                    }
+                }
+                if(!oktag) {
+                    this._mainCamera = null;
+                    targetcamera = this.mainCamera;
+                }
+             }
+             mainCamIdx = this.renderCameras.indexOf(targetcamera);
+             if(!targetcamera) return;
+             if(this._overlay2d){
+                this._overlay2d.forEach(overlay=>{
+                    if(overlay){
+                        overlay.start( targetcamera);
+                        overlay.update(delta);
+                        overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                    }
+                });
+            }
 
             //test----
-            for(var i=0;i< this.renderCameras.length;i++){
-                let cam = this.renderCameras[i];
-                let contx = this.renderContext[i];
-                if(!cam || !contx) return;
-                if(this._overlay2d){
-                    this._overlay2d.forEach(overlay=>{
-                        if(overlay){
-                            overlay.start( cam);
-                            overlay.update(delta);
-                            overlay.render(contx, this.assetmgr, cam);
-                        }
-                    });
-                }
-            }
+            // for(var i=0;i< this.renderCameras.length;i++){
+            //     let cam = this.renderCameras[i];
+            //     let contx = this.renderContext[i];
+            //     if(!cam || !contx) return;
+            //     if(this._overlay2d){
+            //         this._overlay2d.forEach(overlay=>{
+            //             if(overlay){
+            //                 overlay.start( cam);
+            //                 overlay.update(delta);
+            //                 overlay.render(contx, this.assetmgr, cam);
+            //             }
+            //         });
+            //     }
+            // }
         }
 
         private RealCameraNumber: number = 0;

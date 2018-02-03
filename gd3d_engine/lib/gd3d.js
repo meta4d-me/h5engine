@@ -1363,7 +1363,6 @@ var gd3d;
                 this.autoAsp = true;
                 this.sortOrder = 0;
                 this.canvas = new framework.canvas();
-                this.canvas.overlay2d = this;
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
             overlay2D.prototype.start = function (camera) {
@@ -11358,22 +11357,23 @@ var gd3d;
             }
             Object.defineProperty(canvascontainer.prototype, "canvas", {
                 get: function () {
-                    return this._canvas;
-                },
-                set: function (canv) {
-                    this._canvas = canv;
-                    this.canvasInit();
+                    if (this._overlay2d && this._overlay2d.canvas)
+                        return this._overlay2d.canvas;
                 },
                 enumerable: true,
                 configurable: true
             });
+            canvascontainer.prototype.setOverLay = function (lay) {
+                this._overlay2d = lay;
+                this.canvasInit();
+            };
             Object.defineProperty(canvascontainer.prototype, "sortOrder", {
                 get: function () {
-                    return this._canvas && this._canvas.overlay2d ? this._canvas.overlay2d.sortOrder : 0;
+                    return this._overlay2d ? this._overlay2d.sortOrder : 0;
                 },
                 set: function (order) {
-                    if (this._canvas && this._canvas.overlay2d)
-                        this._canvas.overlay2d.sortOrder = order;
+                    if (this._overlay2d)
+                        this._overlay2d.sortOrder = order;
                 },
                 enumerable: true,
                 configurable: true
@@ -11381,8 +11381,10 @@ var gd3d;
             canvascontainer.prototype.canvasInit = function () {
                 if (!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene)
                     return;
-                this._canvas.scene = this.gameObject.transform.scene;
-                this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
+                if (!this._overlay2d || !this._overlay2d.canvas)
+                    return;
+                this._overlay2d.canvas.scene = this.gameObject.transform.scene;
+                this._overlay2d.canvas.assetmgr = this._overlay2d.canvas.scene.app.getAssetMgr();
                 this.isCanvasinit = true;
             };
             Object.defineProperty(canvascontainer.prototype, "renderMode", {
@@ -11400,10 +11402,10 @@ var gd3d;
             canvascontainer.prototype.styleToMode = function () {
                 switch (this._renderMode) {
                     case canvasRenderMode.ScreenSpaceOverlay:
-                        if (!this._canvas || !this._canvas.overlay2d)
+                        if (!this._overlay2d)
                             return;
                         var scene_1 = this.gameObject.getScene();
-                        scene_1.addScreenSpaceOverlay(this._canvas.overlay2d);
+                        scene_1.addScreenSpaceOverlay(this._overlay2d);
                         break;
                 }
             };
@@ -11420,9 +11422,8 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("reference"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.canvas])
-            ], canvascontainer.prototype, "canvas", null);
+                __metadata("design:type", framework.overlay2D)
+            ], canvascontainer.prototype, "_overlay2d", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object),
@@ -14059,6 +14060,7 @@ var gd3d;
                 this.loopCount = 0;
                 this.allTime = 0;
                 this.renderActive = false;
+                this.mvpMat = new gd3d.math.matrix();
                 this.totalTime = 0;
                 this.totalFrame = 0;
                 this.active = false;
@@ -14149,6 +14151,7 @@ var gd3d;
                 this._renderCamera = camera;
                 var curCount = 0;
                 context.updateModel(this.gameObject.transform);
+                gd3d.math.matrixClone(context.matrixModelViewProject, this.mvpMat);
                 for (var i = 0; i < this.renderBatch.length; i++) {
                     this.renderBatch[i].render(context, assetmgr, camera, Effqueue + curCount);
                     curCount += this.renderBatch[i].getElementCount();
@@ -15111,6 +15114,7 @@ var gd3d;
                 return Math.floor(maxrate * maxlife + burstCount + 1);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
+                gd3d.math.matrixMultiply(this.effect.mvpMat, gd3d.math.pool.identityMat, context.matrixModelViewProject);
                 this.mat.setQueue(Effqueue);
                 this.curIndexCount = 0;
                 this.curVertexcount = 0;
@@ -15688,6 +15692,8 @@ var gd3d;
                 this.noBatch = false;
                 this.mat = new gd3d.math.matrix();
                 this.defST = new gd3d.math.vector4(1, 1, 0, 0);
+                this.temptColorv4 = new gd3d.math.vector4();
+                this.uploadData = false;
                 this.type = framework.F14TypeEnum.SingleMeshType;
                 this.effect = effect;
                 this.ElementMat = mat;
@@ -15697,10 +15703,12 @@ var gd3d;
                 if (this.meshlist.length == 1) {
                     this.noBatch = true;
                     this.mesh.glMesh = new gd3d.render.glMesh();
-                    this.dataForVbo = this.meshlist[0].dataforvbo;
-                    this.dataForEbo = this.meshlist[0].dataforebo;
+                    this.dataForVbo = this.meshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
+                    this.dataForEbo = this.meshlist[0].baseddata.mesh.data.genIndexDataArray();
                     this.mesh.glMesh.initBuffer(this.effect.webgl, this.effect.VF, this.meshlist[0].baseddata.mesh.data.pos.length, gd3d.render.MeshTypeEnum.Static);
+                    this.mesh.glMesh.uploadVertexData(this.effect.webgl, this.dataForVbo);
                     this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
+                    this.mesh.glMesh.uploadIndexData(this.effect.webgl, 0, this.dataForEbo);
                     this.mesh.submesh = [];
                     {
                         var sm = new framework.subMeshInfo();
@@ -15763,7 +15771,25 @@ var gd3d;
                 if (this.activemeshlist.length < 1)
                     return;
                 this.ElementMat.setQueue(Effqueue);
-                {
+                if (this.noBatch) {
+                    gd3d.math.matrixMultiply(this.effect.mvpMat, this.activemeshlist[0].targetMat, context.matrixModelViewProject);
+                    if (!this.uploadData) {
+                        this.dataForVbo = this.activemeshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
+                        this.dataForEbo = this.activemeshlist[0].baseddata.mesh.data.genIndexDataArray();
+                        this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
+                        this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
+                        this.mesh.submesh[0].size = this.dataForEbo.length;
+                    }
+                    this.temptColorv4.x = this.activemeshlist[0].color.r;
+                    this.temptColorv4.y = this.activemeshlist[0].color.g;
+                    this.temptColorv4.z = this.activemeshlist[0].color.b;
+                    this.temptColorv4.w = this.activemeshlist[0].color.a;
+                    this.ElementMat.setVector4("_Main_Color", this.temptColorv4);
+                    this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
+                    this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
+                }
+                else {
+                    gd3d.math.matrixMultiply(this.effect.mvpMat, gd3d.math.pool.identityMat, context.matrixModelViewProject);
                     this.curIndexCount = 0;
                     this.curVertexcount = 0;
                     this.curRealVboCount = 0;
@@ -15774,6 +15800,7 @@ var gd3d;
                     this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
                     this.mesh.submesh[0].size = this.curIndexCount;
                     this.ElementMat.setVector4("_Main_Color", new gd3d.math.vector4(1, 1, 1, 1));
+                    this.ElementMat.setVector4("_Main_Tex_ST", new gd3d.math.vector4(1, 1, 0, 0));
                     this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
                 }
             };
@@ -17728,6 +17755,9 @@ var gd3d;
                         _newInstance = gd3d.reflect.createInstance(document["__gdmeta__"][type], null);
                         instanceObj.rootNode = _newInstance;
                         _newInstance.canvas = instanceObj;
+                    }
+                    else if (type == "canvas" && key == "canvas" && gd3d.reflect.getClassName(instanceObj) == "overlay2d") {
+                        instanceObj;
                     }
                     else {
                         _newInstance = gd3d.reflect.createInstance(document["__gdmeta__"][type], null);
@@ -25840,6 +25870,7 @@ var gd3d;
                 if (this._overlay2d.indexOf(overlay) != -1)
                     return;
                 this._overlay2d.push(overlay);
+                this.sortOverLays(this._overlay2d);
             };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
@@ -25890,26 +25921,38 @@ var gd3d;
                 }
                 if (!this._overlay2d || this._overlay2d.length < 1)
                     return;
-                var _loop_1 = function () {
-                    var cam = this_1.renderCameras[i];
-                    var contx = this_1.renderContext[i];
-                    if (!cam || !contx)
-                        return { value: void 0 };
-                    if (this_1._overlay2d) {
-                        this_1._overlay2d.forEach(function (overlay) {
-                            if (overlay) {
-                                overlay.start(cam);
-                                overlay.update(delta);
-                                overlay.render(contx, _this.assetmgr, cam);
-                            }
-                        });
+                var targetcamera = this.mainCamera;
+                targetcamera = this.renderCameras[1];
+                if (!this._overlay2d || !targetcamera)
+                    return;
+                var mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                if (mainCamIdx == -1) {
+                    var cname = targetcamera.gameObject.getName();
+                    var oktag = false;
+                    for (var i = 0; i < this.renderCameras.length; i++) {
+                        var cam = this.renderCameras[i];
+                        if (cam && cam.gameObject.getName() == cname) {
+                            targetcamera = this.mainCamera = cam;
+                            oktag = true;
+                            break;
+                        }
                     }
-                };
-                var this_1 = this;
-                for (var i = 0; i < this.renderCameras.length; i++) {
-                    var state_2 = _loop_1();
-                    if (typeof state_2 === "object")
-                        return state_2.value;
+                    if (!oktag) {
+                        this._mainCamera = null;
+                        targetcamera = this.mainCamera;
+                    }
+                }
+                mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                if (!targetcamera)
+                    return;
+                if (this._overlay2d) {
+                    this._overlay2d.forEach(function (overlay) {
+                        if (overlay) {
+                            overlay.start(targetcamera);
+                            overlay.update(delta);
+                            overlay.render(_this.renderContext[mainCamIdx], _this.assetmgr, targetcamera);
+                        }
+                    });
                 }
             };
             scene.prototype._renderCamera = function (camindex) {
@@ -28568,6 +28611,7 @@ var gd3d;
             pool.unused_vector2 = [];
             pool.unused_matrix3x2 = [];
             pool.unused_matrix = [];
+            pool.identityMat = new math.matrix();
             pool.unused_quaternion = [];
             return pool;
         }());

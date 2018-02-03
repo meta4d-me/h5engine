@@ -22,7 +22,6 @@ namespace gd3d.framework
         constructor()
         {
             this.canvas = new canvas();
-            this.canvas.overlay2d = this;
             sceneMgr.app.markNotify(this.canvas.getRoot(), NotifyType.AddChild);
         }
 

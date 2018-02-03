@@ -22,7 +22,6 @@ namespace gd3d.framework
          */
         gameObject: gameObject;
         
-        private _canvas:canvas;
         /**
          * @public
          * @language zh_CN
@@ -30,29 +29,34 @@ namespace gd3d.framework
          * UI canvas 
          * @version egret-gd3d 1.0
          */
-        @reflect.Field("reference")
         get canvas(){
-            return this._canvas;
+            if(this._overlay2d && this._overlay2d.canvas) 
+                return this._overlay2d.canvas;
         }
-        set canvas(canv:canvas){
-            this._canvas = canv;
+
+        //overlay2d
+        @reflect.Field("reference")
+        private _overlay2d:overlay2D;
+        setOverLay(lay:overlay2D){
+            this._overlay2d = lay;
             this.canvasInit();
-        }
+        }        
 
         //渲染排序
         get sortOrder(){
-            return this._canvas && this._canvas.overlay2d ? this._canvas.overlay2d.sortOrder: 0;         
+            return this._overlay2d ? this._overlay2d.sortOrder: 0;         
         }
         set sortOrder(order:number){
-            if(this._canvas && this._canvas.overlay2d)
-                this._canvas.overlay2d.sortOrder = order;
+            if(this._overlay2d)
+                this._overlay2d.sortOrder = order;
         }
 
         private isCanvasinit = false;
         private canvasInit(){
             if(!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene) return; 
-            this._canvas.scene = this.gameObject.transform.scene;
-            this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
+            if(!this._overlay2d || !this._overlay2d.canvas) return;
+            this._overlay2d.canvas.scene = this.gameObject.transform.scene;
+            this._overlay2d.canvas.assetmgr = this._overlay2d.canvas.scene.app.getAssetMgr();
             this.isCanvasinit = true;
         }
 
@@ -77,9 +81,9 @@ namespace gd3d.framework
         private styleToMode(){
             switch(this._renderMode){
                 case canvasRenderMode.ScreenSpaceOverlay:
-                    if(!this._canvas || !this._canvas.overlay2d) return;
+                    if(!this._overlay2d) return;
                     let scene =this.gameObject.getScene();
-                    scene.addScreenSpaceOverlay(this._canvas.overlay2d);
+                    scene.addScreenSpaceOverlay(this._overlay2d);
                 break;
             }
 

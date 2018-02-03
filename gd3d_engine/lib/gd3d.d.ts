@@ -201,7 +201,6 @@ declare namespace gd3d.framework {
     class canvas {
         constructor();
         is2dUI: boolean;
-        overlay2d: overlay2D;
         parentTrans: transform;
         batcher: batcher2D;
         webgl: WebGLRenderingContext;
@@ -1880,8 +1879,9 @@ declare namespace gd3d.framework {
     class canvascontainer implements INodeComponent {
         constructor();
         gameObject: gameObject;
-        private _canvas;
-        canvas: canvas;
+        readonly canvas: canvas;
+        private _overlay2d;
+        setOverLay(lay: overlay2D): void;
         sortOrder: number;
         private isCanvasinit;
         private canvasInit();
@@ -2359,6 +2359,7 @@ declare namespace gd3d.framework {
         private OnEndOnceLoop();
         private _renderCamera;
         readonly renderCamera: camera;
+        mvpMat: math.matrix;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue?: number): void;
         private totalTime;
         restartFrame: number;
@@ -2818,6 +2819,8 @@ declare namespace gd3d.framework {
         getElementCount(): number;
         private mat;
         private defST;
+        private temptColorv4;
+        private uploadData;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
         unRender(): void;
         dispose(): void;
@@ -5030,6 +5033,7 @@ declare namespace gd3d.math {
         private static unused_matrix;
         static new_matrix(): matrix;
         static clone_matrix(src: matrix): matrix;
+        static readonly identityMat: matrix;
         static delete_matrix(v: matrix): void;
         static collect_matrix(): void;
         private static unused_quaternion;

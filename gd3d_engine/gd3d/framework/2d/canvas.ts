@@ -33,16 +33,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         is2dUI: boolean = true;
-
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * overlay 容器对象
-         * @version egret-gd3d 1.0
-         */
-        overlay2d:overlay2D;
-
+        
         /**
          * @public
          * @language zh_CN
