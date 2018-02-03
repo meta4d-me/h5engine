@@ -68,6 +68,25 @@ declare class demo_ScreenSplit implements IState {
     splitline: HTMLDivElement;
     update(delta: number): void;
 }
+declare class dome_loadaniplayer implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    taskmgr: gd3d.framework.taskMgr;
+    role: gd3d.framework.transform;
+    assetmgr: gd3d.framework.assetMgr;
+    private roleName;
+    private weaponName;
+    private skillName;
+    private ani;
+    private loadShader(laststate, state);
+    private loadRole(laststate, state);
+    private loadSkill(name);
+    private loadWeapon(name);
+    private ctrlBtn(laststate, state);
+    private addCam(laststate, state);
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare namespace t {
     class light_d1 implements IState {
         app: gd3d.framework.application;

@@ -631,6 +631,148 @@ var demo_ScreenSplit = (function () {
     };
     return demo_ScreenSplit;
 }());
+var dome_loadaniplayer = (function () {
+    function dome_loadaniplayer() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.roleName = "pc2";
+        this.weaponName = "wp_ds_001";
+        this.skillName = "pc2_cskill1.FBAni.aniclip.bin";
+    }
+    dome_loadaniplayer.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    dome_loadaniplayer.prototype.loadRole = function (laststate, state) {
+        var _this = this;
+        var name = this.roleName;
+        this.app.getAssetMgr().load("res/prefabs/roles/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                var p = _this.assetmgr.getAssetByName(name + ".prefab.json");
+                _this.role = p.getCloneTrans();
+                _this.ani = _this.role.gameObject.getComponent("aniplayer");
+                _this.ani.autoplay = false;
+                _this.scene.addChild(_this.role);
+                _this.role.markDirty();
+                if (_this.weaponName) {
+                    _this.loadWeapon(_this.weaponName);
+                }
+                if (_this.skillName) {
+                    _this.loadSkill(_this.skillName);
+                }
+                state.finish = true;
+            }
+        });
+    };
+    dome_loadaniplayer.prototype.loadSkill = function (name) {
+        var _this = this;
+        this.assetmgr.load("res/prefabs/roles/" + this.roleName + "/Resources/" + name, gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                var skill = _this.assetmgr.getAssetByName(name);
+                var j = _this.ani.clipnames[name];
+                if (j != null) {
+                    _this.ani.clips[j] = skill;
+                }
+            }
+        });
+    };
+    dome_loadaniplayer.prototype.loadWeapon = function (name) {
+        var _this = this;
+        this.assetmgr.load("res/prefabs/weapons/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                var p = _this.assetmgr.getAssetByName(name + ".prefab.json");
+                var rhand = _this.role.find("Bip01 Prop1");
+                var lhand = _this.role.find("Bip01 Prop2");
+                if (rhand) {
+                    var weapon = p.getCloneTrans();
+                    rhand.addChild(weapon);
+                    weapon.localRotate = new gd3d.math.quaternion();
+                    weapon.localTranslate = new gd3d.math.vector3();
+                    weapon.localScale = new gd3d.math.vector3(1, 1, 1);
+                    weapon.markDirty();
+                }
+                if (lhand) {
+                    var weapon = p.getCloneTrans();
+                    lhand.addChild(weapon);
+                    weapon.localRotate = new gd3d.math.quaternion();
+                    weapon.localTranslate = new gd3d.math.vector3();
+                    weapon.localScale = new gd3d.math.vector3(1, 1, 1);
+                    weapon.markDirty();
+                }
+            }
+        });
+    };
+    dome_loadaniplayer.prototype.ctrlBtn = function (laststate, state) {
+        var _this = this;
+        var play = document.createElement("button");
+        var stop = document.createElement("button");
+        var playspeed = document.createElement("input");
+        play.value = "PLAY";
+        play.textContent = "PLAY";
+        stop.value = "STOP";
+        stop.textContent = "STOP";
+        play.style.position = stop.style.position = playspeed.style.position = "absolute";
+        play.style.height = stop.style.height = playspeed.style.height = "30px";
+        play.style.width = stop.style.width = playspeed.style.width = "100px";
+        play.style.left = stop.style.left = playspeed.style.left = "30px";
+        play.style.top = "50px";
+        stop.style.top = "85px";
+        playspeed.style.top = "120px";
+        playspeed.type = "text";
+        playspeed.value = "1.0";
+        var speed = 1.0;
+        playspeed.style.height;
+        playspeed.onchange = function () {
+            var num = parseFloat(playspeed.value);
+            if (isNaN(num)) {
+                playspeed.value = speed + "";
+            }
+            else {
+                speed = num;
+            }
+        };
+        play.onclick = function () {
+            _this.ani.stop();
+            _this.ani.play(_this.skillName, speed);
+        };
+        stop.onclick = function () {
+            _this.ani.stop();
+        };
+        this.app.container.appendChild(play);
+        this.app.container.appendChild(stop);
+        this.app.container.appendChild(playspeed);
+        state.finish = true;
+    };
+    dome_loadaniplayer.prototype.addCam = function (laststate, state) {
+        var objCam = new gd3d.framework.transform;
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        var camera = objCam.gameObject.addComponent("camera");
+        camera.near = 0.01;
+        camera.far = 2000;
+        camera.fov = Math.PI * 0.3;
+        camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+        objCam.localTranslate = new gd3d.math.vector3(5, 5, 5);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    dome_loadaniplayer.prototype.start = function (app) {
+        this.app = app;
+        this.scene = app.getScene();
+        this.assetmgr = app.getAssetMgr();
+        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.taskmgr.addTaskCall(this.loadRole.bind(this));
+        this.taskmgr.addTaskCall(this.ctrlBtn.bind(this));
+        this.taskmgr.addTaskCall(this.addCam.bind(this));
+    };
+    dome_loadaniplayer.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return dome_loadaniplayer;
+}());
 var t;
 (function (t) {
     var light_d1 = (function () {
@@ -985,6 +1127,7 @@ var main = (function () {
         this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
         this.addBtn("Collider碰撞", function () { return new test_pick_boxcollider(); });
         this.addBtn("SSSSS", function () { return new test_sssss(); });
+        this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;

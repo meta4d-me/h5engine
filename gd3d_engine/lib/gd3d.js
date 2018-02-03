@@ -25919,7 +25919,6 @@ var gd3d;
                 if (!this._overlay2d || this._overlay2d.length < 1)
                     return;
                 var targetcamera = this.mainCamera;
-                targetcamera = this.renderCameras[1];
                 if (!this._overlay2d || !targetcamera)
                     return;
                 var mainCamIdx = this.renderCameras.indexOf(targetcamera);
