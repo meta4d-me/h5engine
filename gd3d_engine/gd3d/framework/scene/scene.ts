@@ -195,7 +195,6 @@ namespace gd3d.framework
             if(!this._overlay2d || this._overlay2d.length < 1) return;
 
             let targetcamera = this.mainCamera;
-            targetcamera = this.renderCameras[1];
             if(!this._overlay2d || !targetcamera) return;
              let mainCamIdx = this.renderCameras.indexOf(targetcamera);
              if(mainCamIdx == -1 ){
