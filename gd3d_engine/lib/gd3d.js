@@ -17756,9 +17756,6 @@ var gd3d;
                         instanceObj.rootNode = _newInstance;
                         _newInstance.canvas = instanceObj;
                     }
-                    else if (type == "canvas" && key == "canvas" && gd3d.reflect.getClassName(instanceObj) == "overlay2d") {
-                        instanceObj;
-                    }
                     else {
                         _newInstance = gd3d.reflect.createInstance(document["__gdmeta__"][type], null);
                         if (_isArray)
