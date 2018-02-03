@@ -25913,9 +25913,6 @@ var gd3d;
             };
             scene.prototype.updateSceneOverLay = function (delta) {
                 var _this = this;
-                if (this.name == "testhe") {
-                    this.name;
-                }
                 if (!this._overlay2d || this._overlay2d.length < 1)
                     return;
                 var targetcamera = this.mainCamera;

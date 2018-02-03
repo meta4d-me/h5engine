@@ -188,10 +188,6 @@ namespace gd3d.framework
 
         //更新和渲染 scene overlayers
         private updateSceneOverLay(delta:number){
-            //if(1) return;
-            if(this.name == "testhe"){
-                this.name;
-            }
             if(!this._overlay2d || this._overlay2d.length < 1) return;
 
             let targetcamera = this.mainCamera;
