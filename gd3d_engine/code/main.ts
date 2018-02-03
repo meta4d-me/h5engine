@@ -96,6 +96,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("导航RVO_防挤Demo", () => new demo_navigaionRVO());
         this.addBtn("Collider碰撞", () => new test_pick_boxcollider());
         this.addBtn("SSSSS", () => new test_sssss());
+        this.addBtn("dome_加载播放动画",()=>new dome_loadaniplayer());
 
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
