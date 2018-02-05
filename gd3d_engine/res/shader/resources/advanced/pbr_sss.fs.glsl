@@ -175,7 +175,6 @@ void main () {
     vec3 finalColor = vec3(0.0);
     // finalColor += lightBRDF(vec3(-50.0, 50.0, 80.0), c) * vec3(0.7, 0.5, 0.2);
     finalColor += lightBRDF(vec3(-10.0, 10.0, -10.0), c) * vec3(1.0, 1.0, 1.0);
-    finalColor += lightBRDF(vec3(-10.0, 10.0, -10.0), c) * vec3(1.0, 1.0, 1.0);
     finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * 0.6; // IBL+PBR
     finalColor += translucency(vec3(-10.0, 10.0, -10.0), c) * vec3(1.0, 1.0, 1.0);
 
