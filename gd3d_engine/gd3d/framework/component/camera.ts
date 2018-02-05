@@ -87,6 +87,7 @@ namespace gd3d.framework
     export interface IOverLay
     {
         init: boolean;
+        sortOrder:number;
         start(camera: camera);
         render(context: renderContext, assetmgr: assetMgr, camera: camera);
         update(delta: number);

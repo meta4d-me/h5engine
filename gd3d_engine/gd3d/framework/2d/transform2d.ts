@@ -425,8 +425,9 @@ namespace gd3d.framework
             if (i >= 0)
             {
                 this.children.splice(i, 1);
+                node.parent = null;
+                sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
             }
-            sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
         }
 
         /**

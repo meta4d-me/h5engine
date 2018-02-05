@@ -1361,8 +1361,8 @@ var gd3d;
             function overlay2D() {
                 this.init = false;
                 this.autoAsp = true;
+                this.sortOrder = 0;
                 this.canvas = new framework.canvas();
-                this.canvas.overlay2d = this;
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
             overlay2D.prototype.start = function (camera) {
@@ -1500,6 +1500,10 @@ var gd3d;
                 gd3d.reflect.Field("boolean"),
                 __metadata("design:type", Boolean)
             ], overlay2D.prototype, "autoAsp", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], overlay2D.prototype, "sortOrder", void 0);
             overlay2D = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [])
@@ -2048,8 +2052,9 @@ var gd3d;
                 var i = this.children.indexOf(node);
                 if (i >= 0) {
                     this.children.splice(i, 1);
+                    node.parent = null;
+                    framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
                 }
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
             };
             transform2D.prototype.removeAllChild = function () {
                 while (this.children.length > 0) {
@@ -11347,15 +11352,28 @@ var gd3d;
         var canvascontainer = (function () {
             function canvascontainer() {
                 this.isCanvasinit = false;
+                this._lastMode = canvasRenderMode.ScreenSpaceOverlay;
                 this._renderMode = canvasRenderMode.ScreenSpaceOverlay;
             }
             Object.defineProperty(canvascontainer.prototype, "canvas", {
                 get: function () {
-                    return this._canvas;
+                    if (this._overlay2d && this._overlay2d.canvas)
+                        return this._overlay2d.canvas;
                 },
-                set: function (canv) {
-                    this._canvas = canv;
-                    this.canvasInit();
+                enumerable: true,
+                configurable: true
+            });
+            canvascontainer.prototype.setOverLay = function (lay) {
+                this._overlay2d = lay;
+                this.canvasInit();
+            };
+            Object.defineProperty(canvascontainer.prototype, "sortOrder", {
+                get: function () {
+                    return this._overlay2d ? this._overlay2d.sortOrder : 0;
+                },
+                set: function (order) {
+                    if (this._overlay2d)
+                        this._overlay2d.sortOrder = order;
                 },
                 enumerable: true,
                 configurable: true
@@ -11363,17 +11381,31 @@ var gd3d;
             canvascontainer.prototype.canvasInit = function () {
                 if (!this.gameObject || !this.gameObject.transform || !this.gameObject.transform.scene)
                     return;
-                this._canvas.scene = this.gameObject.transform.scene;
-                this._canvas.assetmgr = this._canvas.scene.app.getAssetMgr();
+                if (!this._overlay2d || !this._overlay2d.canvas)
+                    return;
+                this._overlay2d.canvas.scene = this.gameObject.transform.scene;
+                this._overlay2d.canvas.assetmgr = this._overlay2d.canvas.scene.app.getAssetMgr();
                 this.isCanvasinit = true;
             };
+            Object.defineProperty(canvascontainer.prototype, "renderMode", {
+                get: function () { return this._renderMode; },
+                set: function (mode) {
+                    if (this._renderMode == mode)
+                        return;
+                    this._lastMode = this._renderMode;
+                    this._renderMode = mode;
+                    this.styleToMode();
+                },
+                enumerable: true,
+                configurable: true
+            });
             canvascontainer.prototype.styleToMode = function () {
                 switch (this._renderMode) {
                     case canvasRenderMode.ScreenSpaceOverlay:
-                        if (!this._canvas || !this._canvas.overlay2d)
+                        if (!this._overlay2d)
                             return;
                         var scene_1 = this.gameObject.getScene();
-                        scene_1.addScreenSpaceOverlay(this._canvas.overlay2d);
+                        scene_1.addScreenSpaceOverlay(this._overlay2d);
                         break;
                 }
             };
@@ -11390,13 +11422,13 @@ var gd3d;
             };
             __decorate([
                 gd3d.reflect.Field("reference"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.canvas])
-            ], canvascontainer.prototype, "canvas", null);
+                __metadata("design:type", framework.overlay2D)
+            ], canvascontainer.prototype, "_overlay2d", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], canvascontainer.prototype, "_renderMode", void 0);
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], canvascontainer.prototype, "renderMode", null);
             canvascontainer = __decorate([
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
@@ -14028,6 +14060,7 @@ var gd3d;
                 this.loopCount = 0;
                 this.allTime = 0;
                 this.renderActive = false;
+                this.mvpMat = new gd3d.math.matrix();
                 this.totalTime = 0;
                 this.totalFrame = 0;
                 this.active = false;
@@ -14118,6 +14151,7 @@ var gd3d;
                 this._renderCamera = camera;
                 var curCount = 0;
                 context.updateModel(this.gameObject.transform);
+                gd3d.math.matrixClone(context.matrixModelViewProject, this.mvpMat);
                 for (var i = 0; i < this.renderBatch.length; i++) {
                     this.renderBatch[i].render(context, assetmgr, camera, Effqueue + curCount);
                     curCount += this.renderBatch[i].getElementCount();
@@ -15080,6 +15114,7 @@ var gd3d;
                 return Math.floor(maxrate * maxlife + burstCount + 1);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
+                gd3d.math.matrixMultiply(this.effect.mvpMat, gd3d.math.pool.identityMat, context.matrixModelViewProject);
                 this.mat.setQueue(Effqueue);
                 this.curIndexCount = 0;
                 this.curVertexcount = 0;
@@ -15657,6 +15692,8 @@ var gd3d;
                 this.noBatch = false;
                 this.mat = new gd3d.math.matrix();
                 this.defST = new gd3d.math.vector4(1, 1, 0, 0);
+                this.temptColorv4 = new gd3d.math.vector4();
+                this.uploadData = false;
                 this.type = framework.F14TypeEnum.SingleMeshType;
                 this.effect = effect;
                 this.ElementMat = mat;
@@ -15666,10 +15703,12 @@ var gd3d;
                 if (this.meshlist.length == 1) {
                     this.noBatch = true;
                     this.mesh.glMesh = new gd3d.render.glMesh();
-                    this.dataForVbo = this.meshlist[0].dataforvbo;
-                    this.dataForEbo = this.meshlist[0].dataforebo;
+                    this.dataForVbo = this.meshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
+                    this.dataForEbo = this.meshlist[0].baseddata.mesh.data.genIndexDataArray();
                     this.mesh.glMesh.initBuffer(this.effect.webgl, this.effect.VF, this.meshlist[0].baseddata.mesh.data.pos.length, gd3d.render.MeshTypeEnum.Static);
+                    this.mesh.glMesh.uploadVertexData(this.effect.webgl, this.dataForVbo);
                     this.mesh.glMesh.addIndex(this.effect.webgl, this.dataForEbo.length);
+                    this.mesh.glMesh.uploadIndexData(this.effect.webgl, 0, this.dataForEbo);
                     this.mesh.submesh = [];
                     {
                         var sm = new framework.subMeshInfo();
@@ -15732,7 +15771,25 @@ var gd3d;
                 if (this.activemeshlist.length < 1)
                     return;
                 this.ElementMat.setQueue(Effqueue);
-                {
+                if (this.noBatch) {
+                    gd3d.math.matrixMultiply(this.effect.mvpMat, this.activemeshlist[0].targetMat, context.matrixModelViewProject);
+                    if (!this.uploadData) {
+                        this.dataForVbo = this.activemeshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
+                        this.dataForEbo = this.activemeshlist[0].baseddata.mesh.data.genIndexDataArray();
+                        this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
+                        this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
+                        this.mesh.submesh[0].size = this.dataForEbo.length;
+                    }
+                    this.temptColorv4.x = this.activemeshlist[0].color.r;
+                    this.temptColorv4.y = this.activemeshlist[0].color.g;
+                    this.temptColorv4.z = this.activemeshlist[0].color.b;
+                    this.temptColorv4.w = this.activemeshlist[0].color.a;
+                    this.ElementMat.setVector4("_Main_Color", this.temptColorv4);
+                    this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
+                    this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
+                }
+                else {
+                    gd3d.math.matrixMultiply(this.effect.mvpMat, gd3d.math.pool.identityMat, context.matrixModelViewProject);
                     this.curIndexCount = 0;
                     this.curVertexcount = 0;
                     this.curRealVboCount = 0;
@@ -15743,6 +15800,7 @@ var gd3d;
                     this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
                     this.mesh.submesh[0].size = this.curIndexCount;
                     this.ElementMat.setVector4("_Main_Color", new gd3d.math.vector4(1, 1, 1, 1));
+                    this.ElementMat.setVector4("_Main_Tex_ST", new gd3d.math.vector4(1, 1, 0, 0));
                     this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
                 }
             };
@@ -25809,6 +25867,7 @@ var gd3d;
                 if (this._overlay2d.indexOf(overlay) != -1)
                     return;
                 this._overlay2d.push(overlay);
+                this.sortOverLays(this._overlay2d);
             };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
@@ -25821,7 +25880,6 @@ var gd3d;
                     for (var i in this.renderCameras) {
                         if (this.renderCameras[i] == _camera) {
                             this._mainCamera = _camera;
-                            console.error("camera swtich :" + _camera.gameObject.getName());
                         }
                     }
                 },
@@ -25855,9 +25913,8 @@ var gd3d;
             };
             scene.prototype.updateSceneOverLay = function (delta) {
                 var _this = this;
-                if (this.name == "testhe") {
-                    this.name;
-                }
+                if (!this._overlay2d || this._overlay2d.length < 1)
+                    return;
                 var targetcamera = this.mainCamera;
                 if (!this._overlay2d || !targetcamera)
                     return;
@@ -25901,6 +25958,7 @@ var gd3d;
                     cam.renderScene(this, context);
                     this.RealCameraNumber++;
                     var overLays = cam.getOverLays();
+                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++) {
                         if (cam.CullingMask & framework.CullingMask.ui) {
                             overLays[i].render(context, this.assetmgr, cam);
@@ -25915,6 +25973,7 @@ var gd3d;
                     this.RealCameraNumber++;
                     if (this.app.be2dstate) {
                         var overLays = cam.getOverLays();
+                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
@@ -25925,6 +25984,7 @@ var gd3d;
                 if (!this.app.bePlay && this.app.be2dstate) {
                     if (camindex == this.app.curcameraindex) {
                         var overLays = cam.getOverLays();
+                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
@@ -25932,6 +25992,13 @@ var gd3d;
                         }
                     }
                 }
+            };
+            scene.prototype.sortOverLays = function (lays) {
+                if (!lays || lays.length < 1)
+                    return;
+                lays.sort(function (a, b) {
+                    return a.sortOrder - b.sortOrder;
+                });
             };
             scene.prototype.updateScene = function (node, delta) {
                 if (this.app.bePlay) {
@@ -28537,6 +28604,7 @@ var gd3d;
             pool.unused_vector2 = [];
             pool.unused_matrix3x2 = [];
             pool.unused_matrix = [];
+            pool.identityMat = new math.matrix();
             pool.unused_quaternion = [];
             return pool;
         }());

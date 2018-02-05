@@ -22,7 +22,6 @@ namespace gd3d.framework
         constructor()
         {
             this.canvas = new canvas();
-            this.canvas.overlay2d = this;
             sceneMgr.app.markNotify(this.canvas.getRoot(), NotifyType.AddChild);
         }
 
@@ -66,6 +65,16 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("boolean")
         autoAsp: boolean = true;
+
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染排序
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("number")
+        sortOrder:number = 0;
 
         /**
          * @public
