@@ -201,7 +201,6 @@ declare namespace gd3d.framework {
     class canvas {
         constructor();
         is2dUI: boolean;
-        overlay2d: overlay2D;
         parentTrans: transform;
         batcher: batcher2D;
         webgl: WebGLRenderingContext;
@@ -307,6 +306,7 @@ declare namespace gd3d.framework {
         start(camera: camera): void;
         canvas: canvas;
         autoAsp: boolean;
+        sortOrder: number;
         addChild(node: transform2D): void;
         removeChild(node: transform2D): void;
         getChildren(): transform2D[];
@@ -1810,6 +1810,7 @@ declare namespace gd3d.framework {
     }
     interface IOverLay {
         init: boolean;
+        sortOrder: number;
         start(camera: camera): any;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
         update(delta: number): any;
@@ -1878,11 +1879,15 @@ declare namespace gd3d.framework {
     class canvascontainer implements INodeComponent {
         constructor();
         gameObject: gameObject;
-        private _canvas;
-        canvas: canvas;
+        readonly canvas: canvas;
+        private _overlay2d;
+        setOverLay(lay: overlay2D): void;
+        sortOrder: number;
         private isCanvasinit;
         private canvasInit();
+        private _lastMode;
         private _renderMode;
+        renderMode: canvasRenderMode;
         private styleToMode();
         start(): void;
         update(delta: number): void;
@@ -2354,6 +2359,7 @@ declare namespace gd3d.framework {
         private OnEndOnceLoop();
         private _renderCamera;
         readonly renderCamera: camera;
+        mvpMat: math.matrix;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue?: number): void;
         private totalTime;
         restartFrame: number;
@@ -2813,6 +2819,8 @@ declare namespace gd3d.framework {
         getElementCount(): number;
         private mat;
         private defST;
+        private temptColorv4;
+        private uploadData;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
         unRender(): void;
         dispose(): void;
@@ -4495,6 +4503,7 @@ declare namespace gd3d.framework {
         private updateSceneOverLay(delta);
         private RealCameraNumber;
         private _renderCamera(camindex);
+        private sortOverLays(lays);
         private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);
@@ -5024,6 +5033,7 @@ declare namespace gd3d.math {
         private static unused_matrix;
         static new_matrix(): matrix;
         static clone_matrix(src: matrix): matrix;
+        static readonly identityMat: matrix;
         static delete_matrix(v: matrix): void;
         static collect_matrix(): void;
         private static unused_quaternion;

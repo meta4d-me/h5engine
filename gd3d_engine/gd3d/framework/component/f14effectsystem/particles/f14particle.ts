@@ -113,7 +113,8 @@ namespace gd3d.framework
             if(data.rendermodel == RenderModelEnum.StretchedBillBoard)
             {
                 this.emissionMatToWorld=this.element.getWorldMatrix();
-                math.matrixTransformNormal(this.speedDir,this.emissionMatToWorld,this.worldspeeddir);                
+                math.matrixTransformNormal(this.speedDir,this.emissionMatToWorld,this.worldspeeddir);
+                gd3d.math.vec3Normalize(this.worldspeeddir,this.worldspeeddir);           
                 math.matrixTransformVector3(this.StartPos,this.emissionMatToWorld,this.worldStartPos);
             }
             // Vector3 worldStartPos = this.getElementMatToWorld() * this.StartPos;
