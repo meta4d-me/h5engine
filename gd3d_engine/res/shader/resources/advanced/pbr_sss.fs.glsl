@@ -29,6 +29,7 @@ uniform sampler2D   uv_AO;
 uniform vec4        CustomBasecolor;
 uniform float       CustomMetallic;
 uniform float       CustomRoughness;
+uniform sampler2D   uv_Thickness;
 
 #define TEX_FORMAT_METALLIC     rgb
 #define TEX_FORMAT_ROUGHNESS    a
@@ -146,6 +147,22 @@ vec3 lightBRDF(vec3 L, st_core c) {
     return max(vec3(0.0), diffuse + specular);
 }
 
+vec3 T(float s) {
+  return vec3(0.233, 0.455, 0.649) * exp(-s * s / 0.0064) +
+         vec3(0.1,   0.336, 0.344) * exp(-s * s / 0.0484) +
+         vec3(0.118, 0.198, 0.0)   * exp(-s * s / 0.187)  +
+         vec3(0.113, 0.007, 0.007) * exp(-s * s / 0.567)  +
+         vec3(0.358, 0.004, 0.0)   * exp(-s * s / 1.99)   +
+         vec3(0.078, 0.0,   0.0)   * exp(-s * s / 7.41);
+}
+vec3 translucency(vec3 l, st_core c) {
+    float thick = 1.0 -texture2D(uv_Thickness, xlv_TEXCOORD0).r;
+    vec3 vLTLight = normalize(l);
+    float fLTDot = pow(max(dot(c.N, -vLTLight), 0.4), 2.0) * 1.0;
+    vec3 fLT = 1.0 * (fLTDot + 0.0) * thick * T(thick);
+    return fLT;
+}
+
 void main () {
     st_core c = init();
 
@@ -156,9 +173,10 @@ void main () {
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g) * vec3(0.3, 0.4, 0.8);
 
     vec3 finalColor = vec3(0.0);
-    finalColor += lightBRDF(vec3(-50.0, 50.0, 80.0), c) * vec3(0.7, 0.5, 0.2);
-    finalColor += lightBRDF(vec3(-20.0, 20.0, -40.0), c) * vec3(1.0, 1.0, 1.0);
+    // finalColor += lightBRDF(vec3(-50.0, 50.0, 80.0), c) * vec3(0.7, 0.5, 0.2);
+    finalColor += lightBRDF(vec3(-10.0, 10.0, -10.0), c) * vec3(1.0, 1.0, 1.0);
     finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * 0.6; // IBL+PBR
+    finalColor += translucency(vec3(-10.0, 10.0, -10.0), c) * vec3(1.0, 1.0, 1.0);
 
     // gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
     // gl_FragColor = texture2D(uv_Basecolor, xlv_TEXCOORD0);

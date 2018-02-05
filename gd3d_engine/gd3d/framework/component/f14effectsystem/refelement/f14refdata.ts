@@ -4,28 +4,19 @@ namespace gd3d.framework
     {
 
         public beLoop:boolean = false;
+        public refdataName:string;
         public refData:F14EffectData;
-    
-        public F14RefBaseData(data:F14EffectData=null)
-        {
-            this.refData = data;
-            //if (data==null)
-            //{
-            //    this.refData = F14Util.ins.getDefEffectData();
-            //}else
-            //{
-                
-            //}
-        }
+        
+        public localPos:math.vector3=new math.vector3();
+        public localEuler:math.vector3=new math.vector3();
+        public localScale:math.vector3=new math.vector3(1,1,1);
 
         parse(json: any, assetmgr: assetMgr, assetbundle: string) {
             this.beLoop=json.beLoop;
-            if(json.refData)
-            {
-                let data=new F14EffectData();
-                data.parsejson(json.refData,assetmgr,assetbundle);
-                this.refData=data;
-            }
+            this.refdataName=json.F14EffectData;
+            gd3d.math.vec3FormJson(json.localPos,this.localPos);
+            gd3d.math.vec3FormJson(json.localEuler,this.localEuler);
+            gd3d.math.vec3FormJson(json.localScale,this.localScale);
         }
 
     }

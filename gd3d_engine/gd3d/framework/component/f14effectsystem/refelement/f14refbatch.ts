@@ -28,7 +28,7 @@ namespace gd3d.framework
             }
             else
             {
-    
+                //this.element.RefEffect.unRender();
             }
         }
         dispose()

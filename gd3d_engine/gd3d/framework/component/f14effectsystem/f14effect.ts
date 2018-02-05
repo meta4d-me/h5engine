@@ -8,7 +8,9 @@ namespace gd3d.framework
         layer: RenderLayerEnum=RenderLayerEnum.Transparent;
         renderLayer: CullingMask=CullingMask.default;
         queue: number=0;
-        start() {}
+        start() {
+
+        }
         gameObject: gameObject;
         remove() {}
         
@@ -20,6 +22,7 @@ namespace gd3d.framework
         public webgl:WebGLRenderingContext;
 
         private _f14eff: f14eff;
+
         /**
          * f14eff 资源
          * @private
@@ -71,27 +74,55 @@ namespace gd3d.framework
                 } 
             }
         }
-
+        /**
+         * ref effect 增加transform层控制
+         */
+        // refRoot:math.matrix=new math.matrix();
+        // public setBatchRootMat(pos:math.vector3,euler:math.vector3,scale:math.vector3)
+        // {
+        //     let temtrot=gd3d.math.pool.new_quaternion();
+        //     math.quatFromEulerAngles(euler.x,euler.y,euler.z,temtrot);
+        //     math.matrixMakeTransformRTS(pos,scale,temtrot,this.refRoot);
+        //     gd3d.math.pool.delete_quaternion(temtrot);
+        // }
+        get root():transform
+        {
+            // if(this._root!=null&&this._root.parent==null)
+            // {
+            //     this._root.parent=this.gameObject.transform;
+            // }
+            return this._root||this.gameObject.transform;
+        }
+        _root:transform;
+        
         private elements:F14Element[] =[];
         public renderBatch:F14Basebatch[] =[];
 
         private loopCount:number=0;
         private allTime:number=0;
         private renderActive:boolean=false;
+        public beref:boolean=false;
         public update(deltaTime:number)
         {
-            this.renderActive=false;
-            if(!this.active) return;
-            if (this.data == null) return;
-            this.allTime+=deltaTime;
-            this.totalTime=this.allTime-this._delayTime;
-            if(this.totalTime<=0) return;
+            if (this.data == null||this.playState==PlayStateEnum.beReady)
+            {
+                this.renderActive=false;
+                return;
+            }
+            if(this.playState==PlayStateEnum.play)
+            {
+                this.allTime+=deltaTime*this.playRate;
+                this.totalTime=this.allTime-this._delayTime;
+                if(this.totalTime<=0)
+                {
+                    this.renderActive=false;
+                    return;
+                }
+            }
             this.renderActive=true;//上面return了应该不再render 
             this.totalFrame=this.totalTime*this.fps;
             this.restartFrame = this.totalFrame % this.data.lifeTime;
             this.restartFrame=Math.floor(this.restartFrame);
-
-
             let newLoopCount=Math.floor(this.totalFrame/this.data.lifeTime);
             if(newLoopCount!=this.loopCount)
             {
@@ -126,23 +157,21 @@ namespace gd3d.framework
         public mvpMat:math.matrix=new math.matrix();
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number=0)
-        {
+        {         
             if(!this.renderActive) return;            
             this._renderCamera=camera;
             let curCount = 0;
-            context.updateModel(this.gameObject.transform);
+            context.updateModel(this.root);
             math.matrixClone(context.matrixModelViewProject,this.mvpMat);
             for (let i = 0; i < this.renderBatch.length; i++)
             {
                 this.renderBatch[i].render(context,assetmgr,camera,Effqueue+curCount);
                 curCount += this.renderBatch[i].getElementCount();
             }
-            
         }
         private totalTime:number=0;
         public restartFrame:number;
         totalFrame:number=0;
-
         private addF14layer(type:F14TypeEnum, layerdata:F14LayerData):F14Layer
         {
             if (type==F14TypeEnum.SingleMeshType)
@@ -195,11 +224,13 @@ namespace gd3d.framework
             {
                 let layer = new F14Layer(this,layerdata);
                 let element = new F14RefElement(this,layer);
+                let data=layerdata.elementdata as F14RefBaseData;
                 layer.element = element;
+                //element.RefEffect.setBatchRootMat(data.localPos,data.localEuler,data.localScale);
+
 
                 this.layers.push(layer);
                 this.elements.push(element);
-    
                 var refbath = new F14RefElementBatch(this,element);
                 this.renderBatch.push(refbath);
                 layer.batch = refbath;
@@ -223,26 +254,46 @@ namespace gd3d.framework
                 }
             }
             return totalcount;
-        }
-    
+        }    
         public dispose()
         {
 
         }
+        private playRate:number=1.0;
+        private playState:PlayStateEnum=PlayStateEnum.beReady;
         private active:boolean=false;
-        public play()
+        public play(PlayRate:number=1.0)
         {
-            if(this.active)
+            // if(this.active)
+            // {
+            //     this.reset();
+            // }
+            // this.active=true;
+            if(this.playState!=PlayStateEnum.beReady)
             {
                 this.reset();
             }
-            this.active=true;
+            this.playState=PlayStateEnum.play;
+            this.playRate=PlayRate;
         }
         public stop()
         {
-            this.active=false;
+            this.playState=PlayStateEnum.beReady;
             this.reset();
         }
+
+        private bePause:boolean=false;
+        public pause()
+        {
+            if(this.playState==PlayStateEnum.pause)
+            {
+                this.playState=PlayStateEnum.play;
+            }else
+            {
+                this.playState=PlayStateEnum.pause;
+            }
+        }
+        
         reset()
         {
             this.allTime=0;
@@ -255,5 +306,11 @@ namespace gd3d.framework
         clone() {
             
         }
+    }
+    export enum PlayStateEnum
+    {
+        play,
+        beReady,
+        pause
     }
 }

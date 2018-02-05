@@ -14064,12 +14064,17 @@ var gd3d;
                 this.loopCount = 0;
                 this.allTime = 0;
                 this.renderActive = false;
+                this.beref = false;
                 this.mvpMat = new gd3d.math.matrix();
                 this.totalTime = 0;
                 this.totalFrame = 0;
+                this.playRate = 1.0;
+                this.playState = PlayStateEnum.beReady;
                 this.active = false;
+                this.bePause = false;
             }
-            f14EffectSystem.prototype.start = function () { };
+            f14EffectSystem.prototype.start = function () {
+            };
             f14EffectSystem.prototype.remove = function () { };
             Object.defineProperty(f14EffectSystem.prototype, "f14eff", {
                 get: function () {
@@ -14108,16 +14113,26 @@ var gd3d;
                     }
                 }
             };
+            Object.defineProperty(f14EffectSystem.prototype, "root", {
+                get: function () {
+                    return this._root || this.gameObject.transform;
+                },
+                enumerable: true,
+                configurable: true
+            });
             f14EffectSystem.prototype.update = function (deltaTime) {
-                this.renderActive = false;
-                if (!this.active)
+                if (this.data == null || this.playState == PlayStateEnum.beReady) {
+                    this.renderActive = false;
                     return;
-                if (this.data == null)
-                    return;
-                this.allTime += deltaTime;
-                this.totalTime = this.allTime - this._delayTime;
-                if (this.totalTime <= 0)
-                    return;
+                }
+                if (this.playState == PlayStateEnum.play) {
+                    this.allTime += deltaTime * this.playRate;
+                    this.totalTime = this.allTime - this._delayTime;
+                    if (this.totalTime <= 0) {
+                        this.renderActive = false;
+                        return;
+                    }
+                }
                 this.renderActive = true;
                 this.totalFrame = this.totalTime * this.fps;
                 this.restartFrame = this.totalFrame % this.data.lifeTime;
@@ -14154,7 +14169,7 @@ var gd3d;
                     return;
                 this._renderCamera = camera;
                 var curCount = 0;
-                context.updateModel(this.gameObject.transform);
+                context.updateModel(this.root);
                 gd3d.math.matrixClone(context.matrixModelViewProject, this.mvpMat);
                 for (var i = 0; i < this.renderBatch.length; i++) {
                     this.renderBatch[i].render(context, assetmgr, camera, Effqueue + curCount);
@@ -14204,6 +14219,7 @@ var gd3d;
                 else {
                     var layer = new framework.F14Layer(this, layerdata);
                     var element = new framework.F14RefElement(this, layer);
+                    var data = layerdata.elementdata;
                     layer.element = element;
                     this.layers.push(layer);
                     this.elements.push(element);
@@ -14227,15 +14243,25 @@ var gd3d;
             };
             f14EffectSystem.prototype.dispose = function () {
             };
-            f14EffectSystem.prototype.play = function () {
-                if (this.active) {
+            f14EffectSystem.prototype.play = function (PlayRate) {
+                if (PlayRate === void 0) { PlayRate = 1.0; }
+                if (this.playState != PlayStateEnum.beReady) {
                     this.reset();
                 }
-                this.active = true;
+                this.playState = PlayStateEnum.play;
+                this.playRate = PlayRate;
             };
             f14EffectSystem.prototype.stop = function () {
-                this.active = false;
+                this.playState = PlayStateEnum.beReady;
                 this.reset();
+            };
+            f14EffectSystem.prototype.pause = function () {
+                if (this.playState == PlayStateEnum.pause) {
+                    this.playState = PlayStateEnum.play;
+                }
+                else {
+                    this.playState = PlayStateEnum.pause;
+                }
             };
             f14EffectSystem.prototype.reset = function () {
                 this.allTime = 0;
@@ -14263,6 +14289,12 @@ var gd3d;
             return f14EffectSystem;
         }());
         framework.f14EffectSystem = f14EffectSystem;
+        var PlayStateEnum;
+        (function (PlayStateEnum) {
+            PlayStateEnum[PlayStateEnum["play"] = 0] = "play";
+            PlayStateEnum[PlayStateEnum["beReady"] = 1] = "beReady";
+            PlayStateEnum[PlayStateEnum["pause"] = 2] = "pause";
+        })(PlayStateEnum = framework.PlayStateEnum || (framework.PlayStateEnum = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -14692,12 +14724,12 @@ var gd3d;
                 gd3d.math.matrixMakeTransformRTS(this.currentData.rotPosition, this.currentData.rotScale, this.localrot, this.localMatrix);
             };
             F14Emission.prototype.getWorldMatrix = function () {
-                var mat = this.effect.gameObject.transform.getWorldMatrix();
+                var mat = this.effect.root.getWorldMatrix();
                 gd3d.math.matrixMultiply(mat, this.localMatrix, this._worldMatrix);
                 return this._worldMatrix;
             };
             F14Emission.prototype.getWorldRotation = function () {
-                var rot = this.effect.gameObject.transform.getWorldRotate();
+                var rot = this.effect.root.getWorldRotate();
                 gd3d.math.quatMultiply(rot, this.localrot, this.worldRot);
                 return this.worldRot;
             };
@@ -15118,7 +15150,7 @@ var gd3d;
                 return Math.floor(maxrate * maxlife + burstCount + 1);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
-                gd3d.math.matrixMultiply(this.effect.mvpMat, gd3d.math.pool.identityMat, context.matrixModelViewProject);
+                gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
                 this.mat.setQueue(Effqueue);
                 this.curIndexCount = 0;
                 this.curVertexcount = 0;
@@ -15212,6 +15244,7 @@ var gd3d;
                 if (data.rendermodel == framework.RenderModelEnum.StretchedBillBoard) {
                     this.emissionMatToWorld = this.element.getWorldMatrix();
                     gd3d.math.matrixTransformNormal(this.speedDir, this.emissionMatToWorld, this.worldspeeddir);
+                    gd3d.math.vec3Normalize(this.worldspeeddir, this.worldspeeddir);
                     gd3d.math.matrixTransformVector3(this.StartPos, this.emissionMatToWorld, this.worldStartPos);
                 }
             };
@@ -15451,18 +15484,16 @@ var gd3d;
         var F14RefBaseData = (function () {
             function F14RefBaseData() {
                 this.beLoop = false;
+                this.localPos = new gd3d.math.vector3();
+                this.localEuler = new gd3d.math.vector3();
+                this.localScale = new gd3d.math.vector3(1, 1, 1);
             }
-            F14RefBaseData.prototype.F14RefBaseData = function (data) {
-                if (data === void 0) { data = null; }
-                this.refData = data;
-            };
             F14RefBaseData.prototype.parse = function (json, assetmgr, assetbundle) {
                 this.beLoop = json.beLoop;
-                if (json.refData) {
-                    var data = new framework.F14EffectData();
-                    data.parsejson(json.refData, assetmgr, assetbundle);
-                    this.refData = data;
-                }
+                this.refdataName = json.F14EffectData;
+                gd3d.math.vec3FormJson(json.localPos, this.localPos);
+                gd3d.math.vec3FormJson(json.localEuler, this.localEuler);
+                gd3d.math.vec3FormJson(json.localScale, this.localScale);
             };
             return F14RefBaseData;
         }());
@@ -15481,8 +15512,20 @@ var gd3d;
                 this.layer = layer;
                 this.refreshStartEndFrame();
                 this.RefEffect = new framework.f14EffectSystem();
+                this.RefEffect._root = new framework.transform();
+                this.RefEffect.gameObject = this.RefEffect._root.gameObject;
+                var data = layer.data.elementdata;
+                gd3d.math.vec3Clone(data.localPos, this.RefEffect._root.localTranslate);
+                gd3d.math.vec3Clone(data.localScale, this.RefEffect._root.localScale);
+                gd3d.math.quatFromEulerAngles(data.localEuler.x, data.localEuler.y, data.localEuler.z, this.RefEffect._root.localRotate);
+                this.RefEffect._root.markDirty();
+                this.RefEffect.beref = true;
+                this.baseddata.refData = framework.sceneMgr.app.getAssetMgr().getAssetByName(this.baseddata.refdataName).data;
                 this.RefEffect.setData(this.baseddata.refData);
             }
+            F14RefElement.prototype.reset = function () {
+                this.RefEffect.reset();
+            };
             F14RefElement.prototype.refreshStartEndFrame = function () {
                 if (this.layer.frameList.length == 0) {
                     this.startFrame = 0;
@@ -15498,22 +15541,30 @@ var gd3d;
                 }
             };
             F14RefElement.prototype.update = function (deltaTime, frame, fps) {
+                if (this.RefEffect._root.parent == null) {
+                    this.RefEffect._root.parent = this.effect.gameObject.transform;
+                    this.RefEffect._root.markDirty();
+                    this.RefEffect._root.updateWorldTran();
+                }
                 if (this.layer.frameList.length == 0) {
                     this.drawActive = false;
                     return;
                 }
+                if (this.effect.data.beloop) {
+                    frame = this.effect.restartFrame;
+                }
                 if (frame < this.startFrame || frame > this.endFrame) {
                     this.drawActive = false;
+                    this.RefEffect["playState"] = framework.PlayStateEnum.beReady;
                     return;
                 }
                 else {
                     this.drawActive = true;
+                    this.RefEffect["playState"] = framework.PlayStateEnum.play;
                 }
                 this.RefEffect.update(deltaTime);
             };
             F14RefElement.prototype.OnEndOnceLoop = function () {
-            };
-            F14RefElement.prototype.reset = function () {
             };
             return F14RefElement;
         }());
@@ -15650,11 +15701,11 @@ var gd3d;
             };
             F14SingleMesh.prototype.updateRotByBillboard = function () {
                 if (this.baseddata.beBillboard) {
-                    var mat = this.effect.gameObject.transform.getWorldMatrix();
+                    var mat = this.effect.root.getWorldMatrix();
                     gd3d.math.matrixTransformVector3(this.position, mat, this.worldpos);
                     var targetpos = this.effect.renderCamera.gameObject.transform.getWorldTranslate();
                     gd3d.math.quatLookat(this.worldpos, targetpos, this.worldRot);
-                    var parentRot = this.effect.gameObject.transform.getWorldRotate();
+                    var parentRot = this.effect.root.getWorldRotate();
                     gd3d.math.quatInverse(parentRot, this.inverseRot);
                     gd3d.math.quatMultiply(this.inverseRot, this.worldRot, this.localRotate);
                     gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, this.euler.z, this.eulerRot);
@@ -15793,7 +15844,7 @@ var gd3d;
                     this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
                 }
                 else {
-                    gd3d.math.matrixMultiply(this.effect.mvpMat, gd3d.math.pool.identityMat, context.matrixModelViewProject);
+                    gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
                     this.curIndexCount = 0;
                     this.curVertexcount = 0;
                     this.curRealVboCount = 0;
