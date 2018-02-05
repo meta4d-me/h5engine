@@ -103,13 +103,13 @@ namespace gd3d.framework
 
         public getWorldMatrix():math.matrix
         {
-            let mat=this.effect.gameObject.transform.getWorldMatrix();
+            let mat=this.effect.root.getWorldMatrix();
             math.matrixMultiply(mat,this.localMatrix,this._worldMatrix);
             return this._worldMatrix;
         }
         getWorldRotation():math.quaternion
         {
-            let rot=this.effect.gameObject.transform.getWorldRotate();
+            let rot=this.effect.root.getWorldRotate();
             gd3d.math.quatMultiply(rot, this.localrot, this.worldRot);
             return this.worldRot;
         }

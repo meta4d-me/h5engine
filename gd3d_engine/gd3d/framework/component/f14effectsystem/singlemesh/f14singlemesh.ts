@@ -197,13 +197,13 @@ namespace gd3d.framework
         {
             if(this.baseddata.beBillboard)
             {
-                let mat=this.effect.gameObject.transform.getWorldMatrix();
+                let mat=this.effect.root.getWorldMatrix();
                 gd3d.math.matrixTransformVector3(this.position,mat,this.worldpos);
                 let targetpos=this.effect.renderCamera.gameObject.transform.getWorldTranslate();
                 gd3d.math.quatLookat(this.worldpos,targetpos,this.worldRot);
                 
                 
-                let parentRot = this.effect.gameObject.transform.getWorldRotate();
+                let parentRot = this.effect.root.getWorldRotate();
                 math.quatInverse(parentRot,this.inverseRot);
                 gd3d.math.quatMultiply(this.inverseRot,this.worldRot,this.localRotate);
                 gd3d.math.quatFromAxisAngle(math.pool.vector3_forward,this.euler.z,this.eulerRot);

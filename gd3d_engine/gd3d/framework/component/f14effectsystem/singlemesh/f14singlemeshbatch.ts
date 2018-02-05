@@ -181,7 +181,7 @@ namespace gd3d.framework
             // }else
             else
             {
-                gd3d.math.matrixMultiply(this.effect.mvpMat,gd3d.math.pool.identityMat, context.matrixModelViewProject);
+                gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
                 //---------------------集合数据
                 this.curIndexCount=0;
                 this.curVertexcount=0;

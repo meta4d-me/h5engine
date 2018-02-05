@@ -20,22 +20,27 @@ namespace gd3d.framework
             this.refreshStartEndFrame();
 
             this.RefEffect = new f14EffectSystem();
+            this.RefEffect._root=new transform();
+            this.RefEffect.gameObject=this.RefEffect._root.gameObject;
+            //this.RefEffect.root.parent=this.effect.gameObject.transform;
+            let data=layer.data.elementdata as F14RefBaseData;
+            gd3d.math.vec3Clone(data.localPos,this.RefEffect._root.localTranslate);
+            gd3d.math.vec3Clone(data.localScale,this.RefEffect._root.localScale);
+            math.quatFromEulerAngles(data.localEuler.x,data.localEuler.y,data.localEuler.z,this.RefEffect._root.localRotate);
+            this.RefEffect._root.markDirty();
+
+            this.RefEffect.beref=true;
+            this.baseddata.refData=(sceneMgr.app.getAssetMgr().getAssetByName(this.baseddata.refdataName) as f14eff).data;
             this.RefEffect.setData(this.baseddata.refData);
             //this.RefEffect.batchRoot = effect.player.transform;
         }
         public RefEffect:f14EffectSystem;
     
-        // public changeData(data:F14EffectData)
-        // {
-        //     this.baseddata.refData = data;
-        //     this.RefEffect.changeData(data);
-        // }
-    
         //---------------------------------------reset-----------------------------------------------
-        // public reset()
-        // {
-        //     this.RefEffect.reset();
-        // }
+        public reset()
+        {
+            this.RefEffect.reset();
+        }
         //------------------------------------update----------------------------------------------
         private refreshStartEndFrame()
         {
@@ -58,28 +63,37 @@ namespace gd3d.framework
         }
         update(deltaTime: number, frame: number, fps: number)
         {
+            if(this.RefEffect._root.parent==null)
+            {
+                this.RefEffect._root.parent=this.effect.gameObject.transform;
+                this.RefEffect._root.markDirty();
+                this.RefEffect._root.updateWorldTran();
+            }
+
             if(this.layer.frameList.length==0)
             {
                 this.drawActive = false;
                 return;
             }
+            if (this.effect.data.beloop)
+            {
+                frame = this.effect.restartFrame;
+            }
             if (frame < this.startFrame || frame > this.endFrame)
             {
                 this.drawActive = false;
+                this.RefEffect["playState"]=PlayStateEnum.beReady;
                 return;
             }
             else
             {
                 this.drawActive = true;
+                this.RefEffect["playState"]=PlayStateEnum.play;
             }
             this.RefEffect.update(deltaTime);
         }
 
         OnEndOnceLoop()
-        {
-
-        }
-        reset()
         {
 
         }
