@@ -306,7 +306,7 @@ namespace gd3d.framework
 
         private sortOverLays(lays:IOverLay[]){
             if(!lays || lays.length<1)return;
-            lays.sort((a, b) =>
+            lays = lays.sort((a, b) =>
             {
                 return a.sortOrder - b.sortOrder;
             });

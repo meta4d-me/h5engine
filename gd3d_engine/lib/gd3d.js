@@ -2513,6 +2513,10 @@ var gd3d;
                 __metadata("design:type", gd3d.math.vector2)
             ], transform2D.prototype, "localScale", void 0);
             __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], transform2D.prototype, "localRotate", void 0);
+            __decorate([
                 gd3d.reflect.Field("boolean"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [Boolean])
@@ -25996,7 +26000,7 @@ var gd3d;
             scene.prototype.sortOverLays = function (lays) {
                 if (!lays || lays.length < 1)
                     return;
-                lays.sort(function (a, b) {
+                lays = lays.sort(function (a, b) {
                     return a.sortOrder - b.sortOrder;
                 });
             };

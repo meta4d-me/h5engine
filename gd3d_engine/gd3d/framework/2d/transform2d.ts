@@ -265,6 +265,7 @@ namespace gd3d.framework
          * 当前2d节点的旋转
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         localRotate: number = 0;//旋转
 
         private _maskRect : math.rect;
