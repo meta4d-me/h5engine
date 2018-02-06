@@ -2563,6 +2563,29 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var behaviour2d = (function () {
+            function behaviour2d() {
+            }
+            behaviour2d.prototype.start = function () {
+            };
+            behaviour2d.prototype.update = function (delta) {
+            };
+            behaviour2d.prototype.onPointEvent = function (canvas, ev, oncap) {
+            };
+            behaviour2d.prototype.remove = function () {
+            };
+            behaviour2d = __decorate([
+                gd3d.reflect.node2DComponent
+            ], behaviour2d);
+            return behaviour2d;
+        }());
+        framework.behaviour2d = behaviour2d;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var TransitionType;
         (function (TransitionType) {
             TransitionType[TransitionType["None"] = 0] = "None";
@@ -10547,6 +10570,30 @@ var gd3d;
             return AudioPlayer;
         }());
         framework.AudioPlayer = AudioPlayer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var behaviour = (function () {
+            function behaviour() {
+            }
+            behaviour.prototype.start = function () {
+            };
+            behaviour.prototype.update = function (delta) {
+            };
+            behaviour.prototype.remove = function () {
+            };
+            behaviour.prototype.clone = function () {
+            };
+            behaviour = __decorate([
+                gd3d.reflect.nodeComponent,
+                __metadata("design:paramtypes", [])
+            ], behaviour);
+            return behaviour;
+        }());
+        framework.behaviour = behaviour;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

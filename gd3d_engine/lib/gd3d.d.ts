@@ -507,6 +507,15 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class behaviour2d implements I2DComponent {
+        transform: transform2D;
+        start(): void;
+        update(delta: number): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
     enum TransitionType {
         None = 0,
         ColorTint = 1,
@@ -1729,6 +1738,16 @@ declare namespace gd3d.framework {
         private lastY;
         private lastZ;
         private curPos;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class behaviour implements INodeComponent {
+        constructor();
+        gameObject: gameObject;
+        start(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
