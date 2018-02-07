@@ -8392,7 +8392,9 @@ var gd3d;
                             console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                         }
                     }
-                    func(unifom.location, unifomValue);
+                    if (unifomValue) {
+                        func(unifom.location, unifomValue);
+                    }
                 }
             };
             material.prototype.setShader = function (shader) {
