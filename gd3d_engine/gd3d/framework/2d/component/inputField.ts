@@ -184,8 +184,11 @@ namespace gd3d.framework
             this.inputElement = <HTMLInputElement>document.createElement("Input");
             this.inputElement.style.opacity = "0";
             this.inputElement.style.visibility = "hidden";
-            if (this.transform.canvas.webgl)
-                this.transform.canvas.webgl.canvas.parentElement.appendChild(this.inputElement);
+            if (this.transform.canvas.scene){
+                let htmlCanv = this.transform.canvas.scene.webgl.canvas;
+                if(htmlCanv)
+                htmlCanv.parentElement.appendChild(this.inputElement);
+            }
             
             this.inputElement.onblur = (e)=>{
                 this.beFocus = false;
