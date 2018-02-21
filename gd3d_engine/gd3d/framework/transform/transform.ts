@@ -564,14 +564,6 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0))
         localTranslate: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 本地缩放
-         * @version egret-gd3d 1.0
-         */
-
         set localPosition(position:gd3d.math.vector3){
             this.localTranslate = position;
         }
@@ -580,8 +572,13 @@ namespace gd3d.framework
             return this.localTranslate;
         }
 
-
-
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 本地缩放
+         * @version egret-gd3d 1.0
+         */
         @gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1))
         localScale: gd3d.math.vector3 = new gd3d.math.vector3(1, 1, 1);
         private localMatrix: gd3d.math.matrix = new gd3d.math.matrix();
