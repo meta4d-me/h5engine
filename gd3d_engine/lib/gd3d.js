@@ -3944,8 +3944,11 @@ var gd3d;
                 this.inputElement = document.createElement("Input");
                 this.inputElement.style.opacity = "0";
                 this.inputElement.style.visibility = "hidden";
-                if (this.transform.canvas.webgl)
-                    this.transform.canvas.webgl.canvas.parentElement.appendChild(this.inputElement);
+                if (this.transform.canvas.scene) {
+                    var htmlCanv = this.transform.canvas.scene.webgl.canvas;
+                    if (htmlCanv)
+                        htmlCanv.parentElement.appendChild(this.inputElement);
+                }
                 this.inputElement.onblur = function (e) {
                     _this.beFocus = false;
                 };
@@ -8389,7 +8392,9 @@ var gd3d;
                             console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                         }
                     }
-                    func(unifom.location, unifomValue);
+                    if (unifomValue) {
+                        func(unifom.location, unifomValue);
+                    }
                 }
             };
             material.prototype.setShader = function (shader) {
@@ -26098,7 +26103,7 @@ var gd3d;
             scene.prototype.sortOverLays = function (lays) {
                 if (!lays || lays.length < 1)
                     return;
-                lays = lays.sort(function (a, b) {
+                lays.sort(function (a, b) {
                     return a.sortOrder - b.sortOrder;
                 });
             };

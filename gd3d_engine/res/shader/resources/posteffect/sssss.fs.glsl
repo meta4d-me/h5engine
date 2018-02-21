@@ -73,7 +73,7 @@ vec4 blur(vec2 _step) {
 
 void main () {
     vec4 color = texture2D(_MainTex, xlv_TEXCOORD0);
-    vec4 blur = blur(_MainTex_TexelSize.xy * _BlurDirection.xy * BLUR_WIDTH * 1.);
-    gl_FragColor = color + blur * BLUR_W_RGBA;
+    vec4 cblur = blur(_MainTex_TexelSize.xy * _BlurDirection.xy * BLUR_WIDTH * 1.);
+    gl_FragColor = color + cblur * BLUR_W_RGBA;
 
 }
