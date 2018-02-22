@@ -12904,9 +12904,6 @@ var gd3d;
                                 var mid = mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
                                 var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                                if (this.gameObject.getName() == "1area_Plant") {
-                                    drawtype;
-                                }
                                 if (this.lightmapIndex >= 0) {
                                     drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                     if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
