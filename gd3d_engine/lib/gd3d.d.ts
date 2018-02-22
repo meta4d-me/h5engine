@@ -4691,6 +4691,7 @@ declare namespace gd3d.framework {
         private dirtyWorldDecompose;
         localRotate: gd3d.math.quaternion;
         localTranslate: gd3d.math.vector3;
+        localPosition: gd3d.math.vector3;
         localScale: gd3d.math.vector3;
         private localMatrix;
         private _localEulerAngles;

@@ -8511,10 +8511,12 @@ var gd3d;
                 if (basetype === void 0) { basetype = "base"; }
                 if (useGLobalLightMap === void 0) { useGLobalLightMap = true; }
                 var drawPasses = this.shader.passes[basetype + context.drawtype];
-                if (drawPasses == undefined)
-                    drawPasses = this.shader.passes["base" + context.drawtype];
-                if (drawPasses == undefined)
-                    return;
+                if (drawPasses == undefined) {
+                    basetype = basetype.indexOf("fog") != -1 ? "base_fog" : "base";
+                    drawPasses = this.shader.passes[basetype + context.drawtype];
+                    if (drawPasses == undefined)
+                        return;
+                }
                 for (var i = 0; i < drawPasses.length; i++) {
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
@@ -12902,6 +12904,9 @@ var gd3d;
                                 var mid = mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
                                 var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
+                                if (this.gameObject.getName() == "1area_Plant") {
+                                    drawtype;
+                                }
                                 if (this.lightmapIndex >= 0) {
                                     drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                     if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
@@ -27253,6 +27258,16 @@ var gd3d;
                     this.aabbchilddirty = false;
                 }
             };
+            Object.defineProperty(transform.prototype, "localPosition", {
+                get: function () {
+                    return this.localTranslate;
+                },
+                set: function (position) {
+                    this.localTranslate = position;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(transform.prototype, "localEulerAngles", {
                 get: function () {
                     gd3d.math.quatToEulerAngles(this.localRotate, this._localEulerAngles);
