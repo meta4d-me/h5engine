@@ -469,8 +469,11 @@ namespace gd3d.framework
             if (drawPasses == undefined){
                 basetype = basetype.indexOf("fog") != -1 ? "base_fog":"base";
                 drawPasses = this.shader.passes[basetype + context.drawtype];
-                if (drawPasses == undefined)
-                return;
+                if (drawPasses == undefined){
+                    drawPasses = this.shader.passes["base" + context.drawtype];
+                    if (drawPasses == undefined)
+                    return;
+                }
             }
             for (var i = 0; i < drawPasses.length; i++)
             {
