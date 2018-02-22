@@ -37,12 +37,12 @@
     export class glDrawPass
     {
 
-        static lastShowFace: number;
-        static lastZWrite: boolean;
-        static lastZTest: boolean;
-        static lastZTestMethod: number;
-        static lastBlend: boolean;
-        static lastBlendEquation: number;
+        static lastShowFace: number=-1;
+        static lastZWrite: boolean=null;
+        static lastZTest: boolean=null;
+        static lastZTestMethod: number=-1;
+        static lastBlend: boolean=null;
+        static lastBlendEquation: number=-1;
         static lastBlendVal: string;
         static lastState: string = "";
         curState: string;
@@ -191,53 +191,136 @@
         //使用材质
         use(webgl: WebGLRenderingContext, applyUniForm: boolean = true)
         {
-            if (this.state_showface == ShowFaceStateEnum.ALL)
+            // if (this.state_showface == ShowFaceStateEnum.ALL)
+            // {
+            //     webgl.disable(webgl.CULL_FACE);
+            // }
+            // else
+            // {
+            //     if (this.state_showface == ShowFaceStateEnum.CCW)
+            //     {
+            //         webgl.frontFace(webgl.CCW);
+            //     }
+            //     else
+            //     {
+            //         webgl.frontFace(webgl.CW);
+            //     }
+            //     webgl.cullFace(webgl.BACK);
+            //     webgl.enable(webgl.CULL_FACE);
+            // }
+
+            // if (this.state_zwrite)
+            // {
+            //     webgl.depthMask(true);
+            // }
+            // else
+            // {
+            //     webgl.depthMask(false);
+            // }
+            // if (this.state_ztest)
+            // {
+            //     webgl.enable(webgl.DEPTH_TEST);
+            //     webgl.depthFunc(this.state_ztest_method);
+            // }
+            // else
+            // {
+            //     webgl.disable(webgl.DEPTH_TEST);
+            // }
+            // if (this.state_blend)
+            // {
+            //     webgl.enable(webgl.BLEND);
+            //     webgl.blendEquation(this.state_blendEquation);
+            //     //this.webgl.blendFunc(this.webgl.ONE, this.webgl.ONE_MINUS_SRC_ALPHA);
+            //     webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB,
+            //         this.state_blendSrcAlpha, this.state_blendDestALpha);
+            // }
+            // else
+            // {
+            //     webgl.disable(webgl.BLEND);
+            // }
+            if(this.state_showface!=glDrawPass.lastShowFace)
             {
-                webgl.disable(webgl.CULL_FACE);
-            }
-            else
-            {
-                if (this.state_showface == ShowFaceStateEnum.CCW)
+                glDrawPass.lastShowFace=this.state_showface;
+                if (this.state_showface == ShowFaceStateEnum.ALL)
                 {
-                    webgl.frontFace(webgl.CCW);
+                    webgl.disable(webgl.CULL_FACE);
                 }
                 else
                 {
-                    webgl.frontFace(webgl.CW);
+                    if (this.state_showface == ShowFaceStateEnum.CCW)
+                    {
+                        webgl.frontFace(webgl.CCW);
+                    }
+                    else
+                    {
+                        webgl.frontFace(webgl.CW);
+                    }
+                    webgl.cullFace(webgl.BACK);
+                    webgl.enable(webgl.CULL_FACE);
                 }
-                webgl.cullFace(webgl.BACK);
-                webgl.enable(webgl.CULL_FACE);
             }
-
-            if (this.state_zwrite)
+            if(this.state_zwrite!=glDrawPass.lastZWrite)
             {
-                webgl.depthMask(true);
+                glDrawPass.lastZWrite=this.state_zwrite;
+                if (this.state_zwrite)
+                {
+                    webgl.depthMask(true);
+                }
+                else
+                {
+                    webgl.depthMask(false);
+                }
             }
-            else
+            if(this.state_ztest!=glDrawPass.lastZTest)
             {
-                webgl.depthMask(false);
+                glDrawPass.lastZTest=this.state_ztest;
+                if (this.state_ztest)
+                {
+                    webgl.enable(webgl.DEPTH_TEST);
+                }
+                else
+                {
+                    webgl.disable(webgl.DEPTH_TEST);
+                }
             }
-            if (this.state_ztest)
+            if(this.state_ztest&&glDrawPass.lastZTestMethod!=this.state_ztest_method)
             {
-                webgl.enable(webgl.DEPTH_TEST);
+                glDrawPass.lastZTestMethod=this.state_ztest_method;
                 webgl.depthFunc(this.state_ztest_method);
             }
-            else
+            if(this.state_blend!=glDrawPass.lastBlend)
             {
-                webgl.disable(webgl.DEPTH_TEST);
+                glDrawPass.lastBlend=this.state_blend;
+                if (this.state_blend)
+                {
+                    webgl.enable(webgl.BLEND);
+                }
+                else
+                {
+                    webgl.disable(webgl.BLEND);
+                }
             }
-            if (this.state_blend)
+            if(this.state_blend&&glDrawPass.lastBlendEquation!=this.state_blendEquation)
             {
-                webgl.enable(webgl.BLEND);
+                glDrawPass.lastBlendEquation=this.state_blendEquation;
                 webgl.blendEquation(this.state_blendEquation);
                 //this.webgl.blendFunc(this.webgl.ONE, this.webgl.ONE_MINUS_SRC_ALPHA);
                 webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB,
-                    this.state_blendSrcAlpha, this.state_blendDestALpha);
+                this.state_blendSrcAlpha, this.state_blendDestALpha);
             }
-            else
-            {
-                webgl.disable(webgl.BLEND);
-            }
+            // if (this.state_blend)
+            // {
+            //     webgl.enable(webgl.BLEND);
+            //     webgl.blendEquation(this.state_blendEquation);
+            //     //this.webgl.blendFunc(this.webgl.ONE, this.webgl.ONE_MINUS_SRC_ALPHA);
+            //     webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB,
+            //         this.state_blendSrcAlpha, this.state_blendDestALpha);
+            // }
+            // else
+            // {
+            //     webgl.disable(webgl.BLEND);
+            // }
+
             //use program
             this.program.use(webgl);
             // if (applyUniForm)
