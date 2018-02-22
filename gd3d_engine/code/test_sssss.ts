@@ -5,6 +5,7 @@ class test_sssss implements IState
     renderer: gd3d.framework.meshRenderer[];
     skinRenders: gd3d.framework.skinnedMeshRenderer[];
     taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
+    lightcamera:gd3d.framework.camera;
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
@@ -17,40 +18,6 @@ class test_sssss implements IState
         {
             if(state.isfinish)
             {
-                // this.app.getAssetMgr().load("res/prefabs/" + name + "/meshprefab/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                // (s) =>
-                // {
-                //     if(s.isfinish)
-                //     {
-                //         var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name + ".prefab.json") as gd3d.framework.prefab;
-                //         this.baihu = _prefab.getCloneTrans();
-                //         this.scene.addChild(this.baihu);
-                //         this.baihu.localScale = new gd3d.math.vector3(50, 50, 50);
-                //         this.baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                //         this.baihu.localEulerAngles = new gd3d.math.vector3(0, 180, 0);
-
-                //         objCam.localTranslate = new gd3d.math.vector3(0, 20, -10);
-                //         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-                //         objCam.markDirty();
-
-                //         this.app.getAssetMgr().load("res/prefabs/" + name + "/textures/" + name + "texture.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
-                //         (s) =>
-                //         {
-                //             if(s.isfinish)
-                //             {
-                //                 this.refreshTexture(this.baihu);
-                //             }
-                //         });
-                //         this.app.getAssetMgr().load("res/prefabs/" + name + "/aniclip/resources/" + "Ready.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Auto,
-                //         (s) =>
-                //         {
-                //             if(s.isfinish)
-                //             {
-                //                 this.refreshAniclip(this.baihu);
-                //             }
-                //         });
-                //     }
-                // });
                 name = "Head";
                 this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto,
                 (s) =>
@@ -86,7 +53,7 @@ class test_sssss implements IState
                         (skytex1.glTexture as gd3d.render.glTextureCube).uploadImages(negx_1,negy_1,negz_1,posx_1,posy_1,posz_1);
                         // this.baihu.localTranslate.x = 0;
                         this.baihu.localTranslate.y = -4;
-                        this.baihu.localTranslate.z = 10;
+                        // this.baihu.localTranslate.z = 10;
                         this.baihu.localScale.x = 10;
                         this.baihu.localScale.y = 10;
                         this.baihu.localScale.z = 10;
@@ -101,6 +68,7 @@ class test_sssss implements IState
                             temp2d.uploadByteArray(true,false,temp2d.width,temp2d.height,temp2d.reader.data,true);
                             mr.materials[0].setTexture("brdf",assetMgr.getAssetByName(`brdf.png`)as gd3d.framework.texture);
                             mr.materials[0].setTexture("uv_Basecolor",assetMgr.getAssetByName(`albedo.jpg`)as gd3d.framework.texture);
+                            mr.materials[0].setTexture("uv_Thickness",assetMgr.getAssetByName(`thickness.png`)as gd3d.framework.texture);
                             mr.materials[0].setTexture("uv_Normal",assetMgr.getAssetByName(`normals.png`)as gd3d.framework.texture);
                             mr.materials[0].setCubeTexture("u_sky",skytex1);
 
@@ -408,10 +376,13 @@ class test_sssss implements IState
                     if(s1.isfinish){
                         this.app.getAssetMgr().load("res/pbrRes/" + "brdf.png",gd3d.framework.AssetTypeEnum.Auto,(s2)=>{
                             if(s2.isfinish){
-                                state.finish = true;
+                                this.app.getAssetMgr().load("res/pbrRes/SSSSS/" + "thickness.png",gd3d.framework.AssetTypeEnum.Auto,(s3)=>{
+                                    if(s3.isfinish){
+                                        state.finish = true;
+                                    }
+                                });
                             }
                         });
-
                     }
                 });
             }

@@ -507,6 +507,15 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class behaviour2d implements I2DComponent {
+        transform: transform2D;
+        start(): void;
+        update(delta: number): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
     enum TransitionType {
         None = 0,
         ColorTint = 1,
@@ -1735,6 +1744,16 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class behaviour implements INodeComponent {
+        constructor();
+        gameObject: gameObject;
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
     class bloomctr implements INodeComponent {
         private _bloomIntensity;
         private _bloomThreshold;
@@ -2350,11 +2369,14 @@ declare namespace gd3d.framework {
         private _delayTime;
         delay: number;
         setData(data: F14EffectData): void;
+        readonly root: transform;
+        _root: transform;
         private elements;
         renderBatch: F14Basebatch[];
         private loopCount;
         private allTime;
         private renderActive;
+        beref: boolean;
         update(deltaTime: number): void;
         private OnEndOnceLoop();
         private _renderCamera;
@@ -2367,11 +2389,20 @@ declare namespace gd3d.framework {
         private addF14layer(type, layerdata);
         getElementCount(): number;
         dispose(): void;
+        private playRate;
+        private playState;
         private active;
-        play(): void;
+        play(PlayRate?: number): void;
         stop(): void;
+        private bePause;
+        pause(): void;
         reset(): void;
         clone(): void;
+    }
+    enum PlayStateEnum {
+        play = 0,
+        beReady = 1,
+        pause = 2,
     }
 }
 declare namespace gd3d.framework {
@@ -2721,8 +2752,11 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class F14RefBaseData implements F14ElementData {
         beLoop: boolean;
+        refdataName: string;
         refData: F14EffectData;
-        F14RefBaseData(data?: F14EffectData): void;
+        localPos: math.vector3;
+        localEuler: math.vector3;
+        localScale: math.vector3;
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
     }
 }
@@ -2737,10 +2771,10 @@ declare namespace gd3d.framework {
         effect: f14EffectSystem;
         constructor(effect: f14EffectSystem, layer: F14Layer);
         RefEffect: f14EffectSystem;
+        reset(): void;
         private refreshStartEndFrame();
         update(deltaTime: number, frame: number, fps: number): void;
         OnEndOnceLoop(): void;
-        reset(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -4657,6 +4691,7 @@ declare namespace gd3d.framework {
         private dirtyWorldDecompose;
         localRotate: gd3d.math.quaternion;
         localTranslate: gd3d.math.vector3;
+        localPosition: gd3d.math.vector3;
         localScale: gd3d.math.vector3;
         private localMatrix;
         private _localEulerAngles;

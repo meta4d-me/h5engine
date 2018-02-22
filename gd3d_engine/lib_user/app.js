@@ -3608,7 +3608,6 @@ var test_sssss = (function () {
                         skytex1.use();
                         skytex1.glTexture.uploadImages(negx_1, negy_1, negz_1, posx_1, posy_1, posz_1);
                         _this.baihu.localTranslate.y = -4;
-                        _this.baihu.localTranslate.z = 10;
                         _this.baihu.localScale.x = 10;
                         _this.baihu.localScale.y = 10;
                         _this.baihu.localScale.z = 10;
@@ -3622,6 +3621,7 @@ var test_sssss = (function () {
                         temp2d.uploadByteArray(true, false, temp2d.width, temp2d.height, temp2d.reader.data, true);
                         mr.materials[0].setTexture("brdf", assetMgr.getAssetByName("brdf.png"));
                         mr.materials[0].setTexture("uv_Basecolor", assetMgr.getAssetByName("albedo.jpg"));
+                        mr.materials[0].setTexture("uv_Thickness", assetMgr.getAssetByName("thickness.png"));
                         mr.materials[0].setTexture("uv_Normal", assetMgr.getAssetByName("normals.png"));
                         mr.materials[0].setCubeTexture("u_sky", skytex1);
                         mr.materials[0].setFloat("CustomMetallic", 0.3);
@@ -3805,7 +3805,11 @@ var test_sssss = (function () {
                     if (s1.isfinish) {
                         _this.app.getAssetMgr().load("res/pbrRes/" + "brdf.png", gd3d.framework.AssetTypeEnum.Auto, function (s2) {
                             if (s2.isfinish) {
-                                state.finish = true;
+                                _this.app.getAssetMgr().load("res/pbrRes/SSSSS/" + "thickness.png", gd3d.framework.AssetTypeEnum.Auto, function (s3) {
+                                    if (s3.isfinish) {
+                                        state.finish = true;
+                                    }
+                                });
                             }
                         });
                     }

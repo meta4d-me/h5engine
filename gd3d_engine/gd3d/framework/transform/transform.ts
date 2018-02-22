@@ -564,6 +564,14 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0))
         localTranslate: gd3d.math.vector3 = new gd3d.math.vector3(0, 0, 0);
+        set localPosition(position:gd3d.math.vector3){
+            this.localTranslate = position;
+        }
+
+        get localPosition(){
+            return this.localTranslate;
+        }
+
         /**
          * @public
          * @language zh_CN

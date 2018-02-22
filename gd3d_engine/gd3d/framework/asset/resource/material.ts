@@ -211,7 +211,9 @@ namespace gd3d.framework
                         console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                     }
                 }
-                func(unifom.location, unifomValue);
+                if(unifomValue){
+                    func(unifom.location, unifomValue);
+                }
             }
         }
 
@@ -464,10 +466,15 @@ namespace gd3d.framework
         {
             
             let drawPasses = this.shader.passes[basetype + context.drawtype];
-            if (drawPasses == undefined)
-                drawPasses = this.shader.passes["base" + context.drawtype];
-            if (drawPasses == undefined)
-                return;
+            if (drawPasses == undefined){
+                basetype = basetype.indexOf("fog") != -1 ? "base_fog":"base";
+                drawPasses = this.shader.passes[basetype + context.drawtype];
+                if (drawPasses == undefined){
+                    drawPasses = this.shader.passes["base" + context.drawtype];
+                    if (drawPasses == undefined)
+                    return;
+                }
+            }
             for (var i = 0; i < drawPasses.length; i++)
             {
                 var pass = drawPasses[i];

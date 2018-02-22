@@ -431,6 +431,7 @@ declare class test_sssss implements IState {
     renderer: gd3d.framework.meshRenderer[];
     skinRenders: gd3d.framework.skinnedMeshRenderer[];
     taskmgr: gd3d.framework.taskMgr;
+    lightcamera: gd3d.framework.camera;
     start(app: gd3d.framework.application): void;
     private loadpbrRes(lastState, state);
     private loadIBL(lastState, state);
