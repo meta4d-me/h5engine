@@ -38,7 +38,9 @@ void main()
     #endif
 
     #ifdef FOG
-    emission.xyz = mix(glstate_fog_color.rgb, emission.rgb, factor);
+    emission= mix(vec4(0,0,0,0), emission, factor);
+
+    //emission.xyz = mix(glstate_fog_color.rgb, emission.rgb, factor);
     #endif
     gl_FragData[0] = emission;
 
