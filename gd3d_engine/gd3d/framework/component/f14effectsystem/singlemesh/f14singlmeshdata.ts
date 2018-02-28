@@ -12,6 +12,12 @@ namespace gd3d.framework
     //     UVRoll,
     //     UVSprite
     // }
+    export enum BindAxis
+    {
+        X=0,
+        Y=1,
+        NONE=2
+    }
     export class F14SingleMeshBaseData implements F14ElementData 
     {
 
@@ -41,7 +47,8 @@ namespace gd3d.framework
 
             //-------------billboard
         public beBillboard:boolean=false;
-    
+        public bindAxis:BindAxis=BindAxis.NONE;
+
 
         //-----------------attline 计算插值
         firtstFrame:number=0;
@@ -92,9 +99,19 @@ namespace gd3d.framework
             if(json.beBillboard!=null)
             {
                 this.beBillboard=json.beBillboard;
+                switch(json.bindAxis)
+                {
+                    case "NONE":
+                        this.bindAxis=BindAxis.NONE;
+                        break;
+                    case "X":
+                        this.bindAxis=BindAxis.X;
+                        break;
+                    case "Y":
+                        this.bindAxis=BindAxis.Y;
+                        break;
+                }
             }
-            
-
         }
     
     }

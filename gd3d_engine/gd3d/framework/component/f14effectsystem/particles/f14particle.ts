@@ -54,7 +54,7 @@ namespace gd3d.framework
         private Color:math.color=new math.color();
         //-----------------------------------------------------------------------------
         private curLife:number;//当前经过的生命周期
-        private life01:number;//(0---1)
+        private life01:number=0;//(0---1)
         public actived:boolean = false;
     
         ////在emission是在simulate in world space 时候,将发射器的这个矩阵保存起来,为静态的

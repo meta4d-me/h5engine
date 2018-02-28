@@ -38,6 +38,7 @@ namespace gd3d.framework
             math.vec3Clone(this.baseddata.position,this.position);
             math.vec3Clone(this.baseddata.scale,this.scale);
             math.vec3Clone(this.baseddata.euler,this.euler);
+            math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
             math.colorClone(this.baseddata.color,this.color);
             math.vec4Clone(this.baseddata.tex_ST,this.tex_ST);
             
@@ -193,22 +194,61 @@ namespace gd3d.framework
         private worldpos=new math.vector3();
         private worldRot=new math.quaternion();
         private inverseRot=new math.quaternion();
+
+        private lookDir=new math.vector3();
+        private worldDirx=new math.vector3();
+        private worldDiry=new math.vector3();
         public updateRotByBillboard()
         {
             if(this.baseddata.beBillboard)
             {
-                let mat=this.effect.root.getWorldMatrix();
-                gd3d.math.matrixTransformVector3(this.position,mat,this.worldpos);
-                let targetpos=this.effect.renderCamera.gameObject.transform.getWorldTranslate();
-                gd3d.math.quatLookat(this.worldpos,targetpos,this.worldRot);
-                
-                
-                let parentRot = this.effect.root.getWorldRotate();
-                math.quatInverse(parentRot,this.inverseRot);
-                gd3d.math.quatMultiply(this.inverseRot,this.worldRot,this.localRotate);
-                gd3d.math.quatFromAxisAngle(math.pool.vector3_forward,this.euler.z,this.eulerRot);
-                gd3d.math.quatMultiply(this.localRotate,this.eulerRot,this.localRotate);
-    
+                if(this.baseddata.bindAxis==BindAxis.NONE)
+                {
+                    let mat=this.effect.root.getWorldMatrix();
+                    gd3d.math.matrixTransformVector3(this.position,mat,this.worldpos);
+                    let targetpos=this.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                    gd3d.math.quatLookat(this.worldpos,targetpos,this.worldRot);
+                    let parentRot = this.effect.root.getWorldRotate();
+                    math.quatInverse(parentRot,this.inverseRot);
+                    gd3d.math.quatMultiply(this.inverseRot,this.worldRot,this.localRotate);
+                    gd3d.math.quatFromAxisAngle(math.pool.vector3_forward,this.euler.z,this.eulerRot);
+                    gd3d.math.quatMultiply(this.localRotate,this.eulerRot,this.localRotate);
+                }else if(this.baseddata.bindAxis==BindAxis.X)
+                {
+                    let mat=this.effect.root.getWorldMatrix();
+                    gd3d.math.matrixTransformVector3(this.position,mat,this.worldpos);
+                    let targetpos=this.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                    math.vec3Subtract(targetpos,this.worldpos,this.lookDir);
+                    math.vec3Normalize(this.lookDir,this.lookDir);
+                    math.matrixMakeTransformRTS(this.baseddata.position,this.baseddata.scale,this.localRotate,this.targetMat);
+                    math.matrixMultiply(mat,this.targetMat,this.targetMat);
+                    gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right,this.targetMat,this.worldDirx);
+                    math.vec3Normalize(this.worldDirx,this.worldDirx);
+                    math.vec3Cross(this.lookDir,this.worldDirx,this.worldDiry);
+                    math.vec3Cross(this.worldDirx,this.worldDiry,this.lookDir);
+                    math.unitxyzToRotation(this.worldDirx,this.worldDiry,this.lookDir,this.worldRot);
+                    let parentRot = this.effect.root.getWorldRotate();
+                    math.quatInverse(parentRot,this.inverseRot);
+                    gd3d.math.quatMultiply(this.inverseRot,this.worldRot,this.localRotate);
+                }else
+                {
+                    let mat=this.effect.root.getWorldMatrix();
+                    gd3d.math.matrixTransformVector3(this.position,mat,this.worldpos);
+                    let targetpos=this.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                    //gd3d.math.quatLookat(this.worldpos,targetpos,this.worldRot);
+                    math.vec3Subtract(targetpos,this.worldpos,this.lookDir);
+                    math.vec3Normalize(this.lookDir,this.lookDir);
+                    math.matrixMakeTransformRTS(this.position,this.scale,this.localRotate,this.targetMat);
+                    math.matrixMultiply(mat,this.targetMat,this.targetMat);
+                    gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up,this.targetMat,this.worldDiry);
+                    math.vec3Normalize(this.worldDiry,this.worldDiry);
+                    math.vec3Cross(this.worldDiry,this.lookDir,this.worldDirx);
+                    math.vec3Cross(this.worldDirx,this.worldDiry,this.lookDir);
+                    math.unitxyzToRotation(this.worldDirx,this.worldDiry,this.lookDir,this.worldRot);
+                    let parentRot = this.effect.root.getWorldRotate();
+                    math.quatInverse(parentRot,this.inverseRot);
+                    gd3d.math.quatMultiply(this.inverseRot,this.worldRot,this.localRotate);
+                }
             }else
             {
                 math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
