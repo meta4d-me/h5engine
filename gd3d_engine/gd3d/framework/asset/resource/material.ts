@@ -412,7 +412,7 @@ namespace gd3d.framework
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (_gltexture != null)
+                    if (_gltexture != null&&this.defaultMapUniform[_texelsizeName] != null)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
@@ -466,10 +466,15 @@ namespace gd3d.framework
         {
             
             let drawPasses = this.shader.passes[basetype + context.drawtype];
-            if (drawPasses == undefined)
-                drawPasses = this.shader.passes["base" + context.drawtype];
-            if (drawPasses == undefined)
-                return;
+            if (drawPasses == undefined){
+                basetype = basetype.indexOf("fog") != -1 ? "base_fog":"base";
+                drawPasses = this.shader.passes[basetype + context.drawtype];
+                if (drawPasses == undefined){
+                    drawPasses = this.shader.passes["base" + context.drawtype];
+                    if (drawPasses == undefined)
+                    return;
+                }
+            }
             for (var i = 0; i < drawPasses.length; i++)
             {
                 var pass = drawPasses[i];

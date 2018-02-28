@@ -172,6 +172,7 @@ namespace gd3d.framework
             this.RealCameraNumber = 0;
             for (var i = 0; i < this.renderCameras.length; i++)
             {
+                render.glDrawPass.resetLastState();
                 this._renderCamera(i);
             }
 

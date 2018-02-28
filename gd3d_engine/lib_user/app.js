@@ -6795,6 +6795,11 @@ var test_loadScene = (function () {
             _this.app.getScene().lightmaps = [];
             _scene.useLightMap(_this.app.getScene());
             _scene.useFog(_this.app.getScene());
+            var lt = new gd3d.framework.transform();
+            _this.scene.addChild(lt);
+            var light = lt.gameObject.addComponent("light");
+            light.type = gd3d.framework.LightTypeEnum.Direction;
+            lt.localEulerAngles.x = 1.6;
         };
         if (isCompress) {
             this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {

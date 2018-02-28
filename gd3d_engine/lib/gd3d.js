@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000053";
+                this.build = "b000056";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -8511,10 +8511,15 @@ var gd3d;
                 if (basetype === void 0) { basetype = "base"; }
                 if (useGLobalLightMap === void 0) { useGLobalLightMap = true; }
                 var drawPasses = this.shader.passes[basetype + context.drawtype];
-                if (drawPasses == undefined)
-                    drawPasses = this.shader.passes["base" + context.drawtype];
-                if (drawPasses == undefined)
-                    return;
+                if (drawPasses == undefined) {
+                    basetype = basetype.indexOf("fog") != -1 ? "base_fog" : "base";
+                    drawPasses = this.shader.passes[basetype + context.drawtype];
+                    if (drawPasses == undefined) {
+                        drawPasses = this.shader.passes["base" + context.drawtype];
+                        if (drawPasses == undefined)
+                            return;
+                    }
+                }
                 for (var i = 0; i < drawPasses.length; i++) {
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
@@ -27253,6 +27258,16 @@ var gd3d;
                     this.aabbchilddirty = false;
                 }
             };
+            Object.defineProperty(transform.prototype, "localPosition", {
+                get: function () {
+                    return this.localTranslate;
+                },
+                set: function (position) {
+                    this.localTranslate = position;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(transform.prototype, "localEulerAngles", {
                 get: function () {
                     gd3d.math.quatToEulerAngles(this.localRotate, this._localEulerAngles);

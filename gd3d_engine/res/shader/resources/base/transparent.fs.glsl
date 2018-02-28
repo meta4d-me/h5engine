@@ -15,7 +15,7 @@ void main()
     emission.xyz *= _Superimposition;
     //----------------------------------------------------------
     #ifdef FOG
-    emission= mix(vec4(0,0,0,0), emission, factor);
+    emission.xyz= mix(glstate_fog_color.xyz, emission.xyz, factor);
     #endif
     gl_FragData[0] = emission;
 
