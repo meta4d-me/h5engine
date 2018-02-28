@@ -5,7 +5,7 @@ namespace gd3d.math {
         var width = 1.0 / column;
         var height = 1.0 / row;
         var offsetx = width * (index % column);
-        var offsety = height *(row-Math.floor(index / column) - 1) ;
+        var offsety = height *(row-height*(Math.floor(index / column) + 1)) ;
         
         out.x = width;
         out.y = height;
@@ -14,7 +14,17 @@ namespace gd3d.math {
         // var uvOffset=new gd3d.math.vector4(width,height,offsetx,offsety);
         // return  uvOffset;
     }
+    // int index = Mathf.FloorToInt(this.life01 * data.count);
 
+    // float width = 1.0f / data.column;//width
+    // float height = 1.0f / data.row;//height
+    // float offsetx = width * (index % data.column);//offsetx
+    // float offsety =height * data.row-height * (Mathf.FloorToInt(index / data.column)+1);//offsety
+
+    // this.tex_ST.x = width;
+    // this.tex_ST.y = height;
+    // this.tex_ST.z = offsetx;
+    // this.tex_ST.w = offsety;
     export function GetPointAlongCurve(curveStart:vector3,curveStartHandle:vector3,curveEnd:vector3,curveEndHandle:vector3,t:number, out:vector3,crease:number=0.3)
     {
         var oneMinT = 1 - t;
