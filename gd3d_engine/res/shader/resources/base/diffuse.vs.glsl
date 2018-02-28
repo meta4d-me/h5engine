@@ -4,6 +4,14 @@ attribute mediump vec4 _glesMultiTexCoord0;
 uniform highp mat4 glstate_matrix_mvp;
 uniform mediump vec4 _MainTex_ST;  
 varying mediump vec2 xlv_TEXCOORD0;
+//light
+attribute lowp vec3 _glesNormal;  
+uniform highp mat4 glstate_matrix_model;
+uniform lowp float glstate_lightcount;
+
+varying highp vec3 v_N;
+varying highp vec3 v_Mpos;
+
 
 #ifdef LIGHTMAP
 attribute mediump vec4 _glesMultiTexCoord1;
@@ -59,6 +67,16 @@ highp vec4 calcVertex(highp vec4 srcVertex,lowp vec4 blendIndex,lowp vec4 blendW
 }
 #endif
 
+void calcCOLOR(){
+	int c =int(glstate_lightcount);
+	if(c>0){
+		//求世界空间法线
+		lowp mat3 normalmat = mat3(glstate_matrix_model);
+		v_N =normalize(normalmat*_glesNormal);
+		v_Mpos =(glstate_matrix_model * vec4(_glesVertex.xyz, 1.0)).xyz;
+	}
+}
+
 void main()
 {
     xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
@@ -81,6 +99,9 @@ void main()
     factor = (glstate_fog_end - abs(position.z))/(glstate_fog_end - glstate_fog_start); 
     factor = clamp(factor, 0.0, 1.0);  
     #endif
+
+	//light
+    calcCOLOR();
 
     gl_Position =position;
 }
