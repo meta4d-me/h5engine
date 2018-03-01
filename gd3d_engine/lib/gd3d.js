@@ -8477,7 +8477,7 @@ var gd3d;
                         }
                         var _texelsizeName = _id + "_TexelSize";
                         var _gltexture = _texture.glTexture;
-                        if (_gltexture != null) {
+                        if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null) {
                             this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                         }
                     }
@@ -15252,6 +15252,7 @@ var gd3d;
                 this.color = new gd3d.math.vector3(1, 1, 1);
                 this.alpha = 1;
                 this.Color = new gd3d.math.color();
+                this.life01 = 0;
                 this.actived = false;
                 this.tempos = gd3d.math.pool.new_vector3();
                 this.temcolor = gd3d.math.pool.new_color();
@@ -15648,6 +15649,9 @@ var gd3d;
                 this.worldpos = new gd3d.math.vector3();
                 this.worldRot = new gd3d.math.quaternion();
                 this.inverseRot = new gd3d.math.quaternion();
+                this.lookDir = new gd3d.math.vector3();
+                this.worldDirx = new gd3d.math.vector3();
+                this.worldDiry = new gd3d.math.vector3();
                 this.type = framework.F14TypeEnum.SingleMeshType;
                 this.effect = effect;
                 this.layer = layer;
@@ -15655,6 +15659,7 @@ var gd3d;
                 gd3d.math.vec3Clone(this.baseddata.position, this.position);
                 gd3d.math.vec3Clone(this.baseddata.scale, this.scale);
                 gd3d.math.vec3Clone(this.baseddata.euler, this.euler);
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.localRotate);
                 gd3d.math.colorClone(this.baseddata.color, this.color);
                 gd3d.math.vec4Clone(this.baseddata.tex_ST, this.tex_ST);
                 this.refreshStartEndFrame();
@@ -15758,15 +15763,51 @@ var gd3d;
             };
             F14SingleMesh.prototype.updateRotByBillboard = function () {
                 if (this.baseddata.beBillboard) {
-                    var mat = this.effect.root.getWorldMatrix();
-                    gd3d.math.matrixTransformVector3(this.position, mat, this.worldpos);
-                    var targetpos = this.effect.renderCamera.gameObject.transform.getWorldTranslate();
-                    gd3d.math.quatLookat(this.worldpos, targetpos, this.worldRot);
-                    var parentRot = this.effect.root.getWorldRotate();
-                    gd3d.math.quatInverse(parentRot, this.inverseRot);
-                    gd3d.math.quatMultiply(this.inverseRot, this.worldRot, this.localRotate);
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, this.euler.z, this.eulerRot);
-                    gd3d.math.quatMultiply(this.localRotate, this.eulerRot, this.localRotate);
+                    if (this.baseddata.bindAxis == framework.BindAxis.NONE) {
+                        var mat = this.effect.root.getWorldMatrix();
+                        gd3d.math.matrixTransformVector3(this.position, mat, this.worldpos);
+                        var targetpos = this.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                        gd3d.math.quatLookat(this.worldpos, targetpos, this.worldRot);
+                        var parentRot = this.effect.root.getWorldRotate();
+                        gd3d.math.quatInverse(parentRot, this.inverseRot);
+                        gd3d.math.quatMultiply(this.inverseRot, this.worldRot, this.localRotate);
+                        gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, this.euler.z, this.eulerRot);
+                        gd3d.math.quatMultiply(this.localRotate, this.eulerRot, this.localRotate);
+                    }
+                    else if (this.baseddata.bindAxis == framework.BindAxis.X) {
+                        var mat = this.effect.root.getWorldMatrix();
+                        gd3d.math.matrixTransformVector3(this.position, mat, this.worldpos);
+                        var targetpos = this.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                        gd3d.math.vec3Subtract(targetpos, this.worldpos, this.lookDir);
+                        gd3d.math.vec3Normalize(this.lookDir, this.lookDir);
+                        gd3d.math.matrixMakeTransformRTS(this.baseddata.position, this.baseddata.scale, this.localRotate, this.targetMat);
+                        gd3d.math.matrixMultiply(mat, this.targetMat, this.targetMat);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.targetMat, this.worldDirx);
+                        gd3d.math.vec3Normalize(this.worldDirx, this.worldDirx);
+                        gd3d.math.vec3Cross(this.lookDir, this.worldDirx, this.worldDiry);
+                        gd3d.math.vec3Cross(this.worldDirx, this.worldDiry, this.lookDir);
+                        gd3d.math.unitxyzToRotation(this.worldDirx, this.worldDiry, this.lookDir, this.worldRot);
+                        var parentRot = this.effect.root.getWorldRotate();
+                        gd3d.math.quatInverse(parentRot, this.inverseRot);
+                        gd3d.math.quatMultiply(this.inverseRot, this.worldRot, this.localRotate);
+                    }
+                    else {
+                        var mat = this.effect.root.getWorldMatrix();
+                        gd3d.math.matrixTransformVector3(this.position, mat, this.worldpos);
+                        var targetpos = this.effect.renderCamera.gameObject.transform.getWorldTranslate();
+                        gd3d.math.vec3Subtract(targetpos, this.worldpos, this.lookDir);
+                        gd3d.math.vec3Normalize(this.lookDir, this.lookDir);
+                        gd3d.math.matrixMakeTransformRTS(this.position, this.scale, this.localRotate, this.targetMat);
+                        gd3d.math.matrixMultiply(mat, this.targetMat, this.targetMat);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.targetMat, this.worldDiry);
+                        gd3d.math.vec3Normalize(this.worldDiry, this.worldDiry);
+                        gd3d.math.vec3Cross(this.worldDiry, this.lookDir, this.worldDirx);
+                        gd3d.math.vec3Cross(this.worldDirx, this.worldDiry, this.lookDir);
+                        gd3d.math.unitxyzToRotation(this.worldDirx, this.worldDiry, this.lookDir, this.worldRot);
+                        var parentRot = this.effect.root.getWorldRotate();
+                        gd3d.math.quatInverse(parentRot, this.inverseRot);
+                        gd3d.math.quatMultiply(this.inverseRot, this.worldRot, this.localRotate);
+                    }
                 }
                 else {
                     gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.localRotate);
@@ -15934,6 +15975,12 @@ var gd3d;
             LoopEnum[LoopEnum["Restart"] = 0] = "Restart";
             LoopEnum[LoopEnum["TimeContinue"] = 1] = "TimeContinue";
         })(LoopEnum = framework.LoopEnum || (framework.LoopEnum = {}));
+        var BindAxis;
+        (function (BindAxis) {
+            BindAxis[BindAxis["X"] = 0] = "X";
+            BindAxis[BindAxis["Y"] = 1] = "Y";
+            BindAxis[BindAxis["NONE"] = 2] = "NONE";
+        })(BindAxis = framework.BindAxis || (framework.BindAxis = {}));
         var F14SingleMeshBaseData = (function () {
             function F14SingleMeshBaseData(firstFrame) {
                 this.loopenum = LoopEnum.Restart;
@@ -15945,6 +15992,7 @@ var gd3d;
                 this.enableTexAnimation = false;
                 this.uvType = framework.UVTypeEnum.NONE;
                 this.beBillboard = false;
+                this.bindAxis = BindAxis.NONE;
                 this.firtstFrame = 0;
                 this.firtstFrame = firstFrame;
                 this.mesh = gd3d.framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad");
@@ -15987,6 +16035,17 @@ var gd3d;
                 }
                 if (json.beBillboard != null) {
                     this.beBillboard = json.beBillboard;
+                    switch (json.bindAxis) {
+                        case "NONE":
+                            this.bindAxis = BindAxis.NONE;
+                            break;
+                        case "X":
+                            this.bindAxis = BindAxis.X;
+                            break;
+                        case "Y":
+                            this.bindAxis = BindAxis.Y;
+                            break;
+                    }
                 }
             };
             return F14SingleMeshBaseData;
@@ -19683,7 +19742,7 @@ var gd3d;
             var width = 1.0 / column;
             var height = 1.0 / row;
             var offsetx = width * (index % column);
-            var offsety = height * (row - Math.floor(index / column) - 1);
+            var offsety = height * (row - height * (Math.floor(index / column) + 1));
             out.x = width;
             out.y = height;
             out.z = offsetx;
@@ -26013,6 +26072,7 @@ var gd3d;
                 }
                 this.RealCameraNumber = 0;
                 for (var i = 0; i < this.renderCameras.length; i++) {
+                    gd3d.render.glDrawPass.resetLastState();
                     this._renderCamera(i);
                 }
                 this.updateSceneOverLay(delta);
@@ -28851,6 +28911,7 @@ var gd3d;
                 this.mapuniforms = program.mapUniform;
             };
             glDrawPass.prototype.setAlphaBlend = function (mode) {
+                this.state_blendMode = mode;
                 if (mode == BlendModeEnum.Add) {
                     this.state_blend = true;
                     this.state_blendEquation = render.webglkit.FUNC_ADD;
@@ -28888,41 +28949,67 @@ var gd3d;
                     this.state_blend = false;
                 }
             };
+            glDrawPass.resetLastState = function () {
+                this.lastShowFace = -1;
+                this.lastZWrite = null;
+                this.lastZTest = null;
+                this.lastZTestMethod = -1;
+                this.lastBlend = null;
+                this.lastBlendMode = null;
+            };
             glDrawPass.prototype.use = function (webgl, applyUniForm) {
                 if (applyUniForm === void 0) { applyUniForm = true; }
-                if (this.state_showface == ShowFaceStateEnum.ALL) {
-                    webgl.disable(webgl.CULL_FACE);
-                }
-                else {
-                    if (this.state_showface == ShowFaceStateEnum.CCW) {
-                        webgl.frontFace(webgl.CCW);
+                if (this.state_showface != glDrawPass.lastShowFace) {
+                    glDrawPass.lastShowFace = this.state_showface;
+                    if (this.state_showface == ShowFaceStateEnum.ALL) {
+                        webgl.disable(webgl.CULL_FACE);
                     }
                     else {
-                        webgl.frontFace(webgl.CW);
+                        if (this.state_showface == ShowFaceStateEnum.CCW) {
+                            webgl.frontFace(webgl.CCW);
+                        }
+                        else {
+                            webgl.frontFace(webgl.CW);
+                        }
+                        webgl.cullFace(webgl.BACK);
+                        webgl.enable(webgl.CULL_FACE);
                     }
-                    webgl.cullFace(webgl.BACK);
-                    webgl.enable(webgl.CULL_FACE);
                 }
-                if (this.state_zwrite) {
-                    webgl.depthMask(true);
+                if (this.state_zwrite != glDrawPass.lastZWrite) {
+                    glDrawPass.lastZWrite = this.state_zwrite;
+                    if (this.state_zwrite) {
+                        webgl.depthMask(true);
+                    }
+                    else {
+                        webgl.depthMask(false);
+                    }
                 }
-                else {
-                    webgl.depthMask(false);
+                if (this.state_ztest != glDrawPass.lastZTest) {
+                    glDrawPass.lastZTest = this.state_ztest;
+                    if (this.state_ztest) {
+                        webgl.enable(webgl.DEPTH_TEST);
+                    }
+                    else {
+                        webgl.disable(webgl.DEPTH_TEST);
+                    }
                 }
-                if (this.state_ztest) {
-                    webgl.enable(webgl.DEPTH_TEST);
+                if (this.state_ztest && glDrawPass.lastZTestMethod != this.state_ztest_method) {
+                    glDrawPass.lastZTestMethod = this.state_ztest_method;
                     webgl.depthFunc(this.state_ztest_method);
                 }
-                else {
-                    webgl.disable(webgl.DEPTH_TEST);
+                if (this.state_blend != glDrawPass.lastBlend) {
+                    glDrawPass.lastBlend = this.state_blend;
+                    if (this.state_blend) {
+                        webgl.enable(webgl.BLEND);
+                    }
+                    else {
+                        webgl.disable(webgl.BLEND);
+                    }
                 }
-                if (this.state_blend) {
-                    webgl.enable(webgl.BLEND);
+                if (this.state_blend && glDrawPass.lastBlendMode != this.state_blendMode) {
+                    glDrawPass.lastBlendMode = this.state_blendMode;
                     webgl.blendEquation(this.state_blendEquation);
                     webgl.blendFuncSeparate(this.state_blendSrcRGB, this.state_blendDestRGB, this.state_blendSrcAlpha, this.state_blendDestALpha);
-                }
-                else {
-                    webgl.disable(webgl.BLEND);
                 }
                 this.program.use(webgl);
             };
@@ -28977,7 +29064,12 @@ var gd3d;
             glDrawPass.prototype.formate = function (str, out) {
                 return out += str + "_";
             };
-            glDrawPass.lastState = "";
+            glDrawPass.lastShowFace = -1;
+            glDrawPass.lastZWrite = null;
+            glDrawPass.lastZTest = null;
+            glDrawPass.lastZTestMethod = -1;
+            glDrawPass.lastBlend = null;
+            glDrawPass.lastBlendMode = null;
             return glDrawPass;
         }());
         render.glDrawPass = glDrawPass;

@@ -6,6 +6,7 @@ varying mediump vec2 xlv_TEXCOORD0;
 //light
 lowp vec4 xlv_COLOR; 
 bool hasLight = false;
+lowp float fixedAmbient = 0.3;
 uniform lowp float glstate_lightcount;
 uniform lowp vec4 glstate_vec4_lightposs[8];
 uniform lowp vec4 glstate_vec4_lightdirs[8];
@@ -77,7 +78,8 @@ void main()
     lowp vec4 basecolor = texture2D(_MainTex, xlv_TEXCOORD0);
     if(basecolor.a < _AlphaCut)
         discard;
-    lowp vec4 emission=basecolor*_MainColor;
+    lowp vec4 fristColor=basecolor*_MainColor;
+    lowp vec4 emission = fristColor;
 
     //----------------------------------------------------------
     //light
@@ -87,13 +89,13 @@ void main()
     lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
     emission.xyz *= decode_hdr(lightmap);
     if(hasLight){ // have light
-        lowp vec4 tempColor= (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));
-        emission = emission + mix(vec4(1.0, 1.0, 1.0, 1.0), tempColor, tempColor.wwww);
+        fristColor = fristColor * xlv_COLOR ;
+        emission = emission + mix(vec4(1.0, 1.0, 1.0, 1.0), fristColor, fristColor.wwww);
     }
     #else
 	if(hasLight){ // have light
-        emission = emission * xlv_COLOR;
-        emission = mix(vec4(1.0, 1.0, 1.0, 1.0), emission, emission.wwww);
+        fristColor = (fristColor * xlv_COLOR) + (fristColor * vec4(fixedAmbient,fixedAmbient,fixedAmbient,1.0));
+        emission = fristColor;
     }
     #endif
 

@@ -5,6 +5,7 @@ uniform highp mat4 glstate_matrix_mvp;
 uniform mediump vec4 _MainTex_ST;  
 varying mediump vec2 xlv_TEXCOORD0;
 //light
+lowp mat4 blendMat ;
 attribute lowp vec3 _glesNormal;  
 uniform highp mat4 glstate_matrix_model;
 uniform lowp float glstate_lightcount;
@@ -59,21 +60,25 @@ highp vec4 calcVertex(highp vec4 srcVertex,lowp vec4 blendIndex,lowp vec4 blendW
 	int i3 =int(blendIndex.z);
 	int i4 =int(blendIndex.w);
 	
-    mat4 mat = buildMat4(i)*blendWeight.x 
+    blendMat = buildMat4(i)*blendWeight.x 
 			 + buildMat4(i2)*blendWeight.y 
 			 + buildMat4(i3)*blendWeight.z 
 			 + buildMat4(i4)*blendWeight.w;
-	return mat* srcVertex;
+	return blendMat * srcVertex;
 }
+
 #endif
 
-void calcCOLOR(){
+void calcCOLOR(highp vec4 pos){
 	int c =int(glstate_lightcount);
 	if(c>0){
 		//求世界空间法线
+		#ifdef SKIN
+		v_N = normalize(mat3(blendMat) * _glesNormal);
+		#endif
 		lowp mat3 normalmat = mat3(glstate_matrix_model);
-		v_N =normalize(normalmat*_glesNormal);
-		v_Mpos =(glstate_matrix_model * vec4(_glesVertex.xyz, 1.0)).xyz;
+		v_N =normalize(normalmat*v_N);
+		v_Mpos =(glstate_matrix_model * pos).xyz;
 	}
 }
 
@@ -93,6 +98,8 @@ void main()
     #ifdef SKIN
     position =calcVertex(position,_glesBlendIndex4,_glesBlendWeight4);
     #endif
+	//light
+    calcCOLOR(position);
     position = (glstate_matrix_mvp * position);    
 
     #ifdef FOG
@@ -100,8 +107,6 @@ void main()
     factor = clamp(factor, 0.0, 1.0);  
     #endif
 
-	//light
-    calcCOLOR();
 
     gl_Position =position;
 }
