@@ -69,7 +69,7 @@ highp vec4 calcVertex(highp vec4 srcVertex,lowp vec4 blendIndex,lowp vec4 blendW
 
 #endif
 
-void calcCOLOR(highp vec4 pos){
+void calcNormal(highp vec4 pos){
 	int c =int(glstate_lightcount);
 	if(c>0){
 		//求世界空间法线
@@ -101,7 +101,7 @@ void main()
     position =calcVertex(position,_glesBlendIndex4,_glesBlendWeight4);
     #endif
 	//light
-    calcCOLOR(position);
+    calcNormal(position);
     position = (glstate_matrix_mvp * position);    
 
     #ifdef FOG
