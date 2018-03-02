@@ -196,14 +196,14 @@ namespace gd3d.framework
             div.appendChild(rotateDiv);
 
             //插入textureutil的js代码
-            let sc1 =document.createElement("script") as HTMLScriptElement;
-            let sc2 =document.createElement("script") as HTMLScriptElement;
-            sc1.type = "text/javascript";
-            sc2.type = "text/javascript";
-            sc1.innerHTML = textureutil.webgl_util;
-            sc2.innerHTML = textureutil.webgl_texture_util;
-            document.body.appendChild(sc1);
-            document.body.appendChild(sc2);
+            // let sc1 =document.createElement("script") as HTMLScriptElement;
+            // let sc2 =document.createElement("script") as HTMLScriptElement;
+            // sc1.type = "text/javascript";
+            // sc2.type = "text/javascript";
+            // sc1.innerHTML = textureutil.webgl_util;
+            // sc2.innerHTML = textureutil.webgl_texture_util;
+            // document.body.appendChild(sc1);
+            // document.body.appendChild(sc2);
 
             var canvas = document.createElement("canvas");
             if(canvas == null){
