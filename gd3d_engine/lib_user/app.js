@@ -2945,21 +2945,6 @@ var test_pick_boxcollider = (function () {
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
     };
-    test_pick_boxcollider.prototype.testLight = function (open) {
-        if (open) {
-            this.light = new gd3d.framework.transform();
-            this.light.localEulerAngles = new gd3d.math.vector3(30, 0, 0);
-            this.light.markDirty();
-            this.light.name = "----light";
-            var l = this.light.gameObject.addComponent("light");
-            l.type = gd3d.framework.LightTypeEnum.Direction;
-            l.color = new gd3d.math.color(1, 0.5, 0.5, 1);
-            this.scene.addChild(this.light);
-        }
-        else {
-            this.scene.removeChild(this.light);
-        }
-    };
     test_pick_boxcollider.prototype.loadScene = function (assetName, isCompress) {
         var _this = this;
         if (isCompress === void 0) { isCompress = false; }
@@ -2988,7 +2973,6 @@ var test_pick_boxcollider = (function () {
                 _scene.useLightMap(_this.app.getScene());
                 _this.scene.addChild(_root);
                 ShowBoxcollder(_root);
-                test_pick_boxcollider.loadScene = _this;
             }
         };
         if (isCompress) {

@@ -350,9 +350,6 @@ declare class test_pick_boxcollider implements IState {
     goals: any[];
     mods: gd3d.framework.transform[];
     start(app: gd3d.framework.application): void;
-    static loadScene: test_pick_boxcollider;
-    light: gd3d.framework.transform;
-    testLight(open: boolean): void;
     private loadScene(assetName, isCompress?);
     private colorMap;
     private getColor(r, g, b);

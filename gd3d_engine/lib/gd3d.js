@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000056";
+                this.build = "b000059";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -15614,7 +15614,7 @@ var gd3d;
             };
             F14RefElement.prototype.update = function (deltaTime, frame, fps) {
                 if (this.RefEffect._root.parent == null) {
-                    this.RefEffect._root.parent = this.effect.gameObject.transform;
+                    this.effect.gameObject.transform.addChild(this.RefEffect._root);
                     this.RefEffect._root.markDirty();
                     this.RefEffect._root.updateWorldTran();
                 }
