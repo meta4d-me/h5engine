@@ -4801,12 +4801,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class textureutil {
-        static webgl_util: string;
-        static webgl_texture_util: string;
-    }
-}
-declare namespace gd3d.framework {
     enum PrimitiveType {
         Sphere = 0,
         Capsule = 1,
