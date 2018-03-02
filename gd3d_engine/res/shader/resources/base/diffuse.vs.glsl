@@ -75,6 +75,8 @@ void calcCOLOR(highp vec4 pos){
 		//求世界空间法线
 		#ifdef SKIN
 		v_N = normalize(mat3(blendMat) * _glesNormal);
+		#else
+		v_N = _glesNormal;
 		#endif
 		lowp mat3 normalmat = mat3(glstate_matrix_model);
 		v_N =normalize(normalmat*v_N);

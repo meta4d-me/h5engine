@@ -34,6 +34,8 @@ namespace gd3d.framework
         intLightCount: number = 0;
         vec4LightPos: Float32Array = new Float32Array(32);
         vec4LightDir: Float32Array = new Float32Array(32);
+        vec4LightColor: Float32Array = new Float32Array(32);
+        floatLightRange: Float32Array = new Float32Array(8);
         floatLightSpotAngleCos: Float32Array = new Float32Array(8);
 
         lightmap: gd3d.framework.texture = null;
@@ -83,6 +85,13 @@ namespace gd3d.framework
                     //dir.w=0 && pos.w=1 表示点光源
                     //dir.w=1 && pos.w=0 表示方向光
                     this.floatLightSpotAngleCos[i] = lights[i].spotAngelCos;
+
+                    this.vec4LightColor[i * 4 + 0] = lights[i].color.r;
+                    this.vec4LightColor[i * 4 + 1] = lights[i].color.g;
+                    this.vec4LightColor[i * 4 + 2] = lights[i].color.b;
+                    this.vec4LightColor[i * 4 + 3] = lights[i].color.a;
+
+                    this.floatLightRange[i] = lights[i].range;
                 }
 
             }

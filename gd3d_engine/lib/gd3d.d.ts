@@ -2112,6 +2112,8 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         type: LightTypeEnum;
         spotAngelCos: number;
+        range: number;
+        color: math.color;
         start(): void;
         update(delta: number): void;
         remove(): void;
@@ -4488,6 +4490,8 @@ declare namespace gd3d.framework {
         intLightCount: number;
         vec4LightPos: Float32Array;
         vec4LightDir: Float32Array;
+        vec4LightColor: Float32Array;
+        floatLightRange: Float32Array;
         floatLightSpotAngleCos: Float32Array;
         lightmap: gd3d.framework.texture;
         lightmapUV: number;
@@ -4794,6 +4798,12 @@ declare namespace gd3d.framework {
         static trimAll(str: string): string;
         static firstCharToLowerCase(str: string): string;
         static isNullOrEmptyObject(obj: any): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class textureutil {
+        static webgl_util: string;
+        static webgl_texture_util: string;
     }
 }
 declare namespace gd3d.framework {
