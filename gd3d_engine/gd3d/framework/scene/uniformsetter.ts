@@ -39,6 +39,12 @@ namespace gd3d.framework
             this.autoUniformDic["glstate_vec4_lightdirs"]=(context: renderContext)=>{
                 return context.vec4LightDir;
             };
+            this.autoUniformDic["glstate_vec4_lightcolors"]=(context: renderContext)=>{
+                return context.vec4LightColor;
+            };
+            this.autoUniformDic["glstate_float_lightrange"]=(context: renderContext)=>{
+                return context.floatLightRange;
+            };
             this.autoUniformDic["glstate_float_spotangelcoss"]=(context: renderContext)=>{
                 return context.floatLightSpotAngleCos;
             };
