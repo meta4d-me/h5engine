@@ -65,7 +65,8 @@ namespace gd3d.framework
         {
             if(this.RefEffect._root.parent==null)
             {
-                this.RefEffect._root.parent=this.effect.gameObject.transform;
+                this.effect.gameObject.transform.addChild(this.RefEffect._root);
+                //this.RefEffect._root.parent=this.effect.gameObject.transform;
                 this.RefEffect._root.markDirty();
                 this.RefEffect._root.updateWorldTran();
             }
