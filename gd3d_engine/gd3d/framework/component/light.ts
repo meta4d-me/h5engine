@@ -34,11 +34,30 @@ namespace gd3d.framework
          * 光源类型
          * @version egret-gd3d 1.0
          */
+        @reflect.Field("number")
         type:LightTypeEnum;
          /**
          * @private
          */
         spotAngelCos:number =0.9;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 光源范围
+         * @version egret-gd3d 1.0
+         */
+        @reflect.Field("number")
+        range:number = 10;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 光源颜色
+         * @version egret-gd3d 1.0
+         */
+        @reflect.Field("color")
+        color:math.color = new math.color(1.0, 1.0, 1.0, 1.0);
         start()
         {
 

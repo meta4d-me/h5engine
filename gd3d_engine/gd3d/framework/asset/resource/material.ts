@@ -211,9 +211,7 @@ namespace gd3d.framework
                         console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                     }
                 }
-                if(unifomValue){
-                    func(unifom.location, unifomValue);
-                }
+                func(unifom.location, unifomValue);
             }
         }
 

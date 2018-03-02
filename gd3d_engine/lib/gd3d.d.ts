@@ -2112,6 +2112,8 @@ declare namespace gd3d.framework {
         gameObject: gameObject;
         type: LightTypeEnum;
         spotAngelCos: number;
+        range: number;
+        color: math.color;
         start(): void;
         update(delta: number): void;
         remove(): void;
@@ -2814,6 +2816,9 @@ declare namespace gd3d.framework {
         private worldpos;
         private worldRot;
         private inverseRot;
+        private lookDir;
+        private worldDirx;
+        private worldDiry;
         updateRotByBillboard(): void;
         reset(): void;
     }
@@ -2865,6 +2870,11 @@ declare namespace gd3d.framework {
         Restart = 0,
         TimeContinue = 1,
     }
+    enum BindAxis {
+        X = 0,
+        Y = 1,
+        NONE = 2,
+    }
     class F14SingleMeshBaseData implements F14ElementData {
         loopenum: LoopEnum;
         mesh: mesh;
@@ -2882,6 +2892,7 @@ declare namespace gd3d.framework {
         column: number;
         count: number;
         beBillboard: boolean;
+        bindAxis: BindAxis;
         firtstFrame: number;
         constructor(firstFrame: number);
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
@@ -4479,6 +4490,8 @@ declare namespace gd3d.framework {
         intLightCount: number;
         vec4LightPos: Float32Array;
         vec4LightDir: Float32Array;
+        vec4LightColor: Float32Array;
+        floatLightRange: Float32Array;
         floatLightSpotAngleCos: Float32Array;
         lightmap: gd3d.framework.texture;
         lightmapUV: number;
@@ -4785,6 +4798,12 @@ declare namespace gd3d.framework {
         static trimAll(str: string): string;
         static firstCharToLowerCase(str: string): string;
         static isNullOrEmptyObject(obj: any): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class textureutil {
+        static webgl_util: string;
+        static webgl_texture_util: string;
     }
 }
 declare namespace gd3d.framework {
@@ -5152,16 +5171,14 @@ declare namespace gd3d.render {
         static lastZTest: boolean;
         static lastZTestMethod: number;
         static lastBlend: boolean;
-        static lastBlendEquation: number;
-        static lastBlendVal: string;
-        static lastState: string;
-        curState: string;
+        static lastBlendMode: BlendModeEnum;
         program: glProgram;
         state_showface: ShowFaceStateEnum;
         state_zwrite: boolean;
         state_ztest: boolean;
         state_ztest_method: number;
         state_blend: boolean;
+        state_blendMode: BlendModeEnum;
         state_blendEquation: number;
         state_blendSrcRGB: number;
         state_blendDestRGB: number;
@@ -5172,6 +5189,7 @@ declare namespace gd3d.render {
         };
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
+        static resetLastState(): void;
         use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
         draw(webgl: WebGLRenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
         private getCurDrawState();

@@ -77,6 +77,7 @@ declare class dome_loadaniplayer implements IState {
     private roleName;
     private weaponName;
     private skillName;
+    private names;
     private ani;
     private loadShader(laststate, state);
     private loadRole(laststate, state);
@@ -349,6 +350,9 @@ declare class test_pick_boxcollider implements IState {
     goals: any[];
     mods: gd3d.framework.transform[];
     start(app: gd3d.framework.application): void;
+    static loadScene: test_pick_boxcollider;
+    light: gd3d.framework.transform;
+    testLight(open: boolean): void;
     private loadScene(assetName, isCompress?);
     private colorMap;
     private getColor(r, g, b);
@@ -1477,6 +1481,46 @@ declare class test_effecteditor implements IState {
     bestop: boolean;
     bereplay: boolean;
     update(delta: number): void;
+}
+declare class LoadDomes {
+    static load(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (out: any) => void): void;
+    static loadBundle(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (name: string) => void): void;
+    static loadCompressBundle(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (out: any) => void): void;
+    static loadGLVertexShader(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (vs: string) => void): void;
+    static loadGLFragmentShader(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (fs: string) => void): void;
+    static loadShader(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (shader: gd3d.framework.shader) => void): void;
+    static loadTextAsset(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (textAsset: gd3d.framework.textasset) => void): void;
+    static loadPathAsset(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (textAsset: gd3d.framework.pathasset) => void): void;
+    static loadMesh(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (mesh: gd3d.framework.mesh) => void): void;
+    static loadTexture(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (texture: gd3d.framework.texture) => void): void;
+    static loadPVR(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (texture: gd3d.framework.texture) => void): void;
+    static loadDDS(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (texture: gd3d.framework.texture) => void): void;
+    static loadTextureDesc(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (name: string) => void): void;
+    static loadFont(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (font: gd3d.framework.font) => void): void;
+    static loadAtlas(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (atlas: gd3d.framework.atlas) => void): void;
+    static loadMaterial(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (material: gd3d.framework.material) => void): void;
+    static loadAniplayer(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (animationClip: gd3d.framework.animationClip) => void): void;
+    static loadF14Effect(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (f14Effect: gd3d.framework.f14eff) => void): void;
+    static loadPrefab(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (prefab: gd3d.framework.prefab) => void): void;
+    static loadPrefabToTranfrom(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (transform: gd3d.framework.transform) => void): void;
+    static loadPrefabToTranfrom2D(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (transform2D: gd3d.framework.transform2D) => void): void;
+    static loadScene(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (rawscene: gd3d.framework.rawscene) => void): void;
+    static loadSceneToRoot(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (rawscene: gd3d.framework.transform) => void): void;
+    private static getName(file);
+}
+declare class LoadPrefebDome implements IState {
+    app: gd3d.framework.application;
+    assetMgr: gd3d.framework.assetMgr;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    update(detal: number): void;
+}
+declare class LoadPrefebDome2 implements IState {
+    app: gd3d.framework.application;
+    assetMgr: gd3d.framework.assetMgr;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    update(detal: number): void;
 }
 declare class test_drawMesh implements IState {
     app: gd3d.framework.application;

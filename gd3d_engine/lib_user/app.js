@@ -637,6 +637,7 @@ var dome_loadaniplayer = (function () {
         this.roleName = "pc2";
         this.weaponName = "wp_ds_001";
         this.skillName = "pc2_cskill1.FBAni.aniclip.bin";
+        this.names = ["pc2_cskill1.FBAni.aniclip.bin", "pc2_skill1.FBAni.aniclip.bin", "pc2_skill34.FBAni.aniclip.bin", "pc2_skill27.FBAni.aniclip.bin", "pc1_skill27.FBAni.aniclip.bin"];
     }
     dome_loadaniplayer.prototype.loadShader = function (laststate, state) {
         this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
@@ -709,14 +710,28 @@ var dome_loadaniplayer = (function () {
         var play = document.createElement("button");
         var stop = document.createElement("button");
         var playspeed = document.createElement("input");
+        var sel = document.createElement("select");
+        sel.value = sel.innerText = this.names[0];
+        for (var i_1 = 0; i_1 < this.names.length; i_1++) {
+            var op = document.createElement("option");
+            op.value = op.innerText = this.names[i_1];
+            sel.appendChild(op);
+        }
+        sel.onchange = function (e) {
+            _this.loadSkill(_this.skillName = e.target.value);
+        };
+        sel.style.height = "20px";
+        sel.style.width = "200px";
+        sel.style.fontSize = "12px";
+        sel.style.top = "150px";
         play.value = "PLAY";
         play.textContent = "PLAY";
         stop.value = "STOP";
         stop.textContent = "STOP";
-        play.style.position = stop.style.position = playspeed.style.position = "absolute";
+        play.style.position = stop.style.position = playspeed.style.position = sel.style.position = "absolute";
         play.style.height = stop.style.height = playspeed.style.height = "30px";
         play.style.width = stop.style.width = playspeed.style.width = "100px";
-        play.style.left = stop.style.left = playspeed.style.left = "30px";
+        play.style.left = stop.style.left = playspeed.style.left = sel.style.left = "30px";
         play.style.top = "50px";
         stop.style.top = "85px";
         playspeed.style.top = "120px";
@@ -733,6 +748,7 @@ var dome_loadaniplayer = (function () {
                 speed = num;
             }
         };
+        var i = 0;
         play.onclick = function () {
             _this.ani.stop();
             _this.ani.play(_this.skillName, speed);
@@ -743,6 +759,7 @@ var dome_loadaniplayer = (function () {
         this.app.container.appendChild(play);
         this.app.container.appendChild(stop);
         this.app.container.appendChild(playspeed);
+        this.app.container.appendChild(sel);
         state.finish = true;
     };
     dome_loadaniplayer.prototype.addCam = function (laststate, state) {
@@ -2928,6 +2945,21 @@ var test_pick_boxcollider = (function () {
         objCam.markDirty();
         CameraController.instance().init(this.app, this.camera);
     };
+    test_pick_boxcollider.prototype.testLight = function (open) {
+        if (open) {
+            this.light = new gd3d.framework.transform();
+            this.light.localEulerAngles = new gd3d.math.vector3(30, 0, 0);
+            this.light.markDirty();
+            this.light.name = "----light";
+            var l = this.light.gameObject.addComponent("light");
+            l.type = gd3d.framework.LightTypeEnum.Direction;
+            l.color = new gd3d.math.color(1, 0.5, 0.5, 1);
+            this.scene.addChild(this.light);
+        }
+        else {
+            this.scene.removeChild(this.light);
+        }
+    };
     test_pick_boxcollider.prototype.loadScene = function (assetName, isCompress) {
         var _this = this;
         if (isCompress === void 0) { isCompress = false; }
@@ -2956,6 +2988,7 @@ var test_pick_boxcollider = (function () {
                 _scene.useLightMap(_this.app.getScene());
                 _this.scene.addChild(_root);
                 ShowBoxcollder(_root);
+                test_pick_boxcollider.loadScene = _this;
             }
         };
         if (isCompress) {
@@ -6795,11 +6828,6 @@ var test_loadScene = (function () {
             _this.app.getScene().lightmaps = [];
             _scene.useLightMap(_this.app.getScene());
             _scene.useFog(_this.app.getScene());
-            var lt = new gd3d.framework.transform();
-            _this.scene.addChild(lt);
-            var light = lt.gameObject.addComponent("light");
-            light.type = gd3d.framework.LightTypeEnum.Direction;
-            lt.localEulerAngles.x = 1.6;
         };
         if (isCompress) {
             this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
@@ -7711,8 +7739,8 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = true;
                 }
-                for (var i_1 = 0; i_1 < _this.traillist.length; i_1++) {
-                    _this.traillist[i_1].play();
+                for (var i_2 = 0; i_2 < _this.traillist.length; i_2++) {
+                    _this.traillist[i_2].play();
                 }
                 _this.guippaths[0].play(2);
                 _this.guippaths[1].play();
@@ -7722,9 +7750,9 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = false;
                 }
-                for (var i_2 = 0; i_2 < _this.guippaths.length; i_2++) {
-                    _this.traillist[i_2].stop();
-                    _this.guippaths[i_2].stop();
+                for (var i_3 = 0; i_3 < _this.guippaths.length; i_3++) {
+                    _this.traillist[i_3].stop();
+                    _this.guippaths[i_3].stop();
                 }
             });
         };
@@ -11294,6 +11322,413 @@ var test_effecteditor = (function () {
         this.taskmgr.move(delta);
     };
     return test_effecteditor;
+}());
+var LoadDomes = (function () {
+    function LoadDomes() {
+    }
+    LoadDomes.load = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.iserror) {
+                if (onLoadfinish)
+                    onLoadfinish(s);
+                return;
+            }
+            if (s.isfinish) {
+                if (onLoadfinish)
+                    onLoadfinish(s);
+            }
+        });
+    };
+    LoadDomes.loadBundle = function (assetMgr, url, onLoadfinish) {
+        var _this = this;
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Bundle, function (s) {
+            if (s.isfinish) {
+                if (onLoadfinish)
+                    onLoadfinish(_this.getName(assetMgr.getFileName(url)));
+            }
+        });
+    };
+    LoadDomes.loadCompressBundle = function (assetMgr, url, onLoadfinish) {
+        var _this = this;
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.loadCompressBundle(url, function (s) {
+            if (s.iserror) {
+                if (onLoadfinish)
+                    onLoadfinish(s);
+                return;
+            }
+            if (s.isfinish) {
+                if (onLoadfinish)
+                    onLoadfinish(_this.getName(assetMgr.getFileName(url)));
+            }
+        });
+    };
+    LoadDomes.loadGLVertexShader = function (assetMgr, url, onLoadfinish) {
+        var _this = this;
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.GLVertexShader, function (s) {
+            if (s.isfinish) {
+                var vs = void 0;
+                {
+                    var name_1 = _this.getName(assetMgr.getFileName(url));
+                    vs = assetMgr.shaderPool.mapVSString[name_1];
+                }
+                if (vs) {
+                    if (onLoadfinish)
+                        onLoadfinish(vs);
+                }
+                else {
+                    console.error("GLVertexShader资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadGLFragmentShader = function (assetMgr, url, onLoadfinish) {
+        var _this = this;
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.GLFragmentShader, function (s) {
+            if (s.isfinish) {
+                var fs = assetMgr.shaderPool.mapFSString[_this.getName(assetMgr.getFileName(url))];
+                if (fs) {
+                    if (onLoadfinish)
+                        onLoadfinish(fs);
+                }
+                else {
+                    console.error("GLFragmentShader资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadShader = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Shader, function (s) {
+            if (s.isfinish) {
+                var shader = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (shader) {
+                    if (onLoadfinish)
+                        onLoadfinish(shader);
+                }
+                else {
+                    console.error("shader资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadTextAsset = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.TextAsset, function (s) {
+            if (s.isfinish) {
+                var textAsset = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (textAsset) {
+                    if (onLoadfinish)
+                        onLoadfinish(textAsset);
+                }
+                else {
+                    console.error("textasset资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadPathAsset = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.PathAsset, function (s) {
+            if (s.isfinish) {
+                var pathAsset = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (pathAsset) {
+                    if (onLoadfinish)
+                        onLoadfinish(pathAsset);
+                }
+                else {
+                    console.error("textasset资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadMesh = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Mesh, function (s) {
+            if (s.isfinish) {
+                var mesh = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (mesh) {
+                    if (onLoadfinish)
+                        onLoadfinish(mesh);
+                }
+                else {
+                    console.error("mesh资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadTexture = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Texture, function (s) {
+            if (s.isfinish) {
+                var texture = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (texture) {
+                    if (onLoadfinish)
+                        onLoadfinish(texture);
+                }
+                else {
+                    console.error("texture资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadPVR = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.PVR, function (s) {
+            if (s.isfinish) {
+                var texture = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (texture) {
+                    if (onLoadfinish)
+                        onLoadfinish(texture);
+                }
+                else {
+                    console.error("PVR图片资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadDDS = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.DDS, function (s) {
+            if (s.isfinish) {
+                var texture = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (texture) {
+                    if (onLoadfinish)
+                        onLoadfinish(texture);
+                }
+                else {
+                    console.error("DDS图片资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadTextureDesc = function (assetMgr, url, onLoadfinish) {
+        var _this = this;
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.TextureDesc, function (s) {
+            if (s.isfinish) {
+                if (onLoadfinish)
+                    onLoadfinish(_this.getName(assetMgr.getFileName(url)));
+            }
+        });
+    };
+    LoadDomes.loadFont = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Font, function (s) {
+            if (s.isfinish) {
+                var font = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (font) {
+                    if (onLoadfinish)
+                        onLoadfinish(font);
+                }
+                else {
+                    console.error("font资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadAtlas = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Atlas, function (s) {
+            if (s.isfinish) {
+                var atlas = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (atlas) {
+                    if (onLoadfinish)
+                        onLoadfinish(atlas);
+                }
+                else {
+                    console.error("atlas资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadMaterial = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Material, function (s) {
+            if (s.isfinish) {
+                var material = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (material) {
+                    if (onLoadfinish)
+                        onLoadfinish(material);
+                }
+                else {
+                    console.error("material资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadAniplayer = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Aniclip, function (s) {
+            if (s.isfinish) {
+                var aniClip = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (aniClip) {
+                    if (onLoadfinish)
+                        onLoadfinish(aniClip);
+                }
+                else {
+                    console.error("animationClip资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadF14Effect = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.F14Effect, function (s) {
+            if (s.isfinish) {
+                var f14eff = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (f14eff) {
+                    if (onLoadfinish)
+                        onLoadfinish(f14eff);
+                }
+                else {
+                    console.error("animationClip资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadPrefab = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Prefab, function (s) {
+            if (s.isfinish) {
+                var fileName = assetMgr.getFileName(url);
+                var name_2 = LoadDomes.getName(fileName);
+                var prefab = assetMgr.getAssetByName(name_2 + ".prefab.json");
+                if (prefab) {
+                    if (onLoadfinish)
+                        onLoadfinish(prefab);
+                }
+                else {
+                    console.error("Prefab资源加载异常");
+                }
+            }
+        });
+    };
+    LoadDomes.loadPrefabToTranfrom = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        this.loadPrefab(assetMgr, url, function (out) {
+            var tran = out.getCloneTrans();
+            if (tran) {
+                if (onLoadfinish)
+                    onLoadfinish(tran);
+            }
+            else {
+                console.error("loadPrefabToTranfrom资源加载异常");
+            }
+        });
+    };
+    LoadDomes.loadPrefabToTranfrom2D = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        this.loadPrefab(assetMgr, url, function (out) {
+            var tran = out.getCloneTrans2D();
+            if (tran) {
+                if (onLoadfinish)
+                    onLoadfinish(tran);
+            }
+            else {
+                console.error("loadPrefabToTranfrom2D资源加载异常");
+            }
+        });
+    };
+    LoadDomes.loadScene = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Scene, function (s) {
+            if (s.isfinish) {
+                var scene = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (scene) {
+                    onLoadfinish(scene);
+                }
+            }
+        });
+    };
+    LoadDomes.loadSceneToRoot = function (assetMgr, url, onLoadfinish) {
+        if (onLoadfinish === void 0) { onLoadfinish = null; }
+        assetMgr.load(url, gd3d.framework.AssetTypeEnum.Scene, function (s) {
+            if (s.isfinish) {
+                var scene = assetMgr.getAssetByName(assetMgr.getFileName(url));
+                if (scene) {
+                    onLoadfinish(scene.getSceneRoot());
+                }
+            }
+        });
+    };
+    LoadDomes.getName = function (file) {
+        var name = file.substring(0, file.indexOf("."));
+        return name;
+    };
+    return LoadDomes;
+}());
+var LoadPrefebDome = (function () {
+    function LoadPrefebDome() {
+    }
+    LoadPrefebDome.prototype.start = function (app) {
+        var _this = this;
+        this.app = app;
+        this.assetMgr = app.getAssetMgr();
+        this.scene = app.getScene();
+        var cam, camera;
+        {
+            cam = new gd3d.framework.transform();
+            cam.name = "looker";
+            this.scene.addChild(cam);
+            cam.localPosition = new gd3d.math.vector3(0, 0, -10);
+            camera = cam.gameObject.addComponent("camera");
+            camera.far = 100;
+            cam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            cam.markDirty();
+        }
+        LoadDomes.loadPrefab(this.assetMgr, "res/prefabs/Quad11/resources/Quad11.prefab.json", function (prefeb) {
+            var quad11 = prefeb.getCloneTrans();
+            quad11.name = "Quad11";
+            _this.scene.addChild(quad11);
+            quad11.localPosition = new gd3d.math.vector3(0, 0, 0);
+            quad11.markDirty();
+            console.log(quad11);
+        });
+    };
+    LoadPrefebDome.prototype.update = function (detal) {
+    };
+    return LoadPrefebDome;
+}());
+var LoadPrefebDome2 = (function () {
+    function LoadPrefebDome2() {
+    }
+    LoadPrefebDome2.prototype.start = function (app) {
+        var _this = this;
+        this.app = app;
+        this.assetMgr = app.getAssetMgr();
+        this.scene = app.getScene();
+        var cam, camera;
+        {
+            cam = new gd3d.framework.transform();
+            cam.name = "looker";
+            this.scene.addChild(cam);
+            cam.localPosition = new gd3d.math.vector3(0, 0, -10);
+            camera = cam.gameObject.addComponent("camera");
+            camera.far = 100;
+            cam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            cam.markDirty();
+        }
+        LoadDomes.loadBundle(this.assetMgr, "res/shader/MainShader.assetbundle.json", function (s) {
+            LoadDomes.loadMesh(_this.assetMgr, "res/prefabs/Quad11/resources/Library_unity_default_resources_Quad.mesh.bin", function (mesh) {
+                LoadDomes.loadTextureDesc(_this.assetMgr, "res/prefabs/Quad11/resources/87_terrain_007_diff.imgdesc.json", function (s) {
+                    LoadDomes.loadMaterial(_this.assetMgr, "res/prefabs/Quad11/resources/NewMaterial.mat.json", function (s) {
+                        LoadDomes.loadPrefabToTranfrom(_this.assetMgr, "res/prefabs/Quad11/resources/Quad.prefab.json", function (tran) {
+                            _this.scene.addChild(tran);
+                            tran.markDirty();
+                        });
+                    });
+                });
+            });
+        });
+    };
+    LoadPrefebDome2.prototype.update = function (detal) {
+    };
+    return LoadPrefebDome2;
 }());
 var test_drawMesh = (function () {
     function test_drawMesh() {
