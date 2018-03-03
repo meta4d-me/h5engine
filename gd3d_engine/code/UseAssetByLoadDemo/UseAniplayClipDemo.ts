@@ -1,5 +1,5 @@
 //加载动作病简单使用动作的Dome
-class UseAniplayClipDome implements IState {
+class UseAniplayClipDemo implements IState {
 
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -7,17 +7,26 @@ class UseAniplayClipDome implements IState {
     taskMgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
     aniplayer: gd3d.framework.aniplayer;
 
-    private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-            if (s.iserror) {
-                state.error = true;
-            }
-            if (s.isfinish)
+
+    //加载一个动作
+    private loadAniplayClip(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        this.app.getAssetMgr().load(`res/prefabs/roles/pc2/Resources/pc2_skill1.FBAni.aniclip.bin`, gd3d.framework.AssetTypeEnum.Aniclip, (s) => {
+            if (s.isfinish) {
+                //取出一个动作的 IAsset对象
+                let clip = this.app.getAssetMgr().getAssetByName("pc2_skill1.FBAni.aniclip.bin") as gd3d.framework.animationClip;
+                //通过动作资源的名字找到对应动作的ID
+                let j = this.aniplayer.clipnames["pc2_skill1.FBAni.aniclip.bin"];
+                //如果ID存在就说明该aniplayer存在，然后绑定动作资源
+                if (j != null) {
+                    this.aniplayer.clips[j] = clip;
+                }
                 state.finish = true;
+                this.aniplayer.play("pc2_skill1.FBAni.aniclip.bin", 1.0);
+            }
         });
     }
 
-    //通过bundle包加载一个完整的带动作的角色。
+    //#region  通过bundle包加载一个完整的带动作的角色。
     private loadRole(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
         this.app.getAssetMgr().load(`res/prefabs/roles/pc2/pc2.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s) => {
             if (s.isfinish) {
@@ -45,7 +54,7 @@ class UseAniplayClipDome implements IState {
                             weapon.markDirty();
                         }
 
-                        if(lhand){
+                        if (lhand) {
                             let weapon = prefab.getCloneTrans();
                             lhand.addChild(weapon);
                             weapon.localRotate = new gd3d.math.quaternion();
@@ -61,26 +70,21 @@ class UseAniplayClipDome implements IState {
             }
         });
     }
-
-    //加载一个动作
-    private loadAniplayClip(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate){
-        this.app.getAssetMgr().load(`res/prefabs/roles/pc2/Resources/pc2_skill1.FBAni.aniclip.bin`,gd3d.framework.AssetTypeEnum.Aniclip,(s)=>{
-            if(s.isfinish){
-                //取出一个动作的 IAsset对象
-                let clip = this.app.getAssetMgr().getAssetByName("pc2_skill1.FBAni.aniclip.bin") as gd3d.framework.animationClip;
-                //通过动作资源的名字找到对应动作的ID
-                let j = this.aniplayer.clipnames["pc2_skill1.FBAni.aniclip.bin"];
-                //如果ID存在就说明该aniplayer存在，然后绑定动作资源
-                if(j!=null){
-                    this.aniplayer.clips[j] = clip;
-                }
-                state.finish = true;
-                this.aniplayer.play("pc2_skill1.FBAni.aniclip.bin",1.0);
+    //#endregion
+    
+    //#region 加载shader
+    private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
+            if (s.iserror) {
+                state.error = true;
             }
+            if (s.isfinish)
+                state.finish = true;
         });
     }
+    //#endregion
 
-    //添加摄像机
+    //#region  添加摄像机
     private addCamera(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
         let objCam = new gd3d.framework.transform();
         objCam.name = "camera.";
@@ -95,6 +99,7 @@ class UseAniplayClipDome implements IState {
         objCam.markDirty();
         state.finish = true;
     }
+    //#endregion
 
     start(app: gd3d.framework.application) {
         this.app = app;
@@ -103,8 +108,9 @@ class UseAniplayClipDome implements IState {
         this.taskMgr.addTaskCall(this.addCamera.bind(this));
         this.taskMgr.addTaskCall(this.loadRole.bind(this));
         this.taskMgr.addTaskCall(this.loadAniplayClip.bind(this));
-        
+
     }
+
 
     update(delta: number) {
         this.taskMgr.move(delta);
