@@ -24,7 +24,7 @@ class LoadPrefebDome implements IState {//IState 接口是给dome用的接口，
             cam.markDirty();
         }
         //Dome加载的资源使用的是 res/prefabs/Quad11
-        LoadDomes.loadPrefab(this.assetMgr, "res/prefabs/Quad11/resources/Quad11.prefab.json", (prefeb: gd3d.framework.prefab) => {
+        LoadDomes.loadPrefab(this.assetMgr, "res/prefabs/Cube/resources/Cube.prefab.json", (prefeb: gd3d.framework.prefab) => {
             let quad11 = prefeb.getCloneTrans();
             quad11.name = "Quad11"
             this.scene.addChild(quad11);
@@ -34,7 +34,7 @@ class LoadPrefebDome implements IState {//IState 接口是给dome用的接口，
         });
     }
 
-    update(detal: number) {//接口IState 的update方法 detal一般是当前与上次 app中update方法被的时间差
+    update(delta: number) {//接口IState 的update方法 detal一般是当前与上次 app中update方法被的时间差
 
     }
 
@@ -81,6 +81,7 @@ class LoadPrefebDome2 implements IState {
                         LoadDomes.loadPrefabToTranfrom(this.assetMgr, "res/prefabs/Quad11/resources/Quad.prefab.json", (tran: gd3d.framework.transform) => {
                             this.scene.addChild(tran);
                             tran.markDirty();
+                            console.log(tran);
                         });
                     });
                 });
@@ -112,7 +113,10 @@ class LoadPrefebDome2 implements IState {
                     });
                 }
             });
+        */
 
+
+        /*  
             从上面的代码中可以看出，加载复杂的资源代码量会非常乱，所以实际开发中都会把资源打包成bundle包 或 压缩的bundle包进行统一加载。如下：
             this.assetMgr.load("res/shader/MainShader.assetbundle.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
                 if(s.isfinish){
@@ -123,16 +127,13 @@ class LoadPrefebDome2 implements IState {
                             this.scene.addChild(quad);
                             quad.markDirty();
                         }
-                    }
+                    });
                 }
             });
-
         */
-
-        
     }
 
-    update(detal: number) {
+    update(delta: number) {
 
     }
 

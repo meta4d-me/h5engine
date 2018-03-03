@@ -170,15 +170,6 @@ namespace gd3d.framework {
                             t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
                             t2d.texture = texture;
                             _texture.glTexture = t2d;
-                            // if (stats != null) {
-
-                            // }
-
-                            // if (!error) {
-
-                            // } else {
-
-                            // }
                         });
 
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
