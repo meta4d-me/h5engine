@@ -37,6 +37,13 @@ namespace gd3d.framework
         vec4LightColor: Float32Array = new Float32Array(32);
         floatLightRange: Float32Array = new Float32Array(8);
         floatLightSpotAngleCos: Float32Array = new Float32Array(8);
+        private _lightCullingMask:number[] = [];
+        private _vec4LightPos: Float32Array = new Float32Array(32);
+        private _vec4LightDir: Float32Array = new Float32Array(32);
+        private _vec4LightColor: Float32Array = new Float32Array(32);
+        private _floatLightRange: Float32Array = new Float32Array(8);
+        private _floatLightSpotAngleCos: Float32Array = new Float32Array(8);
+
 
         lightmap: gd3d.framework.texture = null;
         lightmapUV: number = 1;
@@ -65,33 +72,34 @@ namespace gd3d.framework
         updateLights(lights: light[])
         {
             this.intLightCount = lights.length;
+            this._lightCullingMask.length = 0;
             var dirt = math.pool.new_vector3();
             for (var i = 0; i < lights.length; i++)
             {
-
+                this._lightCullingMask.push(lights[i].cullingMask);
                 {
                     var pos = lights[i].gameObject.transform.getWorldTranslate();
-                    this.vec4LightPos[i * 4 + 0] = pos.x;
-                    this.vec4LightPos[i * 4 + 1] = pos.y;
-                    this.vec4LightPos[i * 4 + 2] = pos.z;
-                    this.vec4LightPos[i * 4 + 3] = lights[i].type == framework.LightTypeEnum.Direction ? 0 : 1;
+                    this._vec4LightPos[i * 4 + 0] = pos.x;
+                    this._vec4LightPos[i * 4 + 1] = pos.y;
+                    this._vec4LightPos[i * 4 + 2] = pos.z;
+                    this._vec4LightPos[i * 4 + 3] = lights[i].type == framework.LightTypeEnum.Direction ? 0 : 1;
 
                     lights[i].gameObject.transform.getForwardInWorld(dirt);
-                    this.vec4LightDir[i * 4 + 0] = dirt.x;
-                    this.vec4LightDir[i * 4 + 1] = dirt.y;
-                    this.vec4LightDir[i * 4 + 2] = dirt.z;
-                    this.vec4LightDir[i * 4 + 3] = lights[i].type == framework.LightTypeEnum.Point ? 0 : 1;
+                    this._vec4LightDir[i * 4 + 0] = dirt.x;
+                    this._vec4LightDir[i * 4 + 1] = dirt.y;
+                    this._vec4LightDir[i * 4 + 2] = dirt.z;
+                    this._vec4LightDir[i * 4 + 3] = lights[i].type == framework.LightTypeEnum.Point ? 0 : 1;
                     //dir.w=1 && pos.w=1 表示聚光灯
                     //dir.w=0 && pos.w=1 表示点光源
                     //dir.w=1 && pos.w=0 表示方向光
-                    this.floatLightSpotAngleCos[i] = lights[i].spotAngelCos;
+                    this._floatLightSpotAngleCos[i] = lights[i].spotAngelCos;
 
-                    this.vec4LightColor[i * 4 + 0] = lights[i].color.r;
-                    this.vec4LightColor[i * 4 + 1] = lights[i].color.g;
-                    this.vec4LightColor[i * 4 + 2] = lights[i].color.b;
-                    this.vec4LightColor[i * 4 + 3] = lights[i].color.a;
+                    this._vec4LightColor[i * 4 + 0] = lights[i].color.r;
+                    this._vec4LightColor[i * 4 + 1] = lights[i].color.g;
+                    this._vec4LightColor[i * 4 + 2] = lights[i].color.b;
+                    this._vec4LightColor[i * 4 + 3] = lights[i].color.a;
 
-                    this.floatLightRange[i] = lights[i].range;
+                    this._floatLightRange[i] = lights[i].range;
                 }
 
             }
@@ -125,6 +133,38 @@ namespace gd3d.framework
         {
             gd3d.math.matrixClone(this.matrixView, this.matrixModelView);
             gd3d.math.matrixClone(this.matrixViewProject, this.matrixModelViewProject);
+        }
+
+        //更新 光照剔除mask
+        updateLightMask(layer:number){
+            if(this.intLightCount == 0) return ;
+            let num = 1 << layer; 
+            let indexList:number[] = [];
+            for(var i = 0;i<this._lightCullingMask.length ;i++){
+                let mask = this._lightCullingMask[i];
+                if(mask & num) indexList.push(i);
+            }
+            this.intLightCount = indexList.length;
+            for(var i=0;i<indexList.length;i++){
+                let idx = indexList[i];
+                this.floatLightSpotAngleCos[i] = this._floatLightSpotAngleCos[idx];
+                this.floatLightRange[i] = this._floatLightRange[idx];
+                //pos
+                this.vec4LightPos[i * 4 + 0] = this._vec4LightPos[idx * 4 + 0];
+                this.vec4LightPos[i * 4 + 1] = this._vec4LightPos[idx * 4 + 1];
+                this.vec4LightPos[i * 4 + 2] = this._vec4LightPos[idx * 4 + 2];
+                this.vec4LightPos[i * 4 + 3] = this._vec4LightPos[idx * 4 + 3];
+                //dir
+                this.vec4LightDir[i * 4 + 0] = this._vec4LightDir[idx * 4 + 0];
+                this.vec4LightDir[i * 4 + 1] = this._vec4LightDir[idx * 4 + 1];
+                this.vec4LightDir[i * 4 + 2] = this._vec4LightDir[idx * 4 + 2];
+                this.vec4LightDir[i * 4 + 3] = this._vec4LightDir[idx * 4 + 3];
+                //color
+                this.vec4LightColor[i * 4 + 0] = this._vec4LightColor[idx * 4 + 0];
+                this.vec4LightColor[i * 4 + 1] = this._vec4LightColor[idx * 4 + 1];
+                this.vec4LightColor[i * 4 + 2] = this._vec4LightColor[idx * 4 + 2];
+                this.vec4LightColor[i * 4 + 3] = this._vec4LightColor[idx * 4 + 3];
+            }
         }
     }
     /**

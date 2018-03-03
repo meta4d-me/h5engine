@@ -383,7 +383,7 @@ namespace gd3d.framework
             }
             //收集灯光
             var l = node.gameObject.light;
-            if (l != null)
+            if (l != null && node.gameObject.visible)
             {
                 this.renderLights.push(l);
             }
@@ -488,9 +488,9 @@ namespace gd3d.framework
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
          * @version egret-gd3d 1.0
          */
-        public pickAll(ray: ray, isPickMesh: boolean = false, root: transform = this.getRoot(),layer:number = NaN): Array<pickinfo>
+        public pickAll(ray: ray, isPickMesh: boolean = false, root: transform = this.getRoot(),layermask:number = NaN): Array<pickinfo>
         {
-            var picked = this.doPick(ray, true, isPickMesh, root,layer) as Array<pickinfo>;
+            var picked = this.doPick(ray, true, isPickMesh, root,layermask) as Array<pickinfo>;
             if (picked == null) return null;
             return picked;
         }
@@ -504,9 +504,9 @@ namespace gd3d.framework
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
          * @version egret-gd3d 1.0
          */
-        public pick(ray: ray, isPickMesh: boolean = false, root: transform = this.getRoot(),layer:number = NaN): pickinfo
+        public pick(ray: ray, isPickMesh: boolean = false, root: transform = this.getRoot(),layermask:number = NaN): pickinfo
         {
-            var pickinfo = this.doPick(ray, false, isPickMesh, root,layer) as pickinfo;
+            var pickinfo = this.doPick(ray, false, isPickMesh, root,layermask) as pickinfo;
             if (pickinfo == null) return null;
 
             //pickinfo.pickedtran.gameObject.collider.subTran.gameObject.visible = !pickinfo.pickedtran.gameObject.collider.subTran.gameObject.visible;
@@ -514,16 +514,16 @@ namespace gd3d.framework
 
             return pickinfo;
         }
-        private doPick(ray: ray, pickall: boolean, isPickMesh: boolean, root: transform ,layer:number = NaN): any
+        private doPick(ray: ray, pickall: boolean, isPickMesh: boolean, root: transform ,layermask:number = NaN): any
         {
             var pickedList: Array<pickinfo> = new Array<pickinfo>();
             if (isPickMesh)
             {
-                this.pickMesh(ray, root, pickedList,layer);
+                this.pickMesh(ray, root, pickedList,layermask);
             }
             else
             {
-                this.pickCollider(ray, root, pickedList,layer);
+                this.pickCollider(ray, root, pickedList,layermask);
             }
 
             if (pickedList.length == 0) return null;
@@ -543,13 +543,14 @@ namespace gd3d.framework
             }
         }
 
-        private pickMesh(ray: gd3d.framework.ray, tran: gd3d.framework.transform, pickedList: Array<gd3d.framework.pickinfo>,layer:number = NaN)
+        private pickMesh(ray: gd3d.framework.ray, tran: gd3d.framework.transform, pickedList: Array<gd3d.framework.pickinfo>,layermask:number = NaN)
         {
             if (tran.gameObject != null)
             {
                 if (!tran.gameObject.visible) return;
                 let canDo = true;
-                if(!isNaN(layer) && layer != tran.gameObject.layer) canDo = false;
+                //if(!isNaN(layermask) && layermask != tran.gameObject.layer) canDo = false;
+                if(!isNaN(layermask) && (layermask & ( 1 << tran.gameObject.layer)) == 0) canDo = false;
                 if(canDo){
                     var meshFilter = tran.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
                     if (meshFilter != null)
@@ -584,12 +585,12 @@ namespace gd3d.framework
             {
                 for (var i = 0; i < tran.children.length; i++)
                 {
-                    this.pickMesh(ray, tran.children[i], pickedList,layer);
+                    this.pickMesh(ray, tran.children[i], pickedList,layermask);
                 }
             }
         }
 
-        private pickCollider(ray: ray, tran: transform, pickedList: Array<pickinfo>,layer:number = NaN)
+        private pickCollider(ray: ray, tran: transform, pickedList: Array<pickinfo>,layermask:number = NaN)
         {
             if (tran.gameObject != null)
             {
@@ -597,8 +598,8 @@ namespace gd3d.framework
                 if (tran.gameObject.collider != null)
                 {
                     let canDo = true;
-                    if(!isNaN(layer) && layer != tran.gameObject.layer) canDo = false;
-                    console.error(`${tran.gameObject.layer}  --  ${layer}`);
+                    if(!isNaN(layermask) && (layermask & ( 1 << tran.gameObject.layer)) == 0) canDo = false;
+                    console.error(`${tran.gameObject.layer}  --  ${layermask}`);
                     if(canDo){
                         //挂了collider
                         var pickinfo = ray.intersectCollider(tran);
@@ -614,7 +615,7 @@ namespace gd3d.framework
             {
                 for (var i = 0; i < tran.children.length; i++)
                 {
-                    this.pickCollider(ray, tran.children[i], pickedList,layer);
+                    this.pickCollider(ray, tran.children[i], pickedList,layermask);
                 }
             }
         }

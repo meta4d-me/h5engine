@@ -2114,6 +2114,7 @@ declare namespace gd3d.framework {
         spotAngelCos: number;
         range: number;
         color: math.color;
+        cullingMask: number;
         start(): void;
         update(delta: number): void;
         remove(): void;
@@ -4493,6 +4494,12 @@ declare namespace gd3d.framework {
         vec4LightColor: Float32Array;
         floatLightRange: Float32Array;
         floatLightSpotAngleCos: Float32Array;
+        private _lightCullingMask;
+        private _vec4LightPos;
+        private _vec4LightDir;
+        private _vec4LightColor;
+        private _floatLightRange;
+        private _floatLightSpotAngleCos;
         lightmap: gd3d.framework.texture;
         lightmapUV: number;
         lightmapOffset: gd3d.math.vector4;
@@ -4504,6 +4511,7 @@ declare namespace gd3d.framework {
         updateOverlay(): void;
         updateModel(model: transform): void;
         updateModeTrail(): void;
+        updateLightMask(layer: number): void;
     }
     enum RenderLayerEnum {
         Common = 0,
@@ -4562,11 +4570,11 @@ declare namespace gd3d.framework {
         getChild(index: number): transform;
         getChildByName(name: string): transform;
         getRoot(): transform;
-        pickAll(ray: ray, isPickMesh?: boolean, root?: transform, layer?: number): Array<pickinfo>;
-        pick(ray: ray, isPickMesh?: boolean, root?: transform, layer?: number): pickinfo;
-        private doPick(ray, pickall, isPickMesh, root, layer?);
-        private pickMesh(ray, tran, pickedList, layer?);
-        private pickCollider(ray, tran, pickedList, layer?);
+        pickAll(ray: ray, isPickMesh?: boolean, root?: transform, layermask?: number): Array<pickinfo>;
+        pick(ray: ray, isPickMesh?: boolean, root?: transform, layermask?: number): pickinfo;
+        private doPick(ray, pickall, isPickMesh, root, layermask?);
+        private pickMesh(ray, tran, pickedList, layermask?);
+        private pickCollider(ray, tran, pickedList, layermask?);
     }
 }
 declare namespace gd3d.framework {

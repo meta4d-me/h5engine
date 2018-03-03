@@ -161,6 +161,7 @@ namespace gd3d.framework
         {
             
             context.updateModel(this.gameObject.transform);
+            context.updateLightMask(this.gameObject.layer);
             if (this.filter != null)
             {
                 var mesh = this.filter.getMeshOutput();
