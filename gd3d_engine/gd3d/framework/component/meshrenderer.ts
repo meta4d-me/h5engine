@@ -160,8 +160,8 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
             
-            context.updateModel(this.gameObject.transform);
             context.updateLightMask(this.gameObject.layer);
+            context.updateModel(this.gameObject.transform);
             if (this.filter != null)
             {
                 var mesh = this.filter.getMeshOutput();

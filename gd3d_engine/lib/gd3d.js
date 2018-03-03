@@ -12907,8 +12907,8 @@ var gd3d;
                 }
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
-                context.updateModel(this.gameObject.transform);
                 context.updateLightMask(this.gameObject.layer);
+                context.updateModel(this.gameObject.transform);
                 if (this.filter != null) {
                     var mesh = this.filter.getMeshOutput();
                     if (mesh != null) {
@@ -13231,6 +13231,7 @@ var gd3d;
             };
             skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
                 if (this.player != null) {
+                    context.updateLightMask(this.gameObject.layer);
                     context.updateModel(this.player.gameObject.transform);
                 }
                 for (var i_6 = 0; i_6 < this.materials.length; i_6++) {
@@ -25919,6 +25920,7 @@ var gd3d;
                 this.vec4LightColor = new Float32Array(32);
                 this.floatLightRange = new Float32Array(8);
                 this.floatLightSpotAngleCos = new Float32Array(8);
+                this._intLightCount = 0;
                 this._lightCullingMask = [];
                 this._vec4LightPos = new Float32Array(32);
                 this._vec4LightDir = new Float32Array(32);
@@ -25951,7 +25953,7 @@ var gd3d;
                 this.eyePos.z = pso.z;
             };
             renderContext.prototype.updateLights = function (lights) {
-                this.intLightCount = lights.length;
+                this._intLightCount = lights.length;
                 this._lightCullingMask.length = 0;
                 var dirt = gd3d.math.pool.new_vector3();
                 for (var i = 0; i < lights.length; i++) {
@@ -25989,7 +25991,8 @@ var gd3d;
                 gd3d.math.matrixClone(this.matrixViewProject, this.matrixModelViewProject);
             };
             renderContext.prototype.updateLightMask = function (layer) {
-                if (this.intLightCount == 0)
+                this.intLightCount = 0;
+                if (this._intLightCount == 0)
                     return;
                 var num = 1 << layer;
                 var indexList = [];

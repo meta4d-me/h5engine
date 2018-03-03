@@ -4494,6 +4494,7 @@ declare namespace gd3d.framework {
         vec4LightColor: Float32Array;
         floatLightRange: Float32Array;
         floatLightSpotAngleCos: Float32Array;
+        private _intLightCount;
         private _lightCullingMask;
         private _vec4LightPos;
         private _vec4LightDir;

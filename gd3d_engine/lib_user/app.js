@@ -11665,7 +11665,7 @@ var LoadPrefebDome = (function () {
             cam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             cam.markDirty();
         }
-        LoadDomes.loadPrefab(this.assetMgr, "res/prefabs/Quad11/resources/Quad11.prefab.json", function (prefeb) {
+        LoadDomes.loadPrefab(this.assetMgr, "res/prefabs/Cube/resources/Cube.prefab.json", function (prefeb) {
             var quad11 = prefeb.getCloneTrans();
             quad11.name = "Quad11";
             _this.scene.addChild(quad11);
@@ -11674,7 +11674,7 @@ var LoadPrefebDome = (function () {
             console.log(quad11);
         });
     };
-    LoadPrefebDome.prototype.update = function (detal) {
+    LoadPrefebDome.prototype.update = function (delta) {
     };
     return LoadPrefebDome;
 }());
@@ -11704,15 +11704,76 @@ var LoadPrefebDome2 = (function () {
                         LoadDomes.loadPrefabToTranfrom(_this.assetMgr, "res/prefabs/Quad11/resources/Quad.prefab.json", function (tran) {
                             _this.scene.addChild(tran);
                             tran.markDirty();
+                            console.log(tran);
                         });
                     });
                 });
             });
         });
     };
-    LoadPrefebDome2.prototype.update = function (detal) {
+    LoadPrefebDome2.prototype.update = function (delta) {
     };
     return LoadPrefebDome2;
+}());
+var LoadSceneDome = (function () {
+    function LoadSceneDome() {
+        this.taskMgr = new gd3d.framework.taskMgr();
+    }
+    LoadSceneDome.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.iserror) {
+                state.error = true;
+            }
+            if (s.isfinish)
+                state.finish = true;
+        });
+    };
+    LoadSceneDome.prototype.addCamera = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera.";
+        objCam.localPosition.z = -20;
+        objCam.localPosition.y = 50;
+        objCam.localPosition.x = -20;
+        var camera = objCam.gameObject.addComponent("camera");
+        camera.far = 1000;
+        this.scene.addChild(objCam);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 100));
+        objCam.markDirty();
+        state.finish = true;
+        CameraController.instance().init(this.app, camera);
+    };
+    LoadSceneDome.prototype.useRawScene = function () {
+        var raw = this.app.getAssetMgr().getAssetByName("MainCity_.scene.json");
+        var root = raw.getSceneRoot();
+        root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+        this.scene.addChild(root = raw.getSceneRoot());
+        this.scene.lightmaps = [];
+        raw.useLightMap(this.scene);
+        raw.useFog(this.scene);
+        this.scene.getRoot().markDirty();
+        root.markDirty();
+    };
+    LoadSceneDome.prototype.loadScene = function (laststate, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/scenes/MainCity_/MainCity_.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.useRawScene();
+                state.finish = true;
+            }
+        });
+    };
+    LoadSceneDome.prototype.start = function (app) {
+        this.app = app;
+        this.scene = app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.loadScene.bind(this));
+        this.taskMgr.addTaskCall(this.addCamera.bind(this));
+    };
+    LoadSceneDome.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+        CameraController.instance().update(delta);
+    };
+    return LoadSceneDome;
 }());
 var test_drawMesh = (function () {
     function test_drawMesh() {
@@ -11811,5 +11872,395 @@ var test_LiLoadScene = (function () {
         objCam.markDirty();
     };
     return test_LiLoadScene;
+}());
+var UseAniplayClipDome = (function () {
+    function UseAniplayClipDome() {
+        this.taskMgr = new gd3d.framework.taskMgr();
+    }
+    UseAniplayClipDome.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.iserror) {
+                state.error = true;
+            }
+            if (s.isfinish)
+                state.finish = true;
+        });
+    };
+    UseAniplayClipDome.prototype.loadRole = function (laststate, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/prefabs/roles/pc2/pc2.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                var pc_1 = _this.app.getAssetMgr().getAssetByName("pc2.prefab.json").getCloneTrans();
+                _this.aniplayer = pc_1.gameObject.getComponent("aniplayer");
+                _this.scene.addChild(pc_1);
+                _this.app.getAssetMgr().load("res/prefabs/weapons/wp_ds_001/wp_ds_001.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        var prefab = _this.app.getAssetMgr().getAssetByName("wp_ds_001.prefab.json");
+                        var rhand = pc_1.find("Bip01 Prop1");
+                        var lhand = pc_1.find("Bip01 Prop1");
+                        if (rhand) {
+                            var weapon = prefab.getCloneTrans();
+                            rhand.addChild(weapon);
+                            weapon.localRotate = new gd3d.math.quaternion();
+                            weapon.localTranslate = new gd3d.math.vector3();
+                            weapon.localScale = new gd3d.math.vector3(1, 1, 1);
+                            weapon.markDirty();
+                        }
+                        if (lhand) {
+                            var weapon = prefab.getCloneTrans();
+                            lhand.addChild(weapon);
+                            weapon.localRotate = new gd3d.math.quaternion();
+                            weapon.localTranslate = new gd3d.math.vector3();
+                            weapon.localScale = new gd3d.math.vector3(1, 1, 1);
+                            weapon.markDirty();
+                        }
+                        state.finish = true;
+                        console.log(pc_1);
+                    }
+                });
+            }
+        });
+    };
+    UseAniplayClipDome.prototype.loadAniplayClip = function (laststate, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/prefabs/roles/pc2/Resources/pc2_skill1.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Aniclip, function (s) {
+            if (s.isfinish) {
+                var clip = _this.app.getAssetMgr().getAssetByName("pc2_skill1.FBAni.aniclip.bin");
+                var j = _this.aniplayer.clipnames["pc2_skill1.FBAni.aniclip.bin"];
+                if (j != null) {
+                    _this.aniplayer.clips[j] = clip;
+                }
+                state.finish = true;
+                _this.aniplayer.play("pc2_skill1.FBAni.aniclip.bin", 1.0);
+            }
+        });
+    };
+    UseAniplayClipDome.prototype.addCamera = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera.";
+        objCam.localPosition.z = -10;
+        objCam.localPosition.y = 10;
+        objCam.localPosition.x = 10;
+        var camera = objCam.gameObject.addComponent("camera");
+        camera.far = 100;
+        this.scene.addChild(objCam);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    UseAniplayClipDome.prototype.start = function (app) {
+        this.app = app;
+        this.scene = app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.addCamera.bind(this));
+        this.taskMgr.addTaskCall(this.loadRole.bind(this));
+        this.taskMgr.addTaskCall(this.loadAniplayClip.bind(this));
+    };
+    UseAniplayClipDome.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+    };
+    return UseAniplayClipDome;
+}());
+var LoadAudioDome = (function () {
+    function LoadAudioDome() {
+        this.taskMgr = new gd3d.framework.taskMgr;
+    }
+    LoadAudioDome.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.iserror) {
+                state.error = true;
+            }
+            if (s.isfinish)
+                state.finish = true;
+        });
+    };
+    LoadAudioDome.prototype.loadAudio = function (laststate, state) {
+        var _this = this;
+        gd3d.framework.AudioEx.instance().loadAudioBuffer("res/audio/music1.mp3", function (buffer, err) {
+            if (err)
+                return;
+            _this.audiobuf = buffer;
+            state.finish = true;
+        });
+    };
+    LoadAudioDome.prototype.addCamera = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera.";
+        objCam.localPosition.z = -10;
+        objCam.localPosition.y = 0;
+        objCam.localPosition.x = 0;
+        var camera = objCam.gameObject.addComponent("camera");
+        camera.far = 100;
+        this.scene.addChild(objCam);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var audioplayer = objCam.gameObject.addComponent("AudioListener");
+        this.objCam = objCam;
+        objCam.markDirty();
+        state.finish = true;
+    };
+    LoadAudioDome.prototype.addAudioPlay = function (laststate, state) {
+        var objAudioPlay = new gd3d.framework.transform();
+        objAudioPlay.name = "audio_play";
+        this.audioplay = objAudioPlay.gameObject.addComponent("AudioPlayer");
+        var mesh = objAudioPlay.gameObject.addComponent("meshFilter");
+        mesh.mesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        var render = objAudioPlay.gameObject.addComponent("meshRenderer");
+        render.materials.push(this.app.getAssetMgr().getDefParticleMat());
+        this.scene.addChild(objAudioPlay);
+        objAudioPlay.markDirty();
+        this.audioplay.play(this.audiobuf, true, 0.5);
+        state.finish = true;
+    };
+    LoadAudioDome.prototype.start = function (app) {
+        var _this = this;
+        this.app = app;
+        this.scene = app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.loadAudio.bind(this));
+        this.taskMgr.addTaskCall(this.addCamera.bind(this));
+        this.taskMgr.addTaskCall(this.addAudioPlay.bind(this));
+        document.addEventListener("keydown", function (e) {
+            if (e.keyCode == 38) {
+                _this.objCam.localPosition.z += 1;
+            }
+            if (e.keyCode == 40) {
+                _this.objCam.localPosition.z -= 1;
+            }
+            _this.objCam.markDirty();
+        }, false);
+    };
+    LoadAudioDome.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+    };
+    return LoadAudioDome;
+}());
+var UseF14EffectDome = (function () {
+    function UseF14EffectDome() {
+        this.taskMgr = new gd3d.framework.taskMgr();
+    }
+    UseF14EffectDome.prototype.addCamera = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera.";
+        objCam.localPosition.z = -10;
+        objCam.localPosition.y = 10;
+        objCam.localPosition.x = 10;
+        var camera = objCam.gameObject.addComponent("camera");
+        camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3);
+        camera.far = 100;
+        this.scene.addChild(objCam);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    UseF14EffectDome.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.iserror) {
+                state.error = true;
+            }
+            if (s.isfinish)
+                state.finish = true;
+        });
+    };
+    UseF14EffectDome.prototype.useF14Effect = function () {
+        this.eff = this.app.getAssetMgr().getAssetByName("fx_B_5.prefab.json").getCloneTrans();
+        this.scene.addChild(this.eff);
+        this.effectSystems = this.eff.gameObject.getComponentsInChildren("f14EffectSystem");
+        this.eff.markDirty();
+        console.log(this.eff);
+        console.log(this.effectSystems);
+    };
+    UseF14EffectDome.prototype.loadF14Effect = function (laststate, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/effectShow/fx_B_5/fx_B_5.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.useF14Effect();
+                state.finish = true;
+            }
+        });
+    };
+    UseF14EffectDome.prototype.addCtrl = function () {
+        var _this = this;
+        var play = document.createElement("button");
+        var stop = document.createElement("button");
+        this.app.container.appendChild(play);
+        this.app.container.appendChild(stop);
+        play.innerText = "Play";
+        stop.innerText = "stop";
+        play.style.position = stop.style.position = "absolute";
+        play.style.height = stop.style.height = "25px";
+        play.style.width = stop.style.width = "75px";
+        play.style.top = "40px";
+        stop.style.top = "80px";
+        stop.style.left = play.style.left = "100px";
+        play.onclick = function (e) {
+            for (var i in _this.effectSystems) {
+                _this.effectSystems[i].play(1.0);
+            }
+        };
+        stop.onclick = function (e) {
+            for (var i in _this.effectSystems) {
+                _this.effectSystems[i].stop();
+            }
+        };
+    };
+    UseF14EffectDome.prototype.start = function (app) {
+        this.app = app;
+        this.scene = app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.addCamera.bind(this));
+        this.taskMgr.addTaskCall(this.loadF14Effect.bind(this));
+        this.addCtrl();
+    };
+    UseF14EffectDome.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+    };
+    return UseF14EffectDome;
+}());
+var UseMeshAndMatDome = (function () {
+    function UseMeshAndMatDome() {
+        this.taskMgr = new gd3d.framework.taskMgr;
+    }
+    UseMeshAndMatDome.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.iserror) {
+                state.error = true;
+            }
+            if (s.isfinish)
+                state.finish = true;
+        });
+    };
+    UseMeshAndMatDome.prototype.loadMesh = function (laststate, state) {
+        this.app.getAssetMgr().load("res/prefabs/Cube/resources/Library_unity_default_resources_Cube.mesh.bin", gd3d.framework.AssetTypeEnum.Mesh, function (s) {
+            if (s.iserror) {
+                state.error = true;
+                console.log(s.errs);
+            }
+            if (s.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    UseMeshAndMatDome.prototype.loadMaterial = function (laststate, state) {
+        this.app.getAssetMgr().load("res/prefabs/Cube/resources/Default-Diffuse.mat.json", gd3d.framework.AssetTypeEnum.Material, function (s) {
+            if (s.iserror) {
+                state.error = true;
+                console.log(s.errs);
+            }
+            if (s.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    UseMeshAndMatDome.prototype.addCamera = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "camera.";
+        objCam.localPosition.z = -10;
+        objCam.localPosition.y = 10;
+        objCam.localPosition.x = 10;
+        var camera = objCam.gameObject.addComponent("camera");
+        camera.far = 100;
+        this.scene.addChild(objCam);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    UseMeshAndMatDome.prototype.addCube = function (laststate, state) {
+        var cube = new gd3d.framework.transform();
+        cube.name = "cube";
+        cube.localPosition = new gd3d.math.vector3(0, 0, 0);
+        var mesh = cube.gameObject.addComponent("meshFilter");
+        mesh.mesh = this.app.getAssetMgr().getAssetByName("Library_unity_default_resources_Cube.mesh.bin");
+        var render = cube.gameObject.addComponent("meshRenderer");
+        render.materials.push(this.app.getAssetMgr().getAssetByName("Default-Diffuse.mat.json"));
+        this.scene.addChild(cube);
+        cube.markDirty();
+        state.finish = true;
+    };
+    UseMeshAndMatDome.prototype.start = function (app) {
+        this.app = app;
+        this.scene = app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.addCamera.bind(this));
+        this.taskMgr.addTaskCall(this.loadMesh.bind(this));
+        this.taskMgr.addTaskCall(this.loadMaterial.bind(this));
+        this.taskMgr.addTaskCall(this.addCube.bind(this));
+    };
+    UseMeshAndMatDome.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+    };
+    return UseMeshAndMatDome;
+}());
+var UseTextureDome = (function () {
+    function UseTextureDome() {
+        this.taskMgr = new gd3d.framework.taskMgr();
+    }
+    UseTextureDome.prototype.start = function (app) {
+        this.app = app;
+        this.assetMgr = app.getAssetMgr();
+        this.scene = app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.loadQuad.bind(this));
+        this.taskMgr.addTaskCall(this.loadTexture.bind(this));
+        var cam = new gd3d.framework.transform();
+        cam.name = "looker";
+        this.scene.addChild(cam);
+        cam.localPosition = new gd3d.math.vector3(0, 0, -10);
+        var camera = cam.gameObject.addComponent("camera");
+        camera.far = 100;
+        cam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        cam.markDirty();
+        this.addCtrl();
+    };
+    UseTextureDome.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.iserror) {
+                state.error = true;
+            }
+            if (s.isfinish)
+                state.finish = true;
+        });
+    };
+    UseTextureDome.prototype.loadQuad = function (laststate, state) {
+        var _this = this;
+        this.assetMgr.load("res/prefabs/Quad11/Quad.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                var quadPrefab = _this.assetMgr.getAssetByName("Quad.prefab.json");
+                var quad = quadPrefab.getCloneTrans();
+                _this.scene.addChild(quad);
+                quad.markDirty();
+                state.finish = true;
+                _this.quad = quad;
+            }
+        });
+    };
+    UseTextureDome.prototype.loadTexture = function (laststate, state) {
+        var _this = this;
+        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Texture, function (s) {
+            if (s.isfinish) {
+                _this.texture = _this.app.getAssetMgr().getAssetByName("zg256.png");
+                state.finish = true;
+            }
+        });
+    };
+    UseTextureDome.prototype.addCtrl = function () {
+        var _this = this;
+        var changeTexture = document.createElement("button");
+        changeTexture.innerText = "更换纹理";
+        this.app.container.appendChild(changeTexture);
+        changeTexture.style.position = "absolute";
+        changeTexture.style.height = "25px";
+        changeTexture.style.width = "75px";
+        changeTexture.style.top = "100px";
+        changeTexture.style.left = "75px";
+        changeTexture.onclick = function (e) {
+            var render = _this.quad.gameObject.getComponent("meshRenderer");
+            console.log(_this.texture);
+            render.materials[0].setTexture("_MainTex", _this.texture);
+        };
+    };
+    UseTextureDome.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+    };
+    return UseTextureDome;
 }());
 //# sourceMappingURL=app.js.map
