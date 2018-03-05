@@ -6,13 +6,14 @@ varying mediump vec2 xlv_TEXCOORD0;
 //light
 lowp vec4 xlv_COLOR; 
 bool hasLight = false;
-lowp float fixedAmbient = 0.3;
+lowp vec3 fixedAmbient = vec3(0.6,0.6,0.6);
 uniform lowp float glstate_lightcount;
 uniform lowp vec4 glstate_vec4_lightposs[8];
 uniform lowp vec4 glstate_vec4_lightdirs[8];
 uniform lowp float glstate_float_spotangelcoss[8];
 uniform lowp vec4 glstate_vec4_lightcolors[8];
 uniform lowp float glstate_float_lightrange[8];
+uniform lowp float glstate_float_lightintensity[8];
 
 varying lowp vec3 v_N;
 varying lowp vec3 v_Mpos;
@@ -43,7 +44,6 @@ varying lowp float factor;
 //cosspot cos(a) a为spot的半径 a取值0到90度，算好cos再传进来
 lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot,lowp float range )
 {
-    lowp float intensity = range;
     lowp vec3 v3 = lightPos.xyz - worldpos;
     lowp float len = length(v3);
     len = len > range ? range : len;
@@ -53,15 +53,12 @@ lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp ve
     lowp vec3 L2 = -lightDir.xyz;
     lowp float dotSpot = dot(L,L2);
     //漫反射强度
-    lowp float diffuse =clamp(dot(N.xyz,L.xyz),0.0,1.0) * pow(1.0 - len/range,3.0); 
+    lowp float diffuse =clamp(dot(N.xyz,L.xyz),0.0,1.0) * pow(1.0 - len/range,2.0); 
     lowp float diffuseD =clamp(dot(N.xyz,L2.xyz),0.0,1.0); 
-
     //pos.w 和 dir.w 至少有一个1，刚好组合出三种光源
     diffuse= mix(diffuse,diffuse*smoothstep(cosspot,1.0,dotSpot),lightDir.w);
     diffuse= mix(diffuseD,diffuse,lightPos.w);
-
     return diffuse;
-     
 }
 
 void calcCOLOR(){
@@ -74,7 +71,7 @@ void calcCOLOR(){
 		{
 			if(i>=c)break;
 			diff += calcDiffuse(v_N,v_Mpos,glstate_vec4_lightposs[i],glstate_vec4_lightdirs[i],glstate_float_spotangelcoss[i],glstate_float_lightrange[i]);
-            xlv_COLOR += glstate_vec4_lightcolors[i] * diff;
+            xlv_COLOR += glstate_float_lightintensity[i] * glstate_vec4_lightcolors[i] * diff;
 		}
 		//xlv_COLOR = vec4(diff,diff,diff,1.0);  
 		xlv_COLOR.w = 1.0;  
@@ -102,8 +99,7 @@ void main()
     }
     #else
 	if(hasLight){ // have light
-        fristColor = (fristColor * xlv_COLOR) + (fristColor * vec4(fixedAmbient,fixedAmbient,fixedAmbient,1.0));
-        emission = fristColor;
+        emission = (fristColor * xlv_COLOR) + (fristColor * vec4(fixedAmbient,1.0));
     }
     #endif
 

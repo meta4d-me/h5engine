@@ -2113,6 +2113,7 @@ declare namespace gd3d.framework {
         type: LightTypeEnum;
         spotAngelCos: number;
         range: number;
+        intensity: number;
         color: math.color;
         cullingMask: number;
         start(): void;
@@ -4493,6 +4494,7 @@ declare namespace gd3d.framework {
         vec4LightDir: Float32Array;
         vec4LightColor: Float32Array;
         floatLightRange: Float32Array;
+        floatLightIntensity: Float32Array;
         floatLightSpotAngleCos: Float32Array;
         private _intLightCount;
         private _lightCullingMask;
@@ -4500,6 +4502,7 @@ declare namespace gd3d.framework {
         private _vec4LightDir;
         private _vec4LightColor;
         private _floatLightRange;
+        private _floatLightIntensity;
         private _floatLightSpotAngleCos;
         lightmap: gd3d.framework.texture;
         lightmapUV: number;

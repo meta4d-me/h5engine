@@ -36,6 +36,7 @@ namespace gd3d.framework
         vec4LightDir: Float32Array = new Float32Array(32);
         vec4LightColor: Float32Array = new Float32Array(32);
         floatLightRange: Float32Array = new Float32Array(8);
+        floatLightIntensity: Float32Array = new Float32Array(8);
         floatLightSpotAngleCos: Float32Array = new Float32Array(8);
         private _intLightCount:number = 0;
         private _lightCullingMask:number[] = [];
@@ -43,6 +44,7 @@ namespace gd3d.framework
         private _vec4LightDir: Float32Array = new Float32Array(32);
         private _vec4LightColor: Float32Array = new Float32Array(32);
         private _floatLightRange: Float32Array = new Float32Array(8);
+        private _floatLightIntensity: Float32Array = new Float32Array(8);
         private _floatLightSpotAngleCos: Float32Array = new Float32Array(8);
 
 
@@ -101,6 +103,7 @@ namespace gd3d.framework
                     this._vec4LightColor[i * 4 + 3] = lights[i].color.a;
 
                     this._floatLightRange[i] = lights[i].range;
+                    this._floatLightIntensity[i] = lights[i].intensity;
                 }
 
             }
@@ -151,6 +154,7 @@ namespace gd3d.framework
                 let idx = indexList[i];
                 this.floatLightSpotAngleCos[i] = this._floatLightSpotAngleCos[idx];
                 this.floatLightRange[i] = this._floatLightRange[idx];
+                this.floatLightIntensity[i] = this._floatLightIntensity[idx];
                 //pos
                 this.vec4LightPos[i * 4 + 0] = this._vec4LightPos[idx * 4 + 0];
                 this.vec4LightPos[i * 4 + 1] = this._vec4LightPos[idx * 4 + 1];

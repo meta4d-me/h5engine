@@ -1479,127 +1479,98 @@ declare class test_effecteditor implements IState {
     bereplay: boolean;
     update(delta: number): void;
 }
-declare class LoadDomes {
-    static load(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (out: any) => void): void;
-    static loadBundle(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (name: string) => void): void;
-    static loadCompressBundle(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (out: any) => void): void;
-    static loadGLVertexShader(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (vs: string) => void): void;
-    static loadGLFragmentShader(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (fs: string) => void): void;
-    static loadShader(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (shader: gd3d.framework.shader) => void): void;
-    static loadTextAsset(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (textAsset: gd3d.framework.textasset) => void): void;
-    static loadPathAsset(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (textAsset: gd3d.framework.pathasset) => void): void;
-    static loadMesh(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (mesh: gd3d.framework.mesh) => void): void;
-    static loadTexture(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (texture: gd3d.framework.texture) => void): void;
-    static loadPVR(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (texture: gd3d.framework.texture) => void): void;
-    static loadDDS(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (texture: gd3d.framework.texture) => void): void;
-    static loadTextureDesc(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (name: string) => void): void;
-    static loadFont(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (font: gd3d.framework.font) => void): void;
-    static loadAtlas(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (atlas: gd3d.framework.atlas) => void): void;
-    static loadMaterial(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (material: gd3d.framework.material) => void): void;
-    static loadAniplayer(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (animationClip: gd3d.framework.animationClip) => void): void;
-    static loadF14Effect(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (f14Effect: gd3d.framework.f14eff) => void): void;
-    static loadPrefab(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (prefab: gd3d.framework.prefab) => void): void;
-    static loadPrefabToTranfrom(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (transform: gd3d.framework.transform) => void): void;
-    static loadPrefabToTranfrom2D(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (transform2D: gd3d.framework.transform2D) => void): void;
-    static loadScene(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (rawscene: gd3d.framework.rawscene) => void): void;
-    static loadSceneToRoot(assetMgr: gd3d.framework.assetMgr, url: string, onLoadfinish?: (rawscene: gd3d.framework.transform) => void): void;
-    private static getName(file);
-}
-declare class LoadPrefebDome implements IState {
-    app: gd3d.framework.application;
-    assetMgr: gd3d.framework.assetMgr;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
-declare class LoadPrefebDome2 implements IState {
-    app: gd3d.framework.application;
-    assetMgr: gd3d.framework.assetMgr;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
-declare class LoadSceneDome implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    taskMgr: gd3d.framework.taskMgr;
-    private loadShader(laststate, state);
-    private addCamera(laststate, state);
-    private useRawScene();
-    private loadScene(laststate, state);
-    start(app: gd3d.framework.application): void;
-    update(delta: number): void;
-}
-declare class test_drawMesh implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    camera: gd3d.framework.camera;
-    timer: number;
-    update(delta: number): void;
-}
-declare class test_LiLoadScene implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    camera: gd3d.framework.camera;
-    timer: number;
-    update(delta: number): void;
-}
-declare class UseAniplayClipDome implements IState {
+declare class UseAniplayClipDemo implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     aniClip: gd3d.framework.animationClip;
     taskMgr: gd3d.framework.taskMgr;
     aniplayer: gd3d.framework.aniplayer;
-    private loadShader(laststate, state);
-    private loadRole(laststate, state);
     private loadAniplayClip(laststate, state);
+    private loadRole(laststate, state);
+    private loadShader(laststate, state);
     private addCamera(laststate, state);
     start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
-declare class LoadAudioDome implements IState {
+declare class UseAssetByLoadDemoList implements IState {
+    app: gd3d.framework.application;
+    state: IState;
+    start(app: gd3d.framework.application): void;
+    private x;
+    private y;
+    private btns;
+    private addBtn(text, act);
+    private clearBtn();
+    update(delta: any): void;
+}
+declare class UseAudioDemo implements IState {
     audioplay: gd3d.framework.AudioPlayer;
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     taskMgr: gd3d.framework.taskMgr;
     objCam: gd3d.framework.transform;
     audiobuf: AudioBuffer;
-    private loadShader(laststate, state);
     private loadAudio(laststate, state);
     private addCamera(laststate, state);
     private addAudioPlay(laststate, state);
+    private loadShader(laststate, state);
     start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
-declare class UseF14EffectDome implements IState {
+declare class UseF14EffectDemo implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     taskMgr: gd3d.framework.taskMgr;
     eff: gd3d.framework.transform;
-    effectSystems: gd3d.framework.f14EffectSystem[];
-    private addCamera(laststate, state);
-    private loadShader(laststate, state);
+    effectSystems: gd3d.framework.f14EffectSystem;
     private useF14Effect();
     private loadF14Effect(laststate, state);
+    playEffect(): void;
+    stopEffect(): void;
     addCtrl(): void;
+    private addCamera(laststate, state);
+    private loadShader(laststate, state);
     start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
-declare class UseMeshAndMatDome implements IState {
+declare class UseMeshAndMatDemo implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     taskMgr: gd3d.framework.taskMgr;
-    private loadShader(laststate, state);
     private loadMesh(laststate, state);
     private loadMaterial(laststate, state);
+    private useMeshAndMat(laststate, state);
+    private loadShader(laststate, state);
     private addCamera(laststate, state);
-    private addCube(laststate, state);
     start(app: gd3d.framework.application): void;
     update(delta: number): void;
 }
-declare class UseTextureDome implements IState {
+declare class UsePrefebDemo implements IState {
+    app: gd3d.framework.application;
+    assetMgr: gd3d.framework.assetMgr;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class UsePrefebDemo2 implements IState {
+    app: gd3d.framework.application;
+    assetMgr: gd3d.framework.assetMgr;
+    scene: gd3d.framework.scene;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class UseSceneDemo implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    taskMgr: gd3d.framework.taskMgr;
+    private useRawScene();
+    private loadScene(laststate, state);
+    private loadShader(laststate, state);
+    private addCamera(laststate, state);
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
+declare class UseTextureDemo implements IState {
     app: gd3d.framework.application;
     assetMgr: gd3d.framework.assetMgr;
     scene: gd3d.framework.scene;
@@ -1607,9 +1578,10 @@ declare class UseTextureDome implements IState {
     texture: gd3d.framework.texture;
     quad: gd3d.framework.transform;
     start(app: gd3d.framework.application): void;
+    private loadTexture(laststate, state);
+    private useTexture();
     private loadShader(laststate, state);
     private loadQuad(laststate, state);
-    private loadTexture(laststate, state);
     private addCtrl();
     update(delta: number): void;
 }

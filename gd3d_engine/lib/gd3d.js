@@ -12669,6 +12669,7 @@ var gd3d;
             function light() {
                 this.spotAngelCos = 0.9;
                 this.range = 10;
+                this.intensity = 1;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
                 this.cullingMask = 0xffffffff;
             }
@@ -12688,6 +12689,10 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], light.prototype, "range", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], light.prototype, "intensity", void 0);
             __decorate([
                 gd3d.reflect.Field("color"),
                 __metadata("design:type", gd3d.math.color)
@@ -25919,6 +25924,7 @@ var gd3d;
                 this.vec4LightDir = new Float32Array(32);
                 this.vec4LightColor = new Float32Array(32);
                 this.floatLightRange = new Float32Array(8);
+                this.floatLightIntensity = new Float32Array(8);
                 this.floatLightSpotAngleCos = new Float32Array(8);
                 this._intLightCount = 0;
                 this._lightCullingMask = [];
@@ -25926,6 +25932,7 @@ var gd3d;
                 this._vec4LightDir = new Float32Array(32);
                 this._vec4LightColor = new Float32Array(32);
                 this._floatLightRange = new Float32Array(8);
+                this._floatLightIntensity = new Float32Array(8);
                 this._floatLightSpotAngleCos = new Float32Array(8);
                 this.lightmap = null;
                 this.lightmapUV = 1;
@@ -25975,6 +25982,7 @@ var gd3d;
                         this._vec4LightColor[i * 4 + 2] = lights[i].color.b;
                         this._vec4LightColor[i * 4 + 3] = lights[i].color.a;
                         this._floatLightRange[i] = lights[i].range;
+                        this._floatLightIntensity[i] = lights[i].intensity;
                     }
                 }
                 gd3d.math.pool.delete_vector3(dirt);
@@ -26006,6 +26014,7 @@ var gd3d;
                     var idx = indexList[i];
                     this.floatLightSpotAngleCos[i] = this._floatLightSpotAngleCos[idx];
                     this.floatLightRange[i] = this._floatLightRange[idx];
+                    this.floatLightIntensity[i] = this._floatLightIntensity[idx];
                     this.vec4LightPos[i * 4 + 0] = this._vec4LightPos[idx * 4 + 0];
                     this.vec4LightPos[i * 4 + 1] = this._vec4LightPos[idx * 4 + 1];
                     this.vec4LightPos[i * 4 + 2] = this._vec4LightPos[idx * 4 + 2];
@@ -26459,6 +26468,9 @@ var gd3d;
                 };
                 this.autoUniformDic["glstate_float_lightrange"] = function (context) {
                     return context.floatLightRange;
+                };
+                this.autoUniformDic["glstate_float_lightintensity"] = function (context) {
+                    return context.floatLightIntensity;
                 };
                 this.autoUniformDic["glstate_float_spotangelcoss"] = function (context) {
                     return context.floatLightSpotAngleCos;
