@@ -79,6 +79,10 @@ namespace gd3d.framework
             //-------------------------------change current basedata------------------------------------------------------------
             if(frame!=this.lastFrame&&this.layer.frames[frame])
             {
+                if(frame==this.layer.frameList[0])
+                {
+                    this.currentData=this.baseddata;
+                }
                 if(this.layer.frames[frame].data.EmissionData != this.currentData)
                 {
                     this.changeCurrentBaseData(this.layer.frames[frame].data.EmissionData);
@@ -151,13 +155,14 @@ namespace gd3d.framework
             this.numcount = 0;
     
             this.currentData.rateOverTime.getValue(true);//重新随机
-            for (let i = 0; i < this.baseddata.bursts.length; i++)
-            {
-                this.baseddata.bursts[i].burst(false);
-            }
+            // for (let i = 0; i < this.baseddata.bursts.length; i++)
+            // {
+            //     this.baseddata.bursts[i].burst(false);
+            // }
+            this.bursts=[];
         }
     
-    
+        private bursts:number[] = [];
         private updateEmission()
         {
             let needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime-this.newStartDataTime));
@@ -169,12 +174,19 @@ namespace gd3d.framework
             {
                 for(let i=0;i<this.baseddata.bursts.length;i++)
                 {
-                    if(!this.baseddata.bursts[i].beburst()&&this.baseddata.bursts[i].time<=this.TotalTime)
+                    if(this.bursts.indexOf(this.baseddata.bursts[i].time)<0&&this.baseddata.bursts[i].time<=this.TotalTime)
                     {
                         let count = this.baseddata.bursts[i].count.getValue(true);
                         this.baseddata.bursts[i].burst();
+                        this.bursts.push(this.baseddata.bursts[i].time);
                         this.addParticle(count);
                     }
+                    // if(!this.baseddata.bursts[i].beburst()&&this.baseddata.bursts[i].time<=this.TotalTime)
+                    // {
+                    //     let count = this.baseddata.bursts[i].count.getValue(true);
+                    //     this.baseddata.bursts[i].burst();
+                    //     this.addParticle(count);
+                    // }
                 }
             }
         }
