@@ -45,6 +45,9 @@ namespace gd3d.framework
             this.autoUniformDic["glstate_float_lightrange"]=(context: renderContext)=>{
                 return context.floatLightRange;
             };
+            this.autoUniformDic["glstate_float_lightintensity"]=(context: renderContext)=>{
+                return context.floatLightIntensity;
+            };
             this.autoUniformDic["glstate_float_spotangelcoss"]=(context: renderContext)=>{
                 return context.floatLightSpotAngleCos;
             };

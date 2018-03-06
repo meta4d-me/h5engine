@@ -97,7 +97,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("Collider碰撞", () => new test_pick_boxcollider());
         this.addBtn("SSSSS", () => new test_sssss());
         this.addBtn("dome_加载播放动画",()=>new dome_loadaniplayer());
-
+        this.addBtn("使用加载资源的Demo列表",()=>new UseAssetByLoadDemoList());
 
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
         // this.addBtn("cj_zs",()=>new dome.testCJ());

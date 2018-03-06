@@ -1,17 +1,9 @@
 //加载并使用mesh和材质资源
-class UseMeshAndMatDome implements IState {
+class UseMeshAndMatDemo implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     taskMgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr;
-    private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-            if (s.iserror) {
-                state.error = true;
-            }
-            if (s.isfinish)
-                state.finish = true;
-        });
-    }
+    
     //加载一个mesh
     private loadMesh(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
         this.app.getAssetMgr().load(`res/prefabs/Cube/resources/Library_unity_default_resources_Cube.mesh.bin`, gd3d.framework.AssetTypeEnum.Mesh, (s) => {
@@ -36,24 +28,9 @@ class UseMeshAndMatDome implements IState {
             }
         })
     }
-    //添加一个摄像机
-    private addCamera(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-        let objCam = new gd3d.framework.transform();
-        objCam.name = "camera.";
-        objCam.localPosition.z = -10;
-        objCam.localPosition.y = 10;
-        objCam.localPosition.x = 10;
-
-        let camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
-        camera.far = 100;
-        this.scene.addChild(objCam);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        objCam.markDirty();
-        state.finish = true;
-    }
-
+    
     //新建一个cube 绑定加载的mesh资源和材质资源
-    private addCube(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+    private useMeshAndMat(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
         let cube = new gd3d.framework.transform();
         cube.name = "cube";
         cube.localPosition = new gd3d.math.vector3(0, 0, 0);
@@ -71,6 +48,34 @@ class UseMeshAndMatDome implements IState {
         state.finish = true;
     }
 
+    //#region 加载shader
+    private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
+            if (s.iserror) {
+                state.error = true;
+            }
+            if (s.isfinish)
+                state.finish = true;
+        });
+    }
+    //#endregion
+    //#region 添加一个摄像机
+    private addCamera(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
+        let objCam = new gd3d.framework.transform();
+        objCam.name = "camera.";
+        objCam.localPosition.z = -10;
+        objCam.localPosition.y = 10;
+        objCam.localPosition.x = 10;
+
+        let camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
+        camera.far = 100;
+        this.scene.addChild(objCam);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    }
+    //#endregion
+
     start(app: gd3d.framework.application) {
         this.app = app;
         this.scene = app.getScene();
@@ -79,7 +84,7 @@ class UseMeshAndMatDome implements IState {
         this.taskMgr.addTaskCall(this.addCamera.bind(this));
         this.taskMgr.addTaskCall(this.loadMesh.bind(this));
         this.taskMgr.addTaskCall(this.loadMaterial.bind(this));
-        this.taskMgr.addTaskCall(this.addCube.bind(this));
+        this.taskMgr.addTaskCall(this.useMeshAndMat.bind(this));
     }
 
     update(delta: number) {

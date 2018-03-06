@@ -432,6 +432,7 @@ namespace gd3d.framework
 
             if (this.player != null)
             {
+                context.updateLightMask(this.gameObject.layer);
                 context.updateModel(this.player.gameObject.transform);
             }
 

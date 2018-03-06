@@ -53,11 +53,29 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 光源强度
+         * @version egret-gd3d 1.0
+         */
+        @reflect.Field("number")
+        intensity:number = 1;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 光源颜色
          * @version egret-gd3d 1.0
          */
         @reflect.Field("color")
         color:math.color = new math.color(1.0, 1.0, 1.0, 1.0);
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 光照剔除mask
+         * @version egret-gd3d 1.0
+         */
+        @reflect.Field("number")
+        cullingMask:number = 0xffffffff; //最大 32个layer（32位） 默认everything = 0xffffffff
         start()
         {
 
