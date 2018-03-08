@@ -55,6 +55,20 @@
         out.z = src.z;
         out.w = src.w;
     }
+
+    export function quatEqual(quat:quaternion,quat2:quaternion,threshold = 0.00001){
+        if (Math.abs(quat.x - quat2.x) > threshold)
+        return false;
+        if (Math.abs(quat.y - quat2.y) > threshold)
+        return false;
+        if (Math.abs(quat.z - quat2.z) > threshold)
+        return false;
+        if (Math.abs(quat.w - quat2.w) > threshold)
+        return false;
+
+        return true;
+    }
+    
     export function quatToMatrix(src: quaternion, out: matrix) {
         var xy2: number = 2.0 * src.x * src.y, xz2: number = 2.0 * src.x * src.z, xw2: number = 2.0 * src.x * src.w;
         var yz2: number = 2.0 * src.y * src.z, yw2: number = 2.0 * src.y * src.w, zw2: number = 2.0 * src.z * src.w;

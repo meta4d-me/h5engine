@@ -36,12 +36,15 @@ namespace gd3d.framework
         vec4LightDir: Float32Array = new Float32Array(32);
         vec4LightColor: Float32Array = new Float32Array(32);
         floatLightRange: Float32Array = new Float32Array(8);
+        floatLightIntensity: Float32Array = new Float32Array(8);
         floatLightSpotAngleCos: Float32Array = new Float32Array(8);
+        private _intLightCount:number = 0;
         private _lightCullingMask:number[] = [];
         private _vec4LightPos: Float32Array = new Float32Array(32);
         private _vec4LightDir: Float32Array = new Float32Array(32);
         private _vec4LightColor: Float32Array = new Float32Array(32);
         private _floatLightRange: Float32Array = new Float32Array(8);
+        private _floatLightIntensity: Float32Array = new Float32Array(8);
         private _floatLightSpotAngleCos: Float32Array = new Float32Array(8);
 
 
@@ -71,7 +74,7 @@ namespace gd3d.framework
         }
         updateLights(lights: light[])
         {
-            this.intLightCount = lights.length;
+            this._intLightCount = lights.length;
             this._lightCullingMask.length = 0;
             var dirt = math.pool.new_vector3();
             for (var i = 0; i < lights.length; i++)
@@ -100,6 +103,7 @@ namespace gd3d.framework
                     this._vec4LightColor[i * 4 + 3] = lights[i].color.a;
 
                     this._floatLightRange[i] = lights[i].range;
+                    this._floatLightIntensity[i] = lights[i].intensity;
                 }
 
             }
@@ -137,7 +141,8 @@ namespace gd3d.framework
 
         //更新 光照剔除mask
         updateLightMask(layer:number){
-            if(this.intLightCount == 0) return ;
+            this.intLightCount = 0;
+            if(this._intLightCount == 0) return ;
             let num = 1 << layer; 
             let indexList:number[] = [];
             for(var i = 0;i<this._lightCullingMask.length ;i++){
@@ -149,6 +154,7 @@ namespace gd3d.framework
                 let idx = indexList[i];
                 this.floatLightSpotAngleCos[i] = this._floatLightSpotAngleCos[idx];
                 this.floatLightRange[i] = this._floatLightRange[idx];
+                this.floatLightIntensity[i] = this._floatLightIntensity[idx];
                 //pos
                 this.vec4LightPos[i * 4 + 0] = this._vec4LightPos[idx * 4 + 0];
                 this.vec4LightPos[i * 4 + 1] = this._vec4LightPos[idx * 4 + 1];

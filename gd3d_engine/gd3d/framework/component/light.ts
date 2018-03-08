@@ -53,6 +53,15 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 光源强度
+         * @version egret-gd3d 1.0
+         */
+        @reflect.Field("number")
+        intensity:number = 1;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 光源颜色
          * @version egret-gd3d 1.0
          */

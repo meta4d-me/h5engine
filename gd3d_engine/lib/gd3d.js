@@ -12669,6 +12669,7 @@ var gd3d;
             function light() {
                 this.spotAngelCos = 0.9;
                 this.range = 10;
+                this.intensity = 1;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
                 this.cullingMask = 0xffffffff;
             }
@@ -12688,6 +12689,10 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], light.prototype, "range", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], light.prototype, "intensity", void 0);
             __decorate([
                 gd3d.reflect.Field("color"),
                 __metadata("design:type", gd3d.math.color)
@@ -12907,8 +12912,8 @@ var gd3d;
                 }
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
-                context.updateModel(this.gameObject.transform);
                 context.updateLightMask(this.gameObject.layer);
+                context.updateModel(this.gameObject.transform);
                 if (this.filter != null) {
                     var mesh = this.filter.getMeshOutput();
                     if (mesh != null) {
@@ -13231,6 +13236,7 @@ var gd3d;
             };
             skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
                 if (this.player != null) {
+                    context.updateLightMask(this.gameObject.layer);
                     context.updateModel(this.player.gameObject.transform);
                 }
                 for (var i_6 = 0; i_6 < this.materials.length; i_6++) {
@@ -19360,6 +19366,19 @@ var gd3d;
             out.w = src.w;
         }
         math.quatClone = quatClone;
+        function quatEqual(quat, quat2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            if (Math.abs(quat.x - quat2.x) > threshold)
+                return false;
+            if (Math.abs(quat.y - quat2.y) > threshold)
+                return false;
+            if (Math.abs(quat.z - quat2.z) > threshold)
+                return false;
+            if (Math.abs(quat.w - quat2.w) > threshold)
+                return false;
+            return true;
+        }
+        math.quatEqual = quatEqual;
         function quatToMatrix(src, out) {
             var xy2 = 2.0 * src.x * src.y, xz2 = 2.0 * src.x * src.z, xw2 = 2.0 * src.x * src.w;
             var yz2 = 2.0 * src.y * src.z, yw2 = 2.0 * src.y * src.w, zw2 = 2.0 * src.z * src.w;
@@ -25918,12 +25937,15 @@ var gd3d;
                 this.vec4LightDir = new Float32Array(32);
                 this.vec4LightColor = new Float32Array(32);
                 this.floatLightRange = new Float32Array(8);
+                this.floatLightIntensity = new Float32Array(8);
                 this.floatLightSpotAngleCos = new Float32Array(8);
+                this._intLightCount = 0;
                 this._lightCullingMask = [];
                 this._vec4LightPos = new Float32Array(32);
                 this._vec4LightDir = new Float32Array(32);
                 this._vec4LightColor = new Float32Array(32);
                 this._floatLightRange = new Float32Array(8);
+                this._floatLightIntensity = new Float32Array(8);
                 this._floatLightSpotAngleCos = new Float32Array(8);
                 this.lightmap = null;
                 this.lightmapUV = 1;
@@ -25951,7 +25973,7 @@ var gd3d;
                 this.eyePos.z = pso.z;
             };
             renderContext.prototype.updateLights = function (lights) {
-                this.intLightCount = lights.length;
+                this._intLightCount = lights.length;
                 this._lightCullingMask.length = 0;
                 var dirt = gd3d.math.pool.new_vector3();
                 for (var i = 0; i < lights.length; i++) {
@@ -25973,6 +25995,7 @@ var gd3d;
                         this._vec4LightColor[i * 4 + 2] = lights[i].color.b;
                         this._vec4LightColor[i * 4 + 3] = lights[i].color.a;
                         this._floatLightRange[i] = lights[i].range;
+                        this._floatLightIntensity[i] = lights[i].intensity;
                     }
                 }
                 gd3d.math.pool.delete_vector3(dirt);
@@ -25989,7 +26012,8 @@ var gd3d;
                 gd3d.math.matrixClone(this.matrixViewProject, this.matrixModelViewProject);
             };
             renderContext.prototype.updateLightMask = function (layer) {
-                if (this.intLightCount == 0)
+                this.intLightCount = 0;
+                if (this._intLightCount == 0)
                     return;
                 var num = 1 << layer;
                 var indexList = [];
@@ -26003,6 +26027,7 @@ var gd3d;
                     var idx = indexList[i];
                     this.floatLightSpotAngleCos[i] = this._floatLightSpotAngleCos[idx];
                     this.floatLightRange[i] = this._floatLightRange[idx];
+                    this.floatLightIntensity[i] = this._floatLightIntensity[idx];
                     this.vec4LightPos[i * 4 + 0] = this._vec4LightPos[idx * 4 + 0];
                     this.vec4LightPos[i * 4 + 1] = this._vec4LightPos[idx * 4 + 1];
                     this.vec4LightPos[i * 4 + 2] = this._vec4LightPos[idx * 4 + 2];
@@ -26356,10 +26381,12 @@ var gd3d;
                         var meshFilter = tran.gameObject.getComponent("meshFilter");
                         if (meshFilter != null) {
                             var mesh = meshFilter.getMeshOutput();
-                            var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
-                            if (pickinfo) {
-                                pickedList.push(pickinfo);
-                                pickinfo.pickedtran = tran;
+                            if (mesh) {
+                                var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
+                                if (pickinfo) {
+                                    pickedList.push(pickinfo);
+                                    pickinfo.pickedtran = tran;
+                                }
                             }
                         }
                         else {
@@ -26456,6 +26483,9 @@ var gd3d;
                 };
                 this.autoUniformDic["glstate_float_lightrange"] = function (context) {
                     return context.floatLightRange;
+                };
+                this.autoUniformDic["glstate_float_lightintensity"] = function (context) {
+                    return context.floatLightIntensity;
                 };
                 this.autoUniformDic["glstate_float_spotangelcoss"] = function (context) {
                     return context.floatLightSpotAngleCos;
