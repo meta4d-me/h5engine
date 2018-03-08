@@ -26381,10 +26381,12 @@ var gd3d;
                         var meshFilter = tran.gameObject.getComponent("meshFilter");
                         if (meshFilter != null) {
                             var mesh = meshFilter.getMeshOutput();
-                            var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
-                            if (pickinfo) {
-                                pickedList.push(pickinfo);
-                                pickinfo.pickedtran = tran;
+                            if (mesh) {
+                                var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
+                                if (pickinfo) {
+                                    pickedList.push(pickinfo);
+                                    pickinfo.pickedtran = tran;
+                                }
                             }
                         }
                         else {
