@@ -758,7 +758,7 @@ var WebGLTextureUtil = (function() {
         this.pendingTextures = {};
 
         // Reload this file as a worker.
-        this.worker = new Worker("lib/webgl-texture-util.js");
+        this.worker = new Worker("js/webgl-texture-util.js");
 
         // The worker's message handler.
         this.worker.onmessage = function(msg) {
@@ -840,9 +840,6 @@ var WebGLTextureUtil = (function() {
       var startTime = Date.now();
       // Loop through each mip level of compressed texture data provided and upload it to the given texture.
       for (var i = 0; i < levels; ++i) {
-        
-        
-
         // Determine how big this level of compressed texture data is in bytes.
         var levelSize = textureLevelSize(internalFormat, width, height);
         // Get a view of the bytes for this level of DXT data.
@@ -903,7 +900,6 @@ var WebGLTextureUtil = (function() {
     // Loads a DDS file into the given texture.
     // If no texture is provided one is created and returned.
     TextureLoader.prototype.loadDDS = function(src, texture, callback) {
-      console.log(src);
       var self = this;
       if (!texture) {
         texture = this.gl.createTexture();
