@@ -54,12 +54,15 @@ namespace gd3d.math
         * 获取一个v4
         * @version gd3d 1.0
         */
-        static new_vector4(): vector4
+        static new_vector4(x:number = 0,y:number = 0,z:number = 0,w:number = 0): vector4
         {
-            if (pool.unused_vector4.length > 0)
-                return pool.unused_vector4.pop();
+            if (pool.unused_vector4.length > 0){
+                let v4 = pool.unused_vector4.pop();
+                v4.x=x; v4.y=y; v4.z=z; v4.w=w; 
+                return v4;
+            }
             else
-                return new vector4();
+                return new vector4(x,y,z,w);
         }
         /**
         * @public
@@ -139,12 +142,15 @@ namespace gd3d.math
         * 获取一个color
         * @version gd3d 1.0
         */
-        static new_color(): color
+        static new_color(r:number = 0, g:number = 0, b:number = 0, a:number = 0): color
         {
-            if (pool.unused_color.length > 0)
-                return pool.unused_color.pop();
+            if (pool.unused_color.length > 0){
+                let c = pool.unused_color.pop();
+                c.r = r; c.g = g; c.b = b; c.a = a;
+                return c;
+            }
             else
-                return new color();
+                return new color(r,g,b,a);
         }
         /**
         * @public
@@ -267,15 +273,16 @@ namespace gd3d.math
         * 获取一个v3
         * @version gd3d 1.0
         */
-        static new_vector3(): vector3
+        static new_vector3(x:number = 0,y:number = 0,z:number = 0): vector3
         {
             if (pool.unused_vector3.length > 0)
             {
-                let v = pool.unused_vector3.pop();
-                return v;
+                let v3 = pool.unused_vector3.pop();
+                v3.x = x;   v3.y = y;   v3.z = z;
+                return v3;
             }
             else
-                return new vector3();
+                return new vector3(x,y,z);
         }
         /**
         * @public
@@ -368,12 +375,15 @@ namespace gd3d.math
         * 获取一个v2
         * @version gd3d 1.0
         */
-        static new_vector2(): vector2
+        static new_vector2(x:number = 0,y:number = 0): vector2
         {
-            if (pool.unused_vector2.length > 0)
-                return pool.unused_vector2.pop();
+            if (pool.unused_vector2.length > 0){
+                let v2 = pool.unused_vector2.pop();
+                v2.x = x;   v2.y = y;
+                return v2;
+            }
             else
-                return new vector2();
+                return new vector2(x,y);
         }
         /**
         * @public
