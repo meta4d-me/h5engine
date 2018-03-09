@@ -260,9 +260,6 @@ var gd3d;
                         this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
                         this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
-                    console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
-                    console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
-                    console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
                 }
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
@@ -2199,19 +2196,21 @@ var gd3d;
                 this.removeAllComponents();
             };
             transform2D.prototype.update = function (delta) {
-                if (this.components != null) {
-                    for (var i = 0; i < this.components.length; i++) {
-                        if (this.components[i].init == false) {
-                            this.components[i].comp.start();
-                            this.components[i].init = true;
+                if (framework.sceneMgr.app.bePlay) {
+                    if (this.components != null) {
+                        for (var i = 0; i < this.components.length; i++) {
+                            if (this.components[i].init == false) {
+                                this.components[i].comp.start();
+                                this.components[i].init = true;
+                            }
+                            if (framework.sceneMgr.app.bePlay && !framework.sceneMgr.app.bePause)
+                                this.components[i].comp.update(delta);
                         }
-                        if (framework.sceneMgr.app.bePlay && !framework.sceneMgr.app.bePause)
-                            this.components[i].comp.update(delta);
                     }
-                }
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.children[i].update(delta);
+                    if (this.children != null) {
+                        for (var i = 0; i < this.children.length; i++) {
+                            this.children[i].update(delta);
+                        }
                     }
                 }
             };
