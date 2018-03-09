@@ -4,7 +4,7 @@ uniform lowp float _AlphaCut;
 varying mediump vec2 xlv_TEXCOORD0;
 
 //light
-lowp vec4 xlv_COLOR; 
+lowp vec4 xlv_COLOR = vec4(0.0,0.0,0.0,1.0); 
 bool hasLight = false;
 lowp vec3 fixedAmbient = vec3(0.6,0.6,0.6);
 uniform lowp float glstate_lightcount;
@@ -70,10 +70,10 @@ void calcCOLOR(){
 		for(int i=0;i<8;i++)
 		{
 			if(i>=c)break;
-			diff += calcDiffuse(v_N,v_Mpos,glstate_vec4_lightposs[i],glstate_vec4_lightdirs[i],glstate_float_spotangelcoss[i],glstate_float_lightrange[i]);
+			//diff += calcDiffuse(v_N,v_Mpos,glstate_vec4_lightposs[i],glstate_vec4_lightdirs[i],glstate_float_spotangelcoss[i],glstate_float_lightrange[i]);
+			diff = calcDiffuse(v_N,v_Mpos,glstate_vec4_lightposs[i],glstate_vec4_lightdirs[i],glstate_float_spotangelcoss[i],glstate_float_lightrange[i]);
             xlv_COLOR += glstate_float_lightintensity[i] * glstate_vec4_lightcolors[i] * diff;
 		}
-		//xlv_COLOR = vec4(diff,diff,diff,1.0);  
 		xlv_COLOR.w = 1.0;  
     }
 }
@@ -106,5 +106,6 @@ void main()
     #ifdef FOG
     emission.xyz = mix(glstate_fog_color.rgb, emission.rgb, factor);
     #endif
+    
     gl_FragData[0] = emission;
 }

@@ -67,7 +67,7 @@
             return pickinfo;
         }
 
-        public intersectPlane(planePoint: gd3d.math.vector3, planeNormal): gd3d.math.vector3
+        public intersectPlane(planePoint: gd3d.math.vector3, planeNormal:gd3d.math.vector3): gd3d.math.vector3
         {
             var vp1 = planeNormal.x;
             var vp2 = planeNormal.y;

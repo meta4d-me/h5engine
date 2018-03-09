@@ -19366,6 +19366,19 @@ var gd3d;
             out.w = src.w;
         }
         math.quatClone = quatClone;
+        function quatEqual(quat, quat2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            if (Math.abs(quat.x - quat2.x) > threshold)
+                return false;
+            if (Math.abs(quat.y - quat2.y) > threshold)
+                return false;
+            if (Math.abs(quat.z - quat2.z) > threshold)
+                return false;
+            if (Math.abs(quat.w - quat2.w) > threshold)
+                return false;
+            return true;
+        }
+        math.quatEqual = quatEqual;
         function quatToMatrix(src, out) {
             var xy2 = 2.0 * src.x * src.y, xz2 = 2.0 * src.x * src.z, xw2 = 2.0 * src.x * src.w;
             var yz2 = 2.0 * src.y * src.z, yw2 = 2.0 * src.y * src.w, zw2 = 2.0 * src.z * src.w;
@@ -26368,10 +26381,12 @@ var gd3d;
                         var meshFilter = tran.gameObject.getComponent("meshFilter");
                         if (meshFilter != null) {
                             var mesh = meshFilter.getMeshOutput();
-                            var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
-                            if (pickinfo) {
-                                pickedList.push(pickinfo);
-                                pickinfo.pickedtran = tran;
+                            if (mesh) {
+                                var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
+                                if (pickinfo) {
+                                    pickedList.push(pickinfo);
+                                    pickinfo.pickedtran = tran;
+                                }
                             }
                         }
                         else {

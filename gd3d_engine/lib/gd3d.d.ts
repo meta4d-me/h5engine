@@ -3229,6 +3229,7 @@ declare namespace gd3d.math {
     function quatTransformVectorDataAndQuat(src: Float32Array, srcseek: number, vector: vector3, out: vector3): void;
     function quatMagnitude(src: quaternion): number;
     function quatClone(src: quaternion, out: quaternion): void;
+    function quatEqual(quat: quaternion, quat2: quaternion, threshold?: number): boolean;
     function quatToMatrix(src: quaternion, out: matrix): void;
     function quatInverse(src: quaternion, out: quaternion): void;
     function quatFromYawPitchRoll(yaw: number, pitch: number, roll: number, result: quaternion): void;
@@ -4668,7 +4669,7 @@ declare namespace gd3d.framework {
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3);
         intersectAABB(_aabb: aabb): boolean;
         intersectPlaneTransform(tran: transform): pickinfo;
-        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: any): gd3d.math.vector3;
+        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: gd3d.math.vector3): gd3d.math.vector3;
         intersectCollider(tran: transform): pickinfo;
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;

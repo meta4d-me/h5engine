@@ -557,11 +557,13 @@ namespace gd3d.framework
                     {
                         //3d normal mesh
                         var mesh = meshFilter.getMeshOutput();
-                        var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
-                        if (pickinfo)
-                        {
-                            pickedList.push(pickinfo);
-                            pickinfo.pickedtran = tran;
+                        if(mesh){
+                            var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
+                            if (pickinfo)
+                            {
+                                pickedList.push(pickinfo);
+                                pickinfo.pickedtran = tran;
+                            }
                         }
                     }
                     else
