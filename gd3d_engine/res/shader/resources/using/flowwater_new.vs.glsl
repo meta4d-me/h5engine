@@ -28,7 +28,7 @@ void main()
 
     lowp vec2 _speed= vec2(_speedu,_speedv);
 	_base_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw+ _speed * glstate_timer;
-	attcolor=_glesColor*_MainColor;
+	attcolor= _MainColor;
 	attcolor.rgb=attcolor.rgb*_colorRate;
 	attcolor.a=attcolor.a*_alphaRate;
 	
