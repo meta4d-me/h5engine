@@ -5,7 +5,7 @@ namespace gd3d.math {
         var width = 1.0 / column;
         var height = 1.0 / row;
         var offsetx = width * (index % column);
-        var offsety = height *(row-height*(Math.floor(index / column) + 1)) ;
+        var offsety = height *row-height*(Math.floor(index / column) + 1) ;
         
         out.x = width;
         out.y = height;
