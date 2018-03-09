@@ -14753,6 +14753,7 @@ var gd3d;
                 this.localrot = new gd3d.math.quaternion();
                 this.worldRot = new gd3d.math.quaternion();
                 this.lastFrame = 0;
+                this.bursts = [];
                 this.type = framework.F14TypeEnum.particlesType;
                 this.effect = effect;
                 this.layer = layer;
@@ -14782,6 +14783,9 @@ var gd3d;
                     this.frameLife = 1;
                 var frame = Math.floor(this.TotalTime * fps) % this.frameLife;
                 if (frame != this.lastFrame && this.layer.frames[frame]) {
+                    if (frame == this.layer.frameList[0]) {
+                        this.currentData = this.baseddata;
+                    }
                     if (this.layer.frames[frame].data.EmissionData != this.currentData) {
                         this.changeCurrentBaseData(this.layer.frames[frame].data.EmissionData);
                     }
@@ -14838,9 +14842,7 @@ var gd3d;
                 this.TotalTime = 0;
                 this.numcount = 0;
                 this.currentData.rateOverTime.getValue(true);
-                for (var i = 0; i < this.baseddata.bursts.length; i++) {
-                    this.baseddata.bursts[i].burst(false);
-                }
+                this.bursts = [];
             };
             F14Emission.prototype.updateEmission = function () {
                 var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
@@ -14849,9 +14851,10 @@ var gd3d;
                 this.numcount += realcount;
                 if (this.baseddata.bursts.length > 0) {
                     for (var i = 0; i < this.baseddata.bursts.length; i++) {
-                        if (!this.baseddata.bursts[i].beburst() && this.baseddata.bursts[i].time <= this.TotalTime) {
+                        if (this.bursts.indexOf(this.baseddata.bursts[i].time) < 0 && this.baseddata.bursts[i].time <= this.TotalTime) {
                             var count = this.baseddata.bursts[i].count.getValue(true);
                             this.baseddata.bursts[i].burst();
+                            this.bursts.push(this.baseddata.bursts[i].time);
                             this.addParticle(count);
                         }
                     }
@@ -15925,7 +15928,13 @@ var gd3d;
                 mesh.layer.batch = this;
             };
             F14SingleMeshBath.prototype.canBatch = function (mesh) {
-                return this.ElementMat == mesh.baseddata.material;
+                if (this.ElementMat != mesh.baseddata.material) {
+                    return false;
+                }
+                if (this.ElementMat.getShader().getName().indexOf("mask") > 0) {
+                    return false;
+                }
+                return true;
             };
             F14SingleMeshBath.prototype.getElementCount = function () {
                 return this.meshlist.length;
@@ -19773,7 +19782,7 @@ var gd3d;
             var width = 1.0 / column;
             var height = 1.0 / row;
             var offsetx = width * (index % column);
-            var offsety = height * (row - height * (Math.floor(index / column) + 1));
+            var offsety = height * row - height * (Math.floor(index / column) + 1);
             out.x = width;
             out.y = height;
             out.z = offsetx;
@@ -27772,6 +27781,26 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var textureutil = (function () {
+            function textureutil() {
+            }
+            textureutil.loadUtil = function (path) {
+                var sc1 = document.createElement("script");
+                var sc2 = document.createElement("script");
+                sc1.src = path + "lib/webgl-util.js";
+                sc2.src = path + "";
+                document.body.appendChild(sc1);
+                document.body.appendChild(sc2);
+            };
+            return textureutil;
+        }());
+        framework.textureutil = textureutil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var PrimitiveType;
         (function (PrimitiveType) {
             PrimitiveType[PrimitiveType["Sphere"] = 0] = "Sphere";
@@ -28567,11 +28596,21 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_vector4 = function () {
-                if (pool.unused_vector4.length > 0)
-                    return pool.unused_vector4.pop();
+            pool.new_vector4 = function (x, y, z, w) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
+                if (w === void 0) { w = 0; }
+                if (pool.unused_vector4.length > 0) {
+                    var v4 = pool.unused_vector4.pop();
+                    v4.x = x;
+                    v4.y = y;
+                    v4.z = z;
+                    v4.w = w;
+                    return v4;
+                }
                 else
-                    return new math.vector4();
+                    return new math.vector4(x, y, z, w);
             };
             pool.clone_vector4 = function (src) {
                 if (pool.unused_vector4.length > 0) {
@@ -28609,11 +28648,21 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_color = function () {
-                if (pool.unused_color.length > 0)
-                    return pool.unused_color.pop();
+            pool.new_color = function (r, g, b, a) {
+                if (r === void 0) { r = 0; }
+                if (g === void 0) { g = 0; }
+                if (b === void 0) { b = 0; }
+                if (a === void 0) { a = 0; }
+                if (pool.unused_color.length > 0) {
+                    var c = pool.unused_color.pop();
+                    c.r = r;
+                    c.g = g;
+                    c.b = b;
+                    c.a = a;
+                    return c;
+                }
                 else
-                    return new math.color();
+                    return new math.color(r, g, b, a);
             };
             pool.delete_color = function (v) {
                 if (v == null)
@@ -28679,13 +28728,19 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_vector3 = function () {
+            pool.new_vector3 = function (x, y, z) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
                 if (pool.unused_vector3.length > 0) {
-                    var v = pool.unused_vector3.pop();
-                    return v;
+                    var v3 = pool.unused_vector3.pop();
+                    v3.x = x;
+                    v3.y = y;
+                    v3.z = z;
+                    return v3;
                 }
                 else
-                    return new math.vector3();
+                    return new math.vector3(x, y, z);
             };
             pool.clone_vector3 = function (src) {
                 if (pool.unused_vector3.length > 0) {
@@ -28731,11 +28786,17 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_vector2 = function () {
-                if (pool.unused_vector2.length > 0)
-                    return pool.unused_vector2.pop();
+            pool.new_vector2 = function (x, y) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (pool.unused_vector2.length > 0) {
+                    var v2 = pool.unused_vector2.pop();
+                    v2.x = x;
+                    v2.y = y;
+                    return v2;
+                }
                 else
-                    return new math.vector2();
+                    return new math.vector2(x, y);
             };
             pool.clone_vector2 = function (src) {
                 if (pool.unused_vector2.length > 0) {
