@@ -1040,7 +1040,8 @@ namespace gd3d.io
             if (_asset == null && type == "animationClip")
             {
                 _asset = assetMgr.getAssetByName(assetName); //资源可能不在同一个包
-                if(!_asset){
+                if (!_asset)
+                {
                     _asset = new framework.animationClip(assetName);
                     (_asset as framework.IAsset).use();
                 }
@@ -1065,19 +1066,25 @@ namespace gd3d.io
             else
             {
                 let _newInstance;
+                let componentType = document["__gdmeta__"][type];
+                if (!componentType)
+                {
+                    console.warn(instanceObj);
+                    return console.warn(`无法找到组件:${document["__gdmeta__"][type]}`);
+                }
                 if (type == "gameObject" && key == "gameObject" && reflect.getClassName(instanceObj) == "transform")
                 {
                     _newInstance = instanceObj.gameObject;
                 }
                 else if (type == "transform2D" && key == "rootNode" && reflect.getClassName(instanceObj) == "canvas")
                 {
-                    _newInstance = reflect.createInstance(document["__gdmeta__"][type], null);
+                    _newInstance = reflect.createInstance(componentType, null);
                     instanceObj.rootNode = _newInstance;
                     _newInstance.canvas = instanceObj;
                 }
                 else
                 {
-                    _newInstance = reflect.createInstance(document["__gdmeta__"][type], null);
+                    _newInstance = reflect.createInstance(componentType, null);
                     if (_isArray)
                         instanceObj.push(_newInstance);
                     else

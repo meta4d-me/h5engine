@@ -17948,16 +17948,21 @@ var gd3d;
                 }
                 else {
                     var _newInstance = void 0;
+                    var componentType = document["__gdmeta__"][type];
+                    if (!componentType) {
+                        console.warn(instanceObj);
+                        return console.warn("\u65E0\u6CD5\u627E\u5230\u7EC4\u4EF6:" + document["__gdmeta__"][type]);
+                    }
                     if (type == "gameObject" && key == "gameObject" && gd3d.reflect.getClassName(instanceObj) == "transform") {
                         _newInstance = instanceObj.gameObject;
                     }
                     else if (type == "transform2D" && key == "rootNode" && gd3d.reflect.getClassName(instanceObj) == "canvas") {
-                        _newInstance = gd3d.reflect.createInstance(document["__gdmeta__"][type], null);
+                        _newInstance = gd3d.reflect.createInstance(componentType, null);
                         instanceObj.rootNode = _newInstance;
                         _newInstance.canvas = instanceObj;
                     }
                     else {
-                        _newInstance = gd3d.reflect.createInstance(document["__gdmeta__"][type], null);
+                        _newInstance = gd3d.reflect.createInstance(componentType, null);
                         if (_isArray)
                             instanceObj.push(_newInstance);
                         else
