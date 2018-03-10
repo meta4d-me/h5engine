@@ -20670,8 +20670,8 @@ var gd3d;
             NavMeshLoadManager.prototype.showNavmesh = function (isshow, material) {
                 if (material === void 0) { material = null; }
                 if (this.navTrans) {
+                    this.navTrans.gameObject.visible = isshow;
                     if (!isshow) {
-                        this.navTrans.gameObject.visible = isshow;
                         this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0);
                         this.navTrans.markDirty();
                         return;
