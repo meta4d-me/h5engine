@@ -840,6 +840,8 @@ namespace gd3d.io
             }
             else
             {
+                if(!instanceObj[key])
+                    return console.warn(`${serializedObj[key].value.comp.type} 填充值失败`);
                 fillReference(serializedObj[key].value, instanceObj[key]);
             }
         }
@@ -962,7 +964,8 @@ namespace gd3d.io
                             {
                                 let _nodeComponent = [];
                                 deSerializeOtherType(serializedObj[key]["value"], _nodeComponent, newkey, assetMgr, bundlename);
-                                instanceObj.addComponentDirect(_nodeComponent[0].comp);
+                                if (_nodeComponent[0].comp)
+                                    instanceObj.addComponentDirect(_nodeComponent[0].comp);
                             }
                             else if (baseType == "transform" && key == "children" && reflect.getClassName(instanceObj) == "transform")
                             {
@@ -974,7 +977,8 @@ namespace gd3d.io
                             {
                                 let _nodeComponent = [];
                                 deSerializeOtherType(serializedObj[key]["value"], _nodeComponent, newkey, assetMgr, bundlename);
-                                instanceObj.addComponentDirect(_nodeComponent[0].comp);
+                                if (_nodeComponent[0].comp)
+                                    instanceObj.addComponentDirect(_nodeComponent[0].comp);
                             }
                             else if (baseType == "transform2D" && key == "children" && reflect.getClassName(instanceObj) == "transform2D")
                             {
