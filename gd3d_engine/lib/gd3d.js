@@ -17785,6 +17785,8 @@ var gd3d;
                     }
                 }
                 else {
+                    if (!instanceObj[key])
+                        return console.warn(serializedObj[key].value.comp.type + " \u586B\u5145\u503C\u5931\u8D25");
                     fillReference(serializedObj[key].value, instanceObj[key]);
                 }
             }
@@ -17873,7 +17875,8 @@ var gd3d;
                                 if (baseType == "nodeComponent" && key == "components" && gd3d.reflect.getClassName(instanceObj) == "gameObject") {
                                     var _nodeComponent = [];
                                     deSerializeOtherType(serializedObj[key]["value"], _nodeComponent, newkey, assetMgr, bundlename);
-                                    instanceObj.addComponentDirect(_nodeComponent[0].comp);
+                                    if (_nodeComponent[0].comp)
+                                        instanceObj.addComponentDirect(_nodeComponent[0].comp);
                                 }
                                 else if (baseType == "transform" && key == "children" && gd3d.reflect.getClassName(instanceObj) == "transform") {
                                     var _transforms = [];
@@ -17883,7 +17886,8 @@ var gd3d;
                                 else if (baseType == "C2DComponent" && key == "components" && gd3d.reflect.getClassName(instanceObj) == "transform2D") {
                                     var _nodeComponent = [];
                                     deSerializeOtherType(serializedObj[key]["value"], _nodeComponent, newkey, assetMgr, bundlename);
-                                    instanceObj.addComponentDirect(_nodeComponent[0].comp);
+                                    if (_nodeComponent[0].comp)
+                                        instanceObj.addComponentDirect(_nodeComponent[0].comp);
                                 }
                                 else if (baseType == "transform2D" && key == "children" && gd3d.reflect.getClassName(instanceObj) == "transform2D") {
                                     var _transforms2D = [];
