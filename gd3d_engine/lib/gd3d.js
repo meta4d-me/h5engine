@@ -7668,6 +7668,15 @@ var gd3d;
                 }
                 buf = null;
             };
+            Object.defineProperty(animationClip.prototype, "time", {
+                get: function () {
+                    if (!this.frameCount || !this.fps)
+                        return 0;
+                    return this.frameCount / this.fps;
+                },
+                enumerable: true,
+                configurable: true
+            });
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -10029,6 +10038,7 @@ var gd3d;
                 this.percent = 0;
                 this.mix = false;
                 this.isCache = false;
+                this._playTimes = 0;
             }
             aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
@@ -10043,6 +10053,11 @@ var gd3d;
                     }
                     return this._clipnames;
                 },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(aniplayer.prototype, "playTimes", {
+                get: function () { return this._playTimes; },
                 enumerable: true,
                 configurable: true
             });
@@ -10198,6 +10213,7 @@ var gd3d;
                 this._playClip = this.clips[index];
                 this._playTimer = 0;
                 this._playFrameid = 0;
+                this._playTimes;
                 this.speed = speed;
                 this.beRevert = beRevert;
                 this.playStyle = PlayStyle.NormalPlay;
@@ -10287,6 +10303,7 @@ var gd3d;
                     this._playTimer += delay * this.speed;
                     this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
                     if (this._playClip.loop) {
+                        this._playTimes += Math.floor(this._playFrameid / this._playClip.frameCount);
                         this._playFrameid %= this._playClip.frameCount;
                     }
                     else if (this._playFrameid > this._playClip.frameCount - 1) {
@@ -10310,6 +10327,7 @@ var gd3d;
                     if (this.finishCallBack) {
                         this.finishCallBack(this.thisObject);
                         this.finishCallBack = null;
+                        this.thisObject = null;
                     }
                 }
             };
