@@ -10038,7 +10038,7 @@ var gd3d;
                 this.percent = 0;
                 this.mix = false;
                 this.isCache = false;
-                this._playTimes = 0;
+                this._playCount = 0;
             }
             aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
@@ -10056,8 +10056,8 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(aniplayer.prototype, "playTimes", {
-                get: function () { return this._playTimes; },
+            Object.defineProperty(aniplayer.prototype, "playCount", {
+                get: function () { return this._playCount; },
                 enumerable: true,
                 configurable: true
             });
@@ -10213,7 +10213,7 @@ var gd3d;
                 this._playClip = this.clips[index];
                 this._playTimer = 0;
                 this._playFrameid = 0;
-                this._playTimes;
+                this._playCount;
                 this.speed = speed;
                 this.beRevert = beRevert;
                 this.playStyle = PlayStyle.NormalPlay;
@@ -10303,7 +10303,7 @@ var gd3d;
                     this._playTimer += delay * this.speed;
                     this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
                     if (this._playClip.loop) {
-                        this._playTimes += Math.floor(this._playFrameid / this._playClip.frameCount);
+                        this._playCount += Math.floor(this._playFrameid / this._playClip.frameCount);
                         this._playFrameid %= this._playClip.frameCount;
                     }
                     else if (this._playFrameid > this._playClip.frameCount - 1) {
