@@ -136,6 +136,16 @@ namespace gd3d.framework
         public isCache: boolean = false;
         public static playerCaches: { key: string, data: aniplayer }[] = [];
 
+        private _playTimes = 0;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 动画循环播放次数
+         * @version egret-gd3d 1.0
+         */
+        public get playTimes(){return this._playTimes;}
+
         /**
          * @public
          * @language zh_CN
@@ -392,6 +402,7 @@ namespace gd3d.framework
             this._playClip = this.clips[index];
             this._playTimer = 0;
             this._playFrameid = 0;
+            this._playTimes;
             this.speed = speed;
 
             this.beRevert = beRevert;
@@ -548,6 +559,7 @@ namespace gd3d.framework
                 this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
                 if (this._playClip.loop)//加上循环与非循环动画的分别控制
                 {
+                    this._playTimes += Math.floor(this._playFrameid/this._playClip.frameCount);
                     this._playFrameid %= this._playClip.frameCount;
                 }
                 else if (this._playFrameid > this._playClip.frameCount - 1)
@@ -579,6 +591,7 @@ namespace gd3d.framework
                 {
                     this.finishCallBack(this.thisObject);
                     this.finishCallBack = null;
+                    this.thisObject = null;
                 }
             }
         }
