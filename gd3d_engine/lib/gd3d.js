@@ -6307,7 +6307,7 @@ var gd3d;
                     sh.fillUnDefUniform(p);
                     p.state_ztest = false;
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     sh.layer = framework.RenderLayerEnum.Overlay;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
@@ -6626,12 +6626,14 @@ var gd3d;
         }";
             defShader.materialShader = "{\
             \"properties\": [\
-              \"_Color('Color',Vector) = (1,1,1,1)\"\
+              \"_Color('Color',Vector) = (1,1,1,1)\",\
+              \"_Alpha('Alpha', Range(0.0, 1.0)) = 1.0\"\
             ]\
             }";
             defShader.vsmaterialcolor = "\
         attribute vec4 _glesVertex;\
         uniform vec4 _Color;\
+        uniform float _Alpha;\
         uniform highp mat4 glstate_matrix_mvp;\
         varying lowp vec4 xlv_COLOR;\
         void main()\
@@ -6640,6 +6642,7 @@ var gd3d;
             tmpvar_1.w = 1.0;\
             tmpvar_1.xyz = _glesVertex.xyz;\
             xlv_COLOR = _Color;\
+            xlv_COLOR.a = xlv_COLOR.a * _Alpha;\
             gl_Position = (glstate_matrix_mvp * tmpvar_1);\
         }";
             return defShader;
@@ -20667,8 +20670,8 @@ var gd3d;
             NavMeshLoadManager.prototype.showNavmesh = function (isshow, material) {
                 if (material === void 0) { material = null; }
                 if (this.navTrans) {
+                    this.navTrans.gameObject.visible = isshow;
                     if (!isshow) {
-                        this.navTrans.gameObject.visible = isshow;
                         this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0);
                         this.navTrans.markDirty();
                         return;

@@ -306,12 +306,14 @@ namespace gd3d.framework
 
         static materialShader: string = "{\
             \"properties\": [\
-              \"_Color('Color',Vector) = (1,1,1,1)\"\
+              \"_Color('Color',Vector) = (1,1,1,1)\",\
+              \"_Alpha('Alpha', Range(0.0, 1.0)) = 1.0\"\
             ]\
             }";
         static vsmaterialcolor: string = "\
         attribute vec4 _glesVertex;\
         uniform vec4 _Color;\
+        uniform float _Alpha;\
         uniform highp mat4 glstate_matrix_mvp;\
         varying lowp vec4 xlv_COLOR;\
         void main()\
@@ -320,6 +322,7 @@ namespace gd3d.framework
             tmpvar_1.w = 1.0;\
             tmpvar_1.xyz = _glesVertex.xyz;\
             xlv_COLOR = _Color;\
+            xlv_COLOR.a = xlv_COLOR.a * _Alpha;\
             gl_Position = (glstate_matrix_mvp * tmpvar_1);\
         }";
 
@@ -467,7 +470,7 @@ namespace gd3d.framework
                 //p.state_ztest_method = render.webglkit.LEQUAL;
                 //p.state_zwrite = true;
                 p.state_showface = render.ShowFaceStateEnum.ALL;
-                p.setAlphaBlend(render.BlendModeEnum.Close);
+                p.setAlphaBlend(render.BlendModeEnum.Blend);
                 sh.layer = RenderLayerEnum.Overlay;
                 assetmgr.mapShader[sh.getName()] = sh;
             }
