@@ -5704,11 +5704,14 @@ var gd3d;
                 delete this.mapInLoad[name];
             };
             assetMgr.prototype.loadScene = function (sceneName, onComplete) {
+                var firstChilds = new Array();
                 if (sceneName.length > 0) {
                     var _rawscene = this.getAssetByName(sceneName);
                     var willLoadRoot = _rawscene.getSceneRoot();
                     while (willLoadRoot.children.length > 0) {
-                        this.app.getScene().addChild(willLoadRoot.children.shift());
+                        var trans = willLoadRoot.children.shift();
+                        firstChilds.push(trans);
+                        this.app.getScene().addChild(trans);
                     }
                     _rawscene.useLightMap(this.app.getScene());
                     _rawscene.useFog(this.app.getScene());
@@ -5717,11 +5720,12 @@ var gd3d;
                     var _camera = new framework.transform();
                     _camera.gameObject.addComponent("camera");
                     _camera.name = "camera";
+                    firstChilds.push(_camera);
                     this.app.getScene().addChild(_camera);
                 }
                 this.app.getScene().name = sceneName;
                 this.app.getScene().getRoot().markDirty();
-                onComplete();
+                onComplete(firstChilds);
             };
             assetMgr.prototype.saveScene = function (fun) {
                 gd3d.io.SerializeDependent.resourseDatas = [];
@@ -15245,7 +15249,7 @@ var gd3d;
                     var Count = info.count.isRandom ? info.count._valueLimitMax : info.count._value;
                     burstCount += Count;
                 }
-                return Math.floor(maxrate * maxlife + burstCount + 1);
+                return Math.floor(maxrate * maxlife + burstCount + 2);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
