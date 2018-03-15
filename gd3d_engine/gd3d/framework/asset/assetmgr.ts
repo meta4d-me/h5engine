@@ -1510,11 +1510,12 @@ namespace gd3d.framework {
          * @param sceneName 场景名称
          * @param onComplete 加载完成回调
          */
-        loadScene(sceneName: string, onComplete: () => void) {
+        loadScene(sceneName: string, onComplete: (sceneRoot:transform) => void) {
+            let willLoadRoot:transform;
             if (sceneName.length > 0) {
                 var _rawscene: rawscene = this.getAssetByName(sceneName) as rawscene;
 
-                let willLoadRoot = _rawscene.getSceneRoot();
+                willLoadRoot = _rawscene.getSceneRoot();
                 while (willLoadRoot.children.length > 0) {
                     this.app.getScene().addChild(willLoadRoot.children.shift());
                 }
@@ -1533,7 +1534,7 @@ namespace gd3d.framework {
             }
             this.app.getScene().name = sceneName;
             this.app.getScene().getRoot().markDirty();
-            onComplete();
+            onComplete(willLoadRoot);
         }
 
         /**
