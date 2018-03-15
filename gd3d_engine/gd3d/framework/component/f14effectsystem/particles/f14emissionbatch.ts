@@ -22,7 +22,7 @@ namespace gd3d.framework
         curIndexCount:number=0;
 
         vertexLength:number=0;
-
+        //private maxcoun:number;
         public constructor(effect:f14EffectSystem,element:F14Emission)
         {
             this.type= F14TypeEnum.particlesType;
@@ -35,6 +35,7 @@ namespace gd3d.framework
             this.vertexLength=gd3d.render.meshData.calcByteSize(this.effect.VF)/4;
 
             let maxParticlesCount=this.getMaxParticleCount();
+            //this.maxcoun=maxParticlesCount;
             let particleVertexCount=this.mesh.data.pos.length;
             let particleIndexCount=this.mesh.data.trisindex.length;
             let totalVertex=maxParticlesCount*particleVertexCount;
@@ -98,7 +99,7 @@ namespace gd3d.framework
                 let Count=info.count.isRandom?info.count._valueLimitMax:info.count._value;
                 burstCount+=Count;
             }
-            return Math.floor(maxrate*maxlife+burstCount+1);
+            return Math.floor(maxrate*maxlife+burstCount+2);
         }
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number)
@@ -127,7 +128,9 @@ namespace gd3d.framework
             this.mesh.glMesh.uploadVertexData(context.webgl,this.dataForVbo);
             this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
             this.mesh.submesh[0].size=this.curIndexCount;
-                  
+
+
+            //console.log("ebo leng="+this.dataForEbo.length+" vbo leng="+this.dataForVbo.length+" draw size="+this.curIndexCount+"particle count="+this.curVertexcount/this.emission.vertexCount+"max count:"+this.maxcoun);
             this.mat.draw(context,this.mesh,this.mesh.submesh[0]);    
         }
         unRender() {

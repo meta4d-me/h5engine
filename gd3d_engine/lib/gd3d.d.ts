@@ -1186,6 +1186,7 @@ declare namespace gd3d.framework {
         Parse(buf: ArrayBuffer): void;
         fps: number;
         loop: boolean;
+        readonly time: number;
         boneCount: number;
         bones: string[];
         frameCount: number;
@@ -1651,7 +1652,7 @@ declare namespace gd3d.framework {
             [id: string]: transform;
         };
         private _playFrameid;
-        _playTimer: number;
+        private _playTimer;
         speed: number;
         crossdelta: number;
         crossspeed: number;
@@ -1664,6 +1665,8 @@ declare namespace gd3d.framework {
             key: string;
             data: aniplayer;
         }[];
+        private _playCount;
+        readonly playCount: number;
         readonly cacheKey: string | number;
         private init();
         start(): void;
