@@ -1510,14 +1510,16 @@ namespace gd3d.framework {
          * @param sceneName 场景名称
          * @param onComplete 加载完成回调
          */
-        loadScene(sceneName: string, onComplete: (sceneRoot:transform) => void) {
-            let willLoadRoot:transform;
+        loadScene(sceneName: string, onComplete: (firstChilds:Array<transform>) => void) {
+            let firstChilds = new Array<transform>();
             if (sceneName.length > 0) {
                 var _rawscene: rawscene = this.getAssetByName(sceneName) as rawscene;
 
-                willLoadRoot = _rawscene.getSceneRoot();
+                let willLoadRoot = _rawscene.getSceneRoot();
                 while (willLoadRoot.children.length > 0) {
-                    this.app.getScene().addChild(willLoadRoot.children.shift());
+                    let trans = willLoadRoot.children.shift();
+                    firstChilds.push(trans);
+                    this.app.getScene().addChild(trans);
                 }
 
                 //lightmap
@@ -1530,11 +1532,12 @@ namespace gd3d.framework {
                 var _camera: transform = new transform();
                 _camera.gameObject.addComponent("camera");
                 _camera.name = "camera";
+                firstChilds.push(_camera);
                 this.app.getScene().addChild(_camera);
             }
             this.app.getScene().name = sceneName;
             this.app.getScene().getRoot().markDirty();
-            onComplete(willLoadRoot);
+            onComplete(firstChilds);
         }
 
         /**
