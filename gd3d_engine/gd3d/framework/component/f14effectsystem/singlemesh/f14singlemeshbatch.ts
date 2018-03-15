@@ -125,7 +125,15 @@ namespace gd3d.framework
         }
         public canBatch(mesh:F14SingleMesh):boolean
         {
-            return this.ElementMat == mesh.baseddata.material;
+            if(this.ElementMat != mesh.baseddata.material)
+            {
+                return  false;
+            }
+            if(this.ElementMat.getShader().getName().indexOf("mask")>0)
+            {
+                return false;
+            }
+            return  true;
         }
         public getElementCount():number
         {

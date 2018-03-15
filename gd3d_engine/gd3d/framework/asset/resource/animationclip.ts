@@ -197,6 +197,18 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 播放时长
+         * @version egret-gd3d 1.0
+         */
+        get time(){
+            if(!this.frameCount || !this.fps) return 0;
+            return this.frameCount/this.fps;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 骨骼数量
          * @version egret-gd3d 1.0
          */

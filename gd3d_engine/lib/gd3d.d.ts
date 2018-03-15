@@ -928,7 +928,7 @@ declare namespace gd3d.framework {
         loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         unload(url: string, onstate?: () => void): void;
-        loadScene(sceneName: string, onComplete: () => void): void;
+        loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
         saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;
@@ -1186,6 +1186,7 @@ declare namespace gd3d.framework {
         Parse(buf: ArrayBuffer): void;
         fps: number;
         loop: boolean;
+        readonly time: number;
         boneCount: number;
         bones: string[];
         frameCount: number;
@@ -1651,7 +1652,7 @@ declare namespace gd3d.framework {
             [id: string]: transform;
         };
         private _playFrameid;
-        _playTimer: number;
+        private _playTimer;
         speed: number;
         crossdelta: number;
         crossspeed: number;
@@ -1664,6 +1665,8 @@ declare namespace gd3d.framework {
             key: string;
             data: aniplayer;
         }[];
+        private _playCount;
+        readonly playCount: number;
         readonly cacheKey: string | number;
         private init();
         start(): void;
@@ -2576,6 +2579,7 @@ declare namespace gd3d.framework {
         getWorldRotation(): math.quaternion;
         private updateLife();
         private reInit();
+        private bursts;
         private updateEmission();
         private addParticle(count?);
         reset(): void;
@@ -4814,6 +4818,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class textureutil {
+        static loadUtil(path: string): void;
+    }
+}
+declare namespace gd3d.framework {
     enum PrimitiveType {
         Sphere = 0,
         Capsule = 1,
@@ -5051,14 +5060,14 @@ declare namespace gd3d.math {
         private static _vector4_one;
         static readonly vector4_one: vector4;
         private static unused_vector4;
-        static new_vector4(): vector4;
+        static new_vector4(x?: number, y?: number, z?: number, w?: number): vector4;
         static clone_vector4(src: vector4): vector4;
         static delete_vector4(v: vector4): void;
         static collect_vector4(): void;
         private static _color_one;
         static readonly color_one: color;
         private static unused_color;
-        static new_color(): color;
+        static new_color(r?: number, g?: number, b?: number, a?: number): color;
         static delete_color(v: color): void;
         static collect_color(): void;
         private static _vector3_up;
@@ -5072,7 +5081,7 @@ declare namespace gd3d.math {
         private static _vector3_one;
         static readonly vector3_one: vector3;
         private static unused_vector3;
-        static new_vector3(): vector3;
+        static new_vector3(x?: number, y?: number, z?: number): vector3;
         static clone_vector3(src: vector3): vector3;
         static delete_vector3(v: vector3): void;
         static collect_vector3(): void;
@@ -5081,7 +5090,7 @@ declare namespace gd3d.math {
         private static _vector2_right;
         static readonly vector2_right: vector2;
         private static unused_vector2;
-        static new_vector2(): vector2;
+        static new_vector2(x?: number, y?: number): vector2;
         static clone_vector2(src: vector2): vector2;
         static delete_vector2(v: vector2): void;
         static delete_vector2Array(vs: vector2[]): void;
