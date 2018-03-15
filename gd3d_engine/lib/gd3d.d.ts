@@ -928,7 +928,7 @@ declare namespace gd3d.framework {
         loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         unload(url: string, onstate?: () => void): void;
-        loadScene(sceneName: string, onComplete: () => void): void;
+        loadScene(sceneName: string, onComplete: (sceneRoot: transform) => void): void;
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
         saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;

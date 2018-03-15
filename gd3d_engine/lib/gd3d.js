@@ -5704,9 +5704,10 @@ var gd3d;
                 delete this.mapInLoad[name];
             };
             assetMgr.prototype.loadScene = function (sceneName, onComplete) {
+                var willLoadRoot;
                 if (sceneName.length > 0) {
                     var _rawscene = this.getAssetByName(sceneName);
-                    var willLoadRoot = _rawscene.getSceneRoot();
+                    willLoadRoot = _rawscene.getSceneRoot();
                     while (willLoadRoot.children.length > 0) {
                         this.app.getScene().addChild(willLoadRoot.children.shift());
                     }
@@ -5721,7 +5722,7 @@ var gd3d;
                 }
                 this.app.getScene().name = sceneName;
                 this.app.getScene().getRoot().markDirty();
-                onComplete();
+                onComplete(willLoadRoot);
             };
             assetMgr.prototype.saveScene = function (fun) {
                 gd3d.io.SerializeDependent.resourseDatas = [];
@@ -15245,7 +15246,7 @@ var gd3d;
                     var Count = info.count.isRandom ? info.count._valueLimitMax : info.count._value;
                     burstCount += Count;
                 }
-                return Math.floor(maxrate * maxlife + burstCount + 1);
+                return Math.floor(maxrate * maxlife + burstCount + 2);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
