@@ -136,8 +136,8 @@
 
     public showNavmesh(isshow: boolean , material:gd3d.framework.material = null) {
         if (this.navTrans) {
+            this.navTrans.gameObject.visible = isshow;
             if (!isshow) {
-                this.navTrans.gameObject.visible = isshow;
                 this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0)
                 this.navTrans.markDirty();
                 return;
@@ -151,6 +151,7 @@
                     compent.materials[0] = material;
                 }
             }
+
             this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0)
             this.navTrans.markDirty();
         }
