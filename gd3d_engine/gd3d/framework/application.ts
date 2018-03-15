@@ -94,7 +94,7 @@ namespace gd3d.framework
             return this._timeScale;
         }
         private version: string = "v0.0.1";
-        private build: string = "b000059";
+        private build: string = "b000061";
         private _tar: number = -1;
         private _standDeltaTime: number = -1;
         /**
@@ -379,9 +379,9 @@ namespace gd3d.framework
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
                     this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
-                console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
-                console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
-                console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
+                // console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
+                // console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
+                // console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
 
             }
             this.width = this.webgl.canvas.width;

@@ -10,7 +10,8 @@ namespace gd3d.framework
      * UI布局选项
      * @version egret-gd3d 1.0
      */
-    export enum layoutOption{
+    export enum layoutOption
+    {
         LEFT = 1,
         TOP = 2,
         RIGHT = 4,
@@ -83,7 +84,7 @@ namespace gd3d.framework
     {
         // public notify: INotify;
         private _canvas: canvas;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -134,7 +135,7 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("transform2D[]")
         children: transform2D[];
-        
+
         /**
          * @public
          * @language zh_CN
@@ -268,11 +269,13 @@ namespace gd3d.framework
         @gd3d.reflect.Field("number")
         localRotate: number = 0;//旋转
 
-        private _maskRect : math.rect;
-        private _temp_maskRect:math.rect;
-        get maskRect(){
-            if(this._temp_maskRect == null) this._temp_maskRect = new math.rect();
-            if(this._maskRect != null){
+        private _maskRect: math.rect;
+        private _temp_maskRect: math.rect;
+        get maskRect()
+        {
+            if (this._temp_maskRect == null) this._temp_maskRect = new math.rect();
+            if (this._maskRect != null)
+            {
                 this._temp_maskRect.x = this._maskRect.x;
                 this._temp_maskRect.y = this._maskRect.y;
                 this._temp_maskRect.w = this._maskRect.w;
@@ -280,7 +283,7 @@ namespace gd3d.framework
             }
             return this._temp_maskRect;
         }
-        private _isMask:boolean = false;
+        private _isMask: boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -289,63 +292,73 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        get isMask(){
-            return this._isMask;            
+        get isMask()
+        {
+            return this._isMask;
         }
-        set isMask(b:boolean){
+        set isMask(b: boolean)
+        {
             this._isMask = b;
             this.markDirty();
-            if(this.parent != null) 
+            if (this.parent != null)
                 this.updateTran(true);
         }
 
-        private updateMaskRect(){
+        private updateMaskRect()
+        {
             let rect_x; let rect_y; let rect_w; let rect_h;
             let ParentRect;
-            if(this.parent != null){
+            if (this.parent != null)
+            {
                 this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
                 ParentRect = this.parent.maskRect;
-            }else
+            } else
                 this._parentIsMask = false;
-            if(this.isMask || this.parentIsMask){
-                if(this.isMask){
+            if (this.isMask || this.parentIsMask)
+            {
+                if (this.isMask)
+                {
                     //计算 maskrect 
                     let wPos = this.getWorldTranslate();
                     let wW = this.canvas.pixelWidth;
                     let wH = this.canvas.pixelHeight;
-                    rect_x = wPos.x/wW;
-                    rect_y = wPos.y/wH;
-                    rect_w = this.width/wW;
-                    rect_h = this.height/wH;
-                    if(this.parentIsMask && ParentRect != null){
+                    rect_x = wPos.x / wW;
+                    rect_y = wPos.y / wH;
+                    rect_w = this.width / wW;
+                    rect_h = this.height / wH;
+                    if (this.parentIsMask && ParentRect != null)
+                    {
                         //计算 rect  ∩  parentRect
-                        let min_x =Math.max(rect_x,ParentRect.x);
-                        let min_y =Math.max(rect_y,ParentRect.y);
-                        let max_x =Math.min(rect_x+rect_w,ParentRect.x+ParentRect.w);
-                        let max_y =Math.min(rect_y+rect_h,ParentRect.y+ParentRect.h);
-        
+                        let min_x = Math.max(rect_x, ParentRect.x);
+                        let min_y = Math.max(rect_y, ParentRect.y);
+                        let max_x = Math.min(rect_x + rect_w, ParentRect.x + ParentRect.w);
+                        let max_y = Math.min(rect_y + rect_h, ParentRect.y + ParentRect.h);
+
                         rect_x = min_x;
                         rect_y = min_y;
                         rect_w = max_x - min_x;
                         rect_h = max_y - min_y;
                     }
-                }else if(ParentRect != null){
+                } else if (ParentRect != null)
+                {
                     rect_x = ParentRect.x; rect_y = ParentRect.y; rect_w = ParentRect.w; rect_h = ParentRect.h;
                 }
-                if(this._maskRect == null) this._maskRect = new math.rect();
+                if (this._maskRect == null) this._maskRect = new math.rect();
 
-                if(this._maskRect.x != rect_x || this._maskRect.x != rect_y ||this._maskRect.x != rect_w ||this._maskRect.x != rect_h ){
-                    this._maskRect.x = rect_x; 
-                    this._maskRect.y = rect_y; 
-                    this._maskRect.w = rect_w; 
-                    this._maskRect.h = rect_h; 
+                if (this._maskRect.x != rect_x || this._maskRect.x != rect_y || this._maskRect.x != rect_w || this._maskRect.x != rect_h)
+                {
+                    this._maskRect.x = rect_x;
+                    this._maskRect.y = rect_y;
+                    this._maskRect.w = rect_w;
+                    this._maskRect.h = rect_h;
                 }
             }
         }
-        
+
 
         private _parentIsMask = false;
-        get parentIsMask(){
+        get parentIsMask()
+        {
             return this._parentIsMask;
         }
 
@@ -440,7 +453,7 @@ namespace gd3d.framework
          */
         removeAllChild()
         {
-            while(this.children.length>0)
+            while (this.children.length > 0)
             {
                 this.removeChild(this.children[0]);
             }
@@ -536,23 +549,26 @@ namespace gd3d.framework
         }
 
         //计算 to canvasMtx 矩阵
-        private CalcReCanvasMtx(out:math.matrix3x2){
-            if(!out)  return;
+        private CalcReCanvasMtx(out: math.matrix3x2)
+        {
+            if (!out) return;
             let tsca = gd3d.math.pool.new_vector2();
             let ttran = gd3d.math.pool.new_vector2();
-            tsca.x = this.canvas.pixelWidth/2;
-            tsca.y = - this.canvas.pixelHeight/2;
-            ttran.x = this.canvas.pixelWidth/2;
-            ttran.y = this.canvas.pixelHeight/2;
-            math.matrix3x2MakeTransformRTS(ttran,tsca,0,out);
+            tsca.x = this.canvas.pixelWidth / 2;
+            tsca.y = - this.canvas.pixelHeight / 2;
+            ttran.x = this.canvas.pixelWidth / 2;
+            ttran.y = this.canvas.pixelHeight / 2;
+            math.matrix3x2MakeTransformRTS(ttran, tsca, 0, out);
         }
 
         /**
          * @private
          * 转换并拆解canvas坐标空间 RTS
          */
-        private decomposeWorldMatrix(){
-            if(this.dirtyWorldDecompose){
+        private decomposeWorldMatrix()
+        {
+            if (this.dirtyWorldDecompose)
+            {
                 let reCanvasMtx = gd3d.math.pool.new_matrix3x2();
                 // let tsca = gd3d.math.pool.new_vector2();
                 // let ttran = gd3d.math.pool.new_vector2();
@@ -560,13 +576,13 @@ namespace gd3d.framework
                 // tsca.y = - this.canvas.pixelHeight/2;
                 // ttran.x = this.canvas.pixelWidth/2;
                 // ttran.y = this.canvas.pixelHeight/2;
-            
+
                 // math.matrix3x2MakeTransformRTS(ttran,tsca,0,reCanvsMtx);
                 this.CalcReCanvasMtx(reCanvasMtx);
 
                 let outMatrix = gd3d.math.pool.new_matrix3x2();
-                math.matrix3x2Multiply(reCanvasMtx,this.worldMatrix,outMatrix);
-                
+                math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, outMatrix);
+
                 math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
 
                 // math.pool.delete_vector2(tsca);
@@ -641,25 +657,25 @@ namespace gd3d.framework
             return this.worldMatrix;
         }
 
-        public static getTransInfoInCanvas(trans:transform2D,out:t2dInfo)//实际上是rootnode space
+        public static getTransInfoInCanvas(trans: transform2D, out: t2dInfo)//实际上是rootnode space
         {
-            var mat=trans.getWorldMatrix();
-            var rotmat=trans.canvas.getRoot().getWorldMatrix();
-            var inversemat=gd3d.math.pool.new_matrix3x2();
-            gd3d.math.matrix3x2Inverse(rotmat,inversemat);
-            var mattoRoot=gd3d.math.pool.new_matrix3x2();
-            gd3d.math.matrix3x2Multiply(inversemat,mat,mattoRoot);
+            var mat = trans.getWorldMatrix();
+            var rotmat = trans.canvas.getRoot().getWorldMatrix();
+            var inversemat = gd3d.math.pool.new_matrix3x2();
+            gd3d.math.matrix3x2Inverse(rotmat, inversemat);
+            var mattoRoot = gd3d.math.pool.new_matrix3x2();
+            gd3d.math.matrix3x2Multiply(inversemat, mat, mattoRoot);
 
-            var rotscale=gd3d.math.pool.new_vector2();
-            var rotRot:gd3d.math.angelref=new gd3d.math.angelref();
-            var rotPos=gd3d.math.pool.new_vector2();
+            var rotscale = gd3d.math.pool.new_vector2();
+            var rotRot: gd3d.math.angelref = new gd3d.math.angelref();
+            var rotPos = gd3d.math.pool.new_vector2();
             math.matrix3x2Decompose(mattoRoot, rotscale, rotRot, rotPos);
-            gd3d.math.vec2Clone(trans.pivot,out.pivot);
-            gd3d.math.vec2Clone(rotPos,out.pivotPos);
+            gd3d.math.vec2Clone(trans.pivot, out.pivot);
+            gd3d.math.vec2Clone(rotPos, out.pivotPos);
 
-            out.rot=rotRot.v;
-            out.width=trans.width*rotscale.x;
-            out.height=trans.height*rotscale.y;
+            out.rot = rotRot.v;
+            out.width = trans.width * rotscale.x;
+            out.height = trans.height * rotscale.y;
 
             gd3d.math.pool.delete_matrix3x2(inversemat);
             gd3d.math.pool.delete_matrix3x2(mattoRoot);
@@ -717,7 +733,7 @@ namespace gd3d.framework
          */
         dispose()
         {
-            if(this.children)
+            if (this.children)
             {
                 for (var k in this.children)
                 {
@@ -736,7 +752,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         renderer: IRectRenderer;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -757,24 +773,27 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-            if (this.components != null)
+            if (sceneMgr.app.bePlay)
             {
-                for (var i = 0; i < this.components.length; i++)
+                if (this.components != null)
                 {
-                    if (this.components[i].init == false)
+                    for (var i = 0; i < this.components.length; i++)
                     {
-                        this.components[i].comp.start();
-                        this.components[i].init = true;
+                        if (this.components[i].init == false)
+                        {
+                            this.components[i].comp.start();
+                            this.components[i].init = true;
+                        }
+                        if (sceneMgr.app.bePlay && !sceneMgr.app.bePause)
+                            this.components[i].comp.update(delta);
                     }
-                    if (sceneMgr.app.bePlay && !sceneMgr.app.bePause)
-                        this.components[i].comp.update(delta);
                 }
-            }
-            if (this.children != null)
-            {
-                for (var i = 0; i < this.children.length; i++)
+                if (this.children != null)
                 {
-                    this.children[i].update(delta);
+                    for (var i = 0; i < this.children.length; i++)
+                    {
+                        this.children[i].update(delta);
+                    }
                 }
             }
         }
@@ -1050,7 +1069,7 @@ namespace gd3d.framework
          * @param pworld 位置
          * @version egret-gd3d 1.0
          */
-        ContainsCanvasPoint(pworld: math.vector2,tolerance:number=0): boolean
+        ContainsCanvasPoint(pworld: math.vector2, tolerance: number = 0): boolean
         {
             var mworld = this.getWorldMatrix();
             var mout = new math.matrix3x2();
@@ -1060,7 +1079,7 @@ namespace gd3d.framework
             gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
             p2.x += this.pivot.x * this.width;
             p2.y += this.pivot.y * this.height;
-            return p2.x+tolerance >=0 && p2.y+tolerance >= 0 && p2.x < this.width+tolerance && p2.y < this.height+tolerance;
+            return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
         }
 
         /**
@@ -1080,7 +1099,7 @@ namespace gd3d.framework
                     if (ev.eated == false)
                     {
                         var c = this.children[i];
-                        if (c != null && c.visible )
+                        if (c != null && c.visible)
                             c.onPointEvent(canvas, ev);
                         // if (ev.eated)
                         // {//事件刚刚被吃掉，
@@ -1106,8 +1125,8 @@ namespace gd3d.framework
 
         }
 
-        private readonly optionArr : layoutOption[] = [layoutOption.LEFT,layoutOption.TOP,layoutOption.RIGHT,layoutOption.BOTTOM,layoutOption.H_CENTER,layoutOption.V_CENTER];
-        private _layoutState : number = 0;
+        private readonly optionArr: layoutOption[] = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
+        private _layoutState: number = 0;
         /**
          * @public
          * @language zh_CN
@@ -1116,20 +1135,23 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        set layoutState(state:number){
-            if(isNaN(state) || state==undefined) return;
-            if(state != this._layoutState){
+        set layoutState(state: number)
+        {
+            if (isNaN(state) || state == undefined) return;
+            if (state != this._layoutState)
+            {
                 this.layoutDirty = true;
                 this.markDirty();
                 this._layoutState = state;
             }
         }
-        get layoutState(){
+        get layoutState()
+        {
             return this._layoutState;
         }
 
         @reflect.Field("numberdic")
-        private layoutValueMap : {[option:number]: number} = {};   // map structure {layoutOption : value}
+        private layoutValueMap: { [option: number]: number } = {};   // map structure {layoutOption : value}
         //private layoutValueMap : number[] = [];   // map structure {layoutOption : value}
         /**
          * @public
@@ -1138,19 +1160,22 @@ namespace gd3d.framework
          * 布局设定值
          * @version egret-gd3d 1.0
          */
-        setLayoutValue(option:layoutOption,value:number){
-            if(isNaN(option) || isNaN(value) || option==undefined || value==undefined) return;
-            if(this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option]){
+        setLayoutValue(option: layoutOption, value: number)
+        {
+            if (isNaN(option) || isNaN(value) || option == undefined || value == undefined) return;
+            if (this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option])
+            {
                 this.layoutDirty = true;
                 this.markDirty();
                 this.layoutValueMap[option] = value;
             }
         }
-        getLayoutValue(option:layoutOption){
-            return this.layoutValueMap[option];     
+        getLayoutValue(option: layoutOption)
+        {
+            return this.layoutValueMap[option];
         }
 
-        private _layoutPercentState:number = 0;//百分比模式
+        private _layoutPercentState: number = 0;//百分比模式
         /**
          * @public
          * @language zh_CN
@@ -1159,58 +1184,71 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        set layoutPercentState(state:number){
-            if(isNaN(state) || state==undefined) return;
-            if(state != this._layoutPercentState){
+        set layoutPercentState(state: number)
+        {
+            if (isNaN(state) || state == undefined) return;
+            if (state != this._layoutPercentState)
+            {
                 this.layoutDirty = true;
                 this.markDirty();
                 this._layoutPercentState = state;
             }
         }
-        get layoutPercentState(){
+        get layoutPercentState()
+        {
             return this._layoutPercentState;
         }
 
         private layoutDirty = false;
         private lastParentWidth = 0;
         private lastParentHeight = 0;
-        private lastParentPivot = new math.vector2(0,0);
-        private lastPivot = new math.vector2(0,0);
-        
-        private refreshLayout(){
+        private lastParentPivot = new math.vector2(0, 0);
+        private lastPivot = new math.vector2(0, 0);
+
+        private refreshLayout()
+        {
             let parent = this.parent;
-            if(!parent) return;
-            if(parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x 
-                || parent.pivot.y != this.lastParentPivot.y || this.pivot.x !=this.lastPivot.x || this.pivot.y != this.lastPivot.y)
+            if (!parent) return;
+            if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
+                || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                 this.layoutDirty = true;
 
-            if(!this.layoutDirty) return;
+            if (!this.layoutDirty) return;
             let state = this._layoutState;
-            if(state != 0){
-                if(state & layoutOption.LEFT){
-                    if(state & layoutOption.RIGHT){
+            if (state != 0)
+            {
+                if (state & layoutOption.LEFT)
+                {
+                    if (state & layoutOption.RIGHT)
+                    {
                         this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
                     }
                     this.localTranslate.x = this.getLayValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
-                }else if (state & layoutOption.RIGHT){
+                } else if (state & layoutOption.RIGHT)
+                {
                     this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
-    
-                if(state & layoutOption.H_CENTER){
-                    this.localTranslate.x = (parent.width - this.width)/2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
+
+                if (state & layoutOption.H_CENTER)
+                {
+                    this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
-    
-                if(state & layoutOption.TOP){
-                    if(state & layoutOption.BOTTOM){
+
+                if (state & layoutOption.TOP)
+                {
+                    if (state & layoutOption.BOTTOM)
+                    {
                         this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
                     }
                     this.localTranslate.y = this.getLayValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
-                }else if(state & layoutOption.BOTTOM){
+                } else if (state & layoutOption.BOTTOM)
+                {
                     this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
-    
-                if(state & layoutOption.V_CENTER){
-                    this.localTranslate.y = (parent.height - this.height)/2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
+
+                if (state & layoutOption.V_CENTER)
+                {
+                    this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
                 //布局调整 后刷新 matrix
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
@@ -1225,30 +1263,35 @@ namespace gd3d.framework
             this.lastPivot.y = this.pivot.y;
         }
 
-        private getLayValue(opation:layoutOption){
-            if(this.layoutValueMap[opation] == undefined)
+        private getLayValue(opation: layoutOption)
+        {
+            if (this.layoutValueMap[opation] == undefined)
                 this.layoutValueMap[opation] = 0;
 
             let value = 0;
-            if(this._layoutPercentState & opation){
-                if(this.parent){
-                    switch(opation){
+            if (this._layoutPercentState & opation)
+            {
+                if (this.parent)
+                {
+                    switch (opation)
+                    {
                         case layoutOption.LEFT:
                         case layoutOption.H_CENTER:
                         case layoutOption.RIGHT:
-                        value = this.parent.width * this.layoutValueMap[opation]/100;
-                        break;
+                            value = this.parent.width * this.layoutValueMap[opation] / 100;
+                            break;
                         case layoutOption.TOP:
                         case layoutOption.V_CENTER:
                         case layoutOption.BOTTOM:
-                        value = this.parent.height * this.layoutValueMap[opation]/100;
-                        break;
+                            value = this.parent.height * this.layoutValueMap[opation] / 100;
+                            break;
                     }
                 }
-            }else{
+            } else
+            {
                 value = this.layoutValueMap[opation];
             }
-            
+
             return value;
         }
 
@@ -1267,16 +1310,16 @@ namespace gd3d.framework
 
     export class t2dInfo
     {
-        pivot:math.vector2=new math.vector2();
-        pivotPos:math.vector2=new math.vector2();
-        width:number;
-        height:number;
-        rot:number;
+        pivot: math.vector2 = new math.vector2();
+        pivotPos: math.vector2 = new math.vector2();
+        width: number;
+        height: number;
+        rot: number;
 
-        public static getCenter(info:t2dInfo,outCenter:math.vector2)
+        public static getCenter(info: t2dInfo, outCenter: math.vector2)
         {
-            outCenter.x=info.pivotPos.x+info.width*(0.5-info.pivot.x)*Math.cos(info.rot)-info.height*(0.5-info.pivot.y)*Math.sin(info.rot);
-            outCenter.y=info.pivotPos.y-info.width*(0.5-info.pivot.x)*Math.sin(info.rot)+info.height*(0.5-info.pivot.y)*Math.cos(info.rot);
+            outCenter.x = info.pivotPos.x + info.width * (0.5 - info.pivot.x) * Math.cos(info.rot) - info.height * (0.5 - info.pivot.y) * Math.sin(info.rot);
+            outCenter.y = info.pivotPos.y - info.width * (0.5 - info.pivot.x) * Math.sin(info.rot) + info.height * (0.5 - info.pivot.y) * Math.cos(info.rot);
         }
     }
 }

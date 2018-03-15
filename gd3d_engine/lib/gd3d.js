@@ -38,7 +38,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000059";
+                this.build = "b000061";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
@@ -260,9 +260,6 @@ var gd3d;
                         this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
                         this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
-                    console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
-                    console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
-                    console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
                 }
                 this.width = this.webgl.canvas.width;
                 this.height = this.webgl.canvas.height;
@@ -2199,19 +2196,21 @@ var gd3d;
                 this.removeAllComponents();
             };
             transform2D.prototype.update = function (delta) {
-                if (this.components != null) {
-                    for (var i = 0; i < this.components.length; i++) {
-                        if (this.components[i].init == false) {
-                            this.components[i].comp.start();
-                            this.components[i].init = true;
+                if (framework.sceneMgr.app.bePlay) {
+                    if (this.components != null) {
+                        for (var i = 0; i < this.components.length; i++) {
+                            if (this.components[i].init == false) {
+                                this.components[i].comp.start();
+                                this.components[i].init = true;
+                            }
+                            if (framework.sceneMgr.app.bePlay && !framework.sceneMgr.app.bePause)
+                                this.components[i].comp.update(delta);
                         }
-                        if (framework.sceneMgr.app.bePlay && !framework.sceneMgr.app.bePause)
-                            this.components[i].comp.update(delta);
                     }
-                }
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.children[i].update(delta);
+                    if (this.children != null) {
+                        for (var i = 0; i < this.children.length; i++) {
+                            this.children[i].update(delta);
+                        }
                     }
                 }
             };
@@ -6308,7 +6307,7 @@ var gd3d;
                     sh.fillUnDefUniform(p);
                     p.state_ztest = false;
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     sh.layer = framework.RenderLayerEnum.Overlay;
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
@@ -6627,12 +6626,14 @@ var gd3d;
         }";
             defShader.materialShader = "{\
             \"properties\": [\
-              \"_Color('Color',Vector) = (1,1,1,1)\"\
+              \"_Color('Color',Vector) = (1,1,1,1)\",\
+              \"_Alpha('Alpha', Range(0.0, 1.0)) = 1.0\"\
             ]\
             }";
             defShader.vsmaterialcolor = "\
         attribute vec4 _glesVertex;\
         uniform vec4 _Color;\
+        uniform float _Alpha;\
         uniform highp mat4 glstate_matrix_mvp;\
         varying lowp vec4 xlv_COLOR;\
         void main()\
@@ -6641,6 +6642,7 @@ var gd3d;
             tmpvar_1.w = 1.0;\
             tmpvar_1.xyz = _glesVertex.xyz;\
             xlv_COLOR = _Color;\
+            xlv_COLOR.a = xlv_COLOR.a * _Alpha;\
             gl_Position = (glstate_matrix_mvp * tmpvar_1);\
         }";
             return defShader;
@@ -7666,6 +7668,15 @@ var gd3d;
                 }
                 buf = null;
             };
+            Object.defineProperty(animationClip.prototype, "time", {
+                get: function () {
+                    if (!this.frameCount || !this.fps)
+                        return 0;
+                    return this.frameCount / this.fps;
+                },
+                enumerable: true,
+                configurable: true
+            });
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -10027,6 +10038,7 @@ var gd3d;
                 this.percent = 0;
                 this.mix = false;
                 this.isCache = false;
+                this._playCount = 0;
             }
             aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
@@ -10041,6 +10053,11 @@ var gd3d;
                     }
                     return this._clipnames;
                 },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(aniplayer.prototype, "playCount", {
+                get: function () { return this._playCount; },
                 enumerable: true,
                 configurable: true
             });
@@ -10196,6 +10213,7 @@ var gd3d;
                 this._playClip = this.clips[index];
                 this._playTimer = 0;
                 this._playFrameid = 0;
+                this._playCount;
                 this.speed = speed;
                 this.beRevert = beRevert;
                 this.playStyle = PlayStyle.NormalPlay;
@@ -10285,6 +10303,7 @@ var gd3d;
                     this._playTimer += delay * this.speed;
                     this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
                     if (this._playClip.loop) {
+                        this._playCount += Math.floor(this._playFrameid / this._playClip.frameCount);
                         this._playFrameid %= this._playClip.frameCount;
                     }
                     else if (this._playFrameid > this._playClip.frameCount - 1) {
@@ -10308,6 +10327,7 @@ var gd3d;
                     if (this.finishCallBack) {
                         this.finishCallBack(this.thisObject);
                         this.finishCallBack = null;
+                        this.thisObject = null;
                     }
                 }
             };
@@ -14753,6 +14773,7 @@ var gd3d;
                 this.localrot = new gd3d.math.quaternion();
                 this.worldRot = new gd3d.math.quaternion();
                 this.lastFrame = 0;
+                this.bursts = [];
                 this.type = framework.F14TypeEnum.particlesType;
                 this.effect = effect;
                 this.layer = layer;
@@ -14782,6 +14803,9 @@ var gd3d;
                     this.frameLife = 1;
                 var frame = Math.floor(this.TotalTime * fps) % this.frameLife;
                 if (frame != this.lastFrame && this.layer.frames[frame]) {
+                    if (frame == this.layer.frameList[0]) {
+                        this.currentData = this.baseddata;
+                    }
                     if (this.layer.frames[frame].data.EmissionData != this.currentData) {
                         this.changeCurrentBaseData(this.layer.frames[frame].data.EmissionData);
                     }
@@ -14838,9 +14862,7 @@ var gd3d;
                 this.TotalTime = 0;
                 this.numcount = 0;
                 this.currentData.rateOverTime.getValue(true);
-                for (var i = 0; i < this.baseddata.bursts.length; i++) {
-                    this.baseddata.bursts[i].burst(false);
-                }
+                this.bursts = [];
             };
             F14Emission.prototype.updateEmission = function () {
                 var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
@@ -14849,9 +14871,10 @@ var gd3d;
                 this.numcount += realcount;
                 if (this.baseddata.bursts.length > 0) {
                     for (var i = 0; i < this.baseddata.bursts.length; i++) {
-                        if (!this.baseddata.bursts[i].beburst() && this.baseddata.bursts[i].time <= this.TotalTime) {
+                        if (this.bursts.indexOf(this.baseddata.bursts[i].time) < 0 && this.baseddata.bursts[i].time <= this.TotalTime) {
                             var count = this.baseddata.bursts[i].count.getValue(true);
                             this.baseddata.bursts[i].burst();
+                            this.bursts.push(this.baseddata.bursts[i].time);
                             this.addParticle(count);
                         }
                     }
@@ -15925,7 +15948,13 @@ var gd3d;
                 mesh.layer.batch = this;
             };
             F14SingleMeshBath.prototype.canBatch = function (mesh) {
-                return this.ElementMat == mesh.baseddata.material;
+                if (this.ElementMat != mesh.baseddata.material) {
+                    return false;
+                }
+                if (this.ElementMat.getShader().getName().indexOf("mask") > 0) {
+                    return false;
+                }
+                return true;
             };
             F14SingleMeshBath.prototype.getElementCount = function () {
                 return this.meshlist.length;
@@ -17774,6 +17803,8 @@ var gd3d;
                     }
                 }
                 else {
+                    if (!instanceObj[key])
+                        return console.warn(serializedObj[key].value.comp.type + " \u586B\u5145\u503C\u5931\u8D25");
                     fillReference(serializedObj[key].value, instanceObj[key]);
                 }
             }
@@ -17862,7 +17893,8 @@ var gd3d;
                                 if (baseType == "nodeComponent" && key == "components" && gd3d.reflect.getClassName(instanceObj) == "gameObject") {
                                     var _nodeComponent = [];
                                     deSerializeOtherType(serializedObj[key]["value"], _nodeComponent, newkey, assetMgr, bundlename);
-                                    instanceObj.addComponentDirect(_nodeComponent[0].comp);
+                                    if (_nodeComponent[0].comp)
+                                        instanceObj.addComponentDirect(_nodeComponent[0].comp);
                                 }
                                 else if (baseType == "transform" && key == "children" && gd3d.reflect.getClassName(instanceObj) == "transform") {
                                     var _transforms = [];
@@ -17872,7 +17904,8 @@ var gd3d;
                                 else if (baseType == "C2DComponent" && key == "components" && gd3d.reflect.getClassName(instanceObj) == "transform2D") {
                                     var _nodeComponent = [];
                                     deSerializeOtherType(serializedObj[key]["value"], _nodeComponent, newkey, assetMgr, bundlename);
-                                    instanceObj.addComponentDirect(_nodeComponent[0].comp);
+                                    if (_nodeComponent[0].comp)
+                                        instanceObj.addComponentDirect(_nodeComponent[0].comp);
                                 }
                                 else if (baseType == "transform2D" && key == "children" && gd3d.reflect.getClassName(instanceObj) == "transform2D") {
                                     var _transforms2D = [];
@@ -17937,16 +17970,21 @@ var gd3d;
                 }
                 else {
                     var _newInstance = void 0;
+                    var componentType = document["__gdmeta__"][type];
+                    if (!componentType) {
+                        console.warn(instanceObj);
+                        return console.warn("\u65E0\u6CD5\u627E\u5230\u7EC4\u4EF6:" + document["__gdmeta__"][type]);
+                    }
                     if (type == "gameObject" && key == "gameObject" && gd3d.reflect.getClassName(instanceObj) == "transform") {
                         _newInstance = instanceObj.gameObject;
                     }
                     else if (type == "transform2D" && key == "rootNode" && gd3d.reflect.getClassName(instanceObj) == "canvas") {
-                        _newInstance = gd3d.reflect.createInstance(document["__gdmeta__"][type], null);
+                        _newInstance = gd3d.reflect.createInstance(componentType, null);
                         instanceObj.rootNode = _newInstance;
                         _newInstance.canvas = instanceObj;
                     }
                     else {
-                        _newInstance = gd3d.reflect.createInstance(document["__gdmeta__"][type], null);
+                        _newInstance = gd3d.reflect.createInstance(componentType, null);
                         if (_isArray)
                             instanceObj.push(_newInstance);
                         else
@@ -19773,7 +19811,7 @@ var gd3d;
             var width = 1.0 / column;
             var height = 1.0 / row;
             var offsetx = width * (index % column);
-            var offsety = height * (row - height * (Math.floor(index / column) + 1));
+            var offsety = height * row - height * (Math.floor(index / column) + 1);
             out.x = width;
             out.y = height;
             out.z = offsetx;
@@ -20654,8 +20692,8 @@ var gd3d;
             NavMeshLoadManager.prototype.showNavmesh = function (isshow, material) {
                 if (material === void 0) { material = null; }
                 if (this.navTrans) {
+                    this.navTrans.gameObject.visible = isshow;
                     if (!isshow) {
-                        this.navTrans.gameObject.visible = isshow;
                         this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0);
                         this.navTrans.markDirty();
                         return;
@@ -27772,6 +27810,26 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var textureutil = (function () {
+            function textureutil() {
+            }
+            textureutil.loadUtil = function (path) {
+                var sc1 = document.createElement("script");
+                var sc2 = document.createElement("script");
+                sc1.src = path + "lib/webgl-util.js";
+                sc2.src = path + "";
+                document.body.appendChild(sc1);
+                document.body.appendChild(sc2);
+            };
+            return textureutil;
+        }());
+        framework.textureutil = textureutil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var PrimitiveType;
         (function (PrimitiveType) {
             PrimitiveType[PrimitiveType["Sphere"] = 0] = "Sphere";
@@ -28567,11 +28625,21 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_vector4 = function () {
-                if (pool.unused_vector4.length > 0)
-                    return pool.unused_vector4.pop();
+            pool.new_vector4 = function (x, y, z, w) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
+                if (w === void 0) { w = 0; }
+                if (pool.unused_vector4.length > 0) {
+                    var v4 = pool.unused_vector4.pop();
+                    v4.x = x;
+                    v4.y = y;
+                    v4.z = z;
+                    v4.w = w;
+                    return v4;
+                }
                 else
-                    return new math.vector4();
+                    return new math.vector4(x, y, z, w);
             };
             pool.clone_vector4 = function (src) {
                 if (pool.unused_vector4.length > 0) {
@@ -28609,11 +28677,21 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_color = function () {
-                if (pool.unused_color.length > 0)
-                    return pool.unused_color.pop();
+            pool.new_color = function (r, g, b, a) {
+                if (r === void 0) { r = 0; }
+                if (g === void 0) { g = 0; }
+                if (b === void 0) { b = 0; }
+                if (a === void 0) { a = 0; }
+                if (pool.unused_color.length > 0) {
+                    var c = pool.unused_color.pop();
+                    c.r = r;
+                    c.g = g;
+                    c.b = b;
+                    c.a = a;
+                    return c;
+                }
                 else
-                    return new math.color();
+                    return new math.color(r, g, b, a);
             };
             pool.delete_color = function (v) {
                 if (v == null)
@@ -28679,13 +28757,19 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_vector3 = function () {
+            pool.new_vector3 = function (x, y, z) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
                 if (pool.unused_vector3.length > 0) {
-                    var v = pool.unused_vector3.pop();
-                    return v;
+                    var v3 = pool.unused_vector3.pop();
+                    v3.x = x;
+                    v3.y = y;
+                    v3.z = z;
+                    return v3;
                 }
                 else
-                    return new math.vector3();
+                    return new math.vector3(x, y, z);
             };
             pool.clone_vector3 = function (src) {
                 if (pool.unused_vector3.length > 0) {
@@ -28731,11 +28815,17 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            pool.new_vector2 = function () {
-                if (pool.unused_vector2.length > 0)
-                    return pool.unused_vector2.pop();
+            pool.new_vector2 = function (x, y) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (pool.unused_vector2.length > 0) {
+                    var v2 = pool.unused_vector2.pop();
+                    v2.x = x;
+                    v2.y = y;
+                    return v2;
+                }
                 else
-                    return new math.vector2();
+                    return new math.vector2(x, y);
             };
             pool.clone_vector2 = function (src) {
                 if (pool.unused_vector2.length > 0) {
