@@ -1,3 +1,4 @@
+precision lowp float;
 uniform lowp sampler2D _MainTex;
 uniform lowp vec4 _MainColor;
 uniform lowp float _AlphaCut;
