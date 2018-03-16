@@ -7,7 +7,7 @@ namespace gd3d.framework{
      *        canvas.
      * @return {string} The html.
      */
-    private makeFailHTML = function(msg) {
+    private makeFailHTML(msg) {
         return '' +
               '<div style="margin: auto; width:500px;z-index:10000;margin-top:20em;text-align:center;">' + msg + '</div>';
         // return '' +
@@ -49,7 +49,7 @@ namespace gd3d.framework{
      * @return {WebGLRenderingContext} The created context.
      */
     public setupWebGL(canvas:Element, opt_attribs:WebGLContextAttributes = null, opt_onError:(msg:string)=>void =null){
-        function handleCreationError(msg) {
+        let handleCreationError= (msg)=> {
             var container = document.getElementsByTagName("body")[0];
           //var container = canvas.parentNode;
           if (container) {
