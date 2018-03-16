@@ -43,13 +43,13 @@ namespace gd3d.framework
          */
         start(camera: camera)
         {
-            if(camera == this.camera) return;
+            if (camera == this.camera) return;
             this.camera = camera;
             this.app = camera.gameObject.getScene().app;
             this.canvas.scene = camera.gameObject.getScene();
             this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
         }
-        
+
         /**
          * @private
          */
@@ -66,15 +66,15 @@ namespace gd3d.framework
         @gd3d.reflect.Field("boolean")
         autoAsp: boolean = true;
 
-         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 渲染排序
-         * @version egret-gd3d 1.0
-         */
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 渲染排序
+        * @version egret-gd3d 1.0
+        */
         @gd3d.reflect.Field("number")
-        sortOrder:number = 0;
+        sortOrder: number = 0;
 
         /**
          * @public
@@ -145,7 +145,7 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
             if (!this.canvas.getRoot().visible) return;
-           // if (!(camera.CullingMask & this.renderLayer)) return;
+            // if (!(camera.CullingMask & this.renderLayer)) return;
             if (this.camera == null || this.camera == undefined)
                 return;
             if (this.autoAsp)
@@ -192,7 +192,7 @@ namespace gd3d.framework
          * @param my y偏移
          * @version egret-gd3d 1.0
          */
-        pick2d(mx: number, my: number,tolerance:number=0): transform2D
+        pick2d(mx: number, my: number, tolerance: number = 0): transform2D
         {
             if (this.camera == null) return null;
             var vp = new math.rect();
@@ -204,7 +204,7 @@ namespace gd3d.framework
             outv2.x = sx;
             outv2.y = sy;
             var root = this.canvas.getRoot();
-            let trans = this.dopick2d(outv2, root,tolerance);
+            let trans = this.dopick2d(outv2, root, tolerance);
             math.pool.delete_vector2(outv2);
             return trans;
         }
@@ -212,7 +212,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        dopick2d(outv: math.vector2, tran: transform2D,tolerance:number=0): transform2D
+        dopick2d(outv: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
         {
             if (tran.components != null)
             {
@@ -220,7 +220,8 @@ namespace gd3d.framework
                 {
                     var comp = tran.components[i];
                     if (comp != null)
-                        if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv,tolerance))
+                        //if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv,tolerance))
+                        if (comp.comp.transform.ContainsCanvasPoint(outv, tolerance))
                         {
                             return comp.comp.transform;
                         }
@@ -231,7 +232,7 @@ namespace gd3d.framework
             {
                 for (var i = tran.children.length - 1; i >= 0; i--)
                 {
-                    var tran2 = this.dopick2d(outv, tran.children[i],tolerance);
+                    var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
                     if (tran2 != null) return tran2;
                 }
             }
@@ -240,7 +241,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        pick2d_new(mx: number, my: number,tolerance:number=0): transform2D
+        pick2d_new(mx: number, my: number, tolerance: number = 0): transform2D
         {
             if (this.camera == null) return null;
             var vp = new math.rect();
@@ -252,14 +253,14 @@ namespace gd3d.framework
             outv2.x = sx;
             outv2.y = sy;
             var root = this.canvas.getRoot();
-            return this.dopick2d_new(outv2, root,tolerance);
+            return this.dopick2d_new(outv2, root, tolerance);
         }
         /**
          * @private
          */
-        dopick2d_new(outv: math.vector2, tran: transform2D,tolerance:number=0): transform2D
+        dopick2d_new(outv: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
         {
-            if(tran.children!=null)
+            if (tran.children != null)
             {
                 for (var i = tran.children.length - 1; i >= 0; i--)
                 {
@@ -267,10 +268,10 @@ namespace gd3d.framework
                     if (tran2 != null) return tran2;
                 }
             }
-            var uirect=tran.getComponent("uirect") as gd3d.framework.uirect;
-            if(uirect!=null)
+            var uirect = tran.getComponent("uirect") as gd3d.framework.uirect;
+            if (uirect != null)
             {
-                if(uirect.canbeClick&&uirect.transform.ContainsCanvasPoint(outv,tolerance))
+                if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance))
                 {
                     return uirect.transform;
                 }
