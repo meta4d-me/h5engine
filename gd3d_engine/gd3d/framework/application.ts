@@ -149,7 +149,9 @@ namespace gd3d.framework
         {
             return this._canvasClientHeight;
         }
-        public scale: number = 0;
+        
+        get scaleFromPandding(){return this._scaleFromPandding};
+        private _scaleFromPandding:number = 1;
         /**
          * @public
          * @language zh_CN
@@ -236,13 +238,13 @@ namespace gd3d.framework
             {
                 this.webgl.canvas.width = this._fixWidth;
                 this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
             }
             else if (this.beHeightSetted)
             {
                 this.webgl.canvas.height = this._fixHeight;
                 this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
             }
             this._canvasClientWidth = this.webgl.canvas.clientWidth;
             this._canvasClientHeight = this.webgl.canvas.clientHeight;
@@ -372,12 +374,12 @@ namespace gd3d.framework
                 {
                     this.webgl.canvas.width = this._fixWidth;
                     this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 } else if (this.beHeightSetted)
                 {
                     this.webgl.canvas.height = this._fixHeight;
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 // console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
                 // console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);

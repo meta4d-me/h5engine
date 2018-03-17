@@ -244,8 +244,8 @@ namespace gd3d.framework
             if(!this.tempV2_0) this.tempV2_0 = gd3d.math.pool.new_vector2();
             if(!this.tempV2_1) this.tempV2_1 = gd3d.math.pool.new_vector2();
 
-            this.tempV2_0.x = clientX / this.app.scale;
-            this.tempV2_0.y = clientY / this.app.scale;
+            this.tempV2_0.x = clientX / this.app.scaleFromPandding;
+            this.tempV2_0.y = clientY / this.app.scaleFromPandding;
             gd3d.math.vec2Clone(this.tempV2_0,this.tempV2_1);
             
             if(this.app.shouldRotate){

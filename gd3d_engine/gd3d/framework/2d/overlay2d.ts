@@ -279,21 +279,26 @@ namespace gd3d.framework
             return null;
         }
 
-        /**
-         * @private
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 屏幕空间坐标 转到 canvas坐标
+         * @version egret-gd3d 1.0
          */
-        calScreenPosToCanvasPos(mousePos: gd3d.math.vector2, canvasPos: gd3d.math.vector2)
+        calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2)
         {
+            if(!this.camera || !this.canvas)    return;
             var vp = new math.rect();
             this.camera.calcViewPortPixel(this.app, vp);
             var temt = gd3d.math.pool.new_vector2();
-            temt.x = (mousePos.x / vp.w) * 2 - 1;
-            temt.y = (mousePos.y / vp.h) * -2 + 1;
+            temt.x = (screenPos.x / vp.w) * 2 - 1;
+            temt.y = (screenPos.y / vp.h) * -2 + 1;
 
             var mat: gd3d.math.matrix3x2 = gd3d.math.pool.new_matrix3x2();
             gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
             gd3d.math.matrix3x2Inverse(mat, mat);
-            gd3d.math.matrix3x2TransformVector2(mat, temt, canvasPos);
+            gd3d.math.matrix3x2TransformVector2(mat, temt, outCanvasPos);
             gd3d.math.pool.delete_vector2(temt);
         }
     }
