@@ -183,6 +183,60 @@ namespace gd3d.framework
             },false);
         }
 
+        public anyKey(){
+            if(this.point.touch) return true;
+            for (const key in this.keyboardMap) {
+                if (this.keyboardMap.hasOwnProperty(key)) {
+                    const element = this.keyboardMap[key];
+                    if(element == true) 
+                        return true;
+                }
+            }
+            return false;
+        }
+
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取 指定按键是否Down
+         * @version egret-gd3d 1.0
+         */
+        public GetKeyDown(name:string)
+        public GetKeyDown(key:KeyCode)
+        public GetKeyDown(value:any){
+            if( typeof(value) === "number" ){
+                if(this.keyboardMap[value] != null)
+                   return this.keyboardMap[value];
+            }else if(typeof(value) === "string"){
+                let id = KeyCode[value];
+                if(id != null && this.keyboardMap[id] != null)
+                    return this.keyboardMap[id];
+            }
+            return false;
+        }
+        
+         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取 指定按键是否UP
+         * @version egret-gd3d 1.0
+         */
+        public GetKeyUP(name:string)
+        public GetKeyUP(key:KeyCode)
+        public GetKeyUP(value:any):boolean{
+            if( typeof(value) === "number" ){
+                if(this.keyboardMap[value] != null)
+                   return !this.keyboardMap[value];
+            }else if(typeof(value) === "string"){
+                let id = KeyCode[value];
+                if(id != null && this.keyboardMap[id] != null)
+                    return !this.keyboardMap[id];
+            }
+            return false;
+        }
+
         private tempV2_0:gd3d.math.vector2;
         private tempV2_1:gd3d.math.vector2;
         private CalcuPoint(clientX:number,clientY:number){
@@ -190,8 +244,8 @@ namespace gd3d.framework
             if(!this.tempV2_0) this.tempV2_0 = gd3d.math.pool.new_vector2();
             if(!this.tempV2_1) this.tempV2_1 = gd3d.math.pool.new_vector2();
 
-            this.tempV2_0.x = clientX / this.app.scale;
-            this.tempV2_0.y = clientY / this.app.scale;
+            this.tempV2_0.x = clientX / this.app.scaleFromPandding;
+            this.tempV2_0.y = clientY / this.app.scaleFromPandding;
             gd3d.math.vec2Clone(this.tempV2_0,this.tempV2_1);
             
             if(this.app.shouldRotate){
