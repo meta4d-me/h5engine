@@ -151,6 +151,7 @@
                     compent.materials[0] = material;
                 }
             }
+
             this.navTrans.localTranslate = new gd3d.math.vector3(0, 0, 0)
             this.navTrans.markDirty();
         }

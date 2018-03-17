@@ -26,15 +26,14 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("test_ui", () => new t.test_ui());
         this.addBtn("test_load", () => new test_load());
-        this.addBtn("test_loadprefab", () => new test_loadprefab());
+        //this.addBtn("test_loadprefab", () => new test_loadprefab());
         this.addBtn("test_loadScene", () => new test_loadScene());
-        this.addBtn("test_loadMulBundle", () => new test_loadMulBundle());
+        //this.addBtn("test_loadMulBundle", () => new test_loadMulBundle());
         this.addBtn("test_pick", () => new test_pick());
 
         this.addBtn("test_anim", () => new test_anim());
         this.addBtn("test_multipleplayer_anim", () => new test_multipleplayer_anim());
         this.addBtn("test_reload(换装)", () => new testReload());
-        this.addBtn("test_uvroll", () => new t.test_uvroll());
 
         this.addBtn("test_light1", () => new t.test_light1());
         this.addBtn("test_light_d1", () => new t.light_d1());
@@ -62,7 +61,7 @@ class main implements gd3d.framework.IUserCode
 
         this.addBtn("TestRotate", () => new t.TestRotate());
         this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde());
-        this.addBtn("effect", () => new test_effect());
+        //this.addBtn("effect", () => new test_effect());
         this.addBtn("pathasset", () => new t.test_pathAsset());
         this.addBtn("test_Asi_prefab", () => new test_loadAsiprefab());
 
@@ -79,13 +78,14 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("example_newObject",()=>new test_NewGameObject);
         this.addBtn("example_changeMesh",()=>new test_ChangeMesh());
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
-        this.addBtn("example_Sound",()=>new test_Sound());
-        this.addBtn("demo_ScreenSplit",()=>new demo_ScreenSplit());
+        // this.addBtn("example_Sound",()=>new test_Sound());
+        // this.addBtn("demo_ScreenSplit",()=>new demo_ScreenSplit());
+        // this.addBtn("test_四分屏", () => new test_pick_4p());
         //----------------------------------------------文档案例
 
         //this.addBtn("test_liloadscene", () => new test_LiLoadScene());
         //this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
-        this.addBtn("test_四分屏", () => new test_pick_4p());
+        
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
