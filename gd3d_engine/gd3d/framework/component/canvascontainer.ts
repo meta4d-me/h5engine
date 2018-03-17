@@ -103,7 +103,8 @@ namespace gd3d.framework
          */
         remove()
         {
-            
+            if(this.gameObject.getScene())
+                this.gameObject.getScene().removeScreenSpaceOverlay(this._overlay2d);
         }
         /**
          * @private
