@@ -72,6 +72,19 @@ namespace gd3d.framework
             this._overlay2d.push(overlay);
             this.sortOverLays(this._overlay2d);
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 删除ScreenSpaceOverlay
+         * @version egret-gd3d 1.0
+         */
+        removeScreenSpaceOverlay(overlay){
+            if(!overlay || !this._overlay2d) return;
+            let idx = this._overlay2d.indexOf(overlay);
+            if(idx != -1) this._overlay2d.splice(idx,1);
+        }
         /**
          * @public
          * @language zh_CN

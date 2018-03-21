@@ -40,7 +40,11 @@ namespace gd3d.framework
         setOverLay(lay:overlay2D){
             this._overlay2d = lay;
             this.canvasInit();
-        }        
+        }
+        
+        getOverLay(){
+            return this._overlay2d;
+        }
 
         //渲染排序
         get sortOrder(){
@@ -103,7 +107,8 @@ namespace gd3d.framework
          */
         remove()
         {
-            
+            if(this.gameObject.getScene())
+                this.gameObject.getScene().removeScreenSpaceOverlay(this._overlay2d);
         }
         /**
          * @private

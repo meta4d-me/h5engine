@@ -513,6 +513,7 @@ namespace gd3d.framework
          */
         remove()
         {   
+            if(this.clips)
             this.clips.forEach(temp =>{
                 if(temp) temp.unuse();
             });

@@ -71,7 +71,7 @@ namespace gd3d.framework
                     let temps = math.pool.new_vector2();
                     temps.x = ev.x; temps.y = ev.y;
                     let tempc = math.pool.new_vector2();
-                    this.transform.canvas.screenToCanvasPoint(temps,tempc);
+                    this.transform.canvas.NDCPosToCanvasPos(temps,tempc);
 
                     if(this.strPoint == null) this.strPoint = new math.vector2();
                     let sp = this.strPoint;

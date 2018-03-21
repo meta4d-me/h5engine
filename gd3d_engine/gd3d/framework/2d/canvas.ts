@@ -142,7 +142,7 @@ namespace gd3d.framework
 
         private lastWidth = 0;
         private lastHeight = 0;
-
+        
         /**
          * @public
          * @language zh_CN
@@ -150,11 +150,11 @@ namespace gd3d.framework
          * 更新
          * @param delta 两次update的间隔时间
          * @param touch 是否接收到事件
-         * @param XOnScreenSpace 屏幕空间下的x偏移
-         * @param YOnScreenSpace 屏幕空间下的y偏移
+         * @param XOnNDCSpace 归一化设备坐标空间下的x偏移
+         * @param YOnNDCSpace 归一化设备坐标空间下的y偏移
          * @version egret-gd3d 1.0
          */
-        update(delta: number, touch: Boolean, XOnScreenSpace: number, YOnScreenSpace: number)
+        update(delta: number, touch: Boolean, XOnNDCSpace: number, YOnNDCSpace: number)
         {
             //canvas 的空间是左上角(-asp,1)-(asp,-1),和屏幕空间一致
             //右下角是 1*asp，1
@@ -178,8 +178,8 @@ namespace gd3d.framework
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
-                this.pointEvent.x = XOnScreenSpace;
-                this.pointEvent.y = YOnScreenSpace;
+                this.pointEvent.x = XOnNDCSpace;
+                this.pointEvent.y = YOnNDCSpace;
                 this.pointEvent.selected = this.pointSelect;
                 var skip = false;
                 if (this.pointDown == false && touch == false)//nothing
@@ -406,7 +406,7 @@ namespace gd3d.framework
         }
 
         //屏幕空间坐标 转到 canvas 坐标
-        screenToCanvasPoint(fromP:math.vector2,outP:math.vector2){
+        NDCPosToCanvasPos(fromP:math.vector2,outP:math.vector2){
             if(fromP == null || outP == null) return;
             let scalx = 1 - (fromP.x - 1)/-2;  
             let scaly =  (fromP.y - 1)/-2;

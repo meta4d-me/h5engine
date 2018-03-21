@@ -1096,14 +1096,11 @@ var main = (function () {
         this.app = app;
         this.addBtn("test_ui", function () { return new t.test_ui(); });
         this.addBtn("test_load", function () { return new test_load(); });
-        this.addBtn("test_loadprefab", function () { return new test_loadprefab(); });
         this.addBtn("test_loadScene", function () { return new test_loadScene(); });
-        this.addBtn("test_loadMulBundle", function () { return new test_loadMulBundle(); });
         this.addBtn("test_pick", function () { return new test_pick(); });
         this.addBtn("test_anim", function () { return new test_anim(); });
         this.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
         this.addBtn("test_reload(换装)", function () { return new testReload(); });
-        this.addBtn("test_uvroll", function () { return new t.test_uvroll(); });
         this.addBtn("test_light1", function () { return new t.test_light1(); });
         this.addBtn("test_light_d1", function () { return new t.light_d1(); });
         this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
@@ -1122,7 +1119,6 @@ var main = (function () {
         this.addBtn("test_blend", function () { return new t.test_blend(); });
         this.addBtn("TestRotate", function () { return new t.TestRotate(); });
         this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
-        this.addBtn("effect", function () { return new test_effect(); });
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
         this.addBtn("test_tex_uv", function () { return new test_texuv(); });
@@ -1131,9 +1127,6 @@ var main = (function () {
         this.addBtn("example_newObject", function () { return new test_NewGameObject; });
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
-        this.addBtn("example_Sound", function () { return new test_Sound(); });
-        this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
-        this.addBtn("test_四分屏", function () { return new test_pick_4p(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
         this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });

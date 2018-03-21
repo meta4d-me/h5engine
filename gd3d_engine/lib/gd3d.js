@@ -43,7 +43,7 @@ var gd3d;
                 this._standDeltaTime = -1;
                 this.beWidthSetted = false;
                 this.beHeightSetted = false;
-                this.scale = 0;
+                this._scaleFromPandding = 1;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
                 this.isFrustumCulling = true;
@@ -117,6 +117,12 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(application.prototype, "scaleFromPandding", {
+                get: function () { return this._scaleFromPandding; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             application.prototype.start = function (div, type, val, webglDebug) {
                 if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
                 if (val === void 0) { val = 1200; }
@@ -170,12 +176,12 @@ var gd3d;
                 if (this.beWidthSetted) {
                     this.webgl.canvas.width = this._fixWidth;
                     this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 else if (this.beHeightSetted) {
                     this.webgl.canvas.height = this._fixHeight;
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                    this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
                 this._canvasClientHeight = this.webgl.canvas.clientHeight;
@@ -253,12 +259,12 @@ var gd3d;
                     if (this.beWidthSetted) {
                         this.webgl.canvas.width = this._fixWidth;
                         this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                        this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
                     else if (this.beHeightSetted) {
                         this.webgl.canvas.height = this._fixHeight;
                         this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                        this.scale = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     }
                 }
                 this.width = this.webgl.canvas.width;
@@ -964,7 +970,7 @@ var gd3d;
             canvas.prototype.getChild = function (index) {
                 return this.rootNode.children[index];
             };
-            canvas.prototype.update = function (delta, touch, XOnScreenSpace, YOnScreenSpace) {
+            canvas.prototype.update = function (delta, touch, XOnNDCSpace, YOnNDCSpace) {
                 var asp = this.pixelWidth / this.pixelHeight;
                 this.rootNode.localScale.x = 2 / this.pixelWidth;
                 this.rootNode.localScale.y = -2 / this.pixelHeight;
@@ -980,8 +986,8 @@ var gd3d;
                 this.rootNode.updateTran(false);
                 {
                     this.pointEvent.eated = false;
-                    this.pointEvent.x = XOnScreenSpace;
-                    this.pointEvent.y = YOnScreenSpace;
+                    this.pointEvent.x = XOnNDCSpace;
+                    this.pointEvent.y = YOnNDCSpace;
                     this.pointEvent.selected = this.pointSelect;
                     var skip = false;
                     if (this.pointDown == false && touch == false) {
@@ -1074,7 +1080,7 @@ var gd3d;
                 }
                 return this.rootNode;
             };
-            canvas.prototype.screenToCanvasPoint = function (fromP, outP) {
+            canvas.prototype.NDCPosToCanvasPos = function (fromP, outP) {
                 if (fromP == null || outP == null)
                     return;
                 var scalx = 1 - (fromP.x - 1) / -2;
@@ -1426,7 +1432,7 @@ var gd3d;
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
+                            if (comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
                                 return comp.comp.transform;
                             }
                     }
@@ -1471,16 +1477,18 @@ var gd3d;
                 }
                 return null;
             };
-            overlay2D.prototype.calScreenPosToCanvasPos = function (mousePos, canvasPos) {
+            overlay2D.prototype.calScreenPosToCanvasPos = function (screenPos, outCanvasPos) {
+                if (!this.camera || !this.canvas)
+                    return;
                 var vp = new gd3d.math.rect();
                 this.camera.calcViewPortPixel(this.app, vp);
                 var temt = gd3d.math.pool.new_vector2();
-                temt.x = (mousePos.x / vp.w) * 2 - 1;
-                temt.y = (mousePos.y / vp.h) * -2 + 1;
+                temt.x = (screenPos.x / vp.w) * 2 - 1;
+                temt.y = (screenPos.y / vp.h) * -2 + 1;
                 var mat = gd3d.math.pool.new_matrix3x2();
                 gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
                 gd3d.math.matrix3x2Inverse(mat, mat);
-                gd3d.math.matrix3x2TransformVector2(mat, temt, canvasPos);
+                gd3d.math.matrix3x2TransformVector2(mat, temt, outCanvasPos);
                 gd3d.math.pool.delete_vector2(temt);
             };
             __decorate([
@@ -4718,7 +4726,7 @@ var gd3d;
                         temps.x = ev.x;
                         temps.y = ev.y;
                         var tempc = gd3d.math.pool.new_vector2();
-                        this.transform.canvas.screenToCanvasPoint(temps, tempc);
+                        this.transform.canvas.NDCPosToCanvasPos(temps, tempc);
                         if (this.strPoint == null)
                             this.strPoint = new gd3d.math.vector2();
                         var sp = this.strPoint;
@@ -10282,10 +10290,11 @@ var gd3d;
                 return false;
             };
             aniplayer.prototype.remove = function () {
-                this.clips.forEach(function (temp) {
-                    if (temp)
-                        temp.unuse();
-                });
+                if (this.clips)
+                    this.clips.forEach(function (temp) {
+                        if (temp)
+                            temp.unuse();
+                    });
                 this.clips.length = 0;
                 this.bones.length = 0;
                 this.startPos.length = 0;
@@ -11444,6 +11453,9 @@ var gd3d;
                 this._overlay2d = lay;
                 this.canvasInit();
             };
+            canvascontainer.prototype.getOverLay = function () {
+                return this._overlay2d;
+            };
             Object.defineProperty(canvascontainer.prototype, "sortOrder", {
                 get: function () {
                     return this._overlay2d ? this._overlay2d.sortOrder : 0;
@@ -11494,6 +11506,8 @@ var gd3d;
                     this.canvasInit();
             };
             canvascontainer.prototype.remove = function () {
+                if (this.gameObject.getScene())
+                    this.gameObject.getScene().removeScreenSpaceOverlay(this._overlay2d);
             };
             canvascontainer.prototype.clone = function () {
             };
@@ -13511,6 +13525,67 @@ var gd3d;
             return spherecollider;
         }());
         framework.spherecollider = spherecollider;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var starCamCtr = (function () {
+            function starCamCtr() {
+                this.moveDuration = 1;
+                this.minSpeed = 5;
+                this.relativelocation = new gd3d.math.vector3(0, 6, 0);
+                this.relativeEuler = new gd3d.math.vector3(90, 0, 0);
+                this.relativeRot = new gd3d.math.quaternion();
+                this.targetCamPos = new gd3d.math.vector3();
+                this.targetCamRot = new gd3d.math.quaternion();
+                this.movedir = new gd3d.math.vector3();
+                this.active = false;
+                this.moveDis = new gd3d.math.vector3();
+            }
+            starCamCtr.prototype.start = function () {
+            };
+            starCamCtr.prototype.update = function (delta) {
+                if (!this.active)
+                    return;
+                var pos = this.gameObject.transform.localPosition;
+                var rot = this.gameObject.transform.localRotate;
+                var distanc = gd3d.math.vec3Distance(pos, this.targetCamPos);
+                var movedis = this.moveSpeed * delta;
+                if (distanc > movedis) {
+                    gd3d.math.vec3ScaleByNum(this.movedir, movedis, this.moveDis);
+                    gd3d.math.vec3Add(pos, this.moveDis, this.gameObject.transform.localPosition);
+                    gd3d.math.quatLerp(rot, this.targetCamRot, this.gameObject.transform.localRotate, (this.distance - distanc) / this.distance);
+                    this.gameObject.transform.markDirty();
+                }
+                else {
+                    this.active = false;
+                }
+            };
+            starCamCtr.prototype.remove = function () {
+            };
+            starCamCtr.prototype.clone = function () {
+            };
+            starCamCtr.prototype.moveTo = function (to) {
+                gd3d.math.quatFromEulerAngles(this.relativeEuler.x, this.relativeEuler.y, this.relativeEuler.z, this.relativeRot);
+                gd3d.math.quatTransformVector(to.localRotate, this.relativelocation, this.targetCamPos);
+                gd3d.math.vec3Add(to.localPosition, this.targetCamPos, this.targetCamPos);
+                gd3d.math.quatMultiply(to.localRotate, this.relativeRot, this.targetCamRot);
+                var distanc = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(this.targetCamPos, this.gameObject.transform.localTranslate, distanc);
+                gd3d.math.vec3Normalize(distanc, this.movedir);
+                this.distance = gd3d.math.vec3Length(distanc);
+                this.moveSpeed = this.distance / this.moveDuration;
+                gd3d.math.pool.delete_vector3(distanc);
+                this.active = true;
+            };
+            starCamCtr = __decorate([
+                gd3d.reflect.nodeComponent
+            ], starCamCtr);
+            return starCamCtr;
+        }());
+        framework.starCamCtr = starCamCtr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -16218,6 +16293,42 @@ var gd3d;
                     _this.point.touch = false;
                 }, false);
             }
+            inputMgr.prototype.anyKey = function () {
+                if (this.point.touch)
+                    return true;
+                for (var key in this.keyboardMap) {
+                    if (this.keyboardMap.hasOwnProperty(key)) {
+                        var element = this.keyboardMap[key];
+                        if (element == true)
+                            return true;
+                    }
+                }
+                return false;
+            };
+            inputMgr.prototype.GetKeyDown = function (value) {
+                if (typeof (value) === "number") {
+                    if (this.keyboardMap[value] != null)
+                        return this.keyboardMap[value];
+                }
+                else if (typeof (value) === "string") {
+                    var id = framework.KeyCode[value];
+                    if (id != null && this.keyboardMap[id] != null)
+                        return this.keyboardMap[id];
+                }
+                return false;
+            };
+            inputMgr.prototype.GetKeyUP = function (value) {
+                if (typeof (value) === "number") {
+                    if (this.keyboardMap[value] != null)
+                        return !this.keyboardMap[value];
+                }
+                else if (typeof (value) === "string") {
+                    var id = framework.KeyCode[value];
+                    if (id != null && this.keyboardMap[id] != null)
+                        return !this.keyboardMap[id];
+                }
+                return false;
+            };
             inputMgr.prototype.CalcuPoint = function (clientX, clientY) {
                 if (!this.app || isNaN(clientX) || isNaN(clientY))
                     return;
@@ -16225,8 +16336,8 @@ var gd3d;
                     this.tempV2_0 = gd3d.math.pool.new_vector2();
                 if (!this.tempV2_1)
                     this.tempV2_1 = gd3d.math.pool.new_vector2();
-                this.tempV2_0.x = clientX / this.app.scale;
-                this.tempV2_0.y = clientY / this.app.scale;
+                this.tempV2_0.x = clientX / this.app.scaleFromPandding;
+                this.tempV2_0.y = clientY / this.app.scaleFromPandding;
                 gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
                 if (this.app.shouldRotate) {
                     switch (this.app.orientation) {
@@ -16255,6 +16366,336 @@ var gd3d;
             return inputMgr;
         }());
         framework.inputMgr = inputMgr;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var KeyCode;
+        (function (KeyCode) {
+            KeyCode[KeyCode["None"] = 0] = "None";
+            KeyCode[KeyCode["Backspace"] = 8] = "Backspace";
+            KeyCode[KeyCode["Tab"] = 9] = "Tab";
+            KeyCode[KeyCode["Clear"] = 12] = "Clear";
+            KeyCode[KeyCode["Return"] = 13] = "Return";
+            KeyCode[KeyCode["Pause"] = 19] = "Pause";
+            KeyCode[KeyCode["Escape"] = 27] = "Escape";
+            KeyCode[KeyCode["Space"] = 32] = "Space";
+            KeyCode[KeyCode["Exclaim"] = 33] = "Exclaim";
+            KeyCode[KeyCode["DoubleQuote"] = 34] = "DoubleQuote";
+            KeyCode[KeyCode["Hash"] = 35] = "Hash";
+            KeyCode[KeyCode["Dollar"] = 36] = "Dollar";
+            KeyCode[KeyCode["Ampersand"] = 38] = "Ampersand";
+            KeyCode[KeyCode["Quote"] = 39] = "Quote";
+            KeyCode[KeyCode["LeftParen"] = 40] = "LeftParen";
+            KeyCode[KeyCode["RightParen"] = 41] = "RightParen";
+            KeyCode[KeyCode["Asterisk"] = 42] = "Asterisk";
+            KeyCode[KeyCode["Plus"] = 43] = "Plus";
+            KeyCode[KeyCode["Comma"] = 44] = "Comma";
+            KeyCode[KeyCode["Minus"] = 45] = "Minus";
+            KeyCode[KeyCode["Period"] = 46] = "Period";
+            KeyCode[KeyCode["Slash"] = 47] = "Slash";
+            KeyCode[KeyCode["Alpha0"] = 48] = "Alpha0";
+            KeyCode[KeyCode["Alpha1"] = 49] = "Alpha1";
+            KeyCode[KeyCode["Alpha2"] = 50] = "Alpha2";
+            KeyCode[KeyCode["Alpha3"] = 51] = "Alpha3";
+            KeyCode[KeyCode["Alpha4"] = 52] = "Alpha4";
+            KeyCode[KeyCode["Alpha5"] = 53] = "Alpha5";
+            KeyCode[KeyCode["Alpha6"] = 54] = "Alpha6";
+            KeyCode[KeyCode["Alpha7"] = 55] = "Alpha7";
+            KeyCode[KeyCode["Alpha8"] = 56] = "Alpha8";
+            KeyCode[KeyCode["Alpha9"] = 57] = "Alpha9";
+            KeyCode[KeyCode["Colon"] = 58] = "Colon";
+            KeyCode[KeyCode["Semicolon"] = 59] = "Semicolon";
+            KeyCode[KeyCode["Less"] = 60] = "Less";
+            KeyCode[KeyCode["Equals"] = 61] = "Equals";
+            KeyCode[KeyCode["Greater"] = 62] = "Greater";
+            KeyCode[KeyCode["Question"] = 63] = "Question";
+            KeyCode[KeyCode["At"] = 64] = "At";
+            KeyCode[KeyCode["LeftBracket"] = 91] = "LeftBracket";
+            KeyCode[KeyCode["Backslash"] = 92] = "Backslash";
+            KeyCode[KeyCode["RightBracket"] = 93] = "RightBracket";
+            KeyCode[KeyCode["Caret"] = 94] = "Caret";
+            KeyCode[KeyCode["Underscore"] = 95] = "Underscore";
+            KeyCode[KeyCode["BackQuote"] = 96] = "BackQuote";
+            KeyCode[KeyCode["A"] = 97] = "A";
+            KeyCode[KeyCode["B"] = 98] = "B";
+            KeyCode[KeyCode["C"] = 99] = "C";
+            KeyCode[KeyCode["D"] = 100] = "D";
+            KeyCode[KeyCode["E"] = 101] = "E";
+            KeyCode[KeyCode["F"] = 102] = "F";
+            KeyCode[KeyCode["G"] = 103] = "G";
+            KeyCode[KeyCode["H"] = 104] = "H";
+            KeyCode[KeyCode["I"] = 105] = "I";
+            KeyCode[KeyCode["J"] = 106] = "J";
+            KeyCode[KeyCode["K"] = 107] = "K";
+            KeyCode[KeyCode["L"] = 108] = "L";
+            KeyCode[KeyCode["M"] = 109] = "M";
+            KeyCode[KeyCode["N"] = 110] = "N";
+            KeyCode[KeyCode["O"] = 111] = "O";
+            KeyCode[KeyCode["P"] = 112] = "P";
+            KeyCode[KeyCode["Q"] = 113] = "Q";
+            KeyCode[KeyCode["R"] = 114] = "R";
+            KeyCode[KeyCode["S"] = 115] = "S";
+            KeyCode[KeyCode["T"] = 116] = "T";
+            KeyCode[KeyCode["U"] = 117] = "U";
+            KeyCode[KeyCode["V"] = 118] = "V";
+            KeyCode[KeyCode["W"] = 119] = "W";
+            KeyCode[KeyCode["X"] = 120] = "X";
+            KeyCode[KeyCode["Y"] = 121] = "Y";
+            KeyCode[KeyCode["Z"] = 122] = "Z";
+            KeyCode[KeyCode["Delete"] = 127] = "Delete";
+            KeyCode[KeyCode["Keypad0"] = 256] = "Keypad0";
+            KeyCode[KeyCode["Keypad1"] = 257] = "Keypad1";
+            KeyCode[KeyCode["Keypad2"] = 258] = "Keypad2";
+            KeyCode[KeyCode["Keypad3"] = 259] = "Keypad3";
+            KeyCode[KeyCode["Keypad4"] = 260] = "Keypad4";
+            KeyCode[KeyCode["Keypad5"] = 261] = "Keypad5";
+            KeyCode[KeyCode["Keypad6"] = 262] = "Keypad6";
+            KeyCode[KeyCode["Keypad7"] = 263] = "Keypad7";
+            KeyCode[KeyCode["Keypad8"] = 264] = "Keypad8";
+            KeyCode[KeyCode["Keypad9"] = 265] = "Keypad9";
+            KeyCode[KeyCode["KeypadPeriod"] = 266] = "KeypadPeriod";
+            KeyCode[KeyCode["KeypadDivide"] = 267] = "KeypadDivide";
+            KeyCode[KeyCode["KeypadMultiply"] = 268] = "KeypadMultiply";
+            KeyCode[KeyCode["KeypadMinus"] = 269] = "KeypadMinus";
+            KeyCode[KeyCode["KeypadPlus"] = 270] = "KeypadPlus";
+            KeyCode[KeyCode["KeypadEnter"] = 271] = "KeypadEnter";
+            KeyCode[KeyCode["KeypadEquals"] = 272] = "KeypadEquals";
+            KeyCode[KeyCode["UpArrow"] = 273] = "UpArrow";
+            KeyCode[KeyCode["DownArrow"] = 274] = "DownArrow";
+            KeyCode[KeyCode["RightArrow"] = 275] = "RightArrow";
+            KeyCode[KeyCode["LeftArrow"] = 276] = "LeftArrow";
+            KeyCode[KeyCode["Insert"] = 277] = "Insert";
+            KeyCode[KeyCode["Home"] = 278] = "Home";
+            KeyCode[KeyCode["End"] = 279] = "End";
+            KeyCode[KeyCode["PageUp"] = 280] = "PageUp";
+            KeyCode[KeyCode["PageDown"] = 281] = "PageDown";
+            KeyCode[KeyCode["F1"] = 282] = "F1";
+            KeyCode[KeyCode["F2"] = 283] = "F2";
+            KeyCode[KeyCode["F3"] = 284] = "F3";
+            KeyCode[KeyCode["F4"] = 285] = "F4";
+            KeyCode[KeyCode["F5"] = 286] = "F5";
+            KeyCode[KeyCode["F6"] = 287] = "F6";
+            KeyCode[KeyCode["F7"] = 288] = "F7";
+            KeyCode[KeyCode["F8"] = 289] = "F8";
+            KeyCode[KeyCode["F9"] = 290] = "F9";
+            KeyCode[KeyCode["F10"] = 291] = "F10";
+            KeyCode[KeyCode["F11"] = 292] = "F11";
+            KeyCode[KeyCode["F12"] = 293] = "F12";
+            KeyCode[KeyCode["F13"] = 294] = "F13";
+            KeyCode[KeyCode["F14"] = 295] = "F14";
+            KeyCode[KeyCode["F15"] = 296] = "F15";
+            KeyCode[KeyCode["Numlock"] = 300] = "Numlock";
+            KeyCode[KeyCode["CapsLock"] = 301] = "CapsLock";
+            KeyCode[KeyCode["ScrollLock"] = 302] = "ScrollLock";
+            KeyCode[KeyCode["RightShift"] = 303] = "RightShift";
+            KeyCode[KeyCode["LeftShift"] = 304] = "LeftShift";
+            KeyCode[KeyCode["RightControl"] = 305] = "RightControl";
+            KeyCode[KeyCode["LeftControl"] = 306] = "LeftControl";
+            KeyCode[KeyCode["RightAlt"] = 307] = "RightAlt";
+            KeyCode[KeyCode["LeftAlt"] = 308] = "LeftAlt";
+            KeyCode[KeyCode["RightCommand"] = 309] = "RightCommand";
+            KeyCode[KeyCode["RightApple"] = 309] = "RightApple";
+            KeyCode[KeyCode["LeftCommand"] = 310] = "LeftCommand";
+            KeyCode[KeyCode["LeftApple"] = 310] = "LeftApple";
+            KeyCode[KeyCode["LeftWindows"] = 311] = "LeftWindows";
+            KeyCode[KeyCode["RightWindows"] = 312] = "RightWindows";
+            KeyCode[KeyCode["AltGr"] = 313] = "AltGr";
+            KeyCode[KeyCode["Help"] = 315] = "Help";
+            KeyCode[KeyCode["Print"] = 316] = "Print";
+            KeyCode[KeyCode["SysReq"] = 317] = "SysReq";
+            KeyCode[KeyCode["Break"] = 318] = "Break";
+            KeyCode[KeyCode["Menu"] = 319] = "Menu";
+            KeyCode[KeyCode["Mouse0"] = 323] = "Mouse0";
+            KeyCode[KeyCode["Mouse1"] = 324] = "Mouse1";
+            KeyCode[KeyCode["Mouse2"] = 325] = "Mouse2";
+            KeyCode[KeyCode["Mouse3"] = 326] = "Mouse3";
+            KeyCode[KeyCode["Mouse4"] = 327] = "Mouse4";
+            KeyCode[KeyCode["Mouse5"] = 328] = "Mouse5";
+            KeyCode[KeyCode["Mouse6"] = 329] = "Mouse6";
+            KeyCode[KeyCode["JoystickButton0"] = 330] = "JoystickButton0";
+            KeyCode[KeyCode["JoystickButton1"] = 331] = "JoystickButton1";
+            KeyCode[KeyCode["JoystickButton2"] = 332] = "JoystickButton2";
+            KeyCode[KeyCode["JoystickButton3"] = 333] = "JoystickButton3";
+            KeyCode[KeyCode["JoystickButton4"] = 334] = "JoystickButton4";
+            KeyCode[KeyCode["JoystickButton5"] = 335] = "JoystickButton5";
+            KeyCode[KeyCode["JoystickButton6"] = 336] = "JoystickButton6";
+            KeyCode[KeyCode["JoystickButton7"] = 337] = "JoystickButton7";
+            KeyCode[KeyCode["JoystickButton8"] = 338] = "JoystickButton8";
+            KeyCode[KeyCode["JoystickButton9"] = 339] = "JoystickButton9";
+            KeyCode[KeyCode["JoystickButton10"] = 340] = "JoystickButton10";
+            KeyCode[KeyCode["JoystickButton11"] = 341] = "JoystickButton11";
+            KeyCode[KeyCode["JoystickButton12"] = 342] = "JoystickButton12";
+            KeyCode[KeyCode["JoystickButton13"] = 343] = "JoystickButton13";
+            KeyCode[KeyCode["JoystickButton14"] = 344] = "JoystickButton14";
+            KeyCode[KeyCode["JoystickButton15"] = 345] = "JoystickButton15";
+            KeyCode[KeyCode["JoystickButton16"] = 346] = "JoystickButton16";
+            KeyCode[KeyCode["JoystickButton17"] = 347] = "JoystickButton17";
+            KeyCode[KeyCode["JoystickButton18"] = 348] = "JoystickButton18";
+            KeyCode[KeyCode["JoystickButton19"] = 349] = "JoystickButton19";
+            KeyCode[KeyCode["Joystick1Button0"] = 350] = "Joystick1Button0";
+            KeyCode[KeyCode["Joystick1Button1"] = 351] = "Joystick1Button1";
+            KeyCode[KeyCode["Joystick1Button2"] = 352] = "Joystick1Button2";
+            KeyCode[KeyCode["Joystick1Button3"] = 353] = "Joystick1Button3";
+            KeyCode[KeyCode["Joystick1Button4"] = 354] = "Joystick1Button4";
+            KeyCode[KeyCode["Joystick1Button5"] = 355] = "Joystick1Button5";
+            KeyCode[KeyCode["Joystick1Button6"] = 356] = "Joystick1Button6";
+            KeyCode[KeyCode["Joystick1Button7"] = 357] = "Joystick1Button7";
+            KeyCode[KeyCode["Joystick1Button8"] = 358] = "Joystick1Button8";
+            KeyCode[KeyCode["Joystick1Button9"] = 359] = "Joystick1Button9";
+            KeyCode[KeyCode["Joystick1Button10"] = 360] = "Joystick1Button10";
+            KeyCode[KeyCode["Joystick1Button11"] = 361] = "Joystick1Button11";
+            KeyCode[KeyCode["Joystick1Button12"] = 362] = "Joystick1Button12";
+            KeyCode[KeyCode["Joystick1Button13"] = 363] = "Joystick1Button13";
+            KeyCode[KeyCode["Joystick1Button14"] = 364] = "Joystick1Button14";
+            KeyCode[KeyCode["Joystick1Button15"] = 365] = "Joystick1Button15";
+            KeyCode[KeyCode["Joystick1Button16"] = 366] = "Joystick1Button16";
+            KeyCode[KeyCode["Joystick1Button17"] = 367] = "Joystick1Button17";
+            KeyCode[KeyCode["Joystick1Button18"] = 368] = "Joystick1Button18";
+            KeyCode[KeyCode["Joystick1Button19"] = 369] = "Joystick1Button19";
+            KeyCode[KeyCode["Joystick2Button0"] = 370] = "Joystick2Button0";
+            KeyCode[KeyCode["Joystick2Button1"] = 371] = "Joystick2Button1";
+            KeyCode[KeyCode["Joystick2Button2"] = 372] = "Joystick2Button2";
+            KeyCode[KeyCode["Joystick2Button3"] = 373] = "Joystick2Button3";
+            KeyCode[KeyCode["Joystick2Button4"] = 374] = "Joystick2Button4";
+            KeyCode[KeyCode["Joystick2Button5"] = 375] = "Joystick2Button5";
+            KeyCode[KeyCode["Joystick2Button6"] = 376] = "Joystick2Button6";
+            KeyCode[KeyCode["Joystick2Button7"] = 377] = "Joystick2Button7";
+            KeyCode[KeyCode["Joystick2Button8"] = 378] = "Joystick2Button8";
+            KeyCode[KeyCode["Joystick2Button9"] = 379] = "Joystick2Button9";
+            KeyCode[KeyCode["Joystick2Button10"] = 380] = "Joystick2Button10";
+            KeyCode[KeyCode["Joystick2Button11"] = 381] = "Joystick2Button11";
+            KeyCode[KeyCode["Joystick2Button12"] = 382] = "Joystick2Button12";
+            KeyCode[KeyCode["Joystick2Button13"] = 383] = "Joystick2Button13";
+            KeyCode[KeyCode["Joystick2Button14"] = 384] = "Joystick2Button14";
+            KeyCode[KeyCode["Joystick2Button15"] = 385] = "Joystick2Button15";
+            KeyCode[KeyCode["Joystick2Button16"] = 386] = "Joystick2Button16";
+            KeyCode[KeyCode["Joystick2Button17"] = 387] = "Joystick2Button17";
+            KeyCode[KeyCode["Joystick2Button18"] = 388] = "Joystick2Button18";
+            KeyCode[KeyCode["Joystick2Button19"] = 389] = "Joystick2Button19";
+            KeyCode[KeyCode["Joystick3Button0"] = 390] = "Joystick3Button0";
+            KeyCode[KeyCode["Joystick3Button1"] = 391] = "Joystick3Button1";
+            KeyCode[KeyCode["Joystick3Button2"] = 392] = "Joystick3Button2";
+            KeyCode[KeyCode["Joystick3Button3"] = 393] = "Joystick3Button3";
+            KeyCode[KeyCode["Joystick3Button4"] = 394] = "Joystick3Button4";
+            KeyCode[KeyCode["Joystick3Button5"] = 395] = "Joystick3Button5";
+            KeyCode[KeyCode["Joystick3Button6"] = 396] = "Joystick3Button6";
+            KeyCode[KeyCode["Joystick3Button7"] = 397] = "Joystick3Button7";
+            KeyCode[KeyCode["Joystick3Button8"] = 398] = "Joystick3Button8";
+            KeyCode[KeyCode["Joystick3Button9"] = 399] = "Joystick3Button9";
+            KeyCode[KeyCode["Joystick3Button10"] = 400] = "Joystick3Button10";
+            KeyCode[KeyCode["Joystick3Button11"] = 401] = "Joystick3Button11";
+            KeyCode[KeyCode["Joystick3Button12"] = 402] = "Joystick3Button12";
+            KeyCode[KeyCode["Joystick3Button13"] = 403] = "Joystick3Button13";
+            KeyCode[KeyCode["Joystick3Button14"] = 404] = "Joystick3Button14";
+            KeyCode[KeyCode["Joystick3Button15"] = 405] = "Joystick3Button15";
+            KeyCode[KeyCode["Joystick3Button16"] = 406] = "Joystick3Button16";
+            KeyCode[KeyCode["Joystick3Button17"] = 407] = "Joystick3Button17";
+            KeyCode[KeyCode["Joystick3Button18"] = 408] = "Joystick3Button18";
+            KeyCode[KeyCode["Joystick3Button19"] = 409] = "Joystick3Button19";
+            KeyCode[KeyCode["Joystick4Button0"] = 410] = "Joystick4Button0";
+            KeyCode[KeyCode["Joystick4Button1"] = 411] = "Joystick4Button1";
+            KeyCode[KeyCode["Joystick4Button2"] = 412] = "Joystick4Button2";
+            KeyCode[KeyCode["Joystick4Button3"] = 413] = "Joystick4Button3";
+            KeyCode[KeyCode["Joystick4Button4"] = 414] = "Joystick4Button4";
+            KeyCode[KeyCode["Joystick4Button5"] = 415] = "Joystick4Button5";
+            KeyCode[KeyCode["Joystick4Button6"] = 416] = "Joystick4Button6";
+            KeyCode[KeyCode["Joystick4Button7"] = 417] = "Joystick4Button7";
+            KeyCode[KeyCode["Joystick4Button8"] = 418] = "Joystick4Button8";
+            KeyCode[KeyCode["Joystick4Button9"] = 419] = "Joystick4Button9";
+            KeyCode[KeyCode["Joystick4Button10"] = 420] = "Joystick4Button10";
+            KeyCode[KeyCode["Joystick4Button11"] = 421] = "Joystick4Button11";
+            KeyCode[KeyCode["Joystick4Button12"] = 422] = "Joystick4Button12";
+            KeyCode[KeyCode["Joystick4Button13"] = 423] = "Joystick4Button13";
+            KeyCode[KeyCode["Joystick4Button14"] = 424] = "Joystick4Button14";
+            KeyCode[KeyCode["Joystick4Button15"] = 425] = "Joystick4Button15";
+            KeyCode[KeyCode["Joystick4Button16"] = 426] = "Joystick4Button16";
+            KeyCode[KeyCode["Joystick4Button17"] = 427] = "Joystick4Button17";
+            KeyCode[KeyCode["Joystick4Button18"] = 428] = "Joystick4Button18";
+            KeyCode[KeyCode["Joystick4Button19"] = 429] = "Joystick4Button19";
+            KeyCode[KeyCode["Joystick5Button0"] = 430] = "Joystick5Button0";
+            KeyCode[KeyCode["Joystick5Button1"] = 431] = "Joystick5Button1";
+            KeyCode[KeyCode["Joystick5Button2"] = 432] = "Joystick5Button2";
+            KeyCode[KeyCode["Joystick5Button3"] = 433] = "Joystick5Button3";
+            KeyCode[KeyCode["Joystick5Button4"] = 434] = "Joystick5Button4";
+            KeyCode[KeyCode["Joystick5Button5"] = 435] = "Joystick5Button5";
+            KeyCode[KeyCode["Joystick5Button6"] = 436] = "Joystick5Button6";
+            KeyCode[KeyCode["Joystick5Button7"] = 437] = "Joystick5Button7";
+            KeyCode[KeyCode["Joystick5Button8"] = 438] = "Joystick5Button8";
+            KeyCode[KeyCode["Joystick5Button9"] = 439] = "Joystick5Button9";
+            KeyCode[KeyCode["Joystick5Button10"] = 440] = "Joystick5Button10";
+            KeyCode[KeyCode["Joystick5Button11"] = 441] = "Joystick5Button11";
+            KeyCode[KeyCode["Joystick5Button12"] = 442] = "Joystick5Button12";
+            KeyCode[KeyCode["Joystick5Button13"] = 443] = "Joystick5Button13";
+            KeyCode[KeyCode["Joystick5Button14"] = 444] = "Joystick5Button14";
+            KeyCode[KeyCode["Joystick5Button15"] = 445] = "Joystick5Button15";
+            KeyCode[KeyCode["Joystick5Button16"] = 446] = "Joystick5Button16";
+            KeyCode[KeyCode["Joystick5Button17"] = 447] = "Joystick5Button17";
+            KeyCode[KeyCode["Joystick5Button18"] = 448] = "Joystick5Button18";
+            KeyCode[KeyCode["Joystick5Button19"] = 449] = "Joystick5Button19";
+            KeyCode[KeyCode["Joystick6Button0"] = 450] = "Joystick6Button0";
+            KeyCode[KeyCode["Joystick6Button1"] = 451] = "Joystick6Button1";
+            KeyCode[KeyCode["Joystick6Button2"] = 452] = "Joystick6Button2";
+            KeyCode[KeyCode["Joystick6Button3"] = 453] = "Joystick6Button3";
+            KeyCode[KeyCode["Joystick6Button4"] = 454] = "Joystick6Button4";
+            KeyCode[KeyCode["Joystick6Button5"] = 455] = "Joystick6Button5";
+            KeyCode[KeyCode["Joystick6Button6"] = 456] = "Joystick6Button6";
+            KeyCode[KeyCode["Joystick6Button7"] = 457] = "Joystick6Button7";
+            KeyCode[KeyCode["Joystick6Button8"] = 458] = "Joystick6Button8";
+            KeyCode[KeyCode["Joystick6Button9"] = 459] = "Joystick6Button9";
+            KeyCode[KeyCode["Joystick6Button10"] = 460] = "Joystick6Button10";
+            KeyCode[KeyCode["Joystick6Button11"] = 461] = "Joystick6Button11";
+            KeyCode[KeyCode["Joystick6Button12"] = 462] = "Joystick6Button12";
+            KeyCode[KeyCode["Joystick6Button13"] = 463] = "Joystick6Button13";
+            KeyCode[KeyCode["Joystick6Button14"] = 464] = "Joystick6Button14";
+            KeyCode[KeyCode["Joystick6Button15"] = 465] = "Joystick6Button15";
+            KeyCode[KeyCode["Joystick6Button16"] = 466] = "Joystick6Button16";
+            KeyCode[KeyCode["Joystick6Button17"] = 467] = "Joystick6Button17";
+            KeyCode[KeyCode["Joystick6Button18"] = 468] = "Joystick6Button18";
+            KeyCode[KeyCode["Joystick6Button19"] = 469] = "Joystick6Button19";
+            KeyCode[KeyCode["Joystick7Button0"] = 470] = "Joystick7Button0";
+            KeyCode[KeyCode["Joystick7Button1"] = 471] = "Joystick7Button1";
+            KeyCode[KeyCode["Joystick7Button2"] = 472] = "Joystick7Button2";
+            KeyCode[KeyCode["Joystick7Button3"] = 473] = "Joystick7Button3";
+            KeyCode[KeyCode["Joystick7Button4"] = 474] = "Joystick7Button4";
+            KeyCode[KeyCode["Joystick7Button5"] = 475] = "Joystick7Button5";
+            KeyCode[KeyCode["Joystick7Button6"] = 476] = "Joystick7Button6";
+            KeyCode[KeyCode["Joystick7Button7"] = 477] = "Joystick7Button7";
+            KeyCode[KeyCode["Joystick7Button8"] = 478] = "Joystick7Button8";
+            KeyCode[KeyCode["Joystick7Button9"] = 479] = "Joystick7Button9";
+            KeyCode[KeyCode["Joystick7Button10"] = 480] = "Joystick7Button10";
+            KeyCode[KeyCode["Joystick7Button11"] = 481] = "Joystick7Button11";
+            KeyCode[KeyCode["Joystick7Button12"] = 482] = "Joystick7Button12";
+            KeyCode[KeyCode["Joystick7Button13"] = 483] = "Joystick7Button13";
+            KeyCode[KeyCode["Joystick7Button14"] = 484] = "Joystick7Button14";
+            KeyCode[KeyCode["Joystick7Button15"] = 485] = "Joystick7Button15";
+            KeyCode[KeyCode["Joystick7Button16"] = 486] = "Joystick7Button16";
+            KeyCode[KeyCode["Joystick7Button17"] = 487] = "Joystick7Button17";
+            KeyCode[KeyCode["Joystick7Button18"] = 488] = "Joystick7Button18";
+            KeyCode[KeyCode["Joystick7Button19"] = 489] = "Joystick7Button19";
+            KeyCode[KeyCode["Joystick8Button0"] = 490] = "Joystick8Button0";
+            KeyCode[KeyCode["Joystick8Button1"] = 491] = "Joystick8Button1";
+            KeyCode[KeyCode["Joystick8Button2"] = 492] = "Joystick8Button2";
+            KeyCode[KeyCode["Joystick8Button3"] = 493] = "Joystick8Button3";
+            KeyCode[KeyCode["Joystick8Button4"] = 494] = "Joystick8Button4";
+            KeyCode[KeyCode["Joystick8Button5"] = 495] = "Joystick8Button5";
+            KeyCode[KeyCode["Joystick8Button6"] = 496] = "Joystick8Button6";
+            KeyCode[KeyCode["Joystick8Button7"] = 497] = "Joystick8Button7";
+            KeyCode[KeyCode["Joystick8Button8"] = 498] = "Joystick8Button8";
+            KeyCode[KeyCode["Joystick8Button9"] = 499] = "Joystick8Button9";
+            KeyCode[KeyCode["Joystick8Button10"] = 500] = "Joystick8Button10";
+            KeyCode[KeyCode["Joystick8Button11"] = 501] = "Joystick8Button11";
+            KeyCode[KeyCode["Joystick8Button12"] = 502] = "Joystick8Button12";
+            KeyCode[KeyCode["Joystick8Button13"] = 503] = "Joystick8Button13";
+            KeyCode[KeyCode["Joystick8Button14"] = 504] = "Joystick8Button14";
+            KeyCode[KeyCode["Joystick8Button15"] = 505] = "Joystick8Button15";
+            KeyCode[KeyCode["Joystick8Button16"] = 506] = "Joystick8Button16";
+            KeyCode[KeyCode["Joystick8Button17"] = 507] = "Joystick8Button17";
+            KeyCode[KeyCode["Joystick8Button18"] = 508] = "Joystick8Button18";
+            KeyCode[KeyCode["Joystick8Button19"] = 509] = "Joystick8Button19";
+        })(KeyCode = framework.KeyCode || (framework.KeyCode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -26163,6 +26604,13 @@ var gd3d;
                 this._overlay2d.push(overlay);
                 this.sortOverLays(this._overlay2d);
             };
+            scene.prototype.removeScreenSpaceOverlay = function (overlay) {
+                if (!overlay || !this._overlay2d)
+                    return;
+                var idx = this._overlay2d.indexOf(overlay);
+                if (idx != -1)
+                    this._overlay2d.splice(idx, 1);
+            };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
                     if (this._mainCamera == null) {
@@ -28416,10 +28864,6 @@ var gd3d;
     (function (framework) {
         var WebGLUtils = (function () {
             function WebGLUtils() {
-                this.makeFailHTML = function (msg) {
-                    return '' +
-                        '<div style="margin: auto; width:500px;z-index:10000;margin-top:20em;text-align:center;">' + msg + '</div>';
-                };
                 this.GET_A_WEBGL_BROWSER = '' +
                     'This page requires a browser that supports WebGL.<br/>' +
                     '<a href="http://get.webgl.org">Click here to upgrade your browser.</a>';
@@ -28448,22 +28892,27 @@ var gd3d;
                         window.clearTimeout);
                 }
             }
+            WebGLUtils.prototype.makeFailHTML = function (msg) {
+                return '' +
+                    '<div style="margin: auto; width:500px;z-index:10000;margin-top:20em;text-align:center;">' + msg + '</div>';
+            };
+            ;
             WebGLUtils.prototype.setupWebGL = function (canvas, opt_attribs, opt_onError) {
+                var _this = this;
                 if (opt_attribs === void 0) { opt_attribs = null; }
                 if (opt_onError === void 0) { opt_onError = null; }
-                function handleCreationError(msg) {
+                var handleCreationError = function (msg) {
                     var container = document.getElementsByTagName("body")[0];
                     if (container) {
                         var str = WebGLRenderingContext ?
-                            this.OTHER_PROBLEM :
-                            this.GET_A_WEBGL_BROWSER;
+                            _this.OTHER_PROBLEM :
+                            _this.GET_A_WEBGL_BROWSER;
                         if (msg) {
                             str += "<br/><br/>Status: " + msg;
                         }
-                        container.innerHTML = this.makeFailHTML(str);
+                        container.innerHTML = _this.makeFailHTML(str);
                     }
-                }
-                ;
+                };
                 opt_onError = opt_onError || handleCreationError;
                 if (canvas.addEventListener) {
                     canvas.addEventListener("webglcontextcreationerror", function (event) {

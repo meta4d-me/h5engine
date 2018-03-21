@@ -47,7 +47,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_posteffect(后期效果)", () => new t.test_posteffect());
         this.addBtn("test_streamlight", () => new test_streamlight());
 
-        //this.addBtn("test_trailRender", () => new t.test_trailrender());
+        this.addBtn("test_trailRender", () => new t.test_trailrender());
         this.addBtn("test_rendertexture", () => new t.test_rendertexture());
         this.addBtn("test_sound", () => new t.test_sound());
         this.addBtn("test_cleardepth", () => new t.test_clearDepth0());
@@ -61,13 +61,13 @@ class main implements gd3d.framework.IUserCode
         //this.addBtn("test_integratedrender", () => new t.test_integratedrender());
         this.addBtn("test_blend", () => new t.test_blend());
 
-        //this.addBtn("TestRotate", () => new t.TestRotate());
-        //this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde());
+        this.addBtn("TestRotate", () => new t.TestRotate());
+        this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde());
         //this.addBtn("effect", () => new test_effect());
         this.addBtn("pathasset", () => new t.test_pathAsset());
         this.addBtn("test_Asi_prefab", () => new test_loadAsiprefab());
 
-        //this.addBtn("test_tex_uv", () => new test_texuv());
+        this.addBtn("test_tex_uv", () => new test_texuv());
         //this.addBtn("test_uimove", () => new test_uimove());
 
         //this.addBtn("test_effecteditor", () => new test_effecteditor());
