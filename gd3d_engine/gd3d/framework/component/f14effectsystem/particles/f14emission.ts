@@ -221,6 +221,11 @@ namespace gd3d.framework
                 }
             }
         }
+        changeColor(value:math.color)
+        {
+            this.currentData.startColor=new Vector3Data(value.r,value.g,value.b);
+            this.currentData.startAlpha=new NumberData(value.a);
+        }
         OnEndOnceLoop()
         {
 

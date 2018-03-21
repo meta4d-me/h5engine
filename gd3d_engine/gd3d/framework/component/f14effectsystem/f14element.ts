@@ -12,6 +12,7 @@ namespace gd3d.framework
         update(deltaTime:number,frame:number, fps:number);
         reset();
         OnEndOnceLoop();
+        changeColor(value:math.color);
         layer:F14Layer;
         drawActive:boolean;
     }

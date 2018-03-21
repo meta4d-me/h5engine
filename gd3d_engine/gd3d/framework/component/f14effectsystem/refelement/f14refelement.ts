@@ -98,6 +98,10 @@ namespace gd3d.framework
         {
 
         }
+        changeColor(value:math.color)
+        {
+            this.RefEffect.changeColor(value);
+        }
     
     }
 }

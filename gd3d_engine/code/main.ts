@@ -18,6 +18,8 @@ class main implements gd3d.framework.IUserCode
         this.app = app;
         //this.addBtn("test_loadScene",()=>new dome.test_loadScene());
         //this.addBtn("f14effect",()=>new dome.db_test_f14eff());
+        //this.addBtn("starcam",()=>new dome.db_test_starcam());
+        
         //this.addBtn("loadPrefab",()=>new dome.loadPrefab());
 
 
@@ -102,7 +104,7 @@ class main implements gd3d.framework.IUserCode
         // this.addBtn("test_drawMesh",()=>new test_drawMesh());
         // this.addBtn("cj_zs",()=>new dome.testCJ());
         // this.addBtn("test_eff",()=>new dome.db_test_eff());
-        //this.addBtn("tesrtss",()=>new dome.testCJ());
+        this.addBtn("tesrtss",()=>new dome.testCJ());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }

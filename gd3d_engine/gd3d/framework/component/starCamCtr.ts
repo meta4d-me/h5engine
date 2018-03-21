@@ -9,6 +9,7 @@ namespace gd3d.framework
         relativeEuler:math.vector3=new math.vector3(90,0,0);
         private relativeRot:math.quaternion=new math.quaternion();
 
+        private starteCamRot:math.quaternion=new math.quaternion();
         private targetCamPos:math.vector3=new math.vector3();
         private targetCamRot:math.quaternion=new math.quaternion();
         
@@ -25,7 +26,7 @@ namespace gd3d.framework
         private moveDis:math.vector3=new math.vector3();
         update(delta: number) {
             if(!this.active) return;
-            let pos=this.gameObject.transform.localPosition
+            let pos=this.gameObject.transform.localTranslate
             let rot=this.gameObject.transform.localRotate;
 
             let distanc=math.vec3Distance(pos,this.targetCamPos);
@@ -33,9 +34,11 @@ namespace gd3d.framework
             if(distanc>movedis)
             {
                 math.vec3ScaleByNum(this.movedir,movedis,this.moveDis);
-                math.vec3Add(pos,this.moveDis,this.gameObject.transform.localPosition);
-                math.quatLerp(rot,this.targetCamRot,this.gameObject.transform.localRotate,(this.distance-distanc)/this.distance);
+                math.vec3Add(pos,this.moveDis,this.gameObject.transform.localTranslate);
+                math.quatLerp(this.starteCamRot,this.targetCamRot,this.gameObject.transform.localRotate,(this.distance-distanc)/this.distance);
+
                 this.gameObject.transform.markDirty();
+                this.gameObject.transform.updateWorldTran();
             }else
             {
                 this.active=false;
@@ -54,9 +57,11 @@ namespace gd3d.framework
 
         moveTo(to:transform)
         {
+            gd3d.math.quatClone(this.gameObject.transform.localRotate,this.starteCamRot);
+
             math.quatFromEulerAngles(this.relativeEuler.x,this.relativeEuler.y,this.relativeEuler.z,this.relativeRot);
             math.quatTransformVector(to.localRotate,this.relativelocation,this.targetCamPos);
-            math.vec3Add(to.localPosition,this.targetCamPos,this.targetCamPos);
+            math.vec3Add(to.localTranslate,this.targetCamPos,this.targetCamPos);
             math.quatMultiply(to.localRotate,this.relativeRot,this.targetCamRot);
 
             let distanc=math.pool.new_vector3();
