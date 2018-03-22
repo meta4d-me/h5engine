@@ -105,7 +105,7 @@ namespace gd3d.framework
             math.matrixMakeTransformRTS(this.currentData.rotPosition,this.currentData.rotScale,this.localrot,this.localMatrix);
         }
 
-        public getWorldMatrix():math.matrix
+        getWorldMatrix():math.matrix
         {
             let mat=this.effect.root.getWorldMatrix();
             math.matrixMultiply(mat,this.localMatrix,this._worldMatrix);
@@ -167,14 +167,18 @@ namespace gd3d.framework
         {
             let needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime-this.newStartDataTime));
             let realcount = needCount - this.numcount;
-            this.addParticle(realcount);
+            if(realcount>0)
+            {
+                this.addParticle(realcount);
+            }
             this.numcount+=realcount;
 
             if(this.baseddata.bursts.length>0)
             {
                 for(let i=0;i<this.baseddata.bursts.length;i++)
                 {
-                    if(this.bursts.indexOf(this.baseddata.bursts[i].time)<0&&this.baseddata.bursts[i].time<=this.TotalTime)
+                    let index=this.bursts.indexOf(this.baseddata.bursts[i].time);
+                    if(index<0&&this.baseddata.bursts[i].time<=this.TotalTime)
                     {
                         let count = this.baseddata.bursts[i].count.getValue(true);
                         this.baseddata.bursts[i].burst();

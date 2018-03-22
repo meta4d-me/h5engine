@@ -58,10 +58,30 @@ namespace gd3d.framework
         public actived:boolean = false;
     
         ////在emission是在simulate in world space 时候,将发射器的这个矩阵保存起来,为静态的
-        ////在emission是在simulate in local space 时候，为动态的
         private emissionMatToWorld:math.matrix;
         private emissionWorldRotation:math.quaternion;
-    
+        
+        private getEmissionMatToWorld():math.matrix
+        {
+            if(this.data.simulateInLocalSpace)
+            {
+                return this.element.getWorldMatrix();
+            }else
+            {
+                return this.emissionMatToWorld;
+            }
+        }
+        private getemissionWorldRotation():math.quaternion
+        {
+            if(this.data.simulateInLocalSpace)
+            {
+                return this.element.getWorldRotation();
+            }else
+            {
+                return this.emissionWorldRotation;
+            }
+        }
+
         //private float startTime = 0;
         public constructor(element:F14Emission,data:F14EmissionBaseData)
         {
@@ -109,10 +129,17 @@ namespace gd3d.framework
             //this.tex_ST = this.starTex_ST;
             gd3d.math.vec4Clone(this.starTex_ST,this.tex_ST);
 
+            if(!data.simulateInLocalSpace)
+            {
+                this.emissionMatToWorld=new gd3d.math.matrix();
+                this.emissionWorldRotation=new gd3d.math.quaternion();
+                gd3d.math.matrixClone(this.element.getWorldMatrix(),this.emissionMatToWorld);
+                gd3d.math.quatClone(this.element.getWorldRotation(),this.emissionWorldRotation);
+            }
             //--strechbillboard
             if(data.rendermodel == RenderModelEnum.StretchedBillBoard)
             {
-                this.emissionMatToWorld=this.element.getWorldMatrix();
+                this.emissionMatToWorld=this.getEmissionMatToWorld();
                 math.matrixTransformNormal(this.speedDir,this.emissionMatToWorld,this.worldspeeddir);
                 gd3d.math.vec3Normalize(this.worldspeeddir,this.worldspeeddir);           
                 math.matrixTransformVector3(this.StartPos,this.emissionMatToWorld,this.worldStartPos);
@@ -204,9 +231,8 @@ namespace gd3d.framework
                 math.matrixMultiply(this.element.localMatrix,this.localMatrix,this.transformVertex);
             }
             else
-            {//这边待定
-                //gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
-                console.log("还未处理！");
+            {
+                gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
             }
         }
         private updatePos()
@@ -271,12 +297,12 @@ namespace gd3d.framework
             }
             else if (this.data.rendermodel == RenderModelEnum.BillBoard)
             {
-                this.emissionMatToWorld=this.element.getWorldMatrix();
+                this.emissionMatToWorld=this.getEmissionMatToWorld();
                 math.matrixTransformVector3(this.localTranslate,this.emissionMatToWorld,this.worldpos);
                 this.tarWorldpos=this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
                 gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
 
-                this.emissionWorldRotation=this.element.getWorldRotation();
+                this.emissionWorldRotation=this.getemissionWorldRotation();
                 math.quatInverse(this.emissionWorldRotation,this.invParWorldRot);
                 gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
 
@@ -291,7 +317,7 @@ namespace gd3d.framework
                 this.worldRotation.z = 0.5;
                 this.worldRotation.w = 0.5;
 
-                this.emissionWorldRotation=this.element.getWorldRotation();
+                this.emissionWorldRotation=this.getemissionWorldRotation();
                 math.quatInverse(this.emissionWorldRotation,this.invParWorldRot);
                 gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
 
@@ -300,14 +326,14 @@ namespace gd3d.framework
             }
             else if (this.data.rendermodel == RenderModelEnum.VerticalBillBoard)
             {
-                this.emissionMatToWorld=this.element.getWorldMatrix();
+                this.emissionMatToWorld=this.getEmissionMatToWorld();
                 math.matrixTransformVector3(this.localTranslate,this.emissionMatToWorld,this.worldpos);
                 let campos=this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
                 gd3d.math.vec3Clone(campos, this.tarWorldpos);
                 this.tarWorldpos.y=this.worldpos.y;
                 gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
                 
-                this.emissionWorldRotation=this.element.getWorldRotation();
+                this.emissionWorldRotation=this.getemissionWorldRotation();
                 math.quatInverse(this.emissionWorldRotation,this.invParWorldRot);
                 gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
 
@@ -327,7 +353,7 @@ namespace gd3d.framework
                 // Quaternion parentRot = this.getElementQuat();
                 // this.localRotation = Quaternion.Inverse(parentRot) * worldRot;
 
-                this.emissionMatToWorld=this.element.getWorldMatrix();
+                this.emissionMatToWorld=this.getEmissionMatToWorld();
                 math.matrixTransformVector3(this.localTranslate,this.emissionMatToWorld,this.worldpos);
                 let campos =this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
                 math.vec3Subtract(campos,this.worldpos,this.lookDir);
@@ -335,7 +361,7 @@ namespace gd3d.framework
                 math.vec3Cross(this.worldspeeddir,this.lookDir,this.temptx);
                 math.vec3Cross(this.temptx,this.worldspeeddir,this.lookDir);
                 math.unitxyzToRotation(this.temptx,this.worldspeeddir,this.lookDir,this.worldRotation);
-                this.emissionWorldRotation=this.element.getWorldRotation();
+                this.emissionWorldRotation=this.getemissionWorldRotation();
                 math.quatInverse(this.emissionWorldRotation,this.invParWorldRot);
                 gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
                 
@@ -403,18 +429,6 @@ namespace gd3d.framework
             }
             else
             {
-                // let index = Math.floor(this.life01 * data.count);
-    
-                // let width = 1 / data.column;//width
-                // let height = 1 / data.row;//height
-                // let offsetx = width * (index % data.column);//offsetx
-                // let offsety = height * Math.floor(index / data.column);//offsety
-    
-                // this.tex_ST.x = width;
-                // this.tex_ST.y = height;
-                // this.tex_ST.z = offsetx;
-                // this.tex_ST.w = offsety;
-
                 let index = Math.floor(this.life01 * data.count);
                 gd3d.math.spriteAnimation(data.row,data.column,index,this.tex_ST);
 

@@ -70,7 +70,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 拖尾mesh是否向经过路径的两边延展
+         * 拖尾mesh是否向经过路径的单边延展
          * @version egret-gd3d 1.0
          */
         extenedOneSide: boolean = true;//延展方向
