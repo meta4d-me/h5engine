@@ -263,6 +263,10 @@ namespace gd3d.framework
             math.colorClone(this.baseddata.color,this.color);
             math.vec4Clone(this.baseddata.tex_ST,this.tex_ST);
         }
+        changeColor(value:math.color)
+        {
+            this.color=value;
+        }
         dispose()
         {
             this.layer=null;
@@ -275,7 +279,6 @@ namespace gd3d.framework
             delete this.dataforvbo;
             delete this.dataforebo;
             
-        }
-    }
+        }    }
     
 }

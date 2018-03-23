@@ -105,8 +105,14 @@ namespace gd3d.framework
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number)
         {
             //gd3d.math.matrixMultiply(this.effect.mvpMat,gd3d.math.pool.identityMat, context.matrixModelViewProject);
-            gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
-
+            if(this.emission.baseddata.simulateInLocalSpace)
+            {
+                gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
+            }else
+            {
+                //gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
+                context.updateModeTrail();
+            }
             this.mat.setQueue(Effqueue);
             //---------------------集合数据
             this.curIndexCount=0;

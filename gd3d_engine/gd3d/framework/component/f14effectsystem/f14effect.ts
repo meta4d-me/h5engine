@@ -294,7 +294,13 @@ namespace gd3d.framework
                 this.playState=PlayStateEnum.pause;
             }
         }
-        
+        public changeColor(newcolor:math.color)
+        {
+            for (let i = 0; i < this.elements.length; i++)
+            {
+                this.elements[i].changeColor(newcolor);
+            }
+        }
         reset()
         {
             this.allTime=0;

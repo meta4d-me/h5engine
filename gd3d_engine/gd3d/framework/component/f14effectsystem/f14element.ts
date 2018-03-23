@@ -13,6 +13,7 @@ namespace gd3d.framework
         dispose();
         reset();
         OnEndOnceLoop();
+        changeColor(value:math.color);
         layer:F14Layer;
         drawActive:boolean;
     }
