@@ -225,6 +225,26 @@ namespace gd3d.framework
         {
 
         }
+        dispose() {
+            this.effect=null;
+            this.baseddata=null;
+            this.currentData=null;
+
+            delete this.dataforebo;
+            delete this.posArr;
+            delete this.colorArr;
+            delete this.uvArr;
+            delete this.bursts;
+            
+            for(let i=0;i<this.particlelist.length;i++)
+            {
+                this.particlelist[i].dispose();
+            }
+            for(let i=0;i<this.deadParticles.length;i++)
+            {
+                this.deadParticles[i].dispose();
+            }
+        }
     }
     
 }

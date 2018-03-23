@@ -12,7 +12,7 @@ namespace gd3d.framework
 
         }
         gameObject: gameObject;
-        remove() {}
+
         
         private fps:number=30;
         public data:F14EffectData;
@@ -121,6 +121,11 @@ namespace gd3d.framework
             }
             this.renderActive=true;//上面return了应该不再render 
             this.totalFrame=this.totalTime*this.fps;
+            if(!this.data.beloop&&this.totalFrame>this.data.lifeTime)
+            {
+                this.renderActive=false;
+                this.stop();
+            }
             this.restartFrame = this.totalFrame % this.data.lifeTime;
             this.restartFrame=Math.floor(this.restartFrame);
             let newLoopCount=Math.floor(this.totalFrame/this.data.lifeTime);
@@ -255,10 +260,6 @@ namespace gd3d.framework
             }
             return totalcount;
         }    
-        public dispose()
-        {
-
-        }
         private playRate:number=1.0;
         private playState:PlayStateEnum=PlayStateEnum.beReady;
         private active:boolean=false;
@@ -305,6 +306,26 @@ namespace gd3d.framework
         }
         clone() {
             
+        }
+        remove() {
+            this.data=null;
+            this._f14eff=null;
+            for (let i = 0,count=this.layers.length; i < count; i++)
+            {
+                this.layers[i].dispose();
+            }
+            for (let i = 0; i < this.elements.length; i++)
+            {
+                this.elements[i].dispose();
+            }
+            for(let i=0;i<this.renderBatch.length;i++)
+            {
+                this.renderBatch[i].dispose();
+            }
+
+            delete this.layers;
+            delete this.elements;
+            delete this.renderBatch;
         }
     }
     export enum PlayStateEnum

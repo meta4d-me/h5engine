@@ -263,6 +263,19 @@ namespace gd3d.framework
             math.colorClone(this.baseddata.color,this.color);
             math.vec4Clone(this.baseddata.tex_ST,this.tex_ST);
         }
+        dispose()
+        {
+            this.layer=null;
+            this.RenderBatch=null;
+            this.baseddata=null;
+            this.effect=null;
+            this.posArr.length=0;
+            this.colorArr.length=0;
+            this.uvArr.length=0;
+            delete this.dataforvbo;
+            delete this.dataforebo;
+            
+        }
     }
     
 }

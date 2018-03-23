@@ -2,6 +2,7 @@ namespace gd3d.framework
 {
     export class F14RefElement implements F14Element
     {
+
         type: F14TypeEnum;
         layer: F14Layer;
         drawActive: boolean;
@@ -97,6 +98,11 @@ namespace gd3d.framework
         OnEndOnceLoop()
         {
 
+        }
+        dispose() {
+            this.baseddata=null;
+            this.RefEffect.remove();
+            this.RefEffect=null;
         }
     
     }

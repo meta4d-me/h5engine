@@ -33,7 +33,8 @@ namespace gd3d.framework
         }
         dispose()
         {
-            this.element.RefEffect.dispose();
+            this.effect=null;
+            this.element=null;
         }
     }
 }
