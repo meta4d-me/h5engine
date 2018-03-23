@@ -123,6 +123,7 @@ namespace gd3d.framework
         {
             return this._tar;
         }
+        screenAdaptiveType:string;
         private _fixHeight: number;
         private _fixWidth: number;
         private beWidthSetted: boolean = false;
@@ -224,14 +225,15 @@ namespace gd3d.framework
                     alert("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
-
             switch (type)
             {
                 case CanvasFixedType.FixedWidthType:
                     this.canvasFixWidth = val;
+                    this.screenAdaptiveType="宽度自适应(宽度固定,一般横屏使用)";
                     break;
                 case CanvasFixedType.FixedHeightType:
                     this.canvasFixHeight = val;
+                    this.screenAdaptiveType="高度自适应(高度固定，一般竖屏使用)";
                     break;
             }
             if (this.beWidthSetted)
