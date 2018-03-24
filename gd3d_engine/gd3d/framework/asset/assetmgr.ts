@@ -1522,11 +1522,14 @@ namespace gd3d.framework {
                     this.app.getScene().addChild(trans);
                 }
 
+                //清空原场景UI
+                this.app.getScene()["_overlay2d"]=new Array<overlay2D>();
                 //lightmap
                 _rawscene.useLightMap(this.app.getScene());
                 //fog
                 _rawscene.useFog(this.app.getScene());
 
+                
             }
             else {
                 var _camera: transform = new transform();
