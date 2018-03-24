@@ -17,9 +17,9 @@ class main implements gd3d.framework.IUserCode
         console.log("i am here.");
         this.app = app;
         //this.addBtn("test_loadScene",()=>new dome.test_loadScene());
-        this.addBtn("f14effect",()=>new dome.db_test_f14eff());
+        //this.addBtn("f14effect",()=>new dome.db_test_f14eff());
         //this.addBtn("starcam",()=>new dome.db_test_starcam());
-        this.addBtn("trailComponent",()=>new dome.db_test_trail());
+        //this.addBtn("trailComponent",()=>new dome.db_test_trail());
         
         
         //this.addBtn("loadPrefab",()=>new dome.loadPrefab());

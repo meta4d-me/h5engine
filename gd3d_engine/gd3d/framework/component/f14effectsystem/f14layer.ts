@@ -74,6 +74,17 @@ namespace gd3d.framework
             }
     
         }
+
+        public dispose()
+        {
+            this.data=null;
+            this.effect=null;
+            this.frameList.length=0;
+            this.frames=null;
+            this.Attlines=null;
+            this.element=null;
+            this.batch=null;
+        }
     }
     export class F14Frame
     {

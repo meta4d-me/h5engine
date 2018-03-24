@@ -267,6 +267,18 @@ namespace gd3d.framework
         {
             this.color=value;
         }
-    }
+        dispose()
+        {
+            this.layer=null;
+            this.RenderBatch=null;
+            this.baseddata=null;
+            this.effect=null;
+            this.posArr.length=0;
+            this.colorArr.length=0;
+            this.uvArr.length=0;
+            delete this.dataforvbo;
+            delete this.dataforebo;
+            
+        }    }
     
 }

@@ -147,7 +147,12 @@ namespace gd3d.framework
         }
         public dispose()
         {
-            
+            this.effect=null;
+            this.emission=null;
+            this.mesh=null;
+            this.mat=null;
+            delete this.dataForEbo;
+            delete this.dataForVbo;
         }
     
     }

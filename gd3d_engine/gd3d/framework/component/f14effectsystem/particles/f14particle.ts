@@ -434,6 +434,15 @@ namespace gd3d.framework
 
             }
         }
+
+        dispose()
+        {
+            this.data=null;
+            this.element=null;
+            delete this.sizeNodes;
+            delete this.colorNodes;
+            delete this.alphaNodes;
+        }
     }
     
 }

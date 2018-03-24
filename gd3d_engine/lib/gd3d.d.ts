@@ -4911,7 +4911,6 @@ declare namespace gd3d.framework {
         private assetmgr;
         private _overlay2d;
         addScreenSpaceOverlay(overlay: overlay2D): void;
-        removeScreenSpaceOverlay(overlay: any): void;
         renderCameras: camera[];
         private _mainCamera;
         mainCamera: camera;
