@@ -10,6 +10,7 @@ namespace gd3d.framework
     {
         type:F14TypeEnum;
         update(deltaTime:number,frame:number, fps:number);
+        dispose();
         reset();
         OnEndOnceLoop();
         changeColor(value:math.color);

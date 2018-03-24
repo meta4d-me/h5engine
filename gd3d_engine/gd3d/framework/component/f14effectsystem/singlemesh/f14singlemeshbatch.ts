@@ -245,6 +245,21 @@ namespace gd3d.framework
         }
         public dispose()
         {
+            this.effect=null;
+            this.ElementMat=null;
+            this.meshlist.length=0;
+            this.activemeshlist.length=0;
+            delete this.meshlist;
+            delete this.activemeshlist;
+            this.mesh.dispose();
+            delete this.mesh;
+            delete this.indices;
+            delete this.vertices;
+            delete this.colors;
+            delete this.uv;
+
+            delete this.dataForEbo;
+            delete this.dataForVbo;
         }
     }
     

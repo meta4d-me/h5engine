@@ -11506,8 +11506,6 @@ var gd3d;
                     this.canvasInit();
             };
             canvascontainer.prototype.remove = function () {
-                if (this.gameObject.getScene())
-                    this.gameObject.getScene().removeScreenSpaceOverlay(this._overlay2d);
             };
             canvascontainer.prototype.clone = function () {
             };
@@ -26603,13 +26601,6 @@ var gd3d;
                     return;
                 this._overlay2d.push(overlay);
                 this.sortOverLays(this._overlay2d);
-            };
-            scene.prototype.removeScreenSpaceOverlay = function (overlay) {
-                if (!overlay || !this._overlay2d)
-                    return;
-                var idx = this._overlay2d.indexOf(overlay);
-                if (idx != -1)
-                    this._overlay2d.splice(idx, 1);
             };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
