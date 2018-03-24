@@ -268,6 +268,13 @@ namespace gd3d.reflect
     /**
      * @private
      */
+    export function nodeBoxCollider2d(constructorObj: any)
+    {
+        regType(constructorObj.prototype, { "boxcollider2d": "1" });
+    }
+    /**
+     * @private
+     */
     export function nodeSphereCollider(constructorObj: any)
     {
         regType(constructorObj.prototype, { "spherecollider": "1" });

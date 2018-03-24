@@ -135,5 +135,48 @@ namespace gd3d.framework
         {
             return !(min0 > max1 || min1 > max0);
         }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 克隆一个obb
+        * @version egret-gd3d 1.0
+        */
+        clone():obb2d
+        {
+            let _obb = new obb2d();
+            _obb.center = math.pool.clone_vector2(this.center);
+            _obb._size = math.pool.clone_vector2(this._size);
+            _obb.halfWidth = this.halfWidth;
+            _obb.halfHeight = this.halfHeight;
+            _obb.scale = math.pool.clone_vector2(this.scale);
+            _obb.rotate = new math.angelref();
+            _obb.rotate.v = this.rotate.v;
+            for(let key in this.directions)
+            {
+                 _obb.directions[key] = math.pool.clone_vector2(this.directions[key]);
+            }
+            return _obb;
+        }
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 释放
+        * @version egret-gd3d 1.0
+        */
+        dispose()
+        {
+            if(this.center) math.pool.delete_vector2(this.center);
+            if(this._size) math.pool.delete_vector2(this._size);
+            if(this.scale) math.pool.delete_vector2(this.scale);
+            if(this.directions){
+                this.directions.forEach(dir=>{
+                    if(dir) math.pool.delete_vector2(dir);
+                });
+                this.directions.length = 0;
+            }
+        }
     }
 }
