@@ -224,7 +224,7 @@
     }
     export function matrix3x2Clone(src: matrix3x2, out: matrix3x2)
     {
-        for (var i = 0; i < 16; i++)
+        for (var i = 0; i < 6; i++)
         {
             out.rawData[i] = src.rawData[i];
         }

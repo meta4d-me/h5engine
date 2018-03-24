@@ -56,8 +56,8 @@ namespace gd3d.framework
             let t = this.transform;
             this._obb = new obb2d();
             this._obb.buildByCenterSize(t.getWorldTranslate(),t.width,t.height);
-            this._obb.offset.x = (0.5-t.pivot.x) * this._obb.size.x/2;
-            this._obb.offset.y = (0.5-t.pivot.y) * this._obb.size.y/2;
+            this._obb.offset.x = (0.5-t.pivot.x) * this._obb.size.x;
+            this._obb.offset.y = (0.5-t.pivot.y) * this._obb.size.y;
         }
 
         start() {

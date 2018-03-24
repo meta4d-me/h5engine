@@ -480,7 +480,7 @@ namespace gd3d.math
         */
         static clone_matrix3x2(src: matrix3x2): matrix3x2
         {
-            var v: matrix3x2 = pool.new_matrix();
+            var v: matrix3x2 = pool.new_matrix3x2();
             for (var i = 0; i < 6; i++)
                 v.rawData[i] = src.rawData[i];
             return v;

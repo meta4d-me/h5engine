@@ -2628,8 +2628,8 @@ var gd3d;
                 var t = this.transform;
                 this._obb = new framework.obb2d();
                 this._obb.buildByCenterSize(t.getWorldTranslate(), t.width, t.height);
-                this._obb.offset.x = (0.5 - t.pivot.x) * this._obb.size.x / 2;
-                this._obb.offset.y = (0.5 - t.pivot.y) * this._obb.size.y / 2;
+                this._obb.offset.x = (0.5 - t.pivot.x) * this._obb.size.x;
+                this._obb.offset.y = (0.5 - t.pivot.y) * this._obb.size.y;
             };
             boxcollider2d.prototype.start = function () {
                 this.build();
@@ -19410,7 +19410,7 @@ var gd3d;
         }
         math.matrixClone = matrixClone;
         function matrix3x2Clone(src, out) {
-            for (var i = 0; i < 16; i++) {
+            for (var i = 0; i < 6; i++) {
                 out.rawData[i] = src.rawData[i];
             }
         }
@@ -27597,6 +27597,7 @@ var gd3d;
                 set: function (size) {
                     if (!size)
                         return;
+                    gd3d.math.vec2Clone(size, this._size);
                     this.halfWidth = this._size.x / 2;
                     this.halfHeight = this._size.y / 2;
                 },
@@ -29641,7 +29642,7 @@ var gd3d;
                     return new math.matrix3x2();
             };
             pool.clone_matrix3x2 = function (src) {
-                var v = pool.new_matrix();
+                var v = pool.new_matrix3x2();
                 for (var i = 0; i < 6; i++)
                     v.rawData[i] = src.rawData[i];
                 return v;
