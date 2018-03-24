@@ -829,6 +829,10 @@ var gd3d;
             regType(constructorObj.prototype, { "boxcollider": "1" });
         }
         reflect.nodeBoxCollider = nodeBoxCollider;
+        function nodeBoxCollider2d(constructorObj) {
+            regType(constructorObj.prototype, { "boxcollider2d": "1" });
+        }
+        reflect.nodeBoxCollider2d = nodeBoxCollider2d;
         function nodeSphereCollider(constructorObj) {
             regType(constructorObj.prototype, { "spherecollider": "1" });
         }
@@ -2257,14 +2261,26 @@ var gd3d;
                         throw new Error("已经有一个渲染器的组件了，不能俩");
                     }
                 }
+                if (gd3d.reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1") {
+                    if (this.collider == null) {
+                        this.collider = comp;
+                    }
+                    else {
+                        throw new Error("已经有一个碰撞组件了，不能俩");
+                    }
+                }
                 return comp;
             };
             transform2D.prototype.removeComponent = function (comp) {
+                if (!comp)
+                    return;
                 for (var i = 0; i < this.components.length; i++) {
                     if (this.components[i].comp == comp) {
                         if (this.components[i].init) {
                         }
-                        this.components.splice(i, 1);
+                        var p = this.components.splice(i, 1);
+                        comp.remove();
+                        break;
                     }
                 }
             };
@@ -2274,6 +2290,9 @@ var gd3d;
                         var p = this.components.splice(i, 1);
                         if (p[0].comp == this.renderer)
                             this.renderer = null;
+                        if (p[0].comp == this.collider)
+                            this.collider = null;
+                        p[0].comp.remove();
                         return p[0];
                     }
                 }
@@ -2281,9 +2300,11 @@ var gd3d;
             transform2D.prototype.removeAllComponents = function () {
                 for (var i = 0; i < this.components.length; i++) {
                     this.components[i].comp.remove();
-                    if (this.components[i].comp == this.renderer)
-                        this.renderer = null;
                 }
+                if (this.renderer)
+                    this.renderer = null;
+                if (this.collider)
+                    this.renderer = null;
                 this.components.length = 0;
             };
             transform2D.prototype.getComponent = function (type) {
@@ -2583,6 +2604,55 @@ var gd3d;
             return behaviour2d;
         }());
         framework.behaviour2d = behaviour2d;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var boxcollider2d = (function () {
+            function boxcollider2d() {
+            }
+            boxcollider2d.prototype.getBound = function () {
+                return this._obb;
+            };
+            boxcollider2d.prototype.intersectsTransform = function (tran) {
+                if (tran == null)
+                    return false;
+                if (this._obb == null || tran.collider.getBound() == null)
+                    return false;
+                var _obb = tran.collider.getBound();
+                return this._obb.intersects(_obb);
+            };
+            boxcollider2d.prototype.build = function () {
+                var t = this.transform;
+                this._obb = new framework.obb2d();
+                this._obb.buildByCenterSize(t.getWorldTranslate(), t.width, t.height);
+                this._obb.offset.x = (0.5 - t.pivot.x) * this._obb.size.x / 2;
+                this._obb.offset.y = (0.5 - t.pivot.y) * this._obb.size.y / 2;
+            };
+            boxcollider2d.prototype.start = function () {
+                this.build();
+            };
+            boxcollider2d.prototype.update = function (delta) {
+                if (this._obb) {
+                    this._obb.update(this.transform.getCanvasWorldMatrix());
+                }
+            };
+            boxcollider2d.prototype.onPointEvent = function (canvas, ev, oncap) {
+            };
+            boxcollider2d.prototype.remove = function () {
+                if (this._obb)
+                    this._obb.dispose();
+                this._obb = null;
+            };
+            boxcollider2d = __decorate([
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.nodeBoxCollider2d
+            ], boxcollider2d);
+            return boxcollider2d;
+        }());
+        framework.boxcollider2d = boxcollider2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -27590,6 +27660,35 @@ var gd3d;
             };
             obb2d.prototype.extentsOverlap = function (min0, max0, min1, max1) {
                 return !(min0 > max1 || min1 > max0);
+            };
+            obb2d.prototype.clone = function () {
+                var _obb = new obb2d();
+                _obb.center = gd3d.math.pool.clone_vector2(this.center);
+                _obb._size = gd3d.math.pool.clone_vector2(this._size);
+                _obb.halfWidth = this.halfWidth;
+                _obb.halfHeight = this.halfHeight;
+                _obb.scale = gd3d.math.pool.clone_vector2(this.scale);
+                _obb.rotate = new gd3d.math.angelref();
+                _obb.rotate.v = this.rotate.v;
+                for (var key in this.directions) {
+                    _obb.directions[key] = gd3d.math.pool.clone_vector2(this.directions[key]);
+                }
+                return _obb;
+            };
+            obb2d.prototype.dispose = function () {
+                if (this.center)
+                    gd3d.math.pool.delete_vector2(this.center);
+                if (this._size)
+                    gd3d.math.pool.delete_vector2(this._size);
+                if (this.scale)
+                    gd3d.math.pool.delete_vector2(this.scale);
+                if (this.directions) {
+                    this.directions.forEach(function (dir) {
+                        if (dir)
+                            gd3d.math.pool.delete_vector2(dir);
+                    });
+                    this.directions.length = 0;
+                }
             };
             __decorate([
                 gd3d.reflect.Field("vector2"),

@@ -176,6 +176,7 @@ declare namespace gd3d.reflect {
     function nodeCamera(constructorObj: any): void;
     function nodeLight(constructorObj: any): void;
     function nodeBoxCollider(constructorObj: any): void;
+    function nodeBoxCollider2d(constructorObj: any): void;
     function nodeSphereCollider(constructorObj: any): void;
     function nodeEffectBatcher(constructorObj: any): void;
     function nodeMeshCollider(constructorObj: any): void;
@@ -407,6 +408,11 @@ declare namespace gd3d.framework {
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): any;
         remove(): any;
     }
+    interface ICollider2d {
+        transform: transform2D;
+        getBound(): any;
+        intersectsTransform(tran: transform2D): boolean;
+    }
     interface IRectRenderer extends I2DComponent {
         render(canvas: canvas): any;
         updateTran(): any;
@@ -470,6 +476,7 @@ declare namespace gd3d.framework {
         setWorldPosition(pos: math.vector2): void;
         dispose(): void;
         renderer: IRectRenderer;
+        collider: ICollider2d & I2DComponent;
         components: C2DComponent[];
         update(delta: number): void;
         addComponent(type: string): I2DComponent;
@@ -513,6 +520,19 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class behaviour2d implements I2DComponent {
         transform: transform2D;
+        start(): void;
+        update(delta: number): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class boxcollider2d implements I2DComponent, ICollider2d {
+        transform: transform2D;
+        private _obb;
+        getBound(): obb2d;
+        intersectsTransform(tran: transform2D): boolean;
+        private build();
         start(): void;
         update(delta: number): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
@@ -5042,6 +5062,8 @@ declare namespace gd3d.framework {
         private computeBoxExtents(axis, box);
         private axisOverlap(axis, box0, box1);
         private extentsOverlap(min0, max0, min1, max1);
+        clone(): obb2d;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
