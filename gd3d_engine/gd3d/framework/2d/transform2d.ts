@@ -366,6 +366,7 @@ namespace gd3d.framework
         //这个是如果爹改了就要跟着算的
 
         private worldMatrix: gd3d.math.matrix3x2 = new gd3d.math.matrix3x2();
+        private canvasWorldMatrix: gd3d.math.matrix3x2 = new gd3d.math.matrix3x2();
         private worldRotate: math.angelref = new math.angelref();
         private worldTranslate: gd3d.math.vector2 = new gd3d.math.vector2(0, 0);
         private worldScale: gd3d.math.vector2 = new gd3d.math.vector2(1, 1);
@@ -580,15 +581,13 @@ namespace gd3d.framework
                 // math.matrix3x2MakeTransformRTS(ttran,tsca,0,reCanvsMtx);
                 this.CalcReCanvasMtx(reCanvasMtx);
 
-                let outMatrix = gd3d.math.pool.new_matrix3x2();
-                math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, outMatrix);
+                math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, this.canvasWorldMatrix);
 
-                math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                math.matrix3x2Decompose(this.canvasWorldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
 
                 // math.pool.delete_vector2(tsca);
                 // math.pool.delete_vector2(ttran);
                 math.pool.delete_matrix3x2(reCanvasMtx);
-                math.pool.delete_matrix3x2(outMatrix);
 
                 this.dirtyWorldDecompose = false;
             }
@@ -655,6 +654,19 @@ namespace gd3d.framework
         getWorldMatrix(): gd3d.math.matrix3x2
         {
             return this.worldMatrix;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的Canvas_世界_变换矩阵
+         * @version egret-gd3d 1.0
+         */
+        getCanvasWorldMatrix(): gd3d.math.matrix3x2
+        {
+            this.decomposeWorldMatrix();
+            return this.canvasWorldMatrix;
         }
 
         public static getTransInfoInCanvas(trans: transform2D, out: t2dInfo)//实际上是rootnode space

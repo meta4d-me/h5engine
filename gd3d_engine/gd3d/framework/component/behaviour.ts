@@ -7,13 +7,8 @@ namespace gd3d.framework
      * 脚本行文类
      * @version egret-gd3d 1.0
      */
-    @reflect.nodeComponent
     export class behaviour implements INodeComponent
     {
-        constructor()
-        {
-
-        }
         /**
          * @public
          * @language zh_CN

@@ -2,7 +2,6 @@
 
 namespace gd3d.framework
 {
-    @reflect.node2DComponent
     export class behaviour2d implements I2DComponent
     {
         transform: transform2D;
