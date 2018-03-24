@@ -30,6 +30,7 @@ declare namespace gd3d.framework {
         private _tar;
         private _standDeltaTime;
         targetFrame: number;
+        screenAdaptiveType: string;
         private _fixHeight;
         private _fixWidth;
         private beWidthSetted;
@@ -446,6 +447,7 @@ declare namespace gd3d.framework {
         readonly parentIsMask: boolean;
         private localMatrix;
         private worldMatrix;
+        private canvasWorldMatrix;
         private worldRotate;
         private worldTranslate;
         private worldScale;
@@ -463,6 +465,7 @@ declare namespace gd3d.framework {
         getWorldRotate(): math.angelref;
         getLocalMatrix(): gd3d.math.matrix3x2;
         getWorldMatrix(): gd3d.math.matrix3x2;
+        getCanvasWorldMatrix(): gd3d.math.matrix3x2;
         static getTransInfoInCanvas(trans: transform2D, out: t2dInfo): void;
         setWorldPosition(pos: math.vector2): void;
         dispose(): void;
@@ -1749,7 +1752,6 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class behaviour implements INodeComponent {
-        constructor();
         gameObject: gameObject;
         start(): void;
         update(delta: number): void;
@@ -2256,6 +2258,7 @@ declare namespace gd3d.framework {
         relativelocation: math.vector3;
         relativeEuler: math.vector3;
         private relativeRot;
+        private starteCamRot;
         private targetCamPos;
         private targetCamRot;
         private distance;
@@ -2270,6 +2273,48 @@ declare namespace gd3d.framework {
         remove(): void;
         clone(): void;
         moveTo(to: transform): void;
+    }
+}
+declare namespace gd3d.framework {
+    class trailRender implements IRenderer {
+        layer: RenderLayerEnum;
+        renderLayer: gd3d.framework.CullingMask;
+        queue: number;
+        private width;
+        private _material;
+        private _color;
+        private mesh;
+        private vertexcount;
+        private dataForVbo;
+        private dataForEbo;
+        private sticks;
+        private active;
+        private reInit;
+        start(): void;
+        private app;
+        private webgl;
+        private camerapositon;
+        extenedOneSide: boolean;
+        update(delta: number): void;
+        gameObject: gameObject;
+        material: gd3d.framework.material;
+        color: gd3d.math.color;
+        setspeed(upspeed: number): void;
+        setWidth(Width: number): void;
+        play(): void;
+        stop(): void;
+        lookAtCamera: boolean;
+        private initmesh();
+        private intidata();
+        private speed;
+        private updateTrailData();
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        clone(): void;
+        remove(): void;
+    }
+    class trailStick {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
     }
 }
 declare namespace gd3d.framework {
@@ -2323,48 +2368,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class trailRender implements IRenderer {
-        layer: RenderLayerEnum;
-        renderLayer: gd3d.framework.CullingMask;
-        queue: number;
-        private width;
-        private _material;
-        private _color;
-        private mesh;
-        private vertexcount;
-        private dataForVbo;
-        private dataForEbo;
-        private sticks;
-        private active;
-        private reInit;
-        start(): void;
-        private app;
-        private webgl;
-        private camerapositon;
-        extenedOneSide: boolean;
-        update(delta: number): void;
-        gameObject: gameObject;
-        material: gd3d.framework.material;
-        color: gd3d.math.color;
-        setspeed(upspeed: number): void;
-        setWidth(Width: number): void;
-        play(): void;
-        stop(): void;
-        lookAtCamera: boolean;
-        private initmesh();
-        private intidata();
-        private speed;
-        private updateTrailData();
-        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        clone(): void;
-        remove(): void;
-    }
-    class trailStick {
-        location: gd3d.math.vector3;
-        updir: gd3d.math.vector3;
-    }
-}
-declare namespace gd3d.framework {
     class vignettingCtr implements INodeComponent {
         private app;
         private scene;
@@ -2390,7 +2393,6 @@ declare namespace gd3d.framework {
         queue: number;
         start(): void;
         gameObject: gameObject;
-        remove(): void;
         private fps;
         data: F14EffectData;
         layers: F14Layer[];
@@ -2420,7 +2422,6 @@ declare namespace gd3d.framework {
         totalFrame: number;
         private addF14layer(type, layerdata);
         getElementCount(): number;
-        dispose(): void;
         private playRate;
         private playState;
         private active;
@@ -2428,8 +2429,10 @@ declare namespace gd3d.framework {
         stop(): void;
         private bePause;
         pause(): void;
+        changeColor(newcolor: math.color): void;
         reset(): void;
         clone(): void;
+        remove(): void;
     }
     enum PlayStateEnum {
         play = 0,
@@ -2446,8 +2449,10 @@ declare namespace gd3d.framework {
     interface F14Element {
         type: F14TypeEnum;
         update(deltaTime: number, frame: number, fps: number): any;
+        dispose(): any;
         reset(): any;
         OnEndOnceLoop(): any;
+        changeColor(value: math.color): any;
         layer: F14Layer;
         drawActive: boolean;
     }
@@ -2470,6 +2475,7 @@ declare namespace gd3d.framework {
         constructor(effect: f14EffectSystem, data: F14LayerData);
         addFrame(index: number, framedata: F14FrameData): F14Frame;
         removeFrame(frame: number): void;
+        dispose(): void;
     }
     class F14Frame {
         layer: F14Layer;
@@ -2608,7 +2614,9 @@ declare namespace gd3d.framework {
         private updateEmission();
         private addParticle(count?);
         reset(): void;
+        changeColor(value: math.color): void;
         OnEndOnceLoop(): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2743,6 +2751,8 @@ declare namespace gd3d.framework {
         actived: boolean;
         private emissionMatToWorld;
         private emissionWorldRotation;
+        private getEmissionMatToWorld();
+        private getemissionWorldRotation();
         constructor(element: F14Emission, data: F14EmissionBaseData);
         initByEmissionData(data: F14EmissionBaseData): void;
         update(deltaTime: number): void;
@@ -2768,6 +2778,7 @@ declare namespace gd3d.framework {
         private updateColor();
         private updateUV();
         getCurTex_ST(data: F14EmissionBaseData): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2808,6 +2819,8 @@ declare namespace gd3d.framework {
         private refreshStartEndFrame();
         update(deltaTime: number, frame: number, fps: number): void;
         OnEndOnceLoop(): void;
+        changeColor(value: math.color): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2852,6 +2865,8 @@ declare namespace gd3d.framework {
         private worldDiry;
         updateRotByBillboard(): void;
         reset(): void;
+        changeColor(value: math.color): void;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -4911,6 +4926,7 @@ declare namespace gd3d.framework {
         private assetmgr;
         private _overlay2d;
         addScreenSpaceOverlay(overlay: overlay2D): void;
+        removeScreenSpaceOverlay(overlay: any): void;
         renderCameras: camera[];
         private _mainCamera;
         mainCamera: camera;
@@ -5007,6 +5023,25 @@ declare namespace gd3d.framework {
         private extentsOverlap(min0, max0, min1, max1);
         clone(): obb;
         dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class obb2d {
+        private rotate;
+        private scale;
+        private center;
+        offset: gd3d.math.vector2;
+        private halfWidth;
+        private halfHeight;
+        private directions;
+        private _size;
+        size: gd3d.math.vector2;
+        buildByCenterSize(center: gd3d.math.vector2, width: number, height: number): void;
+        update(canvasWorldMtx: gd3d.math.matrix3x2): void;
+        intersects(_obb: obb2d): boolean;
+        private computeBoxExtents(axis, box);
+        private axisOverlap(axis, box0, box1);
+        private extentsOverlap(min0, max0, min1, max1);
     }
 }
 declare namespace gd3d.framework {
