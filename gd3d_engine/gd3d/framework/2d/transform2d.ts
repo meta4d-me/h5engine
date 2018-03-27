@@ -46,7 +46,7 @@ namespace gd3d.framework
     export interface ICollider2d
     {
         transform: transform2D;
-        getBound();
+        getBound():obb2d;
         intersectsTransform(tran: transform2D): boolean;
     }
 
@@ -786,7 +786,7 @@ namespace gd3d.framework
          * 碰撞盒组件 可为空
          * @version egret-gd3d 1.0
          */
-        collider:ICollider2d & I2DComponent;
+        collider:ICollider2d;
 
         /**
          * @public
@@ -946,7 +946,7 @@ namespace gd3d.framework
                 {
                     var p = this.components.splice(i, 1);
                     if (p[0].comp == this.renderer) this.renderer = null;
-                    if (p[0].comp == this.collider) this.collider = null;
+                    if (p[0].comp == (this.collider as any)) this.collider = null;
                     p[0].comp.remove();
                     return p[0];
                 }

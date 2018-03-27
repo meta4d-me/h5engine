@@ -410,7 +410,7 @@ declare namespace gd3d.framework {
     }
     interface ICollider2d {
         transform: transform2D;
-        getBound(): any;
+        getBound(): obb2d;
         intersectsTransform(tran: transform2D): boolean;
     }
     interface IRectRenderer extends I2DComponent {
@@ -476,7 +476,7 @@ declare namespace gd3d.framework {
         setWorldPosition(pos: math.vector2): void;
         dispose(): void;
         renderer: IRectRenderer;
-        collider: ICollider2d & I2DComponent;
+        collider: ICollider2d;
         components: C2DComponent[];
         update(delta: number): void;
         addComponent(type: string): I2DComponent;
@@ -533,6 +533,7 @@ declare namespace gd3d.framework {
         getBound(): obb2d;
         intersectsTransform(tran: transform2D): boolean;
         private build();
+        refreshTofullOver(): void;
         start(): void;
         update(delta: number): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;

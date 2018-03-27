@@ -56,6 +56,21 @@ namespace gd3d.framework
             let t = this.transform;
             this._obb = new obb2d();
             this._obb.buildByCenterSize(t.getWorldTranslate(),t.width,t.height);
+            this.refreshTofullOver();
+        }
+
+        /**
+        * @private
+        * @language zh_CN
+        * @classdesc
+        * 刷新成碰撞框完全覆盖transform
+        * @version egret-gd3d 1.0
+        */
+        refreshTofullOver(){
+            if(!this._obb || !this._obb.size || !this._obb.offset) return;
+            let t = this.transform;
+            this._obb.size.x = t.width;            
+            this._obb.size.y = t.height;            
             this._obb.offset.x = (0.5-t.pivot.x) * this._obb.size.x;
             this._obb.offset.y = (0.5-t.pivot.y) * this._obb.size.y;
         }

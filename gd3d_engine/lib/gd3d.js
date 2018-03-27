@@ -2628,6 +2628,14 @@ var gd3d;
                 var t = this.transform;
                 this._obb = new framework.obb2d();
                 this._obb.buildByCenterSize(t.getWorldTranslate(), t.width, t.height);
+                this.refreshTofullOver();
+            };
+            boxcollider2d.prototype.refreshTofullOver = function () {
+                if (!this._obb || !this._obb.size || !this._obb.offset)
+                    return;
+                var t = this.transform;
+                this._obb.size.x = t.width;
+                this._obb.size.y = t.height;
                 this._obb.offset.x = (0.5 - t.pivot.x) * this._obb.size.x;
                 this._obb.offset.y = (0.5 - t.pivot.y) * this._obb.size.y;
             };
@@ -27595,7 +27603,7 @@ var gd3d;
             Object.defineProperty(obb2d.prototype, "size", {
                 get: function () { return this._size; },
                 set: function (size) {
-                    if (!size)
+                    if (!size || !this._size)
                         return;
                     gd3d.math.vec2Clone(size, this._size);
                     this.halfWidth = this._size.x / 2;

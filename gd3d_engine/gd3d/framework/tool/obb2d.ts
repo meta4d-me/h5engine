@@ -34,7 +34,7 @@ namespace gd3d.framework
         @reflect.Field("vector2")
         get size(){return this._size;}
         set size(size:gd3d.math.vector2){
-            if(!size)return;
+            if(!size || !this._size)return;
             gd3d.math.vec2Clone(size,this._size);
             this.halfWidth = this._size.x/2;
             this.halfHeight = this._size.y/2;
