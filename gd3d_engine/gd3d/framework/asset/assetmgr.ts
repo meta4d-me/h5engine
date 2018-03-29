@@ -1572,10 +1572,16 @@ namespace gd3d.framework {
                 let lightMapUrl = this.getAssetUrl(lightmaps[str]);
                 io.SerializeDependent.resourseDatas.push({ "url": lightMapUrl, "type": io.SaveAssetType.FullUrl });
             }
+            //navmesh
+            let navstr = NavMeshLoadManager.Instance.navmeshJson;
+            navstr = navstr == null ? "": navstr;
+            let navmeshJson = {name:navstr};
+
 
             _scene["rootNode"] = _rootNode;
             _scene["lightmap"] = _lightmaps;
             _scene["fog"] = scene.fog;
+            _scene["navmesh"] = navmeshJson;
 
             let _sceneStr = JSON.stringify(_scene);
 

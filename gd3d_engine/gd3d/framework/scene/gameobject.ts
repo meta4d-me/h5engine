@@ -104,6 +104,16 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 对象是静态
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("boolean")
+        isStatic : boolean = false;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * gameObject必须依赖transform存在
          * @version egret-gd3d 1.0
          */

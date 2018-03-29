@@ -5831,9 +5831,13 @@ var gd3d;
                     var lightMapUrl = this.getAssetUrl(lightmaps[str]);
                     gd3d.io.SerializeDependent.resourseDatas.push({ "url": lightMapUrl, "type": gd3d.io.SaveAssetType.FullUrl });
                 }
+                var navstr = framework.NavMeshLoadManager.Instance.navmeshJson;
+                navstr = navstr == null ? "" : navstr;
+                var navmeshJson = { name: navstr };
                 _scene["rootNode"] = _rootNode;
                 _scene["lightmap"] = _lightmaps;
                 _scene["fog"] = scene.fog;
+                _scene["navmesh"] = navmeshJson;
                 var _sceneStr = JSON.stringify(_scene);
                 var _rawscene = this.getAssetByName(scene.name);
                 _rawscene.Parse(_sceneStr, this);
@@ -9518,6 +9522,14 @@ var gd3d;
                         this.fog._Color = cor;
                     this.fog._Density = fogData["_Density"];
                 }
+                var nav = _json["navmesh"];
+                if (nav != undefined && nav.name != null) {
+                    var navmesh = assetmgr.getAssetByName(nav.name, this.assetbundle);
+                    if (navmesh) {
+                        navmesh.use();
+                        this.navMeshJson = navmesh.content;
+                    }
+                }
             };
             rawscene.prototype.getSceneRoot = function () {
                 return gd3d.io.cloneObj(this.rootNode);
@@ -9530,6 +9542,15 @@ var gd3d;
             };
             rawscene.prototype.useFog = function (scene) {
                 scene.fog = this.fog;
+            };
+            rawscene.prototype.useNavMesh = function (scene) {
+                var loaded = false;
+                if (this.navMeshJson == null || this.navMeshJson == "")
+                    return loaded;
+                framework.NavMeshLoadManager.Instance.loadNavMeshByDate(this.navMeshJson, scene.app, function () {
+                    loaded = true;
+                });
+                return loaded;
             };
             rawscene.prototype.dispose = function () {
                 if (this.rootNode) {
@@ -21260,7 +21281,13 @@ var gd3d;
         var NavMeshLoadManager = (function () {
             function NavMeshLoadManager() {
                 this.navMeshVertexOffset = new gd3d.math.vector3(0, 0, 0);
+                this._navmeshJson = "";
             }
+            Object.defineProperty(NavMeshLoadManager.prototype, "navmeshJson", {
+                get: function () { return this._navmeshJson; },
+                enumerable: true,
+                configurable: true
+            });
             NavMeshLoadManager.prototype.loadNavMesh = function (navMeshUrl, app, onstate) {
                 var _this = this;
                 if (!app)
@@ -21284,12 +21311,25 @@ var gd3d;
                     }
                 });
             };
+            NavMeshLoadManager.prototype.loadNavMeshByDate = function (dataStr, app, callback) {
+                if (!app)
+                    return;
+                this.app = app;
+                this.navmeshLoaded(dataStr, callback);
+            };
             NavMeshLoadManager.prototype.navmeshLoaded = function (dataStr, callback) {
                 console.warn("navmeshLoaded");
-                if (this.navMesh != null) {
+                if (dataStr == null || dataStr == "")
+                    return;
+                this._navmeshJson = dataStr;
+                if (this.navTrans != null) {
+                    if (this.navTrans.parent)
+                        this.navTrans.parent.removeChild(this.navTrans);
+                    this.navTrans.dispose();
                 }
                 this.navTrans = new gd3d.framework.transform();
                 this.navTrans.name = "navMesh";
+                this.navTrans.gameObject.hideFlags = gd3d.framework.HideFlags.HideInHierarchy;
                 var meshD = new gd3d.render.meshData();
                 meshD.pos = [];
                 meshD.trisindex = [];
@@ -26375,6 +26415,7 @@ var gd3d;
             function gameObject() {
                 this.layer = 0;
                 this.hideFlags = HideFlags.None;
+                this.isStatic = false;
                 this.components = [];
                 this.componentsInit = [];
                 this._visible = true;
@@ -26594,6 +26635,10 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], gameObject.prototype, "hideFlags", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], gameObject.prototype, "isStatic", void 0);
             __decorate([
                 gd3d.reflect.Field("nodeComponent[]"),
                 __metadata("design:type", Array)

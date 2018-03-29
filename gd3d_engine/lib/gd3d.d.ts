@@ -1531,7 +1531,9 @@ declare namespace gd3d.framework {
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
         useFog(scene: scene): void;
+        useNavMesh(scene: scene): boolean;
         dispose(): void;
+        private navMeshJson;
         private rootNode;
         private lightmaps;
     }
@@ -3780,8 +3782,10 @@ declare namespace gd3d.framework {
         private app;
         navigate: gd3d.framework.Navigate;
         navTrans: gd3d.framework.transform;
-        constructor();
+        readonly navmeshJson: string;
+        private _navmeshJson;
         loadNavMesh(navMeshUrl: string, app: gd3d.framework.application, onstate?: (state: stateLoad) => void): void;
+        loadNavMeshByDate(dataStr: string, app: gd3d.framework.application, callback: () => any): void;
         private navmeshLoaded(dataStr, callback);
         private createMesh(meshData, webgl);
         showNavmesh(isshow: boolean, material?: gd3d.framework.material): void;
@@ -4842,6 +4846,7 @@ declare namespace gd3d.framework {
         getScene(): scene;
         layer: number;
         hideFlags: HideFlags;
+        isStatic: boolean;
         transform: transform;
         components: nodeComponent[];
         private componentsInit;
