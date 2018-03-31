@@ -2299,48 +2299,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class trailRender implements IRenderer {
-        layer: RenderLayerEnum;
-        renderLayer: gd3d.framework.CullingMask;
-        queue: number;
-        private width;
-        private _material;
-        private _color;
-        private mesh;
-        private vertexcount;
-        private dataForVbo;
-        private dataForEbo;
-        private sticks;
-        private active;
-        private reInit;
-        start(): void;
-        private app;
-        private webgl;
-        private camerapositon;
-        extenedOneSide: boolean;
-        update(delta: number): void;
-        gameObject: gameObject;
-        material: gd3d.framework.material;
-        color: gd3d.math.color;
-        setspeed(upspeed: number): void;
-        setWidth(Width: number): void;
-        play(): void;
-        stop(): void;
-        lookAtCamera: boolean;
-        private initmesh();
-        private intidata();
-        private speed;
-        private updateTrailData();
-        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        clone(): void;
-        remove(): void;
-    }
-    class trailStick {
-        location: gd3d.math.vector3;
-        updir: gd3d.math.vector3;
-    }
-}
-declare namespace gd3d.framework {
     class trailRender_recorde implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: gd3d.framework.CullingMask;
@@ -2388,6 +2346,48 @@ declare namespace gd3d.framework {
         handle: gd3d.math.vector3;
         trailNodes: trailNode[];
         constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
+    }
+}
+declare namespace gd3d.framework {
+    class trailRender implements IRenderer {
+        layer: RenderLayerEnum;
+        renderLayer: gd3d.framework.CullingMask;
+        queue: number;
+        private width;
+        private _material;
+        private _color;
+        private mesh;
+        private vertexcount;
+        private dataForVbo;
+        private dataForEbo;
+        private sticks;
+        private active;
+        private reInit;
+        start(): void;
+        private app;
+        private webgl;
+        private camerapositon;
+        extenedOneSide: boolean;
+        update(delta: number): void;
+        gameObject: gameObject;
+        material: gd3d.framework.material;
+        color: gd3d.math.color;
+        setspeed(upspeed: number): void;
+        setWidth(Width: number): void;
+        play(): void;
+        stop(): void;
+        lookAtCamera: boolean;
+        private initmesh();
+        private intidata();
+        private speed;
+        private updateTrailData();
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        clone(): void;
+        remove(): void;
+    }
+    class trailStick {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
     }
 }
 declare namespace gd3d.framework {
@@ -5166,6 +5166,7 @@ declare namespace gd3d.framework {
         clone(): transform;
         readonly beDispose: boolean;
         private _beDispose;
+        onDispose: () => void;
         dispose(): void;
     }
     class insID {

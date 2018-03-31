@@ -13693,255 +13693,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var trailRender = (function () {
-            function trailRender() {
-                this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
-                this.queue = 0;
-                this.width = 1.0;
-                this.vertexcount = 24;
-                this.active = false;
-                this.reInit = false;
-                this.extenedOneSide = true;
-                this.lookAtCamera = false;
-                this.speed = 0.5;
-            }
-            trailRender.prototype.start = function () {
-                this.app = this.gameObject.getScene().app;
-                this.webgl = this.app.webgl;
-                this.initmesh();
-            };
-            trailRender.prototype.update = function (delta) {
-                if (!this.active)
-                    return;
-                if (this.reInit) {
-                    this.intidata();
-                    this.reInit = false;
-                }
-                var targetpos = this.gameObject.transform.getWorldTranslate();
-                if (this.lookAtCamera) {
-                    this.camerapositon = framework.sceneMgr.app.getScene().mainCamera.gameObject.transform.getWorldTranslate();
-                    var camdir = gd3d.math.pool.new_vector3();
-                    gd3d.math.vec3Subtract(this.camerapositon, this.sticks[0].location, camdir);
-                    gd3d.math.vec3Normalize(camdir, camdir);
-                    var direction = gd3d.math.pool.new_vector3();
-                    gd3d.math.vec3Subtract(targetpos, this.sticks[0].location, direction);
-                    gd3d.math.vec3Normalize(direction, direction);
-                    gd3d.math.vec3Cross(camdir, direction, this.sticks[0].updir);
-                    gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
-                    gd3d.math.pool.delete_vector3(direction);
-                }
-                gd3d.math.vec3Clone(targetpos, this.sticks[0].location);
-                var length = this.sticks.length;
-                for (var i = 1; i < length; i++) {
-                    gd3d.math.vec3SLerp(this.sticks[i].location, this.sticks[i - 1].location, this.speed, this.sticks[i].location);
-                }
-                if (this.lookAtCamera) {
-                    for (var i = 1; i < length; i++) {
-                        var tocamdir = gd3d.math.pool.new_vector3();
-                        gd3d.math.vec3Subtract(this.camerapositon, this.sticks[i].location, tocamdir);
-                        gd3d.math.vec3Normalize(tocamdir, tocamdir);
-                        var movedir = gd3d.math.pool.new_vector3();
-                        gd3d.math.vec3Subtract(this.sticks[i - 1].location, this.sticks[i].location, movedir);
-                        gd3d.math.vec3Normalize(movedir, movedir);
-                        gd3d.math.vec3Cross(tocamdir, movedir, this.sticks[i].updir);
-                        gd3d.math.vec3ScaleByNum(this.sticks[i].updir, this.width, this.sticks[i].updir);
-                        gd3d.math.pool.delete_vector3(tocamdir);
-                    }
-                }
-                else {
-                    this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
-                    gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
-                    for (var i = 1; i < length; i++) {
-                        gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, this.speed, this.sticks[i].updir);
-                    }
-                }
-                this.updateTrailData();
-            };
-            Object.defineProperty(trailRender.prototype, "material", {
-                get: function () {
-                    if (this._material != undefined) {
-                        return this._material;
-                    }
-                    else {
-                        var mat = new gd3d.framework.material();
-                        mat.setShader(this.app.getAssetMgr().getShader("shader/def"));
-                        this.material = mat;
-                        return this._material;
-                    }
-                },
-                set: function (material) {
-                    this._material = material;
-                    this.layer = this.material.getLayer();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(trailRender.prototype, "color", {
-                get: function () {
-                    if (this._color == undefined) {
-                        this._color = new gd3d.math.color(1, 1, 1, 1);
-                    }
-                    return this._color;
-                },
-                set: function (color) {
-                    this._color = color;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            trailRender.prototype.setspeed = function (upspeed) {
-                this.speed = upspeed;
-            };
-            trailRender.prototype.setWidth = function (Width) {
-                this.width = Width;
-            };
-            trailRender.prototype.play = function () {
-                this.reInit = true;
-                this.active = true;
-            };
-            trailRender.prototype.stop = function () {
-                this.active = false;
-            };
-            trailRender.prototype.initmesh = function () {
-                this.mesh = new gd3d.framework.mesh();
-                this.mesh.data = new gd3d.render.meshData();
-                this.mesh.glMesh = new gd3d.render.glMesh();
-                this.dataForVbo = new Float32Array(this.vertexcount * 9);
-                this.dataForEbo = new Uint16Array((this.vertexcount / 2 - 1) * 6);
-                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
-                this.mesh.glMesh.initBuffer(this.webgl, vf, this.vertexcount, gd3d.render.MeshTypeEnum.Dynamic);
-                this.mesh.glMesh.addIndex(this.webgl, this.dataForEbo.length);
-                this.mesh.submesh = [];
-                {
-                    var sm = new framework.subMeshInfo();
-                    sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
-                    sm.start = 0;
-                    sm.size = this.dataForEbo.length;
-                    sm.line = false;
-                    this.mesh.submesh.push(sm);
-                }
-            };
-            trailRender.prototype.intidata = function () {
-                this.sticks = [];
-                for (var i = 0; i < this.vertexcount / 2; i++) {
-                    var ts = new trailStick();
-                    this.sticks.push(ts);
-                    ts.location = new gd3d.math.vector3();
-                    gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), ts.location);
-                    ts.updir = new gd3d.math.vector3();
-                    this.gameObject.transform.getUpInWorld(ts.updir);
-                    gd3d.math.vec3ScaleByNum(ts.updir, this.width, ts.updir);
-                }
-                var length = this.vertexcount / 2;
-                var updir = gd3d.math.pool.new_vector3();
-                this.gameObject.transform.getUpInWorld(updir);
-                gd3d.math.vec3ScaleByNum(updir, this.width, updir);
-                var pos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
-                var uppos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Add(pos, updir, uppos);
-                var downpos = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(pos, updir, downpos);
-                for (var i = 0; i < length; i++) {
-                    this.dataForVbo[i * 2 * 9] = uppos.x;
-                    this.dataForVbo[i * 2 * 9 + 1] = uppos.y;
-                    this.dataForVbo[i * 2 * 9 + 2] = uppos.z;
-                    this.dataForVbo[i * 2 * 9 + 3] = this.color.r;
-                    this.dataForVbo[i * 2 * 9 + 4] = this.color.g;
-                    this.dataForVbo[i * 2 * 9 + 5] = this.color.b;
-                    this.dataForVbo[i * 2 * 9 + 6] = this.color.a;
-                    this.dataForVbo[i * 2 * 9 + 7] = i / (length - 1);
-                    this.dataForVbo[i * 2 * 9 + 8] = 0;
-                    this.dataForVbo[(i * 2 + 1) * 9] = downpos.x;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 1] = downpos.y;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 2] = downpos.z;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 3] = this.color.r;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 4] = this.color.g;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 5] = this.color.b;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
-                    this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
-                }
-                for (var k = 0; k < length - 1; k++) {
-                    this.dataForEbo[k * 6 + 0] = k * 2;
-                    this.dataForEbo[k * 6 + 1] = (k + 1) * 2;
-                    this.dataForEbo[k * 6 + 2] = k * 2 + 1;
-                    this.dataForEbo[k * 6 + 3] = k * 2 + 1;
-                    this.dataForEbo[k * 6 + 4] = (k + 1) * 2;
-                    this.dataForEbo[k * 6 + 5] = (k + 1) * 2 + 1;
-                }
-                this.mesh.glMesh.uploadVertexData(this.webgl, this.dataForVbo);
-                this.mesh.glMesh.uploadIndexData(this.webgl, 0, this.dataForEbo);
-                gd3d.math.pool.delete_vector3(updir);
-                gd3d.math.pool.delete_vector3(pos);
-                gd3d.math.pool.delete_vector3(uppos);
-                gd3d.math.pool.delete_vector3(downpos);
-            };
-            trailRender.prototype.updateTrailData = function () {
-                var length = this.vertexcount / 2;
-                if (this.extenedOneSide) {
-                    for (var i = 0; i < length; i++) {
-                        var pos = this.sticks[i].location;
-                        var up = this.sticks[i].updir;
-                        this.dataForVbo[i * 2 * 9] = pos.x;
-                        this.dataForVbo[i * 2 * 9 + 1] = pos.y;
-                        this.dataForVbo[i * 2 * 9 + 2] = pos.z;
-                        this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
-                        this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
-                        this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
-                    }
-                }
-                else {
-                    for (var i = 0; i < length; i++) {
-                        var pos = this.sticks[i].location;
-                        var up = this.sticks[i].updir;
-                        this.dataForVbo[i * 2 * 9] = pos.x - up.x;
-                        this.dataForVbo[i * 2 * 9 + 1] = pos.y - up.y;
-                        this.dataForVbo[i * 2 * 9 + 2] = pos.z - up.z;
-                        this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
-                        this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
-                        this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
-                    }
-                }
-            };
-            trailRender.prototype.render = function (context, assetmgr, camera) {
-                if (!this.active)
-                    return;
-                context.updateModeTrail();
-                this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
-                if (this.gameObject.getScene().fog) {
-                    context.fog = this.gameObject.getScene().fog;
-                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
-                }
-                else {
-                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
-                }
-            };
-            trailRender.prototype.clone = function () {
-            };
-            trailRender.prototype.remove = function () {
-            };
-            trailRender = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent
-            ], trailRender);
-            return trailRender;
-        }());
-        framework.trailRender = trailRender;
-        var trailStick = (function () {
-            function trailStick() {
-            }
-            return trailStick;
-        }());
-        framework.trailStick = trailStick;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var trailRender_recorde = (function () {
             function trailRender_recorde() {
                 this.layer = framework.RenderLayerEnum.Common;
@@ -14204,6 +13955,255 @@ var gd3d;
             return trailNode;
         }());
         framework.trailNode = trailNode;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var trailRender = (function () {
+            function trailRender() {
+                this.layer = framework.RenderLayerEnum.Common;
+                this.renderLayer = framework.CullingMask.default;
+                this.queue = 0;
+                this.width = 1.0;
+                this.vertexcount = 24;
+                this.active = false;
+                this.reInit = false;
+                this.extenedOneSide = true;
+                this.lookAtCamera = false;
+                this.speed = 0.5;
+            }
+            trailRender.prototype.start = function () {
+                this.app = this.gameObject.getScene().app;
+                this.webgl = this.app.webgl;
+                this.initmesh();
+            };
+            trailRender.prototype.update = function (delta) {
+                if (!this.active)
+                    return;
+                if (this.reInit) {
+                    this.intidata();
+                    this.reInit = false;
+                }
+                var targetpos = this.gameObject.transform.getWorldTranslate();
+                if (this.lookAtCamera) {
+                    this.camerapositon = framework.sceneMgr.app.getScene().mainCamera.gameObject.transform.getWorldTranslate();
+                    var camdir = gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Subtract(this.camerapositon, this.sticks[0].location, camdir);
+                    gd3d.math.vec3Normalize(camdir, camdir);
+                    var direction = gd3d.math.pool.new_vector3();
+                    gd3d.math.vec3Subtract(targetpos, this.sticks[0].location, direction);
+                    gd3d.math.vec3Normalize(direction, direction);
+                    gd3d.math.vec3Cross(camdir, direction, this.sticks[0].updir);
+                    gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
+                    gd3d.math.pool.delete_vector3(direction);
+                }
+                gd3d.math.vec3Clone(targetpos, this.sticks[0].location);
+                var length = this.sticks.length;
+                for (var i = 1; i < length; i++) {
+                    gd3d.math.vec3SLerp(this.sticks[i].location, this.sticks[i - 1].location, this.speed, this.sticks[i].location);
+                }
+                if (this.lookAtCamera) {
+                    for (var i = 1; i < length; i++) {
+                        var tocamdir = gd3d.math.pool.new_vector3();
+                        gd3d.math.vec3Subtract(this.camerapositon, this.sticks[i].location, tocamdir);
+                        gd3d.math.vec3Normalize(tocamdir, tocamdir);
+                        var movedir = gd3d.math.pool.new_vector3();
+                        gd3d.math.vec3Subtract(this.sticks[i - 1].location, this.sticks[i].location, movedir);
+                        gd3d.math.vec3Normalize(movedir, movedir);
+                        gd3d.math.vec3Cross(tocamdir, movedir, this.sticks[i].updir);
+                        gd3d.math.vec3ScaleByNum(this.sticks[i].updir, this.width, this.sticks[i].updir);
+                        gd3d.math.pool.delete_vector3(tocamdir);
+                    }
+                }
+                else {
+                    this.gameObject.transform.getUpInWorld(this.sticks[0].updir);
+                    gd3d.math.vec3ScaleByNum(this.sticks[0].updir, this.width, this.sticks[0].updir);
+                    for (var i = 1; i < length; i++) {
+                        gd3d.math.vec3SLerp(this.sticks[i].updir, this.sticks[i - 1].updir, this.speed, this.sticks[i].updir);
+                    }
+                }
+                this.updateTrailData();
+            };
+            Object.defineProperty(trailRender.prototype, "material", {
+                get: function () {
+                    if (this._material != undefined) {
+                        return this._material;
+                    }
+                    else {
+                        var mat = new gd3d.framework.material();
+                        mat.setShader(this.app.getAssetMgr().getShader("shader/def"));
+                        this.material = mat;
+                        return this._material;
+                    }
+                },
+                set: function (material) {
+                    this._material = material;
+                    this.layer = this.material.getLayer();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(trailRender.prototype, "color", {
+                get: function () {
+                    if (this._color == undefined) {
+                        this._color = new gd3d.math.color(1, 1, 1, 1);
+                    }
+                    return this._color;
+                },
+                set: function (color) {
+                    this._color = color;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            trailRender.prototype.setspeed = function (upspeed) {
+                this.speed = upspeed;
+            };
+            trailRender.prototype.setWidth = function (Width) {
+                this.width = Width;
+            };
+            trailRender.prototype.play = function () {
+                this.reInit = true;
+                this.active = true;
+            };
+            trailRender.prototype.stop = function () {
+                this.active = false;
+            };
+            trailRender.prototype.initmesh = function () {
+                this.mesh = new gd3d.framework.mesh();
+                this.mesh.data = new gd3d.render.meshData();
+                this.mesh.glMesh = new gd3d.render.glMesh();
+                this.dataForVbo = new Float32Array(this.vertexcount * 9);
+                this.dataForEbo = new Uint16Array((this.vertexcount / 2 - 1) * 6);
+                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                this.mesh.glMesh.initBuffer(this.webgl, vf, this.vertexcount, gd3d.render.MeshTypeEnum.Dynamic);
+                this.mesh.glMesh.addIndex(this.webgl, this.dataForEbo.length);
+                this.mesh.submesh = [];
+                {
+                    var sm = new framework.subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = this.dataForEbo.length;
+                    sm.line = false;
+                    this.mesh.submesh.push(sm);
+                }
+            };
+            trailRender.prototype.intidata = function () {
+                this.sticks = [];
+                for (var i = 0; i < this.vertexcount / 2; i++) {
+                    var ts = new trailStick();
+                    this.sticks.push(ts);
+                    ts.location = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), ts.location);
+                    ts.updir = new gd3d.math.vector3();
+                    this.gameObject.transform.getUpInWorld(ts.updir);
+                    gd3d.math.vec3ScaleByNum(ts.updir, this.width, ts.updir);
+                }
+                var length = this.vertexcount / 2;
+                var updir = gd3d.math.pool.new_vector3();
+                this.gameObject.transform.getUpInWorld(updir);
+                gd3d.math.vec3ScaleByNum(updir, this.width, updir);
+                var pos = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), pos);
+                var uppos = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Add(pos, updir, uppos);
+                var downpos = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(pos, updir, downpos);
+                for (var i = 0; i < length; i++) {
+                    this.dataForVbo[i * 2 * 9] = uppos.x;
+                    this.dataForVbo[i * 2 * 9 + 1] = uppos.y;
+                    this.dataForVbo[i * 2 * 9 + 2] = uppos.z;
+                    this.dataForVbo[i * 2 * 9 + 3] = this.color.r;
+                    this.dataForVbo[i * 2 * 9 + 4] = this.color.g;
+                    this.dataForVbo[i * 2 * 9 + 5] = this.color.b;
+                    this.dataForVbo[i * 2 * 9 + 6] = this.color.a;
+                    this.dataForVbo[i * 2 * 9 + 7] = i / (length - 1);
+                    this.dataForVbo[i * 2 * 9 + 8] = 0;
+                    this.dataForVbo[(i * 2 + 1) * 9] = downpos.x;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 1] = downpos.y;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 2] = downpos.z;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 3] = this.color.r;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 4] = this.color.g;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 5] = this.color.b;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
+                    this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
+                }
+                for (var k = 0; k < length - 1; k++) {
+                    this.dataForEbo[k * 6 + 0] = k * 2;
+                    this.dataForEbo[k * 6 + 1] = (k + 1) * 2;
+                    this.dataForEbo[k * 6 + 2] = k * 2 + 1;
+                    this.dataForEbo[k * 6 + 3] = k * 2 + 1;
+                    this.dataForEbo[k * 6 + 4] = (k + 1) * 2;
+                    this.dataForEbo[k * 6 + 5] = (k + 1) * 2 + 1;
+                }
+                this.mesh.glMesh.uploadVertexData(this.webgl, this.dataForVbo);
+                this.mesh.glMesh.uploadIndexData(this.webgl, 0, this.dataForEbo);
+                gd3d.math.pool.delete_vector3(updir);
+                gd3d.math.pool.delete_vector3(pos);
+                gd3d.math.pool.delete_vector3(uppos);
+                gd3d.math.pool.delete_vector3(downpos);
+            };
+            trailRender.prototype.updateTrailData = function () {
+                var length = this.vertexcount / 2;
+                if (this.extenedOneSide) {
+                    for (var i = 0; i < length; i++) {
+                        var pos = this.sticks[i].location;
+                        var up = this.sticks[i].updir;
+                        this.dataForVbo[i * 2 * 9] = pos.x;
+                        this.dataForVbo[i * 2 * 9 + 1] = pos.y;
+                        this.dataForVbo[i * 2 * 9 + 2] = pos.z;
+                        this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
+                        this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
+                        this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
+                    }
+                }
+                else {
+                    for (var i = 0; i < length; i++) {
+                        var pos = this.sticks[i].location;
+                        var up = this.sticks[i].updir;
+                        this.dataForVbo[i * 2 * 9] = pos.x - up.x;
+                        this.dataForVbo[i * 2 * 9 + 1] = pos.y - up.y;
+                        this.dataForVbo[i * 2 * 9 + 2] = pos.z - up.z;
+                        this.dataForVbo[(i * 2 + 1) * 9] = pos.x + up.x;
+                        this.dataForVbo[(i * 2 + 1) * 9 + 1] = pos.y + up.y;
+                        this.dataForVbo[(i * 2 + 1) * 9 + 2] = pos.z + up.z;
+                    }
+                }
+            };
+            trailRender.prototype.render = function (context, assetmgr, camera) {
+                if (!this.active)
+                    return;
+                context.updateModeTrail();
+                this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
+                if (this.gameObject.getScene().fog) {
+                    context.fog = this.gameObject.getScene().fog;
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
+                }
+                else {
+                    this.material.draw(context, this.mesh, this.mesh.submesh[0], "base");
+                }
+            };
+            trailRender.prototype.clone = function () {
+            };
+            trailRender.prototype.remove = function () {
+            };
+            trailRender = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent
+            ], trailRender);
+            return trailRender;
+        }());
+        framework.trailRender = trailRender;
+        var trailStick = (function () {
+            function trailStick() {
+            }
+            return trailStick;
+        }());
+        framework.trailStick = trailStick;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -28470,6 +28470,8 @@ var gd3d;
                 }
                 this._gameObject.dispose();
                 this._beDispose = true;
+                if (this.onDispose)
+                    this.onDispose();
             };
             __decorate([
                 gd3d.reflect.Field("string"),
