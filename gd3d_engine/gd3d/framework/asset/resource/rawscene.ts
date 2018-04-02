@@ -177,12 +177,8 @@ namespace gd3d.framework
 
             //navMesh
             let nav = _json["navmesh"];
-            if(nav != undefined && nav.name != null){
-                let navmesh = assetmgr.getAssetByName(nav.name, this.assetbundle) as textasset;
-                if (navmesh){
-                    navmesh.use();
-                   this.navMeshJson =  navmesh.content;
-                }
+            if(nav != undefined && nav.data != null){
+                this.navMeshJson =  nav.data;
             }
         }
 

@@ -5804,6 +5804,7 @@ var gd3d;
                     this.app.getScene()["_overlay2d"] = new Array();
                     _rawscene.useLightMap(this.app.getScene());
                     _rawscene.useFog(this.app.getScene());
+                    _rawscene.useNavMesh(this.app.getScene());
                 }
                 else {
                     var _camera = new framework.transform();
@@ -5833,7 +5834,7 @@ var gd3d;
                 }
                 var navstr = framework.NavMeshLoadManager.Instance.navmeshJson;
                 navstr = navstr == null ? "" : navstr;
-                var navmeshJson = { name: navstr };
+                var navmeshJson = { data: navstr };
                 _scene["rootNode"] = _rootNode;
                 _scene["lightmap"] = _lightmaps;
                 _scene["fog"] = scene.fog;
@@ -9523,12 +9524,8 @@ var gd3d;
                     this.fog._Density = fogData["_Density"];
                 }
                 var nav = _json["navmesh"];
-                if (nav != undefined && nav.name != null) {
-                    var navmesh = assetmgr.getAssetByName(nav.name, this.assetbundle);
-                    if (navmesh) {
-                        navmesh.use();
-                        this.navMeshJson = navmesh.content;
-                    }
+                if (nav != undefined && nav.data != null) {
+                    this.navMeshJson = nav.data;
                 }
             };
             rawscene.prototype.getSceneRoot = function () {

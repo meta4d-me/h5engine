@@ -1528,6 +1528,8 @@ namespace gd3d.framework {
                 _rawscene.useLightMap(this.app.getScene());
                 //fog
                 _rawscene.useFog(this.app.getScene());
+                //nav
+                _rawscene.useNavMesh(this.app.getScene());
 
                 
             }
@@ -1575,7 +1577,7 @@ namespace gd3d.framework {
             //navmesh
             let navstr = NavMeshLoadManager.Instance.navmeshJson;
             navstr = navstr == null ? "": navstr;
-            let navmeshJson = {name:navstr};
+            let navmeshJson = {data:navstr};
 
 
             _scene["rootNode"] = _rootNode;
