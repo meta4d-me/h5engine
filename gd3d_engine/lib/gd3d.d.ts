@@ -5166,6 +5166,7 @@ declare namespace gd3d.framework {
         clone(): transform;
         readonly beDispose: boolean;
         private _beDispose;
+        onDispose: () => void;
         dispose(): void;
     }
     class insID {

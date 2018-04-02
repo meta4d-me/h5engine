@@ -28467,6 +28467,8 @@ var gd3d;
                 }
                 this._gameObject.dispose();
                 this._beDispose = true;
+                if (this.onDispose)
+                    this.onDispose();
             };
             __decorate([
                 gd3d.reflect.Field("string"),
