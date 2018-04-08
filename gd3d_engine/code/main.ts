@@ -107,6 +107,7 @@ class main implements gd3d.framework.IUserCode
         // this.addBtn("cj_zs",()=>new dome.testCJ());
         // this.addBtn("test_eff",()=>new dome.db_test_eff());
         this.addBtn("tesrtss",()=>new dome.testCJ());
+        this.addBtn("关键帧动画",()=>new test_keyframeAnimation());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }
