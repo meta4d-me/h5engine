@@ -1140,6 +1140,7 @@ var main = (function () {
         this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
+        this.addBtn("关键帧animation", function () { return new test_keyFrameAni(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -6495,6 +6496,87 @@ var test_heilongbo = (function () {
         }
     };
     return test_heilongbo;
+}());
+var test_keyFrameAni = (function () {
+    function test_keyFrameAni() {
+        this.taskMgr = new gd3d.framework.taskMgr();
+    }
+    test_keyFrameAni.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskMgr.addTaskCall(this.loadShader.bind(this));
+        this.taskMgr.addTaskCall(this.loadasset.bind(this));
+        this.taskMgr.addTaskCall(this.iniscene.bind(this));
+        this.taskMgr.addTaskCall(this.addbtns.bind(this));
+    };
+    test_keyFrameAni.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_keyFrameAni.prototype.loadasset = function (laststate, state) {
+        this.app.getAssetMgr().load("res/keyframeAnimation/Cube/Cube.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_keyFrameAni.prototype.iniscene = function (laststate, state) {
+        var cubePrefab = this.app.getAssetMgr().getAssetByName("Cube.prefab.json");
+        var head = cubePrefab.getCloneTrans();
+        this.scene.addChild(head);
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "keyframeAni Cam";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.order = 0;
+        this.camera.near = 0.3;
+        this.camera.far = 1000;
+        this.camera.fov = 60;
+        objCam.localTranslate = new gd3d.math.vector3(0, 3, 0);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    test_keyFrameAni.prototype.addbtns = function () {
+        var _this = this;
+        this.addbtn("play", 10, 100, function () {
+        });
+        this.addbtn("stop", 10, 200, function () {
+        });
+        this.addbtn("replay", 10, 300, function () {
+        });
+        var input = document.createElement("input");
+        input.type = "range";
+        input.valueAsNumber = 50;
+        this.longtou.localTranslate.x = input.valueAsNumber - 50;
+        input.oninput = function (e) {
+            _this.longtou.localTranslate.x = input.valueAsNumber - 50;
+            _this.longtou.markDirty();
+            console.log(input.valueAsNumber);
+        };
+        input.style.top = "400px";
+        input.style.left = "10px";
+        input.style.position = "absolute";
+        this.app.container.appendChild(input);
+    };
+    test_keyFrameAni.prototype.addbtn = function (text, x, y, func) {
+        var btn = document.createElement("button");
+        btn.textContent = text;
+        btn.onclick = function () {
+            func();
+        };
+        btn.style.top = y + "px";
+        btn.style.left = x + "px";
+        btn.style.position = "absolute";
+        this.app.container.appendChild(btn);
+    };
+    test_keyFrameAni.prototype.update = function (delta) {
+        this.taskMgr.move(delta);
+    };
+    return test_keyFrameAni;
 }());
 var test_keyframeAnimation = (function () {
     function test_keyframeAnimation() {

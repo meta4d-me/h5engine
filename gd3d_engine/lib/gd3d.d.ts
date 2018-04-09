@@ -807,17 +807,18 @@ declare namespace gd3d.framework {
         Prefab = 10,
         Material = 11,
         Aniclip = 12,
-        Scene = 13,
-        Atlas = 14,
-        Font = 15,
-        TextAsset = 16,
-        PackBin = 17,
-        PackTxt = 18,
-        PathAsset = 19,
-        KeyFrameAnimaionAsset = 20,
-        PVR = 21,
-        F14Effect = 22,
-        DDS = 23,
+        KeyFrameAniclip = 13,
+        Scene = 14,
+        Atlas = 15,
+        Font = 16,
+        TextAsset = 17,
+        PackBin = 18,
+        PackTxt = 19,
+        PathAsset = 20,
+        KeyFrameAnimaionAsset = 21,
+        PVR = 22,
+        F14Effect = 23,
+        DDS = 24,
     }
     enum AssetBundleLoadState {
         None = 0,
@@ -1120,6 +1121,13 @@ declare namespace gd3d.framework {
     function getFileName(url: string): string;
 }
 declare namespace gd3d.framework {
+    class assetfactory_keyFrameAniClip implements IAssetFactory {
+        newAsset(): keyFrameAniClip;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip): void;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_KeyframeAnimationPathAsset implements IAssetFactory {
         newAsset(): keyframeAnimationPathAsset;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyframeAnimationPathAsset): void;
@@ -1326,6 +1334,247 @@ declare namespace gd3d.framework {
         yOffset: number;
         xAddvance: number;
         static caclByteLength(): number;
+    }
+}
+declare namespace gd3d.framework {
+    class transform {
+        private _scene;
+        scene: scene;
+        name: string;
+        insId: insID;
+        prefab: string;
+        private aabbdirty;
+        markAABBDirty(): void;
+        private aabbchilddirty;
+        markAABBChildDirty(): void;
+        aabb: aabb;
+        aabbchild: aabb;
+        caclAABB(): void;
+        caclAABBChild(): void;
+        buildAABB(): aabb;
+        children: transform[];
+        parent: transform;
+        addChild(node: transform): void;
+        addChildAt(node: transform, index: number): void;
+        removeAllChild(): void;
+        removeChild(node: transform): void;
+        find(name: string): transform;
+        checkImpactTran(tran: transform): boolean;
+        checkImpact(): Array<transform>;
+        private doImpact(tran, impacted);
+        markDirty(): void;
+        markHaveComponent(): void;
+        markHaveRendererComp(): void;
+        updateTran(parentChange: boolean): void;
+        updateWorldTran(): void;
+        updateAABBChild(): void;
+        private dirty;
+        private dirtyChild;
+        hasComponent: boolean;
+        hasComponentChild: boolean;
+        hasRendererComp: boolean;
+        hasRendererCompChild: boolean;
+        private dirtyWorldDecompose;
+        localRotate: gd3d.math.quaternion;
+        localTranslate: gd3d.math.vector3;
+        localPosition: gd3d.math.vector3;
+        localScale: gd3d.math.vector3;
+        private localMatrix;
+        private _localEulerAngles;
+        localEulerAngles: gd3d.math.vector3;
+        private worldMatrix;
+        private worldRotate;
+        private worldTranslate;
+        private worldScale;
+        getWorldTranslate(): math.vector3;
+        getWorldScale(): math.vector3;
+        getWorldRotate(): math.quaternion;
+        getLocalMatrix(): gd3d.math.matrix;
+        private tempWorldMatrix;
+        getWorldMatrix(): gd3d.math.matrix;
+        getForwardInWorld(out: gd3d.math.vector3): void;
+        getRightInWorld(out: gd3d.math.vector3): void;
+        getUpInWorld(out: gd3d.math.vector3): void;
+        setWorldMatrix(mat: math.matrix): void;
+        setWorldPosition(pos: math.vector3): void;
+        lookat(trans: transform): void;
+        lookatPoint(point: math.vector3): void;
+        private _gameObject;
+        readonly gameObject: gameObject;
+        clone(): transform;
+        readonly beDispose: boolean;
+        private _beDispose;
+        onDispose: () => void;
+        dispose(): void;
+    }
+    class insID {
+        constructor();
+        private static idAll;
+        private static next();
+        private id;
+        getInsID(): number;
+    }
+}
+declare namespace gd3d.framework {
+    interface ICollider {
+        gameObject: gameObject;
+        subTran: transform;
+        getBound(): any;
+        intersectsTransform(tran: transform): boolean;
+    }
+    class boxcollider implements INodeComponent, ICollider {
+        gameObject: gameObject;
+        subTran: transform;
+        filter: meshFilter;
+        obb: obb;
+        center: math.vector3;
+        size: math.vector3;
+        getBound(): obb;
+        readonly matrix: gd3d.math.matrix;
+        start(): void;
+        update(delta: number): void;
+        _colliderVisible: boolean;
+        colliderVisible: boolean;
+        intersectsTransform(tran: transform): boolean;
+        private build();
+        private buildMesh();
+        private getColliderMesh();
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class meshcollider implements INodeComponent, ICollider {
+        gameObject: gameObject;
+        subTran: transform;
+        mesh: mesh;
+        getBound(): mesh;
+        start(): void;
+        update(delta: number): void;
+        _colliderVisible: boolean;
+        colliderVisible: boolean;
+        intersectsTransform(tran: transform): boolean;
+        private buildMesh();
+        private getColliderMesh();
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class meshFilter implements INodeComponent {
+        gameObject: gameObject;
+        start(): void;
+        update(delta: number): void;
+        private _mesh;
+        mesh: mesh;
+        getMeshOutput(): mesh;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class meshRenderer implements IRenderer {
+        constructor();
+        gameObject: gameObject;
+        materials: material[];
+        useGlobalLightMap: boolean;
+        lightmapIndex: number;
+        lightmapScaleOffset: math.vector4;
+        layer: RenderLayerEnum;
+        renderLayer: gd3d.framework.CullingMask;
+        private issetq;
+        _queue: number;
+        queue: number;
+        filter: meshFilter;
+        start(): void;
+        private refreshLayerAndQue();
+        update(delta: number): void;
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        remove(): void;
+        clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class skinnedMeshRenderer implements IRenderer {
+        constructor();
+        gameObject: gameObject;
+        layer: RenderLayerEnum;
+        renderLayer: CullingMask;
+        private issetq;
+        _queue: number;
+        queue: number;
+        materials: material[];
+        _player: aniplayer;
+        readonly player: aniplayer;
+        private _mesh;
+        mesh: mesh;
+        bones: transform[];
+        rootBone: transform;
+        center: math.vector3;
+        size: math.vector3;
+        maxBoneCount: number;
+        private _skintype;
+        private _skeletonMatrixData;
+        static dataCaches: {
+            key: string;
+            data: Float32Array;
+        }[];
+        private cacheData;
+        private _efficient;
+        start(): void;
+        getMatByIndex(index: number): math.matrix;
+        intersects(ray: ray): pickinfo;
+        update(delta: number): void;
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        remove(): void;
+        clone(): void;
+        useBoneShader(mat: material): number;
+    }
+}
+declare namespace gd3d.framework {
+    enum WrapMode {
+        Default = 0,
+        Once = 1,
+        Clamp = 1,
+        Loop = 2,
+        PingPong = 4,
+        ClampForever = 8,
+    }
+    class keyFrameAniClip implements IAsset {
+        private name;
+        private id;
+        defaultAsset: boolean;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        dispose(): void;
+        caclByteLength(): number;
+        Parse(jsonStr: string): void;
+        private length;
+        readonly wrapMode: WrapMode;
+        _wrapMode: WrapMode;
+        readonly fps: number;
+        private frameRate;
+        readonly loop: any;
+        _loop: boolean;
+        readonly time: number;
+        readonly frameCount: number;
+        curves: AnimationCurve[];
+    }
+    class AnimationCurve {
+        path: string;
+        type: string;
+        propertyName: string;
+        keyFrames: keyFrame[];
+    }
+    class keyFrame {
+        inTangent: number;
+        outTangent: number;
+        tangentMode: number;
+        time: number;
+        value: number;
     }
 }
 declare namespace gd3d.framework {
@@ -1808,34 +2057,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    interface ICollider {
-        gameObject: gameObject;
-        subTran: transform;
-        getBound(): any;
-        intersectsTransform(tran: transform): boolean;
-    }
-    class boxcollider implements INodeComponent, ICollider {
-        gameObject: gameObject;
-        subTran: transform;
-        filter: meshFilter;
-        obb: obb;
-        center: math.vector3;
-        size: math.vector3;
-        getBound(): obb;
-        readonly matrix: gd3d.math.matrix;
-        start(): void;
-        update(delta: number): void;
-        _colliderVisible: boolean;
-        colliderVisible: boolean;
-        intersectsTransform(tran: transform): boolean;
-        private build();
-        private buildMesh();
-        private getColliderMesh();
-        remove(): void;
-        clone(): void;
-    }
-}
-declare namespace gd3d.framework {
     interface ICameraPostQueue {
         render(scene: scene, context: renderContext, camera: camera): any;
         renderTarget: render.glRenderTarget;
@@ -2150,94 +2371,6 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         remove(): void;
         clone(): void;
-    }
-}
-declare namespace gd3d.framework {
-    class meshcollider implements INodeComponent, ICollider {
-        gameObject: gameObject;
-        subTran: transform;
-        mesh: mesh;
-        getBound(): mesh;
-        start(): void;
-        update(delta: number): void;
-        _colliderVisible: boolean;
-        colliderVisible: boolean;
-        intersectsTransform(tran: transform): boolean;
-        private buildMesh();
-        private getColliderMesh();
-        remove(): void;
-        clone(): void;
-    }
-}
-declare namespace gd3d.framework {
-    class meshFilter implements INodeComponent {
-        gameObject: gameObject;
-        start(): void;
-        update(delta: number): void;
-        private _mesh;
-        mesh: mesh;
-        getMeshOutput(): mesh;
-        remove(): void;
-        clone(): void;
-    }
-}
-declare namespace gd3d.framework {
-    class meshRenderer implements IRenderer {
-        constructor();
-        gameObject: gameObject;
-        materials: material[];
-        useGlobalLightMap: boolean;
-        lightmapIndex: number;
-        lightmapScaleOffset: math.vector4;
-        layer: RenderLayerEnum;
-        renderLayer: gd3d.framework.CullingMask;
-        private issetq;
-        _queue: number;
-        queue: number;
-        filter: meshFilter;
-        start(): void;
-        private refreshLayerAndQue();
-        update(delta: number): void;
-        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
-        remove(): void;
-        clone(): void;
-    }
-}
-declare namespace gd3d.framework {
-    class skinnedMeshRenderer implements IRenderer {
-        constructor();
-        gameObject: gameObject;
-        layer: RenderLayerEnum;
-        renderLayer: CullingMask;
-        private issetq;
-        _queue: number;
-        queue: number;
-        materials: material[];
-        _player: aniplayer;
-        readonly player: aniplayer;
-        private _mesh;
-        mesh: mesh;
-        bones: transform[];
-        rootBone: transform;
-        center: math.vector3;
-        size: math.vector3;
-        maxBoneCount: number;
-        private _skintype;
-        private _skeletonMatrixData;
-        static dataCaches: {
-            key: string;
-            data: Float32Array;
-        }[];
-        private cacheData;
-        private _efficient;
-        start(): void;
-        getMatByIndex(index: number): math.matrix;
-        intersects(ray: ray): pickinfo;
-        update(delta: number): void;
-        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
-        remove(): void;
-        clone(): void;
-        useBoneShader(mat: material): number;
     }
 }
 declare namespace gd3d.framework {
@@ -5096,85 +5229,6 @@ declare namespace gd3d.framework {
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
         intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3): pickinfo;
-    }
-}
-declare namespace gd3d.framework {
-    class transform {
-        private _scene;
-        scene: scene;
-        name: string;
-        insId: insID;
-        prefab: string;
-        private aabbdirty;
-        markAABBDirty(): void;
-        private aabbchilddirty;
-        markAABBChildDirty(): void;
-        aabb: aabb;
-        aabbchild: aabb;
-        caclAABB(): void;
-        caclAABBChild(): void;
-        buildAABB(): aabb;
-        children: transform[];
-        parent: transform;
-        addChild(node: transform): void;
-        addChildAt(node: transform, index: number): void;
-        removeAllChild(): void;
-        removeChild(node: transform): void;
-        find(name: string): transform;
-        checkImpactTran(tran: transform): boolean;
-        checkImpact(): Array<transform>;
-        private doImpact(tran, impacted);
-        markDirty(): void;
-        markHaveComponent(): void;
-        markHaveRendererComp(): void;
-        updateTran(parentChange: boolean): void;
-        updateWorldTran(): void;
-        updateAABBChild(): void;
-        private dirty;
-        private dirtyChild;
-        hasComponent: boolean;
-        hasComponentChild: boolean;
-        hasRendererComp: boolean;
-        hasRendererCompChild: boolean;
-        private dirtyWorldDecompose;
-        localRotate: gd3d.math.quaternion;
-        localTranslate: gd3d.math.vector3;
-        localPosition: gd3d.math.vector3;
-        localScale: gd3d.math.vector3;
-        private localMatrix;
-        private _localEulerAngles;
-        localEulerAngles: gd3d.math.vector3;
-        private worldMatrix;
-        private worldRotate;
-        private worldTranslate;
-        private worldScale;
-        getWorldTranslate(): math.vector3;
-        getWorldScale(): math.vector3;
-        getWorldRotate(): math.quaternion;
-        getLocalMatrix(): gd3d.math.matrix;
-        private tempWorldMatrix;
-        getWorldMatrix(): gd3d.math.matrix;
-        getForwardInWorld(out: gd3d.math.vector3): void;
-        getRightInWorld(out: gd3d.math.vector3): void;
-        getUpInWorld(out: gd3d.math.vector3): void;
-        setWorldMatrix(mat: math.matrix): void;
-        setWorldPosition(pos: math.vector3): void;
-        lookat(trans: transform): void;
-        lookatPoint(point: math.vector3): void;
-        private _gameObject;
-        readonly gameObject: gameObject;
-        clone(): transform;
-        readonly beDispose: boolean;
-        private _beDispose;
-        onDispose: () => void;
-        dispose(): void;
-    }
-    class insID {
-        constructor();
-        private static idAll;
-        private static next();
-        private id;
-        getInsID(): number;
     }
 }
 declare namespace gd3d.framework {

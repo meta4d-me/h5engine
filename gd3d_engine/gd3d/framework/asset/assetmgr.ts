@@ -101,6 +101,13 @@ namespace gd3d.framework {
         /**
          * @public
          * @language zh_CN
+         * 关键帧动画片段
+         * @version egret-gd3d 1.0
+         */
+        KeyFrameAniclip,
+        /**
+         * @public
+         * @language zh_CN
          * 场景
          * @version egret-gd3d 1.0
          */
@@ -506,6 +513,7 @@ namespace gd3d.framework {
             let fonts: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let atlass: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let ddss: { url: string, type: AssetTypeEnum, asset: any }[] = [];
+            let kfaniclips: { url: string, type: AssetTypeEnum, asset: any }[] = [];
 
 
             let asslist: any[] = [];
@@ -514,12 +522,12 @@ namespace gd3d.framework {
             //这里定义了加载顺序
             asslist.push(packs, glvshaders, glfshaders,shaders,textassets,meshs,
                 textures,pvrs,ddss,texturedescs,fonts, atlass,
-                materials, anclips, f14effs,prefabs,scenes);
+                materials, anclips, kfaniclips ,f14effs,prefabs,scenes);
 
             assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None,
                 AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh,
                 AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None,
-                AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
+                AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip,AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
             let realTotal = 0;
             var mapPackes: { [id: string]: number } = {};
 
@@ -607,6 +615,10 @@ namespace gd3d.framework {
                             asset = new atlas(fileName);
                             atlass.push({ url, type, asset: asset });
                             break;
+                        case AssetTypeEnum.KeyFrameAniclip:
+                            asset = new keyFrameAniClip(fileName);
+                            kfaniclips.push({ url, type, asset: asset });
+                            break;    
                     }
                     if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
@@ -1247,6 +1259,7 @@ namespace gd3d.framework {
             this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new AssetFactory_KeyframeAnimationPathAsset());
             this.regAssetFactory(AssetTypeEnum.F14Effect, new AssetFactory_f14eff());
             this.regAssetFactory(AssetTypeEnum.DDS, new AssetFactory_DDS());
+            this.regAssetFactory(AssetTypeEnum.KeyFrameAniclip, new assetfactory_keyFrameAniClip());
         }
 
 
@@ -1847,6 +1860,8 @@ namespace gd3d.framework {
                     return AssetTypeEnum.F14Effect;
                 }else if(extname == ".dds" || extname == ".dds.bin"){
                     return AssetTypeEnum.DDS;
+                }else if (extname == ".keyframeAniclip.json") {
+                    return AssetTypeEnum.KeyFrameAniclip;
                 }
 
                 i = file.indexOf(".", i + 1);

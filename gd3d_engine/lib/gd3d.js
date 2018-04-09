@@ -4966,17 +4966,18 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Prefab"] = 10] = "Prefab";
             AssetTypeEnum[AssetTypeEnum["Material"] = 11] = "Material";
             AssetTypeEnum[AssetTypeEnum["Aniclip"] = 12] = "Aniclip";
-            AssetTypeEnum[AssetTypeEnum["Scene"] = 13] = "Scene";
-            AssetTypeEnum[AssetTypeEnum["Atlas"] = 14] = "Atlas";
-            AssetTypeEnum[AssetTypeEnum["Font"] = 15] = "Font";
-            AssetTypeEnum[AssetTypeEnum["TextAsset"] = 16] = "TextAsset";
-            AssetTypeEnum[AssetTypeEnum["PackBin"] = 17] = "PackBin";
-            AssetTypeEnum[AssetTypeEnum["PackTxt"] = 18] = "PackTxt";
-            AssetTypeEnum[AssetTypeEnum["PathAsset"] = 19] = "PathAsset";
-            AssetTypeEnum[AssetTypeEnum["KeyFrameAnimaionAsset"] = 20] = "KeyFrameAnimaionAsset";
-            AssetTypeEnum[AssetTypeEnum["PVR"] = 21] = "PVR";
-            AssetTypeEnum[AssetTypeEnum["F14Effect"] = 22] = "F14Effect";
-            AssetTypeEnum[AssetTypeEnum["DDS"] = 23] = "DDS";
+            AssetTypeEnum[AssetTypeEnum["KeyFrameAniclip"] = 13] = "KeyFrameAniclip";
+            AssetTypeEnum[AssetTypeEnum["Scene"] = 14] = "Scene";
+            AssetTypeEnum[AssetTypeEnum["Atlas"] = 15] = "Atlas";
+            AssetTypeEnum[AssetTypeEnum["Font"] = 16] = "Font";
+            AssetTypeEnum[AssetTypeEnum["TextAsset"] = 17] = "TextAsset";
+            AssetTypeEnum[AssetTypeEnum["PackBin"] = 18] = "PackBin";
+            AssetTypeEnum[AssetTypeEnum["PackTxt"] = 19] = "PackTxt";
+            AssetTypeEnum[AssetTypeEnum["PathAsset"] = 20] = "PathAsset";
+            AssetTypeEnum[AssetTypeEnum["KeyFrameAnimaionAsset"] = 21] = "KeyFrameAnimaionAsset";
+            AssetTypeEnum[AssetTypeEnum["PVR"] = 22] = "PVR";
+            AssetTypeEnum[AssetTypeEnum["F14Effect"] = 23] = "F14Effect";
+            AssetTypeEnum[AssetTypeEnum["DDS"] = 24] = "DDS";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var AssetBundleLoadState;
         (function (AssetBundleLoadState) {
@@ -5147,9 +5148,10 @@ var gd3d;
                 var fonts = [];
                 var atlass = [];
                 var ddss = [];
+                var kfaniclips = [];
                 var asslist = [];
                 var assstatelist = [];
-                asslist.push(packs, glvshaders, glfshaders, shaders, textassets, meshs, textures, pvrs, ddss, texturedescs, fonts, atlass, materials, anclips, f14effs, prefabs, scenes);
+                asslist.push(packs, glvshaders, glfshaders, shaders, textassets, meshs, textures, pvrs, ddss, texturedescs, fonts, atlass, materials, anclips, kfaniclips, f14effs, prefabs, scenes);
                 assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
                 var realTotal = 0;
                 var mapPackes = {};
@@ -5231,6 +5233,10 @@ var gd3d;
                             case AssetTypeEnum.Atlas:
                                 asset = new framework.atlas(fileName);
                                 atlass.push({ url: url, type: type, asset: asset });
+                                break;
+                            case AssetTypeEnum.KeyFrameAniclip:
+                                asset = new framework.keyFrameAniClip(fileName);
+                                kfaniclips.push({ url: url, type: type, asset: asset });
                                 break;
                         }
                         if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
@@ -5606,6 +5612,7 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new framework.AssetFactory_KeyframeAnimationPathAsset());
                 this.regAssetFactory(AssetTypeEnum.F14Effect, new framework.AssetFactory_f14eff());
                 this.regAssetFactory(AssetTypeEnum.DDS, new framework.AssetFactory_DDS());
+                this.regAssetFactory(AssetTypeEnum.KeyFrameAniclip, new framework.assetfactory_keyFrameAniClip());
             };
             assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
                 if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1) {
@@ -6008,6 +6015,9 @@ var gd3d;
                     }
                     else if (extname == ".dds" || extname == ".dds.bin") {
                         return AssetTypeEnum.DDS;
+                    }
+                    else if (extname == ".keyframeAniclip.json") {
+                        return AssetTypeEnum.KeyFrameAniclip;
                     }
                     i = file.indexOf(".", i + 1);
                 }
@@ -7133,6 +7143,42 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var assetfactory_keyFrameAniClip = (function () {
+            function assetfactory_keyFrameAniClip() {
+            }
+            assetfactory_keyFrameAniClip.prototype.newAsset = function () {
+                return null;
+            };
+            assetfactory_keyFrameAniClip.prototype.load = function (url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                gd3d.io.loadText(url, function (text, err) {
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
+                    _clip.Parse(text);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            assetfactory_keyFrameAniClip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.ResourceState();
+                var _buffer = respack[filename];
+                var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
+                _clip.Parse(_buffer);
+                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+            };
+            return assetfactory_keyFrameAniClip;
+        }());
+        framework.assetfactory_keyFrameAniClip = assetfactory_keyFrameAniClip;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var AssetFactory_KeyframeAnimationPathAsset = (function () {
             function AssetFactory_KeyframeAnimationPathAsset() {
             }
@@ -8192,6 +8238,1496 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var transform = (function () {
+            function transform() {
+                this.name = "noname";
+                this.insId = new insID();
+                this.prefab = null;
+                this.aabbdirty = true;
+                this.aabbchilddirty = true;
+                this.dirty = true;
+                this.dirtyChild = true;
+                this.hasComponent = false;
+                this.hasComponentChild = false;
+                this.hasRendererComp = false;
+                this.hasRendererCompChild = false;
+                this.dirtyWorldDecompose = false;
+                this.localRotate = new gd3d.math.quaternion();
+                this.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                this.localScale = new gd3d.math.vector3(1, 1, 1);
+                this.localMatrix = new gd3d.math.matrix();
+                this._localEulerAngles = new gd3d.math.vector3(0, 0, 0);
+                this.worldMatrix = new gd3d.math.matrix();
+                this.worldRotate = new gd3d.math.quaternion();
+                this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
+                this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.tempWorldMatrix = new gd3d.math.matrix();
+                this._beDispose = false;
+            }
+            Object.defineProperty(transform.prototype, "scene", {
+                get: function () {
+                    if (this._scene == null) {
+                        if (this.parent == null)
+                            return null;
+                        this._scene = this.parent.scene;
+                    }
+                    return this._scene;
+                },
+                set: function (value) {
+                    this._scene = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform.prototype.markAABBDirty = function () {
+                this.aabbdirty = true;
+                this.markAABBChildDirty();
+                var p = this.parent;
+                while (p != null) {
+                    p.markAABBChildDirty();
+                    p = p.parent;
+                }
+            };
+            transform.prototype.markAABBChildDirty = function () {
+                this.aabbchilddirty = true;
+            };
+            transform.prototype.caclAABB = function () {
+                if (this.gameObject.components == null)
+                    return;
+                if (this.aabb == null) {
+                    this.aabb = this.buildAABB();
+                    this.aabbchild = this.aabb.clone();
+                }
+                this.aabb.update(this.worldMatrix);
+            };
+            transform.prototype.caclAABBChild = function () {
+                if (this.aabb == null)
+                    return;
+                this.aabbchild = this.aabb.clone();
+                if (this.children != null) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        this.aabbchild.addAABB(this.children[i].aabbchild);
+                    }
+                }
+            };
+            transform.prototype.buildAABB = function () {
+                var minimum = new gd3d.math.vector3();
+                var maximum = new gd3d.math.vector3();
+                var filter = this.gameObject.getComponent("meshFilter");
+                if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
+                    var meshdata = filter.mesh.data;
+                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                    for (var i = 0; i < meshdata.pos.length; i++) {
+                        gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
+                        gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                    }
+                }
+                else {
+                    var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
+                    if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
+                        var skinmeshdata = skinmesh.mesh.data;
+                        gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                        gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                        for (var i = 0; i < skinmeshdata.pos.length; i++) {
+                            gd3d.math.vec3Max(skinmeshdata.pos[i], maximum, maximum);
+                            gd3d.math.vec3Min(skinmeshdata.pos[i], minimum, minimum);
+                        }
+                    }
+                    else {
+                        minimum.x = -1;
+                        minimum.y = -1;
+                        minimum.z = -1;
+                        maximum.x = 1;
+                        maximum.y = 1;
+                        maximum.z = 1;
+                    }
+                }
+                var _aabb = new framework.aabb(minimum, maximum);
+                return _aabb;
+            };
+            transform.prototype.addChild = function (node) {
+                if (node.parent != null) {
+                    node.parent.removeChild(node);
+                }
+                if (this.children == null)
+                    this.children = [];
+                this.children.push(node);
+                node.scene = this.scene;
+                node.parent = this;
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                if (node.hasComponent || node.hasComponentChild)
+                    this.markHaveComponent();
+                if (node.hasRendererComp || node.hasRendererCompChild)
+                    this.markHaveRendererComp();
+            };
+            transform.prototype.addChildAt = function (node, index) {
+                if (index < 0)
+                    return;
+                if (node.parent != null) {
+                    node.parent.removeChild(node);
+                }
+                if (this.children == null)
+                    this.children = [];
+                this.children.splice(index, 0, node);
+                node.scene = this.scene;
+                node.parent = this;
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                if (node.hasComponent || node.hasComponentChild)
+                    this.markHaveComponent();
+                if (node.hasRendererComp || node.hasRendererCompChild)
+                    this.markHaveRendererComp();
+            };
+            transform.prototype.removeAllChild = function () {
+                if (this.children == undefined)
+                    return;
+                while (this.children.length > 0) {
+                    this.removeChild(this.children[0]);
+                }
+            };
+            transform.prototype.removeChild = function (node) {
+                if (node.parent != this || this.children == null) {
+                    throw new Error("not my child.");
+                }
+                var i = this.children.indexOf(node);
+                if (i >= 0) {
+                    this.children.splice(i, 1);
+                    framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
+                    node.parent = null;
+                }
+            };
+            transform.prototype.find = function (name) {
+                if (this.name == name)
+                    return this;
+                else {
+                    if (this.children != undefined) {
+                        for (var i in this.children) {
+                            var res = this.children[i].find(name);
+                            if (res != null)
+                                return res;
+                            else {
+                                continue;
+                            }
+                        }
+                    }
+                }
+                return null;
+            };
+            transform.prototype.checkImpactTran = function (tran) {
+                if (this.gameObject.collider == null)
+                    return false;
+                return this.gameObject.collider.intersectsTransform(tran);
+            };
+            transform.prototype.checkImpact = function () {
+                var trans = new Array();
+                this.doImpact(this.scene.getRoot(), trans);
+                return trans;
+            };
+            transform.prototype.doImpact = function (tran, impacted) {
+                if (tran == this)
+                    return;
+                if (tran.gameObject != null && tran.gameObject.collider != null) {
+                    if (this.checkImpactTran(tran)) {
+                        impacted.push(tran);
+                    }
+                }
+                if (tran.children != null) {
+                    for (var i = 0; i < tran.children.length; i++) {
+                        this.doImpact(tran.children[i], impacted);
+                    }
+                }
+            };
+            transform.prototype.markDirty = function () {
+                this.dirty = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p = p.parent;
+                }
+            };
+            transform.prototype.markHaveComponent = function () {
+                this.hasComponent = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p.hasComponentChild = true;
+                    p = p.parent;
+                }
+            };
+            transform.prototype.markHaveRendererComp = function () {
+                this.hasRendererComp = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p.hasRendererCompChild = true;
+                    p = p.parent;
+                }
+            };
+            transform.prototype.updateTran = function (parentChange) {
+                if (this.dirtyChild == false && this.dirty == false && parentChange == false)
+                    return;
+                if (this.dirty) {
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                }
+                if (this.dirty || parentChange) {
+                    if (this.parent == null) {
+                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
+                    }
+                    else {
+                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
+                    }
+                    this.dirtyWorldDecompose = true;
+                    this.markAABBDirty();
+                }
+                if (this.children != null) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        this.children[i].updateTran(parentChange || this.dirty);
+                    }
+                }
+                this.dirty = false;
+                this.dirtyChild = false;
+                if (this.aabbdirty) {
+                    this.caclAABB();
+                    this.aabbdirty = false;
+                }
+            };
+            transform.prototype.updateWorldTran = function () {
+                var p = this.parent;
+                var dirtylist = [];
+                dirtylist.push(this);
+                while (p != null) {
+                    if (p.dirty)
+                        dirtylist.push(p);
+                    p = p.parent;
+                }
+                var top = dirtylist.pop();
+                top.updateTran(false);
+            };
+            transform.prototype.updateAABBChild = function () {
+                if (this.aabbchilddirty) {
+                    if (this.children != null) {
+                        for (var i = 0; i < this.children.length; i++) {
+                            this.children[i].updateAABBChild();
+                        }
+                    }
+                    this.caclAABBChild();
+                    this.aabbchilddirty = false;
+                }
+            };
+            Object.defineProperty(transform.prototype, "localPosition", {
+                get: function () {
+                    return this.localTranslate;
+                },
+                set: function (position) {
+                    this.localTranslate = position;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(transform.prototype, "localEulerAngles", {
+                get: function () {
+                    gd3d.math.quatToEulerAngles(this.localRotate, this._localEulerAngles);
+                    return this._localEulerAngles;
+                },
+                set: function (angle) {
+                    gd3d.math.quatFromEulerAngles(angle.x, angle.y, angle.z, this.localRotate);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform.prototype.getWorldTranslate = function () {
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
+                return this.worldTranslate;
+            };
+            transform.prototype.getWorldScale = function () {
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
+                return this.worldScale;
+            };
+            transform.prototype.getWorldRotate = function () {
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
+                return this.worldRotate;
+            };
+            transform.prototype.getLocalMatrix = function () {
+                if (this.dirty)
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                return this.localMatrix;
+            };
+            transform.prototype.getWorldMatrix = function () {
+                if (this.dirty) {
+                    if (!this.parent)
+                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
+                    else
+                        gd3d.math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
+                    return this.tempWorldMatrix;
+                }
+                else
+                    return this.worldMatrix;
+            };
+            transform.prototype.getForwardInWorld = function (out) {
+                var forward = gd3d.math.pool.new_vector3();
+                forward.x = 0;
+                forward.y = 0;
+                forward.z = 1;
+                gd3d.math.matrixTransformNormal(forward, this.getWorldMatrix(), out);
+                gd3d.math.vec3Normalize(out, out);
+                gd3d.math.pool.delete_vector3(forward);
+            };
+            transform.prototype.getRightInWorld = function (out) {
+                var right = gd3d.math.pool.new_vector3();
+                right.x = 1;
+                right.y = 0;
+                right.z = 0;
+                gd3d.math.matrixTransformNormal(right, this.getWorldMatrix(), out);
+                gd3d.math.vec3Normalize(out, out);
+                gd3d.math.pool.delete_vector3(right);
+            };
+            transform.prototype.getUpInWorld = function (out) {
+                var up = gd3d.math.pool.new_vector3();
+                up.x = 0;
+                up.y = 1;
+                up.z = 0;
+                gd3d.math.matrixTransformNormal(up, this.getWorldMatrix(), out);
+                gd3d.math.vec3Normalize(out, out);
+                gd3d.math.pool.delete_vector3(up);
+            };
+            transform.prototype.setWorldMatrix = function (mat) {
+                this.dirty = true;
+                this.updateWorldTran();
+                var pworld = gd3d.math.pool.new_matrix();
+                if (this.parent != null) {
+                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
+                }
+                else {
+                    gd3d.math.matrixMakeIdentity(pworld);
+                }
+                var invparentworld = gd3d.math.pool.new_matrix();
+                gd3d.math.matrixInverse(pworld, invparentworld);
+                gd3d.math.matrixClone(mat, this.worldMatrix);
+                this.dirtyWorldDecompose = true;
+                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
+                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
+                this.markDirty();
+                gd3d.math.pool.delete_matrix(pworld);
+                gd3d.math.pool.delete_matrix(invparentworld);
+            };
+            transform.prototype.setWorldPosition = function (pos) {
+                this.dirty = true;
+                this.updateWorldTran();
+                var pworld = gd3d.math.pool.new_matrix();
+                if (this.parent != null) {
+                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
+                }
+                else {
+                    gd3d.math.matrixMakeIdentity(pworld);
+                }
+                var invparentworld = gd3d.math.pool.new_matrix();
+                gd3d.math.matrixInverse(pworld, invparentworld);
+                this.worldMatrix.rawData[12] = pos.x;
+                this.worldMatrix.rawData[13] = pos.y;
+                this.worldMatrix.rawData[14] = pos.z;
+                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
+                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
+                this.markDirty();
+                gd3d.math.pool.delete_matrix(pworld);
+                gd3d.math.pool.delete_matrix(invparentworld);
+            };
+            transform.prototype.lookat = function (trans) {
+                this.dirty = true;
+                trans.updateWorldTran();
+                this.updateWorldTran();
+                var p0 = this.getWorldTranslate();
+                var p1 = trans.getWorldTranslate();
+                var d = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(p1, p0, d);
+                var quatworld = gd3d.math.pool.new_quaternion();
+                var quat = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatLookat(p0, p1, quatworld);
+                var quatworldCur = this.parent.getWorldRotate();
+                gd3d.math.quatInverse(quatworldCur, quat);
+                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
+                gd3d.math.pool.delete_vector3(d);
+                gd3d.math.pool.delete_quaternion(quatworld);
+                gd3d.math.pool.delete_quaternion(quat);
+            };
+            transform.prototype.lookatPoint = function (point) {
+                this.dirty = true;
+                this.updateWorldTran();
+                var p0 = this.getWorldTranslate();
+                var p1 = point;
+                var d = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(p1, p0, d);
+                var quatworld = gd3d.math.pool.new_quaternion();
+                var quat = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatLookat(p0, p1, quatworld);
+                var quatworldCur = this.parent.getWorldRotate();
+                gd3d.math.quatInverse(quatworldCur, quat);
+                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
+                this.markDirty();
+                gd3d.math.pool.delete_vector3(d);
+                gd3d.math.pool.delete_quaternion(quatworld);
+                gd3d.math.pool.delete_quaternion(quat);
+            };
+            Object.defineProperty(transform.prototype, "gameObject", {
+                get: function () {
+                    if (this._gameObject == null) {
+                        this._gameObject = new framework.gameObject();
+                        this._gameObject.transform = this;
+                    }
+                    return this._gameObject;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform.prototype.clone = function () {
+                return gd3d.io.cloneObj(this);
+            };
+            Object.defineProperty(transform.prototype, "beDispose", {
+                get: function () {
+                    return this._beDispose;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform.prototype.dispose = function () {
+                if (this._beDispose)
+                    return;
+                if (this.children) {
+                    for (var k in this.children) {
+                        this.children[k].dispose();
+                    }
+                    this.removeAllChild();
+                }
+                this._gameObject.dispose();
+                this._beDispose = true;
+                if (this.onDispose)
+                    this.onDispose();
+            };
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], transform.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("transform[]"),
+                __metadata("design:type", Array)
+            ], transform.prototype, "children", void 0);
+            __decorate([
+                gd3d.reflect.Field("quaternion"),
+                __metadata("design:type", gd3d.math.quaternion)
+            ], transform.prototype, "localRotate", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
+                __metadata("design:type", gd3d.math.vector3)
+            ], transform.prototype, "localTranslate", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
+                __metadata("design:type", gd3d.math.vector3)
+            ], transform.prototype, "localScale", void 0);
+            __decorate([
+                gd3d.reflect.Field("gameObject"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [])
+            ], transform.prototype, "gameObject", null);
+            transform = __decorate([
+                gd3d.reflect.SerializeType
+            ], transform);
+            return transform;
+        }());
+        framework.transform = transform;
+        var insID = (function () {
+            function insID() {
+                this.id = insID.next();
+            }
+            insID.next = function () {
+                var next = insID.idAll;
+                insID.idAll++;
+                return next;
+            };
+            insID.prototype.getInsID = function () {
+                return this.id;
+            };
+            insID.idAll = 1;
+            return insID;
+        }());
+        framework.insID = insID;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var boxcollider = (function () {
+            function boxcollider() {
+                this._colliderVisible = false;
+            }
+            boxcollider.prototype.getBound = function () {
+                return this.obb;
+            };
+            Object.defineProperty(boxcollider.prototype, "matrix", {
+                get: function () {
+                    if (this.gameObject)
+                        return this.gameObject.transform.getWorldMatrix();
+                    return new gd3d.math.matrix();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            boxcollider.prototype.start = function () {
+                this.filter = this.gameObject.getComponent("meshFilter");
+                this.build();
+            };
+            boxcollider.prototype.update = function (delta) {
+                if (this.obb) {
+                    this.obb.update(this.matrix);
+                }
+            };
+            Object.defineProperty(boxcollider.prototype, "colliderVisible", {
+                get: function () {
+                    return this._colliderVisible;
+                },
+                set: function (value) {
+                    this._colliderVisible = value;
+                    if (this.subTran) {
+                        this.subTran.gameObject.visible = this._colliderVisible;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            boxcollider.prototype.intersectsTransform = function (tran) {
+                if (tran.gameObject.collider == null)
+                    return false;
+                if (this.obb == null || tran.gameObject.collider.getBound() == null)
+                    return false;
+                var _obb = tran.gameObject.collider.getBound();
+                return this.obb.intersects(_obb);
+            };
+            boxcollider.prototype.build = function () {
+                this.obb = new framework.obb();
+                if (this.center && this.size) {
+                    this.obb.buildByCenterSize(this.center, this.size);
+                }
+                else {
+                    var minimum = new gd3d.math.vector3();
+                    var maximum = new gd3d.math.vector3();
+                    if (this.filter) {
+                        var meshdata = this.filter.getMeshOutput().data;
+                        gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                        gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                        for (var i = 0; i < meshdata.pos.length; i++) {
+                            gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
+                            gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                        }
+                        console.log("add obb filter " + minimum + "  " + maximum);
+                    }
+                    else {
+                        minimum.x = -1;
+                        minimum.y = -1;
+                        minimum.z = -1;
+                        maximum.x = 1;
+                        maximum.y = 1;
+                        maximum.z = 1;
+                    }
+                    this.obb.buildByMaxMin(minimum, maximum);
+                }
+                this.buildMesh();
+            };
+            boxcollider.prototype.buildMesh = function () {
+                this.subTran = new gd3d.framework.transform();
+                this.subTran.gameObject.hideFlags = framework.HideFlags.DontSave | framework.HideFlags.HideInHierarchy;
+                this.subTran.name = "boxcollider";
+                var mesh = this.subTran.gameObject.addComponent("meshFilter");
+                mesh.mesh = this.getColliderMesh();
+                var renderer = this.subTran.gameObject.addComponent("meshRenderer");
+                this.subTran.gameObject.visible = this._colliderVisible;
+                this.gameObject.transform.addChild(this.subTran);
+                this.gameObject.transform.markDirty();
+                this.subTran.markDirty();
+                this.gameObject.transform.updateWorldTran();
+            };
+            boxcollider.prototype.getColliderMesh = function () {
+                var _mesh = new framework.mesh();
+                _mesh.data = gd3d.render.meshData.genBoxByArray_Quad(this.obb.vectors);
+                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal;
+                var v32 = _mesh.data.genVertexDataArray(vf);
+                var i16 = _mesh.data.genIndexDataArrayQuad2Line();
+                var webgl = this.gameObject.getScene().webgl;
+                _mesh.glMesh = new gd3d.render.glMesh();
+                _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
+                _mesh.glMesh.uploadVertexData(webgl, v32);
+                _mesh.glMesh.addIndex(webgl, i16.length);
+                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
+                _mesh.submesh = [];
+                {
+                    var sm = new framework.subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = i16.length;
+                    sm.line = true;
+                    _mesh.submesh.push(sm);
+                }
+                return _mesh;
+            };
+            boxcollider.prototype.remove = function () {
+                if (this.subTran) {
+                    this.subTran.dispose();
+                }
+                if (this.obb) {
+                    this.obb.dispose();
+                }
+            };
+            boxcollider.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("vector3"),
+                __metadata("design:type", gd3d.math.vector3)
+            ], boxcollider.prototype, "center", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector3"),
+                __metadata("design:type", gd3d.math.vector3)
+            ], boxcollider.prototype, "size", void 0);
+            boxcollider = __decorate([
+                gd3d.reflect.nodeComponent,
+                gd3d.reflect.nodeBoxCollider
+            ], boxcollider);
+            return boxcollider;
+        }());
+        framework.boxcollider = boxcollider;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var meshcollider = (function () {
+            function meshcollider() {
+                this._colliderVisible = false;
+            }
+            meshcollider.prototype.getBound = function () {
+                return this.mesh;
+            };
+            meshcollider.prototype.start = function () {
+                var filter = this.gameObject.getComponent("meshFilter");
+                if (filter != null) {
+                    this.mesh = filter.getMeshOutput();
+                    this.buildMesh();
+                }
+            };
+            meshcollider.prototype.update = function (delta) {
+            };
+            Object.defineProperty(meshcollider.prototype, "colliderVisible", {
+                get: function () {
+                    return this._colliderVisible;
+                },
+                set: function (value) {
+                    this._colliderVisible = value;
+                    if (this.subTran) {
+                        this.subTran.gameObject.visible = this._colliderVisible;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            meshcollider.prototype.intersectsTransform = function (tran) {
+                return false;
+            };
+            meshcollider.prototype.buildMesh = function () {
+                this.subTran = new gd3d.framework.transform();
+                this.subTran.gameObject.hideFlags = framework.HideFlags.DontSave | framework.HideFlags.HideInHierarchy;
+                this.subTran.name = "meshcollider";
+                var mesh = this.subTran.gameObject.addComponent("meshFilter");
+                mesh.mesh = this.getColliderMesh();
+                var renderer = this.subTran.gameObject.addComponent("meshRenderer");
+                this.subTran.gameObject.visible = this._colliderVisible;
+                this.gameObject.transform.addChild(this.subTran);
+                this.gameObject.transform.markDirty();
+                this.subTran.markDirty();
+                this.gameObject.transform.updateWorldTran();
+            };
+            meshcollider.prototype.getColliderMesh = function () {
+                var _mesh = new framework.mesh();
+                _mesh.data = this.mesh.data;
+                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal;
+                var v32 = _mesh.data.genVertexDataArray(vf);
+                var i16 = _mesh.data.genIndexDataArrayTri2Line();
+                var webgl = this.gameObject.getScene().webgl;
+                _mesh.glMesh = new gd3d.render.glMesh();
+                _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
+                _mesh.glMesh.uploadVertexData(webgl, v32);
+                _mesh.glMesh.addIndex(webgl, i16.length);
+                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
+                _mesh.submesh = [];
+                {
+                    var sm = new framework.subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = i16.length;
+                    sm.line = true;
+                    _mesh.submesh.push(sm);
+                }
+                return _mesh;
+            };
+            meshcollider.prototype.remove = function () {
+                if (this.subTran) {
+                    this.subTran.dispose();
+                }
+            };
+            meshcollider.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], meshcollider.prototype, "_colliderVisible", void 0);
+            meshcollider = __decorate([
+                gd3d.reflect.nodeComponent,
+                gd3d.reflect.nodeMeshCollider
+            ], meshcollider);
+            return meshcollider;
+        }());
+        framework.meshcollider = meshcollider;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var meshFilter = (function () {
+            function meshFilter() {
+            }
+            meshFilter.prototype.start = function () {
+            };
+            meshFilter.prototype.update = function (delta) {
+            };
+            Object.defineProperty(meshFilter.prototype, "mesh", {
+                get: function () {
+                    return this._mesh;
+                },
+                set: function (mesh) {
+                    if (this._mesh != null) {
+                        this._mesh.unuse();
+                    }
+                    this._mesh = mesh;
+                    if (this._mesh != null) {
+                        this._mesh.use();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            meshFilter.prototype.getMeshOutput = function () {
+                return this._mesh;
+            };
+            meshFilter.prototype.remove = function () {
+                if (this.mesh)
+                    this.mesh.unuse(true);
+            };
+            meshFilter.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("mesh"),
+                gd3d.reflect.UIStyle("WidgetDragSelect"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.mesh])
+            ], meshFilter.prototype, "mesh", null);
+            meshFilter = __decorate([
+                gd3d.reflect.nodeComponent
+            ], meshFilter);
+            return meshFilter;
+        }());
+        framework.meshFilter = meshFilter;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var meshRenderer = (function () {
+            function meshRenderer() {
+                this.materials = [];
+                this.useGlobalLightMap = true;
+                this.lightmapIndex = -1;
+                this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
+                this.layer = framework.RenderLayerEnum.Common;
+                this.renderLayer = framework.CullingMask.default;
+                this.issetq = false;
+                this._queue = 0;
+            }
+            Object.defineProperty(meshRenderer.prototype, "queue", {
+                get: function () {
+                    return this._queue;
+                },
+                set: function (value) {
+                    this._queue = value;
+                    this.issetq = true;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            meshRenderer.prototype.start = function () {
+                this.filter = this.gameObject.getComponent("meshFilter");
+                this.refreshLayerAndQue();
+                if (this.lightmapIndex == -2) {
+                    this.useGlobalLightMap = false;
+                }
+            };
+            meshRenderer.prototype.refreshLayerAndQue = function () {
+                if (this.materials == null || this.materials.length == 0) {
+                    this.materials = [];
+                    var material_1 = new framework.material();
+                    material_1.use();
+                    this.materials.push(material_1);
+                    this.materials[0].setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
+                }
+                this.layer = this.materials[0].getLayer();
+                if (!this.issetq)
+                    this._queue = this.materials[0].getQueue();
+            };
+            meshRenderer.prototype.update = function (delta) {
+                if (this.materials != null && this.materials.length > 0) {
+                    var _mat = this.materials[0];
+                    if (_mat) {
+                        this.layer = _mat.getLayer();
+                        if (!this.issetq)
+                            this._queue = _mat.getQueue();
+                    }
+                }
+                if (this.filter == null) {
+                    this.filter = this.gameObject.getComponent("meshFilter");
+                }
+            };
+            meshRenderer.prototype.render = function (context, assetmgr, camera) {
+                context.updateLightMask(this.gameObject.layer);
+                context.updateModel(this.gameObject.transform);
+                if (this.filter != null) {
+                    var mesh = this.filter.getMeshOutput();
+                    if (mesh != null) {
+                        mesh.glMesh.bindVboBuffer(context.webgl);
+                        if (mesh.submesh != null) {
+                            for (var i = 0; i < mesh.submesh.length; i++) {
+                                var sm = mesh.submesh[i];
+                                var mid = mesh.submesh[i].matIndex;
+                                var usemat = this.materials[mid];
+                                var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
+                                if (this.lightmapIndex >= 0) {
+                                    drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
+                                    if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
+                                        context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
+                                        context.lightmapOffset = this.lightmapScaleOffset;
+                                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                                    }
+                                }
+                                else {
+                                    if (!this.useGlobalLightMap) {
+                                        drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
+                                        context.lightmapOffset = this.lightmapScaleOffset;
+                                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                                    }
+                                }
+                                if (this.gameObject.transform.scene.fog) {
+                                    context.fog = this.gameObject.transform.scene.fog;
+                                }
+                                if (usemat != null)
+                                    usemat.draw(context, mesh, sm, drawtype, this.useGlobalLightMap);
+                            }
+                        }
+                    }
+                }
+            };
+            meshRenderer.prototype.remove = function () {
+                this.materials.forEach(function (element) {
+                    if (element)
+                        element.unuse();
+                });
+                this.materials.length = 0;
+            };
+            meshRenderer.prototype.clone = function () {
+            };
+            __decorate([
+                gd3d.reflect.Field("material[]"),
+                __metadata("design:type", Array)
+            ], meshRenderer.prototype, "materials", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], meshRenderer.prototype, "lightmapIndex", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector4"),
+                __metadata("design:type", gd3d.math.vector4)
+            ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], meshRenderer.prototype, "layer", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], meshRenderer.prototype, "renderLayer", void 0);
+            meshRenderer = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent,
+                __metadata("design:paramtypes", [])
+            ], meshRenderer);
+            return meshRenderer;
+        }());
+        framework.meshRenderer = meshRenderer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var skinnedMeshRenderer = (function () {
+            function skinnedMeshRenderer() {
+                this.layer = framework.RenderLayerEnum.Common;
+                this.renderLayer = framework.CullingMask.default;
+                this.issetq = false;
+                this._queue = 0;
+                this.maxBoneCount = 0;
+                this._skintype = 0;
+                this._efficient = true;
+            }
+            skinnedMeshRenderer_1 = skinnedMeshRenderer;
+            Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
+                get: function () {
+                    return this._queue;
+                },
+                set: function (value) {
+                    this._queue = value;
+                    this.issetq = true;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(skinnedMeshRenderer.prototype, "player", {
+                get: function () {
+                    if (this._player == null) {
+                        this._player = this.gameObject.getComponentInParent("aniplayer");
+                    }
+                    return this._player;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(skinnedMeshRenderer.prototype, "mesh", {
+                get: function () {
+                    return this._mesh;
+                },
+                set: function (mesh) {
+                    if (this._mesh != null) {
+                        this._mesh.unuse();
+                    }
+                    this._mesh = mesh;
+                    if (this._mesh != null) {
+                        this._mesh.use();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            skinnedMeshRenderer.prototype.start = function () {
+            };
+            skinnedMeshRenderer.prototype.getMatByIndex = function (index) {
+                var data = this.mesh.data;
+                if (data.blendIndex[index].v0 >= this.maxBoneCount || data.blendIndex[index].v1 >= this.maxBoneCount || data.blendIndex[index].v2 >= this.maxBoneCount || data.blendIndex[index].v3 >= this.maxBoneCount) {
+                    return null;
+                }
+                var mat = new gd3d.math.matrix();
+                if (this._efficient) {
+                    var vec40r = gd3d.math.pool.new_vector4();
+                    var vec30p = gd3d.math.pool.new_vector3();
+                    vec40r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 0];
+                    vec40r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 1];
+                    vec40r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 2];
+                    vec40r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 3];
+                    vec30p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 4];
+                    vec30p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 5];
+                    vec30p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 6];
+                    var vec41r = gd3d.math.pool.new_vector4();
+                    var vec31p = gd3d.math.pool.new_vector3();
+                    vec41r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 0];
+                    vec41r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 1];
+                    vec41r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 2];
+                    vec41r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 3];
+                    vec31p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 4];
+                    vec31p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 5];
+                    vec31p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 6];
+                    var vec42r = gd3d.math.pool.new_vector4();
+                    var vec32p = gd3d.math.pool.new_vector3();
+                    vec42r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 0];
+                    vec42r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 1];
+                    vec42r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 2];
+                    vec42r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 3];
+                    vec32p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 4];
+                    vec32p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 5];
+                    vec32p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 6];
+                    var vec43r = gd3d.math.pool.new_vector4();
+                    var vec33p = gd3d.math.pool.new_vector3();
+                    vec43r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 0];
+                    vec43r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 1];
+                    vec43r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 2];
+                    vec43r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 3];
+                    vec33p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 4];
+                    vec33p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 5];
+                    vec33p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 6];
+                    var mat0 = gd3d.math.pool.new_matrix();
+                    var mat1 = gd3d.math.pool.new_matrix();
+                    var mat2 = gd3d.math.pool.new_matrix();
+                    var mat3 = gd3d.math.pool.new_matrix();
+                    gd3d.math.matrixMakeTransformRTS(vec30p, gd3d.math.pool.vector3_one, vec40r, mat0);
+                    gd3d.math.matrixMakeTransformRTS(vec31p, gd3d.math.pool.vector3_one, vec41r, mat1);
+                    gd3d.math.matrixMakeTransformRTS(vec32p, gd3d.math.pool.vector3_one, vec42r, mat2);
+                    gd3d.math.matrixMakeTransformRTS(vec33p, gd3d.math.pool.vector3_one, vec43r, mat3);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v0, mat0);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v1, mat1);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v2, mat2);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v3, mat3);
+                    gd3d.math.matrixAdd(mat0, mat1, mat);
+                    gd3d.math.matrixAdd(mat, mat2, mat);
+                    gd3d.math.matrixAdd(mat, mat3, mat);
+                    gd3d.math.pool.delete_vector4(vec40r);
+                    gd3d.math.pool.delete_vector4(vec41r);
+                    gd3d.math.pool.delete_vector4(vec42r);
+                    gd3d.math.pool.delete_vector4(vec43r);
+                    gd3d.math.pool.delete_vector3(vec30p);
+                    gd3d.math.pool.delete_vector3(vec31p);
+                    gd3d.math.pool.delete_vector3(vec32p);
+                    gd3d.math.pool.delete_vector3(vec33p);
+                    gd3d.math.pool.delete_matrix(mat0);
+                    gd3d.math.pool.delete_matrix(mat1);
+                    gd3d.math.pool.delete_matrix(mat2);
+                    gd3d.math.pool.delete_matrix(mat3);
+                }
+                else {
+                    var mat0 = gd3d.math.pool.new_matrix();
+                    mat0.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v0, 16 * data.blendIndex[index].v0 + 16);
+                    var mat1 = gd3d.math.pool.new_matrix();
+                    mat1.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v1, 16 * data.blendIndex[index].v1 + 16);
+                    var mat2 = gd3d.math.pool.new_matrix();
+                    mat2.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v2, 16 * data.blendIndex[index].v2 + 16);
+                    var mat3 = gd3d.math.pool.new_matrix();
+                    mat3.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v3, 16 * data.blendIndex[index].v3 + 16);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v0, mat0);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v1, mat1);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v2, mat2);
+                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v3, mat3);
+                    gd3d.math.matrixAdd(mat0, mat1, mat);
+                    gd3d.math.matrixAdd(mat, mat2, mat);
+                    gd3d.math.matrixAdd(mat, mat3, mat);
+                    gd3d.math.pool.delete_matrix(mat0);
+                    gd3d.math.pool.delete_matrix(mat1);
+                    gd3d.math.pool.delete_matrix(mat2);
+                    gd3d.math.pool.delete_matrix(mat3);
+                }
+                return mat;
+            };
+            skinnedMeshRenderer.prototype.intersects = function (ray) {
+                var mvpmat = this.player.gameObject.transform.getWorldMatrix();
+                var pickinfo = null;
+                var data = this.mesh.data;
+                for (var i = 0; i < this.mesh.submesh.length; i++) {
+                    var submesh = this.mesh.submesh[i];
+                    var t0 = gd3d.math.pool.new_vector3();
+                    var t1 = gd3d.math.pool.new_vector3();
+                    var t2 = gd3d.math.pool.new_vector3();
+                    for (var index = submesh.start; index < submesh.size; index += 3) {
+                        var verindex0 = data.trisindex[index];
+                        var verindex1 = data.trisindex[index + 1];
+                        var verindex2 = data.trisindex[index + 2];
+                        var p0 = data.pos[verindex0];
+                        var p1 = data.pos[verindex1];
+                        var p2 = data.pos[verindex2];
+                        var mat0 = this.getMatByIndex(verindex0);
+                        var mat1 = this.getMatByIndex(verindex1);
+                        var mat2 = this.getMatByIndex(verindex2);
+                        if (mat0 == null || mat1 == null || mat2 == null)
+                            continue;
+                        var mat00 = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
+                        var mat11 = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
+                        var mat22 = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
+                        gd3d.math.matrixTransformVector3(p0, mat00, t0);
+                        gd3d.math.matrixTransformVector3(p1, mat11, t1);
+                        gd3d.math.matrixTransformVector3(p2, mat22, t2);
+                        var result = ray.intersectsTriangle(t0, t1, t2);
+                        if (result) {
+                            if (result.distance < 0)
+                                continue;
+                            if (!pickinfo || pickinfo.distance > result.distance) {
+                                pickinfo = result;
+                                pickinfo.faceId = index / 3;
+                                pickinfo.subMeshId = i;
+                                var tdir = gd3d.math.pool.new_vector3();
+                                gd3d.math.vec3ScaleByNum(ray.direction, result.distance, tdir);
+                                gd3d.math.vec3Add(ray.origin, tdir, pickinfo.hitposition);
+                            }
+                        }
+                    }
+                    gd3d.math.pool.delete_vector3(t0);
+                    gd3d.math.pool.delete_vector3(t1);
+                    gd3d.math.pool.delete_vector3(t2);
+                }
+                return pickinfo;
+            };
+            skinnedMeshRenderer.prototype.update = function (delta) {
+                if (this._skeletonMatrixData == null) {
+                    this._skintype = this.useBoneShader(this.materials[0]);
+                    if (this._skintype == 1) {
+                        this.maxBoneCount = 24;
+                        this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
+                        this._efficient = false;
+                    }
+                    else if (this._skintype == 2) {
+                        this.maxBoneCount = 55;
+                        this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
+                        this._efficient = true;
+                    }
+                }
+                if (this.materials != null && this.materials.length > 0) {
+                    var _mat = this.materials[0];
+                    if (_mat) {
+                        this.layer = _mat.getLayer();
+                        if (!this.issetq)
+                            this._queue = _mat.getQueue();
+                    }
+                }
+                if (this.player != null) {
+                    if (this.player.isCache && !this.player.mix) {
+                        var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
+                        var data = skinnedMeshRenderer_1.dataCaches[cacheKey];
+                        if (!data) {
+                            var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
+                            if (_cachePlayer) {
+                                var baseSize = this._efficient ? 8 : 16;
+                                data = new Float32Array(this.maxBoneCount * baseSize);
+                                _cachePlayer.fillPoseData(data, this.bones, this._efficient);
+                                skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
+                                this.cacheData = data;
+                                return;
+                            }
+                        }
+                        else {
+                            this.cacheData = data;
+                            return;
+                        }
+                    }
+                    this.cacheData = null;
+                    if (this._skeletonMatrixData != null) {
+                        this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
+                    }
+                }
+            };
+            skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
+                if (this.player != null) {
+                    context.updateLightMask(this.gameObject.layer);
+                    context.updateModel(this.player.gameObject.transform);
+                }
+                for (var i_3 = 0; i_3 < this.materials.length; i_3++) {
+                    if (this.materials[i_3] == null)
+                        continue;
+                    if (this.cacheData != null && this._skintype > 0) {
+                        if (this._efficient) {
+                            context.vec4_bones = this.cacheData;
+                        }
+                        else {
+                            context.matrix_bones = this.cacheData;
+                        }
+                        continue;
+                    }
+                    if (this._skeletonMatrixData != null && this._skintype > 0) {
+                        if (this._efficient) {
+                            context.vec4_bones = this._skeletonMatrixData;
+                        }
+                        else {
+                            context.matrix_bones = this._skeletonMatrixData;
+                        }
+                    }
+                }
+                if (this._mesh != null) {
+                    if (this._mesh != null) {
+                        this._mesh.glMesh.bindVboBuffer(context.webgl);
+                        if (this._mesh.submesh != null) {
+                            for (var i = 0; i < this._mesh.submesh.length; i++) {
+                                var sm = this._mesh.submesh[i];
+                                var mid = this._mesh.submesh[i].matIndex;
+                                var usemat = this.materials[mid];
+                                if (usemat != null) {
+                                    if (this.gameObject.transform.scene.fog) {
+                                        context.fog = this.gameObject.transform.scene.fog;
+                                        usemat.draw(context, this._mesh, sm, "skin_fog");
+                                    }
+                                    else {
+                                        usemat.draw(context, this._mesh, sm, "skin");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            skinnedMeshRenderer.prototype.remove = function () {
+                this.materials.forEach(function (element) {
+                    if (element)
+                        element.unuse();
+                });
+                if (this.mesh)
+                    this.mesh.unuse(true);
+                this.bones.length = 0;
+            };
+            skinnedMeshRenderer.prototype.clone = function () {
+            };
+            skinnedMeshRenderer.prototype.useBoneShader = function (mat) {
+                var matpasses = mat.getShader().passes["skin"];
+                if (matpasses == null || matpasses.length == 0)
+                    return 0;
+                if (matpasses[0].mapuniforms["glstate_vec4_bones"] != null)
+                    return 2;
+                else if (matpasses[0].mapuniforms["glstate_matrix_bones"] != null)
+                    return 1;
+                return 0;
+            };
+            skinnedMeshRenderer.dataCaches = [];
+            __decorate([
+                gd3d.reflect.Field("material[]"),
+                __metadata("design:type", Array)
+            ], skinnedMeshRenderer.prototype, "materials", void 0);
+            __decorate([
+                gd3d.reflect.Field("mesh"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.mesh])
+            ], skinnedMeshRenderer.prototype, "mesh", null);
+            __decorate([
+                gd3d.reflect.Field("transform[]"),
+                __metadata("design:type", Array)
+            ], skinnedMeshRenderer.prototype, "bones", void 0);
+            __decorate([
+                gd3d.reflect.Field("transform"),
+                __metadata("design:type", framework.transform)
+            ], skinnedMeshRenderer.prototype, "rootBone", void 0);
+            skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent,
+                __metadata("design:paramtypes", [])
+            ], skinnedMeshRenderer);
+            return skinnedMeshRenderer;
+            var skinnedMeshRenderer_1;
+        }());
+        framework.skinnedMeshRenderer = skinnedMeshRenderer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var WrapMode;
+        (function (WrapMode) {
+            WrapMode[WrapMode["Default"] = 0] = "Default";
+            WrapMode[WrapMode["Once"] = 1] = "Once";
+            WrapMode[WrapMode["Clamp"] = 1] = "Clamp";
+            WrapMode[WrapMode["Loop"] = 2] = "Loop";
+            WrapMode[WrapMode["PingPong"] = 4] = "PingPong";
+            WrapMode[WrapMode["ClampForever"] = 8] = "ClampForever";
+        })(WrapMode = framework.WrapMode || (framework.WrapMode = {}));
+        var keyFrameAniClip = (function () {
+            function keyFrameAniClip(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                this.length = 0;
+                this.frameRate = 0;
+                this.curves = [];
+                if (!assetName) {
+                    assetName = "keyFrameAniClip_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            keyFrameAniClip.prototype.getName = function () {
+                return this.name.getText();
+            };
+            keyFrameAniClip.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            keyFrameAniClip.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            keyFrameAniClip.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            keyFrameAniClip.prototype.dispose = function () {
+                this.curves.length = 0;
+            };
+            keyFrameAniClip.prototype.caclByteLength = function () {
+                var total = 0;
+                return total;
+            };
+            keyFrameAniClip.prototype.Parse = function (jsonStr) {
+                var obj = JSON.parse(jsonStr);
+                var tag = obj["tag"];
+                this.length = obj["length"];
+                this._wrapMode = obj["wrapMode"];
+                this.frameRate = obj["frameRate"];
+                var curves_o = obj["curves"];
+                for (var i = 0; i < curves_o.length; i++) {
+                    var curve = new AnimationCurve();
+                    var curve_o = curves_o[1];
+                    var kfs_o = curve_o["keyFrames"];
+                    curve.path = curve_o["path"];
+                    curve.propertyName = curve_o["propertyName"];
+                    curve.type = curve_o["type"];
+                    for (var j = 0; j < kfs_o.length; j++) {
+                        var kf_o = kfs_o[j];
+                        var kf = new keyFrame();
+                        kf.inTangent = kf_o["inTangent"];
+                        kf.outTangent = kf_o["outTangent"];
+                        kf.tangentMode = kf_o["tangentMode"];
+                        kf.time = kf_o["time"];
+                        kf.value = kf_o["value"];
+                        curve.keyFrames.push(kf);
+                    }
+                    this.curves.push(curve);
+                }
+                kFAniClipUtil.typePair;
+                debugger;
+            };
+            Object.defineProperty(keyFrameAniClip.prototype, "wrapMode", {
+                get: function () { return this._wrapMode; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniClip.prototype, "fps", {
+                get: function () {
+                    return this.frameRate;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniClip.prototype, "loop", {
+                get: function () { return this.loop; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(keyFrameAniClip.prototype, "time", {
+                get: function () {
+                    return this.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniClip.prototype, "frameCount", {
+                get: function () { return Math.floor(this.frameRate * this.length); },
+                enumerable: true,
+                configurable: true
+            });
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], keyFrameAniClip.prototype, "name", void 0);
+            keyFrameAniClip = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], keyFrameAniClip);
+            return keyFrameAniClip;
+        }());
+        framework.keyFrameAniClip = keyFrameAniClip;
+        var AnimationCurve = (function () {
+            function AnimationCurve() {
+                this.keyFrames = [];
+            }
+            return AnimationCurve;
+        }());
+        framework.AnimationCurve = AnimationCurve;
+        var keyFrame = (function () {
+            function keyFrame() {
+            }
+            return keyFrame;
+        }());
+        framework.keyFrame = keyFrame;
+        var kFAniClipUtil = (function () {
+            function kFAniClipUtil() {
+            }
+            Object.defineProperty(kFAniClipUtil, "typePair", {
+                get: function () {
+                    if (!kFAniClipUtil._typePair)
+                        kFAniClipUtil._typePair = kFAniClipUtil.regType();
+                    return kFAniClipUtil._typePair;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            kFAniClipUtil.isUnityExp = function (tag) {
+                if (framework.StringUtil.isNullOrEmptyObject(tag))
+                    return false;
+                return tag.indexOf("unity") != -1;
+            };
+            kFAniClipUtil.converUnityType = function (tyep) {
+                var result = "";
+                if (framework.StringUtil.isNullOrEmptyObject(tyep))
+                    return result;
+                if (tyep.indexOf("UnityEngine") == -1)
+                    return tyep;
+                var strs = tyep.split(".");
+                if (strs.length < 1 || !strs[strs.length - 1])
+                    return result;
+                var tempT = strs[strs.length - 1];
+                switch (tempT) {
+                    case "Transform":
+                        result = "transform";
+                        break;
+                    case "BoxCollider":
+                        result = "boxcollider";
+                        break;
+                    case "MeshRenderer":
+                        result = "meshRenderer";
+                        break;
+                    case "MeshFilter":
+                        result = "meshFilter";
+                        break;
+                    case "SkinnedMeshRenderer":
+                        result = "skinnedMeshRenderer";
+                        break;
+                }
+                return result;
+            };
+            kFAniClipUtil.converUnityTypeProperty = function (tyep, propertyName) {
+                var result = propertyName;
+                if (framework.StringUtil.isNullOrEmptyObject(propertyName))
+                    return "";
+                return result;
+            };
+            kFAniClipUtil.regType = function () {
+                var result = {};
+                result["Transform"] = { "type": framework.transform["name"] };
+                result["BoxCollider"] = { "type": framework.boxcollider["name"] };
+                result["MeshRenderer"] = { "type": framework.meshRenderer["name"] };
+                result["MeshFilter"] = { "type": framework.meshFilter["name"] };
+                result["SkinnedMeshRenderer"] = { "type": framework.skinnedMeshRenderer["name"] };
+                kFAniClipUtil.regProperty(result);
+                return result;
+            };
+            kFAniClipUtil.regProperty = function (obj) {
+            };
+            kFAniClipUtil._typePair = kFAniClipUtil.regType();
+            return kFAniClipUtil;
+        }());
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var keyframeAnimationPathAsset = (function () {
             function keyframeAnimationPathAsset(assetName) {
                 if (assetName === void 0) { assetName = null; }
@@ -8404,7 +9940,7 @@ var gd3d;
                 this.name = new framework.constText(assetName);
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
             }
-            material_1 = material;
+            material_2 = material;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -8698,7 +10234,7 @@ var gd3d;
                 }
             };
             material.prototype.clone = function () {
-                var mat = new material_1(this.getName());
+                var mat = new material_2(this.getName());
                 mat.setShader(this.shader);
                 for (var i in this.statedMapUniforms) {
                     var _uniformType = this.statedMapUniforms[i].type;
@@ -8758,12 +10294,12 @@ var gd3d;
                 gd3d.reflect.Field("shader"),
                 __metadata("design:type", framework.shader)
             ], material.prototype, "shader", void 0);
-            material = material_1 = __decorate([
+            material = material_2 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
             ], material);
             return material;
-            var material_1;
+            var material_2;
         }());
         framework.material = material;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -10928,150 +12464,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var boxcollider = (function () {
-            function boxcollider() {
-                this._colliderVisible = false;
-            }
-            boxcollider.prototype.getBound = function () {
-                return this.obb;
-            };
-            Object.defineProperty(boxcollider.prototype, "matrix", {
-                get: function () {
-                    if (this.gameObject)
-                        return this.gameObject.transform.getWorldMatrix();
-                    return new gd3d.math.matrix();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            boxcollider.prototype.start = function () {
-                this.filter = this.gameObject.getComponent("meshFilter");
-                this.build();
-            };
-            boxcollider.prototype.update = function (delta) {
-                if (this.obb) {
-                    this.obb.update(this.matrix);
-                }
-            };
-            Object.defineProperty(boxcollider.prototype, "colliderVisible", {
-                get: function () {
-                    return this._colliderVisible;
-                },
-                set: function (value) {
-                    this._colliderVisible = value;
-                    if (this.subTran) {
-                        this.subTran.gameObject.visible = this._colliderVisible;
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            boxcollider.prototype.intersectsTransform = function (tran) {
-                if (tran.gameObject.collider == null)
-                    return false;
-                if (this.obb == null || tran.gameObject.collider.getBound() == null)
-                    return false;
-                var _obb = tran.gameObject.collider.getBound();
-                return this.obb.intersects(_obb);
-            };
-            boxcollider.prototype.build = function () {
-                this.obb = new framework.obb();
-                if (this.center && this.size) {
-                    this.obb.buildByCenterSize(this.center, this.size);
-                }
-                else {
-                    var minimum = new gd3d.math.vector3();
-                    var maximum = new gd3d.math.vector3();
-                    if (this.filter) {
-                        var meshdata = this.filter.getMeshOutput().data;
-                        gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                        gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                        for (var i = 0; i < meshdata.pos.length; i++) {
-                            gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
-                            gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
-                        }
-                        console.log("add obb filter " + minimum + "  " + maximum);
-                    }
-                    else {
-                        minimum.x = -1;
-                        minimum.y = -1;
-                        minimum.z = -1;
-                        maximum.x = 1;
-                        maximum.y = 1;
-                        maximum.z = 1;
-                    }
-                    this.obb.buildByMaxMin(minimum, maximum);
-                }
-                this.buildMesh();
-            };
-            boxcollider.prototype.buildMesh = function () {
-                this.subTran = new gd3d.framework.transform();
-                this.subTran.gameObject.hideFlags = framework.HideFlags.DontSave | framework.HideFlags.HideInHierarchy;
-                this.subTran.name = "boxcollider";
-                var mesh = this.subTran.gameObject.addComponent("meshFilter");
-                mesh.mesh = this.getColliderMesh();
-                var renderer = this.subTran.gameObject.addComponent("meshRenderer");
-                this.subTran.gameObject.visible = this._colliderVisible;
-                this.gameObject.transform.addChild(this.subTran);
-                this.gameObject.transform.markDirty();
-                this.subTran.markDirty();
-                this.gameObject.transform.updateWorldTran();
-            };
-            boxcollider.prototype.getColliderMesh = function () {
-                var _mesh = new framework.mesh();
-                _mesh.data = gd3d.render.meshData.genBoxByArray_Quad(this.obb.vectors);
-                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal;
-                var v32 = _mesh.data.genVertexDataArray(vf);
-                var i16 = _mesh.data.genIndexDataArrayQuad2Line();
-                var webgl = this.gameObject.getScene().webgl;
-                _mesh.glMesh = new gd3d.render.glMesh();
-                _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-                _mesh.glMesh.uploadVertexData(webgl, v32);
-                _mesh.glMesh.addIndex(webgl, i16.length);
-                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
-                _mesh.submesh = [];
-                {
-                    var sm = new framework.subMeshInfo();
-                    sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
-                    sm.start = 0;
-                    sm.size = i16.length;
-                    sm.line = true;
-                    _mesh.submesh.push(sm);
-                }
-                return _mesh;
-            };
-            boxcollider.prototype.remove = function () {
-                if (this.subTran) {
-                    this.subTran.dispose();
-                }
-                if (this.obb) {
-                    this.obb.dispose();
-                }
-            };
-            boxcollider.prototype.clone = function () {
-            };
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], boxcollider.prototype, "center", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", gd3d.math.vector3)
-            ], boxcollider.prototype, "size", void 0);
-            boxcollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeBoxCollider
-            ], boxcollider);
-            return boxcollider;
-        }());
-        framework.boxcollider = boxcollider;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var cameraPostQueue_Depth = (function () {
             function cameraPostQueue_Depth() {
                 this.renderTarget = null;
@@ -11995,9 +13387,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_3 = 0; i_3 < this.matDataGroups.length; i_3++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_3], _initFrameData.attrsData.mat)) {
-                            index = i_3;
+                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
+                            index = i_4;
                             break;
                         }
                     }
@@ -12055,41 +13447,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_4 = 0; i_4 < vertexCount; i_4++) {
+                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_4 * vertexSize + 0];
-                        vertex.y = vertexArr[i_4 * vertexSize + 1];
-                        vertex.z = vertexArr[i_4 * vertexSize + 2];
+                        vertex.x = vertexArr[i_5 * vertexSize + 0];
+                        vertex.y = vertexArr[i_5 * vertexSize + 1];
+                        vertex.z = vertexArr[i_5 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 3] = vertexArr[i_4 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 4] = vertexArr[i_4 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 5] = vertexArr[i_4 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 6] = vertexArr[i_4 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 7] = vertexArr[i_4 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 8] = vertexArr[i_4 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_4 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 13] = vertexArr[i_4 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 14] = vertexArr[i_4 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -12250,11 +13642,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_5 = this.delayElements.length - 1; i_5 >= 0; i_5--) {
-                        var data = this.delayElements[i_5];
+                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
+                        var data = this.delayElements[i_6];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_5]);
-                            this.delayElements.splice(i_5, 1);
+                            this.addElement(this.delayElements[i_6]);
+                            this.delayElements.splice(i_6, 1);
                         }
                     }
                 }
@@ -12841,628 +14233,6 @@ var gd3d;
             return light;
         }());
         framework.light = light;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var meshcollider = (function () {
-            function meshcollider() {
-                this._colliderVisible = false;
-            }
-            meshcollider.prototype.getBound = function () {
-                return this.mesh;
-            };
-            meshcollider.prototype.start = function () {
-                var filter = this.gameObject.getComponent("meshFilter");
-                if (filter != null) {
-                    this.mesh = filter.getMeshOutput();
-                    this.buildMesh();
-                }
-            };
-            meshcollider.prototype.update = function (delta) {
-            };
-            Object.defineProperty(meshcollider.prototype, "colliderVisible", {
-                get: function () {
-                    return this._colliderVisible;
-                },
-                set: function (value) {
-                    this._colliderVisible = value;
-                    if (this.subTran) {
-                        this.subTran.gameObject.visible = this._colliderVisible;
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            meshcollider.prototype.intersectsTransform = function (tran) {
-                return false;
-            };
-            meshcollider.prototype.buildMesh = function () {
-                this.subTran = new gd3d.framework.transform();
-                this.subTran.gameObject.hideFlags = framework.HideFlags.DontSave | framework.HideFlags.HideInHierarchy;
-                this.subTran.name = "meshcollider";
-                var mesh = this.subTran.gameObject.addComponent("meshFilter");
-                mesh.mesh = this.getColliderMesh();
-                var renderer = this.subTran.gameObject.addComponent("meshRenderer");
-                this.subTran.gameObject.visible = this._colliderVisible;
-                this.gameObject.transform.addChild(this.subTran);
-                this.gameObject.transform.markDirty();
-                this.subTran.markDirty();
-                this.gameObject.transform.updateWorldTran();
-            };
-            meshcollider.prototype.getColliderMesh = function () {
-                var _mesh = new framework.mesh();
-                _mesh.data = this.mesh.data;
-                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal;
-                var v32 = _mesh.data.genVertexDataArray(vf);
-                var i16 = _mesh.data.genIndexDataArrayTri2Line();
-                var webgl = this.gameObject.getScene().webgl;
-                _mesh.glMesh = new gd3d.render.glMesh();
-                _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
-                _mesh.glMesh.uploadVertexData(webgl, v32);
-                _mesh.glMesh.addIndex(webgl, i16.length);
-                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
-                _mesh.submesh = [];
-                {
-                    var sm = new framework.subMeshInfo();
-                    sm.matIndex = 0;
-                    sm.useVertexIndex = 0;
-                    sm.start = 0;
-                    sm.size = i16.length;
-                    sm.line = true;
-                    _mesh.submesh.push(sm);
-                }
-                return _mesh;
-            };
-            meshcollider.prototype.remove = function () {
-                if (this.subTran) {
-                    this.subTran.dispose();
-                }
-            };
-            meshcollider.prototype.clone = function () {
-            };
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], meshcollider.prototype, "_colliderVisible", void 0);
-            meshcollider = __decorate([
-                gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeMeshCollider
-            ], meshcollider);
-            return meshcollider;
-        }());
-        framework.meshcollider = meshcollider;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var meshFilter = (function () {
-            function meshFilter() {
-            }
-            meshFilter.prototype.start = function () {
-            };
-            meshFilter.prototype.update = function (delta) {
-            };
-            Object.defineProperty(meshFilter.prototype, "mesh", {
-                get: function () {
-                    return this._mesh;
-                },
-                set: function (mesh) {
-                    if (this._mesh != null) {
-                        this._mesh.unuse();
-                    }
-                    this._mesh = mesh;
-                    if (this._mesh != null) {
-                        this._mesh.use();
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            meshFilter.prototype.getMeshOutput = function () {
-                return this._mesh;
-            };
-            meshFilter.prototype.remove = function () {
-                if (this.mesh)
-                    this.mesh.unuse(true);
-            };
-            meshFilter.prototype.clone = function () {
-            };
-            __decorate([
-                gd3d.reflect.Field("mesh"),
-                gd3d.reflect.UIStyle("WidgetDragSelect"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
-            ], meshFilter.prototype, "mesh", null);
-            meshFilter = __decorate([
-                gd3d.reflect.nodeComponent
-            ], meshFilter);
-            return meshFilter;
-        }());
-        framework.meshFilter = meshFilter;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var meshRenderer = (function () {
-            function meshRenderer() {
-                this.materials = [];
-                this.useGlobalLightMap = true;
-                this.lightmapIndex = -1;
-                this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
-                this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
-                this.issetq = false;
-                this._queue = 0;
-            }
-            Object.defineProperty(meshRenderer.prototype, "queue", {
-                get: function () {
-                    return this._queue;
-                },
-                set: function (value) {
-                    this._queue = value;
-                    this.issetq = true;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            meshRenderer.prototype.start = function () {
-                this.filter = this.gameObject.getComponent("meshFilter");
-                this.refreshLayerAndQue();
-                if (this.lightmapIndex == -2) {
-                    this.useGlobalLightMap = false;
-                }
-            };
-            meshRenderer.prototype.refreshLayerAndQue = function () {
-                if (this.materials == null || this.materials.length == 0) {
-                    this.materials = [];
-                    var material_2 = new framework.material();
-                    material_2.use();
-                    this.materials.push(material_2);
-                    this.materials[0].setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
-                }
-                this.layer = this.materials[0].getLayer();
-                if (!this.issetq)
-                    this._queue = this.materials[0].getQueue();
-            };
-            meshRenderer.prototype.update = function (delta) {
-                if (this.materials != null && this.materials.length > 0) {
-                    var _mat = this.materials[0];
-                    if (_mat) {
-                        this.layer = _mat.getLayer();
-                        if (!this.issetq)
-                            this._queue = _mat.getQueue();
-                    }
-                }
-                if (this.filter == null) {
-                    this.filter = this.gameObject.getComponent("meshFilter");
-                }
-            };
-            meshRenderer.prototype.render = function (context, assetmgr, camera) {
-                context.updateLightMask(this.gameObject.layer);
-                context.updateModel(this.gameObject.transform);
-                if (this.filter != null) {
-                    var mesh = this.filter.getMeshOutput();
-                    if (mesh != null) {
-                        mesh.glMesh.bindVboBuffer(context.webgl);
-                        if (mesh.submesh != null) {
-                            for (var i = 0; i < mesh.submesh.length; i++) {
-                                var sm = mesh.submesh[i];
-                                var mid = mesh.submesh[i].matIndex;
-                                var usemat = this.materials[mid];
-                                var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                                if (this.lightmapIndex >= 0) {
-                                    drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
-                                    if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
-                                        context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
-                                        context.lightmapOffset = this.lightmapScaleOffset;
-                                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                                    }
-                                }
-                                else {
-                                    if (!this.useGlobalLightMap) {
-                                        drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
-                                        context.lightmapOffset = this.lightmapScaleOffset;
-                                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                                    }
-                                }
-                                if (this.gameObject.transform.scene.fog) {
-                                    context.fog = this.gameObject.transform.scene.fog;
-                                }
-                                if (usemat != null)
-                                    usemat.draw(context, mesh, sm, drawtype, this.useGlobalLightMap);
-                            }
-                        }
-                    }
-                }
-            };
-            meshRenderer.prototype.remove = function () {
-                this.materials.forEach(function (element) {
-                    if (element)
-                        element.unuse();
-                });
-                this.materials.length = 0;
-            };
-            meshRenderer.prototype.clone = function () {
-            };
-            __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
-            ], meshRenderer.prototype, "materials", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], meshRenderer.prototype, "lightmapIndex", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector4"),
-                __metadata("design:type", gd3d.math.vector4)
-            ], meshRenderer.prototype, "lightmapScaleOffset", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], meshRenderer.prototype, "layer", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], meshRenderer.prototype, "renderLayer", void 0);
-            meshRenderer = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], meshRenderer);
-            return meshRenderer;
-        }());
-        framework.meshRenderer = meshRenderer;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var skinnedMeshRenderer = (function () {
-            function skinnedMeshRenderer() {
-                this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
-                this.issetq = false;
-                this._queue = 0;
-                this.maxBoneCount = 0;
-                this._skintype = 0;
-                this._efficient = true;
-            }
-            skinnedMeshRenderer_1 = skinnedMeshRenderer;
-            Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
-                get: function () {
-                    return this._queue;
-                },
-                set: function (value) {
-                    this._queue = value;
-                    this.issetq = true;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(skinnedMeshRenderer.prototype, "player", {
-                get: function () {
-                    if (this._player == null) {
-                        this._player = this.gameObject.getComponentInParent("aniplayer");
-                    }
-                    return this._player;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(skinnedMeshRenderer.prototype, "mesh", {
-                get: function () {
-                    return this._mesh;
-                },
-                set: function (mesh) {
-                    if (this._mesh != null) {
-                        this._mesh.unuse();
-                    }
-                    this._mesh = mesh;
-                    if (this._mesh != null) {
-                        this._mesh.use();
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            skinnedMeshRenderer.prototype.start = function () {
-            };
-            skinnedMeshRenderer.prototype.getMatByIndex = function (index) {
-                var data = this.mesh.data;
-                if (data.blendIndex[index].v0 >= this.maxBoneCount || data.blendIndex[index].v1 >= this.maxBoneCount || data.blendIndex[index].v2 >= this.maxBoneCount || data.blendIndex[index].v3 >= this.maxBoneCount) {
-                    return null;
-                }
-                var mat = new gd3d.math.matrix();
-                if (this._efficient) {
-                    var vec40r = gd3d.math.pool.new_vector4();
-                    var vec30p = gd3d.math.pool.new_vector3();
-                    vec40r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 0];
-                    vec40r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 1];
-                    vec40r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 2];
-                    vec40r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 3];
-                    vec30p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 4];
-                    vec30p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 5];
-                    vec30p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 6];
-                    var vec41r = gd3d.math.pool.new_vector4();
-                    var vec31p = gd3d.math.pool.new_vector3();
-                    vec41r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 0];
-                    vec41r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 1];
-                    vec41r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 2];
-                    vec41r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 3];
-                    vec31p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 4];
-                    vec31p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 5];
-                    vec31p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 6];
-                    var vec42r = gd3d.math.pool.new_vector4();
-                    var vec32p = gd3d.math.pool.new_vector3();
-                    vec42r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 0];
-                    vec42r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 1];
-                    vec42r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 2];
-                    vec42r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 3];
-                    vec32p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 4];
-                    vec32p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 5];
-                    vec32p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 6];
-                    var vec43r = gd3d.math.pool.new_vector4();
-                    var vec33p = gd3d.math.pool.new_vector3();
-                    vec43r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 0];
-                    vec43r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 1];
-                    vec43r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 2];
-                    vec43r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 3];
-                    vec33p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 4];
-                    vec33p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 5];
-                    vec33p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 6];
-                    var mat0 = gd3d.math.pool.new_matrix();
-                    var mat1 = gd3d.math.pool.new_matrix();
-                    var mat2 = gd3d.math.pool.new_matrix();
-                    var mat3 = gd3d.math.pool.new_matrix();
-                    gd3d.math.matrixMakeTransformRTS(vec30p, gd3d.math.pool.vector3_one, vec40r, mat0);
-                    gd3d.math.matrixMakeTransformRTS(vec31p, gd3d.math.pool.vector3_one, vec41r, mat1);
-                    gd3d.math.matrixMakeTransformRTS(vec32p, gd3d.math.pool.vector3_one, vec42r, mat2);
-                    gd3d.math.matrixMakeTransformRTS(vec33p, gd3d.math.pool.vector3_one, vec43r, mat3);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v0, mat0);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v1, mat1);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v2, mat2);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v3, mat3);
-                    gd3d.math.matrixAdd(mat0, mat1, mat);
-                    gd3d.math.matrixAdd(mat, mat2, mat);
-                    gd3d.math.matrixAdd(mat, mat3, mat);
-                    gd3d.math.pool.delete_vector4(vec40r);
-                    gd3d.math.pool.delete_vector4(vec41r);
-                    gd3d.math.pool.delete_vector4(vec42r);
-                    gd3d.math.pool.delete_vector4(vec43r);
-                    gd3d.math.pool.delete_vector3(vec30p);
-                    gd3d.math.pool.delete_vector3(vec31p);
-                    gd3d.math.pool.delete_vector3(vec32p);
-                    gd3d.math.pool.delete_vector3(vec33p);
-                    gd3d.math.pool.delete_matrix(mat0);
-                    gd3d.math.pool.delete_matrix(mat1);
-                    gd3d.math.pool.delete_matrix(mat2);
-                    gd3d.math.pool.delete_matrix(mat3);
-                }
-                else {
-                    var mat0 = gd3d.math.pool.new_matrix();
-                    mat0.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v0, 16 * data.blendIndex[index].v0 + 16);
-                    var mat1 = gd3d.math.pool.new_matrix();
-                    mat1.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v1, 16 * data.blendIndex[index].v1 + 16);
-                    var mat2 = gd3d.math.pool.new_matrix();
-                    mat2.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v2, 16 * data.blendIndex[index].v2 + 16);
-                    var mat3 = gd3d.math.pool.new_matrix();
-                    mat3.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v3, 16 * data.blendIndex[index].v3 + 16);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v0, mat0);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v1, mat1);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v2, mat2);
-                    gd3d.math.matrixScaleByNum(data.blendWeight[index].v3, mat3);
-                    gd3d.math.matrixAdd(mat0, mat1, mat);
-                    gd3d.math.matrixAdd(mat, mat2, mat);
-                    gd3d.math.matrixAdd(mat, mat3, mat);
-                    gd3d.math.pool.delete_matrix(mat0);
-                    gd3d.math.pool.delete_matrix(mat1);
-                    gd3d.math.pool.delete_matrix(mat2);
-                    gd3d.math.pool.delete_matrix(mat3);
-                }
-                return mat;
-            };
-            skinnedMeshRenderer.prototype.intersects = function (ray) {
-                var mvpmat = this.player.gameObject.transform.getWorldMatrix();
-                var pickinfo = null;
-                var data = this.mesh.data;
-                for (var i = 0; i < this.mesh.submesh.length; i++) {
-                    var submesh = this.mesh.submesh[i];
-                    var t0 = gd3d.math.pool.new_vector3();
-                    var t1 = gd3d.math.pool.new_vector3();
-                    var t2 = gd3d.math.pool.new_vector3();
-                    for (var index = submesh.start; index < submesh.size; index += 3) {
-                        var verindex0 = data.trisindex[index];
-                        var verindex1 = data.trisindex[index + 1];
-                        var verindex2 = data.trisindex[index + 2];
-                        var p0 = data.pos[verindex0];
-                        var p1 = data.pos[verindex1];
-                        var p2 = data.pos[verindex2];
-                        var mat0 = this.getMatByIndex(verindex0);
-                        var mat1 = this.getMatByIndex(verindex1);
-                        var mat2 = this.getMatByIndex(verindex2);
-                        if (mat0 == null || mat1 == null || mat2 == null)
-                            continue;
-                        var mat00 = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
-                        var mat11 = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
-                        var mat22 = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
-                        gd3d.math.matrixTransformVector3(p0, mat00, t0);
-                        gd3d.math.matrixTransformVector3(p1, mat11, t1);
-                        gd3d.math.matrixTransformVector3(p2, mat22, t2);
-                        var result = ray.intersectsTriangle(t0, t1, t2);
-                        if (result) {
-                            if (result.distance < 0)
-                                continue;
-                            if (!pickinfo || pickinfo.distance > result.distance) {
-                                pickinfo = result;
-                                pickinfo.faceId = index / 3;
-                                pickinfo.subMeshId = i;
-                                var tdir = gd3d.math.pool.new_vector3();
-                                gd3d.math.vec3ScaleByNum(ray.direction, result.distance, tdir);
-                                gd3d.math.vec3Add(ray.origin, tdir, pickinfo.hitposition);
-                            }
-                        }
-                    }
-                    gd3d.math.pool.delete_vector3(t0);
-                    gd3d.math.pool.delete_vector3(t1);
-                    gd3d.math.pool.delete_vector3(t2);
-                }
-                return pickinfo;
-            };
-            skinnedMeshRenderer.prototype.update = function (delta) {
-                if (this._skeletonMatrixData == null) {
-                    this._skintype = this.useBoneShader(this.materials[0]);
-                    if (this._skintype == 1) {
-                        this.maxBoneCount = 24;
-                        this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
-                        this._efficient = false;
-                    }
-                    else if (this._skintype == 2) {
-                        this.maxBoneCount = 55;
-                        this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
-                        this._efficient = true;
-                    }
-                }
-                if (this.materials != null && this.materials.length > 0) {
-                    var _mat = this.materials[0];
-                    if (_mat) {
-                        this.layer = _mat.getLayer();
-                        if (!this.issetq)
-                            this._queue = _mat.getQueue();
-                    }
-                }
-                if (this.player != null) {
-                    if (this.player.isCache && !this.player.mix) {
-                        var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
-                        var data = skinnedMeshRenderer_1.dataCaches[cacheKey];
-                        if (!data) {
-                            var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
-                            if (_cachePlayer) {
-                                var baseSize = this._efficient ? 8 : 16;
-                                data = new Float32Array(this.maxBoneCount * baseSize);
-                                _cachePlayer.fillPoseData(data, this.bones, this._efficient);
-                                skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
-                                this.cacheData = data;
-                                return;
-                            }
-                        }
-                        else {
-                            this.cacheData = data;
-                            return;
-                        }
-                    }
-                    this.cacheData = null;
-                    if (this._skeletonMatrixData != null) {
-                        this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
-                    }
-                }
-            };
-            skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
-                if (this.player != null) {
-                    context.updateLightMask(this.gameObject.layer);
-                    context.updateModel(this.player.gameObject.transform);
-                }
-                for (var i_6 = 0; i_6 < this.materials.length; i_6++) {
-                    if (this.materials[i_6] == null)
-                        continue;
-                    if (this.cacheData != null && this._skintype > 0) {
-                        if (this._efficient) {
-                            context.vec4_bones = this.cacheData;
-                        }
-                        else {
-                            context.matrix_bones = this.cacheData;
-                        }
-                        continue;
-                    }
-                    if (this._skeletonMatrixData != null && this._skintype > 0) {
-                        if (this._efficient) {
-                            context.vec4_bones = this._skeletonMatrixData;
-                        }
-                        else {
-                            context.matrix_bones = this._skeletonMatrixData;
-                        }
-                    }
-                }
-                if (this._mesh != null) {
-                    if (this._mesh != null) {
-                        this._mesh.glMesh.bindVboBuffer(context.webgl);
-                        if (this._mesh.submesh != null) {
-                            for (var i = 0; i < this._mesh.submesh.length; i++) {
-                                var sm = this._mesh.submesh[i];
-                                var mid = this._mesh.submesh[i].matIndex;
-                                var usemat = this.materials[mid];
-                                if (usemat != null) {
-                                    if (this.gameObject.transform.scene.fog) {
-                                        context.fog = this.gameObject.transform.scene.fog;
-                                        usemat.draw(context, this._mesh, sm, "skin_fog");
-                                    }
-                                    else {
-                                        usemat.draw(context, this._mesh, sm, "skin");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-            skinnedMeshRenderer.prototype.remove = function () {
-                this.materials.forEach(function (element) {
-                    if (element)
-                        element.unuse();
-                });
-                if (this.mesh)
-                    this.mesh.unuse(true);
-                this.bones.length = 0;
-            };
-            skinnedMeshRenderer.prototype.clone = function () {
-            };
-            skinnedMeshRenderer.prototype.useBoneShader = function (mat) {
-                var matpasses = mat.getShader().passes["skin"];
-                if (matpasses == null || matpasses.length == 0)
-                    return 0;
-                if (matpasses[0].mapuniforms["glstate_vec4_bones"] != null)
-                    return 2;
-                else if (matpasses[0].mapuniforms["glstate_matrix_bones"] != null)
-                    return 1;
-                return 0;
-            };
-            skinnedMeshRenderer.dataCaches = [];
-            __decorate([
-                gd3d.reflect.Field("material[]"),
-                __metadata("design:type", Array)
-            ], skinnedMeshRenderer.prototype, "materials", void 0);
-            __decorate([
-                gd3d.reflect.Field("mesh"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [framework.mesh])
-            ], skinnedMeshRenderer.prototype, "mesh", null);
-            __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
-            ], skinnedMeshRenderer.prototype, "bones", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform"),
-                __metadata("design:type", framework.transform)
-            ], skinnedMeshRenderer.prototype, "rootBone", void 0);
-            skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
-                gd3d.reflect.nodeRender,
-                gd3d.reflect.nodeComponent,
-                __metadata("design:paramtypes", [])
-            ], skinnedMeshRenderer);
-            return skinnedMeshRenderer;
-            var skinnedMeshRenderer_1;
-        }());
-        framework.skinnedMeshRenderer = skinnedMeshRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -27991,532 +28761,6 @@ var gd3d;
             return ray;
         }());
         framework.ray = ray;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var transform = (function () {
-            function transform() {
-                this.name = "noname";
-                this.insId = new insID();
-                this.prefab = null;
-                this.aabbdirty = true;
-                this.aabbchilddirty = true;
-                this.dirty = true;
-                this.dirtyChild = true;
-                this.hasComponent = false;
-                this.hasComponentChild = false;
-                this.hasRendererComp = false;
-                this.hasRendererCompChild = false;
-                this.dirtyWorldDecompose = false;
-                this.localRotate = new gd3d.math.quaternion();
-                this.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                this.localScale = new gd3d.math.vector3(1, 1, 1);
-                this.localMatrix = new gd3d.math.matrix();
-                this._localEulerAngles = new gd3d.math.vector3(0, 0, 0);
-                this.worldMatrix = new gd3d.math.matrix();
-                this.worldRotate = new gd3d.math.quaternion();
-                this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
-                this.worldScale = new gd3d.math.vector3(1, 1, 1);
-                this.tempWorldMatrix = new gd3d.math.matrix();
-                this._beDispose = false;
-            }
-            Object.defineProperty(transform.prototype, "scene", {
-                get: function () {
-                    if (this._scene == null) {
-                        if (this.parent == null)
-                            return null;
-                        this._scene = this.parent.scene;
-                    }
-                    return this._scene;
-                },
-                set: function (value) {
-                    this._scene = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            transform.prototype.markAABBDirty = function () {
-                this.aabbdirty = true;
-                this.markAABBChildDirty();
-                var p = this.parent;
-                while (p != null) {
-                    p.markAABBChildDirty();
-                    p = p.parent;
-                }
-            };
-            transform.prototype.markAABBChildDirty = function () {
-                this.aabbchilddirty = true;
-            };
-            transform.prototype.caclAABB = function () {
-                if (this.gameObject.components == null)
-                    return;
-                if (this.aabb == null) {
-                    this.aabb = this.buildAABB();
-                    this.aabbchild = this.aabb.clone();
-                }
-                this.aabb.update(this.worldMatrix);
-            };
-            transform.prototype.caclAABBChild = function () {
-                if (this.aabb == null)
-                    return;
-                this.aabbchild = this.aabb.clone();
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.aabbchild.addAABB(this.children[i].aabbchild);
-                    }
-                }
-            };
-            transform.prototype.buildAABB = function () {
-                var minimum = new gd3d.math.vector3();
-                var maximum = new gd3d.math.vector3();
-                var filter = this.gameObject.getComponent("meshFilter");
-                if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
-                    var meshdata = filter.mesh.data;
-                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                    for (var i = 0; i < meshdata.pos.length; i++) {
-                        gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
-                        gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
-                    }
-                }
-                else {
-                    var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
-                    if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
-                        var skinmeshdata = skinmesh.mesh.data;
-                        gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                        gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                        for (var i = 0; i < skinmeshdata.pos.length; i++) {
-                            gd3d.math.vec3Max(skinmeshdata.pos[i], maximum, maximum);
-                            gd3d.math.vec3Min(skinmeshdata.pos[i], minimum, minimum);
-                        }
-                    }
-                    else {
-                        minimum.x = -1;
-                        minimum.y = -1;
-                        minimum.z = -1;
-                        maximum.x = 1;
-                        maximum.y = 1;
-                        maximum.z = 1;
-                    }
-                }
-                var _aabb = new framework.aabb(minimum, maximum);
-                return _aabb;
-            };
-            transform.prototype.addChild = function (node) {
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
-                }
-                if (this.children == null)
-                    this.children = [];
-                this.children.push(node);
-                node.scene = this.scene;
-                node.parent = this;
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
-                if (node.hasComponent || node.hasComponentChild)
-                    this.markHaveComponent();
-                if (node.hasRendererComp || node.hasRendererCompChild)
-                    this.markHaveRendererComp();
-            };
-            transform.prototype.addChildAt = function (node, index) {
-                if (index < 0)
-                    return;
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
-                }
-                if (this.children == null)
-                    this.children = [];
-                this.children.splice(index, 0, node);
-                node.scene = this.scene;
-                node.parent = this;
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
-                if (node.hasComponent || node.hasComponentChild)
-                    this.markHaveComponent();
-                if (node.hasRendererComp || node.hasRendererCompChild)
-                    this.markHaveRendererComp();
-            };
-            transform.prototype.removeAllChild = function () {
-                if (this.children == undefined)
-                    return;
-                while (this.children.length > 0) {
-                    this.removeChild(this.children[0]);
-                }
-            };
-            transform.prototype.removeChild = function (node) {
-                if (node.parent != this || this.children == null) {
-                    throw new Error("not my child.");
-                }
-                var i = this.children.indexOf(node);
-                if (i >= 0) {
-                    this.children.splice(i, 1);
-                    framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
-                    node.parent = null;
-                }
-            };
-            transform.prototype.find = function (name) {
-                if (this.name == name)
-                    return this;
-                else {
-                    if (this.children != undefined) {
-                        for (var i in this.children) {
-                            var res = this.children[i].find(name);
-                            if (res != null)
-                                return res;
-                            else {
-                                continue;
-                            }
-                        }
-                    }
-                }
-                return null;
-            };
-            transform.prototype.checkImpactTran = function (tran) {
-                if (this.gameObject.collider == null)
-                    return false;
-                return this.gameObject.collider.intersectsTransform(tran);
-            };
-            transform.prototype.checkImpact = function () {
-                var trans = new Array();
-                this.doImpact(this.scene.getRoot(), trans);
-                return trans;
-            };
-            transform.prototype.doImpact = function (tran, impacted) {
-                if (tran == this)
-                    return;
-                if (tran.gameObject != null && tran.gameObject.collider != null) {
-                    if (this.checkImpactTran(tran)) {
-                        impacted.push(tran);
-                    }
-                }
-                if (tran.children != null) {
-                    for (var i = 0; i < tran.children.length; i++) {
-                        this.doImpact(tran.children[i], impacted);
-                    }
-                }
-            };
-            transform.prototype.markDirty = function () {
-                this.dirty = true;
-                var p = this.parent;
-                while (p != null) {
-                    p.dirtyChild = true;
-                    p = p.parent;
-                }
-            };
-            transform.prototype.markHaveComponent = function () {
-                this.hasComponent = true;
-                var p = this.parent;
-                while (p != null) {
-                    p.dirtyChild = true;
-                    p.hasComponentChild = true;
-                    p = p.parent;
-                }
-            };
-            transform.prototype.markHaveRendererComp = function () {
-                this.hasRendererComp = true;
-                var p = this.parent;
-                while (p != null) {
-                    p.dirtyChild = true;
-                    p.hasRendererCompChild = true;
-                    p = p.parent;
-                }
-            };
-            transform.prototype.updateTran = function (parentChange) {
-                if (this.dirtyChild == false && this.dirty == false && parentChange == false)
-                    return;
-                if (this.dirty) {
-                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
-                }
-                if (this.dirty || parentChange) {
-                    if (this.parent == null) {
-                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
-                    }
-                    else {
-                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
-                    }
-                    this.dirtyWorldDecompose = true;
-                    this.markAABBDirty();
-                }
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.children[i].updateTran(parentChange || this.dirty);
-                    }
-                }
-                this.dirty = false;
-                this.dirtyChild = false;
-                if (this.aabbdirty) {
-                    this.caclAABB();
-                    this.aabbdirty = false;
-                }
-            };
-            transform.prototype.updateWorldTran = function () {
-                var p = this.parent;
-                var dirtylist = [];
-                dirtylist.push(this);
-                while (p != null) {
-                    if (p.dirty)
-                        dirtylist.push(p);
-                    p = p.parent;
-                }
-                var top = dirtylist.pop();
-                top.updateTran(false);
-            };
-            transform.prototype.updateAABBChild = function () {
-                if (this.aabbchilddirty) {
-                    if (this.children != null) {
-                        for (var i = 0; i < this.children.length; i++) {
-                            this.children[i].updateAABBChild();
-                        }
-                    }
-                    this.caclAABBChild();
-                    this.aabbchilddirty = false;
-                }
-            };
-            Object.defineProperty(transform.prototype, "localPosition", {
-                get: function () {
-                    return this.localTranslate;
-                },
-                set: function (position) {
-                    this.localTranslate = position;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform.prototype, "localEulerAngles", {
-                get: function () {
-                    gd3d.math.quatToEulerAngles(this.localRotate, this._localEulerAngles);
-                    return this._localEulerAngles;
-                },
-                set: function (angle) {
-                    gd3d.math.quatFromEulerAngles(angle.x, angle.y, angle.z, this.localRotate);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            transform.prototype.getWorldTranslate = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
-                return this.worldTranslate;
-            };
-            transform.prototype.getWorldScale = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
-                return this.worldScale;
-            };
-            transform.prototype.getWorldRotate = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
-                return this.worldRotate;
-            };
-            transform.prototype.getLocalMatrix = function () {
-                if (this.dirty)
-                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
-                return this.localMatrix;
-            };
-            transform.prototype.getWorldMatrix = function () {
-                if (this.dirty) {
-                    if (!this.parent)
-                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
-                    else
-                        gd3d.math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
-                    return this.tempWorldMatrix;
-                }
-                else
-                    return this.worldMatrix;
-            };
-            transform.prototype.getForwardInWorld = function (out) {
-                var forward = gd3d.math.pool.new_vector3();
-                forward.x = 0;
-                forward.y = 0;
-                forward.z = 1;
-                gd3d.math.matrixTransformNormal(forward, this.getWorldMatrix(), out);
-                gd3d.math.vec3Normalize(out, out);
-                gd3d.math.pool.delete_vector3(forward);
-            };
-            transform.prototype.getRightInWorld = function (out) {
-                var right = gd3d.math.pool.new_vector3();
-                right.x = 1;
-                right.y = 0;
-                right.z = 0;
-                gd3d.math.matrixTransformNormal(right, this.getWorldMatrix(), out);
-                gd3d.math.vec3Normalize(out, out);
-                gd3d.math.pool.delete_vector3(right);
-            };
-            transform.prototype.getUpInWorld = function (out) {
-                var up = gd3d.math.pool.new_vector3();
-                up.x = 0;
-                up.y = 1;
-                up.z = 0;
-                gd3d.math.matrixTransformNormal(up, this.getWorldMatrix(), out);
-                gd3d.math.vec3Normalize(out, out);
-                gd3d.math.pool.delete_vector3(up);
-            };
-            transform.prototype.setWorldMatrix = function (mat) {
-                this.dirty = true;
-                this.updateWorldTran();
-                var pworld = gd3d.math.pool.new_matrix();
-                if (this.parent != null) {
-                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
-                }
-                else {
-                    gd3d.math.matrixMakeIdentity(pworld);
-                }
-                var invparentworld = gd3d.math.pool.new_matrix();
-                gd3d.math.matrixInverse(pworld, invparentworld);
-                gd3d.math.matrixClone(mat, this.worldMatrix);
-                this.dirtyWorldDecompose = true;
-                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
-                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
-                this.markDirty();
-                gd3d.math.pool.delete_matrix(pworld);
-                gd3d.math.pool.delete_matrix(invparentworld);
-            };
-            transform.prototype.setWorldPosition = function (pos) {
-                this.dirty = true;
-                this.updateWorldTran();
-                var pworld = gd3d.math.pool.new_matrix();
-                if (this.parent != null) {
-                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
-                }
-                else {
-                    gd3d.math.matrixMakeIdentity(pworld);
-                }
-                var invparentworld = gd3d.math.pool.new_matrix();
-                gd3d.math.matrixInverse(pworld, invparentworld);
-                this.worldMatrix.rawData[12] = pos.x;
-                this.worldMatrix.rawData[13] = pos.y;
-                this.worldMatrix.rawData[14] = pos.z;
-                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
-                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
-                this.markDirty();
-                gd3d.math.pool.delete_matrix(pworld);
-                gd3d.math.pool.delete_matrix(invparentworld);
-            };
-            transform.prototype.lookat = function (trans) {
-                this.dirty = true;
-                trans.updateWorldTran();
-                this.updateWorldTran();
-                var p0 = this.getWorldTranslate();
-                var p1 = trans.getWorldTranslate();
-                var d = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(p1, p0, d);
-                var quatworld = gd3d.math.pool.new_quaternion();
-                var quat = gd3d.math.pool.new_quaternion();
-                gd3d.math.quatLookat(p0, p1, quatworld);
-                var quatworldCur = this.parent.getWorldRotate();
-                gd3d.math.quatInverse(quatworldCur, quat);
-                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
-                gd3d.math.pool.delete_vector3(d);
-                gd3d.math.pool.delete_quaternion(quatworld);
-                gd3d.math.pool.delete_quaternion(quat);
-            };
-            transform.prototype.lookatPoint = function (point) {
-                this.dirty = true;
-                this.updateWorldTran();
-                var p0 = this.getWorldTranslate();
-                var p1 = point;
-                var d = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(p1, p0, d);
-                var quatworld = gd3d.math.pool.new_quaternion();
-                var quat = gd3d.math.pool.new_quaternion();
-                gd3d.math.quatLookat(p0, p1, quatworld);
-                var quatworldCur = this.parent.getWorldRotate();
-                gd3d.math.quatInverse(quatworldCur, quat);
-                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
-                this.markDirty();
-                gd3d.math.pool.delete_vector3(d);
-                gd3d.math.pool.delete_quaternion(quatworld);
-                gd3d.math.pool.delete_quaternion(quat);
-            };
-            Object.defineProperty(transform.prototype, "gameObject", {
-                get: function () {
-                    if (this._gameObject == null) {
-                        this._gameObject = new framework.gameObject();
-                        this._gameObject.transform = this;
-                    }
-                    return this._gameObject;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            transform.prototype.clone = function () {
-                return gd3d.io.cloneObj(this);
-            };
-            Object.defineProperty(transform.prototype, "beDispose", {
-                get: function () {
-                    return this._beDispose;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            transform.prototype.dispose = function () {
-                if (this._beDispose)
-                    return;
-                if (this.children) {
-                    for (var k in this.children) {
-                        this.children[k].dispose();
-                    }
-                    this.removeAllChild();
-                }
-                this._gameObject.dispose();
-                this._beDispose = true;
-                if (this.onDispose)
-                    this.onDispose();
-            };
-            __decorate([
-                gd3d.reflect.Field("string"),
-                __metadata("design:type", String)
-            ], transform.prototype, "name", void 0);
-            __decorate([
-                gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array)
-            ], transform.prototype, "children", void 0);
-            __decorate([
-                gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", gd3d.math.quaternion)
-            ], transform.prototype, "localRotate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
-                __metadata("design:type", gd3d.math.vector3)
-            ], transform.prototype, "localTranslate", void 0);
-            __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
-                __metadata("design:type", gd3d.math.vector3)
-            ], transform.prototype, "localScale", void 0);
-            __decorate([
-                gd3d.reflect.Field("gameObject"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [])
-            ], transform.prototype, "gameObject", null);
-            transform = __decorate([
-                gd3d.reflect.SerializeType
-            ], transform);
-            return transform;
-        }());
-        framework.transform = transform;
-        var insID = (function () {
-            function insID() {
-                this.id = insID.next();
-            }
-            insID.next = function () {
-                var next = insID.idAll;
-                insID.idAll++;
-                return next;
-            };
-            insID.prototype.getInsID = function () {
-                return this.id;
-            };
-            insID.idAll = 1;
-            return insID;
-        }());
-        framework.insID = insID;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
