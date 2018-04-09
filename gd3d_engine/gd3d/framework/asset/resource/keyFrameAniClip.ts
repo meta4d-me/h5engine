@@ -303,9 +303,9 @@ namespace gd3d.framework
         //注册转换 具体属性
         private static regProperty(obj){
             //Transform
-            obj["Transform"]["__prop__"]["m_LocalPosition"] = "localTranslate";
-            obj["Transform"]["__prop__"]["m_LocalScale"] = "localScale";
-            obj["Transform"]["__prop__"]["m_LocalRotation"] = "localRotate";
+            // obj["Transform"]["__prop__"]["m_LocalPosition"] = "localTranslate";
+            // obj["Transform"]["__prop__"]["m_LocalScale"] = "localScale";
+            // obj["Transform"]["__prop__"]["m_LocalRotation"] = "localRotate";
 
         }
     }

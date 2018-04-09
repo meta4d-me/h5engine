@@ -1140,7 +1140,7 @@ var main = (function () {
         this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
-        this.addBtn("关键帧animation", function () { return new test_keyFrameAni(); });
+        this.addBtn("关键帧动画", function () { return new test_keyframeAnimation(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -6625,7 +6625,7 @@ var test_keyframeAnimation = (function () {
         });
     };
     test_keyframeAnimation.prototype.loadkeyFrameAnimationPath = function (laststate, state) {
-        this.app.getAssetMgr().load("res/keyframeAnimation/cubeKeyframepath.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+        this.app.getAssetMgr().load("res/keyframeAnimation/Cube.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
             if (s.isfinish) {
                 state.finish = true;
             }
@@ -6643,7 +6643,7 @@ var test_keyframeAnimation = (function () {
     };
     test_keyframeAnimation.prototype.iniscene = function (laststate, state) {
         var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
-        var keyframeanimationpath = this.app.getAssetMgr().getAssetByName("cubeKeyframepath.keyFrameAnimationPath.json");
+        var keyframeanimationpath = this.app.getAssetMgr().getAssetByName("Cube.keyFrameAnimationPath.json");
         var head = longtouprefab.getCloneTrans();
         head.localScale.x = head.localScale.y = head.localScale.z = 10;
         head.localTranslate.x = head.localTranslate.y = head.localTranslate.z = 0;

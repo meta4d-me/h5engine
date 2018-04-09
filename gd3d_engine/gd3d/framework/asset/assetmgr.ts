@@ -1525,25 +1525,24 @@ namespace gd3d.framework {
          */
         loadScene(sceneName: string, onComplete: (firstChilds:Array<transform>) => void) {
             let firstChilds = new Array<transform>();
+            let scene = this.app.getScene();
             if (sceneName.length > 0) {
                 var _rawscene: rawscene = this.getAssetByName(sceneName) as rawscene;
-
                 let willLoadRoot = _rawscene.getSceneRoot();
                 while (willLoadRoot.children.length > 0) {
                     let trans = willLoadRoot.children.shift();
                     firstChilds.push(trans);
-                    this.app.getScene().addChild(trans);
+                    scene.addChild(trans);
                 }
 
                 //清空原场景UI
-                this.app.getScene()["_overlay2d"]=new Array<overlay2D>();
+                scene["_overlay2d"]=new Array<overlay2D>();
                 //lightmap
-                _rawscene.useLightMap(this.app.getScene());
+                _rawscene.useLightMap(scene);
                 //fog
-                _rawscene.useFog(this.app.getScene());
+                _rawscene.useFog(scene);
                 //nav
-                _rawscene.useNavMesh(this.app.getScene());
-
+                _rawscene.useNavMesh(scene);
                 
             }
             else {
@@ -1551,10 +1550,10 @@ namespace gd3d.framework {
                 _camera.gameObject.addComponent("camera");
                 _camera.name = "camera";
                 firstChilds.push(_camera);
-                this.app.getScene().addChild(_camera);
+                scene.addChild(_camera);
             }
-            this.app.getScene().name = sceneName;
-            this.app.getScene().getRoot().markDirty();
+            scene.name = sceneName;
+            scene.getRoot().markDirty();
             onComplete(firstChilds);
         }
 

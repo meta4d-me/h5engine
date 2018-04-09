@@ -9598,7 +9598,6 @@ var gd3d;
                     }
                     this.curves.push(curve);
                 }
-                kFAniClipUtil.typePair;
                 debugger;
             };
             Object.defineProperty(keyFrameAniClip.prototype, "wrapMode", {
@@ -9682,22 +9681,9 @@ var gd3d;
                 if (strs.length < 1 || !strs[strs.length - 1])
                     return result;
                 var tempT = strs[strs.length - 1];
-                switch (tempT) {
-                    case "Transform":
-                        result = "transform";
-                        break;
-                    case "BoxCollider":
-                        result = "boxcollider";
-                        break;
-                    case "MeshRenderer":
-                        result = "meshRenderer";
-                        break;
-                    case "MeshFilter":
-                        result = "meshFilter";
-                        break;
-                    case "SkinnedMeshRenderer":
-                        result = "skinnedMeshRenderer";
-                        break;
+                var obj = kFAniClipUtil._typePair[tempT];
+                if (obj != null) {
+                    result = obj["type"];
                 }
                 return result;
             };
@@ -9705,6 +9691,15 @@ var gd3d;
                 var result = propertyName;
                 if (framework.StringUtil.isNullOrEmptyObject(propertyName))
                     return "";
+                var obj = kFAniClipUtil._typePair[tyep];
+                var cgProperty = propertyName;
+                if (propertyName.lastIndexOf(".") != -1) {
+                    cgProperty = propertyName.substr(0, propertyName.lastIndexOf("."));
+                }
+                if (obj && obj["__prop__"] && obj["__prop__"][cgProperty]) {
+                    var str = obj["__prop__"][cgProperty];
+                    result = propertyName.replace(cgProperty, str);
+                }
                 return result;
             };
             kFAniClipUtil.regType = function () {
