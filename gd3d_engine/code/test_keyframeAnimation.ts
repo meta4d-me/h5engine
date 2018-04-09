@@ -67,7 +67,7 @@ class test_keyframeAnimation implements IState
     private loadkeyFrameAnimationPath(laststate:gd3d.framework.taskstate,state:gd3d.framework.taskstate)
     {
        // this.app.getAssetMgr().load("res/path/circlepath.path.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
-        this.app.getAssetMgr().load("res/keyframeAnimation/cubeKeyframepath.keyFrameAnimationPath.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
+        this.app.getAssetMgr().load("res/keyframeAnimation/Cube.keyFrameAnimationPath.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
             if (s.isfinish) 
             {
                 state.finish=true;      
@@ -103,7 +103,7 @@ class test_keyframeAnimation implements IState
 
         //资源
         var longtouprefab=this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json") as gd3d.framework.prefab;
-        var keyframeanimationpath=this.app.getAssetMgr().getAssetByName("cubeKeyframepath.keyFrameAnimationPath.json") as gd3d.framework.keyframeAnimationPathAsset;
+        var keyframeanimationpath=this.app.getAssetMgr().getAssetByName("Cube.keyFrameAnimationPath.json") as gd3d.framework.keyframeAnimationPathAsset;
         
         let head=longtouprefab.getCloneTrans();
         head.localScale.x=head.localScale.y=head.localScale.z=10;
