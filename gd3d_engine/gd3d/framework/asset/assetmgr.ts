@@ -149,13 +149,6 @@ namespace gd3d.framework {
          */
         PathAsset,
         /**
-        * @public
-        * @language zh_CN
-        * 路径动画
-        * @version egret-gd3d 1.0
-        */
-        KeyFrameAnimaionAsset,
-        /**
          * @public
          * @language zh_CN
          * pvr贴图
@@ -1256,7 +1249,6 @@ namespace gd3d.framework {
             // this.regAssetFactory(AssetTypeEnum.PackTxt,new AssetFactory_PackTxt());
             this.regAssetFactory(AssetTypeEnum.PathAsset, new AssetFactory_PathAsset());
             this.regAssetFactory(AssetTypeEnum.PVR, new AssetFactory_PVR());
-            this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new AssetFactory_KeyframeAnimationPathAsset());
             this.regAssetFactory(AssetTypeEnum.F14Effect, new AssetFactory_f14eff());
             this.regAssetFactory(AssetTypeEnum.DDS, new AssetFactory_DDS());
             this.regAssetFactory(AssetTypeEnum.KeyFrameAniclip, new assetfactory_keyFrameAniClip());
@@ -1851,9 +1843,6 @@ namespace gd3d.framework {
                 }
                 else if (extname == ".path.json") {
                     return AssetTypeEnum.PathAsset;
-                }
-                else if (extname == ".keyFrameAnimationPath.json") {
-                    return AssetTypeEnum.KeyFrameAnimaionAsset;
                 }
                 else if (extname == ".f14effect.json") {
                     return AssetTypeEnum.F14Effect;

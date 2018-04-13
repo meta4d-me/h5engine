@@ -6,10 +6,8 @@
 /// <reference path="../../component/meshrenderer.ts" />
 /// <reference path="../../component/skinnedmeshrenderer.ts" />
 
-namespace gd3d.framework
-{
-    export enum WrapMode
-    {
+namespace gd3d.framework {
+    export enum WrapMode {
         Default = 0,
         Once = 1,
         Clamp = 1,
@@ -26,8 +24,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @gd3d.reflect.SerializeType
-    export class keyFrameAniClip implements IAsset
-    {
+    export class keyFrameAniClip implements IAsset {
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();
@@ -39,10 +36,8 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         defaultAsset: boolean = false;
-        constructor(assetName: string = null)
-        {
-            if (!assetName)
-            {
+        constructor(assetName: string = null) {
+            if (!assetName) {
                 assetName = "keyFrameAniClip_" + this.getGUID();
             }
             this.name = new constText(assetName);
@@ -54,8 +49,7 @@ namespace gd3d.framework
          * 获取资源名称
          * @version egret-gd3d 1.0
          */
-        getName(): string
-        {
+        getName(): string {
             return this.name.getText();
         }
         /**
@@ -65,8 +59,7 @@ namespace gd3d.framework
          * 获取资源唯一id
          * @version egret-gd3d 1.0
          */
-        getGUID(): number
-        {
+        getGUID(): number {
             return this.id.getID();
         }
         /**
@@ -76,8 +69,7 @@ namespace gd3d.framework
          * 引用计数加一
          * @version egret-gd3d 1.0
          */
-        use()
-        {
+        use() {
             sceneMgr.app.getAssetMgr().use(this);
         }
         /**
@@ -87,8 +79,7 @@ namespace gd3d.framework
          * 引用计数减一
          * @version egret-gd3d 1.0
          */
-        unuse(disposeNow: boolean = false)
-        {
+        unuse(disposeNow: boolean = false) {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
         }
         /**
@@ -98,8 +89,7 @@ namespace gd3d.framework
          * 释放资源
          * @version egret-gd3d 1.0
          */
-        dispose()
-        {
+        dispose() {
             this.curves.length = 0;
         }
 
@@ -110,8 +100,7 @@ namespace gd3d.framework
          * 计算资源字节大小
          * @version egret-gd3d 1.0
          */
-        caclByteLength(): number
-        {
+        caclByteLength(): number {
             let total = 0;
             // for (let k in this.bones)
             // {
@@ -138,26 +127,35 @@ namespace gd3d.framework
          * @param jsonStr 动画json数据
          * @version egret-gd3d 1.0
          */
-        Parse(jsonStr: string): void
-        {
+        Parse(jsonStr: string): void {
             let obj = JSON.parse(jsonStr);
             let tag = obj["tag"];
             this.length = obj["length"];
             this._wrapMode = obj["wrapMode"];
             this.frameRate = obj["frameRate"];
-            let curves_o:any[] = obj["curves"];
-            for(var i=0 ;i<curves_o.length ;i++){
+            let curves_o: any[] = obj["curves"];
+            for (var i = 0; i < curves_o.length; i++) {
                 let curve = new AnimationCurve();
-                let curve_o = curves_o[1];
-                let kfs_o:any[] = curve_o["keyFrames"];
+                let curve_o = curves_o[i];
+                let kfs_o: any[] = curve_o["keyFrames"];
                 curve.path = curve_o["path"];
-                curve.propertyName = curve_o["propertyName"];
-                curve.type = curve_o["type"];
-                for(var j=0;j<kfs_o.length;j++){
+                //curve.propertyName = curve_o["propertyName"];
+                curve.propertyName = kFAniClipUtil.converUnityTypeProperty(curve_o["type"], curve_o["propertyName"]);
+                //curve.type = curve_o["type"];
+                curve.type = kFAniClipUtil.converUnityType(curve_o["type"]);
+                for (var j = 0; j < kfs_o.length; j++) {
                     let kf_o = kfs_o[j];
                     let kf = new keyFrame();
-                    kf.inTangent = kf_o["inTangent"];
-                    kf.outTangent = kf_o["outTangent"];
+                    if (typeof (kf_o["inTangent"]) === "string")
+                        kf.inTangent = Number(kf_o["inTangent"]);
+                    else
+                        kf.inTangent = kf_o["inTangent"];
+
+                    if (typeof (kf_o["outTangent"]) === "string")
+                        kf.outTangent = Number(kf_o["outTangent"]);
+                    else
+                        kf.outTangent = kf_o["outTangent"];
+                        
                     kf.tangentMode = kf_o["tangentMode"];
                     kf.time = kf_o["time"];
                     kf.value = kf_o["value"];
@@ -165,12 +163,10 @@ namespace gd3d.framework
                 }
                 this.curves.push(curve);
             }
-
-            debugger;
         }
 
         //总时长 /s
-        private length:number = 0;
+        private length: number = 0;
 
         /**
          * @public
@@ -178,8 +174,8 @@ namespace gd3d.framework
          * 循环模式
          * @version egret-gd3d 1.0
          */
-        get wrapMode(){return this._wrapMode;}
-        _wrapMode:WrapMode;        
+        get wrapMode() { return this._wrapMode; }
+        _wrapMode: WrapMode;
 
         /**
          * @public
@@ -187,20 +183,10 @@ namespace gd3d.framework
          * 动画片段的帧率
          * @version egret-gd3d 1.0
          */
-        get fps(){
+        get fps() {
             return this.frameRate;
         }
         private frameRate: number = 0;
-        
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 是否循环
-         * @version egret-gd3d 1.0
-         */
-        get loop(){return this.loop};
-        _loop: boolean;
 
         /**
          * @public
@@ -209,7 +195,7 @@ namespace gd3d.framework
          * 播放时长
          * @version egret-gd3d 1.0
          */
-        get time(){
+        get time() {
             return this.length;
         }
 
@@ -220,7 +206,7 @@ namespace gd3d.framework
          * 最大帧数
          * @version egret-gd3d 1.0
          */
-        get frameCount(){ return Math.floor(this.frameRate * this.length);}
+        get frameCount() { return Math.floor(this.frameRate * this.length); }
         /**
          * @public
          * @language zh_CN
@@ -232,81 +218,89 @@ namespace gd3d.framework
     }
 
     export class AnimationCurve {
-        public path :string; //"gameobj_0/gameobj_1"  父子树路径
-        public type :string; //"meshRenaderer" 组件名
-        public propertyName :string; //"loaclpostion.x"  属性路径
+        public path: string; //"gameobj_0/gameobj_1"  父子树路径
+        public type: string; //"meshRenaderer" 组件名
+        public propertyName: string; //"loaclpostion.x"  属性路径
         public keyFrames: keyFrame[] = []; //曲线上的 关键帧
     }
 
-    export class keyFrame{
-        public inTangent :number ; //贝塞尔 入切线率
-        public outTangent :number ;//贝塞尔 出切线率
-        public tangentMode :number ; //记录 编辑模式（auto 、free 等等）
-        public time :number ;  //时间点
-        public value :number ; //该帧修改值
+    export class keyFrame {
+        public inTangent: number; //贝塞尔 入切线率
+        public outTangent: number;//贝塞尔 出切线率
+        public tangentMode: number; //记录 编辑模式（auto 、free 等等）
+        public time: number;  //时间点
+        public value: number; //该帧修改值
     }
 
-    
-    class kFAniClipUtil{
-        
-        private static _typePair : object = kFAniClipUtil.regType();
-        static get typePair(){
-            if(!kFAniClipUtil._typePair)    kFAniClipUtil._typePair = kFAniClipUtil.regType();
+
+    class kFAniClipUtil {
+        private static propTag = "__prop__";
+        private static _typePair: object = kFAniClipUtil.regType();
+        static get typePair() {
+            if (!kFAniClipUtil._typePair) kFAniClipUtil._typePair = kFAniClipUtil.regType();
             return kFAniClipUtil._typePair;
         }
-        
-        static isUnityExp(tag :string){
-            if(StringUtil.isNullOrEmptyObject(tag)) return false;
+
+        static isUnityExp(tag: string) {
+            if (StringUtil.isNullOrEmptyObject(tag)) return false;
             return tag.indexOf("unity") != -1;
         }
-        
-        static converUnityType(tyep:string){
+
+        static converUnityType(tyep: string) {
             let result = "";
-            if(StringUtil.isNullOrEmptyObject(tyep)) return result;
-            if(tyep.indexOf("UnityEngine") == -1)   return tyep;//非unity 内建组件
+            if (StringUtil.isNullOrEmptyObject(tyep)) return result;
+            if (tyep.indexOf("UnityEngine") == -1) return tyep;//非unity 内建组件
             let strs = tyep.split(".");
-            if(strs.length <1 || !strs[strs.length -1]) return result;
-            let tempT = strs[strs.length -1];
+            if (strs.length < 1 || !strs[strs.length - 1]) return result;
+            let tempT = strs[strs.length - 1];
             let obj = kFAniClipUtil._typePair[tempT];
-            if(obj != null){
+            if (obj != null) {
                 result = obj["type"];
             }
             return result;
         }
-        
-        static converUnityTypeProperty(tyep:string,propertyName:string){
+
+        static converUnityTypeProperty(tyep: string, propertyName: string) {
             let result = propertyName;
-            if(StringUtil.isNullOrEmptyObject(propertyName)) return "";
+            if (StringUtil.isNullOrEmptyObject(propertyName)) return "";
+            if (tyep.indexOf("UnityEngine") != -1) {
+                let strs = tyep.split(".");
+                tyep = strs[strs.length - 1];
+            }
             let obj = kFAniClipUtil._typePair[tyep];
             let cgProperty = propertyName;
-            if(propertyName.lastIndexOf(".") != -1){
-                cgProperty = propertyName.substr(0,propertyName.lastIndexOf("."));
+            if (propertyName.lastIndexOf(".") != -1) {
+                cgProperty = propertyName.substr(0, propertyName.lastIndexOf("."));
             }
-            if(obj && obj["__prop__"] && obj["__prop__"][cgProperty]){
-                let str:string = obj["__prop__"][cgProperty];
-                result = propertyName.replace(cgProperty,str);
+            if (obj && obj[kFAniClipUtil.propTag] && obj[kFAniClipUtil.propTag][cgProperty]) {
+                let str: string = obj[kFAniClipUtil.propTag][cgProperty];
+                result = propertyName.replace(cgProperty, str);
             }
             return result;
         }
 
         //注册转换 类型
-        private static regType(){
+        private static regType() {
             let result = {};
-            result["Transform"] = {"type":transform["name"]};
-            result["BoxCollider"] = {"type":boxcollider["name"]};
-            result["MeshRenderer"] = {"type":meshRenderer["name"]};
-            result["MeshFilter"] = {"type":meshFilter["name"]};
-            result["SkinnedMeshRenderer"] = {"type":skinnedMeshRenderer["name"]};
+            result["Transform"] = { "type": transform["name"] };
+            result["BoxCollider"] = { "type": boxcollider["name"] };
+            result["MeshRenderer"] = { "type": meshRenderer["name"] };
+            result["MeshFilter"] = { "type": meshFilter["name"] };
+            result["SkinnedMeshRenderer"] = { "type": skinnedMeshRenderer["name"] };
             kFAniClipUtil.regProperty(result);
             return result;
         }
         //注册转换 具体属性
-        private static regProperty(obj){
+        private static regProperty(obj) {
             //Transform
-            // obj["Transform"]["__prop__"]["m_LocalPosition"] = "localTranslate";
-            // obj["Transform"]["__prop__"]["m_LocalScale"] = "localScale";
-            // obj["Transform"]["__prop__"]["m_LocalRotation"] = "localRotate";
-
+            kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalPosition", "localTranslate");
+            kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalScale", "localScale");
+            kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalRotation", "localRotate");
+        }
+        private static assemblyProp(obj, Type: string, prop: string, replaceProp) {
+            if (!obj["Transform"][kFAniClipUtil.propTag])
+                obj["Transform"][kFAniClipUtil.propTag] = {};
+            obj["Transform"][kFAniClipUtil.propTag][prop] = replaceProp;
         }
     }
 }

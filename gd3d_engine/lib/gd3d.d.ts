@@ -815,10 +815,9 @@ declare namespace gd3d.framework {
         PackBin = 18,
         PackTxt = 19,
         PathAsset = 20,
-        KeyFrameAnimaionAsset = 21,
-        PVR = 22,
-        F14Effect = 23,
-        DDS = 24,
+        PVR = 21,
+        F14Effect = 22,
+        DDS = 23,
     }
     enum AssetBundleLoadState {
         None = 0,
@@ -1125,13 +1124,6 @@ declare namespace gd3d.framework {
         newAsset(): keyFrameAniClip;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip): void;
-    }
-}
-declare namespace gd3d.framework {
-    class AssetFactory_KeyframeAnimationPathAsset implements IAssetFactory {
-        newAsset(): keyframeAnimationPathAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyframeAnimationPathAsset): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyframeAnimationPathAsset): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1557,8 +1549,6 @@ declare namespace gd3d.framework {
         _wrapMode: WrapMode;
         readonly fps: number;
         private frameRate;
-        readonly loop: any;
-        _loop: boolean;
         readonly time: number;
         readonly frameCount: number;
         curves: AnimationCurve[];
@@ -1575,49 +1565,6 @@ declare namespace gd3d.framework {
         tangentMode: number;
         time: number;
         value: number;
-    }
-}
-declare namespace gd3d.framework {
-    class keyframeAnimationPathAsset implements IAsset {
-        private name;
-        private id;
-        defaultAsset: boolean;
-        constructor(assetName?: string);
-        getName(): string;
-        getGUID(): number;
-        use(): void;
-        beloop: boolean;
-        timeLength: number;
-        frameRate: number;
-        positionitems: keyframepathpositionitem[];
-        rotationitmes: keyframepathrotationitem[];
-        pathdata: {
-            [pathid: string]: pathData;
-        };
-        Parse(json: JSON): void;
-        addPathData(children: any[]): void;
-        unuse(): void;
-        dispose(): void;
-        caclByteLength(): number;
-    }
-    class keyframepathpositionitem {
-        position: gd3d.math.vector3;
-        time: number;
-    }
-    class keyframepathrotationitem {
-        rotation: gd3d.math.quaternion;
-        time: number;
-    }
-    class children {
-        name: string;
-        position: keyframepathpositionitem[];
-        rotation: keyframepathrotationitem[];
-        children: children[];
-    }
-    class pathData {
-        name: string;
-        positions: keyframepathpositionitem[];
-        rotations: keyframepathrotationitem[];
     }
 }
 declare namespace gd3d.framework {
@@ -2315,42 +2262,31 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class keyframeanimation implements INodeComponent {
-        private _keyframeasset;
-        private positions;
-        private rotations;
-        private timelength;
-        private beloop;
-        private frameRate;
-        pathdata: {
-            [pathid: string]: pathData;
-        };
-        playingtime: number;
-        keyframeasset: keyframeAnimationPathAsset;
-        setkeyframeanimationasst(keyframeanimationpathasset: keyframeAnimationPathAsset): void;
-        childrentrans: {
-            [pathname: string]: transform;
-        };
-        childrenpaths: {
-            child: transform;
-            path: pathData;
-        }[];
-        setChildTrans(mytrans: transform): void;
-        isactived: boolean;
+    class keyFrameAniPlayer implements INodeComponent {
+        clips: keyFrameAniClip[];
+        private nowClip;
+        private readonly nowFrame;
+        private nowTime;
+        private pathPropertyMap;
+        gameObject: gameObject;
         start(): void;
         update(delta: number): void;
-        lastpositionindex: number;
-        lastrotationindex: number;
-        private followmove(delta);
-        private childrenfollow(delta);
-        gameObject: gameObject;
-        private mystrans;
-        remove(): void;
-        clone(): void;
+        private displayByTime(clip, playTime);
+        private calcValueByTime(curve, playTime);
+        private refrasCurveProperty(curve, playTime);
+        private timeFilterCurves(clip, nowTime);
+        private checkPlayEnd(clip);
+        private init();
+        isPlaying(ClipName: string): boolean;
+        playByName(ClipName: string): void;
         play(): void;
-        pause(): void;
         stop(): void;
-        replay(): void;
+        rewind(): void;
+        private collectPropertyObj(clip);
+        private collectPathPropertyObj(clip, pathMap);
+        private serchChild(name, trans);
+        clone(): void;
+        remove(): void;
     }
 }
 declare namespace gd3d.framework {

@@ -91,10 +91,10 @@ class main implements gd3d.framework.IUserCode
         //this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
         
         this.addBtn("test_UI组件", () => new test_UI_Component());
-        this.addBtn("test_帧动画_keyframeAni",()=>new test_heilongbo());
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
         this.addBtn("test_PBR 展示", () => new test_pbr());
         this.addBtn("test_PBR 场景", () => new test_pbr_scene());
+        this.addBtn("关键帧动画",()=>new test_keyFrameAni());
         this.addBtn("导航网格", () => new test_navMesh());
         this.addBtn("rvo2_驾驶行为", () => new test_Rvo2());
         this.addBtn("导航RVO_防挤Demo", () => new demo_navigaionRVO());
@@ -107,7 +107,6 @@ class main implements gd3d.framework.IUserCode
         // this.addBtn("cj_zs",()=>new dome.testCJ());
         // this.addBtn("test_eff",()=>new dome.db_test_eff());
         this.addBtn("tesrtss",()=>new dome.testCJ());
-        this.addBtn("关键帧动画",()=>new test_keyframeAnimation());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }

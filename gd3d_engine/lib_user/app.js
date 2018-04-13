@@ -1128,10 +1128,10 @@ var main = (function () {
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
-        this.addBtn("test_帧动画_keyframeAni", function () { return new test_heilongbo(); });
         this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
         this.addBtn("test_PBR 展示", function () { return new test_pbr(); });
         this.addBtn("test_PBR 场景", function () { return new test_pbr_scene(); });
+        this.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
         this.addBtn("导航网格", function () { return new test_navMesh(); });
         this.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
         this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
@@ -1140,7 +1140,6 @@ var main = (function () {
         this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
-        this.addBtn("关键帧动画", function () { return new test_keyframeAnimation(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -6333,170 +6332,6 @@ var test_fakepbr = (function () {
     };
     return test_fakepbr;
 }());
-var test_heilongbo = (function () {
-    function test_heilongbo() {
-        this.taskMgr = new gd3d.framework.taskMgr();
-    }
-    test_heilongbo.prototype.start = function (app) {
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.taskMgr.addTaskCall(this.loadShader.bind(this));
-        this.taskMgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskMgr.addTaskCall(this.loadkeyFrameAnimationPath.bind(this));
-        this.taskMgr.addTaskCall(this.loadCube.bind(this));
-        this.taskMgr.addTaskCall(this.loadasset.bind(this));
-        this.taskMgr.addTaskCall(this.iniscene.bind(this));
-        this.taskMgr.addTaskCall(this.addbtns.bind(this));
-    };
-    test_heilongbo.prototype.loadShader = function (laststate, state) {
-        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                state.finish = true;
-            }
-        });
-    };
-    test_heilongbo.prototype.loadTexture = function (laststate, state) {
-        var texnumber = 2;
-        this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                texnumber--;
-                if (texnumber == 0) {
-                    state.finish = true;
-                }
-            }
-            else {
-                state.error = true;
-            }
-        });
-        this.app.getAssetMgr().load("res/sd_hlb_1.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                texnumber--;
-                if (texnumber == 0) {
-                    state.finish = true;
-                }
-            }
-            else {
-                state.error = true;
-            }
-        });
-    };
-    test_heilongbo.prototype.loadCube = function (laststate, state) {
-        this.app.getAssetMgr().load("res/prefabs/Cube/Cube.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                state.finish = true;
-            }
-        });
-    };
-    test_heilongbo.prototype.loadkeyFrameAnimationPath = function (laststate, state) {
-        var number = 0;
-        number++;
-        this.app.getAssetMgr().load("res/keyframeAnimation/hlb_lthr.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                number--;
-                if (number == 0) {
-                    state.finish = true;
-                }
-            }
-        });
-        number++;
-        this.app.getAssetMgr().load("res/keyframeAnimation/Cube.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                number--;
-                if (number == 0) {
-                    state.finish = true;
-                }
-            }
-        });
-    };
-    test_heilongbo.prototype.loadasset = function (laststate, state) {
-        this.app.getAssetMgr().load("res/prefabs/hlb_lthr/hlb_lthr.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                state.finish = true;
-            }
-        });
-    };
-    test_heilongbo.prototype.iniscene = function (laststate, state) {
-        var cubeprefab = this.app.getAssetMgr().getAssetByName("Cube.prefab.json");
-        var cube = cubeprefab.getCloneTrans();
-        this.scene.addChild(cube);
-        this.cube = cube;
-        var longtouprefab = this.app.getAssetMgr().getAssetByName("hlb_lthr.prefab.json");
-        var keyframeanimationpath = this.app.getAssetMgr().getAssetByName("hlb_lthr.keyFrameAnimationPath.json");
-        var keyframeanimationpath1 = this.app.getAssetMgr().getAssetByName("Cube.keyFrameAnimationPath.json");
-        var head = longtouprefab.getCloneTrans();
-        head.localScale.x = head.localScale.y = head.localScale.z = 1;
-        head.localTranslate.x = head.localTranslate.y = head.localTranslate.z = 0;
-        this.scene.addChild(head);
-        this.longtou = head;
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "keyframeAni Cam";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.order = 0;
-        this.camera.near = 0.01;
-        this.camera.far = 1000;
-        this.camera.fov = 60;
-        objCam.localTranslate = new gd3d.math.vector3(0, 8, 1);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        objCam.markDirty();
-        var keyframeani = this.longtou.gameObject.addComponent("keyframeanimation");
-        keyframeani.setkeyframeanimationasst(keyframeanimationpath);
-        this.keyframeanicomponet = keyframeani;
-        var keyframeani1 = this.cube.gameObject.addComponent("keyframeanimation");
-        keyframeani1.setkeyframeanimationasst(keyframeanimationpath1);
-        this.keyframeanicomponet1 = keyframeani1;
-        state.finish = true;
-    };
-    test_heilongbo.prototype.addbtns = function () {
-        var _this = this;
-        this.addbtn("play", 10, 100, function () {
-            _this.longtou.gameObject.visible = true;
-            _this.keyframeanicomponet.play();
-            _this.keyframeanicomponet1.play();
-        });
-        this.addbtn("stop", 10, 200, function () {
-            _this.longtou.gameObject.visible = true;
-            _this.keyframeanicomponet.stop();
-            _this.keyframeanicomponet1.stop();
-        });
-        this.addbtn("replay", 10, 300, function () {
-            _this.longtou.gameObject.visible = true;
-            _this.keyframeanicomponet.replay();
-            _this.keyframeanicomponet1.replay();
-        });
-        var input = document.createElement("input");
-        input.type = "range";
-        input.valueAsNumber = 50;
-        this.longtou.localTranslate.x = input.valueAsNumber - 50;
-        input.oninput = function (e) {
-            _this.longtou.localTranslate.x = input.valueAsNumber - 50;
-            _this.longtou.markDirty();
-            console.log(input.valueAsNumber);
-        };
-        input.style.top = "400px";
-        input.style.left = "10px";
-        input.style.position = "absolute";
-        this.app.container.appendChild(input);
-    };
-    test_heilongbo.prototype.addbtn = function (text, x, y, func) {
-        var btn = document.createElement("button");
-        btn.textContent = text;
-        btn.onclick = function () {
-            func();
-        };
-        btn.style.top = y + "px";
-        btn.style.left = x + "px";
-        btn.style.position = "absolute";
-        this.app.container.appendChild(btn);
-    };
-    test_heilongbo.prototype.update = function (delta) {
-        this.taskMgr.move(delta);
-        if (this.cube != null && this.keyframeanicomponet1.isactived) {
-            console.log(this.cube.localTranslate);
-        }
-    };
-    return test_heilongbo;
-}());
 var test_keyFrameAni = (function () {
     function test_keyFrameAni() {
         this.taskMgr = new gd3d.framework.taskMgr();
@@ -6526,41 +6361,34 @@ var test_keyFrameAni = (function () {
     test_keyFrameAni.prototype.iniscene = function (laststate, state) {
         var cubePrefab = this.app.getAssetMgr().getAssetByName("Cube.prefab.json");
         var head = cubePrefab.getCloneTrans();
+        this.obj3d = head;
         this.scene.addChild(head);
         var objCam = new gd3d.framework.transform();
-        objCam.name = "keyframeAni Cam";
+        objCam.name = "sth.";
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.order = 0;
-        this.camera.near = 0.3;
-        this.camera.far = 1000;
-        this.camera.fov = 60;
-        objCam.localTranslate = new gd3d.math.vector3(0, 3, 0);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        this.camera.near = 0.01;
+        this.camera.far = 10000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.lookat(this.obj3d);
         objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
         state.finish = true;
     };
     test_keyFrameAni.prototype.addbtns = function () {
         var _this = this;
         this.addbtn("play", 10, 100, function () {
+            var anip = _this.obj3d.gameObject.getComponent("keyFrameAniPlayer");
+            anip.play();
         });
-        this.addbtn("stop", 10, 200, function () {
+        this.addbtn("stop", 10, 150, function () {
+            var anip = _this.obj3d.gameObject.getComponent("keyFrameAniPlayer");
+            anip.stop();
         });
-        this.addbtn("replay", 10, 300, function () {
+        this.addbtn("rewind", 10, 200, function () {
+            var anip = _this.obj3d.gameObject.getComponent("keyFrameAniPlayer");
+            anip.rewind();
         });
-        var input = document.createElement("input");
-        input.type = "range";
-        input.valueAsNumber = 50;
-        this.longtou.localTranslate.x = input.valueAsNumber - 50;
-        input.oninput = function (e) {
-            _this.longtou.localTranslate.x = input.valueAsNumber - 50;
-            _this.longtou.markDirty();
-            console.log(input.valueAsNumber);
-        };
-        input.style.top = "400px";
-        input.style.left = "10px";
-        input.style.position = "absolute";
-        this.app.container.appendChild(input);
     };
     test_keyFrameAni.prototype.addbtn = function (text, x, y, func) {
         var btn = document.createElement("button");
@@ -6574,149 +6402,10 @@ var test_keyFrameAni = (function () {
         this.app.container.appendChild(btn);
     };
     test_keyFrameAni.prototype.update = function (delta) {
+        CameraController.instance().update(delta);
         this.taskMgr.move(delta);
     };
     return test_keyFrameAni;
-}());
-var test_keyframeAnimation = (function () {
-    function test_keyframeAnimation() {
-        this.taskMgr = new gd3d.framework.taskMgr();
-    }
-    test_keyframeAnimation.prototype.start = function (app) {
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.taskMgr.addTaskCall(this.loadShader.bind(this));
-        this.taskMgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskMgr.addTaskCall(this.loadkeyFrameAnimationPath.bind(this));
-        this.taskMgr.addTaskCall(this.loadasset.bind(this));
-        this.taskMgr.addTaskCall(this.iniscene.bind(this));
-        this.taskMgr.addTaskCall(this.addbtns.bind(this));
-    };
-    test_keyframeAnimation.prototype.loadShader = function (laststate, state) {
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                state.finish = true;
-            }
-        });
-    };
-    test_keyframeAnimation.prototype.loadTexture = function (laststate, state) {
-        var texnumber = 2;
-        this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                texnumber--;
-                if (texnumber == 0) {
-                    state.finish = true;
-                }
-            }
-            else {
-                state.error = true;
-            }
-        });
-        this.app.getAssetMgr().load("res/sd_hlb_1.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                texnumber--;
-                if (texnumber == 0) {
-                    state.finish = true;
-                }
-            }
-            else {
-                state.error = true;
-            }
-        });
-    };
-    test_keyframeAnimation.prototype.loadkeyFrameAnimationPath = function (laststate, state) {
-        this.app.getAssetMgr().load("res/keyframeAnimation/Cube.keyFrameAnimationPath.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                state.finish = true;
-            }
-            else {
-                state.error = true;
-            }
-        });
-    };
-    test_keyframeAnimation.prototype.loadasset = function (laststate, state) {
-        this.app.getAssetMgr().load("res/prefabs/rotatedLongTou/rotatedLongTou.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                state.finish = true;
-            }
-        });
-    };
-    test_keyframeAnimation.prototype.iniscene = function (laststate, state) {
-        var longtouprefab = this.app.getAssetMgr().getAssetByName("rotatedLongTou.prefab.json");
-        var keyframeanimationpath = this.app.getAssetMgr().getAssetByName("Cube.keyFrameAnimationPath.json");
-        var head = longtouprefab.getCloneTrans();
-        head.localScale.x = head.localScale.y = head.localScale.z = 10;
-        head.localTranslate.x = head.localTranslate.y = head.localTranslate.z = 0;
-        this.scene.addChild(head);
-        this.longtou = head;
-        var cube = new gd3d.framework.transform();
-        cube.name = "cube1";
-        cube.localTranslate.x = 4;
-        this.scene.addChild(cube);
-        var meshfiter = cube.gameObject.addComponent("meshFilter");
-        var mesh = this.app.getAssetMgr().getDefaultMesh("cube");
-        meshfiter.mesh = mesh;
-        var meshrender = cube.gameObject.addComponent("meshRenderer");
-        cube.markDirty();
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "keyframeAni Cam";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.order = 0;
-        this.camera.near = 0.3;
-        this.camera.far = 1000;
-        this.camera.fov = 60;
-        objCam.localTranslate = new gd3d.math.vector3(-5, 10, 3);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        objCam.markDirty();
-        var keyframeani = head.gameObject.addComponent("keyframeanimation");
-        keyframeani.setkeyframeanimationasst(keyframeanimationpath);
-        this.keyframeanicomponet = keyframeani;
-        state.finish = true;
-    };
-    test_keyframeAnimation.prototype.addbtns = function () {
-        var _this = this;
-        this.addbtn("play", 10, 100, function () {
-            _this.longtou.gameObject.visible = true;
-            _this.keyframeanicomponet.play();
-        });
-        this.addbtn("stop", 10, 200, function () {
-            _this.longtou.gameObject.visible = false;
-            _this.keyframeanicomponet.stop();
-        });
-        this.addbtn("replay", 10, 300, function () {
-            _this.longtou.gameObject.visible = true;
-            _this.keyframeanicomponet.replay();
-        });
-        var input = document.createElement("input");
-        input.type = "range";
-        input.valueAsNumber = 50;
-        this.longtou.localTranslate.x = input.valueAsNumber - 50;
-        input.oninput = function (e) {
-            _this.longtou.localTranslate.x = input.valueAsNumber - 50;
-            _this.longtou.markDirty();
-            console.log(input.valueAsNumber);
-        };
-        input.style.top = "400px";
-        input.style.left = "10px";
-        input.style.position = "absolute";
-        this.app.container.appendChild(input);
-    };
-    test_keyframeAnimation.prototype.addbtn = function (text, x, y, func) {
-        var btn = document.createElement("button");
-        btn.textContent = text;
-        btn.onclick = function () {
-            func();
-        };
-        btn.style.top = y + "px";
-        btn.style.left = x + "px";
-        btn.style.position = "absolute";
-        this.app.container.appendChild(btn);
-    };
-    test_keyframeAnimation.prototype.update = function (delta) {
-        this.taskMgr.move(delta);
-    };
-    return test_keyframeAnimation;
 }());
 var testLiChangeMesh = (function () {
     function testLiChangeMesh() {

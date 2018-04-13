@@ -4974,10 +4974,9 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["PackBin"] = 18] = "PackBin";
             AssetTypeEnum[AssetTypeEnum["PackTxt"] = 19] = "PackTxt";
             AssetTypeEnum[AssetTypeEnum["PathAsset"] = 20] = "PathAsset";
-            AssetTypeEnum[AssetTypeEnum["KeyFrameAnimaionAsset"] = 21] = "KeyFrameAnimaionAsset";
-            AssetTypeEnum[AssetTypeEnum["PVR"] = 22] = "PVR";
-            AssetTypeEnum[AssetTypeEnum["F14Effect"] = 23] = "F14Effect";
-            AssetTypeEnum[AssetTypeEnum["DDS"] = 24] = "DDS";
+            AssetTypeEnum[AssetTypeEnum["PVR"] = 21] = "PVR";
+            AssetTypeEnum[AssetTypeEnum["F14Effect"] = 22] = "F14Effect";
+            AssetTypeEnum[AssetTypeEnum["DDS"] = 23] = "DDS";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var AssetBundleLoadState;
         (function (AssetBundleLoadState) {
@@ -5609,7 +5608,6 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.TextAsset, new framework.AssetFactory_TextAsset());
                 this.regAssetFactory(AssetTypeEnum.PathAsset, new framework.AssetFactory_PathAsset());
                 this.regAssetFactory(AssetTypeEnum.PVR, new framework.AssetFactory_PVR());
-                this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new framework.AssetFactory_KeyframeAnimationPathAsset());
                 this.regAssetFactory(AssetTypeEnum.F14Effect, new framework.AssetFactory_f14eff());
                 this.regAssetFactory(AssetTypeEnum.DDS, new framework.AssetFactory_DDS());
                 this.regAssetFactory(AssetTypeEnum.KeyFrameAniclip, new framework.assetfactory_keyFrameAniClip());
@@ -5800,28 +5798,29 @@ var gd3d;
             };
             assetMgr.prototype.loadScene = function (sceneName, onComplete) {
                 var firstChilds = new Array();
+                var scene = this.app.getScene();
                 if (sceneName.length > 0) {
                     var _rawscene = this.getAssetByName(sceneName);
                     var willLoadRoot = _rawscene.getSceneRoot();
                     while (willLoadRoot.children.length > 0) {
                         var trans = willLoadRoot.children.shift();
                         firstChilds.push(trans);
-                        this.app.getScene().addChild(trans);
+                        scene.addChild(trans);
                     }
-                    this.app.getScene()["_overlay2d"] = new Array();
-                    _rawscene.useLightMap(this.app.getScene());
-                    _rawscene.useFog(this.app.getScene());
-                    _rawscene.useNavMesh(this.app.getScene());
+                    scene["_overlay2d"] = new Array();
+                    _rawscene.useLightMap(scene);
+                    _rawscene.useFog(scene);
+                    _rawscene.useNavMesh(scene);
                 }
                 else {
                     var _camera = new framework.transform();
                     _camera.gameObject.addComponent("camera");
                     _camera.name = "camera";
                     firstChilds.push(_camera);
-                    this.app.getScene().addChild(_camera);
+                    scene.addChild(_camera);
                 }
-                this.app.getScene().name = sceneName;
-                this.app.getScene().getRoot().markDirty();
+                scene.name = sceneName;
+                scene.getRoot().markDirty();
                 onComplete(firstChilds);
             };
             assetMgr.prototype.saveScene = function (fun) {
@@ -6006,9 +6005,6 @@ var gd3d;
                     }
                     else if (extname == ".path.json") {
                         return AssetTypeEnum.PathAsset;
-                    }
-                    else if (extname == ".keyFrameAnimationPath.json") {
-                        return AssetTypeEnum.KeyFrameAnimaionAsset;
                     }
                     else if (extname == ".f14effect.json") {
                         return AssetTypeEnum.F14Effect;
@@ -7173,42 +7169,6 @@ var gd3d;
             return assetfactory_keyFrameAniClip;
         }());
         framework.assetfactory_keyFrameAniClip = assetfactory_keyFrameAniClip;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var AssetFactory_KeyframeAnimationPathAsset = (function () {
-            function AssetFactory_KeyframeAnimationPathAsset() {
-            }
-            AssetFactory_KeyframeAnimationPathAsset.prototype.newAsset = function () {
-                return null;
-            };
-            AssetFactory_KeyframeAnimationPathAsset.prototype.load = function (url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _keyframepath = asset ? asset : new framework.keyframeAnimationPathAsset(filename);
-                    _keyframepath.Parse(JSON.parse(txt));
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _keyframepath, url);
-                }, function (loadedLength, totalLength) {
-                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                });
-            };
-            AssetFactory_KeyframeAnimationPathAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _keyframepath = asset ? asset : new framework.keyframeAnimationPathAsset(filename);
-                _keyframepath.Parse(JSON.parse(txt));
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _keyframepath, url);
-            };
-            return AssetFactory_KeyframeAnimationPathAsset;
-        }());
-        framework.AssetFactory_KeyframeAnimationPathAsset = AssetFactory_KeyframeAnimationPathAsset;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9581,16 +9541,22 @@ var gd3d;
                 var curves_o = obj["curves"];
                 for (var i = 0; i < curves_o.length; i++) {
                     var curve = new AnimationCurve();
-                    var curve_o = curves_o[1];
+                    var curve_o = curves_o[i];
                     var kfs_o = curve_o["keyFrames"];
                     curve.path = curve_o["path"];
-                    curve.propertyName = curve_o["propertyName"];
-                    curve.type = curve_o["type"];
+                    curve.propertyName = kFAniClipUtil.converUnityTypeProperty(curve_o["type"], curve_o["propertyName"]);
+                    curve.type = kFAniClipUtil.converUnityType(curve_o["type"]);
                     for (var j = 0; j < kfs_o.length; j++) {
                         var kf_o = kfs_o[j];
                         var kf = new keyFrame();
-                        kf.inTangent = kf_o["inTangent"];
-                        kf.outTangent = kf_o["outTangent"];
+                        if (typeof (kf_o["inTangent"]) === "string")
+                            kf.inTangent = Number(kf_o["inTangent"]);
+                        else
+                            kf.inTangent = kf_o["inTangent"];
+                        if (typeof (kf_o["outTangent"]) === "string")
+                            kf.outTangent = Number(kf_o["outTangent"]);
+                        else
+                            kf.outTangent = kf_o["outTangent"];
                         kf.tangentMode = kf_o["tangentMode"];
                         kf.time = kf_o["time"];
                         kf.value = kf_o["value"];
@@ -9598,7 +9564,6 @@ var gd3d;
                     }
                     this.curves.push(curve);
                 }
-                debugger;
             };
             Object.defineProperty(keyFrameAniClip.prototype, "wrapMode", {
                 get: function () { return this._wrapMode; },
@@ -9612,12 +9577,6 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(keyFrameAniClip.prototype, "loop", {
-                get: function () { return this.loop; },
-                enumerable: true,
-                configurable: true
-            });
-            ;
             Object.defineProperty(keyFrameAniClip.prototype, "time", {
                 get: function () {
                     return this.length;
@@ -9691,13 +9650,17 @@ var gd3d;
                 var result = propertyName;
                 if (framework.StringUtil.isNullOrEmptyObject(propertyName))
                     return "";
+                if (tyep.indexOf("UnityEngine") != -1) {
+                    var strs = tyep.split(".");
+                    tyep = strs[strs.length - 1];
+                }
                 var obj = kFAniClipUtil._typePair[tyep];
                 var cgProperty = propertyName;
                 if (propertyName.lastIndexOf(".") != -1) {
                     cgProperty = propertyName.substr(0, propertyName.lastIndexOf("."));
                 }
-                if (obj && obj["__prop__"] && obj["__prop__"][cgProperty]) {
-                    var str = obj["__prop__"][cgProperty];
+                if (obj && obj[kFAniClipUtil.propTag] && obj[kFAniClipUtil.propTag][cgProperty]) {
+                    var str = obj[kFAniClipUtil.propTag][cgProperty];
                     result = propertyName.replace(cgProperty, str);
                 }
                 return result;
@@ -9713,185 +9676,19 @@ var gd3d;
                 return result;
             };
             kFAniClipUtil.regProperty = function (obj) {
+                kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalPosition", "localTranslate");
+                kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalScale", "localScale");
+                kFAniClipUtil.assemblyProp(obj, "Transform", "m_LocalRotation", "localRotate");
             };
+            kFAniClipUtil.assemblyProp = function (obj, Type, prop, replaceProp) {
+                if (!obj["Transform"][kFAniClipUtil.propTag])
+                    obj["Transform"][kFAniClipUtil.propTag] = {};
+                obj["Transform"][kFAniClipUtil.propTag][prop] = replaceProp;
+            };
+            kFAniClipUtil.propTag = "__prop__";
             kFAniClipUtil._typePair = kFAniClipUtil.regType();
             return kFAniClipUtil;
         }());
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var keyframeAnimationPathAsset = (function () {
-            function keyframeAnimationPathAsset(assetName) {
-                if (assetName === void 0) { assetName = null; }
-                this.id = new framework.resID();
-                this.defaultAsset = false;
-                this.beloop = false;
-                this.positionitems = [];
-                this.rotationitmes = [];
-                this.pathdata = {};
-                if (!assetName) {
-                    assetName = "keyframepath_" + this.getGUID();
-                }
-                this.name = new framework.constText(assetName);
-            }
-            keyframeAnimationPathAsset.prototype.getName = function () {
-                return this.name.getText();
-            };
-            keyframeAnimationPathAsset.prototype.getGUID = function () {
-                return this.id.getID();
-            };
-            keyframeAnimationPathAsset.prototype.use = function () {
-                framework.sceneMgr.app.getAssetMgr().use(this);
-            };
-            keyframeAnimationPathAsset.prototype.Parse = function (json) {
-                var isloop = json["isLoop"];
-                if (isloop == "True") {
-                    this.beloop = true;
-                }
-                else {
-                    this.beloop = false;
-                }
-                this.timeLength = json["timeLength"];
-                this.frameRate = json["frameRate"];
-                var position = json["position"];
-                for (var key in position) {
-                    var item = new keyframepathpositionitem();
-                    var pointnode = position[key];
-                    item.time = pointnode["time"];
-                    var itemposition = pointnode["position"];
-                    var arr = itemposition.split(",");
-                    item.position = new gd3d.math.vector3(parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]));
-                    this.positionitems.push(item);
-                }
-                var rotation = json["rotation"];
-                for (var key in rotation) {
-                    var item1 = new keyframepathrotationitem();
-                    var rotationnode = rotation[key];
-                    item1.time = rotationnode["time"];
-                    var itemrotation = rotationnode["rotation"];
-                    var arr1 = itemrotation.split(",");
-                    item1.rotation = new gd3d.math.quaternion(parseFloat(arr1[0]), parseFloat(arr1[1]), parseFloat(arr1[2]), parseFloat(arr1[3]));
-                    this.rotationitmes.push(item1);
-                }
-                var children = json["children"];
-                for (var i = 0; i < children.length; i++) {
-                    var childname = children[i]["name"];
-                    var childpathdata = new pathData();
-                    var position_1 = children[i]["position"];
-                    for (var key in position_1) {
-                        var item_1 = new keyframepathpositionitem();
-                        var positionnode = position_1[key];
-                        item_1.time = positionnode["time"];
-                        var itemposition = positionnode["position"];
-                        var arr_1 = itemposition.split(",");
-                        item_1.position = new gd3d.math.vector3(parseFloat(arr_1[0]), parseFloat(arr_1[1]), parseFloat(arr_1[2]));
-                        childpathdata.positions.push(item_1);
-                    }
-                    var rotation_1 = children[i]["rotation"];
-                    for (var key in rotation_1) {
-                        var item_2 = new keyframepathrotationitem();
-                        var rotationnode = rotation_1[key];
-                        item_2.time = rotationnode["time"];
-                        var itemrotation = rotationnode["rotation"];
-                        var arr_2 = itemrotation.split(",");
-                        item_2.rotation = new gd3d.math.quaternion(parseFloat(arr_2[0]), parseFloat(arr_2[1]), parseFloat(arr_2[2]), parseFloat(arr_2[3]));
-                        childpathdata.rotations.push(item_2);
-                    }
-                    this.pathdata[childname] = childpathdata;
-                    var nextchildren = children[i]["children"];
-                    this.addPathData(nextchildren);
-                }
-            };
-            keyframeAnimationPathAsset.prototype.addPathData = function (children) {
-                for (var i = 0; i < children.length; i++) {
-                    var childname = children[i]["name"];
-                    var childpathdata = new pathData();
-                    childpathdata.name = childname;
-                    var position = children[i]["position"];
-                    for (var key in position) {
-                        var item = new keyframepathpositionitem();
-                        var positionnode = position[key];
-                        item.time = positionnode["time"];
-                        var itemposition = positionnode["position"];
-                        var arr = itemposition.split(",");
-                        item.position = new gd3d.math.vector3(parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]));
-                        childpathdata.positions.push(item);
-                    }
-                    var rotation = children[i]["rotation"];
-                    for (var key in rotation) {
-                        var item = new keyframepathrotationitem();
-                        var rotationnode = rotation[key];
-                        item.time = rotationnode["time"];
-                        var itemrotation = rotationnode["rotation"];
-                        var arr = itemrotation.split(",");
-                        item.rotation = new gd3d.math.quaternion(parseFloat(arr[0]), parseFloat(arr[1]), parseFloat(arr[2]), parseFloat(arr[3]));
-                        childpathdata.rotations.push(item);
-                    }
-                    this.pathdata[childname] = childpathdata;
-                    var nextchildren = children[i]["children"];
-                    this.addPathData(nextchildren);
-                }
-            };
-            keyframeAnimationPathAsset.prototype.unuse = function () {
-                framework.sceneMgr.app.getAssetMgr().unuse(this);
-            };
-            keyframeAnimationPathAsset.prototype.dispose = function () {
-                this.positionitems.length = 0;
-                this.rotationitmes.length = 0;
-            };
-            keyframeAnimationPathAsset.prototype.caclByteLength = function () {
-                var number = 0;
-                if (this.positionitems) {
-                    number += this.positionitems.length * 16;
-                }
-                if (this.rotationitmes) {
-                    number += this.rotationitmes.length * 20;
-                }
-                return number;
-            };
-            __decorate([
-                gd3d.reflect.Field("ConstText"),
-                __metadata("design:type", framework.constText)
-            ], keyframeAnimationPathAsset.prototype, "name", void 0);
-            keyframeAnimationPathAsset = __decorate([
-                gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [String])
-            ], keyframeAnimationPathAsset);
-            return keyframeAnimationPathAsset;
-        }());
-        framework.keyframeAnimationPathAsset = keyframeAnimationPathAsset;
-        var keyframepathpositionitem = (function () {
-            function keyframepathpositionitem() {
-            }
-            return keyframepathpositionitem;
-        }());
-        framework.keyframepathpositionitem = keyframepathpositionitem;
-        var keyframepathrotationitem = (function () {
-            function keyframepathrotationitem() {
-            }
-            return keyframepathrotationitem;
-        }());
-        framework.keyframepathrotationitem = keyframepathrotationitem;
-        var children = (function () {
-            function children() {
-                this.position = [];
-                this.rotation = [];
-                this.children = [];
-            }
-            return children;
-        }());
-        framework.children = children;
-        var pathData = (function () {
-            function pathData() {
-                this.positions = [];
-                this.rotations = [];
-            }
-            return pathData;
-        }());
-        framework.pathData = pathData;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -12401,19 +12198,19 @@ var gd3d;
             bloomctr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_3 = this.camera.postQueues;
+                    var arr_1 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_3.length; i++) {
-                        var temp = arr_3[i];
+                    for (var i = 0; i < arr_1.length; i++) {
+                        var temp = arr_1[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_3.indexOf(element);
+                            var idx = arr_1.indexOf(element);
                             if (idx != -1) {
-                                arr_3.splice(idx, 1);
+                                arr_1.splice(idx, 1);
                             }
                         }
                     });
@@ -13947,232 +13744,245 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var keyframeanimation = (function () {
-            function keyframeanimation() {
-                this.timelength = 0;
-                this.beloop = false;
-                this.frameRate = 0;
-                this.pathdata = {};
-                this.playingtime = 0;
-                this.childrentrans = {};
-                this.childrenpaths = [];
-                this.isactived = false;
-                this.lastpositionindex = 0;
-                this.lastrotationindex = 0;
+        var keyFrameAniPlayer = (function () {
+            function keyFrameAniPlayer() {
+                this.nowTime = 0;
+                this.pathPropertyMap = {};
             }
-            Object.defineProperty(keyframeanimation.prototype, "keyframeasset", {
+            Object.defineProperty(keyFrameAniPlayer.prototype, "nowFrame", {
                 get: function () {
-                    return this._keyframeasset;
-                },
-                set: function (keyframeasset) {
-                    if (this._keyframeasset) {
-                        this._keyframeasset.unuse();
-                    }
-                    this._keyframeasset = keyframeasset;
-                    if (this._keyframeasset) {
-                        this._keyframeasset.use();
-                    }
+                    if (!this.nowClip)
+                        return 0;
+                    return Math.floor(this.nowClip.fps * this.nowTime);
                 },
                 enumerable: true,
                 configurable: true
             });
-            keyframeanimation.prototype.setkeyframeanimationasst = function (keyframeanimationpathasset) {
-                this._keyframeasset = keyframeanimationpathasset;
-                if (keyframeanimationpathasset == null) {
-                    console.log(this.gameObject.getName().toString() + ":are you set the right keyframeanimationasset(error:null)?");
+            ;
+            keyFrameAniPlayer.prototype.start = function () {
+                this.init();
+            };
+            keyFrameAniPlayer.prototype.update = function (delta) {
+                var clip = this.nowClip;
+                if (!clip)
+                    return;
+                if (this.checkPlayEnd(clip)) {
+                    this.nowClip = null;
+                    this.nowTime = 0;
                     return;
                 }
-                this.positions = keyframeanimationpathasset.positionitems;
-                this.rotations = keyframeanimationpathasset.rotationitmes;
-                this.timelength = keyframeanimationpathasset.timeLength;
-                this.beloop = keyframeanimationpathasset.beloop;
-                this.frameRate = keyframeanimationpathasset.frameRate;
-                this.pathdata = keyframeanimationpathasset.pathdata;
-                if (this.positions[0] != null) {
-                    gd3d.math.vec3Clone(this.positions[0].position, this.gameObject.transform.localTranslate);
-                }
-                if (this.rotations[0] != null) {
-                    gd3d.math.quatClone(this.rotations[0].rotation, this.gameObject.transform.localRotate);
-                }
-                this.mystrans = this.gameObject.transform;
-                this.setChildTrans(this.mystrans);
-                this.mystrans.markDirty();
+                this.nowTime += delta;
+                var playTime = this.nowTime % this.nowClip.time;
+                this.displayByTime(clip, playTime);
             };
-            keyframeanimation.prototype.setChildTrans = function (mytrans) {
-                if (mytrans.children) {
-                    for (var i = 0; i < mytrans.children.length; i++) {
-                        if (mytrans.children[i] != this.mystrans) {
-                            var parent = new gd3d.framework.transform();
-                            parent = mytrans.children[i].parent;
-                            var name = mytrans.children[i].name;
-                            while (parent != this.mystrans) {
-                                name = parent.name + "/" + name;
-                                parent = parent.parent;
-                            }
-                            for (var key in this.pathdata) {
-                                if (name == key) {
-                                    this.childrentrans[name] = mytrans.children[i];
-                                    this.childrenpaths.push({ child: this.childrentrans[name], path: this.pathdata[key] });
-                                }
-                            }
-                        }
-                        this.setChildTrans(mytrans.children[i]);
-                    }
-                }
-            };
-            keyframeanimation.prototype.start = function () {
-            };
-            keyframeanimation.prototype.update = function (delta) {
-                if (!this.isactived)
+            keyFrameAniPlayer.prototype.displayByTime = function (clip, playTime) {
+                var curves = this.timeFilterCurves(clip, playTime);
+                if (!curves || curves.length < 1)
                     return;
-                this.followmove(delta);
+                for (var i = 0; i < curves.length; i++) {
+                    var tempc = curves[i];
+                    this.refrasCurveProperty(tempc, playTime);
+                }
             };
-            keyframeanimation.prototype.followmove = function (delta) {
-                this.playingtime += delta;
-                var lastpositionindex = this.lastpositionindex;
-                var lastrotationindex = this.lastrotationindex;
-                if (this.positions[0] != null) {
-                    if (this.playingtime >= this.timelength) {
-                        if (!this.beloop) {
-                            this.isactived = false;
-                        }
-                        else {
-                            this.replay();
-                        }
-                    }
-                    if (lastpositionindex < this.positions.length - 1) {
-                        while (this.playingtime > this.positions[lastpositionindex].time) {
-                            lastpositionindex++;
-                            if (lastpositionindex == this.positions.length - 1)
-                                break;
-                        }
-                    }
-                    if (this.positions[lastpositionindex].time > (this.playingtime - delta) && this.positions[lastpositionindex].time - this.playingtime < 0.016) {
-                        this.mystrans.localTranslate.x = this.positions[lastpositionindex].position.x;
-                        this.mystrans.localTranslate.y = this.positions[lastpositionindex].position.y;
-                        this.mystrans.localTranslate.z = this.positions[lastpositionindex].position.z;
-                        this.mystrans.markDirty();
-                    }
-                    else if (this.positions[lastpositionindex].time > (this.playingtime - delta)) {
-                        var positionlerp = delta / (this.positions[lastpositionindex].time - (this.playingtime - delta));
-                        gd3d.math.vec3SLerp(this.mystrans.localTranslate, this.positions[lastpositionindex].position, positionlerp, this.mystrans.localTranslate);
-                        this.mystrans.markDirty();
+            keyFrameAniPlayer.prototype.calcValueByTime = function (curve, playTime) {
+                var kfs = curve.keyFrames;
+                if (!kfs || kfs.length < 1)
+                    return 0;
+                if (kfs.length == 1 && kfs[0])
+                    return kfs[0].value;
+                var leftKf;
+                var rightKf;
+                for (var i = 0; i < kfs.length; i++) {
+                    rightKf = kfs[i];
+                    if (kfs[i].time > playTime) {
+                        if (i > 0)
+                            leftKf = kfs[i - 1];
+                        break;
                     }
                 }
-                if (this.rotations[0] != null) {
-                    if (this.playingtime >= this.timelength) {
-                        if (!this.beloop) {
-                            this.isactived = false;
-                        }
-                        else {
-                            this.replay();
-                        }
-                    }
-                    if (lastrotationindex < this.rotations.length - 1) {
-                        while (this.playingtime > this.rotations[lastrotationindex].time) {
-                            lastrotationindex++;
-                            if (lastrotationindex == this.rotations.length - 1)
-                                break;
-                        }
-                    }
-                    if (this.rotations[lastrotationindex].time > (this.playingtime - delta) && this.rotations[lastrotationindex].time - (this.playingtime - delta) < 0.01) {
-                        this.mystrans.localRotate.x = this.rotations[lastrotationindex].rotation.x;
-                        this.mystrans.localRotate.y = this.rotations[lastrotationindex].rotation.y;
-                        this.mystrans.localRotate.z = this.rotations[lastrotationindex].rotation.z;
-                        this.mystrans.localRotate.w = this.rotations[lastrotationindex].rotation.w;
-                        this.mystrans.markDirty();
-                    }
-                    else if (this.rotations[lastrotationindex].time > (this.playingtime - delta)) {
-                        var rotationlerp = delta / (this.rotations[lastrotationindex].time - (this.playingtime - delta));
-                        gd3d.math.quatLerp(this.mystrans.localRotate, this.rotations[lastrotationindex].rotation, this.mystrans.localRotate, rotationlerp);
-                        this.mystrans.markDirty();
-                    }
-                }
-                this.childrenfollow(delta);
-                this.lastpositionindex = lastpositionindex;
-                this.lastrotationindex = lastrotationindex;
+                return bezierCurveTool.calcValue(leftKf, rightKf, playTime);
             };
-            keyframeanimation.prototype.childrenfollow = function (delta) {
-                var playingtime = this.playingtime;
-                for (var i = 0; i < this.childrenpaths.length; i++) {
-                    var item = this.childrenpaths[i];
-                    var childtrans = item.child;
-                    var childpositions = item.path.positions;
-                    var childrotations = item.path.rotations;
-                    if (childpositions.length > 0) {
-                        var aheadpositionindex = 0;
-                        while (playingtime > childpositions[aheadpositionindex].time) {
-                            aheadpositionindex++;
-                            if (aheadpositionindex == childpositions.length - 1)
-                                break;
-                        }
-                        if (playingtime <= childpositions[aheadpositionindex].time) {
-                            if (childpositions[aheadpositionindex].time - playingtime < 0.016) {
-                                gd3d.math.vec3Clone(childpositions[aheadpositionindex].position, childtrans.localTranslate);
-                                childtrans.markDirty();
-                            }
-                            else {
-                                var positionlerp = delta / (childpositions[aheadpositionindex].time - (playingtime - delta));
-                                gd3d.math.vec3SLerp(childtrans.localTranslate, childpositions[aheadpositionindex].position, positionlerp, childtrans.localTranslate);
-                                childtrans.markDirty();
+            keyFrameAniPlayer.prototype.refrasCurveProperty = function (curve, playTime) {
+                if (playTime < 0 || !curve || curve.keyFrames.length < 2 || framework.StringUtil.isNullOrEmptyObject(curve.propertyName))
+                    return;
+                var key = curve.path + "_" + curve.type;
+                var obj = this.pathPropertyMap[key];
+                if (!obj)
+                    return;
+                var sub = obj;
+                var strs = curve.propertyName.split(".");
+                while (strs.length > 0) {
+                    if (strs.length == 1) {
+                        sub[strs[0]] = this.calcValueByTime(curve, playTime);
+                        if (curve.type == framework.transform["name"]) {
+                            if (obj instanceof framework.transform) {
+                                obj.markDirty();
                             }
                         }
+                        return;
                     }
-                    if (childrotations.length > 0) {
-                        var aheadrotationindex = 0;
-                        while (playingtime > childrotations[aheadrotationindex].time) {
-                            aheadrotationindex++;
-                            if (aheadrotationindex == childrotations.length - 1)
+                    var str = strs.shift();
+                    sub = sub[str];
+                    if (!sub)
+                        return;
+                }
+            };
+            keyFrameAniPlayer.prototype.timeFilterCurves = function (clip, nowTime) {
+                if (!clip || clip.curves.length < 1)
+                    return;
+                var result = [];
+                for (var i = 0; i < clip.curves.length; i++) {
+                    var curve = clip.curves[i];
+                    var kfs = curve.keyFrames;
+                    if (kfs.length < 1 || !kfs[kfs.length - 1] || kfs[kfs.length - 1].time < nowTime)
+                        continue;
+                    result.push(curve);
+                }
+                return result;
+            };
+            keyFrameAniPlayer.prototype.checkPlayEnd = function (clip) {
+                if (!clip)
+                    return true;
+                if (clip._wrapMode == framework.WrapMode.Loop || clip._wrapMode == framework.WrapMode.PingPong)
+                    return false;
+                if (this.nowTime >= clip.time)
+                    return true;
+            };
+            keyFrameAniPlayer.prototype.init = function () {
+            };
+            keyFrameAniPlayer.prototype.isPlaying = function (ClipName) {
+                return (this.nowClip && this.nowClip.getName() == ClipName);
+            };
+            keyFrameAniPlayer.prototype.playByName = function (ClipName) {
+                if (!this.clips || this.clips.length < 1)
+                    return;
+                for (var i = 0; i < this.clips.length; i++) {
+                    var clip = this.clips[i];
+                    if (!clip)
+                        continue;
+                    if (clip.getName() == ClipName) {
+                        this.nowClip = clip;
+                        this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+                    }
+                }
+            };
+            keyFrameAniPlayer.prototype.play = function () {
+                if (!this.clips || this.clips.length < 1)
+                    return;
+                this.nowClip = this.clips[0];
+                if (!this.nowClip)
+                    return;
+                this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+            };
+            keyFrameAniPlayer.prototype.stop = function () {
+                this.nowClip = null;
+            };
+            keyFrameAniPlayer.prototype.rewind = function () {
+                if (!this.nowClip)
+                    return;
+                this.displayByTime(this.nowClip, 0);
+                this.nowTime = 0;
+            };
+            keyFrameAniPlayer.prototype.collectPropertyObj = function (clip) {
+                if (!clip)
+                    return;
+                for (var i = 0; i < clip.curves.length; i++) {
+                    var curve = clip.curves[i];
+                    var tran = this.gameObject.transform;
+                    if (!framework.StringUtil.isNullOrEmptyObject(curve.path)) {
+                        tran = this.pathPropertyMap[curve.path];
+                    }
+                    var comp = tran;
+                    if (curve.type != framework.transform.prototype.name) {
+                        comp = tran.gameObject.getComponent(curve.type);
+                    }
+                    if (!comp)
+                        continue;
+                }
+            };
+            keyFrameAniPlayer.prototype.collectPathPropertyObj = function (clip, pathMap) {
+                if (!clip || !pathMap)
+                    return;
+                for (var i = 0; i < clip.curves.length; i++) {
+                    var curve = clip.curves[i];
+                    var key = "";
+                    var tran = this.gameObject.transform;
+                    if (!framework.StringUtil.isNullOrEmptyObject(curve.path)) {
+                        var strs = curve.path.split("/");
+                        for (var j = 0; j < strs.length; j++) {
+                            tran = this.serchChild(strs[i], tran);
+                            if (!tran)
                                 break;
                         }
-                        if (playingtime <= childrotations[aheadrotationindex].time) {
-                            if (childrotations[aheadrotationindex].time - playingtime < 0.016) {
-                                gd3d.math.quatClone(childrotations[aheadrotationindex].rotation, childtrans.localRotate);
-                                childtrans.markDirty();
-                            }
-                            else {
-                                var rotationlerp = delta / (childrotations[aheadrotationindex].time - (playingtime - delta));
-                                gd3d.math.quatLerp(childtrans.localRotate, childrotations[aheadrotationindex].rotation, childtrans.localRotate, rotationlerp);
-                                childtrans.markDirty();
-                            }
-                        }
+                        if (!tran)
+                            continue;
                     }
+                    key = curve.path + "_" + curve.type;
+                    var comp = tran;
+                    if (curve.type != framework.transform["name"]) {
+                        comp = tran.gameObject.getComponent(curve.type);
+                    }
+                    pathMap[key] = comp;
                 }
             };
-            keyframeanimation.prototype.remove = function () {
-                if (this._keyframeasset) {
-                    this._keyframeasset.unuse();
+            keyFrameAniPlayer.prototype.serchChild = function (name, trans) {
+                if (!trans || !trans.children || trans.children.length < 1)
+                    return;
+                for (var i = 0; i < trans.children.length; i++) {
+                    var child = trans.children[i];
+                    if (child && child.name == name)
+                        return child;
                 }
             };
-            keyframeanimation.prototype.clone = function () {
+            keyFrameAniPlayer.prototype.clone = function () {
             };
-            keyframeanimation.prototype.play = function () {
-                this.isactived = true;
+            keyFrameAniPlayer.prototype.remove = function () {
             };
-            keyframeanimation.prototype.pause = function () {
-                this.isactived = false;
-            };
-            keyframeanimation.prototype.stop = function () {
-                this.isactived = false;
-            };
-            keyframeanimation.prototype.replay = function () {
-                this.playingtime = 0;
-                this.lastpositionindex = 0;
-                this.lastrotationindex = 0;
-                if (this.positions[0] != null) {
-                    gd3d.math.vec3Clone(this.positions[0].position, this.mystrans.localTranslate);
-                }
-                if (this.rotations[0] != null) {
-                    gd3d.math.quatClone(this.rotations[0].rotation, this.mystrans.localRotate);
-                }
-                this.isactived = true;
-            };
-            keyframeanimation = __decorate([
+            __decorate([
+                gd3d.reflect.Field("keyFrameAniClip[]"),
+                __metadata("design:type", Array)
+            ], keyFrameAniPlayer.prototype, "clips", void 0);
+            keyFrameAniPlayer = __decorate([
                 gd3d.reflect.nodeComponent
-            ], keyframeanimation);
-            return keyframeanimation;
+            ], keyFrameAniPlayer);
+            return keyFrameAniPlayer;
         }());
-        framework.keyframeanimation = keyframeanimation;
+        framework.keyFrameAniPlayer = keyFrameAniPlayer;
+        var bezierCurveTool = (function () {
+            function bezierCurveTool() {
+            }
+            bezierCurveTool.calcValue = function (kf_l, kf_r, playTime) {
+                if (kf_l.outTangent == Infinity || kf_r.inTangent == Infinity)
+                    return kf_l.value;
+                var rate = (playTime - kf_l.time) / (kf_r.time - kf_l.time);
+                var v2 = bezierCurveTool.converCalc(kf_l.value, kf_r.value, kf_l.time, kf_r.time, kf_l.inTangent, kf_r.outTangent, rate);
+                return v2.y;
+            };
+            bezierCurveTool.converCalc = function (inV, outV, inTime, outTime, inTangent, outTangent, t) {
+                var p0 = gd3d.math.pool.new_vector2(inTime, inV);
+                var p1 = gd3d.math.pool.new_vector2();
+                var p2 = gd3d.math.pool.new_vector2();
+                var p3 = gd3d.math.pool.new_vector2(outTime, outV);
+                var dir1 = gd3d.math.pool.new_vector2(inTangent < 0 ? -1 : 1, Math.sqrt(1 + inTangent * inTangent));
+                var dir2 = gd3d.math.pool.new_vector2(outTangent < 0 ? -1 : 1, Math.sqrt(1 + outTangent * outTangent));
+                gd3d.math.vec2Add(p0, dir1, p1);
+                gd3d.math.vec2Add(p3, dir2, p2);
+                bezierCurveTool.calcCurve(t, p0, p1, p2, p3, bezierCurveTool.cupV2);
+                gd3d.math.pool.delete_vector2Array([p0, p1, p2, p3, dir1, dir2]);
+                return bezierCurveTool.cupV2;
+            };
+            bezierCurveTool.calcCurve = function (t, P0, P1, P2, P3, out) {
+                var equation = function (t, val0, val1, val2, val3) {
+                    var res = (1.0 - t) * (1.0 - t) * (1.0 - t) * val0 + 3.0 * t * (1.0 - t) * (1.0 - t) * val1 + 3.0 * t * t * (1.0 - t) * val2 + t * t * t * val3;
+                    return res;
+                };
+                out.x = equation(t, P0.x, P1.x, P2.x, P3.x);
+                out.y = equation(t, P0.y, P1.y, P2.y, P3.y);
+                return out;
+            };
+            bezierCurveTool.cupV2 = new gd3d.math.vector2();
+            return bezierCurveTool;
+        }());
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -15039,19 +14849,19 @@ var gd3d;
             vignettingCtr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_4 = this.camera.postQueues;
+                    var arr_2 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_4.length; i++) {
-                        var temp = arr_4[i];
+                    for (var i = 0; i < arr_2.length; i++) {
+                        var temp = arr_2[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_4.indexOf(element);
+                            var idx = arr_2.indexOf(element);
                             if (idx != -1) {
-                                arr_4.splice(idx, 1);
+                                arr_2.splice(idx, 1);
                             }
                         }
                     });
@@ -19455,7 +19265,7 @@ var gd3d;
         io.isArrayOrDic = isArrayOrDic;
         function isAsset(type) {
             if (type == "mesh" || type == "texture" || type == "shader" ||
-                type == "material" || type == "animationClip" || type == "atlas" ||
+                type == "material" || type == "animationClip" || type == "atlas" || type == "keyFrameAniClip" ||
                 type == "font" || type == "prefab" || type == "sprite" || type == "textasset" || type == "f14eff")
                 return true;
             return false;
@@ -19513,6 +19323,7 @@ var gd3d;
                 referenceInfo.regType("texture");
                 referenceInfo.regType("mesh");
                 referenceInfo.regType("animationclip");
+                referenceInfo.regType("keyFrameAniClip");
                 referenceInfo.regType("constText");
                 referenceInfo.regType("UniformData");
                 referenceInfo.regType("f14eff");

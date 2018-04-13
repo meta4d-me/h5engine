@@ -5,8 +5,7 @@ class test_keyFrameAni implements IState
     scene:gd3d.framework.scene;
     camera:gd3d.framework.camera;
     taskMgr:gd3d.framework.taskMgr=new gd3d.framework.taskMgr();
-    keyframeanicomponet:gd3d.framework.keyframeanimation;
-    longtou:gd3d.framework.transform;
+    obj3d:gd3d.framework.transform;
 
     start(app:gd3d.framework.application)
     {
@@ -47,20 +46,20 @@ class test_keyFrameAni implements IState
         //资源
         var cubePrefab=this.app.getAssetMgr().getAssetByName("Cube.prefab.json") as gd3d.framework.prefab;
         let head=cubePrefab.getCloneTrans();
-         
+        this.obj3d = head;
         this.scene.addChild(head);
 
-        var objCam=new gd3d.framework.transform();
-        objCam.name="keyframeAni Cam";
-        this.scene.addChild(objCam);
-        this.camera=objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
-        this.camera.order=0;
-        this.camera.near=0.3;
-        this.camera.far=1000;
-        this.camera.fov=60;
-        objCam.localTranslate=new gd3d.math.vector3(0,3,0);
-        objCam.lookatPoint(new gd3d.math.vector3(0,0,0)); 
-        objCam.markDirty();
+         //添加一个摄像机
+         var objCam = new gd3d.framework.transform();
+         objCam.name = "sth.";
+         this.scene.addChild(objCam);
+         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
+         this.camera.near = 0.01;
+         this.camera.far = 10000;
+         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+         objCam.lookat(this.obj3d);
+         objCam.markDirty();//标记为需要刷新
+         CameraController.instance().init(this.app,this.camera);
 
         state.finish=true;
     }
@@ -68,33 +67,35 @@ class test_keyFrameAni implements IState
     private addbtns()
     {
         this.addbtn("play",10,100,()=>{
-                 
+            let anip = this.obj3d.gameObject.getComponent("keyFrameAniPlayer") as gd3d.framework.keyFrameAniPlayer;
+            anip.play();
         });
 
-        this.addbtn("stop",10,200,()=>{
-            
+        this.addbtn("stop",10,150,()=>{
+            let anip = this.obj3d.gameObject.getComponent("keyFrameAniPlayer") as gd3d.framework.keyFrameAniPlayer;
+            anip.stop();
         });
 
-        this.addbtn("replay",10,300,()=>
-        {
-            
+        this.addbtn("rewind",10,200,()=>{
+            let anip = this.obj3d.gameObject.getComponent("keyFrameAniPlayer") as gd3d.framework.keyFrameAniPlayer;
+            anip.rewind();
         });
 
 
-        var input=document.createElement("input");
-        input.type="range";
-        input.valueAsNumber=50;
-        this.longtou.localTranslate.x=input.valueAsNumber-50;
-        input.oninput=(e) =>
-        {
-            this.longtou.localTranslate.x=input.valueAsNumber-50;
-            this.longtou.markDirty();
-            console.log(input.valueAsNumber);
-        };
-        input.style.top="400px";
-        input.style.left="10px";
-        input.style.position="absolute";
-        this.app.container.appendChild(input);
+        // var input=document.createElement("input");
+        // input.type="range";
+        // input.valueAsNumber=50;
+        // this.obj3d.localTranslate.x=input.valueAsNumber-50;
+        // input.oninput=(e) =>
+        // {
+        //     this.obj3d.localTranslate.x=input.valueAsNumber-50;
+        //     this.obj3d.markDirty();
+        //     console.log(input.valueAsNumber);
+        // };
+        // input.style.top="400px";
+        // input.style.left="10px";
+        // input.style.position="absolute";
+        // this.app.container.appendChild(input);
     }
 
     private addbtn(text:string,x:number,y:number,func:()=>void)
@@ -114,6 +115,7 @@ class test_keyFrameAni implements IState
 
     update(delta:number)
     {
+        CameraController.instance().update(delta);
         this.taskMgr.move(delta);
           
     }    

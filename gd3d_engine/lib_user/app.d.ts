@@ -844,52 +844,14 @@ declare class test_fakepbr implements IState {
     timer: number;
     update(delta: number): void;
 }
-declare class test_heilongbo implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    camera: gd3d.framework.camera;
-    taskMgr: gd3d.framework.taskMgr;
-    keyframeanicomponet: gd3d.framework.keyframeanimation;
-    keyframeanicomponet1: gd3d.framework.keyframeanimation;
-    longtou: gd3d.framework.transform;
-    start(app: gd3d.framework.application): void;
-    private loadShader(laststate, state);
-    private loadTexture(laststate, state);
-    private loadCube(laststate, state);
-    private loadkeyFrameAnimationPath(laststate, state);
-    private loadasset(laststate, state);
-    cube: gd3d.framework.transform;
-    private iniscene(laststate, state);
-    private addbtns();
-    private addbtn(text, x, y, func);
-    update(delta: number): void;
-}
 declare class test_keyFrameAni implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     taskMgr: gd3d.framework.taskMgr;
-    keyframeanicomponet: gd3d.framework.keyframeanimation;
-    longtou: gd3d.framework.transform;
+    obj3d: gd3d.framework.transform;
     start(app: gd3d.framework.application): void;
     private loadShader(laststate, state);
-    private loadasset(laststate, state);
-    private iniscene(laststate, state);
-    private addbtns();
-    private addbtn(text, x, y, func);
-    update(delta: number): void;
-}
-declare class test_keyframeAnimation implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    camera: gd3d.framework.camera;
-    taskMgr: gd3d.framework.taskMgr;
-    keyframeanicomponet: gd3d.framework.keyframeanimation;
-    longtou: gd3d.framework.transform;
-    start(app: gd3d.framework.application): void;
-    private loadShader(laststate, state);
-    private loadTexture(laststate, state);
-    private loadkeyFrameAnimationPath(laststate, state);
     private loadasset(laststate, state);
     private iniscene(laststate, state);
     private addbtns();
