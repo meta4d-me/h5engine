@@ -149,7 +149,7 @@ namespace gd3d.framework
         private reInit()
         {
             this.currentData = this.baseddata;
-            this.newStartDataTime = 0;
+            this.newStartDataTime = this.baseddata.delayTime;
             this.beover = false;
             this.TotalTime = 0;
             this.numcount = 0;
@@ -245,13 +245,13 @@ namespace gd3d.framework
             delete this.uvArr;
             delete this.bursts;
             
-            for(let i=0;i<this.particlelist.length;i++)
+            for(let key in this.particlelist)
             {
-                this.particlelist[i].dispose();
+                this.particlelist[key].dispose();
             }
-            for(let i=0;i<this.deadParticles.length;i++)
+            for(let key in this.deadParticles)
             {
-                this.deadParticles[i].dispose();
+                this.deadParticles[key].dispose();
             }
         }
     }

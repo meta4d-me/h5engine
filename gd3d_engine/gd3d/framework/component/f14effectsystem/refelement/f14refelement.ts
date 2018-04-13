@@ -22,6 +22,7 @@ namespace gd3d.framework
 
             this.RefEffect = new f14EffectSystem();
             this.RefEffect._root=new transform();
+            this.RefEffect.enableDraw=true;
             this.RefEffect.gameObject=this.RefEffect._root.gameObject;
             //this.RefEffect.root.parent=this.effect.gameObject.transform;
             let data=layer.data.elementdata as F14RefBaseData;
@@ -90,7 +91,8 @@ namespace gd3d.framework
             else
             {
                 this.drawActive = true;
-                this.RefEffect["playState"]=PlayStateEnum.play;
+                //this.RefEffect["playState"]=PlayStateEnum.play;
+                this.RefEffect.enabletimeFlow=true;
             }
             this.RefEffect.update(deltaTime);
         }

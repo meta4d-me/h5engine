@@ -104,12 +104,13 @@ namespace gd3d.framework
         public beref:boolean=false;
         public update(deltaTime:number)
         {
-            if (this.data == null||this.playState==PlayStateEnum.beReady)
+            if(this.data==null)
             {
                 this.renderActive=false;
                 return;
             }
-            if(this.playState==PlayStateEnum.play)
+            this.renderActive=true;
+            if(this.enabletimeFlow)
             {
                 this.allTime+=deltaTime*this.playRate;
                 this.totalTime=this.allTime-this._delayTime;
@@ -118,27 +119,81 @@ namespace gd3d.framework
                     this.renderActive=false;
                     return;
                 }
-            }
-            this.renderActive=true;//上面return了应该不再render 
-            this.totalFrame=this.totalTime*this.fps;
-            if(!this.data.beloop&&this.totalFrame>this.data.lifeTime)
-            {
-                this.renderActive=false;
-                this.stop();
-            }
-            this.restartFrame = this.totalFrame % this.data.lifeTime;
-            this.restartFrame=Math.floor(this.restartFrame);
-            let newLoopCount=Math.floor(this.totalFrame/this.data.lifeTime);
-            if(newLoopCount!=this.loopCount)
-            {
-                this.OnEndOnceLoop();
-            }
-            this.loopCount=newLoopCount;
+                this.totalFrame=this.totalTime*this.fps;
+                if(!this.data.beloop&&this.totalFrame>this.data.lifeTime)
+                {
+                    this.renderActive=false;
+                    this.enabletimeFlow=false;
+                    //this.stop();
+                    if(this.onFinish)
+                    {
+                        this.onFinish();
+                    }
+                    return;
+                }
 
-            for (let i = 0; i < this.elements.length; i++)
+                this.restartFrame = this.totalFrame % this.data.lifeTime;
+                this.restartFrame=Math.floor(this.restartFrame);
+                let newLoopCount=Math.floor(this.totalFrame/this.data.lifeTime);
+                if(newLoopCount!=this.loopCount)
+                {
+                    this.OnEndOnceLoop();
+                }
+                this.loopCount=newLoopCount;
+
+                for (let i = 0; i < this.elements.length; i++)
+                {
+                    this.elements[i].update(deltaTime, this.totalFrame, this.fps);
+                }
+            }else
             {
-                this.elements[i].update(deltaTime, this.totalFrame, this.fps);
+                if(this.totalTime<=0)
+                {
+                    this.renderActive=false;
+                    return;
+                }
+                if(!this.data.beloop&&this.totalFrame>this.data.lifeTime)
+                {
+                    this.renderActive=false;
+                    return;
+                }
             }
+
+            // if (this.data == null||this.playState==PlayStateEnum.beReady)
+            // {
+            //     this.renderActive=false;
+            //     return;
+            // }
+            // if(this.playState==PlayStateEnum.play)
+            // {
+            //     this.allTime+=deltaTime*this.playRate;
+            //     this.totalTime=this.allTime-this._delayTime;
+            //     if(this.totalTime<=0)
+            //     {
+            //         this.renderActive=false;
+            //         return;
+            //     }
+            // }
+            // this.renderActive=true;//上面return了应该不再render 
+            // this.totalFrame=this.totalTime*this.fps;
+            // if(!this.data.beloop&&this.totalFrame>this.data.lifeTime)
+            // {
+            //     this.renderActive=false;
+            //     this.stop();
+            // }
+            // this.restartFrame = this.totalFrame % this.data.lifeTime;
+            // this.restartFrame=Math.floor(this.restartFrame);
+            // let newLoopCount=Math.floor(this.totalFrame/this.data.lifeTime);
+            // if(newLoopCount!=this.loopCount)
+            // {
+            //     this.OnEndOnceLoop();
+            // }
+            // this.loopCount=newLoopCount;
+
+            // for (let i = 0; i < this.elements.length; i++)
+            // {
+            //     this.elements[i].update(deltaTime, this.totalFrame, this.fps);
+            // }
         }
         private OnEndOnceLoop()
         {
@@ -163,7 +218,7 @@ namespace gd3d.framework
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number=0)
         {         
-            if(!this.renderActive) return;            
+            if(!this.renderActive||!this.enableDraw) return;            
             this._renderCamera=camera;
             let curCount = 0;
             context.updateModel(this.root);
@@ -261,38 +316,55 @@ namespace gd3d.framework
             return totalcount;
         }    
         private playRate:number=1.0;
-        private playState:PlayStateEnum=PlayStateEnum.beReady;
-        private active:boolean=false;
-        public play(PlayRate:number=1.0)
+        //private playState:PlayStateEnum=PlayStateEnum.beReady;
+        //private active:boolean=false;
+        enabletimeFlow=false;
+        enableDraw=false;
+        private onFinish:any;
+        public play(onFinish:()=>void=null,PlayRate:number=1.0,)
         {
-            // if(this.active)
-            // {
-            //     this.reset();
-            // }
-            // this.active=true;
-            if(this.playState!=PlayStateEnum.beReady)
+            if(this.allTime>0)
             {
                 this.reset();
             }
-            this.playState=PlayStateEnum.play;
+            this.enabletimeFlow=true;
+            this.enableDraw=true;
             this.playRate=PlayRate;
+
+            if(onFinish)
+            {
+                this.onFinish=onFinish;
+            }
+
+            // if(this.playState!=PlayStateEnum.beReady)
+            // {
+            //     this.reset();
+            // }
+            // this.playState=PlayStateEnum.play;
+            // this.playRate=PlayRate;
         }
         public stop()
         {
-            this.playState=PlayStateEnum.beReady;
+            this.enabletimeFlow=false;
+            this.enableDraw=false;
             this.reset();
+
+            // this.playState=PlayStateEnum.beReady;
+            // this.reset();
         }
 
-        private bePause:boolean=false;
+        //private bePause:boolean=false;
         public pause()
         {
-            if(this.playState==PlayStateEnum.pause)
-            {
-                this.playState=PlayStateEnum.play;
-            }else
-            {
-                this.playState=PlayStateEnum.pause;
-            }
+            // if(this.playState==PlayStateEnum.pause)
+            // {
+            //     this.playState=PlayStateEnum.play;
+            // }else
+            // {
+            //     this.playState=PlayStateEnum.pause;
+            // }
+            this.enableDraw=true;
+            this.enabletimeFlow=false;
         }
         public changeColor(newcolor:math.color)
         {
@@ -305,9 +377,9 @@ namespace gd3d.framework
         {
             this.allTime=0;
             //this.totalTime=0;
-            for (let i = 0; i < this.elements.length; i++)
+            for(let key in this.elements)
             {
-                this.elements[i].reset();
+                this.elements[key].reset();
             }
         }
         clone() {
@@ -316,19 +388,23 @@ namespace gd3d.framework
         remove() {
             this.data=null;
             this._f14eff=null;
-            for (let i = 0,count=this.layers.length; i < count; i++)
-            {
-                this.layers[i].dispose();
-            }
-            for (let i = 0; i < this.elements.length; i++)
-            {
-                this.elements[i].dispose();
-            }
-            for(let i=0;i<this.renderBatch.length;i++)
-            {
-                this.renderBatch[i].dispose();
-            }
+            this.webgl=null;
+            this._root=null;
+            this._renderCamera=null;
+            this.gameObject=null;
 
+            for(let key in this.layers)
+            {
+                this.layers[key].dispose();
+            }
+            for(let key in this.elements)
+            {
+                this.elements[key].dispose();
+            }
+            for(let key in this.renderBatch)
+            {
+                this.renderBatch[key].dispose();
+            }
             delete this.layers;
             delete this.elements;
             delete this.renderBatch;

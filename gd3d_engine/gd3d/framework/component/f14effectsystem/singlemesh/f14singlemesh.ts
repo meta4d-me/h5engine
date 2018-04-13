@@ -184,7 +184,7 @@ namespace gd3d.framework
             }
             else if(this.baseddata.uvType==UVTypeEnum.UVSprite)
             {
-                let lerp = (curframe - this.startFrame) /(this.endFrame - this.startFrame);
+                let lerp = (curframe - this.startFrame) /(this.endFrame+1 - this.startFrame);
                 let spritindex =Math.floor(lerp * this.baseddata.count);
                 gd3d.math.spriteAnimation(this.baseddata.row,this.baseddata.column,spritindex,this.tex_ST);
             }
@@ -273,9 +273,14 @@ namespace gd3d.framework
             this.RenderBatch=null;
             this.baseddata=null;
             this.effect=null;
-            this.posArr.length=0;
-            this.colorArr.length=0;
-            this.uvArr.length=0;
+            // this.posArr.length=0;
+            // this.colorArr.length=0;
+            // this.uvArr.length=0;
+            delete this.posArr;
+            delete this.colorArr;
+            delete this.uvArr;
+            
+
             delete this.dataforvbo;
             delete this.dataforebo;
             
