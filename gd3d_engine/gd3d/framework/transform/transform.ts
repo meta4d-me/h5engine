@@ -966,7 +966,8 @@ namespace gd3d.framework
             return this._beDispose;
         }
         private _beDispose:boolean = false;//是否被释放了 
-        
+
+        public onDispose:()=>void;
         /**
          * @public
          * @language zh_CN
@@ -991,6 +992,8 @@ namespace gd3d.framework
             }
             this._gameObject.dispose();
             this._beDispose = true;
+            if(this.onDispose)
+                this.onDispose();
         }
     }
 

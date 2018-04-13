@@ -101,6 +101,13 @@ namespace gd3d.framework {
         /**
          * @public
          * @language zh_CN
+         * 关键帧动画片段
+         * @version egret-gd3d 1.0
+         */
+        KeyFrameAniclip,
+        /**
+         * @public
+         * @language zh_CN
          * 场景
          * @version egret-gd3d 1.0
          */
@@ -141,13 +148,6 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         PathAsset,
-        /**
-        * @public
-        * @language zh_CN
-        * 路径动画
-        * @version egret-gd3d 1.0
-        */
-        KeyFrameAnimaionAsset,
         /**
          * @public
          * @language zh_CN
@@ -506,6 +506,7 @@ namespace gd3d.framework {
             let fonts: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let atlass: { url: string, type: AssetTypeEnum, asset: any }[] = [];
             let ddss: { url: string, type: AssetTypeEnum, asset: any }[] = [];
+            let kfaniclips: { url: string, type: AssetTypeEnum, asset: any }[] = [];
 
 
             let asslist: any[] = [];
@@ -514,12 +515,12 @@ namespace gd3d.framework {
             //这里定义了加载顺序
             asslist.push(packs, glvshaders, glfshaders,shaders,textassets,meshs,
                 textures,pvrs,ddss,texturedescs,fonts, atlass,
-                materials, anclips, f14effs,prefabs,scenes);
+                materials, anclips, kfaniclips ,f14effs,prefabs,scenes);
 
             assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None,
                 AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh,
                 AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None,
-                AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
+                AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip,AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
             let realTotal = 0;
             var mapPackes: { [id: string]: number } = {};
 
@@ -607,6 +608,10 @@ namespace gd3d.framework {
                             asset = new atlas(fileName);
                             atlass.push({ url, type, asset: asset });
                             break;
+                        case AssetTypeEnum.KeyFrameAniclip:
+                            asset = new keyFrameAniClip(fileName);
+                            kfaniclips.push({ url, type, asset: asset });
+                            break;    
                     }
                     if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
@@ -1244,9 +1249,9 @@ namespace gd3d.framework {
             // this.regAssetFactory(AssetTypeEnum.PackTxt,new AssetFactory_PackTxt());
             this.regAssetFactory(AssetTypeEnum.PathAsset, new AssetFactory_PathAsset());
             this.regAssetFactory(AssetTypeEnum.PVR, new AssetFactory_PVR());
-            this.regAssetFactory(AssetTypeEnum.KeyFrameAnimaionAsset, new AssetFactory_KeyframeAnimationPathAsset());
             this.regAssetFactory(AssetTypeEnum.F14Effect, new AssetFactory_f14eff());
             this.regAssetFactory(AssetTypeEnum.DDS, new AssetFactory_DDS());
+            this.regAssetFactory(AssetTypeEnum.KeyFrameAniclip, new assetfactory_keyFrameAniClip());
         }
 
 
@@ -1512,31 +1517,35 @@ namespace gd3d.framework {
          */
         loadScene(sceneName: string, onComplete: (firstChilds:Array<transform>) => void) {
             let firstChilds = new Array<transform>();
+            let scene = this.app.getScene();
             if (sceneName.length > 0) {
                 var _rawscene: rawscene = this.getAssetByName(sceneName) as rawscene;
-
                 let willLoadRoot = _rawscene.getSceneRoot();
                 while (willLoadRoot.children.length > 0) {
                     let trans = willLoadRoot.children.shift();
                     firstChilds.push(trans);
-                    this.app.getScene().addChild(trans);
+                    scene.addChild(trans);
                 }
 
+                //清空原场景UI
+                scene["_overlay2d"]=new Array<overlay2D>();
                 //lightmap
-                _rawscene.useLightMap(this.app.getScene());
+                _rawscene.useLightMap(scene);
                 //fog
-                _rawscene.useFog(this.app.getScene());
-
+                _rawscene.useFog(scene);
+                //nav
+                _rawscene.useNavMesh(scene);
+                
             }
             else {
                 var _camera: transform = new transform();
                 _camera.gameObject.addComponent("camera");
                 _camera.name = "camera";
                 firstChilds.push(_camera);
-                this.app.getScene().addChild(_camera);
+                scene.addChild(_camera);
             }
-            this.app.getScene().name = sceneName;
-            this.app.getScene().getRoot().markDirty();
+            scene.name = sceneName;
+            scene.getRoot().markDirty();
             onComplete(firstChilds);
         }
 
@@ -1569,10 +1578,16 @@ namespace gd3d.framework {
                 let lightMapUrl = this.getAssetUrl(lightmaps[str]);
                 io.SerializeDependent.resourseDatas.push({ "url": lightMapUrl, "type": io.SaveAssetType.FullUrl });
             }
+            //navmesh
+            let navstr = NavMeshLoadManager.Instance.navmeshJson;
+            navstr = navstr == null ? "": navstr;
+            let navmeshJson = {data:navstr};
+
 
             _scene["rootNode"] = _rootNode;
             _scene["lightmap"] = _lightmaps;
             _scene["fog"] = scene.fog;
+            _scene["navmesh"] = navmeshJson;
 
             let _sceneStr = JSON.stringify(_scene);
 
@@ -1829,13 +1844,12 @@ namespace gd3d.framework {
                 else if (extname == ".path.json") {
                     return AssetTypeEnum.PathAsset;
                 }
-                else if (extname == ".keyFrameAnimationPath.json") {
-                    return AssetTypeEnum.KeyFrameAnimaionAsset;
-                }
                 else if (extname == ".f14effect.json") {
                     return AssetTypeEnum.F14Effect;
                 }else if(extname == ".dds" || extname == ".dds.bin"){
                     return AssetTypeEnum.DDS;
+                }else if (extname == ".keyframeAniclip.json") {
+                    return AssetTypeEnum.KeyFrameAniclip;
                 }
 
                 i = file.indexOf(".", i + 1);

@@ -14,11 +14,11 @@
     private app: gd3d.framework.application;
     public navigate: gd3d.framework.Navigate;
     public navTrans: gd3d.framework.transform;
-
-
-    public constructor() {
-
-    }
+    /**
+     * 导航网格Json数据
+     */
+    public get navmeshJson(){return this._navmeshJson;}
+    private _navmeshJson:string = "";
 
     /**
     * 加载NavMesh
@@ -49,16 +49,33 @@
     }
 
     /**
+    * 通过数据 装载NavMesh
+    * @param dataStr navmesh 的字符串数据
+    * @param callback 完成回调
+    */
+    public loadNavMeshByDate(dataStr:string, app: gd3d.framework.application,callback:()=>any){
+        if(!app) return;
+        this.app = app;
+        this.navmeshLoaded(dataStr,callback);
+    }
+
+    /**
      * 地图寻路网格加载完成
      * @param dataStr 寻路网格信息
      */
     private navmeshLoaded(dataStr: string, callback:any) {
         console.warn("navmeshLoaded");
-        if (this.navMesh != null) {
+        if(dataStr == null || dataStr == "")    return;
+        this._navmeshJson = dataStr;
+        if (this.navTrans != null) {
             // CScene.Instance.removePICKEvent();
+            if(this.navTrans.parent)
+                this.navTrans.parent.removeChild(this.navTrans);
+            this.navTrans.dispose();
         }
         this.navTrans = new gd3d.framework.transform();
         this.navTrans.name = "navMesh";
+        this.navTrans.gameObject.hideFlags = gd3d.framework.HideFlags.HideInHierarchy; //不保存不展示
         var meshD = new gd3d.render.meshData();
         meshD.pos = [];
         meshD.trisindex = [];

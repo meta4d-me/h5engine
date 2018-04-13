@@ -174,6 +174,12 @@ namespace gd3d.framework
                     this.fog._Color = cor;
                 this.fog._Density = <number>fogData["_Density"];
             }
+
+            //navMesh
+            let nav = _json["navmesh"];
+            if(nav != undefined && nav.data != null){
+                this.navMeshJson =  nav.data;
+            }
         }
 
         /**
@@ -221,6 +227,23 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 应用导航网格到场景中
+         * @param scene 场景实例
+         * @version egret-gd3d 1.0
+         */
+        useNavMesh(scene: scene){
+            let loaded = false;
+            if(this.navMeshJson == null || this.navMeshJson == "") return loaded;
+            NavMeshLoadManager.Instance.loadNavMeshByDate(this.navMeshJson,scene.app,()=>{
+                loaded = true;
+            });
+            return loaded;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 释放资源
          * @version egret-gd3d 1.0
          */
@@ -236,6 +259,7 @@ namespace gd3d.framework
             }
         }
 
+        private navMeshJson:string;
         private rootNode: transform;
         private lightmaps: texture[];
     }

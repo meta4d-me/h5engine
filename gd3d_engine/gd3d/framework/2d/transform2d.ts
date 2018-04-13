@@ -40,6 +40,20 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * @classdesc
+     * 2d碰撞器接口
+     * @version egret-gd3d 1.0
+     */
+    export interface ICollider2d
+    {
+        transform: transform2D;
+        getBound():obb2d;
+        intersectsTransform(tran: transform2D): boolean;
+    }
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
      * 2D渲染组件的接口
      * @version egret-gd3d 1.0
      */
@@ -366,6 +380,7 @@ namespace gd3d.framework
         //这个是如果爹改了就要跟着算的
 
         private worldMatrix: gd3d.math.matrix3x2 = new gd3d.math.matrix3x2();
+        private canvasWorldMatrix: gd3d.math.matrix3x2 = new gd3d.math.matrix3x2();
         private worldRotate: math.angelref = new math.angelref();
         private worldTranslate: gd3d.math.vector2 = new gd3d.math.vector2(0, 0);
         private worldScale: gd3d.math.vector2 = new gd3d.math.vector2(1, 1);
@@ -580,15 +595,13 @@ namespace gd3d.framework
                 // math.matrix3x2MakeTransformRTS(ttran,tsca,0,reCanvsMtx);
                 this.CalcReCanvasMtx(reCanvasMtx);
 
-                let outMatrix = gd3d.math.pool.new_matrix3x2();
-                math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, outMatrix);
+                math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, this.canvasWorldMatrix);
 
-                math.matrix3x2Decompose(outMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                math.matrix3x2Decompose(this.canvasWorldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
 
                 // math.pool.delete_vector2(tsca);
                 // math.pool.delete_vector2(ttran);
                 math.pool.delete_matrix3x2(reCanvasMtx);
-                math.pool.delete_matrix3x2(outMatrix);
 
                 this.dirtyWorldDecompose = false;
             }
@@ -655,6 +668,19 @@ namespace gd3d.framework
         getWorldMatrix(): gd3d.math.matrix3x2
         {
             return this.worldMatrix;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取当前节点的Canvas_世界_变换矩阵
+         * @version egret-gd3d 1.0
+         */
+        getCanvasWorldMatrix(): gd3d.math.matrix3x2
+        {
+            this.decomposeWorldMatrix();
+            return this.canvasWorldMatrix;
         }
 
         public static getTransInfoInCanvas(trans: transform2D, out: t2dInfo)//实际上是rootnode space
@@ -752,6 +778,15 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         renderer: IRectRenderer;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 碰撞盒组件 可为空
+         * @version egret-gd3d 1.0
+         */
+        collider:ICollider2d;
 
         /**
          * @public
@@ -855,18 +890,17 @@ namespace gd3d.framework
                     throw new Error("已经有一个渲染器的组件了，不能俩");
                 }
             }
-            // if (reflect.getClassTag(comp["__proto__"], "eventoarser") == "1")
-            // {//这货是个boxcollider
-            //     if (this.eventoarser == null)
-            //     {
-            //         this.eventoarser = comp as any;
-            //         console.warn("add boxcollider2d:" + this.name);
-            //     }
-            //     else
-            //     {
-            //         throw new Error("已经有一个碰撞盒的组件了，不能俩");
-            //     }
-            // }
+            if (reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1")
+            {//这货是个boxcollider2d
+                if (this.collider == null)
+                {
+                    this.collider = comp as any;
+                }
+                else
+                {
+                    throw new Error("已经有一个碰撞组件了，不能俩");
+                }
+            }
             return comp;
         }
 
@@ -880,6 +914,7 @@ namespace gd3d.framework
          */
         removeComponent(comp: I2DComponent)
         {
+            if(!comp)return;
             for (var i = 0; i < this.components.length; i++)
             {
                 if (this.components[i].comp == comp)
@@ -888,7 +923,9 @@ namespace gd3d.framework
                     {//已经初始化过
 
                     }
-                    this.components.splice(i, 1);
+                    let p = this.components.splice(i, 1);
+                    comp.remove();
+                    break;
                 }
             }
         }
@@ -909,6 +946,8 @@ namespace gd3d.framework
                 {
                     var p = this.components.splice(i, 1);
                     if (p[0].comp == this.renderer) this.renderer = null;
+                    if (p[0].comp == (this.collider as any)) this.collider = null;
+                    p[0].comp.remove();
                     return p[0];
                 }
             }
@@ -927,8 +966,9 @@ namespace gd3d.framework
             for (var i = 0; i < this.components.length; i++)
             {
                 this.components[i].comp.remove();
-                if (this.components[i].comp == this.renderer) this.renderer = null;
             }
+            if(this.renderer)   this.renderer = null;
+            if(this.collider)   this.renderer = null;
             this.components.length = 0;
         }
 

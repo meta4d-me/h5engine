@@ -1137,7 +1137,7 @@ namespace gd3d.io
     {
         //rawscene比较特殊、不可能存在结构中
         if (type == "mesh" || type == "texture" || type == "shader" ||
-            type == "material" || type == "animationClip" || type == "atlas" ||
+            type == "material" || type == "animationClip" || type == "atlas" || type == "keyFrameAniClip" ||
             type == "font" || type == "prefab" || type == "sprite" || type == "textasset" || type == "f14eff")
             return true;
         return false;
@@ -1224,6 +1224,7 @@ namespace gd3d.io
             referenceInfo.regType("texture");
             referenceInfo.regType("mesh");
             referenceInfo.regType("animationclip");
+            referenceInfo.regType("keyFrameAniClip");
             referenceInfo.regType("constText");
             referenceInfo.regType("UniformData");
             referenceInfo.regType("f14eff");
