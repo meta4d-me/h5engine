@@ -430,6 +430,7 @@ namespace gd3d.framework
             else
             {
                 let index = Math.floor(this.life01 * data.count);
+                if(index>=data.count) index=data.count-1;
                 gd3d.math.spriteAnimation(data.row,data.column,index,this.tex_ST);
 
             }

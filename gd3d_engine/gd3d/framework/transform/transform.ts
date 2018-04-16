@@ -978,13 +978,17 @@ namespace gd3d.framework
         dispose()
         {
             if(this._beDispose)  return;
+            if(this.parent)
+            {
+                this.parent.removeChild(this);
+            }
             if (this.children)
             {
                 for (var k in this.children)
                 {
                     this.children[k].dispose();
                 }
-                this.removeAllChild();
+                //this.removeAllChild();
             }
             this._gameObject.dispose();
             this._beDispose = true;

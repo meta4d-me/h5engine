@@ -247,8 +247,6 @@ namespace gd3d.framework
         {
             this.effect=null;
             this.ElementMat=null;
-            this.meshlist.length=0;
-            this.activemeshlist.length=0;
             delete this.meshlist;
             delete this.activemeshlist;
             this.mesh.dispose();
