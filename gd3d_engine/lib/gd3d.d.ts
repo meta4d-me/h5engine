@@ -426,6 +426,7 @@ declare namespace gd3d.framework {
         private _canvas;
         canvas: canvas;
         name: string;
+        isStatic: boolean;
         parent: transform2D;
         children: transform2D[];
         width: number;
@@ -505,7 +506,7 @@ declare namespace gd3d.framework {
         private lastParentPivot;
         private lastPivot;
         private refreshLayout();
-        private getLayValue(opation);
+        private getLayValue(option);
         clone(): transform2D;
     }
     class t2dInfo {
@@ -5493,6 +5494,7 @@ declare namespace gd3d.math {
         static new_vector3(x?: number, y?: number, z?: number): vector3;
         static clone_vector3(src: vector3): vector3;
         static delete_vector3(v: vector3): void;
+        static delete_vector3Array(vs: vector3[]): void;
         static collect_vector3(): void;
         private static _vector2_up;
         static readonly vector2_up: vector2;

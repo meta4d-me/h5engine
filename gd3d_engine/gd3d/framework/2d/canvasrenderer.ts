@@ -282,7 +282,7 @@ namespace gd3d.framework
             this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
 
 
-            if (this.cameraTouch != null)//需要用户代码 或者在编辑器里面绑定使用哪个camera（即设置此变量）,否则不会主动响应事件
+            if (this.cameraTouch != null)//需要用户代码 或者在编辑器里面绑定使用哪个camera（即设置此变量）,否则不会主动响应事件否则不会主动响应事件
             {
                 var scene = this.gameObject.getScene();
 
@@ -348,7 +348,8 @@ namespace gd3d.framework
                 {
                     var comp = tran.components[i];
                     if (comp != null)
-                        if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv))
+                        //if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv))
+                        if (comp.comp.transform.ContainsCanvasPoint(outv))
                         {
                             return comp.comp.transform;
                         }

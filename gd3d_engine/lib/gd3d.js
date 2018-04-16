@@ -1280,7 +1280,7 @@ var gd3d;
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv)) {
+                            if (comp.comp.transform.ContainsCanvasPoint(outv)) {
                                 return comp.comp.transform;
                             }
                     }
@@ -1464,7 +1464,9 @@ var gd3d;
                 outv2.x = sx;
                 outv2.y = sy;
                 var root = this.canvas.getRoot();
-                return this.dopick2d_new(outv2, root, tolerance);
+                var trans = this.dopick2d_new(outv2, root, tolerance);
+                gd3d.math.pool.delete_vector2(outv2);
+                return trans;
             };
             overlay2D.prototype.dopick2d_new = function (outv, tran, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
@@ -1866,6 +1868,9 @@ var gd3d;
         var transform2D = (function () {
             function transform2D() {
                 this.name = "noname";
+                this.isStatic = false;
+                this.width = 0;
+                this.height = 0;
                 this.pivot = new gd3d.math.vector2(0, 0);
                 this.hideFlags = framework.HideFlags.None;
                 this._visible = true;
@@ -2420,6 +2425,8 @@ var gd3d;
                 }
             };
             transform2D.prototype.getLayoutValue = function (option) {
+                if (this.layoutValueMap[option] == undefined)
+                    this.layoutValueMap[option] = 0;
                 return this.layoutValueMap[option];
             };
             Object.defineProperty(transform2D.prototype, "layoutPercentState", {
@@ -2483,28 +2490,28 @@ var gd3d;
                 this.lastPivot.x = this.pivot.x;
                 this.lastPivot.y = this.pivot.y;
             };
-            transform2D.prototype.getLayValue = function (opation) {
-                if (this.layoutValueMap[opation] == undefined)
-                    this.layoutValueMap[opation] = 0;
+            transform2D.prototype.getLayValue = function (option) {
+                if (this.layoutValueMap[option] == undefined)
+                    this.layoutValueMap[option] = 0;
                 var value = 0;
-                if (this._layoutPercentState & opation) {
+                if (this._layoutPercentState & option) {
                     if (this.parent) {
-                        switch (opation) {
+                        switch (option) {
                             case layoutOption.LEFT:
                             case layoutOption.H_CENTER:
                             case layoutOption.RIGHT:
-                                value = this.parent.width * this.layoutValueMap[opation] / 100;
+                                value = this.parent.width * this.layoutValueMap[option] / 100;
                                 break;
                             case layoutOption.TOP:
                             case layoutOption.V_CENTER:
                             case layoutOption.BOTTOM:
-                                value = this.parent.height * this.layoutValueMap[opation] / 100;
+                                value = this.parent.height * this.layoutValueMap[option] / 100;
                                 break;
                         }
                     }
                 }
                 else {
-                    value = this.layoutValueMap[opation];
+                    value = this.layoutValueMap[option];
                 }
                 return value;
             };
@@ -2515,6 +2522,10 @@ var gd3d;
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
             ], transform2D.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], transform2D.prototype, "isStatic", void 0);
             __decorate([
                 gd3d.reflect.Field("transform2D[]"),
                 __metadata("design:type", Array)
@@ -29670,6 +29681,14 @@ var gd3d;
                 else
                     console.error("kindding me?确定你要回收的是vector3吗？");
             };
+            pool.delete_vector3Array = function (vs) {
+                for (var i = 0; i < vs.length; i++) {
+                    if (vs[i] != undefined) {
+                        this.delete_vector3(vs[i]);
+                    }
+                }
+                vs.length = 0;
+            };
             pool.collect_vector3 = function () {
                 pool.unused_vector3.length = 0;
             };
@@ -29728,8 +29747,7 @@ var gd3d;
             pool.delete_vector2Array = function (vs) {
                 for (var i = 0; i < vs.length; i++) {
                     if (vs[i] != undefined) {
-                        vs[i].x = vs[i].y = 0;
-                        pool.unused_vector2.push(vs[i]);
+                        this.delete_vector2(vs[i]);
                     }
                 }
                 vs.length = 0;

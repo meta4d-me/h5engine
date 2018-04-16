@@ -322,6 +322,26 @@ namespace gd3d.math
             else
                 console.error("kindding me?确定你要回收的是vector3吗？");
         }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 回收一个v3数组
+        * @version gd3d 1.0
+        */
+        static delete_vector3Array(vs: vector3[]): void
+        {
+            for (let i = 0; i < vs.length; i++)
+            {
+                if (vs[i] != undefined)
+                {
+                    this.delete_vector3(vs[i]);
+                }
+            }
+            vs.length = 0;
+        }
+
         /**
         * @public
         * @language zh_CN
@@ -436,8 +456,7 @@ namespace gd3d.math
             {
                 if (vs[i] != undefined)
                 {
-                    vs[i].x = vs[i].y = 0;
-                    pool.unused_vector2.push(vs[i]);
+                    this.delete_vector2(vs[i]);
                 }
             }
             vs.length = 0;

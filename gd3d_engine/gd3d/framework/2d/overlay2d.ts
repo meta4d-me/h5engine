@@ -253,7 +253,9 @@ namespace gd3d.framework
             outv2.x = sx;
             outv2.y = sy;
             var root = this.canvas.getRoot();
-            return this.dopick2d_new(outv2, root, tolerance);
+            let trans = this.dopick2d_new(outv2, root, tolerance);
+            math.pool.delete_vector2(outv2);
+            return trans;
         }
         /**
          * @private
