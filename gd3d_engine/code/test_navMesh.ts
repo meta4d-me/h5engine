@@ -86,8 +86,9 @@ class test_navMesh implements IState
         if (navmesh == null) return;
         let inputMgr = this.app.getInputMgr();
         let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-        let pickinfo: gd3d.framework.pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
-        if (!pickinfo) return;
+        let pickinfo = new gd3d.framework.pickinfo(); 
+        let bool = navmesh.intersects(ray, navTrans.getWorldMatrix(),pickinfo);
+        if (!bool) return;
         // let startPos = gd3d.math.pool.new_vector3();
         // gd3d.math.vec3Clone(this.cube.localTranslate, startPos);
         let endPos = pickinfo.hitposition;

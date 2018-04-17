@@ -219,7 +219,7 @@
 
     /** 获取指定位置的三角形索引*/
     public static findtriIndex(point: gd3d.math.vector3, trans: gd3d.framework.transform): number {
-        var pickinfo: gd3d.framework.pickinfo;
+        let result = -1;
         var ray = new gd3d.framework.ray(new gd3d.math.vector3(point.x, point.y + 500, point.z), new gd3d.math.vector3(0, -1, 0));
         var mesh: gd3d.framework.mesh;
         var meshFilter = trans.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
@@ -228,9 +228,11 @@
             mesh = meshFilter.getMeshOutput();
         }
         if (!mesh) return;
-        pickinfo = mesh.intersects(ray, trans.getWorldMatrix());
-        if (!pickinfo) return;
-        return pickinfo.faceId;
+        var tempInfo = math.pool.new_pickInfo();
+        if (mesh.intersects(ray, trans.getWorldMatrix(),tempInfo))
+            result = tempInfo.faceId;
+        math.pool.delete_pickInfo(tempInfo);
+        return result;
         }
     }
 

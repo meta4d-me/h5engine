@@ -121,7 +121,10 @@ class test_pick_boxcollider implements IState
     private rayCollider( ):gd3d.framework.pickinfo{
         let inputMgr = this.app.getInputMgr();
         let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-        return this.scene.pick(ray,false,this.scene.getRoot(),this.pickLayer);
+        let temp  = gd3d.math.pool.new_pickInfo();
+        //let bool = this.scene.pick(ray,temp,false,this.scene.getRoot(),this.pickLayer);
+        let bool = this.scene.pick(ray,temp,false);
+        return bool? temp: null;
     }
     //----------- 绘制路径线段----------------
     private points: gd3d.framework.transform[] = [];

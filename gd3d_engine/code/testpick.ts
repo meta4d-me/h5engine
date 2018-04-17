@@ -110,13 +110,14 @@
         if (this.pointDown == false && this.inputMgr.point.touch == true)//pointdown
         {
             var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
-            var pickinfo = this.scene.pick(ray);
-            if (pickinfo != null)
+            let tempinfo = gd3d.math.pool.new_pickInfo();
+            var bool = this.scene.pick(ray,tempinfo,true);
+            if (bool != null)
             {
-                this.movetarget = pickinfo.hitposition;
+                gd3d.math.vec3Clone(tempinfo.hitposition,this.movetarget);
                 this.timer = 0;
             }
-
+            gd3d.math.pool.delete_pickInfo(tempinfo);
         }
         this.pointDown = this.inputMgr.point.touch;
 

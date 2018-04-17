@@ -120,6 +120,18 @@ declare namespace gd3d.framework {
     function getPrefix(name: string, element: any): string;
 }
 declare namespace gd3d.framework {
+    class DeviceInfo {
+        private static debuginfo;
+        private static getExtension();
+        static readonly GraphDevice: string;
+        static readonly CanvasWidth: number;
+        static readonly CanvasHeight: number;
+        static readonly ScreenAdaptiveType: string;
+        static readonly ScreenWidth: number;
+        static readonly ScreenHeight: number;
+    }
+}
+declare namespace gd3d.framework {
     class sceneMgr {
         private static _ins;
         static readonly ins: sceneMgr;
@@ -1516,7 +1528,7 @@ declare namespace gd3d.framework {
         private _efficient;
         start(): void;
         getMatByIndex(index: number): math.matrix;
-        intersects(ray: ray): pickinfo;
+        intersects(ray: ray, outInfo: pickinfo): boolean;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         remove(): void;
@@ -1641,7 +1653,7 @@ declare namespace gd3d.framework {
         private readProcess(read, data, objVF, vcount, vec10tpose, callback);
         private readFinish(read, data, buf, objVF, webgl);
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): void;
-        intersects(ray: ray, matrix: gd3d.math.matrix): pickinfo;
+        intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
     }
     class subMeshInfo {
@@ -1968,6 +1980,19 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         remove(): void;
         clone(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class BeBillboard implements INodeComponent {
+        start(): void;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+        private beActive;
+        setActive(active: boolean): void;
+        private target;
+        setTarget(trans: transform): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2516,11 +2541,11 @@ declare namespace gd3d.framework {
         private addF14layer(type, layerdata);
         getElementCount(): number;
         private playRate;
-        private playState;
-        private active;
-        play(PlayRate?: number): void;
+        enabletimeFlow: boolean;
+        enableDraw: boolean;
+        private onFinish;
+        play(onFinish?: () => void, PlayRate?: number): void;
         stop(): void;
-        private bePause;
         pause(): void;
         changeColor(newcolor: math.color): void;
         reset(): void;
@@ -5046,9 +5071,9 @@ declare namespace gd3d.framework {
         getChild(index: number): transform;
         getChildByName(name: string): transform;
         getRoot(): transform;
-        pickAll(ray: ray, isPickMesh?: boolean, root?: transform, layermask?: number): Array<pickinfo>;
-        pick(ray: ray, isPickMesh?: boolean, root?: transform, layermask?: number): pickinfo;
-        private doPick(ray, pickall, isPickMesh, root, layermask?);
+        pickAll(ray: ray, outInfos: pickinfo[], isPickMesh?: boolean, root?: transform, layermask?: number): boolean;
+        pick(ray: ray, outInfo: pickinfo, isPickMesh?: boolean, root?: transform, layermask?: number): boolean;
+        private doPick(ray, pickall, isPickMesh, root, out, layermask?);
         private pickMesh(ray, tran, pickedList, layermask?);
         private pickCollider(ray, tran, pickedList, layermask?);
     }
@@ -5146,12 +5171,14 @@ declare namespace gd3d.framework {
     class pickinfo {
         pickedtran: transform;
         distance: number;
-        hitposition: gd3d.math.vector3;
+        hitposition: math.vector3;
         bu: number;
         bv: number;
         faceId: number;
         subMeshId: number;
-        constructor(_bu: number, _bv: number, _distance: number);
+        constructor(_bu?: number, _bv?: number, _distance?: number);
+        init(): void;
+        cloneFrom(from: pickinfo): void;
     }
 }
 declare namespace gd3d.framework {
@@ -5160,12 +5187,12 @@ declare namespace gd3d.framework {
         direction: gd3d.math.vector3;
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3);
         intersectAABB(_aabb: aabb): boolean;
-        intersectPlaneTransform(tran: transform): pickinfo;
-        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: gd3d.math.vector3): gd3d.math.vector3;
-        intersectCollider(tran: transform): pickinfo;
+        intersectPlaneTransform(tran: transform, outInfo: pickinfo): boolean;
+        intersectPlane(planePoint: gd3d.math.vector3, planeNormal: gd3d.math.vector3, outHitPoint: gd3d.math.vector3): boolean;
+        intersectCollider(tran: transform, outInfo: pickinfo): boolean;
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
-        intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3): pickinfo;
+        intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3, outInfo: pickinfo): boolean;
     }
 }
 declare namespace gd3d.framework {
@@ -5522,6 +5549,10 @@ declare namespace gd3d.math {
         static clone_quaternion(src: quaternion): quaternion;
         static delete_quaternion(v: quaternion): void;
         static collect_quaternion(): void;
+        private static unused_pickInfo;
+        static new_pickInfo(bu?: number, bv?: number, distance?: number): framework.pickinfo;
+        static delete_pickInfo(v: framework.pickinfo): void;
+        static collect_pickInfo(): void;
     }
 }
 declare namespace gd3d.render {

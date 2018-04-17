@@ -547,6 +547,90 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var DeviceInfo = (function () {
+            function DeviceInfo() {
+            }
+            DeviceInfo.getExtension = function () {
+                this.debuginfo = framework.sceneMgr.app.webgl.getExtension('WEBGL_debug_renderer_info');
+                if (this.debuginfo == null) {
+                    console.warn("extension(WEBGL_debug_renderer_info) not support!");
+                }
+            };
+            Object.defineProperty(DeviceInfo, "GraphDevice", {
+                get: function () {
+                    if (this.debuginfo == null) {
+                        this.getExtension();
+                    }
+                    if (this.debuginfo) {
+                        var device = framework.sceneMgr.app.webgl.getParameter(this.debuginfo.UNMASKED_RENDERER_WEBGL);
+                        return device;
+                    }
+                    else {
+                        return "unknown";
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DeviceInfo, "CanvasWidth", {
+                get: function () {
+                    if (framework.sceneMgr.app) {
+                        return framework.sceneMgr.app.webgl.canvas.width;
+                    }
+                    else {
+                        return null;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DeviceInfo, "CanvasHeight", {
+                get: function () {
+                    if (framework.sceneMgr.app) {
+                        return framework.sceneMgr.app.webgl.canvas.height;
+                    }
+                    else {
+                        return null;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DeviceInfo, "ScreenAdaptiveType", {
+                get: function () {
+                    if (framework.sceneMgr.app) {
+                        return framework.sceneMgr.app.screenAdaptiveType;
+                    }
+                    else {
+                        return "unknown";
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DeviceInfo, "ScreenWidth", {
+                get: function () {
+                    return window.screen.width * (window.devicePixelRatio || 1);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(DeviceInfo, "ScreenHeight", {
+                get: function () {
+                    return window.screen.height * (window.devicePixelRatio || 1);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return DeviceInfo;
+        }());
+        framework.DeviceInfo = DeviceInfo;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var sceneMgr = (function () {
             function sceneMgr() {
             }
@@ -1242,37 +1326,41 @@ var gd3d;
                 if (this.cameraTouch != null) {
                     var scene = this.gameObject.getScene();
                     var ray = this.cameraTouch.creatRayByScreen(new gd3d.math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
-                    var pinfo = scene.pick(ray);
-                    if (pinfo != null && pinfo.pickedtran == this.gameObject.transform) {
+                    var tempInfo = gd3d.math.pool.new_pickInfo();
+                    var pinfo = scene.pick(ray, tempInfo);
+                    if (tempInfo && tempInfo.pickedtran == this.gameObject.transform) {
                         var mat = this.gameObject.transform.getWorldMatrix();
                         var matinv = new gd3d.math.matrix();
                         gd3d.math.matrixInverse(mat, matinv);
                         var outv = new gd3d.math.vector3();
-                        gd3d.math.matrixTransformVector3(pinfo.hitposition, matinv, outv);
+                        gd3d.math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
                         this.canvas.update(delta, this.inputmgr.point.touch, outv.x, outv.y);
                     }
                     else {
                         this.canvas.update(delta, false, 0, 0);
                     }
+                    gd3d.math.pool.delete_pickInfo(tempInfo);
                 }
                 else {
                     this.canvas.update(delta, false, 0, 0);
                 }
             };
             canvasRenderer.prototype.pick2d = function (ray) {
-                var pinfo = ray.intersectPlaneTransform(this.gameObject.transform);
-                if (pinfo != null) {
+                var tempinfo = gd3d.math.pool.new_pickInfo();
+                var bool = ray.intersectPlaneTransform(this.gameObject.transform, tempinfo);
+                if (bool != null) {
                     var mat = this.gameObject.transform.getWorldMatrix();
                     var matinv = gd3d.math.pool.new_matrix();
                     gd3d.math.matrixInverse(mat, matinv);
                     var outv = gd3d.math.pool.new_vector3();
-                    gd3d.math.matrixTransformVector3(pinfo.hitposition, matinv, outv);
+                    gd3d.math.matrixTransformVector3(tempinfo.hitposition, matinv, outv);
                     var outv2 = gd3d.math.pool.new_vector2();
                     outv2.x = outv.x;
                     outv2.y = outv.y;
                     var root = this.canvas.getRoot();
                     return this.dopick2d(outv2, root);
                 }
+                gd3d.math.pool.delete_pickInfo(tempinfo);
                 return null;
             };
             canvasRenderer.prototype.dopick2d = function (outv, tran) {
@@ -8671,11 +8759,13 @@ var gd3d;
             transform.prototype.dispose = function () {
                 if (this._beDispose)
                     return;
+                if (this.parent) {
+                    this.parent.removeChild(this);
+                }
                 if (this.children) {
                     for (var k in this.children) {
                         this.children[k].dispose();
                     }
-                    this.removeAllChild();
                 }
                 this._gameObject.dispose();
                 this._beDispose = true;
@@ -9301,9 +9391,10 @@ var gd3d;
                 }
                 return mat;
             };
-            skinnedMeshRenderer.prototype.intersects = function (ray) {
+            skinnedMeshRenderer.prototype.intersects = function (ray, outInfo) {
+                var ishided = false;
+                var lastDistance = Number.MAX_VALUE;
                 var mvpmat = this.player.gameObject.transform.getWorldMatrix();
-                var pickinfo = null;
                 var data = this.mesh.data;
                 for (var i = 0; i < this.mesh.submesh.length; i++) {
                     var submesh = this.mesh.submesh[i];
@@ -9331,25 +9422,30 @@ var gd3d;
                         gd3d.math.matrixTransformVector3(p0, mat00, t0);
                         gd3d.math.matrixTransformVector3(p1, mat11, t1);
                         gd3d.math.matrixTransformVector3(p2, mat22, t2);
-                        var result = ray.intersectsTriangle(t0, t1, t2);
-                        if (result) {
-                            if (result.distance < 0)
+                        var tempinfo = gd3d.math.pool.new_pickInfo();
+                        var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
+                        if (bool) {
+                            if (tempinfo.distance < 0)
                                 continue;
-                            if (!pickinfo || pickinfo.distance > result.distance) {
-                                pickinfo = result;
-                                pickinfo.faceId = index / 3;
-                                pickinfo.subMeshId = i;
+                            if (lastDistance > tempinfo.distance) {
+                                ishided = true;
+                                outInfo.cloneFrom(tempinfo);
+                                lastDistance = outInfo.distance;
+                                outInfo.faceId = index / 3;
+                                outInfo.subMeshId = i;
                                 var tdir = gd3d.math.pool.new_vector3();
-                                gd3d.math.vec3ScaleByNum(ray.direction, result.distance, tdir);
-                                gd3d.math.vec3Add(ray.origin, tdir, pickinfo.hitposition);
+                                gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
+                                gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
+                                gd3d.math.pool.delete_vector3(tdir);
                             }
                         }
+                        gd3d.math.pool.delete_pickInfo(tempinfo);
                     }
                     gd3d.math.pool.delete_vector3(t0);
                     gd3d.math.pool.delete_vector3(t1);
                     gd3d.math.pool.delete_vector3(t2);
                 }
-                return pickinfo;
+                return ishided;
             };
             skinnedMeshRenderer.prototype.update = function (delta) {
                 if (this._skeletonMatrixData == null) {
@@ -10346,10 +10442,11 @@ var gd3d;
                     _this.readFinish(read, data, buf, objVF, webgl);
                 });
             };
-            mesh.prototype.intersects = function (ray, matrix) {
-                var pickinfo = null;
+            mesh.prototype.intersects = function (ray, matrix, outInfo) {
+                var ishided = false;
                 if (!this.submesh)
-                    return pickinfo;
+                    return ishided;
+                var lastDistance = Number.MAX_VALUE;
                 for (var i = 0; i < this.submesh.length; i++) {
                     var submesh = this.submesh[i];
                     if (submesh.line) {
@@ -10368,19 +10465,24 @@ var gd3d;
                                 gd3d.math.matrixTransformVector3(p0, matrix, t0);
                                 gd3d.math.matrixTransformVector3(p1, matrix, t1);
                                 gd3d.math.matrixTransformVector3(p2, matrix, t2);
-                                var result = ray.intersectsTriangle(t0, t1, t2);
-                                if (result) {
-                                    if (result.distance < 0)
+                                var tempinfo = gd3d.math.pool.new_pickInfo();
+                                var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
+                                if (bool) {
+                                    if (tempinfo.distance < 0)
                                         continue;
-                                    if (!pickinfo || pickinfo.distance > result.distance) {
-                                        pickinfo = result;
-                                        pickinfo.faceId = index / 3;
-                                        pickinfo.subMeshId = i;
+                                    if (lastDistance > tempinfo.distance) {
+                                        ishided = true;
+                                        outInfo.cloneFrom(tempinfo);
+                                        lastDistance = outInfo.distance;
+                                        outInfo.faceId = index / 3;
+                                        outInfo.subMeshId = i;
                                         var tdir = gd3d.math.pool.new_vector3();
-                                        gd3d.math.vec3ScaleByNum(ray.direction, result.distance, tdir);
-                                        gd3d.math.vec3Add(ray.origin, tdir, pickinfo.hitposition);
+                                        gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
+                                        gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
+                                        gd3d.math.pool.delete_vector3(tdir);
                                     }
                                 }
+                                gd3d.math.pool.delete_pickInfo(tempinfo);
                             }
                             gd3d.math.pool.delete_vector3(t0);
                             gd3d.math.pool.delete_vector3(t1);
@@ -10388,7 +10490,7 @@ var gd3d;
                         }
                     }
                 }
-                return pickinfo;
+                return ishided;
             };
             mesh.prototype.clone = function () {
                 var _result = new mesh_1(this.getName());
@@ -12043,6 +12145,40 @@ var gd3d;
             return AudioPlayer;
         }());
         framework.AudioPlayer = AudioPlayer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var BeBillboard = (function () {
+            function BeBillboard() {
+                this.beActive = true;
+                this.target = null;
+            }
+            BeBillboard.prototype.start = function () {
+            };
+            BeBillboard.prototype.update = function (delta) {
+                if (!this.beActive || this.target == null)
+                    return;
+                this.gameObject.transform.lookat(this.target);
+            };
+            BeBillboard.prototype.remove = function () {
+            };
+            BeBillboard.prototype.clone = function () {
+            };
+            BeBillboard.prototype.setActive = function (active) {
+                this.beActive = active;
+            };
+            BeBillboard.prototype.setTarget = function (trans) {
+                this.target = trans;
+            };
+            BeBillboard = __decorate([
+                gd3d.reflect.nodeComponent
+            ], BeBillboard);
+            return BeBillboard;
+        }());
+        framework.BeBillboard = BeBillboard;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -14927,9 +15063,8 @@ var gd3d;
                 this.totalTime = 0;
                 this.totalFrame = 0;
                 this.playRate = 1.0;
-                this.playState = PlayStateEnum.beReady;
-                this.active = false;
-                this.bePause = false;
+                this.enabletimeFlow = false;
+                this.enableDraw = false;
             }
             f14EffectSystem.prototype.start = function () {
             };
@@ -14978,33 +15113,47 @@ var gd3d;
                 configurable: true
             });
             f14EffectSystem.prototype.update = function (deltaTime) {
-                if (this.data == null || this.playState == PlayStateEnum.beReady) {
+                if (this.data == null) {
                     this.renderActive = false;
                     return;
                 }
-                if (this.playState == PlayStateEnum.play) {
+                this.renderActive = true;
+                if (this.enabletimeFlow) {
                     this.allTime += deltaTime * this.playRate;
                     this.totalTime = this.allTime - this._delayTime;
                     if (this.totalTime <= 0) {
                         this.renderActive = false;
                         return;
                     }
+                    this.totalFrame = this.totalTime * this.fps;
+                    if (!this.data.beloop && this.totalFrame > this.data.lifeTime) {
+                        this.renderActive = false;
+                        this.enabletimeFlow = false;
+                        if (this.onFinish) {
+                            this.onFinish();
+                        }
+                        return;
+                    }
+                    this.restartFrame = this.totalFrame % this.data.lifeTime;
+                    this.restartFrame = Math.floor(this.restartFrame);
+                    var newLoopCount = Math.floor(this.totalFrame / this.data.lifeTime);
+                    if (newLoopCount != this.loopCount) {
+                        this.OnEndOnceLoop();
+                    }
+                    this.loopCount = newLoopCount;
+                    for (var i = 0; i < this.elements.length; i++) {
+                        this.elements[i].update(deltaTime, this.totalFrame, this.fps);
+                    }
                 }
-                this.renderActive = true;
-                this.totalFrame = this.totalTime * this.fps;
-                if (!this.data.beloop && this.totalFrame > this.data.lifeTime) {
-                    this.renderActive = false;
-                    this.stop();
-                }
-                this.restartFrame = this.totalFrame % this.data.lifeTime;
-                this.restartFrame = Math.floor(this.restartFrame);
-                var newLoopCount = Math.floor(this.totalFrame / this.data.lifeTime);
-                if (newLoopCount != this.loopCount) {
-                    this.OnEndOnceLoop();
-                }
-                this.loopCount = newLoopCount;
-                for (var i = 0; i < this.elements.length; i++) {
-                    this.elements[i].update(deltaTime, this.totalFrame, this.fps);
+                else {
+                    if (this.totalTime <= 0) {
+                        this.renderActive = false;
+                        return;
+                    }
+                    if (!this.data.beloop && this.totalFrame > this.data.lifeTime) {
+                        this.renderActive = false;
+                        return;
+                    }
                 }
             };
             f14EffectSystem.prototype.OnEndOnceLoop = function () {
@@ -15026,7 +15175,7 @@ var gd3d;
             });
             f14EffectSystem.prototype.render = function (context, assetmgr, camera, Effqueue) {
                 if (Effqueue === void 0) { Effqueue = 0; }
-                if (!this.renderActive)
+                if (!this.renderActive || !this.enableDraw)
                     return;
                 this._renderCamera = camera;
                 var curCount = 0;
@@ -15102,25 +15251,27 @@ var gd3d;
                 }
                 return totalcount;
             };
-            f14EffectSystem.prototype.play = function (PlayRate) {
+            f14EffectSystem.prototype.play = function (onFinish, PlayRate) {
+                if (onFinish === void 0) { onFinish = null; }
                 if (PlayRate === void 0) { PlayRate = 1.0; }
-                if (this.playState != PlayStateEnum.beReady) {
+                if (this.allTime > 0) {
                     this.reset();
                 }
-                this.playState = PlayStateEnum.play;
+                this.enabletimeFlow = true;
+                this.enableDraw = true;
                 this.playRate = PlayRate;
+                if (onFinish) {
+                    this.onFinish = onFinish;
+                }
             };
             f14EffectSystem.prototype.stop = function () {
-                this.playState = PlayStateEnum.beReady;
+                this.enabletimeFlow = false;
+                this.enableDraw = false;
                 this.reset();
             };
             f14EffectSystem.prototype.pause = function () {
-                if (this.playState == PlayStateEnum.pause) {
-                    this.playState = PlayStateEnum.play;
-                }
-                else {
-                    this.playState = PlayStateEnum.pause;
-                }
+                this.enableDraw = true;
+                this.enabletimeFlow = false;
             };
             f14EffectSystem.prototype.changeColor = function (newcolor) {
                 for (var i = 0; i < this.elements.length; i++) {
@@ -15129,8 +15280,8 @@ var gd3d;
             };
             f14EffectSystem.prototype.reset = function () {
                 this.allTime = 0;
-                for (var i = 0; i < this.elements.length; i++) {
-                    this.elements[i].reset();
+                for (var key in this.elements) {
+                    this.elements[key].reset();
                 }
             };
             f14EffectSystem.prototype.clone = function () {
@@ -15138,14 +15289,18 @@ var gd3d;
             f14EffectSystem.prototype.remove = function () {
                 this.data = null;
                 this._f14eff = null;
-                for (var i = 0, count = this.layers.length; i < count; i++) {
-                    this.layers[i].dispose();
+                this.webgl = null;
+                this._root = null;
+                this._renderCamera = null;
+                this.gameObject = null;
+                for (var key in this.layers) {
+                    this.layers[key].dispose();
                 }
-                for (var i = 0; i < this.elements.length; i++) {
-                    this.elements[i].dispose();
+                for (var key in this.elements) {
+                    this.elements[key].dispose();
                 }
-                for (var i = 0; i < this.renderBatch.length; i++) {
-                    this.renderBatch[i].dispose();
+                for (var key in this.renderBatch) {
+                    this.renderBatch[key].dispose();
                 }
                 delete this.layers;
                 delete this.elements;
@@ -15651,7 +15806,7 @@ var gd3d;
             };
             F14Emission.prototype.reInit = function () {
                 this.currentData = this.baseddata;
-                this.newStartDataTime = 0;
+                this.newStartDataTime = this.baseddata.delayTime;
                 this.beover = false;
                 this.TotalTime = 0;
                 this.numcount = 0;
@@ -15714,11 +15869,11 @@ var gd3d;
                 delete this.colorArr;
                 delete this.uvArr;
                 delete this.bursts;
-                for (var i = 0; i < this.particlelist.length; i++) {
-                    this.particlelist[i].dispose();
+                for (var key in this.particlelist) {
+                    this.particlelist[key].dispose();
                 }
-                for (var i = 0; i < this.deadParticles.length; i++) {
-                    this.deadParticles[i].dispose();
+                for (var key in this.deadParticles) {
+                    this.deadParticles[key].dispose();
                 }
             };
             return F14Emission;
@@ -16388,6 +16543,8 @@ var gd3d;
                 }
                 else {
                     var index = Math.floor(this.life01 * data.count);
+                    if (index >= data.count)
+                        index = data.count - 1;
                     gd3d.math.spriteAnimation(data.row, data.column, index, this.tex_ST);
                 }
             };
@@ -16470,6 +16627,7 @@ var gd3d;
                 this.refreshStartEndFrame();
                 this.RefEffect = new framework.f14EffectSystem();
                 this.RefEffect._root = new framework.transform();
+                this.RefEffect.enableDraw = true;
                 this.RefEffect.gameObject = this.RefEffect._root.gameObject;
                 var data = layer.data.elementdata;
                 gd3d.math.vec3Clone(data.localPos, this.RefEffect._root.localTranslate);
@@ -16517,7 +16675,7 @@ var gd3d;
                 }
                 else {
                     this.drawActive = true;
-                    this.RefEffect["playState"] = framework.PlayStateEnum.play;
+                    this.RefEffect.enabletimeFlow = true;
                 }
                 this.RefEffect.update(deltaTime);
             };
@@ -16663,7 +16821,7 @@ var gd3d;
                     this.tex_ST.w += this.baseddata.vSpeed * detalTime;
                 }
                 else if (this.baseddata.uvType == framework.UVTypeEnum.UVSprite) {
-                    var lerp = (curframe - this.startFrame) / (this.endFrame - this.startFrame);
+                    var lerp = (curframe - this.startFrame) / (this.endFrame + 1 - this.startFrame);
                     var spritindex = Math.floor(lerp * this.baseddata.count);
                     gd3d.math.spriteAnimation(this.baseddata.row, this.baseddata.column, spritindex, this.tex_ST);
                 }
@@ -16735,9 +16893,9 @@ var gd3d;
                 this.RenderBatch = null;
                 this.baseddata = null;
                 this.effect = null;
-                this.posArr.length = 0;
-                this.colorArr.length = 0;
-                this.uvArr.length = 0;
+                delete this.posArr;
+                delete this.colorArr;
+                delete this.uvArr;
                 delete this.dataforvbo;
                 delete this.dataforebo;
             };
@@ -16889,8 +17047,6 @@ var gd3d;
             F14SingleMeshBath.prototype.dispose = function () {
                 this.effect = null;
                 this.ElementMat = null;
-                this.meshlist.length = 0;
-                this.activemeshlist.length = 0;
                 delete this.meshlist;
                 delete this.activemeshlist;
                 this.mesh.dispose();
@@ -22036,7 +22192,7 @@ var gd3d;
                 return points;
             };
             NavMeshLoadManager.findtriIndex = function (point, trans) {
-                var pickinfo;
+                var result = -1;
                 var ray = new gd3d.framework.ray(new gd3d.math.vector3(point.x, point.y + 500, point.z), new gd3d.math.vector3(0, -1, 0));
                 var mesh;
                 var meshFilter = trans.gameObject.getComponent("meshFilter");
@@ -22045,10 +22201,11 @@ var gd3d;
                 }
                 if (!mesh)
                     return;
-                pickinfo = mesh.intersects(ray, trans.getWorldMatrix());
-                if (!pickinfo)
-                    return;
-                return pickinfo.faceId;
+                var tempInfo = gd3d.math.pool.new_pickInfo();
+                if (mesh.intersects(ray, trans.getWorldMatrix(), tempInfo))
+                    result = tempInfo.faceId;
+                gd3d.math.pool.delete_pickInfo(tempInfo);
+                return result;
             };
             return NavMeshLoadManager;
         }());
@@ -27658,37 +27815,41 @@ var gd3d;
             scene.prototype.getRoot = function () {
                 return this.rootNode;
             };
-            scene.prototype.pickAll = function (ray, isPickMesh, root, layermask) {
+            scene.prototype.pickAll = function (ray, outInfos, isPickMesh, root, layermask) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
                 if (root === void 0) { root = this.getRoot(); }
                 if (layermask === void 0) { layermask = NaN; }
-                var picked = this.doPick(ray, true, isPickMesh, root, layermask);
-                if (picked == null)
-                    return null;
-                return picked;
+                if (!outInfos || !ray)
+                    return false;
+                var isHited = this.doPick(ray, true, isPickMesh, root, outInfos, layermask);
+                return isHited;
             };
-            scene.prototype.pick = function (ray, isPickMesh, root, layermask) {
+            scene.prototype.pick = function (ray, outInfo, isPickMesh, root, layermask) {
                 if (isPickMesh === void 0) { isPickMesh = false; }
                 if (root === void 0) { root = this.getRoot(); }
                 if (layermask === void 0) { layermask = NaN; }
-                var pickinfo = this.doPick(ray, false, isPickMesh, root, layermask);
-                if (pickinfo == null)
-                    return null;
-                return pickinfo;
+                if (!outInfo || !ray)
+                    return false;
+                var isHited = this.doPick(ray, false, isPickMesh, root, outInfo, layermask);
+                return isHited;
             };
-            scene.prototype.doPick = function (ray, pickall, isPickMesh, root, layermask) {
+            scene.prototype.doPick = function (ray, pickall, isPickMesh, root, out, layermask) {
                 if (layermask === void 0) { layermask = NaN; }
+                var ishited = false;
                 var pickedList = new Array();
                 if (isPickMesh) {
-                    this.pickMesh(ray, root, pickedList, layermask);
+                    ishited = this.pickMesh(ray, root, pickedList, layermask);
                 }
                 else {
-                    this.pickCollider(ray, root, pickedList, layermask);
+                    ishited = this.pickCollider(ray, root, pickedList, layermask);
                 }
                 if (pickedList.length == 0)
-                    return null;
+                    return ishited;
                 if (pickall) {
-                    return pickedList;
+                    out.length = 0;
+                    pickedList.forEach(function (element) {
+                        out.push(element);
+                    });
                 }
                 else {
                     var index = 0;
@@ -27696,14 +27857,21 @@ var gd3d;
                         if (pickedList[i].distance < pickedList[index].distance)
                             index = i;
                     }
-                    return pickedList[index];
+                    var temp = pickedList.splice(index, 1);
+                    out.cloneFrom(temp[0]);
+                    pickedList.forEach(function (element) {
+                        gd3d.math.pool.delete_pickInfo(element);
+                    });
+                    pickedList.length = 0;
                 }
+                return ishited;
             };
             scene.prototype.pickMesh = function (ray, tran, pickedList, layermask) {
                 if (layermask === void 0) { layermask = NaN; }
+                var ishited = false;
                 if (tran.gameObject != null) {
                     if (!tran.gameObject.visible)
-                        return;
+                        return ishited;
                     var canDo = true;
                     if (!isNaN(layermask) && (layermask & (1 << tran.gameObject.layer)) == 0)
                         canDo = false;
@@ -27712,20 +27880,24 @@ var gd3d;
                         if (meshFilter != null) {
                             var mesh = meshFilter.getMeshOutput();
                             if (mesh) {
-                                var pickinfo = mesh.intersects(ray, tran.getWorldMatrix());
-                                if (pickinfo) {
-                                    pickedList.push(pickinfo);
-                                    pickinfo.pickedtran = tran;
+                                var pinfo = gd3d.math.pool.new_pickInfo();
+                                var bool_1 = mesh.intersects(ray, tran.getWorldMatrix(), pinfo);
+                                if (bool_1) {
+                                    ishited = true;
+                                    pickedList.push(pinfo);
+                                    pinfo.pickedtran = tran;
                                 }
                             }
                         }
                         else {
                             var skinmesh = tran.gameObject.getComponent("skinnedMeshRenderer");
                             if (skinmesh != null) {
-                                var pickinfo = skinmesh.intersects(ray);
-                                if (pickinfo) {
-                                    pickedList.push(pickinfo);
-                                    pickinfo.pickedtran = tran;
+                                var pinfo = gd3d.math.pool.new_pickInfo();
+                                var bool = skinmesh.intersects(ray, pinfo);
+                                if (bool) {
+                                    ishited = true;
+                                    pickedList.push(pinfo);
+                                    pinfo.pickedtran = tran;
                                 }
                             }
                         }
@@ -27733,34 +27905,42 @@ var gd3d;
                 }
                 if (tran.children != null) {
                     for (var i = 0; i < tran.children.length; i++) {
-                        this.pickMesh(ray, tran.children[i], pickedList, layermask);
+                        var bool_2 = this.pickMesh(ray, tran.children[i], pickedList, layermask);
+                        if (!ishited)
+                            ishited = bool_2;
                     }
                 }
+                return ishited;
             };
             scene.prototype.pickCollider = function (ray, tran, pickedList, layermask) {
                 if (layermask === void 0) { layermask = NaN; }
+                var ishited = false;
                 if (tran.gameObject != null) {
                     if (!tran.gameObject.visible)
-                        return;
+                        return ishited;
                     if (tran.gameObject.collider != null) {
                         var canDo = true;
                         if (!isNaN(layermask) && (layermask & (1 << tran.gameObject.layer)) == 0)
                             canDo = false;
-                        console.error(tran.gameObject.layer + "  --  " + layermask);
                         if (canDo) {
-                            var pickinfo = ray.intersectCollider(tran);
-                            if (pickinfo) {
-                                pickedList.push(pickinfo);
-                                pickinfo.pickedtran = tran;
+                            var pinfo = gd3d.math.pool.new_pickInfo();
+                            var bool = ray.intersectCollider(tran, pinfo);
+                            if (bool) {
+                                ishited = true;
+                                pickedList.push(pinfo);
+                                pinfo.pickedtran = tran;
                             }
                         }
                     }
                 }
                 if (tran.children != null) {
                     for (var i = 0; i < tran.children.length; i++) {
-                        this.pickCollider(ray, tran.children[i], pickedList, layermask);
+                        var bool_3 = this.pickCollider(ray, tran.children[i], pickedList, layermask);
+                        if (!ishited)
+                            ishited = bool_3;
                     }
                 }
+                return ishited;
             };
             return scene;
         }());
@@ -28348,6 +28528,10 @@ var gd3d;
     (function (framework) {
         var pickinfo = (function () {
             function pickinfo(_bu, _bv, _distance) {
+                if (_bu === void 0) { _bu = 0; }
+                if (_bv === void 0) { _bv = 0; }
+                if (_distance === void 0) { _distance = 0; }
+                this.distance = 0;
                 this.hitposition = new gd3d.math.vector3();
                 this.bu = 0;
                 this.bv = 0;
@@ -28357,6 +28541,20 @@ var gd3d;
                 this.bu = _bu;
                 this.bv = _bv;
             }
+            pickinfo.prototype.init = function () {
+                this.pickedtran = null;
+                this.hitposition.x = this.hitposition.y = this.hitposition.z = this.distance = this.bu = this.bv = this.subMeshId = 0;
+                this.faceId = -1;
+            };
+            pickinfo.prototype.cloneFrom = function (from) {
+                this.pickedtran = from.pickedtran;
+                gd3d.math.vec3Clone(from.hitposition, this.hitposition);
+                this.distance = from.distance;
+                this.bu = from.bu;
+                this.bv = from.bv;
+                this.subMeshId = from.subMeshId;
+                this.faceId = from.faceId;
+            };
             return pickinfo;
         }());
         framework.pickinfo = pickinfo;
@@ -28374,21 +28572,22 @@ var gd3d;
             ray.prototype.intersectAABB = function (_aabb) {
                 return this.intersectBoxMinMax(_aabb.minimum, _aabb.maximum);
             };
-            ray.prototype.intersectPlaneTransform = function (tran) {
-                var pickinfo = null;
+            ray.prototype.intersectPlaneTransform = function (tran, outInfo) {
+                var ishided = false;
                 var panelpoint = tran.getWorldTranslate();
                 var forward = gd3d.math.pool.new_vector3();
                 tran.getForwardInWorld(forward);
-                var hitposition = this.intersectPlane(panelpoint, forward);
-                if (hitposition) {
-                    pickinfo = new gd3d.framework.pickinfo(0, 0, 0);
-                    pickinfo.hitposition = hitposition;
-                    pickinfo.distance = gd3d.math.vec3Distance(pickinfo.hitposition, this.origin);
+                var hitposition = gd3d.math.pool.new_vector3();
+                ishided = this.intersectPlane(panelpoint, forward, hitposition);
+                if (ishided) {
+                    gd3d.math.vec3Clone(hitposition, outInfo.hitposition);
+                    outInfo.distance = gd3d.math.vec3Distance(outInfo.hitposition, this.origin);
                 }
                 gd3d.math.pool.delete_vector3(forward);
-                return pickinfo;
+                gd3d.math.pool.delete_vector3(hitposition);
+                return ishided;
             };
-            ray.prototype.intersectPlane = function (planePoint, planeNormal) {
+            ray.prototype.intersectPlane = function (planePoint, planeNormal, outHitPoint) {
                 var vp1 = planeNormal.x;
                 var vp2 = planeNormal.y;
                 var vp3 = planeNormal.z;
@@ -28403,20 +28602,24 @@ var gd3d;
                 var m3 = this.origin.z;
                 var vpt = v1 * vp1 + v2 * vp2 + v3 * vp3;
                 if (vpt === 0) {
-                    return null;
+                    return false;
                 }
                 else {
                     var t = ((n1 - m1) * vp1 + (n2 - m2) * vp2 + (n3 - m3) * vp3) / vpt;
-                    return new gd3d.math.vector3(m1 + v1 * t, m2 + v2 * t, m3 + v3 * t);
+                    outHitPoint.x = m1 + v1 * t;
+                    outHitPoint.y = m2 + v2 * t;
+                    outHitPoint.z = m3 + v3 * t;
+                    return true;
                 }
             };
-            ray.prototype.intersectCollider = function (tran) {
+            ray.prototype.intersectCollider = function (tran, outInfo) {
+                var ishided = false;
                 var _collider = tran.gameObject.collider;
-                var pickinfo = null;
+                var lastDistance = Number.MAX_VALUE;
                 if (_collider instanceof framework.boxcollider) {
                     var obb_1 = _collider.getBound();
                     if (!obb_1)
-                        return null;
+                        return ishided;
                     var vecs = [];
                     obb_1.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
                     var data = gd3d.render.meshData.genBoxByArray(vecs);
@@ -28424,30 +28627,34 @@ var gd3d;
                         var p0 = data.pos[data.trisindex[index]];
                         var p1 = data.pos[data.trisindex[index + 1]];
                         var p2 = data.pos[data.trisindex[index + 2]];
-                        var result = this.intersectsTriangle(p0, p1, p2);
-                        if (result) {
-                            if (result.distance < 0)
+                        var tempinfo = gd3d.math.pool.new_pickInfo();
+                        var bool = this.intersectsTriangle(p0, p1, p2, tempinfo);
+                        if (bool) {
+                            if (tempinfo.distance < 0)
                                 continue;
-                            if (!pickinfo || pickinfo.distance > result.distance) {
-                                pickinfo = result;
+                            if (lastDistance > tempinfo.distance) {
+                                ishided = true;
+                                outInfo.cloneFrom(tempinfo);
+                                lastDistance = outInfo.distance;
                                 var tdir = gd3d.math.pool.new_vector3();
-                                gd3d.math.vec3ScaleByNum(this.direction, result.distance, tdir);
-                                gd3d.math.vec3Add(this.origin, tdir, pickinfo.hitposition);
+                                gd3d.math.vec3ScaleByNum(this.direction, outInfo.distance, tdir);
+                                gd3d.math.vec3Add(this.origin, tdir, outInfo.hitposition);
                                 gd3d.math.pool.delete_vector3(tdir);
                             }
                         }
+                        gd3d.math.pool.delete_pickInfo(tempinfo);
                     }
                 }
                 else if (_collider instanceof framework.meshcollider) {
                     var mesh_3 = _collider.getBound();
                     if (mesh_3 != null) {
-                        pickinfo = mesh_3.intersects(this, tran.getWorldMatrix());
+                        ishided = mesh_3.intersects(this, tran.getWorldMatrix(), outInfo);
                     }
                 }
                 else if (_collider instanceof framework.canvasRenderer) {
-                    pickinfo = this.intersectPlaneTransform(tran);
+                    ishided = this.intersectPlaneTransform(tran, outInfo);
                 }
-                return pickinfo;
+                return ishided;
             };
             ray.prototype.intersectBoxMinMax = function (minimum, maximum) {
                 var d = 0.0;
@@ -28543,7 +28750,7 @@ var gd3d;
                     return false;
                 return true;
             };
-            ray.prototype.intersectsTriangle = function (vertex0, vertex1, vertex2) {
+            ray.prototype.intersectsTriangle = function (vertex0, vertex1, vertex2, outInfo) {
                 var _edge1 = gd3d.math.pool.new_vector3();
                 var _edge2 = gd3d.math.pool.new_vector3();
                 var _pvec = gd3d.math.pool.new_vector3();
@@ -28554,18 +28761,18 @@ var gd3d;
                 gd3d.math.vec3Cross(this.direction, _edge2, _pvec);
                 var det = gd3d.math.vec3Dot(_edge1, _pvec);
                 if (det === 0) {
-                    return null;
+                    return false;
                 }
                 var invdet = 1 / det;
                 gd3d.math.vec3Subtract(this.origin, vertex0, _tvec);
                 var bu = gd3d.math.vec3Dot(_tvec, _pvec) * invdet;
                 if (bu < 0 || bu > 1.0) {
-                    return null;
+                    return false;
                 }
                 gd3d.math.vec3Cross(_tvec, _edge1, _qvec);
                 var bv = gd3d.math.vec3Dot(this.direction, _qvec) * invdet;
                 if (bv < 0 || bu + bv > 1.0) {
-                    return null;
+                    return false;
                 }
                 var distance = gd3d.math.vec3Dot(_edge2, _qvec) * invdet;
                 gd3d.math.pool.delete_vector3(_edge1);
@@ -28573,7 +28780,11 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(_pvec);
                 gd3d.math.pool.delete_vector3(_tvec);
                 gd3d.math.pool.delete_vector3(_qvec);
-                return new framework.pickinfo(bu, bv, distance);
+                outInfo.init();
+                outInfo.bu = bu;
+                outInfo.bv = bv;
+                outInfo.distance = distance;
+                return true;
             };
             return ray;
         }());
@@ -29503,6 +29714,7 @@ var gd3d;
                 pool.collect_matrix();
                 pool.collect_quaternion();
                 pool.collect_color();
+                pool.collect_pickInfo();
             };
             Object.defineProperty(pool, "vector4_one", {
                 get: function () {
@@ -29858,6 +30070,30 @@ var gd3d;
             pool.collect_quaternion = function () {
                 pool.unused_quaternion.length = 0;
             };
+            pool.new_pickInfo = function (bu, bv, distance) {
+                if (bu === void 0) { bu = 0; }
+                if (bv === void 0) { bv = 0; }
+                if (distance === void 0) { distance = 0; }
+                if (pool.unused_pickInfo.length > 0) {
+                    var pk = pool.unused_pickInfo.pop();
+                    return pk;
+                }
+                else
+                    return new gd3d.framework.pickinfo(bu, bv, distance);
+            };
+            pool.delete_pickInfo = function (v) {
+                if (v == null)
+                    return;
+                if (v instanceof gd3d.framework.pickinfo) {
+                    v.init();
+                    pool.unused_pickInfo.push(v);
+                }
+                else
+                    console.error("kindding me?确定你要回收的是pickInfo吗？");
+            };
+            pool.collect_pickInfo = function () {
+                pool.unused_pickInfo.length = 0;
+            };
             pool.unused_vector4 = [];
             pool.unused_color = [];
             pool.unused_vector3 = [];
@@ -29866,6 +30102,7 @@ var gd3d;
             pool.unused_matrix = [];
             pool.identityMat = new math.matrix();
             pool.unused_quaternion = [];
+            pool.unused_pickInfo = [];
             return pool;
         }());
         math.pool = pool;

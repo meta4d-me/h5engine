@@ -25,6 +25,7 @@ namespace gd3d.math
             pool.collect_matrix();
             pool.collect_quaternion();
             pool.collect_color();
+            pool.collect_pickInfo();
         }
         //需要用啥照着这个加
         //for vector4
@@ -685,6 +686,57 @@ namespace gd3d.math
         static collect_quaternion()
         {
             pool.unused_quaternion.length = 0;//清除未使用的池子
+        }
+
+
+        
+        private static unused_pickInfo: framework.pickinfo[] = [];
+        
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取一个pickInfo
+        * @version gd3d 1.0
+        */
+        static new_pickInfo(bu:number = 0,bv:number = 0,distance:number = 0): framework.pickinfo
+        {
+            if (pool.unused_pickInfo.length > 0){
+                let pk = pool.unused_pickInfo.pop();
+                return pk;
+            }
+            else
+                return new framework.pickinfo(bu,bv,distance);
+        }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 回收一个pickInfo
+        * @version gd3d 1.0
+        */
+       static delete_pickInfo(v: framework.pickinfo): void
+       {
+           if (v == null) return;
+           if (v instanceof framework.pickinfo)
+           {
+                v.init();
+                pool.unused_pickInfo.push(v);
+           }
+           else
+               console.error("kindding me?确定你要回收的是pickInfo吗？");
+       }
+
+       /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 清除pickInfo池
+        * @version gd3d 1.0
+        */
+        static collect_pickInfo(){
+            pool.unused_pickInfo.length = 0;
         }
     }
 }

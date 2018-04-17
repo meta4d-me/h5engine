@@ -287,22 +287,23 @@ namespace gd3d.framework
                 var scene = this.gameObject.getScene();
 
                 var ray = this.cameraTouch.creatRayByScreen(new math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
-                var pinfo = scene.pick(ray);
+                let tempInfo = math.pool.new_pickInfo();
+                var pinfo = scene.pick(ray,tempInfo);
 
-                if (pinfo != null && pinfo.pickedtran == this.gameObject.transform)//pick 到自己
+                if (tempInfo && tempInfo.pickedtran == this.gameObject.transform)//pick 到自己
                 {
                     var mat = this.gameObject.transform.getWorldMatrix();
                     var matinv = new math.matrix();
                     math.matrixInverse(mat, matinv);
                     var outv = new math.vector3();
-                    math.matrixTransformVector3(pinfo.hitposition, matinv, outv);
-
+                    math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
                     this.canvas.update(delta, this.inputmgr.point.touch, outv.x, outv.y);
                 }
                 else
                 {
                     this.canvas.update(delta, false, 0, 0);
                 }
+                math.pool.delete_pickInfo(tempInfo);
             }
             else
             {
@@ -320,20 +321,22 @@ namespace gd3d.framework
          */
         pick2d(ray:gd3d.framework.ray):transform2D
         {
-            var pinfo = ray.intersectPlaneTransform(this.gameObject.transform);
-            if (pinfo != null)
+            let tempinfo = math.pool.new_pickInfo();
+            var bool = ray.intersectPlaneTransform(this.gameObject.transform,tempinfo);
+            if (bool != null)
             {
                 var mat = this.gameObject.transform.getWorldMatrix();
                 var matinv = math.pool.new_matrix();
                 math.matrixInverse(mat, matinv);
                 var outv = math.pool.new_vector3();
-                math.matrixTransformVector3(pinfo.hitposition, matinv, outv);
+                math.matrixTransformVector3(tempinfo.hitposition, matinv, outv);
                 var outv2 = math.pool.new_vector2();
                 outv2.x = outv.x;
                 outv2.y = outv.y;
                 var root = this.canvas.getRoot();
                 return this.dopick2d(outv2, root);
             }
+            math.pool.delete_pickInfo(tempinfo);
             return null;
         }
 
