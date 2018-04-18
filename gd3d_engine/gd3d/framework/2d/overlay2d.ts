@@ -212,7 +212,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        dopick2d(outv: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
+        dopick2d(NDCPos: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
         {
             if (tran.components != null)
             {
@@ -221,7 +221,7 @@ namespace gd3d.framework
                     var comp = tran.components[i];
                     if (comp != null)
                         //if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv,tolerance))
-                        if (comp.comp.transform.ContainsCanvasPoint(outv, tolerance))
+                        if (comp.comp.transform.ContainsCanvasPoint(NDCPos, tolerance))
                         {
                             return comp.comp.transform;
                         }
@@ -232,7 +232,7 @@ namespace gd3d.framework
             {
                 for (var i = tran.children.length - 1; i >= 0; i--)
                 {
-                    var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
+                    var tran2 = this.dopick2d(NDCPos, tran.children[i], tolerance);
                     if (tran2 != null) return tran2;
                 }
             }

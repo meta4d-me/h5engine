@@ -2063,7 +2063,6 @@ declare namespace gd3d.framework {
         near: number;
         private _far;
         far: number;
-        isMainCamera: boolean;
         CullingMask: CullingMask;
         index: number;
         markDirty(): void;

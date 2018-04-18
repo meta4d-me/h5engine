@@ -172,14 +172,6 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 是否为主相机
-         * @version egret-gd3d 1.0
-         */
-        public isMainCamera: boolean = false;
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 相机的渲染层级
          * @version egret-gd3d 1.0
          */

@@ -1327,8 +1327,8 @@ var gd3d;
                     var scene = this.gameObject.getScene();
                     var ray = this.cameraTouch.creatRayByScreen(new gd3d.math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
                     var tempInfo = gd3d.math.pool.new_pickInfo();
-                    var pinfo = scene.pick(ray, tempInfo);
-                    if (tempInfo && tempInfo.pickedtran == this.gameObject.transform) {
+                    var bool = scene.pick(ray, tempInfo);
+                    if (bool && tempInfo.pickedtran == this.gameObject.transform) {
                         var mat = this.gameObject.transform.getWorldMatrix();
                         var matinv = new gd3d.math.matrix();
                         gd3d.math.matrixInverse(mat, matinv);
@@ -12456,7 +12456,6 @@ var gd3d;
             function camera() {
                 this._near = 0.01;
                 this._far = 1000;
-                this.isMainCamera = false;
                 this.CullingMask = CullingMask.default | CullingMask.ui;
                 this.clearOption_Color = true;
                 this.clearOption_Depth = true;

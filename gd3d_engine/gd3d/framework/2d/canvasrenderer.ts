@@ -288,9 +288,9 @@ namespace gd3d.framework
 
                 var ray = this.cameraTouch.creatRayByScreen(new math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
                 let tempInfo = math.pool.new_pickInfo();
-                var pinfo = scene.pick(ray,tempInfo);
+                var bool = scene.pick(ray,tempInfo);
 
-                if (tempInfo && tempInfo.pickedtran == this.gameObject.transform)//pick 到自己
+                if (bool && tempInfo.pickedtran == this.gameObject.transform)//pick 到自己
                 {
                     var mat = this.gameObject.transform.getWorldMatrix();
                     var matinv = new math.matrix();
@@ -330,11 +330,12 @@ namespace gd3d.framework
                 math.matrixInverse(mat, matinv);
                 var outv = math.pool.new_vector3();
                 math.matrixTransformVector3(tempinfo.hitposition, matinv, outv);
-                var outv2 = math.pool.new_vector2();
-                outv2.x = outv.x;
-                outv2.y = outv.y;
                 var root = this.canvas.getRoot();
-                return this.dopick2d(outv2, root);
+                let trans = this.dopick2d(outv, root);
+
+                math.pool.delete_vector3(outv);
+                math.pool.delete_matrix(matinv);
+                return trans;
             }
             math.pool.delete_pickInfo(tempinfo);
             return null;
@@ -343,7 +344,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        dopick2d(outv:math.vector2, tran:transform2D):transform2D
+        dopick2d(NDCPos:math.vector2, tran:transform2D):transform2D
         {
             if (tran.components != null)
             {
@@ -352,7 +353,7 @@ namespace gd3d.framework
                     var comp = tran.components[i];
                     if (comp != null)
                         //if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv))
-                        if (comp.comp.transform.ContainsCanvasPoint(outv))
+                        if (comp.comp.transform.ContainsCanvasPoint(NDCPos))
                         {
                             return comp.comp.transform;
                         }
@@ -363,7 +364,7 @@ namespace gd3d.framework
             {
                 for (var i = tran.children.length - 1; i >= 0; i--)
                 {
-                    var tran2 = this.dopick2d(outv, tran.children[i]);
+                    var tran2 = this.dopick2d(NDCPos, tran.children[i]);
                     if(tran2 != null)   return tran2;
                 }
             }
