@@ -1288,9 +1288,9 @@ var gd3d;
         framework.batcher2D = batcher2D;
         var canvasRenderer = (function () {
             function canvasRenderer() {
+                this.renderLayer = framework.CullingMask.default;
                 this.layer = framework.RenderLayerEnum.Common;
                 this.queue = 0;
-                this.renderLayer = framework.CullingMask.default;
                 this.canvas = new framework.canvas();
                 this.canvas.is2dUI = false;
             }
@@ -1324,58 +1324,67 @@ var gd3d;
                 var asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
                 this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
                 if (this.cameraTouch != null) {
-                    var scene = this.gameObject.getScene();
-                    var ray = this.cameraTouch.creatRayByScreen(new gd3d.math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
-                    var tempInfo = gd3d.math.pool.new_pickInfo();
-                    var bool = scene.pick(ray, tempInfo);
-                    if (bool && tempInfo.pickedtran == this.gameObject.transform) {
-                        var mat = this.gameObject.transform.getWorldMatrix();
-                        var matinv = new gd3d.math.matrix();
-                        gd3d.math.matrixInverse(mat, matinv);
-                        var outv = new gd3d.math.vector3();
-                        gd3d.math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
-                        this.canvas.update(delta, this.inputmgr.point.touch, outv.x, outv.y);
+                    var scene_1 = this.gameObject.getScene();
+                    var tempv2 = gd3d.math.pool.new_vector2(this.inputmgr.point.x, this.inputmgr.point.y);
+                    var ray_1 = this.cameraTouch.creatRayByScreen(tempv2, scene_1.app);
+                    var outNDC = gd3d.math.pool.new_vector2();
+                    var bool = this.pickNDCPos(ray_1, outNDC);
+                    if (bool) {
+                        this.canvas.update(delta, this.inputmgr.point.touch, outNDC.x, outNDC.y);
                     }
                     else {
                         this.canvas.update(delta, false, 0, 0);
                     }
-                    gd3d.math.pool.delete_pickInfo(tempInfo);
+                    gd3d.math.pool.delete_vector2(tempv2);
+                    gd3d.math.pool.delete_vector2(outNDC);
                 }
                 else {
                     this.canvas.update(delta, false, 0, 0);
                 }
             };
-            canvasRenderer.prototype.pick2d = function (ray) {
-                var tempinfo = gd3d.math.pool.new_pickInfo();
-                var bool = ray.intersectPlaneTransform(this.gameObject.transform, tempinfo);
-                if (bool != null) {
+            canvasRenderer.prototype.pickNDCPos = function (ray, outNDCPos) {
+                var result = false;
+                if (!ray || !outNDCPos)
+                    return result;
+                var scene = this.gameObject.getScene();
+                var tempInfo = gd3d.math.pool.new_pickInfo();
+                var bool = ray.intersectPlaneTransform(this.gameObject.transform, tempInfo);
+                if (bool && tempInfo.pickedtran == this.gameObject.transform) {
                     var mat = this.gameObject.transform.getWorldMatrix();
                     var matinv = gd3d.math.pool.new_matrix();
                     gd3d.math.matrixInverse(mat, matinv);
                     var outv = gd3d.math.pool.new_vector3();
-                    gd3d.math.matrixTransformVector3(tempinfo.hitposition, matinv, outv);
-                    var outv2 = gd3d.math.pool.new_vector2();
-                    outv2.x = outv.x;
-                    outv2.y = outv.y;
-                    var root = this.canvas.getRoot();
-                    return this.dopick2d(outv2, root);
+                    gd3d.math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
+                    outNDCPos.x = outv.x;
+                    outNDCPos.y = outv.y;
+                    result = true;
+                    gd3d.math.pool.delete_matrix(matinv);
+                    gd3d.math.pool.delete_vector3(outv);
                 }
-                gd3d.math.pool.delete_pickInfo(tempinfo);
-                return null;
+                return result;
             };
-            canvasRenderer.prototype.dopick2d = function (outv, tran) {
+            canvasRenderer.prototype.pick2d = function (ray) {
+                var result;
+                var outv = gd3d.math.pool.new_vector2();
+                var bool = this.pickNDCPos(ray, outv);
+                if (bool)
+                    result = this.dopick2d(outv, this.canvas.getRoot());
+                gd3d.math.pool.delete_vector2(outv);
+                return result;
+            };
+            canvasRenderer.prototype.dopick2d = function (NDCPos, tran) {
                 if (tran.components != null) {
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.comp.transform.ContainsCanvasPoint(outv)) {
+                            if (comp.comp.transform.ContainsCanvasPoint(NDCPos)) {
                                 return comp.comp.transform;
                             }
                     }
                 }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(outv, tran.children[i]);
+                        var tran2 = this.dopick2d(NDCPos, tran.children[i]);
                         if (tran2 != null)
                             return tran2;
                     }
@@ -1385,8 +1394,6 @@ var gd3d;
             canvasRenderer.prototype.render = function (context, assetmgr, camera) {
                 context.updateModel(this.gameObject.transform);
                 this.canvas.render(context, assetmgr);
-            };
-            canvasRenderer.prototype.jsonToAttribute = function (json, assetmgr) {
             };
             canvasRenderer.prototype.remove = function () {
             };
@@ -1520,20 +1527,20 @@ var gd3d;
                 gd3d.math.pool.delete_vector2(outv2);
                 return trans;
             };
-            overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
+            overlay2D.prototype.dopick2d = function (NDCPos, tran, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 if (tran.components != null) {
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
+                            if (comp.comp.transform.ContainsCanvasPoint(NDCPos, tolerance)) {
                                 return comp.comp.transform;
                             }
                     }
                 }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
+                        var tran2 = this.dopick2d(NDCPos, tran.children[i], tolerance);
                         if (tran2 != null)
                             return tran2;
                     }
@@ -2456,13 +2463,13 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.ContainsCanvasPoint = function (pworld, tolerance) {
+            transform2D.prototype.ContainsCanvasPoint = function (NDCPos, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 var mworld = this.getWorldMatrix();
                 var mout = new gd3d.math.matrix3x2();
                 gd3d.math.matrix3x2Inverse(mworld, mout);
                 var p2 = new gd3d.math.vector2();
-                gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
+                gd3d.math.matrix3x2TransformVector2(mout, NDCPos, p2);
                 p2.x += this.pivot.x * this.width;
                 p2.y += this.pivot.y * this.height;
                 return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
@@ -12918,8 +12925,8 @@ var gd3d;
                     case canvasRenderMode.ScreenSpaceOverlay:
                         if (!this._overlay2d)
                             return;
-                        var scene_1 = this.gameObject.getScene();
-                        scene_1.addScreenSpaceOverlay(this._overlay2d);
+                        var scene_2 = this.gameObject.getScene();
+                        scene_2.addScreenSpaceOverlay(this._overlay2d);
                         break;
                 }
             };
@@ -28581,6 +28588,7 @@ var gd3d;
                 if (ishided) {
                     gd3d.math.vec3Clone(hitposition, outInfo.hitposition);
                     outInfo.distance = gd3d.math.vec3Distance(outInfo.hitposition, this.origin);
+                    outInfo.pickedtran = tran;
                 }
                 gd3d.math.pool.delete_vector3(forward);
                 gd3d.math.pool.delete_vector3(hitposition);

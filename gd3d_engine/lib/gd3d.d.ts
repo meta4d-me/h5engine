@@ -265,6 +265,7 @@ declare namespace gd3d.framework {
     }
     class canvasRenderer implements IRenderer, ICollider {
         constructor();
+        renderLayer: CullingMask;
         subTran: transform;
         getBound(): any;
         intersectsTransform(tran: transform): boolean;
@@ -281,13 +282,12 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         update(delta: number): void;
+        pickNDCPos(ray: gd3d.framework.ray, outNDCPos: math.vector2): boolean;
         pick2d(ray: gd3d.framework.ray): transform2D;
-        dopick2d(outv: math.vector2, tran: transform2D): transform2D;
+        private dopick2d(NDCPos, tran);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
-        jsonToAttribute(json: any, assetmgr: gd3d.framework.assetMgr): void;
         remove(): void;
         clone(): void;
-        renderLayer: CullingMask;
     }
 }
 declare namespace gd3d.framework {
@@ -330,7 +330,7 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         update(delta: number): void;
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
-        dopick2d(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
+        dopick2d(NDCPos: math.vector2, tran: transform2D, tolerance?: number): transform2D;
         pick2d_new(mx: number, my: number, tolerance?: number): transform2D;
         dopick2d_new(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
@@ -502,7 +502,7 @@ declare namespace gd3d.framework {
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents(node, _type, comps);
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
-        ContainsCanvasPoint(pworld: math.vector2, tolerance?: number): boolean;
+        ContainsCanvasPoint(NDCPos: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
         private readonly optionArr;
         private _layoutState;

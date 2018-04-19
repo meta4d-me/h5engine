@@ -160,6 +160,8 @@ namespace gd3d.framework
             this.canvas.is2dUI = false;
         }
 
+        renderLayer: CullingMask = CullingMask.default;
+
         /**
          * @private
          */
@@ -278,32 +280,28 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-            var asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
+            let asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
             this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
 
 
             if (this.cameraTouch != null)//需要用户代码 或者在编辑器里面绑定使用哪个camera（即设置此变量）,否则不会主动响应事件否则不会主动响应事件
             {
-                var scene = this.gameObject.getScene();
-
-                var ray = this.cameraTouch.creatRayByScreen(new math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
-                let tempInfo = math.pool.new_pickInfo();
-                var bool = scene.pick(ray,tempInfo);
-
-                if (bool && tempInfo.pickedtran == this.gameObject.transform)//pick 到自己
+                let scene = this.gameObject.getScene();
+                let tempv2 = math.pool.new_vector2(this.inputmgr.point.x,this.inputmgr.point.y);
+                let ray = this.cameraTouch.creatRayByScreen(tempv2, scene.app);
+                let outNDC = math.pool.new_vector2();
+                let bool = this.pickNDCPos(ray,outNDC);
+                if (bool)
                 {
-                    var mat = this.gameObject.transform.getWorldMatrix();
-                    var matinv = new math.matrix();
-                    math.matrixInverse(mat, matinv);
-                    var outv = new math.vector3();
-                    math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
-                    this.canvas.update(delta, this.inputmgr.point.touch, outv.x, outv.y);
+                    this.canvas.update(delta, this.inputmgr.point.touch, outNDC.x, outNDC.y);
                 }
                 else
                 {
                     this.canvas.update(delta, false, 0, 0);
                 }
-                math.pool.delete_pickInfo(tempInfo);
+
+                math.pool.delete_vector2(tempv2);
+                math.pool.delete_vector2(outNDC);
             }
             else
             {
@@ -315,36 +313,58 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 射线检测
+         * 射线碰撞 获取 NDC坐标点
          * @param ray 射线
+         * @param outNDCPos out获取到的NDC坐标
          * @version egret-gd3d 1.0
          */
-        pick2d(ray:gd3d.framework.ray):transform2D
-        {
-            let tempinfo = math.pool.new_pickInfo();
-            var bool = ray.intersectPlaneTransform(this.gameObject.transform,tempinfo);
-            if (bool != null)
+        pickNDCPos(ray:gd3d.framework.ray,outNDCPos:math.vector2):boolean{
+            let result = false;
+            if(!ray || !outNDCPos) return result;
+            let scene = this.gameObject.getScene();
+            let tempInfo = math.pool.new_pickInfo();
+            let bool = ray.intersectPlaneTransform(this.gameObject.transform,tempInfo);
+            if (bool && tempInfo.pickedtran == this.gameObject.transform)//pick 到自己
             {
                 var mat = this.gameObject.transform.getWorldMatrix();
                 var matinv = math.pool.new_matrix();
                 math.matrixInverse(mat, matinv);
                 var outv = math.pool.new_vector3();
-                math.matrixTransformVector3(tempinfo.hitposition, matinv, outv);
-                var root = this.canvas.getRoot();
-                let trans = this.dopick2d(outv, root);
+                math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
+                outNDCPos.x = outv.x;
+                outNDCPos.y = outv.y;
+                result = true;
 
-                math.pool.delete_vector3(outv);
                 math.pool.delete_matrix(matinv);
-                return trans;
+                math.pool.delete_vector3(outv);
             }
-            math.pool.delete_pickInfo(tempinfo);
-            return null;
+            return result;
         }
 
         /**
-         * @private
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 射线拣选transform2D
+         * @param ray 射线
+         * @version egret-gd3d 1.0
          */
-        dopick2d(NDCPos:math.vector2, tran:transform2D):transform2D
+        pick2d(ray:gd3d.framework.ray):transform2D
+        {
+            let result :transform2D;
+            let outv = math.pool.new_vector2();
+            let bool =  this.pickNDCPos(ray,outv);
+            if (bool)
+                result = this.dopick2d(outv, this.canvas.getRoot());
+
+            math.pool.delete_vector2(outv);
+            return result;
+        }
+
+        /**
+         * NDC坐标来拣选transform2D
+         */
+        private dopick2d(NDCPos:math.vector2, tran:transform2D):transform2D
         {
             if (tran.components != null)
             {
@@ -384,13 +404,6 @@ namespace gd3d.framework
         /**
          * @private
          */
-        jsonToAttribute(json, assetmgr: gd3d.framework.assetMgr)
-        {
-
-        }
-        /**
-         * @private
-         */
         remove()
         {
 
@@ -402,6 +415,5 @@ namespace gd3d.framework
         {
             
         }
-        renderLayer: CullingMask = CullingMask.default;
     }
 }
