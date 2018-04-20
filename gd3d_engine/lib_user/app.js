@@ -1289,10 +1289,10 @@ var test_anim = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
-        var baihu = new gd3d.framework.transform();
-        baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 1;
-        this.scene.addChild(baihu);
+        var prefabObj = new gd3d.framework.transform();
+        prefabObj.name = "baihu";
+        prefabObj.localScale.x = prefabObj.localScale.y = prefabObj.localScale.z = 1;
+        this.scene.addChild(prefabObj);
         {
             var lighttran = new gd3d.framework.transform();
             this.scene.addChild(lighttran);
@@ -1302,19 +1302,20 @@ var test_anim = (function () {
             lighttran.localTranslate.y = 3;
             lighttran.markDirty();
         }
+        var resName = "elong";
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/elong/elong.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/prefabs/" + resName + "/" + resName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName("elong.prefab.json");
-                        baihu = _prefab.getCloneTrans();
-                        _this.player = baihu;
-                        _this.scene.addChild(baihu);
-                        baihu.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-                        baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        objCam.lookat(baihu);
+                        var _prefab = _this.app.getAssetMgr().getAssetByName(resName + ".prefab.json");
+                        prefabObj = _prefab.getCloneTrans();
+                        _this.player = prefabObj;
+                        _this.scene.addChild(prefabObj);
+                        prefabObj.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
+                        prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        objCam.lookat(prefabObj);
                         objCam.markDirty();
-                        var ap = baihu.gameObject.getComponent("aniplayer");
+                        var ap = prefabObj.gameObject.getComponent("aniplayer");
                         document.onkeydown = function (ev) {
                             if (ev.code == "KeyM") {
                                 ap.playCrossByIndex(0, 0.2);
@@ -1326,24 +1327,27 @@ var test_anim = (function () {
                                 ap.stop();
                             }
                         };
-                        var wingroot = baihu.find("Bip001 Xtra17Nub");
-                        var trans = new gd3d.framework.transform();
-                        trans.name = "cube11";
-                        var mesh = trans.gameObject.addComponent("meshFilter");
-                        var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
-                        mesh.mesh = smesh;
-                        var renderer = trans.gameObject.addComponent("meshRenderer");
-                        wingroot.addChild(trans);
-                        trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
-                        renderer.materials = [];
-                        renderer.materials.push(new gd3d.framework.material());
-                        renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
+                        var wingroot = prefabObj.find("Bip001 Xtra17Nub");
+                        if (wingroot) {
+                            wingroot.gameObject.addComponent("asbone");
+                            var trans = new gd3d.framework.transform();
+                            trans.name = "cube11";
+                            var mesh = trans.gameObject.addComponent("meshFilter");
+                            var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
+                            mesh.mesh = smesh;
+                            var renderer = trans.gameObject.addComponent("meshRenderer");
+                            wingroot.addChild(trans);
+                            trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                            trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
+                            renderer.materials = [];
+                            renderer.materials.push(new gd3d.framework.material());
+                            renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
+                        }
                     }
                 });
             }
         });
-        this.cube = baihu;
+        this.cube = prefabObj;
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
@@ -1351,7 +1355,7 @@ var test_anim = (function () {
         this.camera.near = 0.01;
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(baihu);
+        objCam.lookat(prefabObj);
         objCam.markDirty();
     };
     test_anim.prototype.update = function (delta) {

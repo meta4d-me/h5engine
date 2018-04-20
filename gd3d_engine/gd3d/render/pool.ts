@@ -199,6 +199,8 @@ namespace gd3d.math
             {
                 pool._vector3_up = new vector3(0, 1, 0);
             }
+            pool._vector3_up.y = 1;
+            pool._vector3_up.x = pool._vector3_up.z = 0;
             return pool._vector3_up;
         }
         private static _vector3_right: vector3;
@@ -215,6 +217,8 @@ namespace gd3d.math
             {
                 pool._vector3_right = new vector3(1, 0, 0);
             }
+            pool._vector3_right.x = 1;
+            pool._vector3_right.y = pool._vector3_right.z = 0;
             return pool._vector3_right;
         }
         private static _vector3_forward: vector3;
@@ -231,6 +235,8 @@ namespace gd3d.math
             {
                 pool._vector3_forward = new vector3(0, 0, 1);
             }
+            pool._vector3_forward.x = pool._vector3_forward.y = 0;
+            pool._vector3_forward.z = 1;
             return pool._vector3_forward;
         }
         private static _vector3_zero: vector3;
@@ -247,6 +253,7 @@ namespace gd3d.math
             {
                 pool._vector3_zero = new vector3(0, 0, 0);
             }
+            pool._vector3_zero.x = pool._vector3_zero.y = pool._vector3_zero.z = 0;
             return pool._vector3_zero;
         }
         private static _vector3_one: vector3;
@@ -263,6 +270,7 @@ namespace gd3d.math
             {
                 pool._vector3_one = new vector3(1, 1, 1);
             }
+            pool._vector3_one.x = pool._vector3_one.y = pool._vector3_one.z = 1;
             return pool._vector3_one;
         }
 
@@ -356,6 +364,24 @@ namespace gd3d.math
         }
 
         //for vector2
+        private static _vector2_zero: vector2;
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取v2 zero
+        * @version gd3d 1.0
+        */
+        static get vector2_zero(): vector2
+        {
+            if (pool._vector2_zero == null)
+            {
+                pool._vector2_zero = new vector2(0, 0);
+            }
+            pool._vector2_zero.x = pool._vector2_zero.y=1;
+            return pool._vector2_zero;
+        }
+
         private static _vector2_up: vector2;
         /**
         * @public
@@ -370,6 +396,7 @@ namespace gd3d.math
             {
                 pool._vector2_up = new vector2(0, 1);
             }
+            pool._vector2_up.x = 0; pool._vector2_up.y=1;
             return pool._vector2_up;
         }
         private static _vector2_right: vector2;
@@ -386,6 +413,7 @@ namespace gd3d.math
             {
                 pool._vector2_right = new vector2(1, 0);
             }
+            pool._vector2_right.x = 1; pool._vector2_right.y=0;
             return pool._vector2_right;
         }
         private static unused_vector2: vector2[] = [];

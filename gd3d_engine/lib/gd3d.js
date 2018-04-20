@@ -1547,39 +1547,6 @@ var gd3d;
                 }
                 return null;
             };
-            overlay2D.prototype.pick2d_new = function (mx, my, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (this.camera == null)
-                    return null;
-                var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (mx / vp.w) * 2 - 1;
-                var sy = (my / vp.h) * -2 + 1;
-                var outv2 = gd3d.math.pool.new_vector2();
-                outv2.x = sx;
-                outv2.y = sy;
-                var root = this.canvas.getRoot();
-                var trans = this.dopick2d_new(outv2, root, tolerance);
-                gd3d.math.pool.delete_vector2(outv2);
-                return trans;
-            };
-            overlay2D.prototype.dopick2d_new = function (outv, tran, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (tran.children != null) {
-                    for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d_new(outv, tran.children[i]);
-                        if (tran2 != null)
-                            return tran2;
-                    }
-                }
-                var uirect = tran.getComponent("uirect");
-                if (uirect != null) {
-                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance)) {
-                        return uirect.transform;
-                    }
-                }
-                return null;
-            };
             overlay2D.prototype.calScreenPosToCanvasPos = function (screenPos, outCanvasPos) {
                 if (!this.camera || !this.canvas)
                     return;
@@ -29820,6 +29787,8 @@ var gd3d;
                     if (pool._vector3_up == null) {
                         pool._vector3_up = new math.vector3(0, 1, 0);
                     }
+                    pool._vector3_up.y = 1;
+                    pool._vector3_up.x = pool._vector3_up.z = 0;
                     return pool._vector3_up;
                 },
                 enumerable: true,
@@ -29830,6 +29799,8 @@ var gd3d;
                     if (pool._vector3_right == null) {
                         pool._vector3_right = new math.vector3(1, 0, 0);
                     }
+                    pool._vector3_right.x = 1;
+                    pool._vector3_right.y = pool._vector3_right.z = 0;
                     return pool._vector3_right;
                 },
                 enumerable: true,
@@ -29840,6 +29811,8 @@ var gd3d;
                     if (pool._vector3_forward == null) {
                         pool._vector3_forward = new math.vector3(0, 0, 1);
                     }
+                    pool._vector3_forward.x = pool._vector3_forward.y = 0;
+                    pool._vector3_forward.z = 1;
                     return pool._vector3_forward;
                 },
                 enumerable: true,
@@ -29850,6 +29823,7 @@ var gd3d;
                     if (pool._vector3_zero == null) {
                         pool._vector3_zero = new math.vector3(0, 0, 0);
                     }
+                    pool._vector3_zero.x = pool._vector3_zero.y = pool._vector3_zero.z = 0;
                     return pool._vector3_zero;
                 },
                 enumerable: true,
@@ -29860,6 +29834,7 @@ var gd3d;
                     if (pool._vector3_one == null) {
                         pool._vector3_one = new math.vector3(1, 1, 1);
                     }
+                    pool._vector3_one.x = pool._vector3_one.y = pool._vector3_one.z = 1;
                     return pool._vector3_one;
                 },
                 enumerable: true,
@@ -29911,11 +29886,24 @@ var gd3d;
             pool.collect_vector3 = function () {
                 pool.unused_vector3.length = 0;
             };
+            Object.defineProperty(pool, "vector2_zero", {
+                get: function () {
+                    if (pool._vector2_zero == null) {
+                        pool._vector2_zero = new math.vector2(0, 0);
+                    }
+                    pool._vector2_zero.x = pool._vector2_zero.y = 1;
+                    return pool._vector2_zero;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(pool, "vector2_up", {
                 get: function () {
                     if (pool._vector2_up == null) {
                         pool._vector2_up = new math.vector2(0, 1);
                     }
+                    pool._vector2_up.x = 0;
+                    pool._vector2_up.y = 1;
                     return pool._vector2_up;
                 },
                 enumerable: true,
@@ -29926,6 +29914,8 @@ var gd3d;
                     if (pool._vector2_right == null) {
                         pool._vector2_right = new math.vector2(1, 0);
                     }
+                    pool._vector2_right.x = 1;
+                    pool._vector2_right.y = 0;
                     return pool._vector2_right;
                 },
                 enumerable: true,

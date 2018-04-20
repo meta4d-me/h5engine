@@ -330,9 +330,7 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         update(delta: number): void;
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
-        dopick2d(NDCPos: math.vector2, tran: transform2D, tolerance?: number): transform2D;
-        pick2d_new(mx: number, my: number, tolerance?: number): transform2D;
-        dopick2d_new(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
+        private dopick2d(NDCPos, tran, tolerance?);
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
     }
 }
@@ -5522,6 +5520,8 @@ declare namespace gd3d.math {
         static delete_vector3(v: vector3): void;
         static delete_vector3Array(vs: vector3[]): void;
         static collect_vector3(): void;
+        private static _vector2_zero;
+        static readonly vector2_zero: vector2;
         private static _vector2_up;
         static readonly vector2_up: vector2;
         private static _vector2_right;

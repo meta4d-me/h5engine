@@ -212,7 +212,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        dopick2d(NDCPos: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
+        private dopick2d(NDCPos: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
         {
             if (tran.components != null)
             {
@@ -234,48 +234,6 @@ namespace gd3d.framework
                 {
                     var tran2 = this.dopick2d(NDCPos, tran.children[i], tolerance);
                     if (tran2 != null) return tran2;
-                }
-            }
-            return null;
-        }
-        /**
-         * @private
-         */
-        pick2d_new(mx: number, my: number, tolerance: number = 0): transform2D
-        {
-            if (this.camera == null) return null;
-            var vp = new math.rect();
-            var app = this.camera.calcViewPortPixel(this.app, vp);
-            var sx = (mx / vp.w) * 2 - 1;
-            var sy = (my / vp.h) * -2 + 1;
-
-            var outv2 = math.pool.new_vector2();
-            outv2.x = sx;
-            outv2.y = sy;
-            var root = this.canvas.getRoot();
-            let trans = this.dopick2d_new(outv2, root, tolerance);
-            math.pool.delete_vector2(outv2);
-            return trans;
-        }
-        /**
-         * @private
-         */
-        dopick2d_new(outv: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
-        {
-            if (tran.children != null)
-            {
-                for (var i = tran.children.length - 1; i >= 0; i--)
-                {
-                    var tran2 = this.dopick2d_new(outv, tran.children[i]);
-                    if (tran2 != null) return tran2;
-                }
-            }
-            var uirect = tran.getComponent("uirect") as gd3d.framework.uirect;
-            if (uirect != null)
-            {
-                if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance))
-                {
-                    return uirect.transform;
                 }
             }
             return null;
