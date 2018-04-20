@@ -285,6 +285,7 @@ declare namespace gd3d.framework {
         pickNDCPos(ray: gd3d.framework.ray, outNDCPos: math.vector2): boolean;
         pick2d(ray: gd3d.framework.ray): transform2D;
         private dopick2d(NDCPos, tran);
+        calScreenPosToCanvasPos(camera: framework.camera, screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         remove(): void;
         clone(): void;

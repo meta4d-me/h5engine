@@ -392,6 +392,24 @@ namespace gd3d.framework
         }
 
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 屏幕空间坐标 转到 canvas坐标
+         * @version egret-gd3d 1.0
+         */
+        calScreenPosToCanvasPos(camera:framework.camera,screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2)
+        {
+            if(!camera || !screenPos || !outCanvasPos) return;
+            let ray = camera.creatRayByScreen(screenPos,this.gameObject.getScene().app);
+            let NDCPos = gd3d.math.pool.new_vector2();
+            this.pickNDCPos(ray,NDCPos);
+            this.canvas.NDCPosToCanvasPos(NDCPos,outCanvasPos);
+
+            gd3d.math.pool.delete_vector2(NDCPos);
+        }
+
+        /**
          * @private
          */
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)

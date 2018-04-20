@@ -1391,6 +1391,15 @@ var gd3d;
                 }
                 return null;
             };
+            canvasRenderer.prototype.calScreenPosToCanvasPos = function (camera, screenPos, outCanvasPos) {
+                if (!camera || !screenPos || !outCanvasPos)
+                    return;
+                var ray = camera.creatRayByScreen(screenPos, this.gameObject.getScene().app);
+                var NDCPos = gd3d.math.pool.new_vector2();
+                this.pickNDCPos(ray, NDCPos);
+                this.canvas.NDCPosToCanvasPos(NDCPos, outCanvasPos);
+                gd3d.math.pool.delete_vector2(NDCPos);
+            };
             canvasRenderer.prototype.render = function (context, assetmgr, camera) {
                 context.updateModel(this.gameObject.transform);
                 this.canvas.render(context, assetmgr);
@@ -2432,14 +2441,18 @@ var gd3d;
             };
             transform2D.prototype.ContainsCanvasPoint = function (NDCPos, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
+                var result = false;
                 var mworld = this.getWorldMatrix();
-                var mout = new gd3d.math.matrix3x2();
+                var mout = gd3d.math.pool.new_matrix3x2();
                 gd3d.math.matrix3x2Inverse(mworld, mout);
-                var p2 = new gd3d.math.vector2();
+                var p2 = gd3d.math.pool.new_vector2();
                 gd3d.math.matrix3x2TransformVector2(mout, NDCPos, p2);
                 p2.x += this.pivot.x * this.width;
                 p2.y += this.pivot.y * this.height;
-                return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+                result = p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+                gd3d.math.pool.delete_matrix3x2(mout);
+                gd3d.math.pool.delete_vector2(p2);
+                return result;
             };
             transform2D.prototype.onPointEvent = function (canvas, ev) {
                 if (this.children != null) {

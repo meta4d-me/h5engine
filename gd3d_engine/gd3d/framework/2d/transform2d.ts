@@ -1121,15 +1121,20 @@ namespace gd3d.framework
          */
         ContainsCanvasPoint(NDCPos: math.vector2, tolerance: number = 0): boolean
         {
+            let result = false;
             var mworld = this.getWorldMatrix();  //worldMatrix 是 NDC 坐标系
-            var mout = new math.matrix3x2();
+            var mout = math.pool.new_matrix3x2();
             gd3d.math.matrix3x2Inverse(mworld, mout);
 
-            var p2 = new math.vector2();
+            var p2 = math.pool.new_vector2();
             gd3d.math.matrix3x2TransformVector2(mout, NDCPos, p2);
             p2.x += this.pivot.x * this.width;
             p2.y += this.pivot.y * this.height;
-            return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+            result = p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+
+            math.pool.delete_matrix3x2(mout);
+            math.pool.delete_vector2(p2);
+            return result;
         }
 
         /**
