@@ -232,7 +232,7 @@ declare namespace gd3d.framework {
         private pointY;
         private lastWidth;
         private lastHeight;
-        update(delta: number, touch: Boolean, XOnNDCSpace: number, YOnNDCSpace: number): void;
+        update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
         private lastMat;
         afterRender: Function;
         render(context: renderContext, assetmgr: assetMgr): void;
@@ -246,7 +246,7 @@ declare namespace gd3d.framework {
         pixelHeight: number;
         private rootNode;
         getRoot(): transform2D;
-        NDCPosToCanvasPos(fromP: math.vector2, outP: math.vector2): void;
+        ModelPosToCanvasPos(fromP: math.vector2, outP: math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
@@ -282,10 +282,13 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         update(delta: number): void;
-        pickNDCPos(ray: gd3d.framework.ray, outNDCPos: math.vector2): boolean;
+        pickModelPos(ray: gd3d.framework.ray, outModelPos: math.vector2): boolean;
+        pickAll2d(ray: gd3d.framework.ray): transform2D[];
         pick2d(ray: gd3d.framework.ray): transform2D;
-        private dopick2d(NDCPos, tran);
+        private cupTans2ds;
+        private dopick2d(ModelPos, tran, outPicks, isAll?);
         calScreenPosToCanvasPos(camera: framework.camera, screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
+        calCanvasPosToWorldPos(from: math.vector2, out: math.vector3): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         remove(): void;
         clone(): void;
@@ -331,7 +334,7 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         update(delta: number): void;
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
-        private dopick2d(NDCPos, tran, tolerance?);
+        private dopick2d(ModelPos, tran, tolerance?);
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
     }
 }
@@ -501,7 +504,7 @@ declare namespace gd3d.framework {
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents(node, _type, comps);
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
-        ContainsCanvasPoint(NDCPos: math.vector2, tolerance?: number): boolean;
+        ContainsCanvasPoint(ModelPos: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
         private readonly optionArr;
         private _layoutState;

@@ -179,8 +179,6 @@ namespace gd3d.framework
             //canvas de update 直接集成pointevent处理
             this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
 
-            //用屏幕空间坐标系丢给canvas
-
         }
 
         /**
@@ -212,7 +210,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        private dopick2d(NDCPos: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
+        private dopick2d(ModelPos: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
         {
             if (tran.components != null)
             {
@@ -221,7 +219,7 @@ namespace gd3d.framework
                     var comp = tran.components[i];
                     if (comp != null)
                         //if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv,tolerance))
-                        if (comp.comp.transform.ContainsCanvasPoint(NDCPos, tolerance))
+                        if (comp.comp.transform.ContainsCanvasPoint(ModelPos, tolerance))
                         {
                             return comp.comp.transform;
                         }
@@ -232,7 +230,7 @@ namespace gd3d.framework
             {
                 for (var i = tran.children.length - 1; i >= 0; i--)
                 {
-                    var tran2 = this.dopick2d(NDCPos, tran.children[i], tolerance);
+                    var tran2 = this.dopick2d(ModelPos, tran.children[i], tolerance);
                     if (tran2 != null) return tran2;
                 }
             }

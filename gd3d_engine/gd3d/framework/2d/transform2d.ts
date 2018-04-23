@@ -1116,18 +1116,18 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 检测以canvas为参考的位置，是否在节点的范围内
-         * @param NDCPos 位置
+         * @param ModelPos 模型空间位置
          * @version egret-gd3d 1.0
          */
-        ContainsCanvasPoint(NDCPos: math.vector2, tolerance: number = 0): boolean
+        ContainsCanvasPoint(ModelPos: math.vector2, tolerance: number = 0): boolean
         {
             let result = false;
-            var mworld = this.getWorldMatrix();  //worldMatrix 是 NDC 坐标系
+            var mworld = this.getWorldMatrix();  
             var mout = math.pool.new_matrix3x2();
-            gd3d.math.matrix3x2Inverse(mworld, mout);
+            gd3d.math.matrix3x2Inverse(mworld, mout);   
 
             var p2 = math.pool.new_vector2();
-            gd3d.math.matrix3x2TransformVector2(mout, NDCPos, p2);
+            gd3d.math.matrix3x2TransformVector2(mout, ModelPos, p2);  //世界坐标 右乘 逆转worldMatrix 得到 ModelPos
             p2.x += this.pivot.x * this.width;
             p2.y += this.pivot.y * this.height;
             result = p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
