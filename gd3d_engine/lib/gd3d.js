@@ -1421,6 +1421,7 @@ var gd3d;
                 ModelPos.y = (from.y / root.height) * -2 + 1;
                 var m_mtx = this.gameObject.transform.getWorldMatrix();
                 gd3d.math.matrixTransformVector3(ModelPos, m_mtx, out);
+                out.z = this.gameObject.transform.getWorldTranslate().z;
                 gd3d.math.pool.delete_vector3(ModelPos);
             };
             canvasRenderer.prototype.render = function (context, assetmgr, camera) {
@@ -20379,13 +20380,17 @@ var gd3d;
         }
         math.matrixMakeScale = matrixMakeScale;
         function matrix3x2TransformVector2(mat, inp, out) {
-            out.x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
-            out.y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
+            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
+            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
+            out.x = x;
+            out.y = y;
         }
         math.matrix3x2TransformVector2 = matrix3x2TransformVector2;
         function matrix3x2TransformNormal(mat, inp, out) {
-            out.x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
-            out.y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
+            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
+            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
+            out.x = x;
+            out.y = y;
         }
         math.matrix3x2TransformNormal = matrix3x2TransformNormal;
         function matrix3x2MakeScale(xScale, yScale, out) {
@@ -20483,18 +20488,24 @@ var gd3d;
             var a10 = lhs.rawData[2], a11 = lhs.rawData[3], a12 = 0;
             var a30 = lhs.rawData[4], a31 = lhs.rawData[5], a32 = 1;
             var b0 = rhs.rawData[0], b1 = rhs.rawData[1], b3 = 0;
-            out.rawData[0] = b0 * a00 + b1 * a10 + b3 * a30;
-            out.rawData[1] = b0 * a01 + b1 * a11 + b3 * a31;
+            var temp_0 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_1 = b0 * a01 + b1 * a11 + b3 * a31;
             b0 = rhs.rawData[2];
             b1 = rhs.rawData[3];
             b3 = 0;
-            out.rawData[2] = b0 * a00 + b1 * a10 + b3 * a30;
-            out.rawData[3] = b0 * a01 + b1 * a11 + b3 * a31;
+            var temp_2 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_3 = b0 * a01 + b1 * a11 + b3 * a31;
             b0 = rhs.rawData[4];
             b1 = rhs.rawData[5];
             b3 = 1;
-            out.rawData[4] = b0 * a00 + b1 * a10 + b3 * a30;
-            out.rawData[5] = b0 * a01 + b1 * a11 + b3 * a31;
+            var temp_4 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_5 = b0 * a01 + b1 * a11 + b3 * a31;
+            out.rawData[0] = temp_0;
+            out.rawData[1] = temp_1;
+            out.rawData[2] = temp_2;
+            out.rawData[3] = temp_3;
+            out.rawData[4] = temp_4;
+            out.rawData[5] = temp_5;
         }
         math.matrix3x2Multiply = matrix3x2Multiply;
         function matrixProject_PerspectiveLH(fov, aspect, znear, zfar, out) {
