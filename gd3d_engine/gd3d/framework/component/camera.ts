@@ -172,14 +172,6 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 是否为主相机
-         * @version egret-gd3d 1.0
-         */
-        public isMainCamera: boolean = false;
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 相机的渲染层级
          * @version egret-gd3d 1.0
          */
@@ -745,8 +737,8 @@ namespace gd3d.framework
         {
             for (var i = 0; i < scene.renderList.renderLayers.length; i++)
             {
-                var layer = scene.renderList.renderLayers[i];
-                var list = layer.list;
+                let layer = scene.renderList.renderLayers[i];
+                let list = layer.list;
                 if (layer.needSort)
                 {
                     if (list.length > 1)
@@ -761,13 +753,16 @@ namespace gd3d.framework
                             {
                                 // var matrixView = math.pool.new_matrix();
                                 // this.calcViewMatrix(matrixView);
-                                var matrixView = context.matrixView;
+                                let matrixView = context.matrixView;
 
-                                var az = math.pool.new_vector3();
-                                var bz = math.pool.new_vector3();
+                                let az = math.pool.new_vector3();
+                                let bz = math.pool.new_vector3();
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                return bz.z - az.z;
+                                let result = bz.z - az.z;
+                                math.pool.delete_vector3(az);
+                                math.pool.delete_vector3(bz);
+                                return result;
                             }
                         })
                     }

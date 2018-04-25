@@ -160,6 +160,8 @@ namespace gd3d.framework
             this.canvas.is2dUI = false;
         }
 
+        renderLayer: CullingMask = CullingMask.default;
+
         /**
          * @private
          */
@@ -278,32 +280,28 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-            var asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
+            let asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
             this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
 
 
             if (this.cameraTouch != null)//需要用户代码 或者在编辑器里面绑定使用哪个camera（即设置此变量）,否则不会主动响应事件否则不会主动响应事件
             {
-                var scene = this.gameObject.getScene();
-
-                var ray = this.cameraTouch.creatRayByScreen(new math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
-                let tempInfo = math.pool.new_pickInfo();
-                var pinfo = scene.pick(ray,tempInfo);
-
-                if (tempInfo && tempInfo.pickedtran == this.gameObject.transform)//pick 到自己
+                let scene = this.gameObject.getScene();
+                let tempv2 = math.pool.new_vector2(this.inputmgr.point.x,this.inputmgr.point.y);
+                let ray = this.cameraTouch.creatRayByScreen(tempv2, scene.app);
+                let outModel = math.pool.new_vector2();
+                let bool = this.pickModelPos(ray,outModel);
+                if (bool)
                 {
-                    var mat = this.gameObject.transform.getWorldMatrix();
-                    var matinv = new math.matrix();
-                    math.matrixInverse(mat, matinv);
-                    var outv = new math.vector3();
-                    math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
-                    this.canvas.update(delta, this.inputmgr.point.touch, outv.x, outv.y);
+                    this.canvas.update(delta, this.inputmgr.point.touch, outModel.x, outModel.y);
                 }
                 else
                 {
                     this.canvas.update(delta, false, 0, 0);
                 }
-                math.pool.delete_pickInfo(tempInfo);
+
+                math.pool.delete_vector2(tempv2);
+                math.pool.delete_vector2(outModel);
             }
             else
             {
@@ -315,59 +313,135 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 射线检测
+         * 射线碰撞 获取 Model坐标点
          * @param ray 射线
+         * @param outModel Pos out获取到的Model坐标
          * @version egret-gd3d 1.0
          */
-        pick2d(ray:gd3d.framework.ray):transform2D
-        {
-            let tempinfo = math.pool.new_pickInfo();
-            var bool = ray.intersectPlaneTransform(this.gameObject.transform,tempinfo);
-            if (bool != null)
+        pickModelPos(ray:gd3d.framework.ray,outModelPos:math.vector2):boolean{
+            let result = false;
+            if(!ray || !outModelPos) return result;
+            let scene = this.gameObject.getScene();
+            let tempInfo = math.pool.new_pickInfo();
+            let bool = ray.intersectPlaneTransform(this.gameObject.transform,tempInfo);
+            if (bool && tempInfo.pickedtran == this.gameObject.transform)//pick 到自己
             {
                 var mat = this.gameObject.transform.getWorldMatrix();
                 var matinv = math.pool.new_matrix();
                 math.matrixInverse(mat, matinv);
                 var outv = math.pool.new_vector3();
-                math.matrixTransformVector3(tempinfo.hitposition, matinv, outv);
-                var outv2 = math.pool.new_vector2();
-                outv2.x = outv.x;
-                outv2.y = outv.y;
-                var root = this.canvas.getRoot();
-                return this.dopick2d(outv2, root);
+                math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
+                outModelPos.x = outv.x;
+                outModelPos.y = outv.y;
+                result = true;
+
+                math.pool.delete_matrix(matinv);
+                math.pool.delete_vector3(outv);
             }
-            math.pool.delete_pickInfo(tempinfo);
-            return null;
+            return result;
         }
 
         /**
-         * @private
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 射线拣选 全部 transform2D
+         * @param ray 射线
+         * @version egret-gd3d 1.0
          */
-        dopick2d(outv:math.vector2, tran:transform2D):transform2D
+        pickAll2d(ray:gd3d.framework.ray):transform2D[]{
+            let result :transform2D[];
+            let outv = math.pool.new_vector2();
+            let bool =  this.pickModelPos(ray,outv);
+            if (bool){
+                result = [];
+                this.dopick2d(outv, this.canvas.getRoot(),result,true);
+            }
+            
+            math.pool.delete_vector2(outv);
+            return result;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 射线拣选transform2D
+         * @param ray 射线
+         * @version egret-gd3d 1.0
+         */
+        pick2d(ray:gd3d.framework.ray):transform2D
         {
-            if (tran.components != null)
-            {
-                for (var i = tran.components.length - 1; i >= 0; i--)
-                {
-                    var comp = tran.components[i];
-                    if (comp != null)
-                        //if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv))
-                        if (comp.comp.transform.ContainsCanvasPoint(outv))
-                        {
-                            return comp.comp.transform;
-                        }
-                }
+            let result :transform2D;
+            let outv = math.pool.new_vector2();
+            let bool =  this.pickModelPos(ray,outv);
+            if (bool){
+                let temparr = []
+                this.dopick2d(outv, this.canvas.getRoot(),temparr);
+                if(temparr && temparr[0])
+                    result = temparr[0];
             }
 
-            if(tran.children != null)
-            {
-                for (var i = tran.children.length - 1; i >= 0; i--)
-                {
-                    var tran2 = this.dopick2d(outv, tran.children[i]);
-                    if(tran2 != null)   return tran2;
+            math.pool.delete_vector2(outv);
+            return result;
+        }
+
+        private cupTans2ds:transform2D[] = [];
+        /**
+         * Model坐标来拣选transform2D (从下至上递归)
+         */
+        private dopick2d(ModelPos:math.vector2, tran:transform2D,outPicks:transform2D[],isAll = false){
+            if(!ModelPos || !tran || !outPicks)   return;
+            if(tran.children && tran.children.length>0){
+                for(var i = tran.children.length - 1;i >= 0 ;i--){
+                    this.dopick2d(ModelPos,tran.children[i],outPicks,isAll);
                 }
             }
-            return null;
+            
+            if(tran.ContainsCanvasPoint(ModelPos)){
+                outPicks.push(tran);
+                if(!isAll)   
+                    return;
+            }
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 屏幕空间坐标 转到 canvas坐标
+         * @version egret-gd3d 1.0
+         */
+        calScreenPosToCanvasPos(camera:framework.camera,screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2)
+        {
+            if(!camera || !screenPos || !outCanvasPos) return;
+            let ray = camera.creatRayByScreen(screenPos,this.gameObject.getScene().app);
+            let ModelPos = gd3d.math.pool.new_vector2();
+            this.pickModelPos(ray,ModelPos);
+            this.canvas.ModelPosToCanvasPos(ModelPos,outCanvasPos);
+
+            gd3d.math.pool.delete_vector2(ModelPos);
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * canvas坐标 转到 世界空间坐标
+         * @param from Transform2D世界坐标
+         * @param out 返回结果v2
+         * @version egret-gd3d 1.0
+         */
+        calCanvasPosToWorldPos(from:math.vector2,out:math.vector3){
+            if(from == null || out == null) return;
+            let root = this.canvas.getRoot();
+            let ModelPos = math.pool.new_vector3();
+            ModelPos.x = (from.x / root.width) * 2 - 1;
+            ModelPos.y = (from.y / root.height) * -2 + 1;
+            let m_mtx = this.gameObject.transform.getWorldMatrix();
+            math.matrixTransformVector3(ModelPos,m_mtx,out);
+            out.z = this.gameObject.transform.getWorldTranslate().z;
+            gd3d.math.pool.delete_vector3(ModelPos);
         }
 
         /**
@@ -383,13 +457,6 @@ namespace gd3d.framework
         /**
          * @private
          */
-        jsonToAttribute(json, assetmgr: gd3d.framework.assetMgr)
-        {
-
-        }
-        /**
-         * @private
-         */
         remove()
         {
 
@@ -401,6 +468,5 @@ namespace gd3d.framework
         {
             
         }
-        renderLayer: CullingMask = CullingMask.default;
     }
 }

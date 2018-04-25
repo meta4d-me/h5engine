@@ -231,7 +231,7 @@ namespace gd3d.framework
         constructor()
         {
             this.renderLayers = [];
-            var common = new renderLayer();
+            var common = new renderLayer(true);
             var transparent = new renderLayer(true);
             var overlay = new renderLayer(true);
             this.renderLayers.push(common);

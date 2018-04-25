@@ -62,6 +62,7 @@
             {
                 gd3d.math.vec3Clone(hitposition,outInfo.hitposition);
                 outInfo.distance = gd3d.math.vec3Distance(outInfo.hitposition, this.origin);
+                outInfo.pickedtran = tran;
             }
             gd3d.math.pool.delete_vector3(forward);
             gd3d.math.pool.delete_vector3(hitposition);

@@ -1060,7 +1060,7 @@ var gd3d;
             canvas.prototype.getChild = function (index) {
                 return this.rootNode.children[index];
             };
-            canvas.prototype.update = function (delta, touch, XOnNDCSpace, YOnNDCSpace) {
+            canvas.prototype.update = function (delta, touch, XOnModelSpace, YOnModelSpace) {
                 var asp = this.pixelWidth / this.pixelHeight;
                 this.rootNode.localScale.x = 2 / this.pixelWidth;
                 this.rootNode.localScale.y = -2 / this.pixelHeight;
@@ -1076,8 +1076,8 @@ var gd3d;
                 this.rootNode.updateTran(false);
                 {
                     this.pointEvent.eated = false;
-                    this.pointEvent.x = XOnNDCSpace;
-                    this.pointEvent.y = YOnNDCSpace;
+                    this.pointEvent.x = XOnModelSpace;
+                    this.pointEvent.y = YOnModelSpace;
                     this.pointEvent.selected = this.pointSelect;
                     var skip = false;
                     if (this.pointDown == false && touch == false) {
@@ -1170,7 +1170,7 @@ var gd3d;
                 }
                 return this.rootNode;
             };
-            canvas.prototype.NDCPosToCanvasPos = function (fromP, outP) {
+            canvas.prototype.ModelPosToCanvasPos = function (fromP, outP) {
                 if (fromP == null || outP == null)
                     return;
                 var scalx = 1 - (fromP.x - 1) / -2;
@@ -1288,9 +1288,10 @@ var gd3d;
         framework.batcher2D = batcher2D;
         var canvasRenderer = (function () {
             function canvasRenderer() {
+                this.renderLayer = framework.CullingMask.default;
                 this.layer = framework.RenderLayerEnum.Common;
                 this.queue = 0;
-                this.renderLayer = framework.CullingMask.default;
+                this.cupTans2ds = [];
                 this.canvas = new framework.canvas();
                 this.canvas.is2dUI = false;
             }
@@ -1324,69 +1325,108 @@ var gd3d;
                 var asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
                 this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
                 if (this.cameraTouch != null) {
-                    var scene = this.gameObject.getScene();
-                    var ray = this.cameraTouch.creatRayByScreen(new gd3d.math.vector2(this.inputmgr.point.x, this.inputmgr.point.y), scene.app);
-                    var tempInfo = gd3d.math.pool.new_pickInfo();
-                    var pinfo = scene.pick(ray, tempInfo);
-                    if (tempInfo && tempInfo.pickedtran == this.gameObject.transform) {
-                        var mat = this.gameObject.transform.getWorldMatrix();
-                        var matinv = new gd3d.math.matrix();
-                        gd3d.math.matrixInverse(mat, matinv);
-                        var outv = new gd3d.math.vector3();
-                        gd3d.math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
-                        this.canvas.update(delta, this.inputmgr.point.touch, outv.x, outv.y);
+                    var scene_1 = this.gameObject.getScene();
+                    var tempv2 = gd3d.math.pool.new_vector2(this.inputmgr.point.x, this.inputmgr.point.y);
+                    var ray_1 = this.cameraTouch.creatRayByScreen(tempv2, scene_1.app);
+                    var outModel = gd3d.math.pool.new_vector2();
+                    var bool = this.pickModelPos(ray_1, outModel);
+                    if (bool) {
+                        this.canvas.update(delta, this.inputmgr.point.touch, outModel.x, outModel.y);
                     }
                     else {
                         this.canvas.update(delta, false, 0, 0);
                     }
-                    gd3d.math.pool.delete_pickInfo(tempInfo);
+                    gd3d.math.pool.delete_vector2(tempv2);
+                    gd3d.math.pool.delete_vector2(outModel);
                 }
                 else {
                     this.canvas.update(delta, false, 0, 0);
                 }
             };
-            canvasRenderer.prototype.pick2d = function (ray) {
-                var tempinfo = gd3d.math.pool.new_pickInfo();
-                var bool = ray.intersectPlaneTransform(this.gameObject.transform, tempinfo);
-                if (bool != null) {
+            canvasRenderer.prototype.pickModelPos = function (ray, outModelPos) {
+                var result = false;
+                if (!ray || !outModelPos)
+                    return result;
+                var scene = this.gameObject.getScene();
+                var tempInfo = gd3d.math.pool.new_pickInfo();
+                var bool = ray.intersectPlaneTransform(this.gameObject.transform, tempInfo);
+                if (bool && tempInfo.pickedtran == this.gameObject.transform) {
                     var mat = this.gameObject.transform.getWorldMatrix();
                     var matinv = gd3d.math.pool.new_matrix();
                     gd3d.math.matrixInverse(mat, matinv);
                     var outv = gd3d.math.pool.new_vector3();
-                    gd3d.math.matrixTransformVector3(tempinfo.hitposition, matinv, outv);
-                    var outv2 = gd3d.math.pool.new_vector2();
-                    outv2.x = outv.x;
-                    outv2.y = outv.y;
-                    var root = this.canvas.getRoot();
-                    return this.dopick2d(outv2, root);
+                    gd3d.math.matrixTransformVector3(tempInfo.hitposition, matinv, outv);
+                    outModelPos.x = outv.x;
+                    outModelPos.y = outv.y;
+                    result = true;
+                    gd3d.math.pool.delete_matrix(matinv);
+                    gd3d.math.pool.delete_vector3(outv);
                 }
-                gd3d.math.pool.delete_pickInfo(tempinfo);
-                return null;
+                return result;
             };
-            canvasRenderer.prototype.dopick2d = function (outv, tran) {
-                if (tran.components != null) {
-                    for (var i = tran.components.length - 1; i >= 0; i--) {
-                        var comp = tran.components[i];
-                        if (comp != null)
-                            if (comp.comp.transform.ContainsCanvasPoint(outv)) {
-                                return comp.comp.transform;
-                            }
-                    }
+            canvasRenderer.prototype.pickAll2d = function (ray) {
+                var result;
+                var outv = gd3d.math.pool.new_vector2();
+                var bool = this.pickModelPos(ray, outv);
+                if (bool) {
+                    result = [];
+                    this.dopick2d(outv, this.canvas.getRoot(), result, true);
                 }
-                if (tran.children != null) {
+                gd3d.math.pool.delete_vector2(outv);
+                return result;
+            };
+            canvasRenderer.prototype.pick2d = function (ray) {
+                var result;
+                var outv = gd3d.math.pool.new_vector2();
+                var bool = this.pickModelPos(ray, outv);
+                if (bool) {
+                    var temparr = [];
+                    this.dopick2d(outv, this.canvas.getRoot(), temparr);
+                    if (temparr && temparr[0])
+                        result = temparr[0];
+                }
+                gd3d.math.pool.delete_vector2(outv);
+                return result;
+            };
+            canvasRenderer.prototype.dopick2d = function (ModelPos, tran, outPicks, isAll) {
+                if (isAll === void 0) { isAll = false; }
+                if (!ModelPos || !tran || !outPicks)
+                    return;
+                if (tran.children && tran.children.length > 0) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(outv, tran.children[i]);
-                        if (tran2 != null)
-                            return tran2;
+                        this.dopick2d(ModelPos, tran.children[i], outPicks, isAll);
                     }
                 }
-                return null;
+                if (tran.ContainsCanvasPoint(ModelPos)) {
+                    outPicks.push(tran);
+                    if (!isAll)
+                        return;
+                }
+            };
+            canvasRenderer.prototype.calScreenPosToCanvasPos = function (camera, screenPos, outCanvasPos) {
+                if (!camera || !screenPos || !outCanvasPos)
+                    return;
+                var ray = camera.creatRayByScreen(screenPos, this.gameObject.getScene().app);
+                var ModelPos = gd3d.math.pool.new_vector2();
+                this.pickModelPos(ray, ModelPos);
+                this.canvas.ModelPosToCanvasPos(ModelPos, outCanvasPos);
+                gd3d.math.pool.delete_vector2(ModelPos);
+            };
+            canvasRenderer.prototype.calCanvasPosToWorldPos = function (from, out) {
+                if (from == null || out == null)
+                    return;
+                var root = this.canvas.getRoot();
+                var ModelPos = gd3d.math.pool.new_vector3();
+                ModelPos.x = (from.x / root.width) * 2 - 1;
+                ModelPos.y = (from.y / root.height) * -2 + 1;
+                var m_mtx = this.gameObject.transform.getWorldMatrix();
+                gd3d.math.matrixTransformVector3(ModelPos, m_mtx, out);
+                out.z = this.gameObject.transform.getWorldTranslate().z;
+                gd3d.math.pool.delete_vector3(ModelPos);
             };
             canvasRenderer.prototype.render = function (context, assetmgr, camera) {
                 context.updateModel(this.gameObject.transform);
                 this.canvas.render(context, assetmgr);
-            };
-            canvasRenderer.prototype.jsonToAttribute = function (json, assetmgr) {
             };
             canvasRenderer.prototype.remove = function () {
             };
@@ -1520,55 +1560,22 @@ var gd3d;
                 gd3d.math.pool.delete_vector2(outv2);
                 return trans;
             };
-            overlay2D.prototype.dopick2d = function (outv, tran, tolerance) {
+            overlay2D.prototype.dopick2d = function (ModelPos, tran, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 if (tran.components != null) {
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.comp.transform.ContainsCanvasPoint(outv, tolerance)) {
+                            if (comp.comp.transform.ContainsCanvasPoint(ModelPos, tolerance)) {
                                 return comp.comp.transform;
                             }
                     }
                 }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(outv, tran.children[i], tolerance);
+                        var tran2 = this.dopick2d(ModelPos, tran.children[i], tolerance);
                         if (tran2 != null)
                             return tran2;
-                    }
-                }
-                return null;
-            };
-            overlay2D.prototype.pick2d_new = function (mx, my, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (this.camera == null)
-                    return null;
-                var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (mx / vp.w) * 2 - 1;
-                var sy = (my / vp.h) * -2 + 1;
-                var outv2 = gd3d.math.pool.new_vector2();
-                outv2.x = sx;
-                outv2.y = sy;
-                var root = this.canvas.getRoot();
-                var trans = this.dopick2d_new(outv2, root, tolerance);
-                gd3d.math.pool.delete_vector2(outv2);
-                return trans;
-            };
-            overlay2D.prototype.dopick2d_new = function (outv, tran, tolerance) {
-                if (tolerance === void 0) { tolerance = 0; }
-                if (tran.children != null) {
-                    for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d_new(outv, tran.children[i]);
-                        if (tran2 != null)
-                            return tran2;
-                    }
-                }
-                var uirect = tran.getComponent("uirect");
-                if (uirect != null) {
-                    if (uirect.canbeClick && uirect.transform.ContainsCanvasPoint(outv, tolerance)) {
-                        return uirect.transform;
                     }
                 }
                 return null;
@@ -2456,16 +2463,20 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.ContainsCanvasPoint = function (pworld, tolerance) {
+            transform2D.prototype.ContainsCanvasPoint = function (ModelPos, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
+                var result = false;
                 var mworld = this.getWorldMatrix();
-                var mout = new gd3d.math.matrix3x2();
+                var mout = gd3d.math.pool.new_matrix3x2();
                 gd3d.math.matrix3x2Inverse(mworld, mout);
-                var p2 = new gd3d.math.vector2();
-                gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
+                var p2 = gd3d.math.pool.new_vector2();
+                gd3d.math.matrix3x2TransformVector2(mout, ModelPos, p2);
                 p2.x += this.pivot.x * this.width;
                 p2.y += this.pivot.y * this.height;
-                return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+                result = p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+                gd3d.math.pool.delete_matrix3x2(mout);
+                gd3d.math.pool.delete_vector2(p2);
+                return result;
             };
             transform2D.prototype.onPointEvent = function (canvas, ev) {
                 if (this.children != null) {
@@ -4905,7 +4916,7 @@ var gd3d;
                         temps.x = ev.x;
                         temps.y = ev.y;
                         var tempc = gd3d.math.pool.new_vector2();
-                        this.transform.canvas.NDCPosToCanvasPos(temps, tempc);
+                        this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
                         if (this.strPoint == null)
                             this.strPoint = new gd3d.math.vector2();
                         var sp = this.strPoint;
@@ -12456,7 +12467,6 @@ var gd3d;
             function camera() {
                 this._near = 0.01;
                 this._far = 1000;
-                this.isMainCamera = false;
                 this.CullingMask = CullingMask.default | CullingMask.ui;
                 this.clearOption_Color = true;
                 this.clearOption_Depth = true;
@@ -12795,7 +12805,10 @@ var gd3d;
                                     var bz = gd3d.math.pool.new_vector3();
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                    return bz.z - az.z;
+                                    var result = bz.z - az.z;
+                                    gd3d.math.pool.delete_vector3(az);
+                                    gd3d.math.pool.delete_vector3(bz);
+                                    return result;
                                 }
                             });
                         }
@@ -12919,8 +12932,8 @@ var gd3d;
                     case canvasRenderMode.ScreenSpaceOverlay:
                         if (!this._overlay2d)
                             return;
-                        var scene_1 = this.gameObject.getScene();
-                        scene_1.addScreenSpaceOverlay(this._overlay2d);
+                        var scene_2 = this.gameObject.getScene();
+                        scene_2.addScreenSpaceOverlay(this._overlay2d);
                         break;
                 }
             };
@@ -20367,13 +20380,17 @@ var gd3d;
         }
         math.matrixMakeScale = matrixMakeScale;
         function matrix3x2TransformVector2(mat, inp, out) {
-            out.x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
-            out.y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
+            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
+            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
+            out.x = x;
+            out.y = y;
         }
         math.matrix3x2TransformVector2 = matrix3x2TransformVector2;
         function matrix3x2TransformNormal(mat, inp, out) {
-            out.x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
-            out.y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
+            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
+            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
+            out.x = x;
+            out.y = y;
         }
         math.matrix3x2TransformNormal = matrix3x2TransformNormal;
         function matrix3x2MakeScale(xScale, yScale, out) {
@@ -20471,18 +20488,24 @@ var gd3d;
             var a10 = lhs.rawData[2], a11 = lhs.rawData[3], a12 = 0;
             var a30 = lhs.rawData[4], a31 = lhs.rawData[5], a32 = 1;
             var b0 = rhs.rawData[0], b1 = rhs.rawData[1], b3 = 0;
-            out.rawData[0] = b0 * a00 + b1 * a10 + b3 * a30;
-            out.rawData[1] = b0 * a01 + b1 * a11 + b3 * a31;
+            var temp_0 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_1 = b0 * a01 + b1 * a11 + b3 * a31;
             b0 = rhs.rawData[2];
             b1 = rhs.rawData[3];
             b3 = 0;
-            out.rawData[2] = b0 * a00 + b1 * a10 + b3 * a30;
-            out.rawData[3] = b0 * a01 + b1 * a11 + b3 * a31;
+            var temp_2 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_3 = b0 * a01 + b1 * a11 + b3 * a31;
             b0 = rhs.rawData[4];
             b1 = rhs.rawData[5];
             b3 = 1;
-            out.rawData[4] = b0 * a00 + b1 * a10 + b3 * a30;
-            out.rawData[5] = b0 * a01 + b1 * a11 + b3 * a31;
+            var temp_4 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_5 = b0 * a01 + b1 * a11 + b3 * a31;
+            out.rawData[0] = temp_0;
+            out.rawData[1] = temp_1;
+            out.rawData[2] = temp_2;
+            out.rawData[3] = temp_3;
+            out.rawData[4] = temp_4;
+            out.rawData[5] = temp_5;
         }
         math.matrix3x2Multiply = matrix3x2Multiply;
         function matrixProject_PerspectiveLH(fov, aspect, znear, zfar, out) {
@@ -27534,7 +27557,7 @@ var gd3d;
         var renderList = (function () {
             function renderList() {
                 this.renderLayers = [];
-                var common = new renderLayer();
+                var common = new renderLayer(true);
                 var transparent = new renderLayer(true);
                 var overlay = new renderLayer(true);
                 this.renderLayers.push(common);
@@ -28582,6 +28605,7 @@ var gd3d;
                 if (ishided) {
                     gd3d.math.vec3Clone(hitposition, outInfo.hitposition);
                     outInfo.distance = gd3d.math.vec3Distance(outInfo.hitposition, this.origin);
+                    outInfo.pickedtran = tran;
                 }
                 gd3d.math.pool.delete_vector3(forward);
                 gd3d.math.pool.delete_vector3(hitposition);
@@ -29813,6 +29837,8 @@ var gd3d;
                     if (pool._vector3_up == null) {
                         pool._vector3_up = new math.vector3(0, 1, 0);
                     }
+                    pool._vector3_up.y = 1;
+                    pool._vector3_up.x = pool._vector3_up.z = 0;
                     return pool._vector3_up;
                 },
                 enumerable: true,
@@ -29823,6 +29849,8 @@ var gd3d;
                     if (pool._vector3_right == null) {
                         pool._vector3_right = new math.vector3(1, 0, 0);
                     }
+                    pool._vector3_right.x = 1;
+                    pool._vector3_right.y = pool._vector3_right.z = 0;
                     return pool._vector3_right;
                 },
                 enumerable: true,
@@ -29833,6 +29861,8 @@ var gd3d;
                     if (pool._vector3_forward == null) {
                         pool._vector3_forward = new math.vector3(0, 0, 1);
                     }
+                    pool._vector3_forward.x = pool._vector3_forward.y = 0;
+                    pool._vector3_forward.z = 1;
                     return pool._vector3_forward;
                 },
                 enumerable: true,
@@ -29843,6 +29873,7 @@ var gd3d;
                     if (pool._vector3_zero == null) {
                         pool._vector3_zero = new math.vector3(0, 0, 0);
                     }
+                    pool._vector3_zero.x = pool._vector3_zero.y = pool._vector3_zero.z = 0;
                     return pool._vector3_zero;
                 },
                 enumerable: true,
@@ -29853,6 +29884,7 @@ var gd3d;
                     if (pool._vector3_one == null) {
                         pool._vector3_one = new math.vector3(1, 1, 1);
                     }
+                    pool._vector3_one.x = pool._vector3_one.y = pool._vector3_one.z = 1;
                     return pool._vector3_one;
                 },
                 enumerable: true,
@@ -29904,11 +29936,24 @@ var gd3d;
             pool.collect_vector3 = function () {
                 pool.unused_vector3.length = 0;
             };
+            Object.defineProperty(pool, "vector2_zero", {
+                get: function () {
+                    if (pool._vector2_zero == null) {
+                        pool._vector2_zero = new math.vector2(0, 0);
+                    }
+                    pool._vector2_zero.x = pool._vector2_zero.y = 1;
+                    return pool._vector2_zero;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(pool, "vector2_up", {
                 get: function () {
                     if (pool._vector2_up == null) {
                         pool._vector2_up = new math.vector2(0, 1);
                     }
+                    pool._vector2_up.x = 0;
+                    pool._vector2_up.y = 1;
                     return pool._vector2_up;
                 },
                 enumerable: true,
@@ -29919,6 +29964,8 @@ var gd3d;
                     if (pool._vector2_right == null) {
                         pool._vector2_right = new math.vector2(1, 0);
                     }
+                    pool._vector2_right.x = 1;
+                    pool._vector2_right.y = 0;
                     return pool._vector2_right;
                 },
                 enumerable: true,

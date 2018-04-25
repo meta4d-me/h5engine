@@ -232,7 +232,7 @@ declare namespace gd3d.framework {
         private pointY;
         private lastWidth;
         private lastHeight;
-        update(delta: number, touch: Boolean, XOnNDCSpace: number, YOnNDCSpace: number): void;
+        update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
         private lastMat;
         afterRender: Function;
         render(context: renderContext, assetmgr: assetMgr): void;
@@ -246,7 +246,7 @@ declare namespace gd3d.framework {
         pixelHeight: number;
         private rootNode;
         getRoot(): transform2D;
-        NDCPosToCanvasPos(fromP: math.vector2, outP: math.vector2): void;
+        ModelPosToCanvasPos(fromP: math.vector2, outP: math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
@@ -265,6 +265,7 @@ declare namespace gd3d.framework {
     }
     class canvasRenderer implements IRenderer, ICollider {
         constructor();
+        renderLayer: CullingMask;
         subTran: transform;
         getBound(): any;
         intersectsTransform(tran: transform): boolean;
@@ -281,13 +282,16 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         update(delta: number): void;
+        pickModelPos(ray: gd3d.framework.ray, outModelPos: math.vector2): boolean;
+        pickAll2d(ray: gd3d.framework.ray): transform2D[];
         pick2d(ray: gd3d.framework.ray): transform2D;
-        dopick2d(outv: math.vector2, tran: transform2D): transform2D;
+        private cupTans2ds;
+        private dopick2d(ModelPos, tran, outPicks, isAll?);
+        calScreenPosToCanvasPos(camera: framework.camera, screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
+        calCanvasPosToWorldPos(from: math.vector2, out: math.vector3): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
-        jsonToAttribute(json: any, assetmgr: gd3d.framework.assetMgr): void;
         remove(): void;
         clone(): void;
-        renderLayer: CullingMask;
     }
 }
 declare namespace gd3d.framework {
@@ -330,9 +334,7 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         update(delta: number): void;
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
-        dopick2d(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
-        pick2d_new(mx: number, my: number, tolerance?: number): transform2D;
-        dopick2d_new(outv: math.vector2, tran: transform2D, tolerance?: number): transform2D;
+        private dopick2d(ModelPos, tran, tolerance?);
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
     }
 }
@@ -502,7 +504,7 @@ declare namespace gd3d.framework {
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents(node, _type, comps);
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
-        ContainsCanvasPoint(pworld: math.vector2, tolerance?: number): boolean;
+        ContainsCanvasPoint(ModelPos: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
         private readonly optionArr;
         private _layoutState;
@@ -2063,7 +2065,6 @@ declare namespace gd3d.framework {
         near: number;
         private _far;
         far: number;
-        isMainCamera: boolean;
         CullingMask: CullingMask;
         index: number;
         markDirty(): void;
@@ -5523,6 +5524,8 @@ declare namespace gd3d.math {
         static delete_vector3(v: vector3): void;
         static delete_vector3Array(vs: vector3[]): void;
         static collect_vector3(): void;
+        private static _vector2_zero;
+        static readonly vector2_zero: vector2;
         private static _vector2_up;
         static readonly vector2_up: vector2;
         private static _vector2_right;

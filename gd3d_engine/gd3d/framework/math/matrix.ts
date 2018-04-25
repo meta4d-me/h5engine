@@ -423,14 +423,16 @@
     }
     export function matrix3x2TransformVector2(mat: matrix, inp: vector2, out: vector2): void
     {
-        out.x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
-        out.y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
+        let x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
+        let y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
+        out.x = x; out.y = y;
     }
 
     export function matrix3x2TransformNormal(mat: matrix, inp: vector2, out: vector2): void
     {
-        out.x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
-        out.y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
+        let x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
+        let y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
+        out.x = x; out.y = y;
     }
 
     export function matrix3x2MakeScale(xScale: number, yScale: number, out: matrix3x2): void
@@ -597,24 +599,30 @@
             b3 = 0;
 
 
-        out.rawData[0] = b0 * a00 + b1 * a10 + b3 * a30;
-        out.rawData[1] = b0 * a01 + b1 * a11 + b3 * a31;
+        let temp_0 = b0 * a00 + b1 * a10 + b3 * a30;
+        let temp_1 = b0 * a01 + b1 * a11 + b3 * a31;
 
         b0 = rhs.rawData[2];
         b1 = rhs.rawData[3];
 
         b3 = 0;
 
-        out.rawData[2] = b0 * a00 + b1 * a10 + b3 * a30;
-        out.rawData[3] = b0 * a01 + b1 * a11 + b3 * a31;
+        let temp_2 = b0 * a00 + b1 * a10 + b3 * a30;
+        let temp_3 = b0 * a01 + b1 * a11 + b3 * a31;
 
         b0 = rhs.rawData[4];
         b1 = rhs.rawData[5];
         b3 = 1;
 
-        out.rawData[4] = b0 * a00 + b1 * a10 + b3 * a30;
-        out.rawData[5] = b0 * a01 + b1 * a11 + b3 * a31;
+        let temp_4 = b0 * a00 + b1 * a10 + b3 * a30;
+        let temp_5 = b0 * a01 + b1 * a11 + b3 * a31;
 
+        out.rawData[0] = temp_0;
+        out.rawData[1] = temp_1;
+        out.rawData[2] = temp_2;
+        out.rawData[3] = temp_3;
+        out.rawData[4] = temp_4;
+        out.rawData[5] = temp_5;
     }
     export function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix)
     {
