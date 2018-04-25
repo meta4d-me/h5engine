@@ -169,12 +169,18 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-            var vp = new math.rect();
-            var app = this.camera.calcViewPortPixel(this.app, vp);
-            var sx = (this.inputmgr.point.x / vp.w) * 2 - 1;
-            var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
-
+            let vp = new math.rect();
+            this.camera.calcViewPortPixel(this.app, vp);
+            let rect = this.camera.viewport;
+            let real_x = this.inputmgr.point.x - rect.x * this.app.width ;
+            let real_y = this.inputmgr.point.y - rect.y * this.app.height;
+            let sx = (real_x / vp.w) * 2 - 1;
+            let sy = (real_y / vp.h) * -2 + 1;
             //用屏幕空间坐标系丢给canvas
+            
+            if(this.canvas["pointEvent"].type == PointEventEnum.PointDown){
+                this.canvas;
+            }
 
             //canvas de update 直接集成pointevent处理
             this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);

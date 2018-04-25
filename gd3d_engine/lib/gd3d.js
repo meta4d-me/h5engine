@@ -1539,9 +1539,15 @@ var gd3d;
             };
             overlay2D.prototype.update = function (delta) {
                 var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (this.inputmgr.point.x / vp.w) * 2 - 1;
-                var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
+                this.camera.calcViewPortPixel(this.app, vp);
+                var rect = this.camera.viewport;
+                var real_x = this.inputmgr.point.x - rect.x * this.app.width;
+                var real_y = this.inputmgr.point.y - rect.y * this.app.height;
+                var sx = (real_x / vp.w) * 2 - 1;
+                var sy = (real_y / vp.h) * -2 + 1;
+                if (this.canvas["pointEvent"].type == framework.PointEventEnum.PointDown) {
+                    this.canvas;
+                }
                 this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
@@ -17258,14 +17264,14 @@ var gd3d;
                     _this.point.touch = false;
                 });
                 app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.CalcuPoint(ev.clientX, ev.clientY);
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
                     _this.point.touch = true;
                 });
                 app.webgl.canvas.addEventListener("mouseup", function (ev) {
                     _this.point.touch = false;
                 });
                 app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.CalcuPoint(ev.clientX, ev.clientY);
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
                 });
                 app.webgl.canvas.addEventListener("keydown", function (ev) {
                     _this.keyboardMap[ev.keyCode] = true;
