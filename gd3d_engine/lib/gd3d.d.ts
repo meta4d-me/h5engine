@@ -11,16 +11,17 @@ declare namespace gd3d.framework {
         AddCanvasRender = 4,
     }
     enum CanvasFixedType {
-        FixedWidthType = 0,
-        FixedHeightType = 1,
+        Free = 0,
+        FixedWidthType = 1,
+        FixedHeightType = 2,
     }
     class application {
         webgl: WebGLRenderingContext;
         stats: Stats.Stats;
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
-        width: number;
-        height: number;
+        readonly width: number;
+        readonly height: number;
         limitFrame: boolean;
         notify: INotify;
         private _timeScale;
@@ -33,8 +34,7 @@ declare namespace gd3d.framework {
         screenAdaptiveType: string;
         private _fixHeight;
         private _fixWidth;
-        private beWidthSetted;
-        private beHeightSetted;
+        private canvasFixedType;
         private _canvasClientWidth;
         private _canvasClientHeight;
         canvasFixHeight: number;
@@ -51,6 +51,7 @@ declare namespace gd3d.framework {
         closeFps(): void;
         private beStepNumber;
         private update(delta);
+        private updateScreenAsp();
         preusercodetimer: number;
         usercodetime: number;
         getUserUpdateTimer(): number;
@@ -316,6 +317,10 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum UIScaleMode {
+        CONSTANT_PIXEL_SIZE = 0,
+        SCALE_WITH_SCREEN_SIZE = 1,
+    }
     class overlay2D implements IOverLay {
         constructor();
         init: boolean;
@@ -325,6 +330,10 @@ declare namespace gd3d.framework {
         start(camera: camera): void;
         canvas: canvas;
         autoAsp: boolean;
+        screenMatchRate: number;
+        matchReference_width: number;
+        matchReference_height: number;
+        scaleMode: UIScaleMode;
         sortOrder: number;
         addChild(node: transform2D): void;
         removeChild(node: transform2D): void;

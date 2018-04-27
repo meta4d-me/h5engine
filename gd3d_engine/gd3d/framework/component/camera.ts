@@ -547,7 +547,8 @@ namespace gd3d.framework
          * 透视投影的fov
          * @version egret-gd3d 1.0
          */
-        fov: number = Math.PI * 0.25;//透视投影的fov
+        @gd3d.reflect.Field("number")
+        fov: number = 60 * Math.PI / 180;//透视投影的fov
         /**
          * @public
          * @language zh_CN
@@ -555,6 +556,7 @@ namespace gd3d.framework
          * 正交投影的竖向size
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         size: number = 2;//正交投影的竖向size
 
         private _opvalue = 1;
@@ -565,6 +567,7 @@ namespace gd3d.framework
          * 0=正交， 1=透视 中间值可以在两种相机间过度
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         set opvalue(val: number)
         {
             if (val > 0 && this._near < 0.01)

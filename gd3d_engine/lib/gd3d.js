@@ -31,8 +31,9 @@ var gd3d;
         })(NotifyType = framework.NotifyType || (framework.NotifyType = {}));
         var CanvasFixedType;
         (function (CanvasFixedType) {
-            CanvasFixedType[CanvasFixedType["FixedWidthType"] = 0] = "FixedWidthType";
-            CanvasFixedType[CanvasFixedType["FixedHeightType"] = 1] = "FixedHeightType";
+            CanvasFixedType[CanvasFixedType["Free"] = 0] = "Free";
+            CanvasFixedType[CanvasFixedType["FixedWidthType"] = 1] = "FixedWidthType";
+            CanvasFixedType[CanvasFixedType["FixedHeightType"] = 2] = "FixedHeightType";
         })(CanvasFixedType = framework.CanvasFixedType || (framework.CanvasFixedType = {}));
         var application = (function () {
             function application() {
@@ -41,8 +42,7 @@ var gd3d;
                 this.build = "b000061";
                 this._tar = -1;
                 this._standDeltaTime = -1;
-                this.beWidthSetted = false;
-                this.beHeightSetted = false;
+                this.canvasFixedType = CanvasFixedType.Free;
                 this._scaleFromPandding = 1;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
@@ -62,6 +62,16 @@ var gd3d;
                 this.lastHeight = 0;
                 this.OffOrientationUpdate = false;
             }
+            Object.defineProperty(application.prototype, "width", {
+                get: function () { return this.webgl.canvas.width; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "height", {
+                get: function () { return this.webgl.canvas.height; },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(application.prototype, "timeScale", {
                 get: function () {
                     return this._timeScale;
@@ -87,8 +97,6 @@ var gd3d;
             });
             Object.defineProperty(application.prototype, "canvasFixHeight", {
                 set: function (val) {
-                    this.beHeightSetted = true;
-                    this.beWidthSetted = false;
                     this._fixHeight = val;
                 },
                 enumerable: true,
@@ -96,8 +104,6 @@ var gd3d;
             });
             Object.defineProperty(application.prototype, "canvasFixWidth", {
                 set: function (val) {
-                    this.beWidthSetted = true;
-                    this.beHeightSetted = false;
                     this._fixWidth = val;
                 },
                 enumerable: true,
@@ -124,7 +130,7 @@ var gd3d;
             });
             ;
             application.prototype.start = function (div, type, val, webglDebug) {
-                if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
+                if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
                 console.log("version: " + this.version + "  build: " + this.build);
@@ -165,25 +171,28 @@ var gd3d;
                     alert("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
                 }
+                this.canvasFixedType = type;
                 switch (type) {
+                    case CanvasFixedType.Free:
+                        this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                        this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = 1;
+                        break;
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
                         this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+                        this.webgl.canvas.width = this._fixWidth;
+                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                         break;
                     case CanvasFixedType.FixedHeightType:
                         this.canvasFixHeight = val;
                         this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+                        this.webgl.canvas.height = this._fixHeight;
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                         break;
-                }
-                if (this.beWidthSetted) {
-                    this.webgl.canvas.width = this._fixWidth;
-                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                }
-                else if (this.beHeightSetted) {
-                    this.webgl.canvas.height = this._fixHeight;
-                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
                 this._canvasClientHeight = this.webgl.canvas.clientHeight;
@@ -255,22 +264,7 @@ var gd3d;
                 {
                     this.updateOrientationMode();
                 }
-                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
-                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
-                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
-                    if (this.beWidthSetted) {
-                        this.webgl.canvas.width = this._fixWidth;
-                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                    }
-                    else if (this.beHeightSetted) {
-                        this.webgl.canvas.height = this._fixHeight;
-                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                    }
-                }
-                this.width = this.webgl.canvas.width;
-                this.height = this.webgl.canvas.height;
+                this.updateScreenAsp();
                 if (this.bePlay) {
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
@@ -285,6 +279,27 @@ var gd3d;
                 this.updateEditorCode(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
+                }
+            };
+            application.prototype.updateScreenAsp = function () {
+                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
+                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                    if (this.canvasFixedType == CanvasFixedType.Free) {
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                        this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = 1;
+                    }
+                    else if (this.canvasFixedType == CanvasFixedType.FixedWidthType) {
+                        this.webgl.canvas.width = this._fixWidth;
+                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    }
+                    else if (this.canvasFixedType == CanvasFixedType.FixedHeightType) {
+                        this.webgl.canvas.height = this._fixHeight;
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    }
                 }
             };
             application.prototype.getUserUpdateTimer = function () {
@@ -1487,10 +1502,19 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var UIScaleMode;
+        (function (UIScaleMode) {
+            UIScaleMode[UIScaleMode["CONSTANT_PIXEL_SIZE"] = 0] = "CONSTANT_PIXEL_SIZE";
+            UIScaleMode[UIScaleMode["SCALE_WITH_SCREEN_SIZE"] = 1] = "SCALE_WITH_SCREEN_SIZE";
+        })(UIScaleMode = framework.UIScaleMode || (framework.UIScaleMode = {}));
         var overlay2D = (function () {
             function overlay2D() {
                 this.init = false;
                 this.autoAsp = true;
+                this.screenMatchRate = 0;
+                this.matchReference_width = 800;
+                this.matchReference_height = 600;
+                this.scaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
                 this.sortOrder = 0;
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
@@ -1519,19 +1543,30 @@ var gd3d;
                 return this.canvas.getChild(index);
             };
             overlay2D.prototype.render = function (context, assetmgr, camera) {
-                if (!this.canvas.getRoot().visible)
+                if (!this.canvas.getRoot().visible || !this.camera)
                     return;
-                if (this.camera == null || this.camera == undefined)
-                    return;
-                if (this.autoAsp) {
-                    var vp = new gd3d.math.rect();
-                    this.camera.calcViewPortPixel(assetmgr.app, vp);
-                    var aspcam = vp.w / vp.h;
-                    var aspc = this.canvas.pixelWidth / this.canvas.pixelHeight;
-                    if (aspc != aspcam) {
-                        this.canvas.pixelWidth = this.canvas.pixelHeight * aspcam;
+                var vp = new gd3d.math.rect();
+                this.camera.calcViewPortPixel(assetmgr.app, vp);
+                switch (this.scaleMode) {
+                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                        if (this.canvas.pixelWidth == vp.w && this.canvas.pixelHeight == vp.h)
+                            break;
+                        this.canvas.pixelWidth = vp.w;
+                        this.canvas.pixelHeight = vp.h;
                         this.canvas.getRoot().markDirty();
-                    }
+                        break;
+                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                        var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
+                        match = match > 1 ? 1 : match;
+                        var asp = vp.w / vp.h;
+                        var w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
+                        var h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
+                        if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h) {
+                            this.canvas.pixelWidth = w;
+                            this.canvas.pixelHeight = h;
+                            this.canvas.getRoot().markDirty();
+                        }
+                        break;
                 }
                 context.updateOverlay();
                 this.canvas.render(context, assetmgr);
@@ -1607,6 +1642,22 @@ var gd3d;
                 gd3d.reflect.Field("boolean"),
                 __metadata("design:type", Boolean)
             ], overlay2D.prototype, "autoAsp", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], overlay2D.prototype, "screenMatchRate", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object)
+            ], overlay2D.prototype, "matchReference_width", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object)
+            ], overlay2D.prototype, "matchReference_height", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], overlay2D.prototype, "scaleMode", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -12487,7 +12538,7 @@ var gd3d;
                 this.matProjO = new gd3d.math.matrix;
                 this.matProj = new gd3d.math.matrix;
                 this.frameVecs = [];
-                this.fov = Math.PI * 0.25;
+                this.fov = 60 * Math.PI / 180;
                 this.size = 2;
                 this._opvalue = 1;
                 this.postQueues = [];
@@ -12858,6 +12909,19 @@ var gd3d;
                 gd3d.reflect.Field("IOverLay[]"),
                 __metadata("design:type", Array)
             ], camera.prototype, "overlays", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], camera.prototype, "fov", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], camera.prototype, "size", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], camera.prototype, "opvalue", null);
             camera = __decorate([
                 gd3d.reflect.nodeComponent,
                 gd3d.reflect.nodeCamera
