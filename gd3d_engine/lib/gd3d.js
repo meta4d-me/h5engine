@@ -1413,12 +1413,11 @@ var gd3d;
                 gd3d.math.pool.delete_vector2(ModelPos);
             };
             canvasRenderer.prototype.calCanvasPosToWorldPos = function (from, out) {
-                if (from == null || out == null)
+                if (!this.canvas || !from || !out)
                     return;
-                var root = this.canvas.getRoot();
                 var ModelPos = gd3d.math.pool.new_vector3();
-                ModelPos.x = (from.x / root.width) * 2 - 1;
-                ModelPos.y = (from.y / root.height) * -2 + 1;
+                ModelPos.x = (from.x / this.canvas.pixelWidth) * 2 - 1;
+                ModelPos.y = (from.y / this.canvas.pixelHeight) * -2 + 1;
                 var m_mtx = this.gameObject.transform.getWorldMatrix();
                 gd3d.math.matrixTransformVector3(ModelPos, m_mtx, out);
                 out.z = this.gameObject.transform.getWorldTranslate().z;
@@ -2011,6 +2010,8 @@ var gd3d;
                     return this._canvas;
                 },
                 set: function (val) {
+                    if (!val)
+                        return;
                     this._canvas = val;
                 },
                 enumerable: true,
@@ -10186,7 +10187,7 @@ var gd3d;
                     switch (__type) {
                         case gd3d.render.UniformTypeEnum.CubeTexture:
                         case gd3d.render.UniformTypeEnum.Texture:
-                            jsonValue = "" + val.name.name;
+                            jsonValue = "" + val[item].name.name;
                             break;
                         case gd3d.render.UniformTypeEnum.Float4:
                             jsonValue = "(" + val.x + "," + val.y + "," + val.z + "," + val.w + ")";

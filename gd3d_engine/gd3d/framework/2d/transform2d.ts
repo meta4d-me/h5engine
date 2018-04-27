@@ -108,6 +108,7 @@ namespace gd3d.framework
          */
         set canvas(val: canvas)
         {
+            if(!val) return;
             this._canvas = val;
         }
         get canvas(): canvas

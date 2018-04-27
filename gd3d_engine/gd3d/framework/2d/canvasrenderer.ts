@@ -433,11 +433,10 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         calCanvasPosToWorldPos(from:math.vector2,out:math.vector3){
-            if(from == null || out == null) return;
-            let root = this.canvas.getRoot();
+            if(!this.canvas || !from || !out) return;
             let ModelPos = math.pool.new_vector3();
-            ModelPos.x = (from.x / root.width) * 2 - 1;
-            ModelPos.y = (from.y / root.height) * -2 + 1;
+            ModelPos.x = (from.x / this.canvas.pixelWidth) * 2 - 1;
+            ModelPos.y = (from.y / this.canvas.pixelHeight) * -2 + 1;
             let m_mtx = this.gameObject.transform.getWorldMatrix();
             math.matrixTransformVector3(ModelPos,m_mtx,out);
             out.z = this.gameObject.transform.getWorldTranslate().z;
