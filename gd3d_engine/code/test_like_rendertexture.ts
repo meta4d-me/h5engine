@@ -32,7 +32,6 @@ namespace t
             );
         }
         sh: gd3d.framework.shader;
-        testUI_0:gd3d.framework.transform2D;
         private initscene(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             {
@@ -55,19 +54,19 @@ namespace t
 
                 this.showcamera.addOverLay(o2ds);
                 {//overlay1
-                    this.testUI_0 = new gd3d.framework.transform2D();
-                    this.testUI_0.name="ceng1";
-                    this.testUI_0.localTranslate.x = 200;
-                    this.testUI_0.localTranslate.y = 200;
-                    this.testUI_0.width = 300;
-                    this.testUI_0.height = 300;
-                    this.testUI_0.pivot.x = 0;
-                    this.testUI_0.pivot.y = 0;
-                    this.testUI_0.markDirty();
-                    var rawiamge = this.testUI_0.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
+                    var t2d = new gd3d.framework.transform2D();
+                    t2d.name="ceng1";
+                    t2d.localTranslate.x = 200;
+                    t2d.localTranslate.y = 200;
+                    t2d.width = 300;
+                    t2d.height = 300;
+                    t2d.pivot.x = 0;
+                    t2d.pivot.y = 0;
+                    t2d.markDirty();
+                    var rawiamge = t2d.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
                     rawiamge.image = this.scene.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
 
-                    o2ds.addChild(this.testUI_0);
+                    o2ds.addChild(t2d);
                 }
                 {
                     var cube1 = new gd3d.framework.transform();

@@ -67,8 +67,12 @@ namespace gd3d.framework
          * 渲染mask层级（和相机相对应）
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("number")
-        renderLayer: gd3d.framework.CullingMask = CullingMask.default;
+        // @gd3d.reflect.Field("number")
+        // renderLayer: gd3d.framework.CullingMask = CullingMask.default;
+        get renderLayer() {return this.gameObject.layer;}
+        set renderLayer(layer:CullingMask){
+            this.gameObject.layer = layer;
+        }
         private issetq = false;
          /**
          * @private

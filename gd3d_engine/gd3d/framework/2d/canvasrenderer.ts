@@ -160,7 +160,11 @@ namespace gd3d.framework
             this.canvas.is2dUI = false;
         }
 
-        renderLayer: CullingMask = CullingMask.default;
+        //renderLayer: CullingMask = CullingMask.default;
+        get renderLayer() {return this.gameObject.layer;}
+        set renderLayer(layer:CullingMask){
+            this.gameObject.layer = layer;
+        }
 
         /**
          * @private

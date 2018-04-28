@@ -11089,6 +11089,31 @@ var test_effecteditor = (function () {
     };
     return test_effecteditor;
 }());
+var UI;
+(function (UI) {
+    var UILayerEnum;
+    (function (UILayerEnum) {
+        UILayerEnum[UILayerEnum["BOTTOM"] = 0] = "BOTTOM";
+        UILayerEnum[UILayerEnum["MIDDLE"] = 1] = "MIDDLE";
+        UILayerEnum[UILayerEnum["HIGH"] = 2] = "HIGH";
+        UILayerEnum[UILayerEnum["TOP"] = 3] = "TOP";
+    })(UILayerEnum = UI.UILayerEnum || (UI.UILayerEnum = {}));
+    var UILayerMgr = (function () {
+        function UILayerMgr() {
+        }
+        UILayerMgr.getLayerRoot = function (layer) {
+            return UILayerMgr.UILayerMap[layer];
+        };
+        UILayerMgr.prototype.init = function (app) {
+            if (UILayerMgr.isInit)
+                return;
+            UILayerMgr.isInit = true;
+        };
+        UILayerMgr.isInit = false;
+        return UILayerMgr;
+    }());
+    UI.UILayerMgr = UILayerMgr;
+})(UI || (UI = {}));
 var UseAniplayClipDemo = (function () {
     function UseAniplayClipDemo() {
         this.taskMgr = new gd3d.framework.taskMgr();

@@ -217,7 +217,7 @@ namespace gd3d.framework
     export interface IRenderer extends INodeComponent
     {
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: CullingMask;  //后期发现 和 gameObject.layer 概念冲突 ，实现时 对接处理
         queue: number;
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera);

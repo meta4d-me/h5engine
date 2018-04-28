@@ -6,7 +6,11 @@ namespace gd3d.framework
     {
 
         layer: RenderLayerEnum=RenderLayerEnum.Transparent;
-        renderLayer: CullingMask=CullingMask.default;
+        //renderLayer: CullingMask=CullingMask.default;
+        get renderLayer() {return this.gameObject.layer;}
+        set renderLayer(layer:CullingMask){
+            this.gameObject.layer = layer;
+        }
         queue: number=0;
         start() {
 

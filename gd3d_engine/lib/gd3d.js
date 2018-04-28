@@ -1132,6 +1132,8 @@ var gd3d;
                     var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0 | gd3d.render.VertexFormatMask.ColorEX;
                     this.batcher.initBuffer(context.webgl, vf, gd3d.render.DrawModeEnum.VboTri);
                 }
+                if (this.beforeRender != null)
+                    this.beforeRender();
                 this.drawScene(this.rootNode, context, assetmgr);
                 this.batcher.end(context.webgl);
                 if (this.afterRender != null)
@@ -1302,13 +1304,20 @@ var gd3d;
         framework.batcher2D = batcher2D;
         var canvasRenderer = (function () {
             function canvasRenderer() {
-                this.renderLayer = framework.CullingMask.default;
                 this.layer = framework.RenderLayerEnum.Common;
                 this.queue = 0;
                 this.cupTans2ds = [];
                 this.canvas = new framework.canvas();
                 this.canvas.is2dUI = false;
             }
+            Object.defineProperty(canvasRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             canvasRenderer.prototype.getBound = function () {
                 return null;
             };
@@ -9187,10 +9196,17 @@ var gd3d;
                 this.lightmapIndex = -1;
                 this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.issetq = false;
                 this._queue = 0;
             }
+            Object.defineProperty(meshRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(meshRenderer.prototype, "queue", {
                 get: function () {
                     return this._queue;
@@ -9297,10 +9313,6 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], meshRenderer.prototype, "layer", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], meshRenderer.prototype, "renderLayer", void 0);
             meshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -9318,7 +9330,6 @@ var gd3d;
         var skinnedMeshRenderer = (function () {
             function skinnedMeshRenderer() {
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.issetq = false;
                 this._queue = 0;
                 this.maxBoneCount = 0;
@@ -9326,6 +9337,14 @@ var gd3d;
                 this._efficient = true;
             }
             skinnedMeshRenderer_1 = skinnedMeshRenderer;
+            Object.defineProperty(skinnedMeshRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
                 get: function () {
                     return this._queue;
@@ -12591,9 +12610,7 @@ var gd3d;
             };
             camera.prototype.addOverLay = function (overLay) {
                 this.overlays.push(overLay);
-            };
-            camera.prototype.addOverLayAt = function (overLay, index) {
-                this.overlays.splice(index, 0, overLay);
+                this.sortOverLays(this.overlays);
             };
             camera.prototype.getOverLays = function () {
                 return this.overlays;
@@ -12604,6 +12621,14 @@ var gd3d;
                 var index = this.overlays.indexOf(overLay);
                 if (index >= 0)
                     this.overlays.splice(index, 1);
+                this.sortOverLays(this.overlays);
+            };
+            camera.prototype.sortOverLays = function (lays) {
+                if (!lays || lays.length < 1)
+                    return;
+                lays.sort(function (a, b) {
+                    return a.sortOrder - b.sortOrder;
+                });
             };
             camera.prototype.calcViewMatrix = function (matrix) {
                 var camworld = this.gameObject.transform.getWorldMatrix();
@@ -12937,13 +12962,44 @@ var gd3d;
         framework.camera = camera;
         var CullingMask;
         (function (CullingMask) {
-            CullingMask[CullingMask["ui"] = 1] = "ui";
-            CullingMask[CullingMask["default"] = 2] = "default";
-            CullingMask[CullingMask["editor"] = 4] = "editor";
-            CullingMask[CullingMask["model"] = 8] = "model";
-            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
             CullingMask[CullingMask["nothing"] = 0] = "nothing";
-            CullingMask[CullingMask["modelbeforeui"] = 8] = "modelbeforeui";
+            CullingMask[CullingMask["default"] = 1] = "default";
+            CullingMask[CullingMask["ui"] = 2] = "ui";
+            CullingMask[CullingMask["editor"] = 4] = "editor";
+            CullingMask[CullingMask["builtin_0"] = 1] = "builtin_0";
+            CullingMask[CullingMask["builtin_1"] = 2] = "builtin_1";
+            CullingMask[CullingMask["builtin_2"] = 4] = "builtin_2";
+            CullingMask[CullingMask["builtin_3"] = 8] = "builtin_3";
+            CullingMask[CullingMask["builtin_4"] = 16] = "builtin_4";
+            CullingMask[CullingMask["builtin_5"] = 32] = "builtin_5";
+            CullingMask[CullingMask["builtin_6"] = 64] = "builtin_6";
+            CullingMask[CullingMask["builtin_7"] = 128] = "builtin_7";
+            CullingMask[CullingMask["modelbeforeui"] = 256] = "modelbeforeui";
+            CullingMask[CullingMask["user_8"] = 256] = "user_8";
+            CullingMask[CullingMask["user_9"] = 512] = "user_9";
+            CullingMask[CullingMask["user_10"] = 1024] = "user_10";
+            CullingMask[CullingMask["user_11"] = 2048] = "user_11";
+            CullingMask[CullingMask["user_12"] = 4096] = "user_12";
+            CullingMask[CullingMask["user_13"] = 8192] = "user_13";
+            CullingMask[CullingMask["user_14"] = 16384] = "user_14";
+            CullingMask[CullingMask["user_15"] = 32768] = "user_15";
+            CullingMask[CullingMask["user_16"] = 65536] = "user_16";
+            CullingMask[CullingMask["user_17"] = 131072] = "user_17";
+            CullingMask[CullingMask["user_18"] = 262144] = "user_18";
+            CullingMask[CullingMask["user_19"] = 524288] = "user_19";
+            CullingMask[CullingMask["user_20"] = 1048576] = "user_20";
+            CullingMask[CullingMask["user_21"] = 2097152] = "user_21";
+            CullingMask[CullingMask["user_22"] = 4194304] = "user_22";
+            CullingMask[CullingMask["user_23"] = 8388608] = "user_23";
+            CullingMask[CullingMask["user_24"] = 16777216] = "user_24";
+            CullingMask[CullingMask["user_25"] = 33554432] = "user_25";
+            CullingMask[CullingMask["user_26"] = 67108864] = "user_26";
+            CullingMask[CullingMask["user_27"] = 134217728] = "user_27";
+            CullingMask[CullingMask["user_28"] = 268435456] = "user_28";
+            CullingMask[CullingMask["user_29"] = 536870912] = "user_29";
+            CullingMask[CullingMask["user_30"] = 1073741824] = "user_30";
+            CullingMask[CullingMask["user_31"] = 2147483648] = "user_31";
+            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
         })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -13058,7 +13114,6 @@ var gd3d;
         var effectSystem = (function () {
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.autoplay = true;
                 this.state = framework.EffectPlayStateEnum.None;
@@ -13075,6 +13130,14 @@ var gd3d;
                 this.beExecuteNextFrame = true;
             }
             effectSystem_1 = effectSystem;
+            Object.defineProperty(effectSystem.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(effectSystem.prototype, "jsonData", {
                 get: function () {
                     return this._textasset;
@@ -13597,7 +13660,6 @@ var gd3d;
         var TestEffectSystem = (function () {
             function TestEffectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.autoplay = true;
                 this.state = framework.EffectPlayStateEnum.None;
@@ -13613,6 +13675,14 @@ var gd3d;
                 this.refElements = [];
                 this.beExecuteNextFrame = true;
             }
+            Object.defineProperty(TestEffectSystem.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             TestEffectSystem.prototype.setJsonData = function (_jsonData) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.jsonData = _jsonData;
@@ -14505,7 +14575,6 @@ var gd3d;
         var trailRender = (function () {
             function trailRender() {
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.width = 1.0;
                 this.vertexcount = 24;
@@ -14515,6 +14584,14 @@ var gd3d;
                 this.lookAtCamera = false;
                 this.speed = 0.5;
             }
+            Object.defineProperty(trailRender.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             trailRender.prototype.start = function () {
                 this.app = this.gameObject.getScene().app;
                 this.webgl = this.app.webgl;
@@ -14754,7 +14831,6 @@ var gd3d;
         var trailRender_recorde = (function () {
             function trailRender_recorde() {
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this._startWidth = 1;
                 this._endWidth = 0;
@@ -14768,6 +14844,14 @@ var gd3d;
                 this.activeMaxpointlimit = false;
                 this.notRender = false;
             }
+            Object.defineProperty(trailRender_recorde.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(trailRender_recorde.prototype, "material", {
                 get: function () {
                     if (this._material != undefined) {
@@ -15137,7 +15221,6 @@ var gd3d;
         var f14EffectSystem = (function () {
             function f14EffectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.fps = 30;
                 this.layers = [];
@@ -15156,6 +15239,14 @@ var gd3d;
                 this.enabletimeFlow = false;
                 this.enableDraw = false;
             }
+            Object.defineProperty(f14EffectSystem.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             f14EffectSystem.prototype.start = function () {
             };
             Object.defineProperty(f14EffectSystem.prototype, "f14eff", {
@@ -27254,7 +27345,7 @@ var gd3d;
         framework.nodeComponent = nodeComponent;
         var gameObject = (function () {
             function gameObject() {
-                this.layer = 0;
+                this.layer = framework.CullingMask.default;
                 this.hideFlags = HideFlags.None;
                 this.isStatic = false;
                 this.components = [];
@@ -27707,6 +27798,7 @@ var gd3d;
                 var idx = this._overlay2d.indexOf(overlay);
                 if (idx != -1)
                     this._overlay2d.splice(idx, 1);
+                this.sortOverLays(this._overlay2d);
             };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
@@ -27798,7 +27890,6 @@ var gd3d;
                     cam.renderScene(this, context);
                     this.RealCameraNumber++;
                     var overLays = cam.getOverLays();
-                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++) {
                         if (cam.CullingMask & framework.CullingMask.ui) {
                             overLays[i].render(context, this.assetmgr, cam);
@@ -27813,7 +27904,6 @@ var gd3d;
                     this.RealCameraNumber++;
                     if (this.app.be2dstate) {
                         var overLays = cam.getOverLays();
-                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
@@ -27824,7 +27914,6 @@ var gd3d;
                 if (!this.app.bePlay && this.app.be2dstate) {
                     if (camindex == this.app.curcameraindex) {
                         var overLays = cam.getOverLays();
-                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);

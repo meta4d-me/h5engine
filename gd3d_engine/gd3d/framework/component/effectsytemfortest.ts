@@ -28,7 +28,11 @@ namespace gd3d.framework
          * 渲染层级
          * @version egret-gd3d 1.0
          */
-        renderLayer: CullingMask = CullingMask.default;
+        //renderLayer: CullingMask = CullingMask.default;
+        get renderLayer() {return this.gameObject.layer;}
+        set renderLayer(layer:CullingMask){
+            this.gameObject.layer = layer;
+        }
         /**
          * @public
          * @language zh_CN
