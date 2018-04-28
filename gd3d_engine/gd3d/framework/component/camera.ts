@@ -276,27 +276,7 @@ namespace gd3d.framework
             //     }
             // }
             this.overlays.push(overLay);
-        }
-        /**
-         * @public
-         * @language zh_CN
-         * @param overlay 2d组件
-         * @param index 在overlays对应位置添加组件
-         * @classdesc
-         * 添加2d渲染组件
-         * @version egret-gd3d 1.0
-         */
-        addOverLayAt(overLay: IOverLay, index: number)
-        {
-            // if (overLay instanceof overlay2D)
-            // {
-            //     let lay = overLay as overlay2D;
-            //     if (lay.camera != null)
-            //     {
-            //         lay.camera.removeOverLay(lay);
-            //     }
-            // }
-            this.overlays.splice(index, 0, overLay);
+            this.sortOverLays(this.overlays);
         }
         /**
          * @public
@@ -323,6 +303,17 @@ namespace gd3d.framework
             let index = this.overlays.indexOf(overLay);
             if (index >= 0)
                 this.overlays.splice(index, 1);
+            
+            this.sortOverLays(this.overlays);
+        }
+
+        //overlays 排序
+        private sortOverLays(lays:IOverLay[]){
+            if(!lays || lays.length<1)return;
+            lays.sort((a, b) =>
+            {
+                return a.sortOrder - b.sortOrder;
+            });
         }
         /**
          * @public
