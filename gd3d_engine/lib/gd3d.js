@@ -128,7 +128,6 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ;
             application.prototype.start = function (div, type, val, webglDebug) {
                 if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
@@ -12526,6 +12525,7 @@ var gd3d;
                 this._near = 0.01;
                 this._far = 1000;
                 this.CullingMask = CullingMask.default | CullingMask.ui;
+                this._contextIdx = -1;
                 this.clearOption_Color = true;
                 this.clearOption_Depth = true;
                 this.backgroundColor = new gd3d.math.color(0.5, 0.8, 1, 1);
@@ -12568,6 +12568,11 @@ var gd3d;
                         val = this.near + 0.01;
                     this._far = val;
                 },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(camera.prototype, "CurrContextIndex", {
+                get: function () { return this._contextIdx; },
                 enumerable: true,
                 configurable: true
             });
@@ -12848,6 +12853,7 @@ var gd3d;
                 }
             };
             camera.prototype.renderScene = function (scene, context) {
+                this._contextIdx = scene.renderContext.indexOf(context);
                 for (var i = 0; i < scene.renderList.renderLayers.length; i++) {
                     var layer = scene.renderList.renderLayers[i];
                     var list = layer.list;

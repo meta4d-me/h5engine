@@ -85,8 +85,8 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("example_changeMesh",()=>new test_ChangeMesh());
         this.addBtn("example_changeMaterial",()=>new test_ChangeMaterial());
         // this.addBtn("example_Sound",()=>new test_Sound());
-        // this.addBtn("demo_ScreenSplit",()=>new demo_ScreenSplit());
-        // this.addBtn("test_四分屏", () => new test_pick_4p());
+        this.addBtn("demo_ScreenSplit",()=>new demo_ScreenSplit());  //屏幕拆分
+        //this.addBtn("test_四分屏", () => new test_pick_4p());
         //----------------------------------------------文档案例
 
         //this.addBtn("test_liloadscene", () => new test_LiLoadScene());

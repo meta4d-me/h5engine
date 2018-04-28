@@ -128,7 +128,7 @@ namespace gd3d.framework
                 }
             }
         }
-        private renderContext: renderContext[] = [];
+        public renderContext: renderContext[] = [];
         private renderLights: light[] = [];//需要光源 class
         /**
          * @public

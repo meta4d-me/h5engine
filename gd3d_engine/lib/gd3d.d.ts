@@ -2075,7 +2075,8 @@ declare namespace gd3d.framework {
         private _far;
         far: number;
         CullingMask: CullingMask;
-        index: number;
+        readonly CurrContextIndex: number;
+        private _contextIdx;
         markDirty(): void;
         start(): void;
         update(delta: number): void;
@@ -5061,7 +5062,7 @@ declare namespace gd3d.framework {
         renderCameras: camera[];
         private _mainCamera;
         mainCamera: camera;
-        private renderContext;
+        renderContext: renderContext[];
         private renderLights;
         lightmaps: texture[];
         fog: Fog;

@@ -178,9 +178,10 @@ namespace gd3d.framework
         CullingMask: CullingMask = CullingMask.default | CullingMask.ui;
         //CullingMask: CullingMask = CullingMask.everything;
         /**
-         * @private
+         * 当前RenderContext 的 Index
          */
-        index: number;
+        get CurrContextIndex (){return this._contextIdx;}
+        private _contextIdx = -1;
         /**
          * @private
          */
@@ -738,6 +739,7 @@ namespace gd3d.framework
         */
         renderScene(scene: scene, context: renderContext)
         {
+            this._contextIdx = scene.renderContext.indexOf(context);
             for (var i = 0; i < scene.renderList.renderLayers.length; i++)
             {
                 let layer = scene.renderList.renderLayers[i];
