@@ -1456,21 +1456,6 @@ declare class test_effecteditor implements IState {
     bereplay: boolean;
     update(delta: number): void;
 }
-declare namespace UI {
-    enum UILayerEnum {
-        BOTTOM = 0,
-        MIDDLE = 1,
-        HIGH = 2,
-        TOP = 3,
-    }
-    class UILayerMgr {
-        private app;
-        private static isInit;
-        private static UILayerMap;
-        static getLayerRoot(layer: UILayerEnum): gd3d.framework.transform2D;
-        init(app: gd3d.framework.application): void;
-    }
-}
 declare class UseAniplayClipDemo implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
