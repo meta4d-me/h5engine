@@ -12543,7 +12543,7 @@ var gd3d;
             function camera() {
                 this._near = 0.01;
                 this._far = 1000;
-                this.CullingMask = framework.CullingMask.default | framework.CullingMask.ui;
+                this.CullingMask = framework.CullingMask.everything ^ framework.CullingMask.editor;
                 this._contextIdx = -1;
                 this.clearOption_Color = true;
                 this.clearOption_Depth = true;
@@ -12930,6 +12930,10 @@ var gd3d;
                 __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], camera.prototype, "far", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], camera.prototype, "CullingMask", void 0);
             __decorate([
                 gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }),
                 __metadata("design:type", Function),
@@ -27273,47 +27277,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var CullingMask;
-        (function (CullingMask) {
-            CullingMask[CullingMask["nothing"] = 0] = "nothing";
-            CullingMask[CullingMask["default"] = 1] = "default";
-            CullingMask[CullingMask["ui"] = 2] = "ui";
-            CullingMask[CullingMask["editor"] = 4] = "editor";
-            CullingMask[CullingMask["builtin_0"] = 1] = "builtin_0";
-            CullingMask[CullingMask["builtin_1"] = 2] = "builtin_1";
-            CullingMask[CullingMask["builtin_2"] = 4] = "builtin_2";
-            CullingMask[CullingMask["builtin_3"] = 8] = "builtin_3";
-            CullingMask[CullingMask["builtin_4"] = 16] = "builtin_4";
-            CullingMask[CullingMask["builtin_5"] = 32] = "builtin_5";
-            CullingMask[CullingMask["builtin_6"] = 64] = "builtin_6";
-            CullingMask[CullingMask["builtin_7"] = 128] = "builtin_7";
-            CullingMask[CullingMask["modelbeforeui"] = 256] = "modelbeforeui";
-            CullingMask[CullingMask["user_8"] = 256] = "user_8";
-            CullingMask[CullingMask["user_9"] = 512] = "user_9";
-            CullingMask[CullingMask["user_10"] = 1024] = "user_10";
-            CullingMask[CullingMask["user_11"] = 2048] = "user_11";
-            CullingMask[CullingMask["user_12"] = 4096] = "user_12";
-            CullingMask[CullingMask["user_13"] = 8192] = "user_13";
-            CullingMask[CullingMask["user_14"] = 16384] = "user_14";
-            CullingMask[CullingMask["user_15"] = 32768] = "user_15";
-            CullingMask[CullingMask["user_16"] = 65536] = "user_16";
-            CullingMask[CullingMask["user_17"] = 131072] = "user_17";
-            CullingMask[CullingMask["user_18"] = 262144] = "user_18";
-            CullingMask[CullingMask["user_19"] = 524288] = "user_19";
-            CullingMask[CullingMask["user_20"] = 1048576] = "user_20";
-            CullingMask[CullingMask["user_21"] = 2097152] = "user_21";
-            CullingMask[CullingMask["user_22"] = 4194304] = "user_22";
-            CullingMask[CullingMask["user_23"] = 8388608] = "user_23";
-            CullingMask[CullingMask["user_24"] = 16777216] = "user_24";
-            CullingMask[CullingMask["user_25"] = 33554432] = "user_25";
-            CullingMask[CullingMask["user_26"] = 67108864] = "user_26";
-            CullingMask[CullingMask["user_27"] = 134217728] = "user_27";
-            CullingMask[CullingMask["user_28"] = 268435456] = "user_28";
-            CullingMask[CullingMask["user_29"] = 536870912] = "user_29";
-            CullingMask[CullingMask["user_30"] = 1073741824] = "user_30";
-            CullingMask[CullingMask["user_31"] = 2147483648] = "user_31";
-            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
-        })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
         var HideFlags;
         (function (HideFlags) {
             HideFlags[HideFlags["None"] = 0] = "None";
@@ -27345,7 +27308,7 @@ var gd3d;
         framework.nodeComponent = nodeComponent;
         var gameObject = (function () {
             function gameObject() {
-                this.layer = Math.log(CullingMask.default) / Math.log(2);
+                this.layer = framework.cullingmaskutil.maskTolayer(framework.CullingMask.default);
                 this.hideFlags = HideFlags.None;
                 this.isStatic = false;
                 this.components = [];
@@ -27891,7 +27854,7 @@ var gd3d;
                     this.RealCameraNumber++;
                     var overLays = cam.getOverLays();
                     for (var i = 0; i < overLays.length; i++) {
-                        if (cam.CullingMask & (1 << framework.CullingMask.ui)) {
+                        if (cam.CullingMask & framework.CullingMask.ui) {
                             overLays[i].render(context, this.assetmgr, cam);
                         }
                     }
@@ -27905,7 +27868,7 @@ var gd3d;
                     if (this.app.be2dstate) {
                         var overLays = cam.getOverLays();
                         for (var i = 0; i < overLays.length; i++) {
-                            if (cam.CullingMask & (1 << framework.CullingMask.ui)) {
+                            if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
                             }
                         }
@@ -27915,7 +27878,7 @@ var gd3d;
                     if (camindex == this.app.curcameraindex) {
                         var overLays = cam.getOverLays();
                         for (var i = 0; i < overLays.length; i++) {
-                            if (cam.CullingMask & (1 << framework.CullingMask.ui)) {
+                            if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
                             }
                         }
@@ -28979,6 +28942,65 @@ var gd3d;
             return ray;
         }());
         framework.ray = ray;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var CullingMask;
+        (function (CullingMask) {
+            CullingMask[CullingMask["nothing"] = 0] = "nothing";
+            CullingMask[CullingMask["default"] = 1] = "default";
+            CullingMask[CullingMask["ui"] = 2] = "ui";
+            CullingMask[CullingMask["editor"] = 4] = "editor";
+            CullingMask[CullingMask["builtin_0"] = 1] = "builtin_0";
+            CullingMask[CullingMask["builtin_1"] = 2] = "builtin_1";
+            CullingMask[CullingMask["builtin_2"] = 4] = "builtin_2";
+            CullingMask[CullingMask["builtin_3"] = 8] = "builtin_3";
+            CullingMask[CullingMask["builtin_4"] = 16] = "builtin_4";
+            CullingMask[CullingMask["builtin_5"] = 32] = "builtin_5";
+            CullingMask[CullingMask["builtin_6"] = 64] = "builtin_6";
+            CullingMask[CullingMask["builtin_7"] = 128] = "builtin_7";
+            CullingMask[CullingMask["modelbeforeui"] = 256] = "modelbeforeui";
+            CullingMask[CullingMask["user_8"] = 256] = "user_8";
+            CullingMask[CullingMask["user_9"] = 512] = "user_9";
+            CullingMask[CullingMask["user_10"] = 1024] = "user_10";
+            CullingMask[CullingMask["user_11"] = 2048] = "user_11";
+            CullingMask[CullingMask["user_12"] = 4096] = "user_12";
+            CullingMask[CullingMask["user_13"] = 8192] = "user_13";
+            CullingMask[CullingMask["user_14"] = 16384] = "user_14";
+            CullingMask[CullingMask["user_15"] = 32768] = "user_15";
+            CullingMask[CullingMask["user_16"] = 65536] = "user_16";
+            CullingMask[CullingMask["user_17"] = 131072] = "user_17";
+            CullingMask[CullingMask["user_18"] = 262144] = "user_18";
+            CullingMask[CullingMask["user_19"] = 524288] = "user_19";
+            CullingMask[CullingMask["user_20"] = 1048576] = "user_20";
+            CullingMask[CullingMask["user_21"] = 2097152] = "user_21";
+            CullingMask[CullingMask["user_22"] = 4194304] = "user_22";
+            CullingMask[CullingMask["user_23"] = 8388608] = "user_23";
+            CullingMask[CullingMask["user_24"] = 16777216] = "user_24";
+            CullingMask[CullingMask["user_25"] = 33554432] = "user_25";
+            CullingMask[CullingMask["user_26"] = 67108864] = "user_26";
+            CullingMask[CullingMask["user_27"] = 134217728] = "user_27";
+            CullingMask[CullingMask["user_28"] = 268435456] = "user_28";
+            CullingMask[CullingMask["user_29"] = 536870912] = "user_29";
+            CullingMask[CullingMask["user_30"] = 1073741824] = "user_30";
+            CullingMask[CullingMask["user_31"] = 2147483648] = "user_31";
+            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
+        })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
+        var cullingmaskutil = (function () {
+            function cullingmaskutil() {
+            }
+            cullingmaskutil.maskTolayer = function (mask) {
+                return Math.log(mask) / Math.log(2);
+            };
+            cullingmaskutil.layerToMask = function (layer) {
+                return 1 << layer;
+            };
+            return cullingmaskutil;
+        }());
+        framework.cullingmaskutil = cullingmaskutil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

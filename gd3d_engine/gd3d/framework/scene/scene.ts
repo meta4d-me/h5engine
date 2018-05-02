@@ -274,7 +274,7 @@ namespace gd3d.framework
                 let overLays: IOverLay[] = cam.getOverLays();
                 for (var i = 0; i < overLays.length; i++)
                 {
-                    if (cam.CullingMask & (1 << CullingMask.ui))
+                    if (cam.CullingMask &  CullingMask.ui)
                     {
                         overLays[i].render(context, this.assetmgr, cam);
                     }
@@ -293,7 +293,7 @@ namespace gd3d.framework
                     let overLays: IOverLay[] = cam.getOverLays();
                     for (var i = 0; i < overLays.length; i++)
                     {
-                        if (cam.CullingMask &(1 << CullingMask.ui))
+                        if (cam.CullingMask & CullingMask.ui)
                         {
                             overLays[i].render(context, this.assetmgr, cam);
                         }
@@ -307,7 +307,7 @@ namespace gd3d.framework
                     let overLays: IOverLay[] = cam.getOverLays();
                     for (var i = 0; i < overLays.length; i++)
                     {
-                        if (cam.CullingMask & (1 << CullingMask.ui))
+                        if (cam.CullingMask & CullingMask.ui)
                         {
                             overLays[i].render(context, this.assetmgr, cam);
                         }

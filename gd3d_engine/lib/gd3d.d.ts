@@ -4917,46 +4917,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    enum CullingMask {
-        nothing = 0,
-        default = 1,
-        ui = 2,
-        editor = 4,
-        builtin_0 = 1,
-        builtin_1 = 2,
-        builtin_2 = 4,
-        builtin_3 = 8,
-        builtin_4 = 16,
-        builtin_5 = 32,
-        builtin_6 = 64,
-        builtin_7 = 128,
-        modelbeforeui = 256,
-        user_8 = 256,
-        user_9 = 512,
-        user_10 = 1024,
-        user_11 = 2048,
-        user_12 = 4096,
-        user_13 = 8192,
-        user_14 = 16384,
-        user_15 = 32768,
-        user_16 = 65536,
-        user_17 = 131072,
-        user_18 = 262144,
-        user_19 = 524288,
-        user_20 = 1048576,
-        user_21 = 2097152,
-        user_22 = 4194304,
-        user_23 = 8388608,
-        user_24 = 16777216,
-        user_25 = 33554432,
-        user_26 = 67108864,
-        user_27 = 134217728,
-        user_28 = 268435456,
-        user_29 = 536870912,
-        user_30 = 1073741824,
-        user_31 = 2147483648,
-        everything = 4294967295,
-    }
     enum HideFlags {
         None = 0,
         HideInHierarchy = 1,
@@ -5236,6 +5196,52 @@ declare namespace gd3d.framework {
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
         intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3, outInfo: pickinfo): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    enum CullingMask {
+        nothing = 0,
+        default = 1,
+        ui = 2,
+        editor = 4,
+        builtin_0 = 1,
+        builtin_1 = 2,
+        builtin_2 = 4,
+        builtin_3 = 8,
+        builtin_4 = 16,
+        builtin_5 = 32,
+        builtin_6 = 64,
+        builtin_7 = 128,
+        modelbeforeui = 256,
+        user_8 = 256,
+        user_9 = 512,
+        user_10 = 1024,
+        user_11 = 2048,
+        user_12 = 4096,
+        user_13 = 8192,
+        user_14 = 16384,
+        user_15 = 32768,
+        user_16 = 65536,
+        user_17 = 131072,
+        user_18 = 262144,
+        user_19 = 524288,
+        user_20 = 1048576,
+        user_21 = 2097152,
+        user_22 = 4194304,
+        user_23 = 8388608,
+        user_24 = 16777216,
+        user_25 = 33554432,
+        user_26 = 67108864,
+        user_27 = 134217728,
+        user_28 = 268435456,
+        user_29 = 536870912,
+        user_30 = 1073741824,
+        user_31 = 2147483648,
+        everything = 4294967295,
+    }
+    class cullingmaskutil {
+        static maskTolayer(mask: number): number;
+        static layerToMask(layer: number): number;
     }
 }
 declare namespace gd3d.framework {

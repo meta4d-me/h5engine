@@ -172,10 +172,11 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 相机的渲染层级
+         * 相机渲染剔除mask
          * @version egret-gd3d 1.0
          */
-        CullingMask: CullingMask = CullingMask.default | CullingMask.ui;
+        @gd3d.reflect.Field("number")
+        CullingMask: CullingMask = CullingMask.everything ^ CullingMask.editor;
         //CullingMask: CullingMask = CullingMask.everything;
         /**
          * 当前RenderContext 的 Index
@@ -713,7 +714,7 @@ namespace gd3d.framework
 
                 for (var j = 0; j < list.length; j++)
                 {
-                    if (this.CullingMask &(1 << list[j].renderLayer))
+                    if (this.CullingMask & (1 << list[j].renderLayer))
                     {
                         list[j].render(context, assetmgr, this);
                     }
