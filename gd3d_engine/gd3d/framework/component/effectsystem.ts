@@ -30,7 +30,7 @@ namespace gd3d.framework
          */
         //renderLayer: CullingMask = CullingMask.default;
         get renderLayer() {return this.gameObject.layer;}
-        set renderLayer(layer:CullingMask){
+        set renderLayer(layer:number){
             this.gameObject.layer = layer;
         }
         /**
@@ -423,7 +423,7 @@ namespace gd3d.framework
          */
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            if (!(camera.CullingMask & this.renderLayer)) return;
+            if (!(camera.CullingMask &(1 << this.renderLayer))) return;
             if (this.state == EffectPlayStateEnum.Play || this.state == EffectPlayStateEnum.Pause)
             {
                 context.updateModel(this.gameObject.transform);

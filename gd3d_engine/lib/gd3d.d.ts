@@ -267,7 +267,7 @@ declare namespace gd3d.framework {
     }
     class canvasRenderer implements IRenderer, ICollider {
         constructor();
-        renderLayer: CullingMask;
+        renderLayer: number;
         subTran: transform;
         getBound(): any;
         intersectsTransform(tran: transform): boolean;
@@ -1498,7 +1498,7 @@ declare namespace gd3d.framework {
         lightmapIndex: number;
         lightmapScaleOffset: math.vector4;
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         private issetq;
         _queue: number;
         queue: number;
@@ -1516,7 +1516,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         private issetq;
         _queue: number;
         queue: number;
@@ -2119,46 +2119,6 @@ declare namespace gd3d.framework {
         remove(): void;
         clone(): void;
     }
-    enum CullingMask {
-        nothing = 0,
-        default = 1,
-        ui = 2,
-        editor = 4,
-        builtin_0 = 1,
-        builtin_1 = 2,
-        builtin_2 = 4,
-        builtin_3 = 8,
-        builtin_4 = 16,
-        builtin_5 = 32,
-        builtin_6 = 64,
-        builtin_7 = 128,
-        modelbeforeui = 256,
-        user_8 = 256,
-        user_9 = 512,
-        user_10 = 1024,
-        user_11 = 2048,
-        user_12 = 4096,
-        user_13 = 8192,
-        user_14 = 16384,
-        user_15 = 32768,
-        user_16 = 65536,
-        user_17 = 131072,
-        user_18 = 262144,
-        user_19 = 524288,
-        user_20 = 1048576,
-        user_21 = 2097152,
-        user_22 = 4194304,
-        user_23 = 8388608,
-        user_24 = 16777216,
-        user_25 = 33554432,
-        user_26 = 67108864,
-        user_27 = 134217728,
-        user_28 = 268435456,
-        user_29 = 536870912,
-        user_30 = 1073741824,
-        user_31 = 2147483648,
-        everything = 4294967295,
-    }
 }
 declare namespace gd3d.framework {
     class canvascontainer implements INodeComponent {
@@ -2190,7 +2150,7 @@ declare namespace gd3d.framework {
     class effectSystem implements IRenderer {
         gameObject: gameObject;
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         autoplay: boolean;
         beLoop: boolean;
@@ -2246,7 +2206,7 @@ declare namespace gd3d.framework {
     class TestEffectSystem implements IRenderer {
         gameObject: gameObject;
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         autoplay: boolean;
         beLoop: boolean;
@@ -2439,7 +2399,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class trailRender implements IRenderer {
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         private width;
         private _material;
@@ -2481,7 +2441,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class trailRender_recorde implements IRenderer {
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         private _startWidth;
         private _endWidth;
@@ -2550,7 +2510,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class f14EffectSystem implements IRenderer {
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         start(): void;
         gameObject: gameObject;
@@ -4957,6 +4917,46 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum CullingMask {
+        nothing = 0,
+        default = 1,
+        ui = 2,
+        editor = 4,
+        builtin_0 = 1,
+        builtin_1 = 2,
+        builtin_2 = 4,
+        builtin_3 = 8,
+        builtin_4 = 16,
+        builtin_5 = 32,
+        builtin_6 = 64,
+        builtin_7 = 128,
+        modelbeforeui = 256,
+        user_8 = 256,
+        user_9 = 512,
+        user_10 = 1024,
+        user_11 = 2048,
+        user_12 = 4096,
+        user_13 = 8192,
+        user_14 = 16384,
+        user_15 = 32768,
+        user_16 = 65536,
+        user_17 = 131072,
+        user_18 = 262144,
+        user_19 = 524288,
+        user_20 = 1048576,
+        user_21 = 2097152,
+        user_22 = 4194304,
+        user_23 = 8388608,
+        user_24 = 16777216,
+        user_25 = 33554432,
+        user_26 = 67108864,
+        user_27 = 134217728,
+        user_28 = 268435456,
+        user_29 = 536870912,
+        user_30 = 1073741824,
+        user_31 = 2147483648,
+        everything = 4294967295,
+    }
     enum HideFlags {
         None = 0,
         HideInHierarchy = 1,
@@ -5063,7 +5063,7 @@ declare namespace gd3d.framework {
     }
     interface IRenderer extends INodeComponent {
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): any;
     }

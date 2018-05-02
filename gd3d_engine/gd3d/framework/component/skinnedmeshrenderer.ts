@@ -41,7 +41,7 @@ namespace gd3d.framework
          */
         //renderLayer: CullingMask = CullingMask.default;
         get renderLayer() {return this.gameObject.layer;}
-        set renderLayer(layer:CullingMask){
+        set renderLayer(layer:number){
             this.gameObject.layer = layer;
         }
         private issetq = false;

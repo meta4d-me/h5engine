@@ -70,7 +70,7 @@ namespace gd3d.framework
         // @gd3d.reflect.Field("number")
         // renderLayer: gd3d.framework.CullingMask = CullingMask.default;
         get renderLayer() {return this.gameObject.layer;}
-        set renderLayer(layer:CullingMask){
+        set renderLayer(layer:number){
             this.gameObject.layer = layer;
         }
         private issetq = false;
