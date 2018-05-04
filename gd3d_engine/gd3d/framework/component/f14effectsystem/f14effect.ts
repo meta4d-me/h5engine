@@ -7,7 +7,7 @@ namespace gd3d.framework
 
         layer: RenderLayerEnum=RenderLayerEnum.Transparent;
         renderLayer: CullingMask=CullingMask.default;
-        queue: number=0;
+        queue: number=10;
         start() {
 
         }

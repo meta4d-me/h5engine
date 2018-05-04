@@ -93,6 +93,14 @@
           "length":0
           },
       {
+          "name":"resources/using/particles_add_notest.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/using/particles_blend_notest.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/using/terrain.vs.glsl",
           "length":0
           },
