@@ -3,6 +3,16 @@
 namespace gd3d.framework
 {
     /**
+     * UI 缩放模式
+     */
+    export enum UIScaleMode{
+        /** 固定像素尺寸*/
+        CONSTANT_PIXEL_SIZE,
+        /**参考屏幕尺寸比例缩放*/
+        SCALE_WITH_SCREEN_SIZE
+    }
+
+    /**
      * @public
      * @language zh_CN
      * @classdesc
@@ -65,6 +75,46 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("boolean")
         autoAsp: boolean = true;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 屏幕宽高匹配模式 (range 0-1  =0:固定宽  =1:固定高)
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("number")
+        screenMatchRate : number = 0;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 屏幕匹配参考宽度
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("number")
+        matchReference_width = 800;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 屏幕匹配参考高度
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("number")
+        matchReference_height =600;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 缩放模式
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("number")
+        scaleMode : UIScaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
 
         /**
         * @public
@@ -144,22 +194,46 @@ namespace gd3d.framework
          */
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
-            if (!this.canvas.getRoot().visible) return;
+            if (!this.canvas.getRoot().visible || !this.camera) return;
             // if (!(camera.CullingMask & this.renderLayer)) return;
-            if (this.camera == null || this.camera == undefined)
-                return;
-            if (this.autoAsp)
-            {
-                var vp = new gd3d.math.rect();
-                this.camera.calcViewPortPixel(assetmgr.app, vp);
-                var aspcam = vp.w / vp.h;
-                var aspc = this.canvas.pixelWidth / this.canvas.pixelHeight;
-                if (aspc != aspcam)
-                {
-                    this.canvas.pixelWidth = this.canvas.pixelHeight * aspcam;
+            
+            // if (this.autoAsp)
+            // {
+            //     let vp = new gd3d.math.rect();
+            //     this.camera.calcViewPortPixel(assetmgr.app, vp);
+            //     let aspcam = vp.w / vp.h;
+            //     let aspc = this.canvas.pixelWidth / this.canvas.pixelHeight;
+            //     if (aspc != aspcam)
+            //     {
+            //         this.canvas.pixelWidth = this.canvas.pixelHeight * aspcam;
+            //         this.canvas.getRoot().markDirty();
+            //     }
+            // }
+
+            let vp = new gd3d.math.rect();
+            this.camera.calcViewPortPixel(assetmgr.app, vp);
+            switch (this.scaleMode){
+                case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                    if(this.canvas.pixelWidth == vp.w && this.canvas.pixelHeight == vp.h) break;
+                    this.canvas.pixelWidth = vp.w;
+                    this.canvas.pixelHeight = vp.h;
                     this.canvas.getRoot().markDirty();
-                }
+                break;
+                case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                    let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
+                    match = match>1? 1:match;
+                    let asp = vp.w / vp.h;
+                    let w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
+                    let h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
+                    if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h)
+                    {
+                        this.canvas.pixelWidth = w;
+                        this.canvas.pixelHeight = h;
+                        this.canvas.getRoot().markDirty();
+                    }
+                break;
             }
+
             context.updateOverlay();
             this.canvas.render(context, assetmgr);
         }
@@ -169,12 +243,18 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-            var vp = new math.rect();
-            var app = this.camera.calcViewPortPixel(this.app, vp);
-            var sx = (this.inputmgr.point.x / vp.w) * 2 - 1;
-            var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
-
+            let vp = new math.rect();
+            this.camera.calcViewPortPixel(this.app, vp);
+            let rect = this.camera.viewport;
+            let real_x = this.inputmgr.point.x - rect.x * this.app.width ;
+            let real_y = this.inputmgr.point.y - rect.y * this.app.height;
+            let sx = (real_x / vp.w) * 2 - 1;
+            let sy = (real_y / vp.h) * -2 + 1;
             //用屏幕空间坐标系丢给canvas
+            
+            if(this.canvas["pointEvent"].type == PointEventEnum.PointDown){
+                this.canvas;
+            }
 
             //canvas de update 直接集成pointevent处理
             this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);

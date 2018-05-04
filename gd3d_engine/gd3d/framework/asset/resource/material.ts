@@ -629,7 +629,7 @@ namespace gd3d.framework
                 {
                     case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
-                        jsonValue = `${val.name.name}`;
+                        jsonValue = `${val[item].name.name}`;
                         break;
                     case render.UniformTypeEnum.Float4:
                         jsonValue = `(${val.x},${val.y},${val.z},${val.w})`;

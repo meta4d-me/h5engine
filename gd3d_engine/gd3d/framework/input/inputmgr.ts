@@ -70,7 +70,7 @@ namespace gd3d.framework
                 }
             }
             );
-            app.webgl.canvas.addEventListener("touchmove", (ev) =>
+            app.webgl.canvas.addEventListener("touchmove", (ev:any) =>
             {
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
@@ -104,7 +104,7 @@ namespace gd3d.framework
                 this.CalcuPoint(x / count,y / count);
             }
             );
-            app.webgl.canvas.addEventListener("touchend", (ev) =>
+            app.webgl.canvas.addEventListener("touchend", (ev:any) =>
             {
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
@@ -127,7 +127,7 @@ namespace gd3d.framework
                 this.point.touch = false;
             }
             );
-            app.webgl.canvas.addEventListener("touchcancel", (ev) =>
+            app.webgl.canvas.addEventListener("touchcancel", (ev:any) =>
             {
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
@@ -152,7 +152,7 @@ namespace gd3d.framework
             );
             app.webgl.canvas.addEventListener("mousedown", (ev) =>
             {
-                this.CalcuPoint(ev.clientX,ev.clientY);
+                this.CalcuPoint(ev.offsetX,ev.offsetY);
                 this.point.touch = true;
                 
             }
@@ -165,7 +165,7 @@ namespace gd3d.framework
 
             app.webgl.canvas.addEventListener("mousemove", (ev) =>
             {
-                this.CalcuPoint(ev.clientX,ev.clientY);
+                this.CalcuPoint(ev.offsetX,ev.offsetY);
             }
             );
 

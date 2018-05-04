@@ -84,6 +84,7 @@ namespace gd3d.framework
             if(!overlay || !this._overlay2d) return;
             let idx = this._overlay2d.indexOf(overlay);
             if(idx != -1) this._overlay2d.splice(idx,1);
+            this.sortOverLays(this._overlay2d);
         }
         /**
          * @public
@@ -128,7 +129,7 @@ namespace gd3d.framework
                 }
             }
         }
-        private renderContext: renderContext[] = [];
+        public renderContext: renderContext[] = [];
         private renderLights: light[] = [];//需要光源 class
         /**
          * @public
@@ -271,10 +272,9 @@ namespace gd3d.framework
 
                 // //还有overlay
                 let overLays: IOverLay[] = cam.getOverLays();
-                this.sortOverLays(overLays);
                 for (var i = 0; i < overLays.length; i++)
                 {
-                    if (cam.CullingMask & CullingMask.ui)
+                    if (cam.CullingMask &  CullingMask.ui)
                     {
                         overLays[i].render(context, this.assetmgr, cam);
                     }
@@ -291,7 +291,6 @@ namespace gd3d.framework
                 if (this.app.be2dstate)
                 {
                     let overLays: IOverLay[] = cam.getOverLays();
-                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++)
                     {
                         if (cam.CullingMask & CullingMask.ui)
@@ -306,7 +305,6 @@ namespace gd3d.framework
                 if (camindex == this.app.curcameraindex)
                 {
                     let overLays: IOverLay[] = cam.getOverLays();
-                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++)
                     {
                         if (cam.CullingMask & CullingMask.ui)

@@ -13,7 +13,11 @@ namespace gd3d.framework
     {
         //記錄軌跡
         layer: RenderLayerEnum = RenderLayerEnum.Common;
-        renderLayer: gd3d.framework.CullingMask = CullingMask.default;
+        //renderLayer: gd3d.framework.CullingMask = CullingMask.default;
+        get renderLayer() {return this.gameObject.layer;}
+        set renderLayer(layer:number){
+            this.gameObject.layer = layer;
+        }
         queue: number = 0;
 
         //width:number=1;

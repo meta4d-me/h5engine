@@ -93,7 +93,7 @@ namespace gd3d.framework
         }
         @gd3d.reflect.Field("number")
         @gd3d.reflect.UIStyle("enum")
-        layer: number = 0;//物件有一个layer 取值范围0~31，各种功能都可以用layer mask 去过滤作用范围
+        layer: number = cullingmaskutil.maskTolayer(CullingMask.default);//物件有一个layer 取值范围0~31，各种功能都可以用layer mask 去过滤作用范围
         /**
          * @private
          */

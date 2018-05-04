@@ -1130,6 +1130,7 @@ var main = (function () {
         this.addBtn("example_newObject", function () { return new test_NewGameObject; });
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
+        this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
         this.addBtn("test_PBR 展示", function () { return new test_pbr(); });

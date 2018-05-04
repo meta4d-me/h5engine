@@ -28,8 +28,12 @@ namespace gd3d.framework
      */
     export enum CanvasFixedType
     {
+        /** 随着窗口自由适应 */
+        Free,
+        /** 固定宽度 */
         FixedWidthType,
-        FixedHeightType,
+        /** 固定高度 */
+        FixedHeightType
     }
     /**
      * @public
@@ -59,7 +63,7 @@ namespace gd3d.framework
          * 绘制区域宽度 像素单位
          * @version egret-gd3d 1.0
          */
-        width: number;
+        get width(){return this.webgl.canvas.width;}
         /**
          * @public
          * @language zh_CN
@@ -67,7 +71,7 @@ namespace gd3d.framework
          * 绘制区域高度 像素单位
          * @version egret-gd3d 1.0
          */
-        height: number;
+        get height() {return this.webgl.canvas.height;}
         limitFrame: boolean = true;
         notify: INotify;
         private _timeScale: number;
@@ -126,20 +130,17 @@ namespace gd3d.framework
         screenAdaptiveType:string;
         private _fixHeight: number;
         private _fixWidth: number;
-        private beWidthSetted: boolean = false;
-        private beHeightSetted: boolean = false;
+        // private beWidthSetted: boolean = false;
+        // private beHeightSetted: boolean = false;
+        private canvasFixedType:CanvasFixedType = CanvasFixedType.Free;
         private _canvasClientWidth: number;
         private _canvasClientHeight: number;
         set canvasFixHeight(val: number)
         {
-            this.beHeightSetted = true;
-            this.beWidthSetted = false;
             this._fixHeight = val;
         }
         set canvasFixWidth(val: number)
         {
-            this.beWidthSetted = true;
-            this.beHeightSetted = false;
             this._fixWidth = val;
         }
         get canvasClientWidth(): number
@@ -151,7 +152,7 @@ namespace gd3d.framework
             return this._canvasClientHeight;
         }
         
-        get scaleFromPandding(){return this._scaleFromPandding};
+        get scaleFromPandding(){return this._scaleFromPandding;}
         private _scaleFromPandding:number = 1;
         /**
          * @public
@@ -161,7 +162,7 @@ namespace gd3d.framework
          * @param div 绘制区域的dom
          * @version egret-gd3d 1.0
          */
-        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.FixedHeightType, val: number = 1200 ,webglDebug = false)
+        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200 ,webglDebug = false)
         {
             console.log("version: " + this.version + "  build: " + this.build);
             // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
@@ -225,29 +226,31 @@ namespace gd3d.framework
                     alert("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
+            this.canvasFixedType = type;
             switch (type)
             {
+                case CanvasFixedType.Free:
+                    this.screenAdaptiveType="宽高度自适应(宽高都不固定,真实像素宽高)";
+                    this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                    this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                    this._scaleFromPandding = 1;
+                break;
                 case CanvasFixedType.FixedWidthType:
                     this.canvasFixWidth = val;
                     this.screenAdaptiveType="宽度自适应(宽度固定,一般横屏使用)";
+                    this.webgl.canvas.width = this._fixWidth;
+                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     break;
                 case CanvasFixedType.FixedHeightType:
                     this.canvasFixHeight = val;
                     this.screenAdaptiveType="高度自适应(高度固定，一般竖屏使用)";
+                    this.webgl.canvas.height = this._fixHeight;
+                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                     break;
             }
-            if (this.beWidthSetted)
-            {
-                this.webgl.canvas.width = this._fixWidth;
-                this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-            }
-            else if (this.beHeightSetted)
-            {
-                this.webgl.canvas.height = this._fixHeight;
-                this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-            }
+            
             this._canvasClientWidth = this.webgl.canvas.clientWidth;
             this._canvasClientHeight = this.webgl.canvas.clientHeight;
             gd3d.render.webglkit.initConst(this.webgl);
@@ -368,28 +371,7 @@ namespace gd3d.framework
                 this.updateOrientationMode();
             }
 
-            if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight)
-            {
-                this._canvasClientWidth = this.webgl.canvas.clientWidth;
-                this._canvasClientHeight = this.webgl.canvas.clientHeight;
-                if (this.beWidthSetted)
-                {
-                    this.webgl.canvas.width = this._fixWidth;
-                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                } else if (this.beHeightSetted)
-                {
-                    this.webgl.canvas.height = this._fixHeight;
-                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                }
-                // console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
-                // console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
-                // console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
-
-            }
-            this.width = this.webgl.canvas.width;
-            this.height = this.webgl.canvas.height;
+            this.updateScreenAsp();
 
             if (this.bePlay)
             {
@@ -413,6 +395,35 @@ namespace gd3d.framework
                 this._scene.update(delta);
             }
         }
+
+        private updateScreenAsp(){
+            if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight)
+            {
+                this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                if(this.canvasFixedType == CanvasFixedType.Free){
+                    this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                    this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                    this._scaleFromPandding = 1;
+                }
+                else if (this.canvasFixedType == CanvasFixedType.FixedWidthType)
+                {
+                    this.webgl.canvas.width = this._fixWidth;
+                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                } else if (this.canvasFixedType == CanvasFixedType.FixedHeightType)
+                {
+                    this.webgl.canvas.height = this._fixHeight;
+                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                }
+                // console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
+                // console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
+                // console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
+
+            }
+        }
+
         /**
          * @private
          */

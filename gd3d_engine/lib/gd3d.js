@@ -31,8 +31,9 @@ var gd3d;
         })(NotifyType = framework.NotifyType || (framework.NotifyType = {}));
         var CanvasFixedType;
         (function (CanvasFixedType) {
-            CanvasFixedType[CanvasFixedType["FixedWidthType"] = 0] = "FixedWidthType";
-            CanvasFixedType[CanvasFixedType["FixedHeightType"] = 1] = "FixedHeightType";
+            CanvasFixedType[CanvasFixedType["Free"] = 0] = "Free";
+            CanvasFixedType[CanvasFixedType["FixedWidthType"] = 1] = "FixedWidthType";
+            CanvasFixedType[CanvasFixedType["FixedHeightType"] = 2] = "FixedHeightType";
         })(CanvasFixedType = framework.CanvasFixedType || (framework.CanvasFixedType = {}));
         var application = (function () {
             function application() {
@@ -41,8 +42,7 @@ var gd3d;
                 this.build = "b000061";
                 this._tar = -1;
                 this._standDeltaTime = -1;
-                this.beWidthSetted = false;
-                this.beHeightSetted = false;
+                this.canvasFixedType = CanvasFixedType.Free;
                 this._scaleFromPandding = 1;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
@@ -62,6 +62,16 @@ var gd3d;
                 this.lastHeight = 0;
                 this.OffOrientationUpdate = false;
             }
+            Object.defineProperty(application.prototype, "width", {
+                get: function () { return this.webgl.canvas.width; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "height", {
+                get: function () { return this.webgl.canvas.height; },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(application.prototype, "timeScale", {
                 get: function () {
                     return this._timeScale;
@@ -87,8 +97,6 @@ var gd3d;
             });
             Object.defineProperty(application.prototype, "canvasFixHeight", {
                 set: function (val) {
-                    this.beHeightSetted = true;
-                    this.beWidthSetted = false;
                     this._fixHeight = val;
                 },
                 enumerable: true,
@@ -96,8 +104,6 @@ var gd3d;
             });
             Object.defineProperty(application.prototype, "canvasFixWidth", {
                 set: function (val) {
-                    this.beWidthSetted = true;
-                    this.beHeightSetted = false;
                     this._fixWidth = val;
                 },
                 enumerable: true,
@@ -122,9 +128,8 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ;
             application.prototype.start = function (div, type, val, webglDebug) {
-                if (type === void 0) { type = CanvasFixedType.FixedHeightType; }
+                if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
                 console.log("version: " + this.version + "  build: " + this.build);
@@ -165,25 +170,28 @@ var gd3d;
                     alert("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
                 }
+                this.canvasFixedType = type;
                 switch (type) {
+                    case CanvasFixedType.Free:
+                        this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                        this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = 1;
+                        break;
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
                         this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+                        this.webgl.canvas.width = this._fixWidth;
+                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                         break;
                     case CanvasFixedType.FixedHeightType:
                         this.canvasFixHeight = val;
                         this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+                        this.webgl.canvas.height = this._fixHeight;
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                         break;
-                }
-                if (this.beWidthSetted) {
-                    this.webgl.canvas.width = this._fixWidth;
-                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                }
-                else if (this.beHeightSetted) {
-                    this.webgl.canvas.height = this._fixHeight;
-                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
                 }
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
                 this._canvasClientHeight = this.webgl.canvas.clientHeight;
@@ -255,22 +263,7 @@ var gd3d;
                 {
                     this.updateOrientationMode();
                 }
-                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
-                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
-                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
-                    if (this.beWidthSetted) {
-                        this.webgl.canvas.width = this._fixWidth;
-                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                    }
-                    else if (this.beHeightSetted) {
-                        this.webgl.canvas.height = this._fixHeight;
-                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                    }
-                }
-                this.width = this.webgl.canvas.width;
-                this.height = this.webgl.canvas.height;
+                this.updateScreenAsp();
                 if (this.bePlay) {
                     if (this.bePause) {
                         if (this.beStepForward && this.beStepNumber > 0) {
@@ -285,6 +278,27 @@ var gd3d;
                 this.updateEditorCode(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
+                }
+            };
+            application.prototype.updateScreenAsp = function () {
+                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
+                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
+                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                    if (this.canvasFixedType == CanvasFixedType.Free) {
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                        this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = 1;
+                    }
+                    else if (this.canvasFixedType == CanvasFixedType.FixedWidthType) {
+                        this.webgl.canvas.width = this._fixWidth;
+                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    }
+                    else if (this.canvasFixedType == CanvasFixedType.FixedHeightType) {
+                        this.webgl.canvas.height = this._fixHeight;
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                    }
                 }
             };
             application.prototype.getUserUpdateTimer = function () {
@@ -1118,6 +1132,8 @@ var gd3d;
                     var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0 | gd3d.render.VertexFormatMask.ColorEX;
                     this.batcher.initBuffer(context.webgl, vf, gd3d.render.DrawModeEnum.VboTri);
                 }
+                if (this.beforeRender != null)
+                    this.beforeRender();
                 this.drawScene(this.rootNode, context, assetmgr);
                 this.batcher.end(context.webgl);
                 if (this.afterRender != null)
@@ -1288,13 +1304,20 @@ var gd3d;
         framework.batcher2D = batcher2D;
         var canvasRenderer = (function () {
             function canvasRenderer() {
-                this.renderLayer = framework.CullingMask.default;
                 this.layer = framework.RenderLayerEnum.Common;
                 this.queue = 0;
                 this.cupTans2ds = [];
                 this.canvas = new framework.canvas();
                 this.canvas.is2dUI = false;
             }
+            Object.defineProperty(canvasRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             canvasRenderer.prototype.getBound = function () {
                 return null;
             };
@@ -1413,12 +1436,11 @@ var gd3d;
                 gd3d.math.pool.delete_vector2(ModelPos);
             };
             canvasRenderer.prototype.calCanvasPosToWorldPos = function (from, out) {
-                if (from == null || out == null)
+                if (!this.canvas || !from || !out)
                     return;
-                var root = this.canvas.getRoot();
                 var ModelPos = gd3d.math.pool.new_vector3();
-                ModelPos.x = (from.x / root.width) * 2 - 1;
-                ModelPos.y = (from.y / root.height) * -2 + 1;
+                ModelPos.x = (from.x / this.canvas.pixelWidth) * 2 - 1;
+                ModelPos.y = (from.y / this.canvas.pixelHeight) * -2 + 1;
                 var m_mtx = this.gameObject.transform.getWorldMatrix();
                 gd3d.math.matrixTransformVector3(ModelPos, m_mtx, out);
                 out.z = this.gameObject.transform.getWorldTranslate().z;
@@ -1488,10 +1510,19 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var UIScaleMode;
+        (function (UIScaleMode) {
+            UIScaleMode[UIScaleMode["CONSTANT_PIXEL_SIZE"] = 0] = "CONSTANT_PIXEL_SIZE";
+            UIScaleMode[UIScaleMode["SCALE_WITH_SCREEN_SIZE"] = 1] = "SCALE_WITH_SCREEN_SIZE";
+        })(UIScaleMode = framework.UIScaleMode || (framework.UIScaleMode = {}));
         var overlay2D = (function () {
             function overlay2D() {
                 this.init = false;
                 this.autoAsp = true;
+                this.screenMatchRate = 0;
+                this.matchReference_width = 800;
+                this.matchReference_height = 600;
+                this.scaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
                 this.sortOrder = 0;
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
@@ -1520,28 +1551,45 @@ var gd3d;
                 return this.canvas.getChild(index);
             };
             overlay2D.prototype.render = function (context, assetmgr, camera) {
-                if (!this.canvas.getRoot().visible)
+                if (!this.canvas.getRoot().visible || !this.camera)
                     return;
-                if (this.camera == null || this.camera == undefined)
-                    return;
-                if (this.autoAsp) {
-                    var vp = new gd3d.math.rect();
-                    this.camera.calcViewPortPixel(assetmgr.app, vp);
-                    var aspcam = vp.w / vp.h;
-                    var aspc = this.canvas.pixelWidth / this.canvas.pixelHeight;
-                    if (aspc != aspcam) {
-                        this.canvas.pixelWidth = this.canvas.pixelHeight * aspcam;
+                var vp = new gd3d.math.rect();
+                this.camera.calcViewPortPixel(assetmgr.app, vp);
+                switch (this.scaleMode) {
+                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                        if (this.canvas.pixelWidth == vp.w && this.canvas.pixelHeight == vp.h)
+                            break;
+                        this.canvas.pixelWidth = vp.w;
+                        this.canvas.pixelHeight = vp.h;
                         this.canvas.getRoot().markDirty();
-                    }
+                        break;
+                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                        var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
+                        match = match > 1 ? 1 : match;
+                        var asp = vp.w / vp.h;
+                        var w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
+                        var h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
+                        if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h) {
+                            this.canvas.pixelWidth = w;
+                            this.canvas.pixelHeight = h;
+                            this.canvas.getRoot().markDirty();
+                        }
+                        break;
                 }
                 context.updateOverlay();
                 this.canvas.render(context, assetmgr);
             };
             overlay2D.prototype.update = function (delta) {
                 var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (this.inputmgr.point.x / vp.w) * 2 - 1;
-                var sy = (this.inputmgr.point.y / vp.h) * -2 + 1;
+                this.camera.calcViewPortPixel(this.app, vp);
+                var rect = this.camera.viewport;
+                var real_x = this.inputmgr.point.x - rect.x * this.app.width;
+                var real_y = this.inputmgr.point.y - rect.y * this.app.height;
+                var sx = (real_x / vp.w) * 2 - 1;
+                var sy = (real_y / vp.h) * -2 + 1;
+                if (this.canvas["pointEvent"].type == framework.PointEventEnum.PointDown) {
+                    this.canvas;
+                }
                 this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
@@ -1602,6 +1650,22 @@ var gd3d;
                 gd3d.reflect.Field("boolean"),
                 __metadata("design:type", Boolean)
             ], overlay2D.prototype, "autoAsp", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], overlay2D.prototype, "screenMatchRate", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object)
+            ], overlay2D.prototype, "matchReference_width", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object)
+            ], overlay2D.prototype, "matchReference_height", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], overlay2D.prototype, "scaleMode", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -2005,6 +2069,8 @@ var gd3d;
                     return this._canvas;
                 },
                 set: function (val) {
+                    if (!val)
+                        return;
                     this._canvas = val;
                 },
                 enumerable: true,
@@ -9130,10 +9196,17 @@ var gd3d;
                 this.lightmapIndex = -1;
                 this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.issetq = false;
                 this._queue = 0;
             }
+            Object.defineProperty(meshRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(meshRenderer.prototype, "queue", {
                 get: function () {
                     return this._queue;
@@ -9240,10 +9313,6 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], meshRenderer.prototype, "layer", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], meshRenderer.prototype, "renderLayer", void 0);
             meshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -9261,7 +9330,6 @@ var gd3d;
         var skinnedMeshRenderer = (function () {
             function skinnedMeshRenderer() {
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.issetq = false;
                 this._queue = 0;
                 this.maxBoneCount = 0;
@@ -9269,6 +9337,14 @@ var gd3d;
                 this._efficient = true;
             }
             skinnedMeshRenderer_1 = skinnedMeshRenderer;
+            Object.defineProperty(skinnedMeshRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
                 get: function () {
                     return this._queue;
@@ -10180,7 +10256,7 @@ var gd3d;
                     switch (__type) {
                         case gd3d.render.UniformTypeEnum.CubeTexture:
                         case gd3d.render.UniformTypeEnum.Texture:
-                            jsonValue = "" + val.name.name;
+                            jsonValue = "" + val[item].name.name;
                             break;
                         case gd3d.render.UniformTypeEnum.Float4:
                             jsonValue = "(" + val.x + "," + val.y + "," + val.z + "," + val.w + ")";
@@ -12467,7 +12543,8 @@ var gd3d;
             function camera() {
                 this._near = 0.01;
                 this._far = 1000;
-                this.CullingMask = CullingMask.default | CullingMask.ui;
+                this.CullingMask = framework.CullingMask.everything ^ framework.CullingMask.editor;
+                this._contextIdx = -1;
                 this.clearOption_Color = true;
                 this.clearOption_Depth = true;
                 this.backgroundColor = new gd3d.math.color(0.5, 0.8, 1, 1);
@@ -12480,7 +12557,7 @@ var gd3d;
                 this.matProjO = new gd3d.math.matrix;
                 this.matProj = new gd3d.math.matrix;
                 this.frameVecs = [];
-                this.fov = Math.PI * 0.25;
+                this.fov = 60 * Math.PI / 180;
                 this.size = 2;
                 this._opvalue = 1;
                 this.postQueues = [];
@@ -12513,6 +12590,11 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(camera.prototype, "CurrContextIndex", {
+                get: function () { return this._contextIdx; },
+                enumerable: true,
+                configurable: true
+            });
             camera.prototype.markDirty = function () {
             };
             camera.prototype.start = function () {
@@ -12528,9 +12610,7 @@ var gd3d;
             };
             camera.prototype.addOverLay = function (overLay) {
                 this.overlays.push(overLay);
-            };
-            camera.prototype.addOverLayAt = function (overLay, index) {
-                this.overlays.splice(index, 0, overLay);
+                this.sortOverLays(this.overlays);
             };
             camera.prototype.getOverLays = function () {
                 return this.overlays;
@@ -12541,6 +12621,14 @@ var gd3d;
                 var index = this.overlays.indexOf(overLay);
                 if (index >= 0)
                     this.overlays.splice(index, 1);
+                this.sortOverLays(this.overlays);
+            };
+            camera.prototype.sortOverLays = function (lays) {
+                if (!lays || lays.length < 1)
+                    return;
+                lays.sort(function (a, b) {
+                    return a.sortOrder - b.sortOrder;
+                });
             };
             camera.prototype.calcViewMatrix = function (matrix) {
                 var camworld = this.gameObject.transform.getWorldMatrix();
@@ -12783,13 +12871,14 @@ var gd3d;
                     var layer = scene.renderList.renderLayers[i];
                     var list = layer.list;
                     for (var j = 0; j < list.length; j++) {
-                        if (this.CullingMask & list[j].renderLayer) {
+                        if (this.CullingMask & (1 << list[j].renderLayer)) {
                             list[j].render(context, assetmgr, this);
                         }
                     }
                 }
             };
             camera.prototype.renderScene = function (scene, context) {
+                this._contextIdx = scene.renderContext.indexOf(context);
                 for (var i = 0; i < scene.renderList.renderLayers.length; i++) {
                     var layer = scene.renderList.renderLayers[i];
                     var list = layer.list;
@@ -12842,6 +12931,10 @@ var gd3d;
                 __metadata("design:paramtypes", [Number])
             ], camera.prototype, "far", null);
             __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], camera.prototype, "CullingMask", void 0);
+            __decorate([
                 gd3d.reflect.compCall({ "use": "dirty", "display": "刷新camera" }),
                 __metadata("design:type", Function),
                 __metadata("design:paramtypes", []),
@@ -12851,6 +12944,19 @@ var gd3d;
                 gd3d.reflect.Field("IOverLay[]"),
                 __metadata("design:type", Array)
             ], camera.prototype, "overlays", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], camera.prototype, "fov", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], camera.prototype, "size", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], camera.prototype, "opvalue", null);
             camera = __decorate([
                 gd3d.reflect.nodeComponent,
                 gd3d.reflect.nodeCamera
@@ -12858,16 +12964,6 @@ var gd3d;
             return camera;
         }());
         framework.camera = camera;
-        var CullingMask;
-        (function (CullingMask) {
-            CullingMask[CullingMask["ui"] = 1] = "ui";
-            CullingMask[CullingMask["default"] = 2] = "default";
-            CullingMask[CullingMask["editor"] = 4] = "editor";
-            CullingMask[CullingMask["model"] = 8] = "model";
-            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
-            CullingMask[CullingMask["nothing"] = 0] = "nothing";
-            CullingMask[CullingMask["modelbeforeui"] = 8] = "modelbeforeui";
-        })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -12981,7 +13077,6 @@ var gd3d;
         var effectSystem = (function () {
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.autoplay = true;
                 this.state = framework.EffectPlayStateEnum.None;
@@ -12998,6 +13093,14 @@ var gd3d;
                 this.beExecuteNextFrame = true;
             }
             effectSystem_1 = effectSystem;
+            Object.defineProperty(effectSystem.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(effectSystem.prototype, "jsonData", {
                 get: function () {
                     return this._textasset;
@@ -13201,7 +13304,7 @@ var gd3d;
                 }
             };
             effectSystem.prototype.render = function (context, assetmgr, camera) {
-                if (!(camera.CullingMask & this.renderLayer))
+                if (!(camera.CullingMask & (1 << this.renderLayer)))
                     return;
                 if (this.state == framework.EffectPlayStateEnum.Play || this.state == framework.EffectPlayStateEnum.Pause) {
                     context.updateModel(this.gameObject.transform);
@@ -13520,7 +13623,6 @@ var gd3d;
         var TestEffectSystem = (function () {
             function TestEffectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.autoplay = true;
                 this.state = framework.EffectPlayStateEnum.None;
@@ -13536,6 +13638,14 @@ var gd3d;
                 this.refElements = [];
                 this.beExecuteNextFrame = true;
             }
+            Object.defineProperty(TestEffectSystem.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             TestEffectSystem.prototype.setJsonData = function (_jsonData) {
                 this.webgl = gd3d.framework.sceneMgr.app.webgl;
                 this.jsonData = _jsonData;
@@ -13611,7 +13721,7 @@ var gd3d;
                 }
             };
             TestEffectSystem.prototype.render = function (context, assetmgr, camera) {
-                if (!(camera.CullingMask & this.renderLayer))
+                if (!(camera.CullingMask & (1 << this.renderLayer)))
                     return;
                 if (this.state == framework.EffectPlayStateEnum.Play) {
                     context.updateModel(this.gameObject.transform);
@@ -14428,7 +14538,6 @@ var gd3d;
         var trailRender = (function () {
             function trailRender() {
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.width = 1.0;
                 this.vertexcount = 24;
@@ -14438,6 +14547,14 @@ var gd3d;
                 this.lookAtCamera = false;
                 this.speed = 0.5;
             }
+            Object.defineProperty(trailRender.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             trailRender.prototype.start = function () {
                 this.app = this.gameObject.getScene().app;
                 this.webgl = this.app.webgl;
@@ -14677,7 +14794,6 @@ var gd3d;
         var trailRender_recorde = (function () {
             function trailRender_recorde() {
                 this.layer = framework.RenderLayerEnum.Common;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this._startWidth = 1;
                 this._endWidth = 0;
@@ -14691,6 +14807,14 @@ var gd3d;
                 this.activeMaxpointlimit = false;
                 this.notRender = false;
             }
+            Object.defineProperty(trailRender_recorde.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(trailRender_recorde.prototype, "material", {
                 get: function () {
                     if (this._material != undefined) {
@@ -15060,7 +15184,6 @@ var gd3d;
         var f14EffectSystem = (function () {
             function f14EffectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
-                this.renderLayer = framework.CullingMask.default;
                 this.queue = 0;
                 this.fps = 30;
                 this.layers = [];
@@ -15079,6 +15202,14 @@ var gd3d;
                 this.enabletimeFlow = false;
                 this.enableDraw = false;
             }
+            Object.defineProperty(f14EffectSystem.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
             f14EffectSystem.prototype.start = function () {
             };
             Object.defineProperty(f14EffectSystem.prototype, "f14eff", {
@@ -17258,14 +17389,14 @@ var gd3d;
                     _this.point.touch = false;
                 });
                 app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.CalcuPoint(ev.clientX, ev.clientY);
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
                     _this.point.touch = true;
                 });
                 app.webgl.canvas.addEventListener("mouseup", function (ev) {
                     _this.point.touch = false;
                 });
                 app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.CalcuPoint(ev.clientX, ev.clientY);
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
                 });
                 app.webgl.canvas.addEventListener("keydown", function (ev) {
                     _this.keyboardMap[ev.keyCode] = true;
@@ -27177,7 +27308,7 @@ var gd3d;
         framework.nodeComponent = nodeComponent;
         var gameObject = (function () {
             function gameObject() {
-                this.layer = 0;
+                this.layer = framework.cullingmaskutil.maskTolayer(framework.CullingMask.default);
                 this.hideFlags = HideFlags.None;
                 this.isStatic = false;
                 this.components = [];
@@ -27630,6 +27761,7 @@ var gd3d;
                 var idx = this._overlay2d.indexOf(overlay);
                 if (idx != -1)
                     this._overlay2d.splice(idx, 1);
+                this.sortOverLays(this._overlay2d);
             };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
@@ -27721,7 +27853,6 @@ var gd3d;
                     cam.renderScene(this, context);
                     this.RealCameraNumber++;
                     var overLays = cam.getOverLays();
-                    this.sortOverLays(overLays);
                     for (var i = 0; i < overLays.length; i++) {
                         if (cam.CullingMask & framework.CullingMask.ui) {
                             overLays[i].render(context, this.assetmgr, cam);
@@ -27736,7 +27867,6 @@ var gd3d;
                     this.RealCameraNumber++;
                     if (this.app.be2dstate) {
                         var overLays = cam.getOverLays();
-                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
@@ -27747,7 +27877,6 @@ var gd3d;
                 if (!this.app.bePlay && this.app.be2dstate) {
                     if (camindex == this.app.curcameraindex) {
                         var overLays = cam.getOverLays();
-                        this.sortOverLays(overLays);
                         for (var i = 0; i < overLays.length; i++) {
                             if (cam.CullingMask & framework.CullingMask.ui) {
                                 overLays[i].render(context, this.assetmgr, cam);
@@ -28813,6 +28942,65 @@ var gd3d;
             return ray;
         }());
         framework.ray = ray;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var CullingMask;
+        (function (CullingMask) {
+            CullingMask[CullingMask["nothing"] = 0] = "nothing";
+            CullingMask[CullingMask["default"] = 1] = "default";
+            CullingMask[CullingMask["ui"] = 2] = "ui";
+            CullingMask[CullingMask["editor"] = 4] = "editor";
+            CullingMask[CullingMask["builtin_0"] = 1] = "builtin_0";
+            CullingMask[CullingMask["builtin_1"] = 2] = "builtin_1";
+            CullingMask[CullingMask["builtin_2"] = 4] = "builtin_2";
+            CullingMask[CullingMask["builtin_3"] = 8] = "builtin_3";
+            CullingMask[CullingMask["builtin_4"] = 16] = "builtin_4";
+            CullingMask[CullingMask["builtin_5"] = 32] = "builtin_5";
+            CullingMask[CullingMask["builtin_6"] = 64] = "builtin_6";
+            CullingMask[CullingMask["builtin_7"] = 128] = "builtin_7";
+            CullingMask[CullingMask["modelbeforeui"] = 256] = "modelbeforeui";
+            CullingMask[CullingMask["user_8"] = 256] = "user_8";
+            CullingMask[CullingMask["user_9"] = 512] = "user_9";
+            CullingMask[CullingMask["user_10"] = 1024] = "user_10";
+            CullingMask[CullingMask["user_11"] = 2048] = "user_11";
+            CullingMask[CullingMask["user_12"] = 4096] = "user_12";
+            CullingMask[CullingMask["user_13"] = 8192] = "user_13";
+            CullingMask[CullingMask["user_14"] = 16384] = "user_14";
+            CullingMask[CullingMask["user_15"] = 32768] = "user_15";
+            CullingMask[CullingMask["user_16"] = 65536] = "user_16";
+            CullingMask[CullingMask["user_17"] = 131072] = "user_17";
+            CullingMask[CullingMask["user_18"] = 262144] = "user_18";
+            CullingMask[CullingMask["user_19"] = 524288] = "user_19";
+            CullingMask[CullingMask["user_20"] = 1048576] = "user_20";
+            CullingMask[CullingMask["user_21"] = 2097152] = "user_21";
+            CullingMask[CullingMask["user_22"] = 4194304] = "user_22";
+            CullingMask[CullingMask["user_23"] = 8388608] = "user_23";
+            CullingMask[CullingMask["user_24"] = 16777216] = "user_24";
+            CullingMask[CullingMask["user_25"] = 33554432] = "user_25";
+            CullingMask[CullingMask["user_26"] = 67108864] = "user_26";
+            CullingMask[CullingMask["user_27"] = 134217728] = "user_27";
+            CullingMask[CullingMask["user_28"] = 268435456] = "user_28";
+            CullingMask[CullingMask["user_29"] = 536870912] = "user_29";
+            CullingMask[CullingMask["user_30"] = 1073741824] = "user_30";
+            CullingMask[CullingMask["user_31"] = 2147483648] = "user_31";
+            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
+        })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
+        var cullingmaskutil = (function () {
+            function cullingmaskutil() {
+            }
+            cullingmaskutil.maskTolayer = function (mask) {
+                return Math.log(mask) / Math.log(2);
+            };
+            cullingmaskutil.layerToMask = function (layer) {
+                return 1 << layer;
+            };
+            return cullingmaskutil;
+        }());
+        framework.cullingmaskutil = cullingmaskutil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

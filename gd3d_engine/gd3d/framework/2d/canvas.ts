@@ -236,6 +236,15 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 渲染前回调
+         * @version egret-gd3d 1.0
+         */
+        public beforeRender: Function;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 渲染
          * @param context 渲染上下文
          * @param assetmgr 资源管理类的实例
@@ -265,6 +274,8 @@ namespace gd3d.framework
 
             //this.pushDrawData(canvas.defmat, this.vbod);
 
+            if(this.beforeRender != null)
+                this.beforeRender();
 
             //begin
             this.drawScene(this.rootNode, context, assetmgr);

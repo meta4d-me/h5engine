@@ -11,16 +11,17 @@ declare namespace gd3d.framework {
         AddCanvasRender = 4,
     }
     enum CanvasFixedType {
-        FixedWidthType = 0,
-        FixedHeightType = 1,
+        Free = 0,
+        FixedWidthType = 1,
+        FixedHeightType = 2,
     }
     class application {
         webgl: WebGLRenderingContext;
         stats: Stats.Stats;
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
-        width: number;
-        height: number;
+        readonly width: number;
+        readonly height: number;
         limitFrame: boolean;
         notify: INotify;
         private _timeScale;
@@ -33,8 +34,7 @@ declare namespace gd3d.framework {
         screenAdaptiveType: string;
         private _fixHeight;
         private _fixWidth;
-        private beWidthSetted;
-        private beHeightSetted;
+        private canvasFixedType;
         private _canvasClientWidth;
         private _canvasClientHeight;
         canvasFixHeight: number;
@@ -51,6 +51,7 @@ declare namespace gd3d.framework {
         closeFps(): void;
         private beStepNumber;
         private update(delta);
+        private updateScreenAsp();
         preusercodetimer: number;
         usercodetime: number;
         getUserUpdateTimer(): number;
@@ -235,6 +236,7 @@ declare namespace gd3d.framework {
         update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
         private lastMat;
         afterRender: Function;
+        beforeRender: Function;
         render(context: renderContext, assetmgr: assetMgr): void;
         pushRawData(mat: material, data: number[]): void;
         private context;
@@ -265,7 +267,7 @@ declare namespace gd3d.framework {
     }
     class canvasRenderer implements IRenderer, ICollider {
         constructor();
-        renderLayer: CullingMask;
+        renderLayer: number;
         subTran: transform;
         getBound(): any;
         intersectsTransform(tran: transform): boolean;
@@ -316,6 +318,10 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum UIScaleMode {
+        CONSTANT_PIXEL_SIZE = 0,
+        SCALE_WITH_SCREEN_SIZE = 1,
+    }
     class overlay2D implements IOverLay {
         constructor();
         init: boolean;
@@ -325,6 +331,10 @@ declare namespace gd3d.framework {
         start(camera: camera): void;
         canvas: canvas;
         autoAsp: boolean;
+        screenMatchRate: number;
+        matchReference_width: number;
+        matchReference_height: number;
+        scaleMode: UIScaleMode;
         sortOrder: number;
         addChild(node: transform2D): void;
         removeChild(node: transform2D): void;
@@ -1488,7 +1498,7 @@ declare namespace gd3d.framework {
         lightmapIndex: number;
         lightmapScaleOffset: math.vector4;
         layer: RenderLayerEnum;
-        renderLayer: gd3d.framework.CullingMask;
+        renderLayer: number;
         private issetq;
         _queue: number;
         queue: number;
@@ -1506,7 +1516,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         private issetq;
         _queue: number;
         queue: number;
@@ -2066,7 +2076,8 @@ declare namespace gd3d.framework {
         private _far;
         far: number;
         CullingMask: CullingMask;
-        index: number;
+        readonly CurrContextIndex: number;
+        private _contextIdx;
         markDirty(): void;
         start(): void;
         update(delta: number): void;
@@ -2078,9 +2089,9 @@ declare namespace gd3d.framework {
         order: number;
         private overlays;
         addOverLay(overLay: IOverLay): void;
-        addOverLayAt(overLay: IOverLay, index: number): void;
         getOverLays(): IOverLay[];
         removeOverLay(overLay: IOverLay): void;
+        private sortOverLays(lays);
         calcViewMatrix(matrix: gd3d.math.matrix): void;
         calcViewPortPixel(app: application, viewPortPixel: math.rect): void;
         calcProjectMatrix(asp: number, matrix: gd3d.math.matrix): void;
@@ -2107,15 +2118,6 @@ declare namespace gd3d.framework {
         renderScene(scene: scene, context: renderContext): void;
         remove(): void;
         clone(): void;
-    }
-    enum CullingMask {
-        ui = 1,
-        default = 2,
-        editor = 4,
-        model = 8,
-        everything = 4294967295,
-        nothing = 0,
-        modelbeforeui = 8,
     }
 }
 declare namespace gd3d.framework {
@@ -2148,7 +2150,7 @@ declare namespace gd3d.framework {
     class effectSystem implements IRenderer {
         gameObject: gameObject;
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         autoplay: boolean;
         beLoop: boolean;
@@ -2204,7 +2206,7 @@ declare namespace gd3d.framework {
     class TestEffectSystem implements IRenderer {
         gameObject: gameObject;
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         autoplay: boolean;
         beLoop: boolean;
@@ -2397,7 +2399,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class trailRender implements IRenderer {
         layer: RenderLayerEnum;
-        renderLayer: gd3d.framework.CullingMask;
+        renderLayer: number;
         queue: number;
         private width;
         private _material;
@@ -2439,7 +2441,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class trailRender_recorde implements IRenderer {
         layer: RenderLayerEnum;
-        renderLayer: gd3d.framework.CullingMask;
+        renderLayer: number;
         queue: number;
         private _startWidth;
         private _endWidth;
@@ -2508,7 +2510,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class f14EffectSystem implements IRenderer {
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         start(): void;
         gameObject: gameObject;
@@ -5021,7 +5023,7 @@ declare namespace gd3d.framework {
     }
     interface IRenderer extends INodeComponent {
         layer: RenderLayerEnum;
-        renderLayer: CullingMask;
+        renderLayer: number;
         queue: number;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): any;
     }
@@ -5052,7 +5054,7 @@ declare namespace gd3d.framework {
         renderCameras: camera[];
         private _mainCamera;
         mainCamera: camera;
-        private renderContext;
+        renderContext: renderContext[];
         private renderLights;
         lightmaps: texture[];
         fog: Fog;
@@ -5194,6 +5196,52 @@ declare namespace gd3d.framework {
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
         intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3, outInfo: pickinfo): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    enum CullingMask {
+        nothing = 0,
+        default = 1,
+        ui = 2,
+        editor = 4,
+        builtin_0 = 1,
+        builtin_1 = 2,
+        builtin_2 = 4,
+        builtin_3 = 8,
+        builtin_4 = 16,
+        builtin_5 = 32,
+        builtin_6 = 64,
+        builtin_7 = 128,
+        modelbeforeui = 256,
+        user_8 = 256,
+        user_9 = 512,
+        user_10 = 1024,
+        user_11 = 2048,
+        user_12 = 4096,
+        user_13 = 8192,
+        user_14 = 16384,
+        user_15 = 32768,
+        user_16 = 65536,
+        user_17 = 131072,
+        user_18 = 262144,
+        user_19 = 524288,
+        user_20 = 1048576,
+        user_21 = 2097152,
+        user_22 = 4194304,
+        user_23 = 8388608,
+        user_24 = 16777216,
+        user_25 = 33554432,
+        user_26 = 67108864,
+        user_27 = 134217728,
+        user_28 = 268435456,
+        user_29 = 536870912,
+        user_30 = 1073741824,
+        user_31 = 2147483648,
+        everything = 4294967295,
+    }
+    class cullingmaskutil {
+        static maskTolayer(mask: number): number;
+        static layerToMask(layer: number): number;
     }
 }
 declare namespace gd3d.framework {
