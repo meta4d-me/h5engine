@@ -150,11 +150,11 @@ namespace gd3d.framework
          * 更新
          * @param delta 两次update的间隔时间
          * @param touch 是否接收到事件
-         * @param XOnNDCSpace 归一化设备坐标空间下的x偏移
-         * @param YOnNDCSpace 归一化设备坐标空间下的y偏移
+         * @param XOnModelSpace 模型空间下的x偏移
+         * @param YOnModelSpace 模型空间下的y偏移
          * @version egret-gd3d 1.0
          */
-        update(delta: number, touch: Boolean, XOnNDCSpace: number, YOnNDCSpace: number)
+        update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number)
         {
             //canvas 的空间是左上角(-asp,1)-(asp,-1),和屏幕空间一致
             //右下角是 1*asp，1
@@ -178,8 +178,8 @@ namespace gd3d.framework
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
-                this.pointEvent.x = XOnNDCSpace;
-                this.pointEvent.y = YOnNDCSpace;
+                this.pointEvent.x = XOnModelSpace;
+                this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = this.pointSelect;
                 var skip = false;
                 if (this.pointDown == false && touch == false)//nothing
@@ -236,6 +236,15 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 渲染前回调
+         * @version egret-gd3d 1.0
+         */
+        public beforeRender: Function;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 渲染
          * @param context 渲染上下文
          * @param assetmgr 资源管理类的实例
@@ -265,6 +274,8 @@ namespace gd3d.framework
 
             //this.pushDrawData(canvas.defmat, this.vbod);
 
+            if(this.beforeRender != null)
+                this.beforeRender();
 
             //begin
             this.drawScene(this.rootNode, context, assetmgr);
@@ -406,7 +417,7 @@ namespace gd3d.framework
         }
 
         //屏幕空间坐标 转到 canvas 坐标
-        NDCPosToCanvasPos(fromP:math.vector2,outP:math.vector2){
+        ModelPosToCanvasPos(fromP:math.vector2,outP:math.vector2){
             if(fromP == null || outP == null) return;
             let scalx = 1 - (fromP.x - 1)/-2;  
             let scaly =  (fromP.y - 1)/-2;

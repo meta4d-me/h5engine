@@ -132,11 +132,11 @@ var demo_navigaionRVO = (function () {
     demo_navigaionRVO.prototype.PosRayNavmesh = function (oPos) {
         if (!this.navmeshMgr.navMesh || !this.navmeshMgr.navTrans)
             return;
-        var pickinfo;
+        var pickinfo = new gd3d.framework.pickinfo();
         var mesh = this.navmeshMgr.navMesh;
         var ray = new gd3d.framework.ray(new gd3d.math.vector3(oPos.x, oPos.y + 500, oPos.z), new gd3d.math.vector3(0, -1, 0));
-        pickinfo = mesh.intersects(ray, this.navmeshMgr.navTrans.getWorldMatrix());
-        if (!pickinfo)
+        var bool = mesh.intersects(ray, this.navmeshMgr.navTrans.getWorldMatrix(), pickinfo);
+        if (!bool)
             return;
         return pickinfo.hitposition;
     };
@@ -155,8 +155,9 @@ var demo_navigaionRVO = (function () {
             return;
         var inputMgr = this.app.getInputMgr();
         var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-        var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
-        if (!pickinfo)
+        var pickinfo = new gd3d.framework.pickinfo();
+        var bool = navmesh.intersects(ray, navTrans.getWorldMatrix(), pickinfo);
+        if (!bool)
             return;
         return pickinfo.hitposition;
     };
@@ -605,11 +606,13 @@ var demo_ScreenSplit = (function () {
                 }
             }
             console.log("inputMgr.point: " + new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y));
-            var pickinfo = this.scene.pick(ray);
-            if (pickinfo != null) {
-                this.movetarget = pickinfo.hitposition;
+            var tempinfo = gd3d.math.pool.new_pickInfo();
+            var bool = this.scene.pick(ray, tempinfo);
+            if (bool) {
+                gd3d.math.vec3Clone(tempinfo.hitposition, this.movetarget);
                 this.timer = 0;
             }
+            gd3d.math.pool.delete_pickInfo(tempinfo);
         }
         this.pointDown = this.inputMgr.point.touch;
         var tv = new gd3d.math.vector3();
@@ -1127,6 +1130,7 @@ var main = (function () {
         this.addBtn("example_newObject", function () { return new test_NewGameObject; });
         this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
         this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
+        this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
         this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
         this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
         this.addBtn("test_PBR 展示", function () { return new test_pbr(); });
@@ -1286,10 +1290,10 @@ var test_anim = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
-        var baihu = new gd3d.framework.transform();
-        baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 1;
-        this.scene.addChild(baihu);
+        var prefabObj = new gd3d.framework.transform();
+        prefabObj.name = "baihu";
+        prefabObj.localScale.x = prefabObj.localScale.y = prefabObj.localScale.z = 1;
+        this.scene.addChild(prefabObj);
         {
             var lighttran = new gd3d.framework.transform();
             this.scene.addChild(lighttran);
@@ -1299,19 +1303,20 @@ var test_anim = (function () {
             lighttran.localTranslate.y = 3;
             lighttran.markDirty();
         }
+        var resName = "elong";
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/elong/elong.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                _this.app.getAssetMgr().load("res/prefabs/" + resName + "/" + resName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName("elong.prefab.json");
-                        baihu = _prefab.getCloneTrans();
-                        _this.player = baihu;
-                        _this.scene.addChild(baihu);
-                        baihu.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-                        baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        objCam.lookat(baihu);
+                        var _prefab = _this.app.getAssetMgr().getAssetByName(resName + ".prefab.json");
+                        prefabObj = _prefab.getCloneTrans();
+                        _this.player = prefabObj;
+                        _this.scene.addChild(prefabObj);
+                        prefabObj.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
+                        prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        objCam.lookat(prefabObj);
                         objCam.markDirty();
-                        var ap = baihu.gameObject.getComponent("aniplayer");
+                        var ap = prefabObj.gameObject.getComponent("aniplayer");
                         document.onkeydown = function (ev) {
                             if (ev.code == "KeyM") {
                                 ap.playCrossByIndex(0, 0.2);
@@ -1323,24 +1328,27 @@ var test_anim = (function () {
                                 ap.stop();
                             }
                         };
-                        var wingroot = baihu.find("Bip001 Xtra17Nub");
-                        var trans = new gd3d.framework.transform();
-                        trans.name = "cube11";
-                        var mesh = trans.gameObject.addComponent("meshFilter");
-                        var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
-                        mesh.mesh = smesh;
-                        var renderer = trans.gameObject.addComponent("meshRenderer");
-                        wingroot.addChild(trans);
-                        trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
-                        renderer.materials = [];
-                        renderer.materials.push(new gd3d.framework.material());
-                        renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
+                        var wingroot = prefabObj.find("Bip001 Xtra17Nub");
+                        if (wingroot) {
+                            wingroot.gameObject.addComponent("asbone");
+                            var trans = new gd3d.framework.transform();
+                            trans.name = "cube11";
+                            var mesh = trans.gameObject.addComponent("meshFilter");
+                            var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
+                            mesh.mesh = smesh;
+                            var renderer = trans.gameObject.addComponent("meshRenderer");
+                            wingroot.addChild(trans);
+                            trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                            trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
+                            renderer.materials = [];
+                            renderer.materials.push(new gd3d.framework.material());
+                            renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
+                        }
                     }
                 });
             }
         });
-        this.cube = baihu;
+        this.cube = prefabObj;
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
@@ -1348,7 +1356,7 @@ var test_anim = (function () {
         this.camera.near = 0.01;
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(baihu);
+        objCam.lookat(prefabObj);
         objCam.markDirty();
     };
     test_anim.prototype.update = function (delta) {
@@ -3526,11 +3534,13 @@ var test_pick = (function () {
         CameraController.instance().update(delta);
         if (this.pointDown == false && this.inputMgr.point.touch == true) {
             var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
-            var pickinfo = this.scene.pick(ray);
-            if (pickinfo != null) {
-                this.movetarget = pickinfo.hitposition;
+            var tempinfo = gd3d.math.pool.new_pickInfo();
+            var bool = this.scene.pick(ray, tempinfo, true);
+            if (bool != null) {
+                gd3d.math.vec3Clone(tempinfo.hitposition, this.movetarget);
                 this.timer = 0;
             }
+            gd3d.math.pool.delete_pickInfo(tempinfo);
         }
         this.pointDown = this.inputMgr.point.touch;
         if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
@@ -3675,9 +3685,10 @@ var test_pick_4p = (function () {
     test_pick_4p.prototype.update = function (delta) {
         if (this.pointDown == false && this.inputMgr.point.touch == true) {
             var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
-            var pickinfo = this.scene.pick(ray);
-            if (pickinfo != null) {
-                this.movetarget = pickinfo.hitposition;
+            var tempInfo = gd3d.math.pool.new_pickInfo();
+            var bool = this.scene.pick(ray, tempInfo);
+            if (bool != null) {
+                gd3d.math.vec3Clone(tempInfo.hitposition, this.movetarget);
                 this.timer = 0;
             }
         }
@@ -6867,8 +6878,9 @@ var test_navMesh = (function () {
             return;
         var inputMgr = this.app.getInputMgr();
         var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-        var pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
-        if (!pickinfo)
+        var pickinfo = new gd3d.framework.pickinfo();
+        var bool = navmesh.intersects(ray, navTrans.getWorldMatrix(), pickinfo);
+        if (!bool)
             return;
         var endPos = pickinfo.hitposition;
         console.error(endPos);
@@ -7726,7 +7738,9 @@ var test_pick_boxcollider = (function () {
     test_pick_boxcollider.prototype.rayCollider = function () {
         var inputMgr = this.app.getInputMgr();
         var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-        return this.scene.pick(ray, false, this.scene.getRoot(), this.pickLayer);
+        var temp = gd3d.math.pool.new_pickInfo();
+        var bool = this.scene.pick(ray, temp, false);
+        return bool ? temp : null;
     };
     test_pick_boxcollider.prototype.generateGeomtry = function (meshType, color) {
         if (meshType === void 0) { meshType = "cube"; }
@@ -7983,11 +7997,13 @@ var test_RangeScreen = (function () {
     test_RangeScreen.prototype.update = function (delta) {
         if (this.pointDown == false && this.inputMgr.point.touch == true) {
             var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(this.inputMgr.point.x, this.inputMgr.point.y), this.app);
-            var pickinfo = this.scene.pick(ray);
-            if (pickinfo != null) {
-                this.movetarget = pickinfo.hitposition;
+            var tempinfo = gd3d.math.pool.new_pickInfo();
+            var bool = this.scene.pick(ray, tempinfo);
+            if (bool != null) {
+                gd3d.math.vec3Clone(tempinfo.hitposition, this.movetarget);
                 this.timer = 0;
             }
+            gd3d.math.pool.delete_pickInfo(tempinfo);
         }
         this.pointDown = this.inputMgr.point.touch;
         if (this.cube3.gameObject.getComponent("boxcollider").intersectsTransform(this.cube4)) {
@@ -11307,7 +11323,6 @@ var UseF14EffectDemo = (function () {
         });
     };
     UseF14EffectDemo.prototype.playEffect = function () {
-        this.effectSystems.play(1.0);
     };
     UseF14EffectDemo.prototype.stopEffect = function () {
         this.effectSystems.stop();

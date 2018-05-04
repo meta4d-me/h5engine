@@ -32,7 +32,7 @@ class UseF14EffectDemo implements IState {
 
     //播放特效
     playEffect(){
-            this.effectSystems.play(1.0);
+            //this.effectSystems.play(1.0);
     }
     //停止特效
     stopEffect(){

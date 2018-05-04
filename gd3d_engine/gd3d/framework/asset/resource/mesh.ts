@@ -406,10 +406,11 @@ namespace gd3d.framework
          * @param matrix 所在transform的矩阵
          * @version egret-gd3d 1.0
          */
-        intersects(ray: ray, matrix: gd3d.math.matrix): pickinfo
+        intersects(ray: ray, matrix: gd3d.math.matrix,outInfo:pickinfo):boolean
         {
-            var pickinfo = null;
-            if(!this.submesh) return pickinfo;
+            let ishided = false;
+            if(!this.submesh) return ishided;
+            let lastDistance = Number.MAX_VALUE;
             for (var i = 0; i < this.submesh.length; i++)
             {
                 var submesh = this.submesh[i];
@@ -438,28 +439,33 @@ namespace gd3d.framework
                             gd3d.math.matrixTransformVector3(p1, matrix, t1);
                             gd3d.math.matrixTransformVector3(p2, matrix, t2);
 
-                            var result = ray.intersectsTriangle(t0, t1, t2);
-                            if (result)
+                            let tempinfo = math.pool.new_pickInfo();
+                            var bool = ray.intersectsTriangle(t0, t1, t2,tempinfo);
+                            if (bool)
                             {
-                                if (result.distance < 0) continue;
-                                if (!pickinfo || pickinfo.distance > result.distance)
+                                if (tempinfo.distance < 0) continue;
+                                if ( lastDistance > tempinfo.distance)
                                 {
-                                    pickinfo = result;
-                                    pickinfo.faceId = index / 3;
-                                    pickinfo.subMeshId = i;
+                                    ishided = true;
+                                    outInfo.cloneFrom(tempinfo);
+                                    lastDistance = outInfo.distance;
+                                    outInfo.faceId = index / 3;
+                                    outInfo.subMeshId = i;
                                     var tdir = gd3d.math.pool.new_vector3();
-                                    gd3d.math.vec3ScaleByNum(ray.direction, result.distance, tdir);
-                                    gd3d.math.vec3Add(ray.origin, tdir, pickinfo.hitposition);
+                                    math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
+                                    math.vec3Add(ray.origin, tdir, outInfo.hitposition);
+                                    math.pool.delete_vector3(tdir);
                                 }
                             }
+                            math.pool.delete_pickInfo(tempinfo);
                         }
-                        gd3d.math.pool.delete_vector3(t0);
-                        gd3d.math.pool.delete_vector3(t1);
-                        gd3d.math.pool.delete_vector3(t2);
+                        math.pool.delete_vector3(t0);
+                        math.pool.delete_vector3(t1);
+                        math.pool.delete_vector3(t2);
                     }
                 }
             }
-            return pickinfo;
+            return ishided;
         }
 
         /**

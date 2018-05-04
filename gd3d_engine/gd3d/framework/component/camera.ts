@@ -172,23 +172,17 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 是否为主相机
+         * 相机渲染剔除mask
          * @version egret-gd3d 1.0
          */
-        public isMainCamera: boolean = false;
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 相机的渲染层级
-         * @version egret-gd3d 1.0
-         */
-        CullingMask: CullingMask = CullingMask.default | CullingMask.ui;
+        @gd3d.reflect.Field("number")
+        CullingMask: CullingMask = CullingMask.everything ^ CullingMask.editor;
         //CullingMask: CullingMask = CullingMask.everything;
         /**
-         * @private
+         * 当前RenderContext 的 Index
          */
-        index: number;
+        get CurrContextIndex (){return this._contextIdx;}
+        private _contextIdx = -1;
         /**
          * @private
          */
@@ -283,27 +277,7 @@ namespace gd3d.framework
             //     }
             // }
             this.overlays.push(overLay);
-        }
-        /**
-         * @public
-         * @language zh_CN
-         * @param overlay 2d组件
-         * @param index 在overlays对应位置添加组件
-         * @classdesc
-         * 添加2d渲染组件
-         * @version egret-gd3d 1.0
-         */
-        addOverLayAt(overLay: IOverLay, index: number)
-        {
-            // if (overLay instanceof overlay2D)
-            // {
-            //     let lay = overLay as overlay2D;
-            //     if (lay.camera != null)
-            //     {
-            //         lay.camera.removeOverLay(lay);
-            //     }
-            // }
-            this.overlays.splice(index, 0, overLay);
+            this.sortOverLays(this.overlays);
         }
         /**
          * @public
@@ -330,6 +304,17 @@ namespace gd3d.framework
             let index = this.overlays.indexOf(overLay);
             if (index >= 0)
                 this.overlays.splice(index, 1);
+            
+            this.sortOverLays(this.overlays);
+        }
+
+        //overlays 排序
+        private sortOverLays(lays:IOverLay[]){
+            if(!lays || lays.length<1)return;
+            lays.sort((a, b) =>
+            {
+                return a.sortOrder - b.sortOrder;
+            });
         }
         /**
          * @public
@@ -555,7 +540,8 @@ namespace gd3d.framework
          * 透视投影的fov
          * @version egret-gd3d 1.0
          */
-        fov: number = Math.PI * 0.25;//透视投影的fov
+        @gd3d.reflect.Field("number")
+        fov: number = 60 * Math.PI / 180;//透视投影的fov
         /**
          * @public
          * @language zh_CN
@@ -563,6 +549,7 @@ namespace gd3d.framework
          * 正交投影的竖向size
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         size: number = 2;//正交投影的竖向size
 
         private _opvalue = 1;
@@ -573,6 +560,7 @@ namespace gd3d.framework
          * 0=正交， 1=透视 中间值可以在两种相机间过度
          * @version egret-gd3d 1.0
          */
+        @gd3d.reflect.Field("number")
         set opvalue(val: number)
         {
             if (val > 0 && this._near < 0.01)
@@ -726,7 +714,7 @@ namespace gd3d.framework
 
                 for (var j = 0; j < list.length; j++)
                 {
-                    if (this.CullingMask & list[j].renderLayer)
+                    if (this.CullingMask & (1 << list[j].renderLayer))
                     {
                         list[j].render(context, assetmgr, this);
                     }
@@ -743,10 +731,11 @@ namespace gd3d.framework
         */
         renderScene(scene: scene, context: renderContext)
         {
+            this._contextIdx = scene.renderContext.indexOf(context);
             for (var i = 0; i < scene.renderList.renderLayers.length; i++)
             {
-                var layer = scene.renderList.renderLayers[i];
-                var list = layer.list;
+                let layer = scene.renderList.renderLayers[i];
+                let list = layer.list;
                 if (layer.needSort)
                 {
                     if (list.length > 1)
@@ -761,13 +750,16 @@ namespace gd3d.framework
                             {
                                 // var matrixView = math.pool.new_matrix();
                                 // this.calcViewMatrix(matrixView);
-                                var matrixView = context.matrixView;
+                                let matrixView = context.matrixView;
 
-                                var az = math.pool.new_vector3();
-                                var bz = math.pool.new_vector3();
+                                let az = math.pool.new_vector3();
+                                let bz = math.pool.new_vector3();
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                return bz.z - az.z;
+                                let result = bz.z - az.z;
+                                math.pool.delete_vector3(az);
+                                math.pool.delete_vector3(bz);
+                                return result;
                             }
                         })
                     }
@@ -804,22 +796,5 @@ namespace gd3d.framework
         {
 
         }
-    }
-    /**
-     * @public
-     * @language zh_CN
-     * @classdesc
-     * 渲染层级枚举
-     * @version egret-gd3d 1.0
-     */
-    export enum CullingMask
-    {
-        ui = 0x00000001,
-        default = 0x00000002,
-        editor = 0x00000004,
-        model = 0x00000008,
-        everything = 0xffffffff,
-        nothing = 0x00000000,
-        modelbeforeui = 0x00000008
     }
 }

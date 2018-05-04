@@ -12,11 +12,11 @@ class test_anim implements IState
         this.app = app;
         this.scene = this.app.getScene();
         // this.app.targetFrame = 10;
-        var baihu = new gd3d.framework.transform();
-        baihu.name = "baihu";
-        baihu.localScale.x = baihu.localScale.y = baihu.localScale.z = 1;
+        var prefabObj = new gd3d.framework.transform();
+        prefabObj.name = "baihu";
+        prefabObj.localScale.x = prefabObj.localScale.y = prefabObj.localScale.z = 1;
 
-        this.scene.addChild(baihu);
+        this.scene.addChild(prefabObj);
         {
             var lighttran = new gd3d.framework.transform();
             this.scene.addChild(lighttran);
@@ -27,30 +27,32 @@ class test_anim implements IState
             lighttran.markDirty();
 
         }
+        //let resName = "taidao@qirenzhan"; //elong
+        let resName = "elong"; //
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
             if (state.isfinish)
             {
                 // let _shader = this.app.getAssetMgr().getShader("light1.shader.json");
 
-                this.app.getAssetMgr().load("res/prefabs/elong/elong.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+                this.app.getAssetMgr().load(`res/prefabs/${resName}/${resName}.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s) =>
                 {
                     if (s.isfinish)
                     {
-                        var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("elong.prefab.json") as gd3d.framework.prefab;
-                        baihu = _prefab.getCloneTrans();
-                        this.player = baihu;
-                        this.scene.addChild(baihu);
-                        baihu.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-                        baihu.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                        var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(`${resName}.prefab.json`) as gd3d.framework.prefab;
+                        prefabObj = _prefab.getCloneTrans();
+                        this.player = prefabObj;
+                        this.scene.addChild(prefabObj);
+                        prefabObj.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
+                        prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
 
 
-                        objCam.lookat(baihu);
+                        objCam.lookat(prefabObj);
                         objCam.markDirty();
                         // var _skinMeshRenders = baihu.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
                         // _skinMeshRenders[0].materials[0].setShader(_shader);
 
-                        var ap = baihu.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
+                        var ap = prefabObj.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
                         // ap.autoplay = false;
 
                         document.onkeydown = (ev) =>
@@ -68,20 +70,23 @@ class test_anim implements IState
                             }
                         }
 
-                        let wingroot = baihu.find("Bip001 Xtra17Nub");
+                        let wingroot = prefabObj.find("Bip001 Xtra17Nub");
 
-                        let trans = new gd3d.framework.transform();
-                        trans.name = "cube11";
-                        var mesh = trans.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                        var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                        mesh.mesh = smesh;
-                        var renderer = trans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-                        wingroot.addChild(trans);
-                        trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        trans.localScale = new gd3d.math.vector3(0.3,0.3,0.3);
-                        renderer.materials = [];
-                        renderer.materials.push(new gd3d.framework.material());
-                        renderer.materials[0].setShader(this.app.getAssetMgr().getShader("shader/def"));
+                        if(wingroot){
+                            wingroot.gameObject.addComponent("asbone") as gd3d.framework.asbone;
+                            let trans = new gd3d.framework.transform();
+                            trans.name = "cube11";
+                            var mesh = trans.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+                            var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                            mesh.mesh = smesh;
+                            var renderer = trans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+                            wingroot.addChild(trans);
+                            trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                            trans.localScale = new gd3d.math.vector3(0.3,0.3,0.3);
+                            renderer.materials = [];
+                            renderer.materials.push(new gd3d.framework.material());
+                            renderer.materials[0].setShader(this.app.getAssetMgr().getShader("shader/def"));
+                        }
 
                         
 
@@ -105,7 +110,7 @@ class test_anim implements IState
                 });
             }
         });
-        this.cube = baihu;
+        this.cube = prefabObj;
 
         //添加一个摄像机
         var objCam = new gd3d.framework.transform();
@@ -115,7 +120,7 @@ class test_anim implements IState
         this.camera.near = 0.01;
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(baihu);
+        objCam.lookat(prefabObj);
         objCam.markDirty();//标记为需要刷新
 
 

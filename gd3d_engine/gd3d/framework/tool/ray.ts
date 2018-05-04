@@ -50,24 +50,27 @@
         * @version egret-gd3d 1.0
         * @platform Web,Native
         */
-        public intersectPlaneTransform(tran: transform): pickinfo
+        public intersectPlaneTransform(tran: transform,outInfo:pickinfo):boolean
         {
-            var pickinfo = null;
+            let ishided = false;
             var panelpoint = tran.getWorldTranslate();
             var forward = gd3d.math.pool.new_vector3();
             tran.getForwardInWorld(forward);
-            var hitposition = this.intersectPlane(panelpoint, forward);
-            if (hitposition)
+            var hitposition = gd3d.math.pool.new_vector3();
+            ishided = this.intersectPlane(panelpoint, forward,hitposition);
+            if (ishided)
             {
-                pickinfo = new gd3d.framework.pickinfo(0, 0, 0);
-                pickinfo.hitposition = hitposition;
-                pickinfo.distance = gd3d.math.vec3Distance(pickinfo.hitposition, this.origin);
+                gd3d.math.vec3Clone(hitposition,outInfo.hitposition);
+                outInfo.distance = gd3d.math.vec3Distance(outInfo.hitposition, this.origin);
+                outInfo.pickedtran = tran;
             }
             gd3d.math.pool.delete_vector3(forward);
-            return pickinfo;
+            gd3d.math.pool.delete_vector3(hitposition);
+
+            return ishided;
         }
 
-        public intersectPlane(planePoint: gd3d.math.vector3, planeNormal:gd3d.math.vector3): gd3d.math.vector3
+        public intersectPlane(planePoint: gd3d.math.vector3, planeNormal:gd3d.math.vector3,outHitPoint:gd3d.math.vector3):boolean
         {
             var vp1 = planeNormal.x;
             var vp2 = planeNormal.y;
@@ -84,12 +87,16 @@
             var vpt = v1 * vp1 + v2 * vp2 + v3 * vp3;
             if (vpt === 0)
             {
-                return null;
+                return false;
             }
             else
             {
                 var t = ((n1 - m1) * vp1 + (n2 - m2) * vp2 + (n3 - m3) * vp3) / vpt;
-                return new gd3d.math.vector3(m1 + v1 * t, m2 + v2 * t, m3 + v3 * t);
+                outHitPoint.x = m1 + v1 * t;
+                outHitPoint.y = m2 + v2 * t;
+                outHitPoint.z = m3 + v3 * t;
+                //return new gd3d.math.vector3(m1 + v1 * t, m2 + v2 * t, m3 + v3 * t);
+                return true;
             }
         }
 
@@ -102,15 +109,15 @@
         * @version egret-gd3d 1.0
         * @platform Web,Native
         */
-        public intersectCollider(tran: transform): pickinfo
+        public intersectCollider(tran: transform , outInfo: pickinfo):boolean
         {
+            let ishided = false;
             let _collider: ICollider = tran.gameObject.collider;
-
-            let pickinfo = null;
+            let lastDistance = Number.MAX_VALUE;
             if (_collider instanceof boxcollider)
             {
                 let obb = _collider.getBound() as obb;
-                if(!obb)    return null;
+                if(!obb)    return ishided;
                 let vecs: gd3d.math.vector3[] = [];
                 obb.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
                 let data = gd3d.render.meshData.genBoxByArray(vecs);
@@ -120,20 +127,24 @@
                     var p0 = data.pos[data.trisindex[index]];
                     var p1 = data.pos[data.trisindex[index + 1]];
                     var p2 = data.pos[data.trisindex[index + 2]];
-                    
-                    var result = this.intersectsTriangle(p0, p1, p2);
-                    if (result)
+
+                    let tempinfo = math.pool.new_pickInfo();
+                    let bool = this.intersectsTriangle(p0, p1, p2,tempinfo);
+                    if (bool)
                     {
-                        if (result.distance < 0) continue;
-                        if (!pickinfo || pickinfo.distance > result.distance)
+                        if (tempinfo.distance < 0) continue;
+                        if (lastDistance > tempinfo.distance)
                         {
-                            pickinfo = result;
+                            ishided = true;
+                            outInfo.cloneFrom(tempinfo);
+                            lastDistance = outInfo.distance;
                             var tdir = gd3d.math.pool.new_vector3();
-                            gd3d.math.vec3ScaleByNum(this.direction, result.distance, tdir);
-                            gd3d.math.vec3Add(this.origin, tdir, pickinfo.hitposition);
+                            gd3d.math.vec3ScaleByNum(this.direction, outInfo.distance, tdir);
+                            gd3d.math.vec3Add(this.origin, tdir, outInfo.hitposition);
                             gd3d.math.pool.delete_vector3(tdir);
                         }
                     }
+                    math.pool.delete_pickInfo(tempinfo);
                 }
             }
             else if (_collider instanceof meshcollider)
@@ -141,14 +152,14 @@
                 let mesh = _collider.getBound();
                 if (mesh != null)
                 {
-                    pickinfo = mesh.intersects(this, tran.getWorldMatrix());
+                    ishided = mesh.intersects(this, tran.getWorldMatrix() , outInfo);
                 }
             }
             else if (_collider instanceof canvasRenderer)
             {
-                pickinfo = this.intersectPlaneTransform(tran);
+                ishided = this.intersectPlaneTransform(tran,outInfo);
             }
-            return pickinfo;
+            return ishided;
         }
 
         /**
@@ -308,10 +319,11 @@
         * @param vertex0 
         * @param vertex1 
         * @param vertex2 
+        * @param outInfo 
         * @version egret-gd3d 1.0
         * @platform Web,Native
         */
-        public intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3): pickinfo
+        public intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3 , outInfo:pickinfo):boolean
         {
             var _edge1 = gd3d.math.pool.new_vector3();
             var _edge2 = gd3d.math.pool.new_vector3();
@@ -327,7 +339,7 @@
 
             if (det === 0)
             {
-                return null;
+                return false;
             }
 
             var invdet = 1 / det;
@@ -338,7 +350,7 @@
 
             if (bu < 0 || bu > 1.0)
             {
-                return null;
+                return false;
             }
 
             gd3d.math.vec3Cross(_tvec, _edge1, _qvec);
@@ -347,7 +359,7 @@
 
             if (bv < 0 || bu + bv > 1.0)
             {
-                return null;
+                return false;
             }
 
             var distance = gd3d.math.vec3Dot(_edge2, _qvec) * invdet;
@@ -358,7 +370,13 @@
             gd3d.math.pool.delete_vector3(_pvec);
             gd3d.math.pool.delete_vector3(_tvec);
             gd3d.math.pool.delete_vector3(_qvec);
-            return new pickinfo(bu, bv, distance);
+
+            outInfo.init();
+            outInfo.bu = bu;
+            outInfo.bv = bv;
+            outInfo.distance = distance;
+            //return new pickinfo(bu, bv, distance);
+            return true;
         }
     }
 }

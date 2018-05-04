@@ -166,11 +166,11 @@ class demo_navigaionRVO implements IState
 
     private PosRayNavmesh(oPos:gd3d.math.vector3){
         if(!this.navmeshMgr.navMesh || !this.navmeshMgr.navTrans) return;
-        var pickinfo: gd3d.framework.pickinfo;
+        var pickinfo = new gd3d.framework.pickinfo();
         let mesh = this.navmeshMgr.navMesh ;
         let ray = new gd3d.framework.ray(new gd3d.math.vector3(oPos.x, oPos.y + 500, oPos.z), new gd3d.math.vector3(0, -1, 0));
-        pickinfo = mesh.intersects(ray, this.navmeshMgr.navTrans.getWorldMatrix());
-        if (!pickinfo) return;
+        let bool = mesh.intersects(ray, this.navmeshMgr.navTrans.getWorldMatrix(),pickinfo);
+        if (!bool) return;
         return pickinfo.hitposition;
     }
 
@@ -189,8 +189,9 @@ class demo_navigaionRVO implements IState
         if (navmesh == null) return;
         let inputMgr = this.app.getInputMgr();
         let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-        let pickinfo: gd3d.framework.pickinfo = navmesh.intersects(ray, navTrans.getWorldMatrix());
-        if (!pickinfo) return;
+        let pickinfo = new gd3d.framework.pickinfo();
+        let bool = navmesh.intersects(ray, navTrans.getWorldMatrix(),pickinfo);
+        if (!bool) return;
         //console.error(pickinfo.hitposition);
         return pickinfo.hitposition;
     }

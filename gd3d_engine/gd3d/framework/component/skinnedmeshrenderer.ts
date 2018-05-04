@@ -39,7 +39,11 @@ namespace gd3d.framework
          * 渲染mask层级（和相机相对应）
          * @version egret-gd3d 1.0
          */
-        renderLayer: CullingMask = CullingMask.default;
+        //renderLayer: CullingMask = CullingMask.default;
+        get renderLayer() {return this.gameObject.layer;}
+        set renderLayer(layer:number){
+            this.gameObject.layer = layer;
+        }
         private issetq = false;
         /**
          * @private
@@ -300,10 +304,11 @@ namespace gd3d.framework
          * 射线检测
          * @version egret-gd3d 1.0
          */
-        intersects(ray: ray): pickinfo
+        intersects(ray: ray , outInfo:pickinfo): boolean
         {
+            let ishided = false;
+            let lastDistance = Number.MAX_VALUE;
             let mvpmat = this.player.gameObject.transform.getWorldMatrix();
-            var pickinfo = null;
             let data = this.mesh.data;
             for (var i = 0; i < this.mesh.submesh.length; i++)
             {
@@ -337,26 +342,31 @@ namespace gd3d.framework
                     gd3d.math.matrixTransformVector3(p1, mat11, t1);
                     gd3d.math.matrixTransformVector3(p2, mat22, t2);
 
-                    var result = ray.intersectsTriangle(t0, t1, t2);
-                    if (result)
+                    let tempinfo = math.pool.new_pickInfo();
+                    var bool = ray.intersectsTriangle(t0, t1, t2,tempinfo);
+                    if (bool)
                     {
-                        if (result.distance < 0) continue;
-                        if (!pickinfo || pickinfo.distance > result.distance)
+                        if (tempinfo.distance < 0) continue;
+                        if (lastDistance > tempinfo.distance)
                         {
-                            pickinfo = result;
-                            pickinfo.faceId = index / 3;
-                            pickinfo.subMeshId = i;
+                            ishided = true;
+                            outInfo.cloneFrom(tempinfo);
+                            lastDistance = outInfo.distance;
+                            outInfo.faceId = index / 3;
+                            outInfo.subMeshId = i;
                             var tdir = gd3d.math.pool.new_vector3();
-                            gd3d.math.vec3ScaleByNum(ray.direction, result.distance, tdir);
-                            gd3d.math.vec3Add(ray.origin, tdir, pickinfo.hitposition);
+                            gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
+                            gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
+                            gd3d.math.pool.delete_vector3(tdir);
                         }
                     }
+                    math.pool.delete_pickInfo(tempinfo);
                 }
                 gd3d.math.pool.delete_vector3(t0);
                 gd3d.math.pool.delete_vector3(t1);
                 gd3d.math.pool.delete_vector3(t2);
             }
-            return pickinfo;
+            return ishided;
         }
 
         update(delta: number)

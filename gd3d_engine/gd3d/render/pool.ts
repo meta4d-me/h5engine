@@ -25,6 +25,7 @@ namespace gd3d.math
             pool.collect_matrix();
             pool.collect_quaternion();
             pool.collect_color();
+            pool.collect_pickInfo();
         }
         //需要用啥照着这个加
         //for vector4
@@ -198,6 +199,8 @@ namespace gd3d.math
             {
                 pool._vector3_up = new vector3(0, 1, 0);
             }
+            pool._vector3_up.y = 1;
+            pool._vector3_up.x = pool._vector3_up.z = 0;
             return pool._vector3_up;
         }
         private static _vector3_right: vector3;
@@ -214,6 +217,8 @@ namespace gd3d.math
             {
                 pool._vector3_right = new vector3(1, 0, 0);
             }
+            pool._vector3_right.x = 1;
+            pool._vector3_right.y = pool._vector3_right.z = 0;
             return pool._vector3_right;
         }
         private static _vector3_forward: vector3;
@@ -230,6 +235,8 @@ namespace gd3d.math
             {
                 pool._vector3_forward = new vector3(0, 0, 1);
             }
+            pool._vector3_forward.x = pool._vector3_forward.y = 0;
+            pool._vector3_forward.z = 1;
             return pool._vector3_forward;
         }
         private static _vector3_zero: vector3;
@@ -246,6 +253,7 @@ namespace gd3d.math
             {
                 pool._vector3_zero = new vector3(0, 0, 0);
             }
+            pool._vector3_zero.x = pool._vector3_zero.y = pool._vector3_zero.z = 0;
             return pool._vector3_zero;
         }
         private static _vector3_one: vector3;
@@ -262,6 +270,7 @@ namespace gd3d.math
             {
                 pool._vector3_one = new vector3(1, 1, 1);
             }
+            pool._vector3_one.x = pool._vector3_one.y = pool._vector3_one.z = 1;
             return pool._vector3_one;
         }
 
@@ -322,6 +331,26 @@ namespace gd3d.math
             else
                 console.error("kindding me?确定你要回收的是vector3吗？");
         }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 回收一个v3数组
+        * @version gd3d 1.0
+        */
+        static delete_vector3Array(vs: vector3[]): void
+        {
+            for (let i = 0; i < vs.length; i++)
+            {
+                if (vs[i] != undefined)
+                {
+                    this.delete_vector3(vs[i]);
+                }
+            }
+            vs.length = 0;
+        }
+
         /**
         * @public
         * @language zh_CN
@@ -335,6 +364,24 @@ namespace gd3d.math
         }
 
         //for vector2
+        private static _vector2_zero: vector2;
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取v2 zero
+        * @version gd3d 1.0
+        */
+        static get vector2_zero(): vector2
+        {
+            if (pool._vector2_zero == null)
+            {
+                pool._vector2_zero = new vector2(0, 0);
+            }
+            pool._vector2_zero.x = pool._vector2_zero.y=1;
+            return pool._vector2_zero;
+        }
+
         private static _vector2_up: vector2;
         /**
         * @public
@@ -349,6 +396,7 @@ namespace gd3d.math
             {
                 pool._vector2_up = new vector2(0, 1);
             }
+            pool._vector2_up.x = 0; pool._vector2_up.y=1;
             return pool._vector2_up;
         }
         private static _vector2_right: vector2;
@@ -365,6 +413,7 @@ namespace gd3d.math
             {
                 pool._vector2_right = new vector2(1, 0);
             }
+            pool._vector2_right.x = 1; pool._vector2_right.y=0;
             return pool._vector2_right;
         }
         private static unused_vector2: vector2[] = [];
@@ -436,8 +485,7 @@ namespace gd3d.math
             {
                 if (vs[i] != undefined)
                 {
-                    vs[i].x = vs[i].y = 0;
-                    pool.unused_vector2.push(vs[i]);
+                    this.delete_vector2(vs[i]);
                 }
             }
             vs.length = 0;
@@ -666,6 +714,57 @@ namespace gd3d.math
         static collect_quaternion()
         {
             pool.unused_quaternion.length = 0;//清除未使用的池子
+        }
+
+
+        
+        private static unused_pickInfo: framework.pickinfo[] = [];
+        
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取一个pickInfo
+        * @version gd3d 1.0
+        */
+        static new_pickInfo(bu:number = 0,bv:number = 0,distance:number = 0): framework.pickinfo
+        {
+            if (pool.unused_pickInfo.length > 0){
+                let pk = pool.unused_pickInfo.pop();
+                return pk;
+            }
+            else
+                return new framework.pickinfo(bu,bv,distance);
+        }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 回收一个pickInfo
+        * @version gd3d 1.0
+        */
+       static delete_pickInfo(v: framework.pickinfo): void
+       {
+           if (v == null) return;
+           if (v instanceof framework.pickinfo)
+           {
+                v.init();
+                pool.unused_pickInfo.push(v);
+           }
+           else
+               console.error("kindding me?确定你要回收的是pickInfo吗？");
+       }
+
+       /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 清除pickInfo池
+        * @version gd3d 1.0
+        */
+        static collect_pickInfo(){
+            pool.unused_pickInfo.length = 0;
         }
     }
 }

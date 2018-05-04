@@ -108,6 +108,7 @@ namespace gd3d.framework
          */
         set canvas(val: canvas)
         {
+            if(!val) return;
             this._canvas = val;
         }
         get canvas(): canvas
@@ -130,6 +131,16 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("string")
         name: string = "noname";
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 对象是静态
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("boolean")
+        isStatic : boolean = false;
 
         /**
          * @public
@@ -158,7 +169,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        width: number;//2d位置
+        width: number = 0;//2d位置
 
         /**
          * @public
@@ -168,7 +179,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        height: number;
+        height: number = 0;
 
         /**
          * @public
@@ -1106,20 +1117,25 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 检测以canvas为参考的位置，是否在节点的范围内
-         * @param pworld 位置
+         * @param ModelPos 模型空间位置
          * @version egret-gd3d 1.0
          */
-        ContainsCanvasPoint(pworld: math.vector2, tolerance: number = 0): boolean
+        ContainsCanvasPoint(ModelPos: math.vector2, tolerance: number = 0): boolean
         {
-            var mworld = this.getWorldMatrix();
-            var mout = new math.matrix3x2();
-            gd3d.math.matrix3x2Inverse(mworld, mout);
+            let result = false;
+            var mworld = this.getWorldMatrix();  
+            var mout = math.pool.new_matrix3x2();
+            gd3d.math.matrix3x2Inverse(mworld, mout);   
 
-            var p2 = new math.vector2();
-            gd3d.math.matrix3x2TransformVector2(mout, pworld, p2);
+            var p2 = math.pool.new_vector2();
+            gd3d.math.matrix3x2TransformVector2(mout, ModelPos, p2);  //世界坐标 右乘 逆转worldMatrix 得到 ModelPos
             p2.x += this.pivot.x * this.width;
             p2.y += this.pivot.y * this.height;
-            return p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+            result = p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
+
+            math.pool.delete_matrix3x2(mout);
+            math.pool.delete_vector2(p2);
+            return result;
         }
 
         /**
@@ -1212,6 +1228,8 @@ namespace gd3d.framework
         }
         getLayoutValue(option: layoutOption)
         {
+            if (this.layoutValueMap[option] == undefined)
+                this.layoutValueMap[option] = 0;
             return this.layoutValueMap[option];
         }
 
@@ -1303,33 +1321,33 @@ namespace gd3d.framework
             this.lastPivot.y = this.pivot.y;
         }
 
-        private getLayValue(opation: layoutOption)
+        private getLayValue(option: layoutOption)
         {
-            if (this.layoutValueMap[opation] == undefined)
-                this.layoutValueMap[opation] = 0;
+            if (this.layoutValueMap[option] == undefined)
+                this.layoutValueMap[option] = 0;
 
             let value = 0;
-            if (this._layoutPercentState & opation)
+            if (this._layoutPercentState & option)
             {
                 if (this.parent)
                 {
-                    switch (opation)
+                    switch (option)
                     {
                         case layoutOption.LEFT:
                         case layoutOption.H_CENTER:
                         case layoutOption.RIGHT:
-                            value = this.parent.width * this.layoutValueMap[opation] / 100;
+                            value = this.parent.width * this.layoutValueMap[option] / 100;
                             break;
                         case layoutOption.TOP:
                         case layoutOption.V_CENTER:
                         case layoutOption.BOTTOM:
-                            value = this.parent.height * this.layoutValueMap[opation] / 100;
+                            value = this.parent.height * this.layoutValueMap[option] / 100;
                             break;
                     }
                 }
             } else
             {
-                value = this.layoutValueMap[opation];
+                value = this.layoutValueMap[option];
             }
 
             return value;
