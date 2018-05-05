@@ -162,8 +162,8 @@ void main () {
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g) * vec3(0.3, 0.4, 0.8);
 
     vec3 finalColor = vec3(0.0);
-    finalColor += lightBRDF(light_1.xyz, c) * vec3(0.6, 0.4, 0.6);
-    finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
+    // finalColor += lightBRDF(light_1.xyz, c) * vec3(0.6, 0.4, 0.6);
+    // finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
     finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
 
 #ifdef FOG
