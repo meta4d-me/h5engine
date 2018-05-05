@@ -194,14 +194,41 @@
      */
     export class charinfo
     {
+        /**
+         * uv
+         */
         x: number;//uv
+        /**
+         * uv
+         */
         y: number;
+        /**
+         * uv长度
+         */
         w: number;//uv长度
+        /**
+         * uv长度
+         */
         h: number;
+        /**
+         * 像素
+         */
         xSize: number;//像素
+        /**
+         * 像素
+         */
         ySize: number;
-        xOffset: number;//偏移
-        yOffset: number;//相对基线的偏移
+        /**
+         * 偏移
+         */
+        xOffset: number=0;//偏移
+        /**
+         * 相对基线的偏移
+         */
+        yOffset: number=0;//相对基线的偏移
+        /**
+         * 字符宽度
+         */
         xAddvance: number;//字符宽度
         static caclByteLength(): number
         {

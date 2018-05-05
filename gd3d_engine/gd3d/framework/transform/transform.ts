@@ -995,6 +995,11 @@ namespace gd3d.framework
             if(this.onDispose)
                 this.onDispose();
         }
+
+        destroy()
+        {
+            this.dispose();
+        }
     }
 
     /**
