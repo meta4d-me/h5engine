@@ -2026,6 +2026,8 @@ var gd3d;
         framework.C2DComponent = C2DComponent;
         var transform2D = (function () {
             function transform2D() {
+                this.layer = framework.cullingmaskutil.maskTolayer(framework.CullingMask.default);
+                this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.name = "noname";
                 this.isStatic = false;
                 this.width = 0;
@@ -2683,6 +2685,15 @@ var gd3d;
             transform2D.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            __decorate([
+                gd3d.reflect.Field("number"),
+                gd3d.reflect.UIStyle("enum"),
+                __metadata("design:type", Number)
+            ], transform2D.prototype, "layer", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], transform2D.prototype, "tag", void 0);
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -14271,7 +14282,7 @@ var gd3d;
                 this.range = 10;
                 this.intensity = 1;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
-                this.cullingMask = 0xffffffff;
+                this.cullingMask = framework.CullingMask.everything;
             }
             light.prototype.start = function () {
             };
@@ -27309,6 +27320,7 @@ var gd3d;
         var gameObject = (function () {
             function gameObject() {
                 this.layer = framework.cullingmaskutil.maskTolayer(framework.CullingMask.default);
+                this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.hideFlags = HideFlags.None;
                 this.isStatic = false;
                 this.components = [];
@@ -27526,6 +27538,10 @@ var gd3d;
                 gd3d.reflect.UIStyle("enum"),
                 __metadata("design:type", Number)
             ], gameObject.prototype, "layer", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], gameObject.prototype, "tag", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -28952,8 +28968,11 @@ var gd3d;
         (function (CullingMask) {
             CullingMask[CullingMask["nothing"] = 0] = "nothing";
             CullingMask[CullingMask["default"] = 1] = "default";
-            CullingMask[CullingMask["ui"] = 2] = "ui";
-            CullingMask[CullingMask["editor"] = 4] = "editor";
+            CullingMask[CullingMask["transparentFx"] = 2] = "transparentFx";
+            CullingMask[CullingMask["IgnoreRaycast"] = 4] = "IgnoreRaycast";
+            CullingMask[CullingMask["editor"] = 8] = "editor";
+            CullingMask[CullingMask["water"] = 16] = "water";
+            CullingMask[CullingMask["ui"] = 32] = "ui";
             CullingMask[CullingMask["builtin_0"] = 1] = "builtin_0";
             CullingMask[CullingMask["builtin_1"] = 2] = "builtin_1";
             CullingMask[CullingMask["builtin_2"] = 4] = "builtin_2";
@@ -29094,6 +29113,10 @@ var gd3d;
                 }
                 return true;
             };
+            StringUtil.builtinTag_Untagged = "Untagged";
+            StringUtil.builtinTag_Player = "Player";
+            StringUtil.builtinTag_EditorOnly = "EditorOnly";
+            StringUtil.builtinTag_MainCamera = "MainCamera";
             StringUtil.COMPONENT_CAMERA = "camera";
             StringUtil.COMPONENT_BOXCOLLIDER = "boxcollider";
             StringUtil.COMPONENT_LIGHT = "light";

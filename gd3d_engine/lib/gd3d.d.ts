@@ -449,6 +449,8 @@ declare namespace gd3d.framework {
     class transform2D {
         private _canvas;
         canvas: canvas;
+        layer: number;
+        tag: string;
         name: string;
         isStatic: boolean;
         parent: transform2D;
@@ -4943,6 +4945,7 @@ declare namespace gd3d.framework {
     class gameObject {
         getScene(): scene;
         layer: number;
+        tag: string;
         hideFlags: HideFlags;
         isStatic: boolean;
         transform: transform;
@@ -5202,8 +5205,11 @@ declare namespace gd3d.framework {
     enum CullingMask {
         nothing = 0,
         default = 1,
-        ui = 2,
-        editor = 4,
+        transparentFx = 2,
+        IgnoreRaycast = 4,
+        editor = 8,
+        water = 16,
+        ui = 32,
         builtin_0 = 1,
         builtin_1 = 2,
         builtin_2 = 4,
@@ -5279,6 +5285,10 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class StringUtil {
+        static builtinTag_Untagged: string;
+        static builtinTag_Player: string;
+        static builtinTag_EditorOnly: string;
+        static builtinTag_MainCamera: string;
         static COMPONENT_CAMERA: string;
         static COMPONENT_BOXCOLLIDER: string;
         static COMPONENT_LIGHT: string;

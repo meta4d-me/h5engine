@@ -13,8 +13,11 @@ namespace gd3d.framework
         nothing = 0x00000000,
 
         default = 0x00000001,
-        ui = 0x00000002,
-        editor = 0x00000004,
+        transparentFx = 0x00000002,
+        IgnoreRaycast = 0x00000004,
+        editor = 0x00000008,
+        water = 0x00000010,
+        ui = 0x00000020,
 
         builtin_0 = 0x00000001,
         builtin_1 = 0x00000002,
