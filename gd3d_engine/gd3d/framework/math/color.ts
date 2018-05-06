@@ -40,10 +40,11 @@
 
     export function colorClone(src: color, out: color)
     {
-        out.a = src.a;
-        out.r = src.r;
-        out.g = src.g;
-        out.b = src.b;
+        // out.a = src.a;
+        // out.r = src.r;
+        // out.g = src.g;
+        // out.b = src.b;
+        out.rawData.set(src.rawData);
     }
 
     export function colorLerp(srca: color, srcb: color, t: number, out: color)

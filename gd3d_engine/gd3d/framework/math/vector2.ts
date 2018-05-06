@@ -9,8 +9,9 @@
         out.y = a.y + b.y;
     }
     export function vec2Clone(from: vector2, to: vector2) {
-        to.x = from.x;
-        to.y = from.y;
+        // to.x = from.x;
+        // to.y = from.y;
+        to.rawData.set(from.rawData);
     }
     export function vec2Distance(a: vector2, b: vector2): number
     {
@@ -31,10 +32,11 @@
         out.y = from.y * scale.y;
     }
     export function vec4Clone(from: vector4, to: vector4) {
-        to.x = from.x;
-        to.y = from.y;
-        to.z = from.z;
-        to.w = from.w;
+        // to.x = from.x;
+        // to.y = from.y;
+        // to.z = from.z;
+        // to.w = from.w;
+        to.rawData.set(from.rawData);
     }
 
     export function vec2Length(a: vector2): number

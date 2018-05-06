@@ -50,10 +50,11 @@
     }
 
     export function quatClone(src: quaternion, out: quaternion) {
-        out.x = src.x;
-        out.y = src.y;
-        out.z = src.z;
-        out.w = src.w;
+        // out.x = src.x;
+        // out.y = src.y;
+        // out.z = src.z;
+        // out.w = src.w;
+        src.rawData.set(out.rawData);
     }
 
     export function quatEqual(quat:quaternion,quat2:quaternion,threshold = 0.00001){

@@ -14,9 +14,10 @@
 
     export function vec3Clone(from: vector3, to: vector3)
     {
-        to.x = from.x;
-        to.y = from.y;
-        to.z = from.z;
+        // to.x = from.x;
+        // to.y = from.y;
+        // to.z = from.z;
+        to.rawData.set(from.rawData);
     }
     export function vec3ToString(result: string)
     {
