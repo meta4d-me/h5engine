@@ -2,24 +2,114 @@
 
 namespace gd3d.math
 {
+
+
+    export type byte = number;
+    export type short = number;
+    export type int = number;
+    export type ushort = number;
+    export type uint = number;
+    export type float = number;
+    export type double = number;
+
+    var _byte: Uint8Array = new Uint8Array(1);
+    var _int16: Int32Array = new Int32Array(1);
+    var _int32: Int32Array = new Int32Array(1);
+    var _uint16: Int32Array = new Int32Array(1);
+    var _uint32: Int32Array = new Int32Array(1);
+    var _float32: Float32Array = new Float32Array(1);
+    var _float64: Float64Array = new Float64Array(1);
+    export function Byte(v: number | string = 0): byte
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _byte[0] = v;
+        return _byte[0];
+    }
+
+    export function Int16(v: number | string = 0): short
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _int16[0] = v;
+        return _int16[0];
+    }
+
+    export function Int32(v: number | string = 0): int
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _int32[0] = v;
+        return _int32[0];
+    }
+
+
+    export function UInt16(v: number | string = 0): ushort
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _uint16[0] = v;
+        return _uint16[0];
+    }
+
+    export function UInt32(v: number | string = 0): uint
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _uint32[0] = v;
+        return _uint32[0];
+    }
+
+    export function Float(v: number | string = 0): float
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _float32[0] = v;
+        return _float32[0];
+    }
+
+    export function Double(v: number | string = 0): double
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _float64[0] = v;
+        return _float64[0];
+    }
+
+
     /**
      * @private
      */
     @gd3d.reflect.SerializeType
     export class vector2
     {
-        constructor(x: number = 0, y: number = 0)
+        public rawData = new Float32Array(2);
+        constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0)
         {
-            this.x = x;
-            this.y = y;
+            this.rawData[0] = x;
+            this.rawData[1] = y;
         }
         @gd3d.reflect.Field("number")
-        x: number;
+        get x(): float
+        {
+            return this.rawData[0];
+        };
+        set x(x: float)
+        {
+            this.rawData[0] = x;
+        }
         @gd3d.reflect.Field("number")
-        y: number;
+        get y(): float
+        {
+            return this.rawData[1];
+        };
+        set y(y: float)
+        {
+            this.rawData[1] = y;
+        }
         toString(): string
         {
-            return this.x + "," + this.y;
+            return `${this.x},${this.y}`;
         }
     }
 
@@ -29,24 +119,55 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class rect
     {
-        constructor(x: number = 0, y: number = 0, w: number = 0, h: number = 0)
+        public rawData = new Float32Array(4);
+        constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0)
         {
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
+            this.rawData[0] = x;
+            this.rawData[1] = y;
+            this.rawData[2] = w;
+            this.rawData[3] = h;
         }
         @gd3d.reflect.Field("number")
-        x: number;
+        get x(): float
+        {
+            return this.rawData[0];
+        };
+        set x(x: float)
+        {
+            this.rawData[0] = x;
+        }
         @gd3d.reflect.Field("number")
-        y: number;
+        get y(): float
+        {
+            return this.rawData[1];
+        };
+        set y(y: float)
+        {
+            this.rawData[1] = y;
+        }
         @gd3d.reflect.Field("number")
-        w: number;
+        get w(): float
+        {
+            return this.rawData[2];
+        };
+        set w(w: float)
+        {
+            this.rawData[2] = w;
+        }
+
         @gd3d.reflect.Field("number")
-        h: number;
+        get h(): float
+        {
+            return this.rawData[3];
+        };
+        set h(h: float)
+        {
+            this.rawData[3] = h;
+        }
+
         toString(): string
         {
-            return this.x + "," + this.y + "," + this.w + "," + this.h;
+            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
         }
     }
 
@@ -56,21 +177,55 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class border
     {
-        constructor(l: number = 0, t: number = 0, r: number = 0, b: number = 0)
+        public rawData = new Float32Array(4);
+        constructor(l: float = 0, t: float = 0, r: float = 0, b: float = 0)
         {
-            this.l = l;
-            this.t = t;
-            this.r = r;
-            this.b = b;
+            this.rawData[0] = l;
+            this.rawData[1] = t;
+            this.rawData[2] = r;
+            this.rawData[3] = b;
         }
         @gd3d.reflect.Field("number")
-        l: number;
+        get l(): float
+        {
+            return this.rawData[0];
+        };
+        set l(l: float)
+        {
+            this.rawData[0] = l;
+        }
         @gd3d.reflect.Field("number")
-        t: number;
+        get t(): float
+        {
+            return this.rawData[1];
+        };
+        set t(t: float)
+        {
+            this.rawData[1] = t;
+        }
         @gd3d.reflect.Field("number")
-        r: number;
+        get r(): float
+        {
+            return this.rawData[2];
+        };
+        set r(r: float)
+        {
+            this.rawData[2] = r;
+        }
         @gd3d.reflect.Field("number")
-        b: number;
+        get b(): float
+        {
+            return this.rawData[3];
+        };
+        set b(b: float)
+        {
+            this.rawData[3] = b;
+        }
+
+        toString(): string
+        {
+            return `${this.r},${this.t},${this.r},${this.b}`;
+        }
     }
 
     /**
@@ -79,24 +234,53 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class color
     {
-        constructor(r: number = 1, g: number = 1, b: number = 1, a: number = 1)
+        public rawData = new Float32Array(4);
+        constructor(r: float = 1, g: float = 1, b: float = 1, a: float = 1)
         {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-            this.a = a;
+            this.rawData[0] = r;
+            this.rawData[1] = g;
+            this.rawData[2] = b;
+            this.rawData[3] = a;
         }
         @gd3d.reflect.Field("number")
-        r: number;
+        get r(): float
+        {
+            return this.rawData[0];
+        };
+        set r(r: float)
+        {
+            this.rawData[0] = r;
+        }
         @gd3d.reflect.Field("number")
-        g: number;
+        get g(): float
+        {
+            return this.rawData[1];
+        };
+        set g(g: float)
+        {
+            this.rawData[1] = g;
+        }
         @gd3d.reflect.Field("number")
-        b: number;
+        get b(): float
+        {
+            return this.rawData[2];
+        };
+        set b(b: float)
+        {
+            this.rawData[2] = b;
+        }
         @gd3d.reflect.Field("number")
-        a: number;
+        get a(): float
+        {
+            return this.rawData[3];
+        };
+        set a(a: float)
+        {
+            this.rawData[3] = a;
+        }
         toString(): string
         {
-            return this.r + "," + this.g + "," + this.b + "," + this.a;
+            return `${this.r},${this.g},${this.b},${this.a}`;
         }
     }
 
@@ -106,21 +290,44 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector3
     {
-        constructor(x: number = 0, y: number = 0, z: number = 0)
+        public rawData = new Float32Array(3);
+        constructor(x: float = 0, y: float = 0, z: float = 0)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
+            this.rawData[0] = x;
+            this.rawData[1] = y;
+            this.rawData[2] = z;
         }
         @gd3d.reflect.Field("number")
-        x: number;
+        get x(): float
+        {
+            return this.rawData[0];
+        };
+        set x(x: float)
+        {
+            this.rawData[0] = x;
+        }
         @gd3d.reflect.Field("number")
-        y: number;
+        get y(): float
+        {
+            return this.rawData[1];
+        };
+        set y(y: float)
+        {
+            this.rawData[1] = y;
+        }
         @gd3d.reflect.Field("number")
-        z: number;
+        get z(): float
+        {
+            return this.rawData[2];
+        };
+        set z(z: float)
+        {
+            this.rawData[2] = z;
+        }
+
         toString(): string
         {
-            return this.x + "," + this.y + "," + this.z;
+            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]}`;
         }
     }
 
@@ -130,24 +337,53 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector4
     {
-        constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 0)
+        public rawData = new Float32Array(4);
+        constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 0)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
+            this.rawData[0] = x;
+            this.rawData[1] = y;
+            this.rawData[2] = z;
+            this.rawData[3] = w;
         }
         @gd3d.reflect.Field("number")
-        x: number;
+        get x(): float
+        {
+            return this.rawData[0];
+        };
+        set x(x: float)
+        {
+            this.rawData[0] = x;
+        }
         @gd3d.reflect.Field("number")
-        y: number;
+        get y(): float
+        {
+            return this.rawData[1];
+        };
+        set y(y: float)
+        {
+            this.rawData[1] = y;
+        }
         @gd3d.reflect.Field("number")
-        z: number;
+        get z(): float
+        {
+            return this.rawData[2];
+        };
+        set z(z: float)
+        {
+            this.rawData[2] = z;
+        }
         @gd3d.reflect.Field("number")
-        w: number;
+        get w(): float
+        {
+            return this.rawData[3];
+        };
+        set w(w: float)
+        {
+            this.rawData[3] = w;
+        }
         toString(): string
         {
-            return this.x + "," + this.y + "," + this.z + "," + this.w;
+            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
         }
     }
 
@@ -157,27 +393,56 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class quaternion
     {
-        constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 1)
+        public rawData = new Float32Array(4);
+        constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 1)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
+            this.rawData[0] = x;
+            this.rawData[1] = y;
+            this.rawData[2] = z;
+            this.rawData[3] = w;
         }
         @gd3d.reflect.Field("number")
-        x: number;
+        get x(): float
+        {
+            return this.rawData[0];
+        };
+        set x(x: float)
+        {
+            this.rawData[0] = x;
+        }
         @gd3d.reflect.Field("number")
-        y: number;
+        get y(): float
+        {
+            return this.rawData[1];
+        };
+        set y(y: float)
+        {
+            this.rawData[1] = y;
+        }
         @gd3d.reflect.Field("number")
-        z: number;
+        get z(): float
+        {
+            return this.rawData[2];
+        };
+        set z(z: float)
+        {
+            this.rawData[2] = z;
+        }
         @gd3d.reflect.Field("number")
-        w: number;
+        get w(): float
+        {
+            return this.rawData[3];
+        };
+        set w(w: float)
+        {
+            this.rawData[3] = w;
+        }
         toString(): string
         {
-            return this.x + "," + this.y + "," + this.z + "," + this.w;
+            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
         }
     }
-    
+
     /**
      * @private
      */
@@ -236,42 +501,42 @@ namespace gd3d.math
     //     tran: vector3 = new vector3();
     // }
 
-    export function vec4FormJson(json:string,vec4:vector4)
+    export function vec4FormJson(json: string, vec4: vector4)
     {
-        json=json.replace("(","");
-        json=json.replace(")","");    
-        let arr=json.split(",");
-        vec4.x=Number(arr[0]);
-        vec4.y=Number(arr[1]);
-        vec4.z=Number(arr[2]);
-        vec4.w=Number(arr[3]);
+        json = json.replace("(", "");
+        json = json.replace(")", "");
+        let arr = json.split(",");
+        vec4.x = Number(arr[0]);
+        vec4.y = Number(arr[1]);
+        vec4.z = Number(arr[2]);
+        vec4.w = Number(arr[3]);
     }
-    export function vec3FormJson(json:string,vec3:vector3)
+    export function vec3FormJson(json: string, vec3: vector3)
     {
-        json=json.replace("(","");
-        json=json.replace(")","");
-        
-        let arr=json.split(",");
-        vec3.x=Number(arr[0]);
-        vec3.y=Number(arr[1]);
-        vec3.z=Number(arr[2]);
+        json = json.replace("(", "");
+        json = json.replace(")", "");
+
+        let arr = json.split(",");
+        vec3.x = Number(arr[0]);
+        vec3.y = Number(arr[1]);
+        vec3.z = Number(arr[2]);
     }
-    export function vec2FormJson(json:string,vec2:vector2)
+    export function vec2FormJson(json: string, vec2: vector2)
     {
-        json=json.replace("(","");
-        json=json.replace(")","");    
-        let arr=json.split(",");
-        vec2.x=Number(arr[0]);
-        vec2.y=Number(arr[1]);
+        json = json.replace("(", "");
+        json = json.replace(")", "");
+        let arr = json.split(",");
+        vec2.x = Number(arr[0]);
+        vec2.y = Number(arr[1]);
     }
-    export function colorFormJson(json:string,_color:color)
+    export function colorFormJson(json: string, _color: color)
     {
-        json=json.replace("RGBA(","");
-        json=json.replace(")","");  
-        let arr=json.split(",");
-        _color.r=Number(arr[0]);
-        _color.g=Number(arr[1]);
-        _color.b=Number(arr[2]);
-        _color.a=Number(arr[3]);
+        json = json.replace("RGBA(", "");
+        json = json.replace(")", "");
+        let arr = json.split(",");
+        _color.r = Number(arr[0]);
+        _color.g = Number(arr[1]);
+        _color.b = Number(arr[2]);
+        _color.a = Number(arr[3]);
     }
 }

@@ -112,11 +112,11 @@
 
         var sx = src.rawData[0] / scale.x;
         var r1 = Math.acos(sx);
-        var sxs=src.rawData[1] / scale.x;
-        var r2=Math.asin(sxs);
-        if(sxs<0)
+        var sxs = src.rawData[1] / scale.x;
+        var r2 = Math.asin(sxs);
+        if (sxs < 0)
         {
-            r1=2*Math.PI - r1;
+            r1 = 2 * Math.PI - r1;
             //r1=r1+Math.PI;
         }
         rotation.v = r1;
@@ -169,7 +169,7 @@
             result.z = 0.25 * s;
         }
     }
-    export function unitxyzToRotation(xAxis:vector3,yAxis:vector3,zAxis:vector3,out:quaternion)
+    export function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion)
     {
         var m11 = xAxis.x, m12 = yAxis.x, m13 = zAxis.x;
         var m21 = xAxis.y, m22 = yAxis.y, m23 = zAxis.y;
@@ -217,17 +217,19 @@
 
     export function matrixClone(src: matrix, out: matrix)
     {
-        for (var i = 0; i < 16; i++)
-        {
-            out.rawData[i] = src.rawData[i];
-        }
+        // for (var i = 0; i < 16; i++)
+        // {
+        //     out.rawData[i] = src.rawData[i];
+        // }
+        out.rawData.set(src.rawData);
     }
     export function matrix3x2Clone(src: matrix3x2, out: matrix3x2)
     {
-        for (var i = 0; i < 6; i++)
-        {
-            out.rawData[i] = src.rawData[i];
-        }
+        // for (var i = 0; i < 6; i++)
+        // {
+        //     out.rawData[i] = src.rawData[i];
+        // }
+        out.rawData.set(src.rawData);
     }
     export function matrixMakeIdentity(out: matrix)
     {
@@ -407,7 +409,7 @@
         out.rawData[2] = 0.0; out.rawData[3] = 1.0;
         out.rawData[4] = x; out.rawData[5] = y;
     }
-    export function matrixGetScale(src:matrix, scale:vector3):void
+    export function matrixGetScale(src: matrix, scale: vector3): void
     {
         scale.x = src.rawData[0];
         scale.y = src.rawData[5];

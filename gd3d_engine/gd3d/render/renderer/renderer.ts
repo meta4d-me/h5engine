@@ -43,7 +43,7 @@
         mesh: glMesh;
         drawMode: DrawModeEnum;
         vboCount: number = 0;
-        
+
         eboCount: number = 0;
         dataForVbo: Float32Array;
         dataForEbo: Uint16Array;
@@ -77,15 +77,15 @@
 
             if (this.vboCount + vbodata.length > this.dataForVbo.length)
             {
-                var narr = new Float32Array(this.dataForVbo.length * 2);
-                for (var i = 0; i < this.dataForVbo.length; i++)
+                let narr = new Float32Array(this.dataForVbo.length * 2);
+                for (let i = 0, len = this.dataForVbo.length; i < len; ++i)
                 {
                     narr[i] = this.dataForVbo[i];
                 }
                 this.dataForVbo = narr;
                 this.mesh.resetVboSize(webgl, this.dataForVbo.length);
             }
-            for (var i = 0; i < vbodata.length; i++)
+            for (let i = 0,len = vbodata.length; i < len; ++i)
             {
                 this.dataForVbo[this.vboCount + i] = vbodata[i];
             }
@@ -98,15 +98,15 @@
             {
                 if (this.eboCount + ebodata.length > this.dataForEbo.length)
                 {
-                    var narr = new Uint16Array(this.dataForEbo.length * 2);
-                    for (var i = 0; i < this.dataForEbo.length; i++)
+                    let narr = new Uint16Array(this.dataForEbo.length * 2);
+                    for (let i = 0,len = this.dataForEbo.length; i < len; ++i)
                     {
                         narr[i] = this.dataForEbo[i];
                     }
                     this.dataForEbo = narr;
                     this.mesh.resetEboSize(webgl, 0, this.dataForEbo.length);
                 }
-                for (var i = 0; i < ebodata.length; i++)
+                for (let i = 0,len = ebodata.length; i < len; ++i)
                 {
                     this.dataForEbo[this.eboCount + i] = ebodata[i];
                 }
