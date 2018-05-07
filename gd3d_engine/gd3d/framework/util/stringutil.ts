@@ -13,6 +13,42 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 内建TAG “Untagged”
+         * @version egret-gd3d 1.0
+         */
+        static builtinTag_Untagged = "Untagged";
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 内建TAG “Player”
+         * @version egret-gd3d 1.0
+         */
+        static builtinTag_Player = "Player";
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 内建TAG “EditorOnly”
+         * @version egret-gd3d 1.0
+         */
+        static builtinTag_EditorOnly = "EditorOnly";
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 内建TAG “MainCamera”
+         * @version egret-gd3d 1.0
+         */
+        static builtinTag_MainCamera = "MainCamera";
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 获取camera组件的名字
          * @version egret-gd3d 1.0
          */

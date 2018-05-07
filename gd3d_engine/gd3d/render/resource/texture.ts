@@ -198,22 +198,23 @@
         }
         private getExt(name: string)//WEBGL_compressed_texture_pvrtc
         {
-            var browserPrefixes = [
-                "",
-                "MOZ_",
-                "OP_",
-                "WEBKIT_"
-            ];
-            for (var ii = 0; ii < browserPrefixes.length; ++ii)
-            {
-                var prefixedName = browserPrefixes[ii] + name;
-                let ext = this.webgl.getExtension(prefixedName);
-                if (ext)
-                {
-                    return ext;
-                }
-            }
-            return null;
+            // var browserPrefixes = [
+            //     "",
+            //     "MOZ_",
+            //     "OP_",
+            //     "WEBKIT_"
+            // ];            
+            // for (var ii = 0; ii < browserPrefixes.length; ++ii)
+            // {
+            //     var prefixedName = browserPrefixes[ii] + name;
+            //     let ext = this.webgl.getExtension(prefixedName);
+            //     if (ext)
+            //     {
+            //         return ext;
+            //     }
+            // }
+            return this.webgl.getExtension(name)||this.webgl.getExtension(`MOZ_${name}`)||
+            this.webgl.getExtension(`OP_${name}`)||this.webgl.getExtension(`WEBKIT_${name}`)||null;
         }
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void
         {

@@ -75,7 +75,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        cullingMask:number = 0xffffffff; //最大 32个layer（32位） 默认everything = 0xffffffff
+        cullingMask:number = CullingMask.everything; //最大 32个layer（32位） 默认everything = 0xffffffff
         start()
         {
 

@@ -100,6 +100,10 @@ namespace gd3d.framework
         carelist: { [id: string]: transform } = {};
 
         private _playFrameid: number = 0;
+        public get PlayFrameID():number
+        {
+            return this._playFrameid;
+        }
         /**
         * @private
         */

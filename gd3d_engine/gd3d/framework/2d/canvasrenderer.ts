@@ -62,7 +62,7 @@ namespace gd3d.framework
 
             if (this.vboCount + vbodata.length > this.dataForVbo.length)
             {
-                var narr = new Float32Array(this.dataForVbo.length * 2);
+                let narr = new Float32Array(this.dataForVbo.length * 2);
                 for (var i = 0; i < this.dataForVbo.length; i++)
                 {
                     narr[i] = this.dataForVbo[i];
@@ -83,7 +83,7 @@ namespace gd3d.framework
             {
                 if (this.eboCount + ebodata.length > this.dataForEbo.length)
                 {
-                    var narr = new Uint16Array(this.dataForEbo.length * 2);
+                    let narr = new Uint16Array(this.dataForEbo.length * 2);
                     for (var i = 0; i < this.dataForEbo.length; i++)
                     {
                         narr[i] = this.dataForEbo[i];
