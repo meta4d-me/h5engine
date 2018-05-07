@@ -3,130 +3,130 @@ namespace gd3d.io
     /**
      * @private
      */
-    export class binBuffer
-    {
-        public _buf: Uint8Array[]//bufs 循环buf，用完的buf 转着圈用
-        private _seekWritePos: number;//buf位置
-        private _seekWriteIndex: number;//buf 索引
-        private _seekReadPos: number;
-        // private _seekReadIndex: number;//不需要，总是在读零号buf
-        private _bufSize: number;
-        getLength(): number
-        {
-            return (this._seekWriteIndex * this._bufSize + this._seekWritePos) - (this._seekReadPos);
-        }
-        getBufLength(): number
-        {
-            return this._buf.length * this._bufSize;
-        }
+    // export class binBuffer
+    // {
+    //     public _buf: Uint8Array[]//bufs 循环buf，用完的buf 转着圈用
+    //     private _seekWritePos: number;//buf位置
+    //     private _seekWriteIndex: number;//buf 索引
+    //     private _seekReadPos: number;
+    //     // private _seekReadIndex: number;//不需要，总是在读零号buf
+    //     private _bufSize: number;
+    //     getLength(): number
+    //     {
+    //         return (this._seekWriteIndex * this._bufSize + this._seekWritePos) - (this._seekReadPos);
+    //     }
+    //     getBufLength(): number
+    //     {
+    //         return this._buf.length * this._bufSize;
+    //     }
 
-        /**
-         * 剩余有效可读字节
-         */
-        getBytesAvailable(): number
-        {
-            return this.getLength();
-        }
+    //     /**
+    //      * 剩余有效可读字节
+    //      */
+    //     getBytesAvailable(): number
+    //     {
+    //         return this.getLength();
+    //     }
 
-        constructor(bufSize: number = 65536)
-        {
-            //限制buf 最小容量,和最大容量
-            if (bufSize < 1024)
-                bufSize = 1024;
-            if (bufSize > 1024 * 256)
-                bufSize = 1024 * 256;
-            this._bufSize = bufSize;
-            this._buf = [];
-            this._seekWritePos = 0;
-            this._seekWriteIndex = 0;
-            this._buf[0] = new Uint8Array(bufSize);
+    //     constructor(bufSize: number = 65536)
+    //     {
+    //         //限制buf 最小容量,和最大容量
+    //         if (bufSize < 1024)
+    //             bufSize = 1024;
+    //         if (bufSize > 1024 * 256)
+    //             bufSize = 1024 * 256;
+    //         this._bufSize = bufSize;
+    //         this._buf = [];
+    //         this._seekWritePos = 0;
+    //         this._seekWriteIndex = 0;
+    //         this._buf[0] = new Uint8Array(bufSize);
 
-            this._seekReadPos = 0;
-            // this._seekReadIndex = 0;
-        }
-        reset()
-        {
-            this._buf = [];
-            this._seekWritePos = 0;
-            this._seekWriteIndex = 0;
-            this._buf[0] = new Uint8Array(this._bufSize);
-            this._seekReadPos = 0;
-        }
-        dispose()
-        {
-            this._buf.splice(0);
-            this._seekWritePos = 0;
-            this._seekWriteIndex = 0;
-            this._seekReadPos = 0;
-        }
-        read(target: Uint8Array | number[], offset: number = 0, length: number = -1)
-        {
-            if (length < 0) length = target.length;
-            for (var i = offset; i < offset + length; i++)
-            {
-                if (this._seekReadPos >= this._seekWritePos && 0 == this._seekWriteIndex)
-                {
-                    this.reset();
-                    throw new Error("no data to read.");
-                }
-                target[i] = this._buf[0][this._seekReadPos];
+    //         this._seekReadPos = 0;
+    //         // this._seekReadIndex = 0;
+    //     }
+    //     reset()
+    //     {
+    //         this._buf = [];
+    //         this._seekWritePos = 0;
+    //         this._seekWriteIndex = 0;
+    //         this._buf[0] = new Uint8Array(this._bufSize);
+    //         this._seekReadPos = 0;
+    //     }
+    //     dispose()
+    //     {
+    //         this._buf.splice(0);
+    //         this._seekWritePos = 0;
+    //         this._seekWriteIndex = 0;
+    //         this._seekReadPos = 0;
+    //     }
+    //     read(target: Uint8Array | number[], offset: number = 0, length: number = -1)
+    //     {
+    //         if (length < 0) length = target.length;
+    //         for (var i = offset; i < offset + length; i++)
+    //         {
+    //             if (this._seekReadPos >= this._seekWritePos && 0 == this._seekWriteIndex)
+    //             {
+    //                 this.reset();
+    //                 throw new Error("no data to read.");
+    //             }
+    //             target[i] = this._buf[0][this._seekReadPos];
 
-                this._seekReadPos++;
-                if (this._seekReadPos >= this._bufSize)//要滚buf了
-                {
-                    this._seekWriteIndex--;
-                    this._seekReadPos = 0;
-                    var freebuf = this._buf.shift();
-                    this._buf.push(freebuf);
-                }
-            }
-        }
-        write(array: Uint8Array | number[], offset: number = 0, length: number = -1)
-        {
-            if (length < 0) length = array.length;
-            for (var i = offset; i < offset + length; i++)
-            {
-                this._buf[this._seekWriteIndex][this._seekWritePos] = array[i];
-                this._seekWritePos++;
-                if (this._seekWritePos >= this._bufSize)//要加新buf
-                {
-                    this._seekWriteIndex++;
-                    this._seekWritePos = 0;
-                    if (this._buf.length <= this._seekWriteIndex)
-                    {
-                        this._buf.push(new Uint8Array(this._bufSize));
-                    }
-                }
-            }
-        }
-        getBuffer(): Uint8Array
-        {
-            let length = 0;
-            if (this._seekWriteIndex > 0)
-            {
-                length = this._bufSize * (this._seekWriteIndex - 1) + this._seekWritePos;
-            } else
-            {
-                length = this._seekWritePos;
-            }
-            let array = new Uint8Array(length);
-            for (let i = 0; i < this._seekWriteIndex - 1; i++)
-            {
-                array.set(this._buf[i], i * this._bufSize);
-            }
-            for (let i = 0; i < this._seekWritePos; i++)
-            {
-                array[length - this._seekWritePos + i] = this._buf[this._seekWriteIndex][i];
-            }
-            return array;
-        }
+    //             this._seekReadPos++;
+    //             if (this._seekReadPos >= this._bufSize)//要滚buf了
+    //             {
+    //                 this._seekWriteIndex--;
+    //                 this._seekReadPos = 0;
+    //                 var freebuf = this._buf.shift();
+    //                 this._buf.push(freebuf);
+    //             }
+    //         }
+    //     }
+    //     write(array: Uint8Array | number[], offset: number = 0, length: number = -1)
+    //     {
+    //         if (length < 0) length = array.length;
+    //         for (var i = offset; i < offset + length; i++)
+    //         {
+    //             this._buf[this._seekWriteIndex][this._seekWritePos] = array[i];
+    //             this._seekWritePos++;
+    //             if (this._seekWritePos >= this._bufSize)//要加新buf
+    //             {
+    //                 this._seekWriteIndex++;
+    //                 this._seekWritePos = 0;
+    //                 if (this._buf.length <= this._seekWriteIndex)
+    //                 {
+    //                     this._buf.push(new Uint8Array(this._bufSize));
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     getBuffer(): Uint8Array
+    //     {
+    //         let length = 0;
+    //         if (this._seekWriteIndex > 0)
+    //         {
+    //             length = this._bufSize * (this._seekWriteIndex - 1) + this._seekWritePos;
+    //         } else
+    //         {
+    //             length = this._seekWritePos;
+    //         }
+    //         let array = new Uint8Array(length);
+    //         for (let i = 0; i < this._seekWriteIndex - 1; i++)
+    //         {
+    //             array.set(this._buf[i], i * this._bufSize);
+    //         }
+    //         for (let i = 0; i < this._seekWritePos; i++)
+    //         {
+    //             array[length - this._seekWritePos + i] = this._buf[this._seekWriteIndex][i];
+    //         }
+    //         return array;
+    //     }
 
-        getUint8Array(): Uint8Array
-        {
-            return new Uint8Array(this.getBuffer());
-        }
+    //     getUint8Array(): Uint8Array
+    //     {
+    //         return new Uint8Array(this.getBuffer());
+    //     }
 
-    }
+    // }
     export class converter
     {
         static getApplyFun(value: any): any

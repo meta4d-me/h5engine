@@ -314,7 +314,7 @@ namespace gd3d.framework
             {
                 throw "notwrite" + tag;
             }
-            this.reading = false;           
+            this.reading = false;
             setTimeout(() =>
             {
                 this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
@@ -325,7 +325,7 @@ namespace gd3d.framework
         }
         //分片加载完成
         private readFinish(read, data, buf, objVF, webgl)
-        {           
+        {
             var subcount = read.readUInt8();
             data.trisindex = [];
             this.submesh = [];
@@ -363,7 +363,7 @@ namespace gd3d.framework
         }
 
 
-       
+
         /**
          * @public
          * @language zh_CN
@@ -373,28 +373,48 @@ namespace gd3d.framework
          * @param webgl webgl实例
          * @version egret-gd3d 1.0
          */
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext)
+        async Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext)
         {
-            // var vf = 0;
-            var objVF = { vf: 0 };//顶点属性
-            var data: gd3d.render.meshData = new gd3d.render.meshData();
-            var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
-            //meshdata.name = read.readString();
-            //var bound = read.readBound();
 
-            var meshName = read.readStringAnsi();
-            //this.setName(read.readStringAnsi());
-            read.position = read.position + 24;
+            let result = await threading.thread.Instance.Call("meshDataHandle", buf);
+            let objVF = result.objVF;
+            let data = result.meshData;
+            data.originVF = objVF.vf;
+            // this.data = data;
+            this.data = new gd3d.render.meshData();
+            for (let k in data)
+                this.data[k] = data[k];
+            this.submesh = result.subMesh;
 
-            var vcount = read.readUInt32();
+            this.glMesh = new gd3d.render.glMesh();
+            var vertexs = this.data.genVertexDataArray(objVF.vf);
+            var indices = this.data.genIndexDataArray();
 
-            var vec10tpose: number[] = [];
+            this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
+            this.glMesh.uploadVertexData(webgl, vertexs);
+            this.glMesh.addIndex(webgl, indices.length);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
 
-            //分片加载 
-            this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
-            {
-                this.readFinish(read, data, buf, objVF, webgl);
-            });
+            // // var vf = 0;
+            // var objVF = { vf: 0 };//顶点属性
+            // var data: gd3d.render.meshData = new gd3d.render.meshData();
+            // var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
+            // //meshdata.name = read.readString();
+            // //var bound = read.readBound();
+
+            // var meshName = read.readStringAnsi();
+            // //this.setName(read.readStringAnsi());
+            // read.position = read.position + 24;
+
+            // var vcount = read.readUInt32();
+
+            // var vec10tpose: number[] = [];
+
+            // //分片加载 
+            // this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
+            // {
+            //     this.readFinish(read, data, buf, objVF, webgl);
+            // });
         }
 
         /**
@@ -406,10 +426,10 @@ namespace gd3d.framework
          * @param matrix 所在transform的矩阵
          * @version egret-gd3d 1.0
          */
-        intersects(ray: ray, matrix: gd3d.math.matrix,outInfo:pickinfo):boolean
+        intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean
         {
             let ishided = false;
-            if(!this.submesh) return ishided;
+            if (!this.submesh) return ishided;
             let lastDistance = Number.MAX_VALUE;
             for (var i = 0; i < this.submesh.length; i++)
             {
@@ -440,11 +460,11 @@ namespace gd3d.framework
                             gd3d.math.matrixTransformVector3(p2, matrix, t2);
 
                             let tempinfo = math.pool.new_pickInfo();
-                            var bool = ray.intersectsTriangle(t0, t1, t2,tempinfo);
+                            var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
                             if (bool)
                             {
                                 if (tempinfo.distance < 0) continue;
-                                if ( lastDistance > tempinfo.distance)
+                                if (lastDistance > tempinfo.distance)
                                 {
                                     ishided = true;
                                     outInfo.cloneFrom(tempinfo);

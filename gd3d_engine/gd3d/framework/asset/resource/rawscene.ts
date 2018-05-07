@@ -177,8 +177,9 @@ namespace gd3d.framework
 
             //navMesh
             let nav = _json["navmesh"];
-            if(nav != undefined && nav.data != null){
-                this.navMeshJson =  nav.data;
+            if (nav != undefined && nav.data != null)
+            {
+                this.navMeshJson = nav.data;
             }
         }
 
@@ -231,10 +232,12 @@ namespace gd3d.framework
          * @param scene 场景实例
          * @version egret-gd3d 1.0
          */
-        useNavMesh(scene: scene){
+        useNavMesh(scene: scene)
+        {
             let loaded = false;
-            if(this.navMeshJson == null || this.navMeshJson == "") return loaded;
-            NavMeshLoadManager.Instance.loadNavMeshByDate(this.navMeshJson,scene.app,()=>{
+            if (this.navMeshJson == null || this.navMeshJson == "") return loaded;
+            NavMeshLoadManager.Instance.loadNavMeshByDate(this.navMeshJson, scene.app, () =>
+            {
                 loaded = true;
             });
             return loaded;
@@ -259,7 +262,7 @@ namespace gd3d.framework
             }
         }
 
-        private navMeshJson:string;
+        private navMeshJson: string;
         private rootNode: transform;
         private lightmaps: texture[];
     }

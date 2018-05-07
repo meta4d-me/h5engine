@@ -1,0 +1,13 @@
+{
+   
+    "compilerOptions": {
+      "outFile": "../lib/gd3d.thread.js",
+      "module": "system",
+      "experimentalDecorators": true,
+      "sourceMap": false,
+      "sourceRoot": "./src",            
+      "target": "es6",
+      "inlineSourceMap": true,
+      "watch": true
+    }
+  }

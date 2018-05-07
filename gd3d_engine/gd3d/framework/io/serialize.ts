@@ -840,7 +840,7 @@ namespace gd3d.io
             }
             else
             {
-                if(!instanceObj[key])
+                if (!instanceObj[key])
                     return console.warn(`${serializedObj[key].value.comp.type} 填充值失败`);
                 fillReference(serializedObj[key].value, instanceObj[key]);
             }

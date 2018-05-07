@@ -40,8 +40,9 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         //renderLayer: CullingMask = CullingMask.default;
-        get renderLayer() {return this.gameObject.layer;}
-        set renderLayer(layer:number){
+        get renderLayer() { return this.gameObject.layer; }
+        set renderLayer(layer: number)
+        {
             this.gameObject.layer = layer;
         }
         private issetq = false;
@@ -304,7 +305,7 @@ namespace gd3d.framework
          * 射线检测
          * @version egret-gd3d 1.0
          */
-        intersects(ray: ray , outInfo:pickinfo): boolean
+        intersects(ray: ray, outInfo: pickinfo): boolean
         {
             let ishided = false;
             let lastDistance = Number.MAX_VALUE;
@@ -343,7 +344,7 @@ namespace gd3d.framework
                     gd3d.math.matrixTransformVector3(p2, mat22, t2);
 
                     let tempinfo = math.pool.new_pickInfo();
-                    var bool = ray.intersectsTriangle(t0, t1, t2,tempinfo);
+                    var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
                     if (bool)
                     {
                         if (tempinfo.distance < 0) continue;
@@ -411,7 +412,7 @@ namespace gd3d.framework
                         let _cachePlayer = aniplayer.playerCaches[this.player.cacheKey];
                         if (_cachePlayer)
                         {
-                            let baseSize = this._efficient ?  8 : 16;
+                            let baseSize = this._efficient ? 8 : 16;
                             data = new Float32Array(this.maxBoneCount * baseSize);
                             _cachePlayer.fillPoseData(data, this.bones, this._efficient);
                             skinnedMeshRenderer.dataCaches[cacheKey] = data;
@@ -455,12 +456,12 @@ namespace gd3d.framework
                     if (this._efficient)
                     {
                         //this.materials[i].setVector4v("glstate_vec4_bones", this.cacheData);
-                        context.vec4_bones=this.cacheData;
+                        context.vec4_bones = this.cacheData;
                     }
                     else
                     {
                         //this.materials[i].setMatrixv("glstate_matrix_bones", this.cacheData);
-                        context.matrix_bones=this.cacheData;
+                        context.matrix_bones = this.cacheData;
                     }
                     continue;
                 }
@@ -469,54 +470,52 @@ namespace gd3d.framework
                     if (this._efficient)
                     {
                         //this.materials[i].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
-                        context.vec4_bones=this._skeletonMatrixData;
-                        
+                        context.vec4_bones = this._skeletonMatrixData;
+
                     }
                     else
                     {
                         //this.materials[i].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
-                        context.matrix_bones=this._skeletonMatrixData;
-                        
+                        context.matrix_bones = this._skeletonMatrixData;
+
                     }
                 }
             }
-
-            if (this._mesh != null)
+            if (this._mesh && this.mesh.glMesh)
             {
-                if (this._mesh != null)
+                this._mesh.glMesh.bindVboBuffer(context.webgl);
+                if (this._mesh.submesh != null)
                 {
-                    this._mesh.glMesh.bindVboBuffer(context.webgl);
-                    if (this._mesh.submesh != null)
+                    for (var i = 0; i < this._mesh.submesh.length; i++)
                     {
-                        for (var i = 0; i < this._mesh.submesh.length; i++)
-                        {
-                            var sm = this._mesh.submesh[i];
+                        var sm = this._mesh.submesh[i];
 
-                            var mid = this._mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质
-                            var usemat = this.materials[mid];
-                            if (usemat != null)
+                        var mid = this._mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质
+                        var usemat = this.materials[mid];
+                        if (usemat != null)
+                        {
+                            if (this.gameObject.transform.scene.fog)
                             {
-                                if (this.gameObject.transform.scene.fog)
-                                {
-                                    context.fog = this.gameObject.transform.scene.fog;
-                                    usemat.draw(context, this._mesh, sm, "skin_fog");
-                                } else
-                                {
-                                    usemat.draw(context, this._mesh, sm, "skin");
-                                }
+                                context.fog = this.gameObject.transform.scene.fog;
+                                usemat.draw(context, this._mesh, sm, "skin_fog");
+                            } else
+                            {
+                                usemat.draw(context, this._mesh, sm, "skin");
                             }
                         }
                     }
                 }
             }
+
         }
         /**
          * @private
          */
         remove()
         {
-            this.materials.forEach(element=>{
-                if(element) element.unuse();
+            this.materials.forEach(element =>
+            {
+                if (element) element.unuse();
             });
             if (this.mesh)
                 this.mesh.unuse(true);

@@ -14,14 +14,14 @@ namespace gd3d.framework
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadText(url,
-                (txt, err) =>
+                async (txt, err) =>
                 {
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
                     let _scene = asset ? asset : new rawscene(filename);
                     _scene.assetbundle = bundlename;
-                    _scene.Parse(txt, assetMgr);
+                    await _scene.Parse(txt, assetMgr);
 
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
                 },
@@ -31,7 +31,7 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene)
+        async loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene)
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
@@ -40,7 +40,7 @@ namespace gd3d.framework
             let txt = respack[filename];
             let _scene = asset ? asset : new rawscene(filename);
             _scene.assetbundle = bundlename;
-            _scene.Parse(txt, assetMgr);
+            await _scene.Parse(txt, assetMgr);
 
             AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
         }
