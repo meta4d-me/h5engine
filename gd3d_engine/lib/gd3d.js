@@ -20104,7 +20104,7 @@ var gd3d;
         }
         math.quatMagnitude = quatMagnitude;
         function quatClone(src, out) {
-            src.rawData.set(out.rawData);
+            out.rawData.set(src.rawData);
         }
         math.quatClone = quatClone;
         function quatEqual(quat, quat2, threshold = 0.00001) {
