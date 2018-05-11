@@ -54,7 +54,7 @@
         // out.y = src.y;
         // out.z = src.z;
         // out.w = src.w;
-        src.rawData.set(out.rawData);
+        out.rawData.set(src.rawData);
     }
 
     export function quatEqual(quat:quaternion,quat2:quaternion,threshold = 0.00001){
