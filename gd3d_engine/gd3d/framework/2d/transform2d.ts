@@ -1071,7 +1071,7 @@ namespace gd3d.framework
                 var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
                 if (cname == _type)
                 {
-                    comps.push(this.components[i].comp);
+                    comps.push(node.components[i].comp);
                 }
             }
             if (node.children != null)
