@@ -112,6 +112,8 @@
 
         public createAudioChannel(be3DSound: boolean): AudioChannel
         {
+            if(!this.audioContext)
+                return;
             var cc = new AudioChannel();
 
             cc.source = this.audioContext.createBufferSource();

@@ -1,5 +1,5 @@
 /// <reference path="../../lib/Reflect.d.ts"/>
-
+var gd3d_reflect_root = {};
 namespace gd3d.reflect
 {
     /**
@@ -19,9 +19,9 @@ namespace gd3d.reflect
         target["__gdmeta__"]["class"]["typename"] = name;
 
         //注册全局类型标记
-        if (document["__gdmeta__"] == null)
-            document["__gdmeta__"] = {};
-        document["__gdmeta__"][name] = target;
+        if (gd3d_reflect_root["__gdmeta__"] == null)
+            gd3d_reflect_root["__gdmeta__"] = {};
+        gd3d_reflect_root["__gdmeta__"][name] = target;
 
         //fill custom info
         if (target["__gdmeta__"]["class"]["custom"] == null)
@@ -110,14 +110,14 @@ namespace gd3d.reflect
     export function getPrototypes(): { [id: string]: any }
     {
 
-        return document["__gdmeta__"];
+        return gd3d_reflect_root["__gdmeta__"];
     }
     /**
      * @private
      */
     export function getPrototype(name: string)
     {
-        return document["__gdmeta__"][name];
+        return gd3d_reflect_root["__gdmeta__"][name];
     }
     /**
      * @private
