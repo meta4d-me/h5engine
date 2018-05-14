@@ -5,6 +5,7 @@ namespace gd3d.math
 
 
     export type byte = number;
+    export type ubyte = number;
     export type short = number;
     export type int = number;
     export type ushort = number;
@@ -12,13 +13,22 @@ namespace gd3d.math
     export type float = number;
     export type double = number;
 
-    var _byte: Uint8Array = new Uint8Array(1);
-    var _int16: Int32Array = new Int32Array(1);
+    var _ubyte: Uint8Array = new Uint8Array(1);
+    var _byte: Int8Array = new Int8Array(1);
+    var _int16: Int16Array = new Int16Array(1);
     var _int32: Int32Array = new Int32Array(1);
-    var _uint16: Int32Array = new Int32Array(1);
-    var _uint32: Int32Array = new Int32Array(1);
+    var _uint16: Uint16Array = new Uint16Array(1);
+    var _uint32: Uint32Array = new Uint32Array(1);
     var _float32: Float32Array = new Float32Array(1);
     var _float64: Float64Array = new Float64Array(1);
+
+    export function UByte(v: number | string = 0): ubyte
+    {
+        if (typeof (v) == "string")
+            v = Number(v);
+        _ubyte[0] = v;
+        return _ubyte[0];
+    }
     export function Byte(v: number | string = 0): byte
     {
         if (typeof (v) == "string")
