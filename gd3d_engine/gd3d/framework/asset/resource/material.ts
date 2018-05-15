@@ -591,7 +591,7 @@ namespace gd3d.framework
             mat.setShader(this.shader);
             for (var i in this.statedMapUniforms)
             {
-                var _uniformType: render.UniformTypeEnum = this.statedMapUniforms[i].type;
+                var _uniformType: render.UniformTypeEnum = this.defaultMapUniform[i].type;
                 let value=this.statedMapUniforms[i];
                 switch (_uniformType)
                 {
