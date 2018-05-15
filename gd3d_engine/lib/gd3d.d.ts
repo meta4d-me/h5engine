@@ -349,56 +349,80 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.math {
+    type byte = number;
+    type ubyte = number;
+    type short = number;
+    type int = number;
+    type ushort = number;
+    type uint = number;
+    type float = number;
+    type double = number;
+    function UByte(v?: number | string): ubyte;
+    function Byte(v?: number | string): byte;
+    function Int16(v?: number | string): short;
+    function Int32(v?: number | string): int;
+    function UInt16(v?: number | string): ushort;
+    function UInt32(v?: number | string): uint;
+    function Float(v?: number | string): float;
+    function Double(v?: number | string): double;
     class vector2 {
-        constructor(x?: number, y?: number);
-        x: number;
-        y: number;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, w?: float, h?: float);
+        x: float;
+        y: float;
         toString(): string;
     }
     class rect {
-        constructor(x?: number, y?: number, w?: number, h?: number);
-        x: number;
-        y: number;
-        w: number;
-        h: number;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, w?: float, h?: float);
+        x: float;
+        y: float;
+        w: float;
+        h: float;
         toString(): string;
     }
     class border {
-        constructor(l?: number, t?: number, r?: number, b?: number);
-        l: number;
-        t: number;
-        r: number;
-        b: number;
+        rawData: Float32Array;
+        constructor(l?: float, t?: float, r?: float, b?: float);
+        l: float;
+        t: float;
+        r: float;
+        b: float;
+        toString(): string;
     }
     class color {
-        constructor(r?: number, g?: number, b?: number, a?: number);
-        r: number;
-        g: number;
-        b: number;
-        a: number;
+        rawData: Float32Array;
+        constructor(r?: float, g?: float, b?: float, a?: float);
+        r: float;
+        g: float;
+        b: float;
+        a: float;
         toString(): string;
     }
     class vector3 {
-        constructor(x?: number, y?: number, z?: number);
-        x: number;
-        y: number;
-        z: number;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, z?: float);
+        x: float;
+        y: float;
+        z: float;
         toString(): string;
     }
     class vector4 {
-        constructor(x?: number, y?: number, z?: number, w?: number);
-        x: number;
-        y: number;
-        z: number;
-        w: number;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, z?: float, w?: float);
+        x: float;
+        y: float;
+        z: float;
+        w: float;
         toString(): string;
     }
     class quaternion {
-        constructor(x?: number, y?: number, z?: number, w?: number);
-        x: number;
-        y: number;
-        z: number;
-        w: number;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, z?: float, w?: float);
+        x: float;
+        y: float;
+        z: float;
+        w: float;
         toString(): string;
     }
     class matrix {
@@ -1164,7 +1188,7 @@ declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
         newAsset(): mesh;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): Promise<void>;
     }
 }
 declare namespace gd3d.framework {
@@ -1178,7 +1202,7 @@ declare namespace gd3d.framework {
     class AssetFactory_Prefab implements IAssetFactory {
         newAsset(): prefab;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): Promise<void>;
     }
 }
 declare namespace gd3d.framework {
@@ -1192,7 +1216,7 @@ declare namespace gd3d.framework {
     class AssetFactory_Scene implements IAssetFactory {
         newAsset(): rawscene;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): Promise<void>;
     }
 }
 declare namespace gd3d.framework {
@@ -1425,6 +1449,7 @@ declare namespace gd3d.framework {
         private _beDispose;
         onDispose: () => void;
         dispose(): void;
+        destroy(): void;
     }
     class insID {
         constructor();
@@ -1666,7 +1691,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess(read, data, objVF, vcount, vec10tpose, callback);
         private readFinish(read, data, buf, objVF, webgl);
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): void;
+        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): Promise<void>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
     }
@@ -1902,6 +1927,7 @@ declare namespace gd3d.framework {
             [id: string]: transform;
         };
         private _playFrameid;
+        readonly PlayFrameID: number;
         private _playTimer;
         speed: number;
         crossdelta: number;
@@ -3423,37 +3449,19 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.io {
-    class binBuffer {
-        _buf: Uint8Array[];
-        private _seekWritePos;
-        private _seekWriteIndex;
-        private _seekReadPos;
-        private _bufSize;
-        getLength(): number;
-        getBufLength(): number;
-        getBytesAvailable(): number;
-        constructor(bufSize?: number);
-        reset(): void;
-        dispose(): void;
-        read(target: Uint8Array | number[], offset?: number, length?: number): void;
-        write(array: Uint8Array | number[], offset?: number, length?: number): void;
-        getBuffer(): Uint8Array;
-        getUint8Array(): Uint8Array;
-    }
     class converter {
         static getApplyFun(value: any): any;
+        private static dataBuffer;
         private static dataView;
-        static ULongToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
-        static LongToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
+        static ULongToArray(value: number, target?: Uint8Array, offset?: number): Uint8Array | number[];
+        static LongToArray(value: number, t?: Uint8Array | number[], offset?: number): Uint8Array | number[];
         static Float64ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
         static Float32ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
         static Int32ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
         static Int16ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
-        static Int8ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
         static Uint32toArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
         static Uint16ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
-        static Uint8ToArray(value: number, target?: Uint8Array | number[], offset?: number): Uint8Array | number[];
-        static StringToUtf8Array(str: string): Uint8Array | number[];
+        static StringToUtf8Array(str: string): Uint8Array;
         static ArrayToLong(buf: Uint8Array, offset?: number): number;
         static ArrayToULong(buf: Uint8Array, offset?: number): number;
         static ArrayToFloat64(buf: Uint8Array, offset?: number): number;
@@ -3461,12 +3469,15 @@ declare namespace gd3d.io {
         static ArrayToInt32(buf: Uint8Array, offset?: number): number;
         static ArrayToInt16(buf: Uint8Array, offset?: number): number;
         static ArrayToInt8(buf: Uint8Array, offset?: number): number;
-        static ArraytoUint32(buf: Uint8Array, offset?: number): number;
+        static ArrayToUint32(buf: Uint8Array, offset?: number): number;
         static ArrayToUint16(buf: Uint8Array, offset?: number): number;
-        static ArrayToUint8(buf: Uint8Array, offset?: number): number;
         static ArrayToString(buf: Uint8Array, offset?: number): string;
     }
-    class binTool extends binBuffer {
+    class binTool {
+        private buffer;
+        r_offset: number;
+        w_offset: number;
+        constructor(size?: number);
         readSingle(): number;
         readLong(): number;
         readULong(): number;
@@ -3490,6 +3501,8 @@ declare namespace gd3d.io {
         readStringUtf8FixLength(length: number): string;
         readUTFBytes(length: number): string;
         readStringAnsi(): string;
+        getLength(): number;
+        getBytesAvailable(): number;
         readonly length: number;
         writeInt8(num: number): void;
         writeUInt8(num: number): void;
@@ -3505,8 +3518,8 @@ declare namespace gd3d.io {
         writeStringUtf8(str: string): void;
         writeStringUtf8DataOnly(str: string): void;
         writeByte(num: number): void;
-        writeBytes(array: Uint8Array | number[], offset?: number, length?: number): void;
-        writeUint8Array(array: Uint8Array | number[], offset?: number, length?: number): void;
+        writeBytes(array: Uint8Array | number[] | number, offset?: number, length?: number): void;
+        writeUint8Array(array: Uint8Array | number[] | number, offset?: number, length?: number): void;
         writeUnsignedShort(num: number): void;
         writeUnsignedInt(num: number): void;
         writeFloat(num: number): void;
@@ -3514,6 +3527,10 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
+        write(array: Uint8Array | number[] | number, offset?: number, length?: number): void;
+        dispose(): void;
+        getBuffer(): Uint8Array;
+        getUint8Array(): Uint8Array;
     }
 }
 declare namespace gd3d.io {
@@ -5111,6 +5128,16 @@ declare namespace gd3d.framework {
         laststate: taskstate;
         move(delta: number): void;
         cancel(): void;
+    }
+}
+declare namespace gd3d.threading {
+    class thread {
+        static Instance: thread;
+        private worker;
+        private callID;
+        private callMap;
+        constructor();
+        Call(name: string, data: any): Promise<any>;
     }
 }
 declare namespace gd3d.framework {
