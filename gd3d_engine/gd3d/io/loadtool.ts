@@ -11,7 +11,7 @@
      * @param onprocess 加载进度
      * @param loadedFun 正常加载完成后回调
      */
-    function xhrLoad(url: string, fun: (ContentData: any, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null,responseType:XMLHttpRequestResponseType,loadedFun:(req:XMLHttpRequest)=>void){
+    export function xhrLoad(url: string, fun: (ContentData: any, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null,responseType:XMLHttpRequestResponseType,loadedFun:(req:XMLHttpRequest)=>void){
         let req = new XMLHttpRequest();
         let isLoaded = false;
         req.open("GET", url);
@@ -52,7 +52,7 @@
                     dic[url] = 0;
                     fun(null,new Error("load this url fail  ：" + url),true);  //throw error after retry some times
                 }else{
-                    xhrLoad(url,fun,onprocess,responseType,loadedFun);
+                    gd3d.io.xhrLoad(url,fun,onprocess,responseType,loadedFun);
                     dic[url]++;
                 }
             }
@@ -77,7 +77,7 @@
      */
     export function loadText(url: string, fun: (_txt: string, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
     {
-        xhrLoad(url,fun,onprocess,"text",(req)=>{
+        gd3d.io.xhrLoad(url,fun,onprocess,"text",(req)=>{
             fun(req.responseText, null);
         });
     }
@@ -96,7 +96,7 @@
     export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
         //req.responseType = "arraybuffer";//ie 一定要在open之后修改responseType
-        xhrLoad(url,fun,onprocess,"arraybuffer",async (req)=>{
+        gd3d.io.xhrLoad(url,fun,onprocess,"arraybuffer",async (req)=>{
             fun(req.response, null);
         });
     }
@@ -113,7 +113,7 @@
      */
     export function loadBlob(url: string, fun: (_blob: Blob, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        xhrLoad(url,fun,onprocess,"blob",(req)=>{
+        gd3d.io.xhrLoad(url,fun,onprocess,"blob",(req)=>{
             fun(req.response, null);
         });
     }
@@ -130,7 +130,7 @@
      */
     export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error,loadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        xhrLoad(url,fun,onprocess,"blob",(req)=>{
+        gd3d.io.xhrLoad(url,fun,onprocess,"blob",(req)=>{
             var blob = req.response;
             var img = document.createElement("img");
             //img.crossOrigin = "anonymous";

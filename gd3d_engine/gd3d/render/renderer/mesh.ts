@@ -46,9 +46,9 @@
                 drawInfo._ins = new drawInfo();
             return drawInfo._ins;
         }
-        triCount:number;
-        vboCount:number;
-        renderCount:number;
+        triCount:number=0;
+        vboCount:number=0;
+        renderCount:number=0;
     }
     /**
      * @private
