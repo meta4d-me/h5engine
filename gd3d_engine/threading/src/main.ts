@@ -4,6 +4,7 @@ namespace gd3d.threading
     {
         return function (constructor)
         {
+            console.log(`注册多线程处理器:${constructor.name}`);
             handleMaps.set(constructor.name, new constructor());
         };
     }
@@ -12,14 +13,15 @@ var handleMaps = new Map<string, any>();
 
 onmessage = function (ev: MessageEvent)
 {
-    if (handleMaps.has(ev.data.handle))
+    let data: any = ev.data || ev;
+    if (handleMaps.has(data.handle))
     {
-        let result = handleMaps.get(ev.data.handle).handle(ev.data.data);
-        let data = {
+        let result = handleMaps.get(data.handle).handle(data.data);
+        let _data = {
             result: result,
             id: ev.data.id
         };
-        postMessage(data, undefined);
+        postMessage(_data, undefined);
     }
 }
 

@@ -453,7 +453,13 @@ namespace gd3d.math
                 var v = pool.unused_vector2.pop();
                 // v.x = src.x;
                 // v.y = src.y;
-                v.rawData.set(src.rawData);
+                if (src.rawData.length > v.rawData.length)
+                {
+                    src.rawData[0] = v.rawData[0];
+                    src.rawData[1] = v.rawData[1];
+                } else
+                    v.rawData.set(src.rawData);
+
                 return v;
             }
             else

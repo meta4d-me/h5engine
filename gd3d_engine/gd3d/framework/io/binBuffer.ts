@@ -321,7 +321,7 @@ namespace gd3d.io
         static StringToUtf8Array(str: string): Uint8Array 
         {
             var bstr: number[] = [];
-            for (var i = 0,len = str.length; i < len; ++i)
+            for (var i = 0, len = str.length; i < len; ++i)
             {
                 var c = str.charAt(i);
                 var cc = c.charCodeAt(0);
@@ -497,7 +497,9 @@ namespace gd3d.io
                 }
                 else if (cc > 0x80)
                 {
-                    throw new Error("InvalidCharacterError");
+                    //throw new Error("InvalidCharacterError");
+                    console.warn("InvalidCharacterError");
+                    return "";
                 }
                 else
                 {
@@ -1080,7 +1082,15 @@ namespace gd3d.io
                     this.buffer = array;
                 else
                 {
-                    this.buffer.set(array, this.w_offset);
+                    if (this.buffer.length > (array.length + this.w_offset))
+                        this.buffer.set(array, this.w_offset);
+                    else
+                    {
+                        let buf = new Uint8Array((array.length + this.w_offset));
+                        buf.set(this.buffer);
+                        buf.set(array, this.w_offset);
+                        this.buffer = buf;
+                    }
                 }
                 this.w_offset += array.byteLength;
             } else if (array instanceof Array)
@@ -1088,8 +1098,19 @@ namespace gd3d.io
                 if (this.buffer.byteLength < array.length)
                     this.buffer = new Uint8Array(array);
                 else
-                    this.buffer.set(array, this.w_offset);
+                {
 
+                    // this.buffer.set(array, this.w_offset);
+                    if (this.buffer.length > (array.length + this.w_offset))
+                        this.buffer.set(array, this.w_offset);
+                    else
+                    {
+                        let buf = new Uint8Array((array.length + this.w_offset));
+                        buf.set(this.buffer);
+                        buf.set(array, this.w_offset);
+                        this.buffer = buf;
+                    }
+                }
                 this.w_offset += array.length;
             }
             else

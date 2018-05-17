@@ -7,7 +7,7 @@
       "sourceMap": false,
       "sourceRoot": "./src",            
       "target": "es6",
-      "inlineSourceMap": true,
+      
       "watch": true
     }
   }

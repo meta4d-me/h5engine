@@ -29,9 +29,13 @@ namespace gd3d.framework
                 }
                 this.audioChannel = null;
             }
-            this.audioChannel = AudioEx.instance().createAudioChannel(this.be3DSound);
+            
+            if(!(this.audioChannel = AudioEx.instance().createAudioChannel(this.be3DSound)))
+                return;
+            
             this.buffer = buffer;
             this.volume = volume;
+            
             var c = this.audioChannel;
             c.source.loop = this.beLoop;
             c.source.buffer = this.buffer;
@@ -118,7 +122,7 @@ namespace gd3d.framework
         update(delta: number)
         {
             this.curPos = this.gameObject.transform.getWorldTranslate();
-            if (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ)
+            if (this.audioChannel && (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ))
             {
                 this.audioChannel.pannerNode.setPosition(this.curPos.x, this.curPos.y, this.curPos.z);
                 this.lastX = this.curPos.x;

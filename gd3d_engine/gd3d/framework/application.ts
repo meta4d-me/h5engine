@@ -1,6 +1,9 @@
+
+
 //主要的入口
 namespace gd3d.framework
 {
+
     /**
      * @private
      */
@@ -63,7 +66,11 @@ namespace gd3d.framework
          * 绘制区域宽度 像素单位
          * @version egret-gd3d 1.0
          */
-        get width(){return this.webgl.canvas.width;}
+        get width()
+        {
+            return this.webgl.canvas.width;
+            // return this.webgl.canvas.getBoundingClientRect().width;
+        }
         /**
          * @public
          * @language zh_CN
@@ -71,7 +78,11 @@ namespace gd3d.framework
          * 绘制区域高度 像素单位
          * @version egret-gd3d 1.0
          */
-        get height() {return this.webgl.canvas.height;}
+        get height()
+        {
+            return this.webgl.canvas.height;
+            // return this.webgl.canvas.getBoundingClientRect().height;
+        }
         limitFrame: boolean = true;
         notify: INotify;
         private _timeScale: number;
@@ -127,12 +138,12 @@ namespace gd3d.framework
         {
             return this._tar;
         }
-        screenAdaptiveType:string;
+        screenAdaptiveType: string;
         private _fixHeight: number;
         private _fixWidth: number;
         // private beWidthSetted: boolean = false;
         // private beHeightSetted: boolean = false;
-        private canvasFixedType:CanvasFixedType = CanvasFixedType.Free;
+        private canvasFixedType: CanvasFixedType = CanvasFixedType.Free;
         private _canvasClientWidth: number;
         private _canvasClientHeight: number;
         set canvasFixHeight(val: number)
@@ -151,9 +162,9 @@ namespace gd3d.framework
         {
             return this._canvasClientHeight;
         }
-        
-        get scaleFromPandding(){return this._scaleFromPandding;}
-        private _scaleFromPandding:number = 1;
+
+        get scaleFromPandding() { return this._scaleFromPandding; }
+        private _scaleFromPandding: number = 1;
         /**
          * @public
          * @language zh_CN
@@ -162,7 +173,7 @@ namespace gd3d.framework
          * @param div 绘制区域的dom
          * @version egret-gd3d 1.0
          */
-        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200 ,webglDebug = false)
+        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
         {
             console.log("version: " + this.version + "  build: " + this.build);
             // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
@@ -177,7 +188,8 @@ namespace gd3d.framework
             //     meta = metas[0];
             // meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=1, minimum-scale=0.5, maximum-scale=0.5";
 
-            if(div == null){
+            if (div == null)
+            {
                 console.error("root div does Null at application start ");
                 return;
             }
@@ -186,8 +198,7 @@ namespace gd3d.framework
             div.style.width = "100%";
             div.style.height = "100%";
 
-            sceneMgr.app = this;
-            this._timeScale = 1;
+
             this.outcontainer = div;
             var rotateDiv = document.createElement("div");
             rotateDiv.className = "full";
@@ -200,7 +211,8 @@ namespace gd3d.framework
             div.appendChild(rotateDiv);
 
             var canvas = document.createElement("canvas");
-            if(canvas == null){
+            if (canvas == null)
+            {
                 alert("Failed to create canvas at the application.start()");
                 throw Error("Failed to create canvas at the application.start()");
             }
@@ -218,41 +230,52 @@ namespace gd3d.framework
 
             // this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
             //     <WebGLRenderingContext>canvas.getContext("experimental-webgl");
+            this.startForCanvas(canvas, type, val, webglDebug);
+        }
 
+        startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
+        {
+
+            this._timeScale = 1;
+            sceneMgr.app = this;
             let tempWebGlUtil = new WebGLUtils();
             this.webgl = tempWebGlUtil.setupWebGL(canvas);
-           // console.error(" i am ---tempWebGlUtil-" + webglDebug);
-            if(this.webgl == null){
-                    alert("Failed to get webgl at the application.start()");
+            // console.error(" i am ---tempWebGlUtil-" + webglDebug);
+            if (this.webgl == null)
+            {
+                alert("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
             this.canvasFixedType = type;
-            switch (type)
+            if (this.outcontainer)
             {
-                case CanvasFixedType.Free:
-                    this.screenAdaptiveType="宽高度自适应(宽高都不固定,真实像素宽高)";
-                    this.webgl.canvas.width = this.webgl.canvas.clientWidth;
-                    this.webgl.canvas.height = this.webgl.canvas.clientHeight;
-                    this._scaleFromPandding = 1;
-                break;
-                case CanvasFixedType.FixedWidthType:
-                    this.canvasFixWidth = val;
-                    this.screenAdaptiveType="宽度自适应(宽度固定,一般横屏使用)";
-                    this.webgl.canvas.width = this._fixWidth;
-                    this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                    break;
-                case CanvasFixedType.FixedHeightType:
-                    this.canvasFixHeight = val;
-                    this.screenAdaptiveType="高度自适应(高度固定，一般竖屏使用)";
-                    this.webgl.canvas.height = this._fixHeight;
-                    this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                    this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                    break;
+                switch (type)
+                {
+                    case CanvasFixedType.Free:
+                        this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                        this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = 1;
+                        break;
+                    case CanvasFixedType.FixedWidthType:
+                        this.canvasFixWidth = val;
+                        this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+                        this.webgl.canvas.width = this._fixWidth;
+                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                        break;
+                    case CanvasFixedType.FixedHeightType:
+                        this.canvasFixHeight = val;
+                        this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+                        this.webgl.canvas.height = this._fixHeight;
+                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                        break;
+                }
             }
-            
-            this._canvasClientWidth = this.webgl.canvas.clientWidth;
-            this._canvasClientHeight = this.webgl.canvas.clientHeight;
+
+            this._canvasClientWidth = canvas.width; //this.webgl.canvas.clientWidth;
+            this._canvasClientHeight = canvas.height;//this.webgl.canvas.clientHeight;
             gd3d.render.webglkit.initConst(this.webgl);
             this.initRender();
             this.initAssetMgr();
@@ -260,7 +283,7 @@ namespace gd3d.framework
 
             this.initScene();
 
-            
+
             this.beginTimer = this.lastTimer = this.pretimer = Date.now() / 1000;
             this.loop();
             gd3d.io.referenceInfo.regDefaultType();
@@ -272,11 +295,12 @@ namespace gd3d.framework
             }
 
             //debug
-            if (webglDebug) {
+            if (webglDebug)
+            {
                 let tempWebGLDebugUtils = new WebGLDebugUtils();
                 this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
                 console.error(" i am ---webglDebug-");
-              }
+            }
         }
 
         markNotify(trans: any, type: NotifyType)
@@ -396,12 +420,16 @@ namespace gd3d.framework
             }
         }
 
-        private updateScreenAsp(){
+        private updateScreenAsp()
+        {
+            if (!this.outcontainer)
+                return;
             if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight)
             {
                 this._canvasClientWidth = this.webgl.canvas.clientWidth;
                 this._canvasClientHeight = this.webgl.canvas.clientHeight;
-                if(this.canvasFixedType == CanvasFixedType.Free){
+                if (this.canvasFixedType == CanvasFixedType.Free)
+                {
                     this.webgl.canvas.width = this.webgl.canvas.clientWidth;
                     this.webgl.canvas.height = this.webgl.canvas.clientHeight;
                     this._scaleFromPandding = 1;
@@ -527,9 +555,10 @@ namespace gd3d.framework
                 sceneMgr.scene = this._scene;
             }
         }
-        private  initRender(): any {
+        private initRender(): any
+        {
             uniformSetter.initAutouniform();
-            render.shaderUniform.webgl=this.webgl;
+            render.shaderUniform.webgl = this.webgl;
             render.shaderUniform.initApplyUnifmFunc();
         }
         /**
@@ -772,21 +801,21 @@ namespace gd3d.framework
         public OffOrientationUpdate = false;  //关闭更新
         private updateOrientationMode()
         {
-            if(this.OffOrientationUpdate)return;
+            if (this.OffOrientationUpdate || !this.outcontainer) return;
             let screenRect = this.outcontainer.getBoundingClientRect();
 
             this.shouldRotate = false;
             if (this.orientation != OrientationMode.AUTO)
             {
                 this.shouldRotate =
-                (this.orientation == OrientationMode.LANDSCAPE || this.orientation == OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width ||
-                this.orientation == OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
+                    (this.orientation == OrientationMode.LANDSCAPE || this.orientation == OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width ||
+                    this.orientation == OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
             }
 
             let screenWidth = this.shouldRotate ? screenRect.height : screenRect.width;
             let screenHeight = this.shouldRotate ? screenRect.width : screenRect.height;
 
-            if(this.lastWidth == screenWidth && this.lastHeight == screenHeight) return; //不再重复
+            if (this.lastWidth == screenWidth && this.lastHeight == screenHeight) return; //不再重复
 
             this.lastWidth = screenWidth;
             this.lastHeight = screenHeight;
@@ -796,36 +825,38 @@ namespace gd3d.framework
             // if (this.height !== screenHeight) {
             //     this.height = screenHeight;
             // }
-
-            this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
-            this.container.style.width = screenWidth + "px";
-            this.container.style.height = screenHeight + "px";
-
-
-            let rotation = 0;
-            if (this.shouldRotate)
+            if (this.container)
             {
-                if (this.orientation == OrientationMode.LANDSCAPE)
-                {//
-                    rotation = 90;
-                    this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
-                    this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+                this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
+                this.container.style.width = screenWidth + "px";
+                this.container.style.height = screenHeight + "px";
+
+
+                let rotation = 0;
+                if (this.shouldRotate)
+                {
+                    if (this.orientation == OrientationMode.LANDSCAPE)
+                    {//
+                        rotation = 90;
+                        this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
+                        this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+                    }
+                    else
+                    {
+                        rotation = -90;
+                        this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
+                        this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+                    }
                 }
                 else
                 {
-                    rotation = -90;
-                    this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
-                    this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+                    this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
+                    this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
                 }
-            }
-            else
-            {
-                this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
-                this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
-            }
 
-            let transform = `rotate(${rotation}deg)`;
-            this.container.style[getPrefixStyleName("transform")] = transform;
+                let transform = `rotate(${rotation}deg)`;
+                this.container.style[getPrefixStyleName("transform")] = transform;
+            }
         }
     }
     /**
