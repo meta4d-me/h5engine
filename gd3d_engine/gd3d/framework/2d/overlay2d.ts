@@ -238,18 +238,18 @@ namespace gd3d.framework
             this.canvas.render(context, assetmgr);
         }
 
+        private viewPixelrect = new math.rect();
         /**
          * @private
          */
         update(delta: number)
         {
-            let vp = new math.rect();
-            this.camera.calcViewPortPixel(this.app, vp);
+            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
             let rect = this.camera.viewport;
             let real_x = this.inputmgr.point.x - rect.x * this.app.width ;
             let real_y = this.inputmgr.point.y - rect.y * this.app.height;
-            let sx = (real_x / vp.w) * 2 - 1;
-            let sy = (real_y / vp.h) * -2 + 1;
+            let sx = (real_x / this.viewPixelrect.w) * 2 - 1;
+            let sy = (real_y / this.viewPixelrect.h) * -2 + 1;
             //用屏幕空间坐标系丢给canvas
             
             if(this.canvas["pointEvent"].type == PointEventEnum.PointDown){
