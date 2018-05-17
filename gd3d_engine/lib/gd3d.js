@@ -1233,6 +1233,8 @@ var gd3d;
                 this.canvas.parentTrans = this.gameObject.transform;
                 this.inputmgr = this.gameObject.getScene().app.getInputMgr();
             }
+            onPlay() {
+            }
             addChild(node) {
                 this.canvas.addChild(node);
             }
@@ -8739,6 +8741,8 @@ var gd3d;
                 this.filter = this.gameObject.getComponent("meshFilter");
                 this.build();
             }
+            onPlay() {
+            }
             update(delta) {
                 if (this.obb) {
                     this.obb.update(this.matrix);
@@ -8872,6 +8876,8 @@ var gd3d;
                     this.buildMesh();
                 }
             }
+            onPlay() {
+            }
             update(delta) {
             }
             get colliderVisible() {
@@ -8949,6 +8955,8 @@ var gd3d;
         let meshFilter = class meshFilter {
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
             }
             get mesh() {
@@ -9016,6 +9024,8 @@ var gd3d;
                 if (this.lightmapIndex == -2) {
                     this.useGlobalLightMap = false;
                 }
+            }
+            onPlay() {
             }
             refreshLayerAndQue() {
                 if (this.materials == null || this.materials.length == 0) {
@@ -9157,6 +9167,8 @@ var gd3d;
                 }
             }
             start() {
+            }
+            onPlay() {
             }
             getMatByIndex(index) {
                 let data = this.mesh.data;
@@ -11405,6 +11417,8 @@ var gd3d;
                     this.init();
                 }
             }
+            onPlay() {
+            }
             update(delta) {
                 if (this._playClip == null)
                     return;
@@ -11762,6 +11776,8 @@ var gd3d;
             }
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
             }
             remove() {
@@ -11788,6 +11804,8 @@ var gd3d;
             }
             start() {
                 this.listener = framework.AudioEx.instance().audioContext.listener;
+            }
+            onPlay() {
             }
             update(delta) {
                 this.curPos = this.gameObject.transform.getWorldTranslate();
@@ -11863,6 +11881,8 @@ var gd3d;
             start() {
                 this.audioChannel = framework.AudioEx.instance().createAudioChannel(this.be3DSound);
             }
+            onPlay() {
+            }
             update(delta) {
                 this.curPos = this.gameObject.transform.getWorldTranslate();
                 if (this.audioChannel && (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ)) {
@@ -11894,6 +11914,8 @@ var gd3d;
             }
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
                 if (!this.beActive || this.target == null)
                     return;
@@ -11922,6 +11944,8 @@ var gd3d;
     (function (framework) {
         class behaviour {
             start() {
+            }
+            onPlay() {
             }
             update(delta) {
             }
@@ -12053,6 +12077,8 @@ var gd3d;
             start() {
                 this.app = this.gameObject.transform.scene.app;
                 this.scene = this.app.getScene();
+            }
+            onPlay() {
             }
             update(delta) {
                 if (this._init)
@@ -12215,6 +12241,8 @@ var gd3d;
             markDirty() {
             }
             start() {
+            }
+            onPlay() {
             }
             update(delta) {
                 for (var i = 0; i < this.overlays.length; i++) {
@@ -12636,6 +12664,8 @@ var gd3d;
             start() {
                 this.styleToMode();
             }
+            onPlay() {
+            }
             update(delta) {
                 if (!this.isCanvasinit)
                     this.canvasInit();
@@ -12735,6 +12765,8 @@ var gd3d;
             }
             start() {
                 this.init();
+            }
+            onPlay() {
             }
             update(delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
@@ -13238,6 +13270,8 @@ var gd3d;
             start() {
                 this.init();
             }
+            onPlay() {
+            }
             update(delta) {
                 if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)
                     return;
@@ -13415,6 +13449,8 @@ var gd3d;
             }
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
             }
             remove() {
@@ -13489,6 +13525,8 @@ var gd3d;
                 this.oncomplete = oncomplete;
             }
             start() {
+            }
+            onPlay() {
             }
             update(delta) {
                 if (!this.isactived || !this.datasafe)
@@ -13570,6 +13608,8 @@ var gd3d;
             ;
             start() {
                 this.init();
+            }
+            onPlay() {
             }
             update(delta) {
                 let clip = this.nowClip;
@@ -13810,6 +13850,8 @@ var gd3d;
             }
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
             }
             remove() {
@@ -13896,6 +13938,8 @@ var gd3d;
             start() {
                 this.filter = this.gameObject.getComponent("meshFilter");
                 this.build();
+            }
+            onPlay() {
             }
             update(delta) {
                 if (this.spherestruct) {
@@ -14007,6 +14051,8 @@ var gd3d;
             }
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
                 if (!this.active)
                     return;
@@ -14074,6 +14120,8 @@ var gd3d;
                 this.app = this.gameObject.getScene().app;
                 this.webgl = this.app.webgl;
                 this.initmesh();
+            }
+            onPlay() {
             }
             update(delta) {
                 if (!this.active)
@@ -14383,6 +14431,8 @@ var gd3d;
                     this.targetPath = this.nodes;
                 }
             }
+            onPlay() {
+            }
             update(delta) {
                 var _time = this.app.getTotalTime();
                 this.refreshTrailNode(_time);
@@ -14605,6 +14655,8 @@ var gd3d;
                 this.app = this.gameObject.transform.scene.app;
                 this.scene = this.app.getScene();
             }
+            onPlay() {
+            }
             update(delta) {
                 if (this._init)
                     return;
@@ -14689,6 +14741,8 @@ var gd3d;
                 this.gameObject.layer = layer;
             }
             start() {
+            }
+            onPlay() {
             }
             get f14eff() {
                 return this._f14eff;
@@ -26293,11 +26347,13 @@ var gd3d;
             getName() {
                 return this.transform.name;
             }
-            init() {
+            init(onPlay = false) {
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
                         this.componentsInit[i].comp.start();
                         this.componentsInit[i].init = true;
+                        if (onPlay)
+                            this.componentsInit[i].comp.onPlay();
                     }
                     this.componentsInit.length = 0;
                 }
@@ -26680,6 +26736,8 @@ var gd3d;
                 this.renderLights = [];
                 this.lightmaps = [];
                 this.RealCameraNumber = 0;
+                this.hasPlayed = false;
+                this.playDirty = false;
                 this.app = app;
                 this.webgl = app.webgl;
                 this.assetmgr = app.getAssetMgr();
@@ -26831,7 +26889,11 @@ var gd3d;
             }
             updateScene(node, delta) {
                 if (this.app.bePlay) {
+                    if (!this.hasPlayed)
+                        this.playDirty = true;
                     this.objupdate(node, delta);
+                    this.playDirty = false;
+                    this.hasPlayed = true;
                 }
                 else {
                     this.objupdateInEditor(node, delta);
@@ -26856,7 +26918,7 @@ var gd3d;
             objupdate(node, delta) {
                 if (node.hasComponent == false && node.hasComponentChild == false)
                     return;
-                node.gameObject.init();
+                node.gameObject.init(this.playDirty);
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
                     this.collectCameraAndLight(node);

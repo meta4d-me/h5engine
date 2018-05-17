@@ -23,6 +23,12 @@ namespace gd3d.framework
         start() {
             
         }
+
+        onPlay()
+        {
+
+        }
+
         private moveDis:math.vector3=new math.vector3();
         update(delta: number) {
             if(!this.active) return;

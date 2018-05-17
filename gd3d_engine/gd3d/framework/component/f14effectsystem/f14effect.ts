@@ -16,6 +16,12 @@ namespace gd3d.framework
         start() {
 
         }
+
+        onPlay()
+        {
+
+        }
+
         gameObject: gameObject;
 
         

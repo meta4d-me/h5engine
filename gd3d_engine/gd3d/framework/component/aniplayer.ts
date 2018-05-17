@@ -200,6 +200,12 @@ namespace gd3d.framework
                 this.init();
             }
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number)
         {
             if (this._playClip == null)

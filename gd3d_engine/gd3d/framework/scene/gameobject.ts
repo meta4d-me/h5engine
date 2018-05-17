@@ -27,6 +27,7 @@ namespace gd3d.framework
      */
     export interface INodeComponent
     {
+        onPlay();
         start();
         update(delta: number);
         gameObject: gameObject;
@@ -257,7 +258,7 @@ namespace gd3d.framework
          * 初始化 主要是组件的初始化
          * @version egret-gd3d 1.0
          */
-        init()
+        init(onPlay = false)
         {
             if(this.componentsInit.length>0)
             {
@@ -265,6 +266,8 @@ namespace gd3d.framework
                 {
                     this.componentsInit[i].comp.start();
                     this.componentsInit[i].init = true;
+                    if(onPlay)
+                        this.componentsInit[i].comp.onPlay();
                 }
                 this.componentsInit.length=0;
             }

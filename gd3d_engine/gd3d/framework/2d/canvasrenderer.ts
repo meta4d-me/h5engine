@@ -218,6 +218,11 @@ namespace gd3d.framework
             this.inputmgr = this.gameObject.getScene().app.getInputMgr();
         }
 
+        onPlay()
+        {
+
+        }
+        
         /**
          * @public
          * @language zh_CN

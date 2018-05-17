@@ -116,6 +116,13 @@ namespace gd3d.framework
                 this.useGlobalLightMap=false;
             }
         }
+
+        onPlay()
+        {
+
+        }
+
+
         // material(mat:material|material[])
         // {
         //     if(mat==null) this.materials.length=0;

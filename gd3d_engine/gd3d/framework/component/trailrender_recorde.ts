@@ -139,6 +139,12 @@ namespace gd3d.framework
                 this.targetPath = this.nodes;
             }
         }
+
+        onPlay()
+        {
+
+        }
+
         private app: application;
         private webgl: WebGLRenderingContext;
         update(delta: number)

@@ -80,6 +80,12 @@ namespace gd3d.framework
         {
 
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number)
         {
 

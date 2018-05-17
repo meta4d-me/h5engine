@@ -173,6 +173,12 @@ namespace gd3d.framework
             this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
             this.build();
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number)
         {
             if (this.spherestruct)

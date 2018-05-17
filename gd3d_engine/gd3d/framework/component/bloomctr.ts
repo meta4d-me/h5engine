@@ -192,6 +192,12 @@ namespace gd3d.framework
             this.scene = this.app.getScene();
     
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number)
         {
             if (this._init) return;

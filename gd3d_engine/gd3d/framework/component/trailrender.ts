@@ -66,6 +66,12 @@ namespace gd3d.framework
             this.webgl = this.app.webgl;
             this.initmesh();
         }
+
+        onPlay()
+        {
+
+        }
+
         private app: application;
         private webgl: WebGLRenderingContext;
 

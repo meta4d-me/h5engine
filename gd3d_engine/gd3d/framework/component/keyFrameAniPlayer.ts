@@ -30,6 +30,11 @@ namespace gd3d.framework {
             this.init();
         }
 
+        onPlay()
+        {
+
+        }
+
         update(delta: number) {
             let clip = this.nowClip;
             if (!clip) return;

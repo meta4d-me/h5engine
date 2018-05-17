@@ -280,6 +280,7 @@ declare namespace gd3d.framework {
         inputmgr: inputMgr;
         cameraTouch: camera;
         start(): void;
+        onPlay(): void;
         addChild(node: transform2D): void;
         removeChild(node: transform2D): void;
         getChildren(): transform2D[];
@@ -1478,6 +1479,7 @@ declare namespace gd3d.framework {
         getBound(): obb;
         readonly matrix: gd3d.math.matrix;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
@@ -1496,6 +1498,7 @@ declare namespace gd3d.framework {
         mesh: mesh;
         getBound(): mesh;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
@@ -1510,6 +1513,7 @@ declare namespace gd3d.framework {
     class meshFilter implements INodeComponent {
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private _mesh;
         mesh: mesh;
@@ -1533,6 +1537,7 @@ declare namespace gd3d.framework {
         queue: number;
         filter: meshFilter;
         start(): void;
+        onPlay(): void;
         private refreshLayerAndQue();
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
@@ -1568,6 +1573,7 @@ declare namespace gd3d.framework {
         private cacheData;
         private _efficient;
         start(): void;
+        onPlay(): void;
         getMatByIndex(index: number): math.matrix;
         intersects(ray: ray, outInfo: pickinfo): boolean;
         update(delta: number): void;
@@ -1948,6 +1954,7 @@ declare namespace gd3d.framework {
         readonly cacheKey: string | number;
         private init();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         playByIndex(animIndex: number, speed?: number, beRevert?: boolean): void;
         playCrossByIndex(animIndex: number, crosstimer: number, speed?: number, beRevert?: boolean): void;
@@ -1984,6 +1991,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -1993,6 +2001,7 @@ declare namespace gd3d.framework {
     class AudioListener implements INodeComponent {
         private listener;
         start(): void;
+        onPlay(): void;
         private lastX;
         private lastY;
         private lastZ;
@@ -2015,6 +2024,7 @@ declare namespace gd3d.framework {
         volume: number;
         isPlaying(): boolean;
         start(): void;
+        onPlay(): void;
         private lastX;
         private lastY;
         private lastZ;
@@ -2027,6 +2037,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class BeBillboard implements INodeComponent {
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
@@ -2041,6 +2052,7 @@ declare namespace gd3d.framework {
     class behaviour implements INodeComponent {
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2066,6 +2078,7 @@ declare namespace gd3d.framework {
         private _init;
         private init();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2110,6 +2123,7 @@ declare namespace gd3d.framework {
         private _contextIdx;
         markDirty(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         clearOption_Color: boolean;
         clearOption_Depth: boolean;
@@ -2166,6 +2180,7 @@ declare namespace gd3d.framework {
         renderMode: canvasRenderMode;
         private styleToMode();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2207,6 +2222,7 @@ declare namespace gd3d.framework {
         private _data;
         readonly totalFrameCount: number;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private _update(delta);
         private mergeLerpAttribData(realUseCurFrameData, curFrameData);
@@ -2260,6 +2276,7 @@ declare namespace gd3d.framework {
         private _data;
         readonly totalFrameCount: number;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private _update(delta);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
@@ -2287,6 +2304,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2312,6 +2330,7 @@ declare namespace gd3d.framework {
         private oncomplete;
         setpathasset(pathasset: pathasset, speed?: number, oncomplete?: () => void): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private adjustDir;
         private followmove(delta);
@@ -2329,6 +2348,7 @@ declare namespace gd3d.framework {
         private pathPropertyMap;
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private displayByTime(clip, playTime);
         private calcValueByTime(curve, playTime);
@@ -2363,6 +2383,7 @@ declare namespace gd3d.framework {
         color: math.color;
         cullingMask: number;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2390,6 +2411,7 @@ declare namespace gd3d.framework {
         getBound(): spherestruct;
         readonly matrix: gd3d.math.matrix;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
@@ -2418,6 +2440,7 @@ declare namespace gd3d.framework {
         private eulerSpeed;
         private active;
         start(): void;
+        onPlay(): void;
         private moveDis;
         update(delta: number): void;
         gameObject: gameObject;
@@ -2442,6 +2465,7 @@ declare namespace gd3d.framework {
         private active;
         private reInit;
         start(): void;
+        onPlay(): void;
         private app;
         private webgl;
         private camerapositon;
@@ -2497,6 +2521,7 @@ declare namespace gd3d.framework {
         private activeMaxpointlimit;
         setMaxpointcontroll(value?: boolean): void;
         start(): void;
+        onPlay(): void;
         private app;
         private webgl;
         update(delta: number): void;
@@ -2532,6 +2557,7 @@ declare namespace gd3d.framework {
         private _init;
         private init();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2543,6 +2569,7 @@ declare namespace gd3d.framework {
         renderLayer: number;
         queue: number;
         start(): void;
+        onPlay(): void;
         gameObject: gameObject;
         private fps;
         data: F14EffectData;
@@ -4950,6 +4977,7 @@ declare namespace gd3d.framework {
         HideAndDontSave = 61,
     }
     interface INodeComponent {
+        onPlay(): any;
         start(): any;
         update(delta: number): any;
         gameObject: gameObject;
@@ -4978,7 +5006,7 @@ declare namespace gd3d.framework {
         readonly visibleInScene: boolean;
         visible: boolean;
         getName(): string;
-        init(): void;
+        init(onPlay?: boolean): void;
         update(delta: number): void;
         addComponentDirect(comp: INodeComponent): INodeComponent;
         getComponent(type: string): INodeComponent;
@@ -5085,6 +5113,8 @@ declare namespace gd3d.framework {
         private RealCameraNumber;
         private _renderCamera(camindex);
         private sortOverLays(lays);
+        private hasPlayed;
+        private playDirty;
         private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);

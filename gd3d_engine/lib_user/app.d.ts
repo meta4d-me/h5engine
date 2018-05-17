@@ -1110,6 +1110,7 @@ declare class CameraShock implements gd3d.framework.INodeComponent {
     private life;
     private ticker;
     start(): void;
+    onPlay(): void;
     play(strength?: number, life?: number, fade?: boolean, shockType?: ShockType): void;
     update(delta: number): void;
     remove(): void;
