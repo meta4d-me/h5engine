@@ -44,6 +44,7 @@ declare namespace gd3d.framework {
         readonly scaleFromPandding: number;
         private _scaleFromPandding;
         start(div: HTMLDivElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
+        startForCanvas(canvas: HTMLCanvasElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
         checkFilter(trans: any): boolean;
@@ -162,6 +163,7 @@ declare namespace Stats {
         private end();
     }
 }
+declare var gd3d_reflect_root: {};
 declare namespace gd3d.reflect {
     function getPrototypes(): {
         [id: string]: any;
@@ -5132,7 +5134,9 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.threading {
     class thread {
-        static Instance: thread;
+        static workerInstance: Worker;
+        private static instance;
+        static readonly Instance: thread;
         private worker;
         private callID;
         private callMap;
@@ -5572,6 +5576,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.io {
+    function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;

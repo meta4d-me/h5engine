@@ -60,8 +60,12 @@ var gd3d;
                 this.lastHeight = 0;
                 this.OffOrientationUpdate = false;
             }
-            get width() { return this.webgl.canvas.width; }
-            get height() { return this.webgl.canvas.height; }
+            get width() {
+                return this.webgl.canvas.width;
+            }
+            get height() {
+                return this.webgl.canvas.height;
+            }
             set timeScale(val) {
                 this._timeScale = val;
             }
@@ -100,8 +104,6 @@ var gd3d;
                 div.style.position = "absolute";
                 div.style.width = "100%";
                 div.style.height = "100%";
-                framework.sceneMgr.app = this;
-                this._timeScale = 1;
                 this.outcontainer = div;
                 var rotateDiv = document.createElement("div");
                 rotateDiv.className = "full";
@@ -123,6 +125,11 @@ var gd3d;
                 canvas.style.backgroundColor = "#1e1e1e";
                 canvas.setAttribute("tabindex", "1");
                 rotateDiv.appendChild(canvas);
+                this.startForCanvas(canvas, type, val, webglDebug);
+            }
+            startForCanvas(canvas, type = CanvasFixedType.Free, val = 1200, webglDebug = false) {
+                this._timeScale = 1;
+                framework.sceneMgr.app = this;
                 let tempWebGlUtil = new framework.WebGLUtils();
                 this.webgl = tempWebGlUtil.setupWebGL(canvas);
                 if (this.webgl == null) {
@@ -130,30 +137,32 @@ var gd3d;
                     throw Error("Failed to get webgl at the application.start()");
                 }
                 this.canvasFixedType = type;
-                switch (type) {
-                    case CanvasFixedType.Free:
-                        this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
-                        this.webgl.canvas.width = this.webgl.canvas.clientWidth;
-                        this.webgl.canvas.height = this.webgl.canvas.clientHeight;
-                        this._scaleFromPandding = 1;
-                        break;
-                    case CanvasFixedType.FixedWidthType:
-                        this.canvasFixWidth = val;
-                        this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
-                        this.webgl.canvas.width = this._fixWidth;
-                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                        break;
-                    case CanvasFixedType.FixedHeightType:
-                        this.canvasFixHeight = val;
-                        this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
-                        this.webgl.canvas.height = this._fixHeight;
-                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
-                        break;
+                if (this.outcontainer) {
+                    switch (type) {
+                        case CanvasFixedType.Free:
+                            this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+                            this.webgl.canvas.width = this.webgl.canvas.clientWidth;
+                            this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                            this._scaleFromPandding = 1;
+                            break;
+                        case CanvasFixedType.FixedWidthType:
+                            this.canvasFixWidth = val;
+                            this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+                            this.webgl.canvas.width = this._fixWidth;
+                            this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
+                            this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                            break;
+                        case CanvasFixedType.FixedHeightType:
+                            this.canvasFixHeight = val;
+                            this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+                            this.webgl.canvas.height = this._fixHeight;
+                            this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
+                            this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                            break;
+                    }
                 }
-                this._canvasClientWidth = this.webgl.canvas.clientWidth;
-                this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                this._canvasClientWidth = canvas.width;
+                this._canvasClientHeight = canvas.height;
                 gd3d.render.webglkit.initConst(this.webgl);
                 this.initRender();
                 this.initAssetMgr();
@@ -240,6 +249,8 @@ var gd3d;
                 }
             }
             updateScreenAsp() {
+                if (!this.outcontainer)
+                    return;
                 if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
                     this._canvasClientWidth = this.webgl.canvas.clientWidth;
                     this._canvasClientHeight = this.webgl.canvas.clientHeight;
@@ -417,7 +428,7 @@ var gd3d;
                 this._editorCodeNew.push(program);
             }
             updateOrientationMode() {
-                if (this.OffOrientationUpdate)
+                if (this.OffOrientationUpdate || !this.outcontainer)
                     return;
                 let screenRect = this.outcontainer.getBoundingClientRect();
                 this.shouldRotate = false;
@@ -432,28 +443,30 @@ var gd3d;
                     return;
                 this.lastWidth = screenWidth;
                 this.lastHeight = screenHeight;
-                this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
-                this.container.style.width = screenWidth + "px";
-                this.container.style.height = screenHeight + "px";
-                let rotation = 0;
-                if (this.shouldRotate) {
-                    if (this.orientation == framework.OrientationMode.LANDSCAPE) {
-                        rotation = 90;
-                        this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
-                        this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+                if (this.container) {
+                    this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
+                    this.container.style.width = screenWidth + "px";
+                    this.container.style.height = screenHeight + "px";
+                    let rotation = 0;
+                    if (this.shouldRotate) {
+                        if (this.orientation == framework.OrientationMode.LANDSCAPE) {
+                            rotation = 90;
+                            this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
+                            this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+                        }
+                        else {
+                            rotation = -90;
+                            this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
+                            this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+                        }
                     }
                     else {
-                        rotation = -90;
-                        this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
-                        this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+                        this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
+                        this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
                     }
+                    let transform = `rotate(${rotation}deg)`;
+                    this.container.style[getPrefixStyleName("transform")] = transform;
                 }
-                else {
-                    this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
-                    this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
-                }
-                let transform = `rotate(${rotation}deg)`;
-                this.container.style[getPrefixStyleName("transform")] = transform;
             }
         }
         framework.application = application;
@@ -675,6 +688,7 @@ var Stats;
         }
     }
 })(Stats || (Stats = {}));
+var gd3d_reflect_root = {};
 var gd3d;
 (function (gd3d) {
     var reflect;
@@ -691,9 +705,9 @@ var gd3d;
                 name = fs.substring(9, i);
             }
             target["__gdmeta__"]["class"]["typename"] = name;
-            if (document["__gdmeta__"] == null)
-                document["__gdmeta__"] = {};
-            document["__gdmeta__"][name] = target;
+            if (gd3d_reflect_root["__gdmeta__"] == null)
+                gd3d_reflect_root["__gdmeta__"] = {};
+            gd3d_reflect_root["__gdmeta__"][name] = target;
             if (target["__gdmeta__"]["class"]["custom"] == null)
                 target["__gdmeta__"]["class"]["custom"] = {};
             if (customInfo != null) {
@@ -738,11 +752,11 @@ var gd3d;
             }
         }
         function getPrototypes() {
-            return document["__gdmeta__"];
+            return gd3d_reflect_root["__gdmeta__"];
         }
         reflect.getPrototypes = getPrototypes;
         function getPrototype(name) {
-            return document["__gdmeta__"][name];
+            return gd3d_reflect_root["__gdmeta__"][name];
         }
         reflect.getPrototype = getPrototype;
         function createInstance(prototype, matchTag) {
@@ -9941,7 +9955,7 @@ var gd3d;
                 let mat = new material_1(this.getName());
                 mat.setShader(this.shader);
                 for (var i in this.statedMapUniforms) {
-                    var _uniformType = this.statedMapUniforms[i].type;
+                    var _uniformType = this.defaultMapUniform[i].type;
                     let value = this.statedMapUniforms[i];
                     switch (_uniformType) {
                         case gd3d.render.UniformTypeEnum.Texture:
@@ -11264,6 +11278,8 @@ var gd3d;
                 return this.audioContext ? true : false;
             }
             createAudioChannel(be3DSound) {
+                if (!this.audioContext)
+                    return;
                 var cc = new AudioChannel();
                 cc.source = this.audioContext.createBufferSource();
                 cc.gainNode = this.audioContext.createGain();
@@ -11811,7 +11827,8 @@ var gd3d;
                     }
                     this.audioChannel = null;
                 }
-                this.audioChannel = framework.AudioEx.instance().createAudioChannel(this.be3DSound);
+                if (!(this.audioChannel = framework.AudioEx.instance().createAudioChannel(this.be3DSound)))
+                    return;
                 this.buffer = buffer;
                 this.volume = volume;
                 var c = this.audioChannel;
@@ -11848,7 +11865,7 @@ var gd3d;
             }
             update(delta) {
                 this.curPos = this.gameObject.transform.getWorldTranslate();
-                if (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ) {
+                if (this.audioChannel && (this.curPos.x != this.lastX || this.curPos.y != this.lastY || this.curPos.z != this.lastZ)) {
                     this.audioChannel.pannerNode.setPosition(this.curPos.x, this.curPos.y, this.curPos.z);
                     this.lastX = this.curPos.x;
                     this.lastY = this.curPos.y;
@@ -17361,7 +17378,8 @@ var gd3d;
                         ret.push(String.fromCharCode(ct));
                     }
                     else if (cc > 0x80) {
-                        throw new Error("InvalidCharacterError");
+                        console.warn("InvalidCharacterError");
+                        return "";
                     }
                     else {
                         ret.push(String.fromCharCode(buf[i]));
@@ -17575,15 +17593,30 @@ var gd3d;
                     if (this.buffer.byteLength < array.length)
                         this.buffer = array;
                     else {
-                        this.buffer.set(array, this.w_offset);
+                        if (this.buffer.length > (array.length + this.w_offset))
+                            this.buffer.set(array, this.w_offset);
+                        else {
+                            let buf = new Uint8Array((array.length + this.w_offset));
+                            buf.set(this.buffer);
+                            buf.set(array, this.w_offset);
+                            this.buffer = buf;
+                        }
                     }
                     this.w_offset += array.byteLength;
                 }
                 else if (array instanceof Array) {
                     if (this.buffer.byteLength < array.length)
                         this.buffer = new Uint8Array(array);
-                    else
-                        this.buffer.set(array, this.w_offset);
+                    else {
+                        if (this.buffer.length > (array.length + this.w_offset))
+                            this.buffer.set(array, this.w_offset);
+                        else {
+                            let buf = new Uint8Array((array.length + this.w_offset));
+                            buf.set(this.buffer);
+                            buf.set(array, this.w_offset);
+                            this.buffer = buf;
+                        }
+                    }
                     this.w_offset += array.length;
                 }
                 else {
@@ -18712,10 +18745,10 @@ var gd3d;
                 }
                 else {
                     let _newInstance;
-                    let componentType = document["__gdmeta__"][type];
+                    let componentType = gd3d_reflect_root["__gdmeta__"][type];
                     if (!componentType) {
                         console.warn(instanceObj);
-                        return console.warn(`无法找到组件:${document["__gdmeta__"][type]}`);
+                        return console.warn(`无法找到组件:${gd3d_reflect_root["__gdmeta__"][type]}`);
                     }
                     if (type == "gameObject" && key == "gameObject" && gd3d.reflect.getClassName(instanceObj) == "transform") {
                         _newInstance = instanceObj.gameObject;
@@ -27140,9 +27173,12 @@ var gd3d;
     (function (threading) {
         class thread {
             constructor() {
-                this.worker = new Worker("lib/gd3d.thread.js");
                 this.callID = 0;
                 this.callMap = new Map();
+                if (!thread.workerInstance)
+                    this.worker = new Worker("lib/gd3d.thread.js");
+                else
+                    this.worker = thread.workerInstance;
                 this.worker.onmessage = (e) => {
                     if (e.data && this.callMap.has(e.data.id))
                         this.callMap.get(e.data.id).resolve(e.data.result);
@@ -27150,6 +27186,11 @@ var gd3d;
                 this.worker.onerror = (e) => {
                     console.error(e);
                 };
+            }
+            static get Instance() {
+                if (!thread.instance)
+                    thread.instance = new thread();
+                return thread.instance;
             }
             Call(name, data) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -27164,7 +27205,6 @@ var gd3d;
                 });
             }
         }
-        thread.Instance = new thread();
         threading.thread = thread;
     })(threading = gd3d.threading || (gd3d.threading = {}));
 })(gd3d || (gd3d = {}));
@@ -28736,7 +28776,7 @@ var gd3d;
                         fun(null, new Error("load this url fail  ：" + url), true);
                     }
                     else {
-                        xhrLoad(url, fun, onprocess, responseType, loadedFun);
+                        gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
                         dic[url]++;
                     }
                 }
@@ -28748,26 +28788,27 @@ var gd3d;
                 fun(null, err);
             }
         }
+        io.xhrLoad = xhrLoad;
         function loadText(url, fun, onprocess = null) {
-            xhrLoad(url, fun, onprocess, "text", (req) => {
+            gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) => {
                 fun(req.responseText, null);
             });
         }
         io.loadText = loadText;
         function loadArrayBuffer(url, fun, onprocess = null) {
-            xhrLoad(url, fun, onprocess, "arraybuffer", (req) => __awaiter(this, void 0, void 0, function* () {
+            gd3d.io.xhrLoad(url, fun, onprocess, "arraybuffer", (req) => __awaiter(this, void 0, void 0, function* () {
                 fun(req.response, null);
             }));
         }
         io.loadArrayBuffer = loadArrayBuffer;
         function loadBlob(url, fun, onprocess = null) {
-            xhrLoad(url, fun, onprocess, "blob", (req) => {
+            gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) => {
                 fun(req.response, null);
             });
         }
         io.loadBlob = loadBlob;
         function loadImg(url, fun, onprocess = null) {
-            xhrLoad(url, fun, onprocess, "blob", (req) => {
+            gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) => {
                 var blob = req.response;
                 var img = document.createElement("img");
                 img.onload = function (e) {
@@ -28990,7 +29031,12 @@ var gd3d;
             static clone_vector2(src) {
                 if (pool.unused_vector2.length > 0) {
                     var v = pool.unused_vector2.pop();
-                    v.rawData.set(src.rawData);
+                    if (src.rawData.length > v.rawData.length) {
+                        src.rawData[0] = v.rawData[0];
+                        src.rawData[1] = v.rawData[1];
+                    }
+                    else
+                        v.rawData.set(src.rawData);
                     return v;
                 }
                 else
@@ -29444,6 +29490,11 @@ var gd3d;
             MeshTypeEnum[MeshTypeEnum["Stream"] = 2] = "Stream";
         })(MeshTypeEnum = render.MeshTypeEnum || (render.MeshTypeEnum = {}));
         class drawInfo {
+            constructor() {
+                this.triCount = 0;
+                this.vboCount = 0;
+                this.renderCount = 0;
+            }
             static get ins() {
                 if (drawInfo._ins == null)
                     drawInfo._ins = new drawInfo();
