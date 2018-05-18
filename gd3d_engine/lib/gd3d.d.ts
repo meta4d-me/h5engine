@@ -163,57 +163,59 @@ declare namespace Stats {
         private end();
     }
 }
-declare var gd3d_reflect_root: {};
-declare namespace gd3d.reflect {
-    function getPrototypes(): {
-        [id: string]: any;
-    };
-    function getPrototype(name: string): any;
-    function createInstance(prototype: any, matchTag: {
-        [id: string]: string;
-    }): any;
-    function getClassName(prototype: any): any;
-    function getClassTag(prototype: any, tag: string): any;
-    function getMeta(prototype: any): any;
-    function attr_Class(constructorObj: any): void;
-    function attr_Func(customInfo?: {
-        [id: string]: string;
-    }): (target: any, propertyKey: string, value: any) => void;
-    function attr_Field(customInfo?: {
-        [id: string]: string;
-    }): (target: Object, propertyKey: string) => void;
-    function userCode(constructorObj: any): void;
-    function editorCode(constructorObj: any): void;
-    function selfClone(constructorObj: any): void;
-    function nodeComponent(constructorObj: any): void;
-    function nodeComponentInspector(constructorObj: any): void;
-    function nodeRender(constructorObj: any): void;
-    function nodeCamera(constructorObj: any): void;
-    function nodeLight(constructorObj: any): void;
-    function nodeBoxCollider(constructorObj: any): void;
-    function nodeBoxCollider2d(constructorObj: any): void;
-    function nodeSphereCollider(constructorObj: any): void;
-    function nodeEffectBatcher(constructorObj: any): void;
-    function nodeMeshCollider(constructorObj: any): void;
-    function nodeCanvasRendererCollider(constructorObj: any): void;
-    function node2DComponent(constructorObj: any): void;
-    function pluginMenuItem(constructorObj: any): void;
-    function pluginWindow(constructorObj: any): void;
-    function pluginExt(constructorObj: any): void;
-    function compValue(integer?: boolean, defvalue?: number, min?: number, max?: number): (target: Object, propertyKey: string) => void;
-    function compCall(customInfo?: {
-        [id: string]: string;
-    }): (target: any, propertyKey: string, value: any) => void;
-    function SerializeType(constructorObj: any): void;
-    function Field(valueType: string, defaultValue?: any, enumRealType?: string): (target: Object, propertyKey: string) => void;
-    function UIComment(comment: string): (target: Object, propertyKey: string) => void;
-    enum FieldUIStyle {
-        None = 0,
-        RangeFloat = 1,
-        MultiLineString = 2,
-        Enum = 3,
+declare namespace gd3d {
+    var gd3d_reflect_root: {};
+    namespace reflect {
+        function getPrototypes(): {
+            [id: string]: any;
+        };
+        function getPrototype(name: string): any;
+        function createInstance(prototype: any, matchTag: {
+            [id: string]: string;
+        }): any;
+        function getClassName(prototype: any): any;
+        function getClassTag(prototype: any, tag: string): any;
+        function getMeta(prototype: any): any;
+        function attr_Class(constructorObj: any): void;
+        function attr_Func(customInfo?: {
+            [id: string]: string;
+        }): (target: any, propertyKey: string, value: any) => void;
+        function attr_Field(customInfo?: {
+            [id: string]: string;
+        }): (target: Object, propertyKey: string) => void;
+        function userCode(constructorObj: any): void;
+        function editorCode(constructorObj: any): void;
+        function selfClone(constructorObj: any): void;
+        function nodeComponent(constructorObj: any): void;
+        function nodeComponentInspector(constructorObj: any): void;
+        function nodeRender(constructorObj: any): void;
+        function nodeCamera(constructorObj: any): void;
+        function nodeLight(constructorObj: any): void;
+        function nodeBoxCollider(constructorObj: any): void;
+        function nodeBoxCollider2d(constructorObj: any): void;
+        function nodeSphereCollider(constructorObj: any): void;
+        function nodeEffectBatcher(constructorObj: any): void;
+        function nodeMeshCollider(constructorObj: any): void;
+        function nodeCanvasRendererCollider(constructorObj: any): void;
+        function node2DComponent(constructorObj: any): void;
+        function pluginMenuItem(constructorObj: any): void;
+        function pluginWindow(constructorObj: any): void;
+        function pluginExt(constructorObj: any): void;
+        function compValue(integer?: boolean, defvalue?: number, min?: number, max?: number): (target: Object, propertyKey: string) => void;
+        function compCall(customInfo?: {
+            [id: string]: string;
+        }): (target: any, propertyKey: string, value: any) => void;
+        function SerializeType(constructorObj: any): void;
+        function Field(valueType: string, defaultValue?: any, enumRealType?: string): (target: Object, propertyKey: string) => void;
+        function UIComment(comment: string): (target: Object, propertyKey: string) => void;
+        enum FieldUIStyle {
+            None = 0,
+            RangeFloat = 1,
+            MultiLineString = 2,
+            Enum = 3,
+        }
+        function UIStyle(style: string, min?: number, max?: number, defvalue?: any): (target: Object, propertyKey: string) => void;
     }
-    function UIStyle(style: string, min?: number, max?: number, defvalue?: any): (target: Object, propertyKey: string) => void;
 }
 declare namespace gd3d.framework {
     class canvas {
@@ -345,6 +347,7 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        private viewPixelrect;
         update(delta: number): void;
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
         private dopick2d(ModelPos, tran, tolerance?);

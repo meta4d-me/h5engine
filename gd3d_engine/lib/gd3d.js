@@ -688,10 +688,10 @@ var Stats;
         }
     }
 })(Stats || (Stats = {}));
-var gd3d_reflect_root = {};
 var gd3d;
 (function (gd3d) {
-    var reflect;
+    gd3d.gd3d_reflect_root = {};
+    let reflect;
     (function (reflect) {
         function regType(target, customInfo) {
             if (target["__gdmeta__"] == undefined)
@@ -705,9 +705,9 @@ var gd3d;
                 name = fs.substring(9, i);
             }
             target["__gdmeta__"]["class"]["typename"] = name;
-            if (gd3d_reflect_root["__gdmeta__"] == null)
-                gd3d_reflect_root["__gdmeta__"] = {};
-            gd3d_reflect_root["__gdmeta__"][name] = target;
+            if (gd3d.gd3d_reflect_root["__gdmeta__"] == null)
+                gd3d.gd3d_reflect_root["__gdmeta__"] = {};
+            gd3d.gd3d_reflect_root["__gdmeta__"][name] = target;
             if (target["__gdmeta__"]["class"]["custom"] == null)
                 target["__gdmeta__"]["class"]["custom"] = {};
             if (customInfo != null) {
@@ -752,11 +752,11 @@ var gd3d;
             }
         }
         function getPrototypes() {
-            return gd3d_reflect_root["__gdmeta__"];
+            return gd3d.gd3d_reflect_root["__gdmeta__"];
         }
         reflect.getPrototypes = getPrototypes;
         function getPrototype(name) {
-            return gd3d_reflect_root["__gdmeta__"][name];
+            return gd3d.gd3d_reflect_root["__gdmeta__"][name];
         }
         reflect.getPrototype = getPrototype;
         function createInstance(prototype, matchTag) {
@@ -1424,6 +1424,7 @@ var gd3d;
                 this.matchReference_height = 600;
                 this.scaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
                 this.sortOrder = 0;
+                this.viewPixelrect = new gd3d.math.rect();
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
@@ -1480,13 +1481,12 @@ var gd3d;
                 this.canvas.render(context, assetmgr);
             }
             update(delta) {
-                let vp = new gd3d.math.rect();
-                this.camera.calcViewPortPixel(this.app, vp);
+                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
                 let rect = this.camera.viewport;
                 let real_x = this.inputmgr.point.x - rect.x * this.app.width;
                 let real_y = this.inputmgr.point.y - rect.y * this.app.height;
-                let sx = (real_x / vp.w) * 2 - 1;
-                let sy = (real_y / vp.h) * -2 + 1;
+                let sx = (real_x / this.viewPixelrect.w) * 2 - 1;
+                let sy = (real_y / this.viewPixelrect.h) * -2 + 1;
                 if (this.canvas["pointEvent"].type == framework.PointEventEnum.PointDown) {
                     this.canvas;
                 }
@@ -18799,10 +18799,10 @@ var gd3d;
                 }
                 else {
                     let _newInstance;
-                    let componentType = gd3d_reflect_root["__gdmeta__"][type];
+                    let componentType = gd3d.gd3d_reflect_root["__gdmeta__"][type];
                     if (!componentType) {
                         console.warn(instanceObj);
-                        return console.warn(`无法找到组件:${gd3d_reflect_root["__gdmeta__"][type]}`);
+                        return console.warn(`无法找到组件:${gd3d.gd3d_reflect_root["__gdmeta__"][type]}`);
                     }
                     if (type == "gameObject" && key == "gameObject" && gd3d.reflect.getClassName(instanceObj) == "transform") {
                         _newInstance = instanceObj.gameObject;
