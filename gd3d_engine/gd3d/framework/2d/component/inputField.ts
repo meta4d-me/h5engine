@@ -200,6 +200,10 @@ namespace gd3d.framework
 
             this.inputElmLayout();
         }
+
+        onPlay(){
+
+        }
         
          /**
          * @private

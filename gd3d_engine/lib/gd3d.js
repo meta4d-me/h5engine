@@ -954,6 +954,8 @@ var gd3d;
         let canvas = class canvas {
             constructor() {
                 this.is2dUI = true;
+                this.hasPlayed = false;
+                this.playDirty = false;
                 this.pointDown = false;
                 this.pointSelect = null;
                 this.pointEvent = new framework.PointEvent();
@@ -1030,7 +1032,24 @@ var gd3d;
                         this.pointY = this.pointEvent.y;
                     }
                 }
-                this.rootNode.update(delta);
+                if (this.scene.app.bePlay) {
+                    if (!this.hasPlayed)
+                        this.playDirty = true;
+                    this.objupdate(this.rootNode, delta);
+                    this.playDirty = false;
+                    this.hasPlayed = true;
+                }
+            }
+            objupdate(node, delta) {
+                node.init(this.playDirty);
+                if (node.components.length > 0) {
+                    node.update(delta);
+                }
+                if (node.children != null) {
+                    for (let i = 0; i < node.children.length; i++) {
+                        this.objupdate(node.children[i], delta);
+                    }
+                }
             }
             render(context, assetmgr) {
                 this.context = context;
@@ -2184,6 +2203,7 @@ var gd3d;
                 this.worldTranslate = new gd3d.math.vector2(0, 0);
                 this.worldScale = new gd3d.math.vector2(1, 1);
                 this.components = [];
+                this.componentsInit = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
@@ -2486,22 +2506,21 @@ var gd3d;
                 this.removeAllComponents();
             }
             update(delta) {
-                if (framework.sceneMgr.app.bePlay) {
-                    if (this.components != null) {
-                        for (var i = 0; i < this.components.length; i++) {
-                            if (this.components[i].init == false) {
-                                this.components[i].comp.start();
-                                this.components[i].init = true;
-                            }
-                            if (framework.sceneMgr.app.bePlay && !framework.sceneMgr.app.bePause)
-                                this.components[i].comp.update(delta);
-                        }
+                if (this.components.length == 0)
+                    return;
+                for (let i = 0; i < this.components.length; i++) {
+                    this.components[i].comp.update(delta);
+                }
+            }
+            init(onPlay = false) {
+                if (this.componentsInit.length > 0) {
+                    for (var i = 0; i < this.componentsInit.length; i++) {
+                        this.componentsInit[i].comp.start();
+                        this.componentsInit[i].init = true;
+                        if (onPlay)
+                            this.componentsInit[i].comp.onPlay();
                     }
-                    if (this.children != null) {
-                        for (var i = 0; i < this.children.length; i++) {
-                            this.children[i].update(delta);
-                        }
-                    }
+                    this.componentsInit.length = 0;
                 }
             }
             addComponent(type) {
@@ -2526,6 +2545,7 @@ var gd3d;
                     this.components = [];
                 let _comp = new C2DComponent(comp, false);
                 this.components.push(_comp);
+                this.componentsInit.push(_comp);
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1") {
                     if (this.renderer == null) {
                         this.renderer = comp;
@@ -2874,6 +2894,8 @@ var gd3d;
         class behaviour2d {
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
             }
             onPointEvent(canvas, ev, oncap) {
@@ -2917,6 +2939,8 @@ var gd3d;
             }
             start() {
                 this.build();
+            }
+            onPlay() {
             }
             update(delta) {
                 if (this._obb) {
@@ -3031,6 +3055,8 @@ var gd3d;
             updateTran() {
             }
             start() {
+            }
+            onPlay() {
             }
             update(delta) {
             }
@@ -3316,6 +3342,8 @@ var gd3d;
                 }
             }
             start() {
+            }
+            onPlay() {
             }
             update(delta) {
             }
@@ -4232,6 +4260,8 @@ var gd3d;
                 };
                 this.inputElmLayout();
             }
+            onPlay() {
+            }
             inputElmLayout() {
                 if (this.inputElement == null)
                     return;
@@ -4708,6 +4738,8 @@ var gd3d;
             }
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
             }
             remove() {
@@ -4904,6 +4936,8 @@ var gd3d;
             }
             start() {
             }
+            onPlay() {
+            }
             update(delta) {
             }
             remove() {
@@ -4953,6 +4987,8 @@ var gd3d;
                 this._content = content;
             }
             start() {
+            }
+            onPlay() {
             }
             update(delta) {
             }
@@ -5057,6 +5093,8 @@ var gd3d;
                 this.canbeClick = true;
             }
             start() {
+            }
+            onPlay() {
             }
             update(delta) {
             }

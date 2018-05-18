@@ -230,6 +230,8 @@ declare namespace gd3d.framework {
         getChildren(): transform2D[];
         getChildCount(): number;
         getChild(index: number): transform2D;
+        private hasPlayed;
+        private playDirty;
         private pointDown;
         private pointSelect;
         private pointEvent;
@@ -238,6 +240,7 @@ declare namespace gd3d.framework {
         private lastWidth;
         private lastHeight;
         update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
+        private objupdate(node, delta);
         private lastMat;
         afterRender: Function;
         beforeRender: Function;
@@ -456,6 +459,7 @@ declare namespace gd3d.framework {
         V_CENTER = 32,
     }
     interface I2DComponent {
+        onPlay(): any;
         start(): any;
         update(delta: number): any;
         transform: transform2D;
@@ -535,7 +539,9 @@ declare namespace gd3d.framework {
         renderer: IRectRenderer;
         collider: ICollider2d;
         components: C2DComponent[];
+        private componentsInit;
         update(delta: number): void;
+        init(onPlay?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
         removeComponent(comp: I2DComponent): void;
@@ -578,6 +584,7 @@ declare namespace gd3d.framework {
     class behaviour2d implements I2DComponent {
         transform: transform2D;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
@@ -592,6 +599,7 @@ declare namespace gd3d.framework {
         private build();
         refreshTofullOver(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
@@ -623,6 +631,7 @@ declare namespace gd3d.framework {
         render(canvas: canvas): void;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
@@ -661,6 +670,7 @@ declare namespace gd3d.framework {
         render(canvas: canvas): void;
         private _cacheMaskV4;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
@@ -710,6 +720,7 @@ declare namespace gd3d.framework {
         render(canvas: canvas): void;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         private inputElmLayout();
         private textRefresh();
         private filterContentText();
@@ -763,6 +774,7 @@ declare namespace gd3d.framework {
         private _cacheMaskV4;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
@@ -792,6 +804,7 @@ declare namespace gd3d.framework {
         private _cacheMaskV4;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
@@ -805,6 +818,7 @@ declare namespace gd3d.framework {
         horizontal: boolean;
         vertical: boolean;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
@@ -820,6 +834,7 @@ declare namespace gd3d.framework {
     class uirect implements I2DComponent {
         canbeClick: boolean;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;

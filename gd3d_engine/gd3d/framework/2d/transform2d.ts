@@ -1,8 +1,7 @@
 /// <reference path="../../io/reflect.ts" />
 /// <reference path="../../render/struct.ts" />
 
-namespace gd3d.framework
-{
+namespace gd3d.framework {
     /**
      * @public
      * @language zh_CN
@@ -10,8 +9,7 @@ namespace gd3d.framework
      * UI布局选项
      * @version egret-gd3d 1.0
      */
-    export enum layoutOption
-    {
+    export enum layoutOption {
         LEFT = 1,
         TOP = 2,
         RIGHT = 4,
@@ -27,8 +25,8 @@ namespace gd3d.framework
      * 2d组件的接口
      * @version egret-gd3d 1.0
      */
-    export interface I2DComponent
-    {
+    export interface I2DComponent {
+        onPlay();
         start();
         update(delta: number);
         transform: transform2D;
@@ -43,10 +41,9 @@ namespace gd3d.framework
      * 2d碰撞器接口
      * @version egret-gd3d 1.0
      */
-    export interface ICollider2d
-    {
+    export interface ICollider2d {
         transform: transform2D;
-        getBound():obb2d;
+        getBound(): obb2d;
         intersectsTransform(tran: transform2D): boolean;
     }
 
@@ -57,8 +54,7 @@ namespace gd3d.framework
      * 2D渲染组件的接口
      * @version egret-gd3d 1.0
      */
-    export interface IRectRenderer extends I2DComponent
-    {
+    export interface IRectRenderer extends I2DComponent {
         render(canvas: canvas);
         //刷新顶点信息
         updateTran();
@@ -72,13 +68,11 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @gd3d.reflect.SerializeType
-    export class C2DComponent
-    {
+    export class C2DComponent {
         @gd3d.reflect.Field("I2DComponent")
         comp: I2DComponent;
         init: boolean;
-        constructor(comp: I2DComponent, init: boolean = false)
-        {
+        constructor(comp: I2DComponent, init: boolean = false) {
             this.comp = comp;
             this.init = init;
         }
@@ -94,8 +88,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @gd3d.reflect.SerializeType
-    export class transform2D
-    {
+    export class transform2D {
         // public notify: INotify;
         private _canvas: canvas;
 
@@ -106,15 +99,12 @@ namespace gd3d.framework
          * 当前2d节点所属的canvas
          * @version egret-gd3d 1.0
          */
-        set canvas(val: canvas)
-        {
-            if(!val) return;
+        set canvas(val: canvas) {
+            if (!val) return;
             this._canvas = val;
         }
-        get canvas(): canvas
-        {
-            if (this._canvas == null)
-            {
+        get canvas(): canvas {
+            if (this._canvas == null) {
                 if (this.parent == null)
                     return null;
                 return this.parent.canvas;
@@ -140,7 +130,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("string")
-        tag:string = StringUtil.builtinTag_Untagged;
+        tag: string = StringUtil.builtinTag_Untagged;
 
         /**
          * @public
@@ -151,7 +141,7 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("string")
         name: string = "noname";
-        
+
         /**
          * @public
          * @language zh_CN
@@ -160,7 +150,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        isStatic : boolean = false;
+        isStatic: boolean = false;
 
         /**
          * @public
@@ -230,11 +220,9 @@ namespace gd3d.framework
          * 如果其父节点不可见，其同样不可见
          * @version egret-gd3d 1.0
          */
-        get visibleInScene()
-        {
+        get visibleInScene() {
             let obj: transform2D = this;
-            while (obj.visible)
-            {
+            while (obj.visible) {
                 obj = obj.parent;
             }
             return obj.visible;
@@ -247,14 +235,11 @@ namespace gd3d.framework
          * 当前2d节点的隐藏状态
          * @version egret-gd3d 1.0
          */
-        get visible(): boolean
-        {
+        get visible(): boolean {
             return this._visible;
         };
-        set visible(val: boolean)
-        {
-            if (val != this._visible)
-            {
+        set visible(val: boolean) {
+            if (val != this._visible) {
                 this._visible = val;
                 sceneMgr.app.markNotify(this, NotifyType.ChangeVisible);
             }
@@ -267,8 +252,7 @@ namespace gd3d.framework
          * 获取自身
          * @version egret-gd3d 1.0
          */
-        get transform()
-        {
+        get transform() {
             return this;
         }
 
@@ -316,11 +300,9 @@ namespace gd3d.framework
 
         private _maskRect: math.rect;
         private _temp_maskRect: math.rect;
-        get maskRect()
-        {
+        get maskRect() {
             if (this._temp_maskRect == null) this._temp_maskRect = new math.rect();
-            if (this._maskRect != null)
-            {
+            if (this._maskRect != null) {
                 this._temp_maskRect.x = this._maskRect.x;
                 this._temp_maskRect.y = this._maskRect.y;
                 this._temp_maskRect.w = this._maskRect.w;
@@ -337,32 +319,26 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        get isMask()
-        {
+        get isMask() {
             return this._isMask;
         }
-        set isMask(b: boolean)
-        {
+        set isMask(b: boolean) {
             this._isMask = b;
             this.markDirty();
             if (this.parent != null)
                 this.updateTran(true);
         }
 
-        private updateMaskRect()
-        {
+        private updateMaskRect() {
             let rect_x; let rect_y; let rect_w; let rect_h;
             let ParentRect;
-            if (this.parent != null)
-            {
+            if (this.parent != null) {
                 this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
                 ParentRect = this.parent.maskRect;
             } else
                 this._parentIsMask = false;
-            if (this.isMask || this.parentIsMask)
-            {
-                if (this.isMask)
-                {
+            if (this.isMask || this.parentIsMask) {
+                if (this.isMask) {
                     //计算 maskrect 
                     let wPos = this.getWorldTranslate();
                     let wW = this.canvas.pixelWidth;
@@ -371,8 +347,7 @@ namespace gd3d.framework
                     rect_y = wPos.y / wH;
                     rect_w = this.width / wW;
                     rect_h = this.height / wH;
-                    if (this.parentIsMask && ParentRect != null)
-                    {
+                    if (this.parentIsMask && ParentRect != null) {
                         //计算 rect  ∩  parentRect
                         let min_x = Math.max(rect_x, ParentRect.x);
                         let min_y = Math.max(rect_y, ParentRect.y);
@@ -384,14 +359,12 @@ namespace gd3d.framework
                         rect_w = max_x - min_x;
                         rect_h = max_y - min_y;
                     }
-                } else if (ParentRect != null)
-                {
+                } else if (ParentRect != null) {
                     rect_x = ParentRect.x; rect_y = ParentRect.y; rect_w = ParentRect.w; rect_h = ParentRect.h;
                 }
                 if (this._maskRect == null) this._maskRect = new math.rect();
 
-                if (this._maskRect.x != rect_x || this._maskRect.x != rect_y || this._maskRect.x != rect_w || this._maskRect.x != rect_h)
-                {
+                if (this._maskRect.x != rect_x || this._maskRect.x != rect_y || this._maskRect.x != rect_w || this._maskRect.x != rect_h) {
                     this._maskRect.x = rect_x;
                     this._maskRect.y = rect_y;
                     this._maskRect.w = rect_w;
@@ -402,8 +375,7 @@ namespace gd3d.framework
 
 
         private _parentIsMask = false;
-        get parentIsMask()
-        {
+        get parentIsMask() {
             return this._parentIsMask;
         }
 
@@ -424,10 +396,8 @@ namespace gd3d.framework
          * @param node 要添加的子节点
          * @version egret-gd3d 1.0
          */
-        addChild(node: transform2D)
-        {
-            if (node.parent != null)
-            {
+        addChild(node: transform2D) {
+            if (node.parent != null) {
                 node.parent.removeChild(node);
             }
             if (this.children == null)
@@ -448,12 +418,10 @@ namespace gd3d.framework
          * @param index 要插入到的位置
          * @version egret-gd3d 1.0
          */
-        addChildAt(node: transform2D, index: number)
-        {
+        addChildAt(node: transform2D, index: number) {
             if (index < 0)
                 return;
-            if (node.parent != null)
-            {
+            if (node.parent != null) {
                 node.parent.removeChild(node);
             }
             if (this.children == null)
@@ -475,15 +443,12 @@ namespace gd3d.framework
          * @param 要移除的子节点
          * @version egret-gd3d 1.0
          */
-        removeChild(node: transform2D)
-        {
-            if (node.parent != this || this.children == null)
-            {
+        removeChild(node: transform2D) {
+            if (node.parent != this || this.children == null) {
                 throw new Error("not my child.");
             }
             var i = this.children.indexOf(node);
-            if (i >= 0)
-            {
+            if (i >= 0) {
                 this.children.splice(i, 1);
                 node.parent = null;
                 sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
@@ -497,10 +462,8 @@ namespace gd3d.framework
          * 为当前2d节点移除所有子节点
          * @version egret-gd3d 1.0
          */
-        removeAllChild()
-        {
-            while (this.children.length > 0)
-            {
+        removeAllChild() {
+            while (this.children.length > 0) {
                 this.removeChild(this.children[0]);
             }
         }
@@ -512,12 +475,10 @@ namespace gd3d.framework
          * 标记自身脏了
          * @version egret-gd3d 1.0
          */
-        markDirty()
-        {
+        markDirty() {
             this.dirty = true;
             var p = this.parent;
-            while (p != null)
-            {
+            while (p != null) {
                 p.dirtyChild = true;
                 p = p.parent;
             }
@@ -531,39 +492,31 @@ namespace gd3d.framework
          * @param parentChange 父节点是否发生变化
          * @version egret-gd3d 1.0
          */
-        updateTran(parentChange: boolean)
-        {
+        updateTran(parentChange: boolean) {
             //无刷
             if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                 return;
 
-            if (this.dirty)
-            {
+            if (this.dirty) {
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
-            if (this.dirty || parentChange)
-            {
+            if (this.dirty || parentChange) {
                 this.refreshLayout();
-                if (this.parent == null)
-                {
+                if (this.parent == null) {
                     gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
                 }
-                else
-                {
+                else {
                     gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
                 this.updateMaskRect();
-                if (this.renderer != null)
-                {
+                if (this.renderer != null) {
                     this.renderer.updateTran();
                 }
                 this.dirtyWorldDecompose = true;
             }
 
-            if (this.children != null)
-            {
-                for (var i = 0; i < this.children.length; i++)
-                {
+            if (this.children != null) {
+                for (var i = 0; i < this.children.length; i++) {
                     this.children[i].updateTran(parentChange || this.dirty);
                 }
             }
@@ -578,14 +531,12 @@ namespace gd3d.framework
          * 更新整个节点结构
          * @version egret-gd3d 1.0
          */
-        updateWorldTran()
-        {
+        updateWorldTran() {
             //parent 找到顶，第一个dirty的
             var p = this.parent;
             var dirtylist: transform2D[] = [];
             dirtylist.push(this);
-            while (p != null)
-            {
+            while (p != null) {
                 if (p.dirty)
                     dirtylist.push(p);
                 p = p.parent;
@@ -595,8 +546,7 @@ namespace gd3d.framework
         }
 
         //计算 to canvasMtx 矩阵
-        private CalcReCanvasMtx(out: math.matrix3x2)
-        {
+        private CalcReCanvasMtx(out: math.matrix3x2) {
             if (!out) return;
             let tsca = gd3d.math.pool.new_vector2();
             let ttran = gd3d.math.pool.new_vector2();
@@ -611,10 +561,8 @@ namespace gd3d.framework
          * @private
          * 转换并拆解canvas坐标空间 RTS
          */
-        private decomposeWorldMatrix()
-        {
-            if (this.dirtyWorldDecompose)
-            {
+        private decomposeWorldMatrix() {
+            if (this.dirtyWorldDecompose) {
                 let reCanvasMtx = gd3d.math.pool.new_matrix3x2();
                 // let tsca = gd3d.math.pool.new_vector2();
                 // let ttran = gd3d.math.pool.new_vector2();
@@ -645,8 +593,7 @@ namespace gd3d.framework
          * 获取当前节点的相对于canvas的位置
          * @version egret-gd3d 1.0
          */
-        getWorldTranslate()
-        {
+        getWorldTranslate() {
             this.decomposeWorldMatrix();
             return this.worldTranslate;
         }
@@ -658,8 +605,7 @@ namespace gd3d.framework
          * 获取当前节点的相对于canvas的缩放
          * @version egret-gd3d 1.0
          */
-        getWorldScale()
-        {
+        getWorldScale() {
             this.decomposeWorldMatrix();
             return this.worldScale;
         }
@@ -671,8 +617,7 @@ namespace gd3d.framework
          * 获取当前节点的相对于canvas的旋转
          * @version egret-gd3d 1.0
          */
-        getWorldRotate()
-        {
+        getWorldRotate() {
             this.decomposeWorldMatrix();
             return this.worldRotate;
         }
@@ -684,8 +629,7 @@ namespace gd3d.framework
          * 获取当前节点的本地变换矩阵
          * @version egret-gd3d 1.0
          */
-        getLocalMatrix(): gd3d.math.matrix3x2
-        {
+        getLocalMatrix(): gd3d.math.matrix3x2 {
             return this.localMatrix;
         }
 
@@ -696,8 +640,7 @@ namespace gd3d.framework
          * 获取当前节点的世界变换矩阵
          * @version egret-gd3d 1.0
          */
-        getWorldMatrix(): gd3d.math.matrix3x2
-        {
+        getWorldMatrix(): gd3d.math.matrix3x2 {
             return this.worldMatrix;
         }
 
@@ -708,8 +651,7 @@ namespace gd3d.framework
          * 获取当前节点的Canvas_世界_变换矩阵
          * @version egret-gd3d 1.0
          */
-        getCanvasWorldMatrix(): gd3d.math.matrix3x2
-        {
+        getCanvasWorldMatrix(): gd3d.math.matrix3x2 {
             this.decomposeWorldMatrix();
             return this.canvasWorldMatrix;
         }
@@ -748,8 +690,7 @@ namespace gd3d.framework
          * @param pos 相对于canvas的位置
          * @version egret-gd3d 1.0
          */
-        setWorldPosition(pos: math.vector2)
-        {
+        setWorldPosition(pos: math.vector2) {
             this.dirty = true;
             this.updateWorldTran();
 
@@ -759,12 +700,10 @@ namespace gd3d.framework
             dir.y = pos.y - thispos.y;
 
             var pworld = math.pool.new_matrix3x2();
-            if (this.parent != null)
-            {
+            if (this.parent != null) {
                 math.matrix3x2Clone(this.parent.worldMatrix, pworld);
             }
-            else
-            {
+            else {
                 math.matrix3x2MakeIdentity(pworld);
             }
             var matinv = math.pool.new_matrix3x2();
@@ -788,12 +727,9 @@ namespace gd3d.framework
          * 释放当前节点，包括其子节点
          * @version egret-gd3d 1.0
          */
-        dispose()
-        {
-            if (this.children)
-            {
-                for (var k in this.children)
-                {
+        dispose() {
+            if (this.children) {
+                for (var k in this.children) {
                     this.children[k].dispose();
                 }
                 this.removeAllChild();
@@ -817,7 +753,7 @@ namespace gd3d.framework
          * 碰撞盒组件 可为空
          * @version egret-gd3d 1.0
          */
-        collider:ICollider2d;
+        collider: ICollider2d;
 
         /**
          * @public
@@ -829,6 +765,8 @@ namespace gd3d.framework
         @gd3d.reflect.Field("C2DComponent[]")
         components: C2DComponent[] = [];
 
+        private componentsInit :C2DComponent[]=[];
+
         /**
          * @public
          * @language zh_CN
@@ -837,30 +775,32 @@ namespace gd3d.framework
          * @param delta 两次update的间隔时间
          * @version egret-gd3d 1.0
          */
-        update(delta: number)
-        {
-            if (sceneMgr.app.bePlay)
+        update(delta: number) {
+            if (this.components.length == 0) return;
+            for (let i = 0; i < this.components.length; i++)
             {
-                if (this.components != null)
+                this.components[i].comp.update(delta);
+            }
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 组件的初始化
+         * @version egret-gd3d 1.0
+         */
+        init(onPlay = false) {
+            if(this.componentsInit.length>0)
+            {
+                for(var i=0;i<this.componentsInit.length;i++)
                 {
-                    for (var i = 0; i < this.components.length; i++)
-                    {
-                        if (this.components[i].init == false)
-                        {
-                            this.components[i].comp.start();
-                            this.components[i].init = true;
-                        }
-                        if (sceneMgr.app.bePlay && !sceneMgr.app.bePause)
-                            this.components[i].comp.update(delta);
-                    }
+                    this.componentsInit[i].comp.start();
+                    this.componentsInit[i].init = true;
+                    if(onPlay)
+                        this.componentsInit[i].comp.onPlay();
                 }
-                if (this.children != null)
-                {
-                    for (var i = 0; i < this.children.length; i++)
-                    {
-                        this.children[i].update(delta);
-                    }
-                }
+                this.componentsInit.length=0;
             }
         }
 
@@ -872,15 +812,12 @@ namespace gd3d.framework
          * @param type 组件名称
          * @version egret-gd3d 1.0
          */
-        addComponent(type: string): I2DComponent
-        {
+        addComponent(type: string): I2DComponent {
             if (this.components == null)
                 this.components = [];
-            for (var key in this.components)
-            {
+            for (var key in this.components) {
                 var st = this.components[key]["comp"]["constructor"]["name"];
-                if (st == type)
-                {
+                if (st == type) {
                     throw new Error("已经有一个" + type + "的组件了，不能俩");
                 }
             }
@@ -897,10 +834,8 @@ namespace gd3d.framework
          * @param comp 2d组件实例
          * @version egret-gd3d 1.0
          */
-        addComponentDirect(comp: I2DComponent): I2DComponent
-        {
-            if (comp.transform != null)
-            {
+        addComponentDirect(comp: I2DComponent): I2DComponent {
+            if (comp.transform != null) {
                 throw new Error("this components has added to a  gameObject");
             }
             comp.transform = this;
@@ -908,27 +843,22 @@ namespace gd3d.framework
                 this.components = [];
             let _comp: C2DComponent = new C2DComponent(comp, false);
             this.components.push(_comp);
-            if (reflect.getClassTag(comp["__proto__"], "renderer") == "1")
-            {//这货是个渲染器
+            this.componentsInit.push(_comp);
+            if (reflect.getClassTag(comp["__proto__"], "renderer") == "1") {//这货是个渲染器
 
-                if (this.renderer == null)
-                {
+                if (this.renderer == null) {
                     this.renderer = comp as any;
                     // console.warn("add renderer:" + this.name);
                 }
-                else
-                {
+                else {
                     throw new Error("已经有一个渲染器的组件了，不能俩");
                 }
             }
-            if (reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1")
-            {//这货是个boxcollider2d
-                if (this.collider == null)
-                {
+            if (reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1") {//这货是个boxcollider2d
+                if (this.collider == null) {
                     this.collider = comp as any;
                 }
-                else
-                {
+                else {
                     throw new Error("已经有一个碰撞组件了，不能俩");
                 }
             }
@@ -943,15 +873,11 @@ namespace gd3d.framework
          * @param comp 2d组件实例
          * @version egret-gd3d 1.0
          */
-        removeComponent(comp: I2DComponent)
-        {
-            if(!comp)return;
-            for (var i = 0; i < this.components.length; i++)
-            {
-                if (this.components[i].comp == comp)
-                {
-                    if (this.components[i].init)
-                    {//已经初始化过
+        removeComponent(comp: I2DComponent) {
+            if (!comp) return;
+            for (var i = 0; i < this.components.length; i++) {
+                if (this.components[i].comp == comp) {
+                    if (this.components[i].init) {//已经初始化过
 
                     }
                     let p = this.components.splice(i, 1);
@@ -969,12 +895,9 @@ namespace gd3d.framework
          * @param type 2d组件名称
          * @version egret-gd3d 1.0
          */
-        removeComponentByTypeName(type: string)
-        {
-            for (var i = 0; i < this.components.length; i++)
-            {
-                if (reflect.getClassName(this.components[i].comp) == type)
-                {
+        removeComponentByTypeName(type: string) {
+            for (var i = 0; i < this.components.length; i++) {
+                if (reflect.getClassName(this.components[i].comp) == type) {
                     var p = this.components.splice(i, 1);
                     if (p[0].comp == this.renderer) this.renderer = null;
                     if (p[0].comp == (this.collider as any)) this.collider = null;
@@ -992,14 +915,12 @@ namespace gd3d.framework
          * @param type 2d组件名称
          * @version egret-gd3d 1.0
          */
-        removeAllComponents()
-        {
-            for (var i = 0; i < this.components.length; i++)
-            {
+        removeAllComponents() {
+            for (var i = 0; i < this.components.length; i++) {
                 this.components[i].comp.remove();
             }
-            if(this.renderer)   this.renderer = null;
-            if(this.collider)   this.renderer = null;
+            if (this.renderer) this.renderer = null;
+            if (this.collider) this.renderer = null;
             this.components.length = 0;
         }
 
@@ -1011,13 +932,10 @@ namespace gd3d.framework
          * @param type 2d组件的名字
          * @version egret-gd3d 1.0
          */
-        getComponent(type: string): I2DComponent
-        {
-            for (var i = 0; i < this.components.length; i++)
-            {
+        getComponent(type: string): I2DComponent {
+            for (var i = 0; i < this.components.length; i++) {
                 var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
-                if (cname == type)
-                {
+                if (cname == type) {
                     return this.components[i].comp;
                 }
             }
@@ -1031,11 +949,9 @@ namespace gd3d.framework
          * 获取当前节点身上所有的组件
          * @version egret-gd3d 1.0
          */
-        getComponents(): I2DComponent[]
-        {
+        getComponents(): I2DComponent[] {
             let components: I2DComponent[] = [];
-            for (var i = 0; i < this.components.length; i++)
-            {
+            for (var i = 0; i < this.components.length; i++) {
                 components.push(this.components[i].comp);
             }
             return components;
@@ -1049,8 +965,7 @@ namespace gd3d.framework
          * @param type 组件名称
          * @version egret-gd3d 1.0
          */
-        getComponentsInChildren(type: string): I2DComponent[]
-        {
+        getComponentsInChildren(type: string): I2DComponent[] {
             let components: I2DComponent[] = [];
             this.getNodeCompoents(this, type, components);
 
@@ -1064,20 +979,15 @@ namespace gd3d.framework
          * @param _type 
          * @param comps 
          */
-        private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[])
-        {
-            for (var i in node.components)
-            {
+        private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[]) {
+            for (var i in node.components) {
                 var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                if (cname == _type)
-                {
+                if (cname == _type) {
                     comps.push(node.components[i].comp);
                 }
             }
-            if (node.children != null)
-            {
-                for (var i in node.children)
-                {
+            if (node.children != null) {
+                for (var i in node.children) {
                     this.getNodeCompoents(node.children[i], _type, comps);
                 }
             }
@@ -1092,30 +1002,22 @@ namespace gd3d.framework
          * @param ev 事件对象
          * @version egret-gd3d 1.0
          */
-        onCapturePointEvent(canvas: canvas, ev: PointEvent)
-        {
+        onCapturePointEvent(canvas: canvas, ev: PointEvent) {
             //event 捕捉阶段，正向
-            if (this.components != null)
-            {
-                for (var i = 0; i <= this.components.length; i++)
-                {
-                    if (ev.eated == false)
-                    {
+            if (this.components != null) {
+                for (var i = 0; i <= this.components.length; i++) {
+                    if (ev.eated == false) {
                         var comp = this.components[i];
                         if (comp != null)
-                            if (comp.init)
-                            {
+                            if (comp.init) {
                                 comp.comp.onPointEvent(canvas, ev, true);
                             }
                     }
                 }
             }
-            if (ev.eated == false)
-            {
-                if (this.children != null)
-                {
-                    for (var i = 0; i <= this.children.length; i++)
-                    {
+            if (ev.eated == false) {
+                if (this.children != null) {
+                    for (var i = 0; i <= this.children.length; i++) {
                         var c = this.children[i];
                         if (c != null && c.visible)
                             c.onCapturePointEvent(canvas, ev);
@@ -1140,12 +1042,11 @@ namespace gd3d.framework
          * @param ModelPos 模型空间位置
          * @version egret-gd3d 1.0
          */
-        ContainsCanvasPoint(ModelPos: math.vector2, tolerance: number = 0): boolean
-        {
+        ContainsCanvasPoint(ModelPos: math.vector2, tolerance: number = 0): boolean {
             let result = false;
-            var mworld = this.getWorldMatrix();  
+            var mworld = this.getWorldMatrix();
             var mout = math.pool.new_matrix3x2();
-            gd3d.math.matrix3x2Inverse(mworld, mout);   
+            gd3d.math.matrix3x2Inverse(mworld, mout);
 
             var p2 = math.pool.new_vector2();
             gd3d.math.matrix3x2TransformVector2(mout, ModelPos, p2);  //世界坐标 右乘 逆转worldMatrix 得到 ModelPos
@@ -1165,15 +1066,11 @@ namespace gd3d.framework
          * 当前节点的渲染组件，一个节点同时只能存在一个渲染组件
          * @version egret-gd3d 1.0
          */
-        onPointEvent(canvas: canvas, ev: PointEvent)
-        {
+        onPointEvent(canvas: canvas, ev: PointEvent) {
             //event 上升阶段,上升阶段事件会被吞掉
-            if (this.children != null)
-            {
-                for (var i = this.children.length - 1; i >= 0; i--)
-                {
-                    if (ev.eated == false)
-                    {
+            if (this.children != null) {
+                for (var i = this.children.length - 1; i >= 0; i--) {
+                    if (ev.eated == false) {
                         var c = this.children[i];
                         if (c != null && c.visible)
                             c.onPointEvent(canvas, ev);
@@ -1185,15 +1082,12 @@ namespace gd3d.framework
                 }
             }
 
-            if (ev.eated == false && this.components != null)
-            {
+            if (ev.eated == false && this.components != null) {
 
-                for (var i = this.components.length - 1; i >= 0; i--)
-                {
+                for (var i = this.components.length - 1; i >= 0; i--) {
                     var comp = this.components[i];
                     if (comp != null)
-                        if (comp.init)
-                        {
+                        if (comp.init) {
                             comp.comp.onPointEvent(canvas, ev, false);
                         }
                 }
@@ -1211,18 +1105,15 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        set layoutState(state: number)
-        {
+        set layoutState(state: number) {
             if (isNaN(state) || state == undefined) return;
-            if (state != this._layoutState)
-            {
+            if (state != this._layoutState) {
                 this.layoutDirty = true;
                 this.markDirty();
                 this._layoutState = state;
             }
         }
-        get layoutState()
-        {
+        get layoutState() {
             return this._layoutState;
         }
 
@@ -1236,18 +1127,15 @@ namespace gd3d.framework
          * 布局设定值
          * @version egret-gd3d 1.0
          */
-        setLayoutValue(option: layoutOption, value: number)
-        {
+        setLayoutValue(option: layoutOption, value: number) {
             if (isNaN(option) || isNaN(value) || option == undefined || value == undefined) return;
-            if (this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option])
-            {
+            if (this.layoutValueMap[option] == undefined || value != this.layoutValueMap[option]) {
                 this.layoutDirty = true;
                 this.markDirty();
                 this.layoutValueMap[option] = value;
             }
         }
-        getLayoutValue(option: layoutOption)
-        {
+        getLayoutValue(option: layoutOption) {
             if (this.layoutValueMap[option] == undefined)
                 this.layoutValueMap[option] = 0;
             return this.layoutValueMap[option];
@@ -1262,18 +1150,15 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @reflect.Field("number")
-        set layoutPercentState(state: number)
-        {
+        set layoutPercentState(state: number) {
             if (isNaN(state) || state == undefined) return;
-            if (state != this._layoutPercentState)
-            {
+            if (state != this._layoutPercentState) {
                 this.layoutDirty = true;
                 this.markDirty();
                 this._layoutPercentState = state;
             }
         }
-        get layoutPercentState()
-        {
+        get layoutPercentState() {
             return this._layoutPercentState;
         }
 
@@ -1283,8 +1168,7 @@ namespace gd3d.framework
         private lastParentPivot = new math.vector2(0, 0);
         private lastPivot = new math.vector2(0, 0);
 
-        private refreshLayout()
-        {
+        private refreshLayout() {
             let parent = this.parent;
             if (!parent) return;
             if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
@@ -1293,39 +1177,30 @@ namespace gd3d.framework
 
             if (!this.layoutDirty) return;
             let state = this._layoutState;
-            if (state != 0)
-            {
-                if (state & layoutOption.LEFT)
-                {
-                    if (state & layoutOption.RIGHT)
-                    {
+            if (state != 0) {
+                if (state & layoutOption.LEFT) {
+                    if (state & layoutOption.RIGHT) {
                         this.width = parent.width - this.getLayValue(layoutOption.LEFT) - this.getLayValue(layoutOption.RIGHT);
                     }
                     this.localTranslate.x = this.getLayValue(layoutOption.LEFT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
-                } else if (state & layoutOption.RIGHT)
-                {
+                } else if (state & layoutOption.RIGHT) {
                     this.localTranslate.x = parent.width - this.width - this.getLayValue(layoutOption.RIGHT) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
 
-                if (state & layoutOption.H_CENTER)
-                {
+                if (state & layoutOption.H_CENTER) {
                     this.localTranslate.x = (parent.width - this.width) / 2 + this.getLayValue(layoutOption.H_CENTER) - parent.pivot.x * parent.width + this.pivot.x * this.width;
                 }
 
-                if (state & layoutOption.TOP)
-                {
-                    if (state & layoutOption.BOTTOM)
-                    {
+                if (state & layoutOption.TOP) {
+                    if (state & layoutOption.BOTTOM) {
                         this.height = parent.height - this.getLayValue(layoutOption.TOP) - this.getLayValue(layoutOption.BOTTOM);
                     }
                     this.localTranslate.y = this.getLayValue(layoutOption.TOP) - parent.pivot.y * parent.height + this.pivot.y * this.height;
-                } else if (state & layoutOption.BOTTOM)
-                {
+                } else if (state & layoutOption.BOTTOM) {
                     this.localTranslate.y = parent.height - this.height - this.getLayValue(layoutOption.BOTTOM) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
 
-                if (state & layoutOption.V_CENTER)
-                {
+                if (state & layoutOption.V_CENTER) {
                     this.localTranslate.y = (parent.height - this.height) / 2 + this.getLayValue(layoutOption.V_CENTER) - parent.pivot.y * parent.height + this.pivot.y * this.height;
                 }
                 //布局调整 后刷新 matrix
@@ -1341,18 +1216,14 @@ namespace gd3d.framework
             this.lastPivot.y = this.pivot.y;
         }
 
-        private getLayValue(option: layoutOption)
-        {
+        private getLayValue(option: layoutOption) {
             if (this.layoutValueMap[option] == undefined)
                 this.layoutValueMap[option] = 0;
 
             let value = 0;
-            if (this._layoutPercentState & option)
-            {
-                if (this.parent)
-                {
-                    switch (option)
-                    {
+            if (this._layoutPercentState & option) {
+                if (this.parent) {
+                    switch (option) {
                         case layoutOption.LEFT:
                         case layoutOption.H_CENTER:
                         case layoutOption.RIGHT:
@@ -1365,8 +1236,7 @@ namespace gd3d.framework
                             break;
                     }
                 }
-            } else
-            {
+            } else {
                 value = this.layoutValueMap[option];
             }
 
@@ -1380,22 +1250,19 @@ namespace gd3d.framework
          * 获取当前transform2D的克隆
          * @version egret-gd3d 1.0
          */
-        clone(): transform2D
-        {
+        clone(): transform2D {
             return io.cloneObj(this) as transform2D;
         }
     }
 
-    export class t2dInfo
-    {
+    export class t2dInfo {
         pivot: math.vector2 = new math.vector2();
         pivotPos: math.vector2 = new math.vector2();
         width: number;
         height: number;
         rot: number;
 
-        public static getCenter(info: t2dInfo, outCenter: math.vector2)
-        {
+        public static getCenter(info: t2dInfo, outCenter: math.vector2) {
             outCenter.x = info.pivotPos.x + info.width * (0.5 - info.pivot.x) * Math.cos(info.rot) - info.height * (0.5 - info.pivot.y) * Math.sin(info.rot);
             outCenter.y = info.pivotPos.y - info.width * (0.5 - info.pivot.x) * Math.sin(info.rot) + info.height * (0.5 - info.pivot.y) * Math.cos(info.rot);
         }
