@@ -927,13 +927,22 @@ namespace gd3d.io
             this.r_offset += length;
             return converter.ArrayToString(array);
         }
-        readStringUtf8FixLength(length: number): string
+        readUTFBytes(/*length: number*/): string
+        {
+
+            let length = this.readUInt16();
+            return this.readUTFByLen(length);
+            // this.r_offset += length;
+            // return converter.ArrayToString(array);
+        }
+
+        readUTFByLen(length: number): string
         {
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
             return converter.ArrayToString(array);
         }
-        readUTFBytes(length: number): string
+        readStringUtf8FixLength(length: number): string
         {
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
@@ -1132,11 +1141,11 @@ namespace gd3d.io
             // let retBuff = new Uint8Array(this.w_offset);
             // memoryCopy(this.buffer, retBuff, 0);
             // return retBuff;
-            return this.buffer.subarray(0, this.w_offset);
+            return new Uint8Array(this.buffer.subarray(0, this.w_offset));
         }
         public getUint8Array(): Uint8Array
         {
-            return this.buffer.subarray(0, this.w_offset);
+            return new Uint8Array(this.buffer.subarray(0, this.w_offset));
         }
     }
 
