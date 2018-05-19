@@ -96,7 +96,7 @@
     export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
         //req.responseType = "arraybuffer";//ie 一定要在open之后修改responseType
-        gd3d.io.xhrLoad(url,fun,onprocess,"arraybuffer",async (req)=>{
+        gd3d.io.xhrLoad(url,fun,onprocess,"arraybuffer", (req)=>{
             fun(req.response, null);
         });
     }

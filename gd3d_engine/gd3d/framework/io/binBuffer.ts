@@ -922,7 +922,7 @@ namespace gd3d.io
         }
         readStringUtf8(): string
         {
-            let length = this.readInt8();
+            let length = this.readUInt8();
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
             return converter.ArrayToString(array);
@@ -933,12 +933,22 @@ namespace gd3d.io
             this.r_offset += length;
             return converter.ArrayToString(array);
         }
-        readUTFBytes(length: number): string
+        readUTFBytes(/*length: number*/): string
+        {
+
+            let length = this.readUInt16();
+            return this.readUTFByLen(length);
+            // this.r_offset += length;
+            // return converter.ArrayToString(array);
+        }
+
+        readUTFByLen(length: number): string
         {
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
             return converter.ArrayToString(array);
         }
+
         readStringAnsi(): string
         {
             let slen = this.readUInt8();
@@ -1123,7 +1133,9 @@ namespace gd3d.io
         dispose()
         {
             if (this.buffer.byteLength == 1024)
+            {
                 memoryPool.Insance.deleteUint8Array(this.buffer);
+            }
             this.buffer = null;
         }
 
@@ -1132,11 +1144,11 @@ namespace gd3d.io
             // let retBuff = new Uint8Array(this.w_offset);
             // memoryCopy(this.buffer, retBuff, 0);
             // return retBuff;
-            return this.buffer.subarray(0, this.w_offset);
+            return new Uint8Array(this.buffer.subarray(0, this.w_offset));
         }
         public getUint8Array(): Uint8Array
         {
-            return this.buffer.subarray(0, this.w_offset);
+            return new Uint8Array(this.buffer.subarray(0, this.w_offset));
         }
     }
 
@@ -1160,7 +1172,7 @@ namespace gd3d.io
         public newUint8Array()
         {
             if (this.pool.length > 0)
-                return this.pool.shift();
+                return this.pool.shift().fill(0);
             return new Uint8Array(1024);
         }
 

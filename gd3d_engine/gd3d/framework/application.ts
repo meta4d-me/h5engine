@@ -357,6 +357,7 @@ namespace gd3d.framework
          */
         showFps()
         {
+            if(!this.container) return;
             if (this.stats == null)
             {
                 this.stats = new Stats.Stats(this);

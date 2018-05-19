@@ -4,20 +4,20 @@ namespace gd3d.framework
     {
         static initDefaultMesh(assetmgr: assetMgr)
         {
-            assetmgr.mapDefaultMesh["cube"] = defMesh.createDefaultMesh("cube", gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["quad"] = defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["quad_particle"] = defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["plane"] = defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["sphere"] = defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["sphere_quality"] = defMesh.createDefaultMesh("sphere_quality", gd3d.render.meshData.genSphereCCW(2.58,40,40), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["pyramid"] = defMesh.createDefaultMesh("pyramid", gd3d.render.meshData.genPyramid(2,0.5), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["cylinder"] = defMesh.createDefaultMesh("cylinder", gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["circleline"] = defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["cube"] = gd3d.framework.defMesh.createDefaultMesh("cube", gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["quad"] = gd3d.framework.defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["quad_particle"] = gd3d.framework.defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["plane"] = gd3d.framework.defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["sphere"] = gd3d.framework.defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["sphere_quality"] = gd3d.framework.defMesh.createDefaultMesh("sphere_quality", gd3d.render.meshData.genSphereCCW(2.58,40,40), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["pyramid"] = gd3d.framework.defMesh.createDefaultMesh("pyramid", gd3d.render.meshData.genPyramid(2,0.5), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["cylinder"] = gd3d.framework.defMesh.createDefaultMesh("cylinder", gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
+            assetmgr.mapDefaultMesh["circleline"] = gd3d.framework.defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
         }
 
         private static createDefaultMesh(name: string, meshData: render.meshData, webgl: WebGLRenderingContext): mesh
         {
-            var _mesh: mesh = new mesh(name + ".mesh.bin");
+            var _mesh: gd3d.framework.mesh = new gd3d.framework.mesh(name + ".mesh.bin");
             _mesh.defaultAsset = true;
             _mesh.data = meshData;
             var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal| gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
@@ -34,7 +34,7 @@ namespace gd3d.framework
             _mesh.submesh = [];
 
             {
-                var sm = new subMeshInfo();
+                var sm = new gd3d.framework.subMeshInfo();
                 sm.matIndex = 0;
                 sm.useVertexIndex = 0;
                 sm.start = 0;
