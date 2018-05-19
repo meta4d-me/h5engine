@@ -4,10 +4,10 @@
       "outFile": "../lib/gd3d.thread.js",
       "module": "system",
       "experimentalDecorators": true,
-      "sourceMap": false,
+      "sourceMap": true,
       "sourceRoot": "./src",            
-      "target": "es6",
+      "target": "es5",
       
-      "watch": true
+      "watch": false
     }
   }
