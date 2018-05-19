@@ -15,10 +15,10 @@ namespace gd3d.threading
 
         private worker: Worker;// = new Worker("lib/gd3d.thread.js");
         private callID: number = 0;
-        private callMap = new Map<number, { resolve: any }>();
+        private callMap: { [id: number]: { callback: (result) => void } } = {};//new Map<number, { resolve: any }>();
         constructor()
-        {   
-            if(!thread.workerInstance)
+        {
+            if (!thread.workerInstance)
                 this.worker = new Worker("lib/gd3d.thread.js");
             else
                 this.worker = thread.workerInstance;
@@ -26,8 +26,8 @@ namespace gd3d.threading
             this.worker.onmessage = (e: MessageEvent) =>
             {
                 //e.data.id
-                if (e.data && this.callMap.has(e.data.id))
-                    this.callMap.get(e.data.id).resolve(e.data.result);
+                if (e.data && this.callMap[e.data.id])
+                    this.callMap[e.data.id].callback(e.data.result);
             };
 
             this.worker.onerror = (e: ErrorEvent) =>
@@ -36,19 +36,15 @@ namespace gd3d.threading
             };
         }
 
-        public async Call(name: string, data: any)
+        public Call(name: string, data: any, callback: (result) => void)
         {
             this.worker.postMessage({
                 handle: name,
                 data: data,
                 id: ++this.callID
             });
+            this.callMap[this.callID] = { callback: callback };
 
-
-            return new Promise<any>((resolve) =>
-            {
-                this.callMap.set(this.callID, { resolve: resolve });
-            });
         }
 
 

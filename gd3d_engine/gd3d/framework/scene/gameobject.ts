@@ -17,7 +17,7 @@ namespace gd3d.framework
         DontSave = 0x00000034,
         HideAndDontSave = 0x0000003D
     }
-    
+
     /**
      * @public
      * @language zh_CN
@@ -111,7 +111,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("string")
-        tag:string = StringUtil.builtinTag_Untagged;
+        tag: string = StringUtil.builtinTag_Untagged;
 
         /**
          * @public
@@ -122,7 +122,7 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("number")
         hideFlags: HideFlags = HideFlags.None;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -131,7 +131,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        isStatic : boolean = false;
+        isStatic: boolean = false;
 
 
         /**
@@ -154,7 +154,7 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("nodeComponent[]")
         components: nodeComponent[] = [];
-        private  componentsInit:nodeComponent[]=[];
+        private componentsInit: nodeComponent[] = [];
         /**
          * @public
          * @language zh_CN
@@ -171,7 +171,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         camera: camera;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -181,7 +181,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         light: light;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -220,7 +220,7 @@ namespace gd3d.framework
         {
             return this._visible;
         };
-        
+
         /**
          * @public
          * @language zh_CN
@@ -237,7 +237,7 @@ namespace gd3d.framework
                 sceneMgr.app.markNotify(this.transform, NotifyType.ChangeVisible);
             }
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -260,16 +260,16 @@ namespace gd3d.framework
          */
         init(onPlay = false)
         {
-            if(this.componentsInit.length>0)
+            if (this.componentsInit.length > 0)
             {
-                for(var i=0;i<this.componentsInit.length;i++)
+                for (var i = 0; i < this.componentsInit.length; i++)
                 {
                     this.componentsInit[i].comp.start();
                     this.componentsInit[i].init = true;
-                    if(onPlay)
+                    if (onPlay && this.componentsInit[i].comp.onPlay)
                         this.componentsInit[i].comp.onPlay();
                 }
-                this.componentsInit.length=0;
+                this.componentsInit.length = 0;
             }
         }
 

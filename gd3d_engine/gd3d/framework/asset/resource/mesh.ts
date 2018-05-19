@@ -373,27 +373,31 @@ namespace gd3d.framework
          * @param webgl webgl实例
          * @version egret-gd3d 1.0
          */
-        async Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext)
+        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext)
         {
 
-            let result = await threading.thread.Instance.Call("meshDataHandle", buf);
-            let objVF = result.objVF;
-            let data = result.meshData;
-            data.originVF = objVF.vf;
-            // this.data = data;
-            this.data = new gd3d.render.meshData();
-            for (let k in data)
-                this.data[k] = data[k];
-            this.submesh = result.subMesh;
+            threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
+            {
+                let objVF = result.objVF;
+                let data = result.meshData;
+                data.originVF = objVF.vf;
+                // this.data = data;
+                this.data = new gd3d.render.meshData();
+                for (let k in data)
+                    this.data[k] = data[k];
+                this.submesh = result.subMesh;
 
-            this.glMesh = new gd3d.render.glMesh();
-            var vertexs = this.data.genVertexDataArray(objVF.vf);
-            var indices = this.data.genIndexDataArray();
+                this.glMesh = new gd3d.render.glMesh();
+                var vertexs = this.data.genVertexDataArray(objVF.vf);
+                var indices = this.data.genIndexDataArray();
 
-            this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
-            this.glMesh.uploadVertexData(webgl, vertexs);
-            this.glMesh.addIndex(webgl, indices.length);
-            this.glMesh.uploadIndexData(webgl, 0, indices);
+                this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
+                this.glMesh.uploadVertexData(webgl, vertexs);
+                this.glMesh.addIndex(webgl, indices.length);
+                this.glMesh.uploadIndexData(webgl, 0, indices);
+                if(this.onReadFinish)
+                    this.onReadFinish();
+            });
 
             // // var vf = 0;
             // var objVF = { vf: 0 };//顶点属性
