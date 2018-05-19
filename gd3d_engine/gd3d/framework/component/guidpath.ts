@@ -149,6 +149,12 @@ namespace gd3d.framework
         {
 
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number) 
         {
             if(!this.isactived||!this.datasafe) return;

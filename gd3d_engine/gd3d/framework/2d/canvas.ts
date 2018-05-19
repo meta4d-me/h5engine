@@ -134,6 +134,8 @@ namespace gd3d.framework
             return this.rootNode.children[index];
         }
 
+        private hasPlayed = false;
+        private playDirty = false;
         private pointDown: Boolean = false;
         private pointSelect: transform2D = null;//当前选中的UI
         private pointEvent: PointEvent = new PointEvent();
@@ -217,7 +219,31 @@ namespace gd3d.framework
                 }
             }
 
-            this.rootNode.update(delta);
+            //this.rootNode.update(delta);
+            if (this.scene.app.bePlay)
+            {
+                if(!this.hasPlayed) this.playDirty = true;
+                this.objupdate(this.rootNode,delta);
+                this.playDirty = false;
+                this.hasPlayed = true;
+            }
+        }
+
+        private objupdate(node: transform2D, delta){
+
+            node.init(this.playDirty);//组件还未初始化的初始化
+            if (node.components.length > 0)
+            {
+                node.update(delta);
+            }
+
+            if (node.children != null)
+            {
+                for (let i = 0; i < node.children.length; i++)
+                {
+                    this.objupdate(node.children[i], delta);
+                }
+            }
         }
 
         private lastMat: material;

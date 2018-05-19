@@ -194,6 +194,12 @@ namespace gd3d.framework
         start()
         {
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number)
         {
             for (var i = 0; i < this.overlays.length; i++)

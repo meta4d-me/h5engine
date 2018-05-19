@@ -115,6 +115,12 @@ namespace gd3d.framework
         {
             this.audioChannel = AudioEx.instance().createAudioChannel(this.be3DSound);
         }
+
+        onPlay()
+        {
+
+        }
+
         private lastX: number = 0;
         private lastY: number = 0;
         private lastZ: number = 0;

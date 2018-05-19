@@ -178,6 +178,10 @@ namespace gd3d.framework
 
         }
 
+        onPlay(){
+
+        }
+
         /**
          * @private
          */

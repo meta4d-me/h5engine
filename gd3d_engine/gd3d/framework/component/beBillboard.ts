@@ -5,6 +5,12 @@ namespace gd3d.framework
         start() {
 
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number) {
             if(!this.beActive||this.target==null) return;
             this.gameObject.transform.lookat(this.target);

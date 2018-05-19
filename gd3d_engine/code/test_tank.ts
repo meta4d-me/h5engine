@@ -22,6 +22,10 @@ class CameraShock implements gd3d.framework.INodeComponent
     {
         this.isPlaying = false;
     }
+
+    onPlay(){
+        
+    }
     play(strength: number = 0.2, life: number = 0.5, fade: boolean = false, shockType: ShockType = ShockType.Both)
     {
         if (this.oldTranslate == null)

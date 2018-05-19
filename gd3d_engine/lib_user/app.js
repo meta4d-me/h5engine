@@ -8614,6 +8614,8 @@ var CameraShock = (function () {
     CameraShock.prototype.start = function () {
         this.isPlaying = false;
     };
+    CameraShock.prototype.onPlay = function () {
+    };
     CameraShock.prototype.play = function (strength, life, fade, shockType) {
         if (strength === void 0) { strength = 0.2; }
         if (life === void 0) { life = 0.5; }

@@ -324,11 +324,17 @@ namespace gd3d.framework
             });
         }
 
+        private hasPlayed = false;
+        private playDirty = false;
+
         private updateScene(node: transform, delta)
         {
             if (this.app.bePlay)
             {
+                if(!this.hasPlayed) this.playDirty = true;
                 this.objupdate(node, delta);
+                this.playDirty = false;
+                this.hasPlayed = true;
             }
             else
             {
@@ -363,7 +369,7 @@ namespace gd3d.framework
         {
             if (node.hasComponent == false && node.hasComponentChild == false)
                 return;
-            node.gameObject.init();//组件还未初始化的初始化
+            node.gameObject.init(this.playDirty);//组件还未初始化的初始化
             if (node.gameObject.components.length > 0)
             {
                 node.gameObject.update(delta);

@@ -97,6 +97,12 @@ namespace gd3d.framework
         {
             this.styleToMode();
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number)
         {   
             if(!this.isCanvasinit) this.canvasInit();

@@ -153,6 +153,13 @@ namespace gd3d.framework
         {
             this.init();
         }
+
+        onPlay()
+        {
+
+        }
+
+
         update(delta: number)
         {
             if (this.gameObject.getScene() == null || this.gameObject.getScene() == undefined)

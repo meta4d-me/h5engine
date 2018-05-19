@@ -78,7 +78,9 @@ namespace gd3d.framework
         start() {
             this.build();
         }
+        onPlay(){
 
+        }
         update(delta: number) {
             if (this._obb)
             {

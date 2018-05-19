@@ -43,6 +43,12 @@
                 this.buildMesh();
             }
         }
+
+        onPlay()
+        {
+
+        }
+
         update(delta: number)
         {
 

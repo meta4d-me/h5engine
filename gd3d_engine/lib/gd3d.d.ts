@@ -44,6 +44,7 @@ declare namespace gd3d.framework {
         readonly scaleFromPandding: number;
         private _scaleFromPandding;
         start(div: HTMLDivElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
+        startForCanvas(canvas: HTMLCanvasElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
         markNotify(trans: any, type: NotifyType): void;
         private doNotify(trans, type);
         checkFilter(trans: any): boolean;
@@ -162,56 +163,59 @@ declare namespace Stats {
         private end();
     }
 }
-declare namespace gd3d.reflect {
-    function getPrototypes(): {
-        [id: string]: any;
-    };
-    function getPrototype(name: string): any;
-    function createInstance(prototype: any, matchTag: {
-        [id: string]: string;
-    }): any;
-    function getClassName(prototype: any): any;
-    function getClassTag(prototype: any, tag: string): any;
-    function getMeta(prototype: any): any;
-    function attr_Class(constructorObj: any): void;
-    function attr_Func(customInfo?: {
-        [id: string]: string;
-    }): (target: any, propertyKey: string, value: any) => void;
-    function attr_Field(customInfo?: {
-        [id: string]: string;
-    }): (target: Object, propertyKey: string) => void;
-    function userCode(constructorObj: any): void;
-    function editorCode(constructorObj: any): void;
-    function selfClone(constructorObj: any): void;
-    function nodeComponent(constructorObj: any): void;
-    function nodeComponentInspector(constructorObj: any): void;
-    function nodeRender(constructorObj: any): void;
-    function nodeCamera(constructorObj: any): void;
-    function nodeLight(constructorObj: any): void;
-    function nodeBoxCollider(constructorObj: any): void;
-    function nodeBoxCollider2d(constructorObj: any): void;
-    function nodeSphereCollider(constructorObj: any): void;
-    function nodeEffectBatcher(constructorObj: any): void;
-    function nodeMeshCollider(constructorObj: any): void;
-    function nodeCanvasRendererCollider(constructorObj: any): void;
-    function node2DComponent(constructorObj: any): void;
-    function pluginMenuItem(constructorObj: any): void;
-    function pluginWindow(constructorObj: any): void;
-    function pluginExt(constructorObj: any): void;
-    function compValue(integer?: boolean, defvalue?: number, min?: number, max?: number): (target: Object, propertyKey: string) => void;
-    function compCall(customInfo?: {
-        [id: string]: string;
-    }): (target: any, propertyKey: string, value: any) => void;
-    function SerializeType(constructorObj: any): void;
-    function Field(valueType: string, defaultValue?: any, enumRealType?: string): (target: Object, propertyKey: string) => void;
-    function UIComment(comment: string): (target: Object, propertyKey: string) => void;
-    enum FieldUIStyle {
-        None = 0,
-        RangeFloat = 1,
-        MultiLineString = 2,
-        Enum = 3,
+declare namespace gd3d {
+    var gd3d_reflect_root: {};
+    namespace reflect {
+        function getPrototypes(): {
+            [id: string]: any;
+        };
+        function getPrototype(name: string): any;
+        function createInstance(prototype: any, matchTag: {
+            [id: string]: string;
+        }): any;
+        function getClassName(prototype: any): any;
+        function getClassTag(prototype: any, tag: string): any;
+        function getMeta(prototype: any): any;
+        function attr_Class(constructorObj: any): void;
+        function attr_Func(customInfo?: {
+            [id: string]: string;
+        }): (target: any, propertyKey: string, value: any) => void;
+        function attr_Field(customInfo?: {
+            [id: string]: string;
+        }): (target: Object, propertyKey: string) => void;
+        function userCode(constructorObj: any): void;
+        function editorCode(constructorObj: any): void;
+        function selfClone(constructorObj: any): void;
+        function nodeComponent(constructorObj: any): void;
+        function nodeComponentInspector(constructorObj: any): void;
+        function nodeRender(constructorObj: any): void;
+        function nodeCamera(constructorObj: any): void;
+        function nodeLight(constructorObj: any): void;
+        function nodeBoxCollider(constructorObj: any): void;
+        function nodeBoxCollider2d(constructorObj: any): void;
+        function nodeSphereCollider(constructorObj: any): void;
+        function nodeEffectBatcher(constructorObj: any): void;
+        function nodeMeshCollider(constructorObj: any): void;
+        function nodeCanvasRendererCollider(constructorObj: any): void;
+        function node2DComponent(constructorObj: any): void;
+        function pluginMenuItem(constructorObj: any): void;
+        function pluginWindow(constructorObj: any): void;
+        function pluginExt(constructorObj: any): void;
+        function compValue(integer?: boolean, defvalue?: number, min?: number, max?: number): (target: Object, propertyKey: string) => void;
+        function compCall(customInfo?: {
+            [id: string]: string;
+        }): (target: any, propertyKey: string, value: any) => void;
+        function SerializeType(constructorObj: any): void;
+        function Field(valueType: string, defaultValue?: any, enumRealType?: string): (target: Object, propertyKey: string) => void;
+        function UIComment(comment: string): (target: Object, propertyKey: string) => void;
+        enum FieldUIStyle {
+            None = 0,
+            RangeFloat = 1,
+            MultiLineString = 2,
+            Enum = 3,
+        }
+        function UIStyle(style: string, min?: number, max?: number, defvalue?: any): (target: Object, propertyKey: string) => void;
     }
-    function UIStyle(style: string, min?: number, max?: number, defvalue?: any): (target: Object, propertyKey: string) => void;
 }
 declare namespace gd3d.framework {
     class canvas {
@@ -226,6 +230,8 @@ declare namespace gd3d.framework {
         getChildren(): transform2D[];
         getChildCount(): number;
         getChild(index: number): transform2D;
+        private hasPlayed;
+        private playDirty;
         private pointDown;
         private pointSelect;
         private pointEvent;
@@ -234,6 +240,7 @@ declare namespace gd3d.framework {
         private lastWidth;
         private lastHeight;
         update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
+        private objupdate(node, delta);
         private lastMat;
         afterRender: Function;
         beforeRender: Function;
@@ -278,6 +285,7 @@ declare namespace gd3d.framework {
         inputmgr: inputMgr;
         cameraTouch: camera;
         start(): void;
+        onPlay(): void;
         addChild(node: transform2D): void;
         removeChild(node: transform2D): void;
         getChildren(): transform2D[];
@@ -342,6 +350,7 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        private viewPixelrect;
         update(delta: number): void;
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
         private dopick2d(ModelPos, tran, tolerance?);
@@ -450,6 +459,7 @@ declare namespace gd3d.framework {
         V_CENTER = 32,
     }
     interface I2DComponent {
+        onPlay(): any;
         start(): any;
         update(delta: number): any;
         transform: transform2D;
@@ -529,7 +539,9 @@ declare namespace gd3d.framework {
         renderer: IRectRenderer;
         collider: ICollider2d;
         components: C2DComponent[];
+        private componentsInit;
         update(delta: number): void;
+        init(onPlay?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
         removeComponent(comp: I2DComponent): void;
@@ -572,6 +584,7 @@ declare namespace gd3d.framework {
     class behaviour2d implements I2DComponent {
         transform: transform2D;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
@@ -586,6 +599,7 @@ declare namespace gd3d.framework {
         private build();
         refreshTofullOver(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
@@ -617,6 +631,7 @@ declare namespace gd3d.framework {
         render(canvas: canvas): void;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
@@ -655,6 +670,7 @@ declare namespace gd3d.framework {
         render(canvas: canvas): void;
         private _cacheMaskV4;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
@@ -704,6 +720,7 @@ declare namespace gd3d.framework {
         render(canvas: canvas): void;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         private inputElmLayout();
         private textRefresh();
         private filterContentText();
@@ -757,6 +774,7 @@ declare namespace gd3d.framework {
         private _cacheMaskV4;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
@@ -786,6 +804,7 @@ declare namespace gd3d.framework {
         private _cacheMaskV4;
         updateTran(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
@@ -799,6 +818,7 @@ declare namespace gd3d.framework {
         horizontal: boolean;
         vertical: boolean;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
@@ -814,6 +834,7 @@ declare namespace gd3d.framework {
     class uirect implements I2DComponent {
         canbeClick: boolean;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
@@ -1476,6 +1497,7 @@ declare namespace gd3d.framework {
         getBound(): obb;
         readonly matrix: gd3d.math.matrix;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
@@ -1494,6 +1516,7 @@ declare namespace gd3d.framework {
         mesh: mesh;
         getBound(): mesh;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
@@ -1508,6 +1531,7 @@ declare namespace gd3d.framework {
     class meshFilter implements INodeComponent {
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private _mesh;
         mesh: mesh;
@@ -1531,6 +1555,7 @@ declare namespace gd3d.framework {
         queue: number;
         filter: meshFilter;
         start(): void;
+        onPlay(): void;
         private refreshLayerAndQue();
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
@@ -1566,6 +1591,7 @@ declare namespace gd3d.framework {
         private cacheData;
         private _efficient;
         start(): void;
+        onPlay(): void;
         getMatByIndex(index: number): math.matrix;
         intersects(ray: ray, outInfo: pickinfo): boolean;
         update(delta: number): void;
@@ -1946,6 +1972,7 @@ declare namespace gd3d.framework {
         readonly cacheKey: string | number;
         private init();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         playByIndex(animIndex: number, speed?: number, beRevert?: boolean): void;
         playCrossByIndex(animIndex: number, crosstimer: number, speed?: number, beRevert?: boolean): void;
@@ -1982,6 +2009,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -1991,6 +2019,7 @@ declare namespace gd3d.framework {
     class AudioListener implements INodeComponent {
         private listener;
         start(): void;
+        onPlay(): void;
         private lastX;
         private lastY;
         private lastZ;
@@ -2013,6 +2042,7 @@ declare namespace gd3d.framework {
         volume: number;
         isPlaying(): boolean;
         start(): void;
+        onPlay(): void;
         private lastX;
         private lastY;
         private lastZ;
@@ -2025,6 +2055,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class BeBillboard implements INodeComponent {
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
@@ -2039,6 +2070,7 @@ declare namespace gd3d.framework {
     class behaviour implements INodeComponent {
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2064,6 +2096,7 @@ declare namespace gd3d.framework {
         private _init;
         private init();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2108,6 +2141,7 @@ declare namespace gd3d.framework {
         private _contextIdx;
         markDirty(): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         clearOption_Color: boolean;
         clearOption_Depth: boolean;
@@ -2164,6 +2198,7 @@ declare namespace gd3d.framework {
         renderMode: canvasRenderMode;
         private styleToMode();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2205,6 +2240,7 @@ declare namespace gd3d.framework {
         private _data;
         readonly totalFrameCount: number;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private _update(delta);
         private mergeLerpAttribData(realUseCurFrameData, curFrameData);
@@ -2258,6 +2294,7 @@ declare namespace gd3d.framework {
         private _data;
         readonly totalFrameCount: number;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private _update(delta);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
@@ -2285,6 +2322,7 @@ declare namespace gd3d.framework {
         constructor();
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2310,6 +2348,7 @@ declare namespace gd3d.framework {
         private oncomplete;
         setpathasset(pathasset: pathasset, speed?: number, oncomplete?: () => void): void;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private adjustDir;
         private followmove(delta);
@@ -2327,6 +2366,7 @@ declare namespace gd3d.framework {
         private pathPropertyMap;
         gameObject: gameObject;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         private displayByTime(clip, playTime);
         private calcValueByTime(curve, playTime);
@@ -2361,6 +2401,7 @@ declare namespace gd3d.framework {
         color: math.color;
         cullingMask: number;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2388,6 +2429,7 @@ declare namespace gd3d.framework {
         getBound(): spherestruct;
         readonly matrix: gd3d.math.matrix;
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
@@ -2416,6 +2458,7 @@ declare namespace gd3d.framework {
         private eulerSpeed;
         private active;
         start(): void;
+        onPlay(): void;
         private moveDis;
         update(delta: number): void;
         gameObject: gameObject;
@@ -2440,6 +2483,7 @@ declare namespace gd3d.framework {
         private active;
         private reInit;
         start(): void;
+        onPlay(): void;
         private app;
         private webgl;
         private camerapositon;
@@ -2495,6 +2539,7 @@ declare namespace gd3d.framework {
         private activeMaxpointlimit;
         setMaxpointcontroll(value?: boolean): void;
         start(): void;
+        onPlay(): void;
         private app;
         private webgl;
         update(delta: number): void;
@@ -2530,6 +2575,7 @@ declare namespace gd3d.framework {
         private _init;
         private init();
         start(): void;
+        onPlay(): void;
         update(delta: number): void;
         remove(): void;
         clone(): void;
@@ -2541,6 +2587,7 @@ declare namespace gd3d.framework {
         renderLayer: number;
         queue: number;
         start(): void;
+        onPlay(): void;
         gameObject: gameObject;
         private fps;
         data: F14EffectData;
@@ -4948,6 +4995,7 @@ declare namespace gd3d.framework {
         HideAndDontSave = 61,
     }
     interface INodeComponent {
+        onPlay(): any;
         start(): any;
         update(delta: number): any;
         gameObject: gameObject;
@@ -4976,7 +5024,7 @@ declare namespace gd3d.framework {
         readonly visibleInScene: boolean;
         visible: boolean;
         getName(): string;
-        init(): void;
+        init(onPlay?: boolean): void;
         update(delta: number): void;
         addComponentDirect(comp: INodeComponent): INodeComponent;
         getComponent(type: string): INodeComponent;
@@ -5083,6 +5131,8 @@ declare namespace gd3d.framework {
         private RealCameraNumber;
         private _renderCamera(camindex);
         private sortOverLays(lays);
+        private hasPlayed;
+        private playDirty;
         private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);
@@ -5132,7 +5182,9 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.threading {
     class thread {
-        static Instance: thread;
+        static workerInstance: Worker;
+        private static instance;
+        static readonly Instance: thread;
         private worker;
         private callID;
         private callMap;
@@ -5572,6 +5624,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.io {
+    function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;

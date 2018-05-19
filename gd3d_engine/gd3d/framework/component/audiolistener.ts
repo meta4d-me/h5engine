@@ -10,6 +10,12 @@ namespace gd3d.framework
         {
             this.listener = AudioEx.instance().audioContext.listener;
         }
+
+        onPlay()
+        {
+
+        }
+
         private lastX: number = 0;
         private lastY: number = 0;
         private lastZ: number = 0;
