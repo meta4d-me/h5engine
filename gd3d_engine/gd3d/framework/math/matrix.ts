@@ -678,16 +678,16 @@
     export function matrixLookatLH(forward: vector3, up: vector3, out: matrix)
     {
         // Z axis
-        var z = new vector3(-forward.x, -forward.y, -forward.z);
+        let z = pool.new_vector3(-forward.x, -forward.y, -forward.z);
         vec3Normalize(z, z);
 
-        var y = new vector3();
+        let y = pool.new_vector3();
         vec3Clone(up, y);
         vec3Normalize(y, y);
 
 
         // X axis
-        var x = new vector3();
+        let x = pool.new_vector3();
         vec3Cross(y, z, x);
         vec3SqrLength(x)
         if (vec3SqrLength(x) == 0)
@@ -699,7 +699,8 @@
             vec3Normalize(x, x);
         }
         // Y axis
-        var y = new vector3();
+        vec3Clone(pool.vector3_zero,y);
+
         vec3Cross(z, x, y);
         vec3Normalize(y, y);
         out.rawData[0] = x.x;
@@ -721,18 +722,22 @@
         out.rawData[13] = 0;
         out.rawData[14] = 0;
         out.rawData[15] = 1;
+
+        pool.delete_vector3(x);
+        pool.delete_vector3(y);
+        pool.delete_vector3(z);
     }
     export function matrixViewLookatLH(eye: vector3, forward: vector3, up: vector3, out: matrix)
     {
         // Z axis
-        var z = new vector3(forward.x, forward.y, forward.z);
+        let z = pool.new_vector3(forward.x, forward.y, forward.z);
         vec3Normalize(z, z);
 
-        var y = new vector3();
+        let y = pool.new_vector3();
         vec3Clone(up, y);
         vec3Normalize(y, y);
         // X axis
-        var x = new vector3();
+        let x = pool.new_vector3();
         vec3Cross(y, z, x);
         vec3SqrLength(x)
         if (vec3SqrLength(x) == 0)
@@ -744,7 +749,8 @@
             vec3Normalize(x, x);
         }
         // Y axis
-        var y = new vector3();
+        vec3Clone(pool.vector3_zero,y);
+
         vec3Cross(z, x, y);
         vec3Normalize(y, y);
         // Eye angles
@@ -771,6 +777,9 @@
         out.rawData[14] = ez;
         out.rawData[15] = 1;
 
+        pool.delete_vector3(x);
+        pool.delete_vector3(y);
+        pool.delete_vector3(z);
     }
     export function matrixLerp(left: matrix, right: matrix, v: number, out: matrix)
     {
