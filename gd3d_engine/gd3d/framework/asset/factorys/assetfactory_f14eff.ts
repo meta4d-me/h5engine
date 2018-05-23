@@ -20,9 +20,12 @@ namespace gd3d.framework
 
                 let _f14eff = asset ? asset : new f14eff(filename);
                 _f14eff.assetbundle = bundlename;
-                _f14eff.Parse(txt, assetMgr);
-
-                AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+                // _f14eff.Parse(txt, assetMgr);
+                // AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+                _f14eff.Parse(txt, assetMgr).then(()=>{
+                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+                });
+                
             },
                 (loadedLength, totalLength) =>
                 {
@@ -39,9 +42,11 @@ namespace gd3d.framework
             let txt = respack[filename];
             let _f14eff = asset ? asset : new f14eff(filename);
             _f14eff.assetbundle = bundlename;
-            _f14eff.Parse(txt, assetMgr);
-
-            AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+            // _f14eff.Parse(txt, assetMgr);
+            // AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+            _f14eff.Parse(txt, assetMgr).then(()=>{
+                AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+            });
         }
     }
 }

@@ -32,9 +32,10 @@
 
     export function matrixDecompose(src: matrix, scale: vector3, rotation: quaternion, translation: vector3): boolean
     {
-        translation.x = src.rawData[12];
-        translation.y = src.rawData[13];
-        translation.z = src.rawData[14];
+        // translation.x = src.rawData[12];
+        // translation.y = src.rawData[13];
+        // translation.z = src.rawData[14];
+        translation.rawData.set(src.rawData.subarray(12, 15));
 
         var xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
         var ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;

@@ -19,21 +19,28 @@ namespace gd3d.threading
         constructor()
         {
             if (!thread.workerInstance)
+            {
                 this.worker = new Worker("lib/gd3d.thread.js");
+                this.worker.onmessage = (e: MessageEvent) =>
+                {
+                    //e.data.id
+                    this.OnMessage(e);
+                };
+
+                this.worker.onerror = (e: ErrorEvent) =>
+                {
+                    console.error(e);
+                };
+            }
             else
+            {
                 this.worker = thread.workerInstance;
-
-            this.worker.onmessage = (e: MessageEvent) =>
-            {
-                //e.data.id
-                if (e.data && this.callMap[e.data.id])
-                    this.callMap[e.data.id].callback(e.data.result);
-            };
-
-            this.worker.onerror = (e: ErrorEvent) =>
-            {
-                console.error(e);
-            };
+            }
+        }
+        public OnMessage(e: MessageEvent)
+        {
+            if (e.data && this.callMap[e.data.id])
+                this.callMap[e.data.id].callback(e.data.result);
         }
 
         public Call(name: string, data: any, callback: (result) => void)
