@@ -206,7 +206,7 @@ declare namespace gd3d {
             [id: string]: string;
         }): (target: any, propertyKey: string, value: any) => void;
         function SerializeType(constructorObj: any): void;
-        function Field(valueType: string, defaultValue?: any, enumRealType?: string): (target: Object, propertyKey: string) => void;
+        function Field(valueType: string, defaultValue?: any, referenceType?: string): (target: Object, propertyKey: string) => void;
         function UIComment(comment: string): (target: Object, propertyKey: string) => void;
         enum FieldUIStyle {
             None = 0,
@@ -1209,7 +1209,7 @@ declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
         newAsset(): mesh;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): Promise<void>;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1223,7 +1223,7 @@ declare namespace gd3d.framework {
     class AssetFactory_Prefab implements IAssetFactory {
         newAsset(): prefab;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): Promise<void>;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1237,7 +1237,7 @@ declare namespace gd3d.framework {
     class AssetFactory_Scene implements IAssetFactory {
         newAsset(): rawscene;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): Promise<void>;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1717,7 +1717,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess(read, data, objVF, vcount, vec10tpose, callback);
         private readFinish(read, data, buf, objVF, webgl);
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): Promise<void>;
+        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): void;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
     }
@@ -3545,8 +3545,9 @@ declare namespace gd3d.io {
         readInt(): number;
         readBytes(length: number): Uint8Array;
         readStringUtf8(): string;
+        readUTFBytes(): string;
+        readUTFByLen(length: number): string;
         readStringUtf8FixLength(length: number): string;
-        readUTFBytes(length: number): string;
         readStringAnsi(): string;
         getLength(): number;
         getBytesAvailable(): number;
@@ -5189,7 +5190,7 @@ declare namespace gd3d.threading {
         private callID;
         private callMap;
         constructor();
-        Call(name: string, data: any): Promise<any>;
+        Call(name: string, data: any, callback: (result) => void): void;
     }
 }
 declare namespace gd3d.framework {

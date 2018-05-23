@@ -258,12 +258,12 @@
     }
     //获取一个注视目标的四元数
     export function quatLookat(pos: vector3, targetpos: vector3, out: quaternion) {
-        var dir = new vector3();
+        var dir = pool.new_vector3();
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
 
         //dir在xz面上的单位投影             
-        var dirxz = new vector3(dir.x, 0, dir.z);
+        var dirxz = pool.new_vector3(dir.x, 0, dir.z);
         math.vec3Normalize(dirxz, dirxz);
 
         var yaw = Math.acos(dirxz.z);// / Math.PI * 180;
@@ -271,7 +271,7 @@
             yaw = -yaw;
         }
         //dir在xz面上的投影
-        var dirxz1 = new vector3(dir.x, 0, dir.z);
+        var dirxz1 = pool.new_vector3(dir.x, 0, dir.z);
         let v3length = math.vec3Length(dirxz1);
         if (v3length > 0.999)
             v3length = 1;
@@ -283,6 +283,10 @@
         }
         quatFromYawPitchRoll(yaw, pitch, 0, out);
         math.quatNormalize(out, out);
+
+        pool.delete_vector3(dir);
+        pool.delete_vector3(dirxz);
+        pool.delete_vector3(dirxz1);
     }
 
     export function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir: gd3d.math.vector3 = gd3d.math.pool.vector3_up) {
@@ -375,12 +379,12 @@
     }
 
     export function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion) {
-        var dir = new vector3();
+        var dir = pool.new_vector3();
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
 
         //dir在xz面上的单位投影             
-        var dirxz = new vector3(dir.x, 0, dir.z);
+        var dirxz = pool.new_vector3(dir.x, 0, dir.z);
         math.vec3Normalize(dirxz, dirxz);
 
         var yaw = Math.acos(dirxz.z);// / Math.PI * 180;
@@ -401,11 +405,14 @@
         // }
         quatFromYawPitchRoll(yaw, 0, 0, out);
         math.quatNormalize(out, out);
+
+        pool.delete_vector3(dir);
+        pool.delete_vector3(dirxz);
     }
 
     export function rotationTo(from: vector3, to: vector3,out: quaternion)
     {
-        var tmpvec3 =new vector3();
+        var tmpvec3 =pool.new_vector3();
         var xUnitVec3 = pool.vector3_right;
         var yUnitVec3 = pool.vector3_up;
 
@@ -438,6 +445,8 @@
             quatNormalize(out,out);
             //return quat.normalize(out, out);
         }
+
+        pool.delete_vector3(tmpvec3);
     }
     export function myLookRotation(dir:vector3, out:quaternion,up:vector3=pool.vector3_up)
     {
@@ -449,14 +458,18 @@
         }
         if (!vec3Equal(dir,up)) {
 
-            let tempv=new vector3();
+            let tempv=pool.new_vector3();
             vec3ScaleByNum(up,vec3Dot(up,dir),tempv);
             vec3Subtract(dir,tempv,tempv);
-            let qu=new quaternion();
+            let qu=pool.new_quaternion();
             this.rotationTo(pool.vector3_forward,tempv,qu);
-            let qu2=new quaternion();
+            let qu2=pool.new_quaternion();
             this.rotationTo(tempv,dir,qu2);
             quatMultiply(qu,qu2,out);
+
+            pool.delete_quaternion(qu);
+            pool.delete_quaternion(qu2);
+            pool.delete_vector3(tempv);
         }
         else {
             this.rotationTo(pool.vector3_forward,dir,out);

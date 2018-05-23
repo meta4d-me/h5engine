@@ -1010,9 +1010,9 @@ var gd3d;
             regType(constructorObj.prototype, { "SerializeType": "1" });
         }
         reflect.SerializeType = SerializeType;
-        function Field(valueType, defaultValue, enumRealType) {
+        function Field(valueType, defaultValue, referenceType) {
             if (defaultValue === void 0) { defaultValue = undefined; }
-            if (enumRealType === void 0) { enumRealType = undefined; }
+            if (referenceType === void 0) { referenceType = undefined; }
             return function (target, propertyKey) {
                 regField(target, propertyKey, {
                     "SerializeField": true,
@@ -1023,6 +1023,11 @@ var gd3d;
                 else {
                     regField(target, propertyKey, {
                         "defaultValue": defaultValue
+                    });
+                }
+                if (valueType == "reference" && referenceType != undefined) {
+                    regField(target, propertyKey, {
+                        "referenceType": referenceType
                     });
                 }
             };
@@ -5540,103 +5545,6 @@ var gd3d;
             return uirect;
         }());
         framework.uirect = uirect;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var fontAltnas = (function () {
-            function fontAltnas() {
-                this.charIndex = 0;
-                this.testData = new ImageData(1024, 1204);
-                var can2d = document.createElement("canvas");
-                can2d.className = "fontcanvas";
-                can2d.style.left = "0px";
-                can2d.style.top = "0px";
-                can2d.style.width = "400px";
-                can2d.style.height = "200px";
-                can2d.style.backgroundColor = "#000000";
-                can2d.style.position = "absolute";
-                gd3d.framework.sceneMgr.app.container.appendChild(can2d);
-                this.contex2d = can2d.getContext("2d");
-                this.font = new framework.font();
-                this.font.fontname = "dynamicfont";
-                this.font.pointSize = 30;
-                this.font.padding = 1;
-                this.font.lineHeight = 32.75;
-                this.font.baseline = 24.0625;
-                this.font.atlasWidth = 1024;
-                this.font.atlasHeight = 1024;
-                this.font.cmap = {};
-                this.fontTex = new framework.texture();
-                var gltexture = new gd3d.render.glTexture2D(gd3d.framework.sceneMgr.app.webgl, gd3d.render.TextureFormatEnum.RGBA, false, false);
-                this.fontTex.glTexture = gltexture;
-                this.font.texture = this.fontTex;
-                this.imagedata = new Uint8Array(1024 * 1024 * 4);
-                gltexture.uploadByteArray(false, false, 1024, 1024, this.imagedata, false, false, false);
-            }
-            Object.defineProperty(fontAltnas, "inc", {
-                get: function () {
-                    if (this._inc == null) {
-                        this._inc = new fontAltnas();
-                    }
-                    return this._inc;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            fontAltnas.prototype.checkText = function (str) {
-                for (var i = 0; i < str.length; i++) {
-                    var key = str.charAt(i);
-                    if (this.font.cmap[key])
-                        continue;
-                    this.adddNewChar(key);
-                }
-            };
-            fontAltnas.prototype.adddNewChar = function (key) {
-                var size = 32;
-                this.charlenInRow = Math.floor(1000 / 32);
-                this.contex2d.fillStyle = "#000000";
-                this.contex2d.fillRect(0, 0, size, size);
-                this.contex2d.font = size + "px MS Sans Serif,Arial,aa";
-                this.contex2d.fillStyle = "#ffffff";
-                this.contex2d.textBaseline = "bottom";
-                this.contex2d.fillText(key, 0, size);
-                var fontData = this.contex2d.getImageData(0, 0, size, size);
-                var curline = Math.floor(this.charIndex / this.charlenInRow);
-                var curcolumn = this.charIndex % this.charlenInRow;
-                for (var h = 0; h < size; h++) {
-                    for (var w = 0; w < size; w++) {
-                        var oindex = h * size + w;
-                        var newindex = (h + curline * size) * 1024 + w + curcolumn * size;
-                        this.imagedata[newindex * 4 + 0] = fontData.data[oindex * 4 + 0];
-                        this.imagedata[newindex * 4 + 1] = fontData.data[oindex * 4 + 1];
-                        this.imagedata[newindex * 4 + 2] = fontData.data[oindex * 4 + 2];
-                        this.imagedata[newindex * 4 + 3] = fontData.data[oindex * 4 + 3];
-                        this.testData.data[newindex * 4 + 0] = fontData.data[oindex * 4 + 0];
-                        this.testData.data[newindex * 4 + 1] = fontData.data[oindex * 4 + 1];
-                        this.testData.data[newindex * 4 + 2] = fontData.data[oindex * 4 + 2];
-                        this.testData.data[newindex * 4 + 3] = fontData.data[oindex * 4 + 3];
-                    }
-                }
-                this.fontTex.glTexture.uploadByteArray(false, false, 1024, 1024, this.imagedata, false, false, false);
-                this.contex2d.putImageData(this.testData, 100, 0);
-                var newchar = new framework.charinfo();
-                this.font.cmap[key] = newchar;
-                newchar.x = curcolumn * size / 1024.0;
-                newchar.y = curline * size / 1024.0;
-                newchar.w = size / 1024.0;
-                newchar.h = size / 1024.0;
-                newchar.yOffset = 25;
-                newchar.xSize = newchar.w;
-                newchar.ySize = newchar.h;
-                newchar.xAddvance = newchar.w;
-                this.charIndex++;
-            };
-            return fontAltnas;
-        }());
-        framework.fontAltnas = fontAltnas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -18717,12 +18625,16 @@ var gd3d;
                 this.r_offset += length;
                 return converter.ArrayToString(array);
             };
-            binTool.prototype.readStringUtf8FixLength = function (length) {
+            binTool.prototype.readUTFBytes = function () {
+                var length = this.readUInt16();
+                return this.readUTFByLen(length);
+            };
+            binTool.prototype.readUTFByLen = function (length) {
                 var array = this.buffer.subarray(this.r_offset, this.r_offset + length);
                 this.r_offset += length;
                 return converter.ArrayToString(array);
             };
-            binTool.prototype.readUTFBytes = function (length) {
+            binTool.prototype.readStringUtf8FixLength = function (length) {
                 var array = this.buffer.subarray(this.r_offset, this.r_offset + length);
                 this.r_offset += length;
                 return converter.ArrayToString(array);
@@ -18871,10 +18783,10 @@ var gd3d;
                 this.buffer = null;
             };
             binTool.prototype.getBuffer = function () {
-                return this.buffer.subarray(0, this.w_offset);
+                return new Uint8Array(this.buffer.subarray(0, this.w_offset));
             };
             binTool.prototype.getUint8Array = function () {
-                return this.buffer.subarray(0, this.w_offset);
+                return new Uint8Array(this.buffer.subarray(0, this.w_offset));
             };
             return binTool;
         }());
@@ -21156,12 +21068,12 @@ var gd3d;
         }
         math.matrixProject_OrthoLH = matrixProject_OrthoLH;
         function matrixLookatLH(forward, up, out) {
-            var z = new math.vector3(-forward.x, -forward.y, -forward.z);
+            var z = math.pool.new_vector3(-forward.x, -forward.y, -forward.z);
             math.vec3Normalize(z, z);
-            var y = new math.vector3();
+            var y = math.pool.new_vector3();
             math.vec3Clone(up, y);
             math.vec3Normalize(y, y);
-            var x = new math.vector3();
+            var x = math.pool.new_vector3();
             math.vec3Cross(y, z, x);
             math.vec3SqrLength(x);
             if (math.vec3SqrLength(x) == 0) {
@@ -21170,7 +21082,7 @@ var gd3d;
             else {
                 math.vec3Normalize(x, x);
             }
-            var y = new math.vector3();
+            math.vec3Clone(math.pool.vector3_zero, y);
             math.vec3Cross(z, x, y);
             math.vec3Normalize(y, y);
             out.rawData[0] = x.x;
@@ -21189,15 +21101,18 @@ var gd3d;
             out.rawData[13] = 0;
             out.rawData[14] = 0;
             out.rawData[15] = 1;
+            math.pool.delete_vector3(x);
+            math.pool.delete_vector3(y);
+            math.pool.delete_vector3(z);
         }
         math.matrixLookatLH = matrixLookatLH;
         function matrixViewLookatLH(eye, forward, up, out) {
-            var z = new math.vector3(forward.x, forward.y, forward.z);
+            var z = math.pool.new_vector3(forward.x, forward.y, forward.z);
             math.vec3Normalize(z, z);
-            var y = new math.vector3();
+            var y = math.pool.new_vector3();
             math.vec3Clone(up, y);
             math.vec3Normalize(y, y);
-            var x = new math.vector3();
+            var x = math.pool.new_vector3();
             math.vec3Cross(y, z, x);
             math.vec3SqrLength(x);
             if (math.vec3SqrLength(x) == 0) {
@@ -21206,7 +21121,7 @@ var gd3d;
             else {
                 math.vec3Normalize(x, x);
             }
-            var y = new math.vector3();
+            math.vec3Clone(math.pool.vector3_zero, y);
             math.vec3Cross(z, x, y);
             math.vec3Normalize(y, y);
             var ex = -math.vec3Dot(x, eye);
@@ -21228,6 +21143,9 @@ var gd3d;
             out.rawData[13] = ey;
             out.rawData[14] = ez;
             out.rawData[15] = 1;
+            math.pool.delete_vector3(x);
+            math.pool.delete_vector3(y);
+            math.pool.delete_vector3(z);
         }
         math.matrixViewLookatLH = matrixViewLookatLH;
         function matrixLerp(left, right, v, out) {
@@ -21629,16 +21547,16 @@ var gd3d;
         }
         math.quatReset = quatReset;
         function quatLookat(pos, targetpos, out) {
-            var dir = new math.vector3();
+            var dir = math.pool.new_vector3();
             math.vec3Subtract(targetpos, pos, dir);
             math.vec3Normalize(dir, dir);
-            var dirxz = new math.vector3(dir.x, 0, dir.z);
+            var dirxz = math.pool.new_vector3(dir.x, 0, dir.z);
             math.vec3Normalize(dirxz, dirxz);
             var yaw = Math.acos(dirxz.z);
             if (dirxz.x < 0) {
                 yaw = -yaw;
             }
-            var dirxz1 = new math.vector3(dir.x, 0, dir.z);
+            var dirxz1 = math.pool.new_vector3(dir.x, 0, dir.z);
             var v3length = math.vec3Length(dirxz1);
             if (v3length > 0.999)
                 v3length = 1;
@@ -21650,6 +21568,9 @@ var gd3d;
             }
             quatFromYawPitchRoll(yaw, pitch, 0, out);
             math.quatNormalize(out, out);
+            math.pool.delete_vector3(dir);
+            math.pool.delete_vector3(dirxz);
+            math.pool.delete_vector3(dirxz1);
         }
         math.quatLookat = quatLookat;
         function quat2Lookat(pos, targetpos, out, updir) {
@@ -21724,10 +21645,10 @@ var gd3d;
         }
         math.quatLookRotation = quatLookRotation;
         function quatYAxis(pos, targetpos, out) {
-            var dir = new math.vector3();
+            var dir = math.pool.new_vector3();
             math.vec3Subtract(targetpos, pos, dir);
             math.vec3Normalize(dir, dir);
-            var dirxz = new math.vector3(dir.x, 0, dir.z);
+            var dirxz = math.pool.new_vector3(dir.x, 0, dir.z);
             math.vec3Normalize(dirxz, dirxz);
             var yaw = Math.acos(dirxz.z);
             if (dirxz.x < 0) {
@@ -21735,10 +21656,12 @@ var gd3d;
             }
             quatFromYawPitchRoll(yaw, 0, 0, out);
             math.quatNormalize(out, out);
+            math.pool.delete_vector3(dir);
+            math.pool.delete_vector3(dirxz);
         }
         math.quatYAxis = quatYAxis;
         function rotationTo(from, to, out) {
-            var tmpvec3 = new math.vector3();
+            var tmpvec3 = math.pool.new_vector3();
             var xUnitVec3 = math.pool.vector3_right;
             var yUnitVec3 = math.pool.vector3_up;
             var dot = math.vec3Dot(from, to);
@@ -21764,6 +21687,7 @@ var gd3d;
                 out[3] = 1 + dot;
                 quatNormalize(out, out);
             }
+            math.pool.delete_vector3(tmpvec3);
         }
         math.rotationTo = rotationTo;
         function myLookRotation(dir, out, up) {
@@ -21774,14 +21698,17 @@ var gd3d;
                 return;
             }
             if (!math.vec3Equal(dir, up)) {
-                var tempv = new math.vector3();
+                var tempv = math.pool.new_vector3();
                 math.vec3ScaleByNum(up, math.vec3Dot(up, dir), tempv);
                 math.vec3Subtract(dir, tempv, tempv);
-                var qu = new math.quaternion();
+                var qu = math.pool.new_quaternion();
                 this.rotationTo(math.pool.vector3_forward, tempv, qu);
-                var qu2 = new math.quaternion();
+                var qu2 = math.pool.new_quaternion();
                 this.rotationTo(tempv, dir, qu2);
                 quatMultiply(qu, qu2, out);
+                math.pool.delete_quaternion(qu);
+                math.pool.delete_quaternion(qu2);
+                math.pool.delete_vector3(tempv);
             }
             else {
                 this.rotationTo(math.pool.vector3_forward, dir, out);

@@ -326,9 +326,16 @@ namespace gd3d {
         }
 
         /**
-         * @private
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * Field 
+         * @version egret-gd3d 1.0
+         * @param valueType 值类型
+         * @param defaultValue 默认值
+         * @param referenceType valueType 为 reference类型时 的具体类型
          */
-        export function Field(valueType: string, defaultValue: any = undefined, enumRealType: string = undefined) {
+        export function Field(valueType: string, defaultValue: any = undefined, referenceType: string = undefined) {
             return function (target: Object, propertyKey: string) {
                 regField(target, propertyKey, {
                     "SerializeField": true,
@@ -339,6 +346,11 @@ namespace gd3d {
                 else {
                     regField(target, propertyKey, {
                         "defaultValue": defaultValue
+                    });
+                }
+                if (valueType == "reference" && referenceType != undefined) {
+                    regField(target, propertyKey, {
+                        "referenceType": referenceType
                     });
                 }
             }
