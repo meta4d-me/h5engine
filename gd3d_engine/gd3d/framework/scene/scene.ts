@@ -57,7 +57,7 @@ namespace gd3d.framework
          */
         renderList: renderList;
         private assetmgr: assetMgr;
-        private _overlay2d:Array<overlay2D>;
+        private _overlay2d: Array<overlay2D>;
         /**
          * @public
          * @language zh_CN
@@ -65,10 +65,11 @@ namespace gd3d.framework
          * 添加ScreenSpaceOverlay
          * @version egret-gd3d 1.0
          */
-        addScreenSpaceOverlay(overlay:overlay2D){
-            if(!overlay) return;
-            if(!this._overlay2d) this._overlay2d = [];
-            if(this._overlay2d.indexOf(overlay) != -1) return;
+        addScreenSpaceOverlay(overlay: overlay2D)
+        {
+            if (!overlay) return;
+            if (!this._overlay2d) this._overlay2d = [];
+            if (this._overlay2d.indexOf(overlay) != -1) return;
             this._overlay2d.push(overlay);
             this.sortOverLays(this._overlay2d);
         }
@@ -80,10 +81,11 @@ namespace gd3d.framework
          * 删除ScreenSpaceOverlay
          * @version egret-gd3d 1.0
          */
-        removeScreenSpaceOverlay(overlay){
-            if(!overlay || !this._overlay2d) return;
+        removeScreenSpaceOverlay(overlay)
+        {
+            if (!overlay || !this._overlay2d) return;
             let idx = this._overlay2d.indexOf(overlay);
-            if(idx != -1) this._overlay2d.splice(idx,1);
+            if (idx != -1) this._overlay2d.splice(idx, 1);
             this.sortOverLays(this._overlay2d);
         }
         /**
@@ -171,7 +173,7 @@ namespace gd3d.framework
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
 
-            
+
             //排序
             //排序camera 并绘制
             if (this.renderCameras.length > 1)
@@ -202,34 +204,42 @@ namespace gd3d.framework
         }
 
         //更新和渲染 scene overlayers
-        private updateSceneOverLay(delta:number){
-            if(!this._overlay2d || this._overlay2d.length < 1) return;
+        private updateSceneOverLay(delta: number)
+        {
+            if (!this._overlay2d || this._overlay2d.length < 1) return;
 
             let targetcamera = this.mainCamera;
-            if(!this._overlay2d || !targetcamera) return;
-             let mainCamIdx = this.renderCameras.indexOf(targetcamera);
-             if(mainCamIdx == -1 ){
+            if (!this._overlay2d || !targetcamera) return;
+            let mainCamIdx = this.renderCameras.indexOf(targetcamera);
+            if (mainCamIdx == -1)
+            {
                 let cname = targetcamera.gameObject.getName();
                 let oktag = false;
-                for(var i=0;i<this.renderCameras.length;i++){
+                for (var i = 0; i < this.renderCameras.length; i++)
+                {
                     let cam = this.renderCameras[i];
-                    if(cam && cam.gameObject.getName() == cname){
+                    if (cam && cam.gameObject.getName() == cname)
+                    {
                         targetcamera = this.mainCamera = cam;
                         oktag = true;
                         break;
                     }
                 }
-                if(!oktag) {
+                if (!oktag)
+                {
                     this._mainCamera = null;
                     targetcamera = this.mainCamera;
                 }
-             }
-             mainCamIdx = this.renderCameras.indexOf(targetcamera);
-             if(!targetcamera) return;
-             if(this._overlay2d){
-                this._overlay2d.forEach(overlay=>{
-                    if(overlay){
-                        overlay.start( targetcamera);
+            }
+            mainCamIdx = this.renderCameras.indexOf(targetcamera);
+            if (!targetcamera) return;
+            if (this._overlay2d)
+            {
+                this._overlay2d.forEach(overlay =>
+                {
+                    if (overlay)
+                    {
+                        overlay.start(targetcamera);
                         overlay.update(delta);
                         overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
                     }
@@ -256,7 +266,7 @@ namespace gd3d.framework
         private RealCameraNumber: number = 0;
         //这个函数后面还有别的过程，应该留给camera
         private _renderCamera(camindex: number)
-        {        
+        {
             //增加当前编辑器状态，管控场编相机
             //一个camera 不是一次单纯的绘制，camera 还有多个绘制遍
             var cam = this.renderCameras[camindex];
@@ -274,7 +284,7 @@ namespace gd3d.framework
                 let overLays: IOverLay[] = cam.getOverLays();
                 for (var i = 0; i < overLays.length; i++)
                 {
-                    if (cam.CullingMask &  CullingMask.ui)
+                    if (cam.CullingMask & CullingMask.ui)
                     {
                         overLays[i].render(context, this.assetmgr, cam);
                     }
@@ -316,8 +326,9 @@ namespace gd3d.framework
             }
         }
 
-        private sortOverLays(lays:IOverLay[]){
-            if(!lays || lays.length<1)return;
+        private sortOverLays(lays: IOverLay[])
+        {
+            if (!lays || lays.length < 1) return;
             lays.sort((a, b) =>
             {
                 return a.sortOrder - b.sortOrder;
@@ -331,7 +342,7 @@ namespace gd3d.framework
         {
             if (this.app.bePlay)
             {
-                if(!this.hasPlayed) this.playDirty = true;
+                if (!this.hasPlayed) this.playDirty = true;
                 this.objupdate(node, delta);
                 this.playDirty = false;
                 this.hasPlayed = true;
@@ -376,12 +387,14 @@ namespace gd3d.framework
 
                 this.collectCameraAndLight(node);
             }
-            if (node.children != null)
+            if (node.children)
             {
-                for (var i = 0; i < node.children.length; i++)
-                {
-                    this.objupdate(node.children[i], delta);
-                }
+                for (let item of node.children)
+                    this.objupdate(item, delta);
+                // for (var i = 0; i < node.children.length; i++)
+                // {
+                //     this.objupdate(node.children[i], delta);
+                // }
             }
         }
 
@@ -505,10 +518,10 @@ namespace gd3d.framework
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
          * @version egret-gd3d 1.0
          */
-        public pickAll(ray: ray,outInfos:pickinfo[], isPickMesh: boolean = false, root: transform = this.getRoot(),layermask:number = NaN): boolean
+        public pickAll(ray: ray, outInfos: pickinfo[], isPickMesh: boolean = false, root: transform = this.getRoot(), layermask: number = NaN): boolean
         {
-            if(!outInfos || !ray) return false;
-            let isHited = this.doPick(ray, true, isPickMesh, root,outInfos,layermask);
+            if (!outInfos || !ray) return false;
+            let isHited = this.doPick(ray, true, isPickMesh, root, outInfos, layermask);
             return isHited;
         }
 
@@ -521,27 +534,27 @@ namespace gd3d.framework
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
          * @version egret-gd3d 1.0
          */
-        public pick(ray: ray, outInfo:pickinfo, isPickMesh: boolean = false, root: transform = this.getRoot(),layermask:number = NaN): boolean
+        public pick(ray: ray, outInfo: pickinfo, isPickMesh: boolean = false, root: transform = this.getRoot(), layermask: number = NaN): boolean
         {
-            if(!outInfo || !ray) return false;
-            let isHited = this.doPick(ray, false, isPickMesh, root,outInfo,layermask);
+            if (!outInfo || !ray) return false;
+            let isHited = this.doPick(ray, false, isPickMesh, root, outInfo, layermask);
             return isHited;
 
             //pickinfo.pickedtran.gameObject.collider.subTran.gameObject.visible = !pickinfo.pickedtran.gameObject.collider.subTran.gameObject.visible;
             //pickinfo.pickedtran.markDirty();
 
         }
-        private doPick(ray: ray, pickall: boolean, isPickMesh: boolean, root: transform ,out:any,layermask:number = NaN): boolean
+        private doPick(ray: ray, pickall: boolean, isPickMesh: boolean, root: transform, out: any, layermask: number = NaN): boolean
         {
             let ishited = false;
             var pickedList: Array<pickinfo> = new Array<pickinfo>();
             if (isPickMesh)
             {
-                ishited = this.pickMesh(ray, root, pickedList,layermask);
+                ishited = this.pickMesh(ray, root, pickedList, layermask);
             }
             else
             {
-                ishited = this.pickCollider(ray, root, pickedList,layermask);
+                ishited = this.pickCollider(ray, root, pickedList, layermask);
             }
 
             if (pickedList.length == 0) return ishited;
@@ -549,7 +562,8 @@ namespace gd3d.framework
             if (pickall)
             {
                 out.length = 0;
-                pickedList.forEach(element => {
+                pickedList.forEach(element =>
+                {
                     out.push(element);
                 });
             }
@@ -561,9 +575,10 @@ namespace gd3d.framework
                     if (pickedList[i].distance < pickedList[index].distance) index = i;
                 }
                 //return pickedList[index];
-                let temp = pickedList.splice(index,1);
+                let temp = pickedList.splice(index, 1);
                 (out as pickinfo).cloneFrom(temp[0]);
-                pickedList.forEach(element => {
+                pickedList.forEach(element =>
+                {
                     math.pool.delete_pickInfo(element);
                 });
                 pickedList.length = 0;
@@ -572,7 +587,7 @@ namespace gd3d.framework
             return ishited;
         }
 
-        private pickMesh(ray: ray, tran: transform, pickedList: pickinfo[],layermask:number = NaN):boolean
+        private pickMesh(ray: ray, tran: transform, pickedList: pickinfo[], layermask: number = NaN): boolean
         {
             let ishited = false;
             if (tran.gameObject != null)
@@ -580,16 +595,18 @@ namespace gd3d.framework
                 if (!tran.gameObject.visible) return ishited;
                 let canDo = true;
                 //if(!isNaN(layermask) && layermask != tran.gameObject.layer) canDo = false;
-                if(!isNaN(layermask) && (layermask & ( 1 << tran.gameObject.layer)) == 0) canDo = false;
-                if(canDo){
+                if (!isNaN(layermask) && (layermask & (1 << tran.gameObject.layer)) == 0) canDo = false;
+                if (canDo)
+                {
                     var meshFilter = tran.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
                     if (meshFilter != null)
                     {
                         //3d normal mesh
                         var mesh = meshFilter.getMeshOutput();
-                        if(mesh){
+                        if (mesh)
+                        {
                             let pinfo = math.pool.new_pickInfo();
-                            let bool = mesh.intersects(ray, tran.getWorldMatrix(),pinfo);
+                            let bool = mesh.intersects(ray, tran.getWorldMatrix(), pinfo);
                             if (bool)
                             {
                                 ishited = true;
@@ -605,7 +622,7 @@ namespace gd3d.framework
                         {
                             //3d skinmesh
                             let pinfo = math.pool.new_pickInfo();
-                            var bool = skinmesh.intersects(ray,pinfo);
+                            var bool = skinmesh.intersects(ray, pinfo);
                             if (bool)
                             {
                                 ishited = true;
@@ -613,7 +630,7 @@ namespace gd3d.framework
                                 pinfo.pickedtran = tran;
                             }
                         }
-    
+
                     }
                 }
             }
@@ -621,15 +638,15 @@ namespace gd3d.framework
             {
                 for (var i = 0; i < tran.children.length; i++)
                 {
-                    let bool = this.pickMesh(ray, tran.children[i], pickedList,layermask);
-                    if(!ishited)    
+                    let bool = this.pickMesh(ray, tran.children[i], pickedList, layermask);
+                    if (!ishited)
                         ishited = bool;
                 }
             }
             return ishited;
         }
 
-        private pickCollider(ray: ray, tran: transform, pickedList: Array<pickinfo>,layermask:number = NaN):boolean
+        private pickCollider(ray: ray, tran: transform, pickedList: Array<pickinfo>, layermask: number = NaN): boolean
         {
             let ishited = false;
             if (tran.gameObject != null)
@@ -638,12 +655,13 @@ namespace gd3d.framework
                 if (tran.gameObject.collider != null)
                 {
                     let canDo = true;
-                    if(!isNaN(layermask) && (layermask & ( 1 << tran.gameObject.layer)) == 0) canDo = false;
+                    if (!isNaN(layermask) && (layermask & (1 << tran.gameObject.layer)) == 0) canDo = false;
                     //console.error(`${tran.gameObject.layer}  --  ${layermask}`);
-                    if(canDo){
+                    if (canDo)
+                    {
                         //挂了collider
                         let pinfo = math.pool.new_pickInfo();
-                        var bool = ray.intersectCollider(tran,pinfo);
+                        var bool = ray.intersectCollider(tran, pinfo);
                         if (bool)
                         {
                             ishited = true;
@@ -657,8 +675,8 @@ namespace gd3d.framework
             {
                 for (var i = 0; i < tran.children.length; i++)
                 {
-                    let bool = this.pickCollider(ray, tran.children[i], pickedList,layermask);
-                    if(!ishited)    
+                    let bool = this.pickCollider(ray, tran.children[i], pickedList, layermask);
+                    if (!ishited)
                         ishited = bool;
                 }
             }

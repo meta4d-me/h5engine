@@ -39,7 +39,7 @@ namespace gd3d.framework
                 for (let key in this.clips)
                 {
                     if (this.clips[key])
-                    this.clipnames[this.clips[key].getName()] = parseInt(key);
+                        this.clipnames[this.clips[key].getName()] = parseInt(key);
                 }
             }
             return this._clipnames;
@@ -100,7 +100,7 @@ namespace gd3d.framework
         carelist: { [id: string]: transform } = {};
 
         private _playFrameid: number = 0;
-        public get PlayFrameID():number
+        public get PlayFrameID(): number
         {
             return this._playFrameid;
         }
@@ -148,7 +148,7 @@ namespace gd3d.framework
          * 动画循环播放次数
          * @version egret-gd3d 1.0
          */
-        public get playCount(){return this._playCount;}
+        public get playCount() { return this._playCount; }
 
         /**
          * @public
@@ -235,11 +235,13 @@ namespace gd3d.framework
                 if (cached && !this.carelist[bone])
                     continue;
                 var frame;
-                if(this._playClip != null && this._playClip.frames != null){
+                if (this._playClip != null && this._playClip.frames != null)
+                {
                     frame = this._playClip.frames[this._playFrameid];
-                }else{
+                } else
+                {
                     console.warn("is null of animationclip.frames! ");
-                    return ;
+                    return;
                 }
 
                 var nextseek = i * 7 + 1;// this._playClip.frames[this._playFrameid];//.boneInfos[i];
@@ -354,16 +356,17 @@ namespace gd3d.framework
             //     return;
             // }
             if (this.clipnames[animName] == null)
-            {                
+            {
                 console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                 return;
             }
             this.playByIndex(this.clipnames[animName], speed, beRevert);
         }
-        
-        getPlayName(){
+
+        getPlayName()
+        {
             if (this.isPlay())
-            return this._playClip.getName();
+                return this._playClip.getName();
         }
         /**
          * @public
@@ -442,7 +445,6 @@ namespace gd3d.framework
             for (var i = 0; i < _clip.boneCount; i++)
             {
                 var bone = _clip.bones[i];
-
                 var frame = _clip.frames[_frame];
                 var nextseek = i * 7 + 1;
                 var outb = this.nowpose[bone];
@@ -522,11 +524,12 @@ namespace gd3d.framework
          * @private
          */
         remove()
-        {   
-            if(this.clips)
-            this.clips.forEach(temp =>{
-                if(temp) temp.unuse();
-            });
+        {
+            if (this.clips)
+                this.clips.forEach(temp =>
+                {
+                    if (temp) temp.unuse();
+                });
 
             this.clips.length = 0;
             this.bones.length = 0;
@@ -570,7 +573,7 @@ namespace gd3d.framework
                 this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
                 if (this._playClip.loop)//加上循环与非循环动画的分别控制
                 {
-                    this._playCount += Math.floor(this._playFrameid/this._playClip.frameCount);
+                    this._playCount += Math.floor(this._playFrameid / this._playClip.frameCount);
                     this._playFrameid %= this._playClip.frameCount;
                 }
                 else if (this._playFrameid > this._playClip.frameCount - 1)
@@ -689,7 +692,7 @@ namespace gd3d.framework
                     this.carelist[pnode.name] = pnode;
                     return;
                 }
-                if(pnode.parent)
+                if (pnode.parent)
                     pnode = pnode.parent;
                 else
                     return;

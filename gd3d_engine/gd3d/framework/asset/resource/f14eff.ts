@@ -3,13 +3,13 @@ namespace gd3d.framework
 
     export class f14node
     {
-        trans:transform;
-        f14Effect:f14EffectSystem;
+        trans: transform;
+        f14Effect: f14EffectSystem;
     }
-    @gd3d.reflect.SerializeType    
+    @gd3d.reflect.SerializeType
     export class f14eff implements IAsset
     {
-        defaultAsset: boolean=false;
+        defaultAsset: boolean = false;
         private name: constText = null;
         private id: resID = new resID();
         constructor(assetName: string = null)
@@ -21,38 +21,46 @@ namespace gd3d.framework
             this.name = new constText(assetName);
         }
         assetbundle: string = null;
-        getName(): string {
+        getName(): string
+        {
             if (this.name == undefined)
             {
                 return null;
             }
             return this.name.getText();
         }
-        getGUID(): number {
+        getGUID(): number
+        {
             return this.id.getID();
         }
-        use(): void {
+        use(): void
+        {
 
         }
-        unuse(disposeNow?: boolean): void {
+        unuse(disposeNow?: boolean): void
+        {
 
         }
-        dispose() {
+        dispose()
+        {
 
         }
-        caclByteLength(): number {
+        caclByteLength(): number
+        {
             return 0;
         }
-        data:F14EffectData;
-        delayTime:number;
+        data: F14EffectData;
+        delayTime: number;
         // trans:transform;
         // f14Effect:f14EffectSystem;
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
-            let json=JSON.parse(jsonStr);
-            this.data=new F14EffectData();
-            this.data.parsejson(json,assetmgr,this.assetbundle);
-            
+
+            let json = JSON.parse(jsonStr);
+            this.data = new F14EffectData();
+            return this.data.parsejson(json, assetmgr, this.assetbundle);
+
+
             // this.trans=new gd3d.framework.transform();
             // this.f14Effect=this.trans.gameObject.addComponent("f14EffectSystem") as gd3d.framework.f14EffectSystem;
             // this.f14Effect.setData(this.f14data);

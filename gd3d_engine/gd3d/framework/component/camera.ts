@@ -26,10 +26,13 @@ namespace gd3d.framework
             camera._targetAndViewport(this.renderTarget, scene, context, true);
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
             gd3d.render.glDrawPass.lastZWrite = true;
+
+            camera._renderOnce(scene, context, "_depth");
+
             context.webgl.clearColor(0, 0, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
-            camera._renderOnce(scene, context, "_depth");
+
             render.glRenderTarget.useNull(context.webgl);
         }
         renderTarget: render.glRenderTarget;
@@ -49,6 +52,7 @@ namespace gd3d.framework
         {
 
 
+
             camera._targetAndViewport(this.renderTarget, scene, context, true);
 
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
@@ -61,6 +65,7 @@ namespace gd3d.framework
             context.drawtype = "";
             mesh.glMesh.bindVboBuffer(context.webgl);
             this.material.draw(context, mesh, mesh.submesh[0], "quad");
+
         }
         renderTarget: render.glRenderTarget;
     }
@@ -87,7 +92,7 @@ namespace gd3d.framework
     export interface IOverLay
     {
         init: boolean;
-        sortOrder:number;
+        sortOrder: number;
         start(camera: camera);
         render(context: renderContext, assetmgr: assetMgr, camera: camera);
         update(delta: number);
@@ -181,7 +186,7 @@ namespace gd3d.framework
         /**
          * 当前RenderContext 的 Index
          */
-        get CurrContextIndex (){return this._contextIdx;}
+        get CurrContextIndex() { return this._contextIdx; }
         private _contextIdx = -1;
         /**
          * @private
@@ -310,13 +315,14 @@ namespace gd3d.framework
             let index = this.overlays.indexOf(overLay);
             if (index >= 0)
                 this.overlays.splice(index, 1);
-            
+
             this.sortOverLays(this.overlays);
         }
 
         //overlays 排序
-        private sortOverLays(lays:IOverLay[]){
-            if(!lays || lays.length<1)return;
+        private sortOverLays(lays: IOverLay[])
+        {
+            if (!lays || lays.length < 1) return;
             lays.sort((a, b) =>
             {
                 return a.sortOrder - b.sortOrder;
@@ -577,7 +583,7 @@ namespace gd3d.framework
             }
             this._opvalue = val;
         }
-        get opvalue():number
+        get opvalue(): number
         {
             return this._opvalue;
         }
@@ -616,7 +622,7 @@ namespace gd3d.framework
         }
         private _fillRenderer(scene: scene, node: transform)
         {
-            if(node.hasRendererComp == false && node.hasRendererCompChild == false) return;  //自己没有渲染组件 且 子物体也没有 return
+            if (node.hasRendererComp == false && node.hasRendererCompChild == false) return;  //自己没有渲染组件 且 子物体也没有 return
 
             if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node)) return;//视锥测试不通过 直接return
             if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
@@ -675,6 +681,7 @@ namespace gd3d.framework
 
                 if (withoutClear == false)
                 {
+
                     //clear
                     if (this.clearOption_Color && this.clearOption_Depth)
                     {
@@ -700,6 +707,7 @@ namespace gd3d.framework
                     {
 
                     }
+
                 }
 
             }
@@ -712,20 +720,30 @@ namespace gd3d.framework
             context.drawtype = drawtype;
 
             var assetmgr = scene.app.getAssetMgr();
-
-            for (var i = 0; i < scene.renderList.renderLayers.length; i++)
+            for (let layer of scene.renderList.renderLayers)
             {
-                var layer = scene.renderList.renderLayers[i];
-                var list = layer.list;
-
-                for (var j = 0; j < list.length; j++)
+                for (let item of layer.list)
                 {
-                    if (this.CullingMask & (1 << list[j].renderLayer))
+                    if (item.gameObject.visible == true && this.CullingMask & (1 << item.renderLayer))
                     {
-                        list[j].render(context, assetmgr, this);
+                        if (item.gameObject && item.gameObject.visible == true)
+                            item.render(context, assetmgr, this);
                     }
                 }
             }
+            // for (var i = 0; i < scene.renderList.renderLayers.length; i++)
+            // {
+            //     var layer = scene.renderList.renderLayers[i];
+            //     var list = layer.list;
+
+            //     for (var j = 0; j < list.length; j++)
+            //     {
+            //         if (this.CullingMask & (1 << list[j].renderLayer))
+            //         {
+            //             list[j].render(context, assetmgr, this);
+            //         }
+            //     }
+            // }
 
         }
         /**
@@ -773,15 +791,31 @@ namespace gd3d.framework
             }
             if (this.postQueues.length == 0)
             {
-                this._targetAndViewport(this.renderTarget, scene, context, false);
-                this._renderOnce(scene, context, "");
+                // setTimeout(() =>
+                // {
+                    this._targetAndViewport(this.renderTarget, scene, context, false);
+                    this._renderOnce(scene, context, "");
+                // });
+                
                 //context.webgl.flush();
             }
             else
             {
-                for (var i = 0; i < this.postQueues.length; i++)
+
+                // for (var i = 0; i < this.postQueues.length; i++)
+                // {
+                //     this.postQueues[i].render(scene, context, this);
+                // }
+                // let count = 0;
+                for (let item of this.postQueues)
                 {
-                    this.postQueues[i].render(scene, context, this);
+                    // setTimeout(() =>
+                    // {
+
+                        item.render(scene, context, this);
+                        // if (++count >= this.postQueues.length)
+                            // context.webgl.flush();
+                    // });
                 }
                 context.webgl.flush();
             }

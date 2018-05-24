@@ -20,6 +20,8 @@
          * @version egret-gd3d 1.0
          */
         defaultAsset: boolean = false;
+
+       
         constructor(assetName: string = null)
         {
             if (!assetName)
@@ -105,7 +107,7 @@
             return total;
         }
         private trans: transform | transform2D;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -116,7 +118,7 @@
         getCloneTrans(): transform 
         {
             let temp = io.cloneObj(this.trans);
-            if(temp instanceof transform)
+            if (temp instanceof transform)
                 return temp;
         }
 
@@ -130,7 +132,7 @@
         getCloneTrans2D(): transform2D 
         {
             let temp = io.cloneObj(this.trans);
-            if(temp instanceof transform2D)
+            if (temp instanceof transform2D)
                 return temp;
         }
 
@@ -165,16 +167,21 @@
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
-            this.jsonstr = jsonStr;
-            let jsonObj =JSON.parse(jsonStr);
-            let type = jsonObj["type"];
-            switch(type){
-                case "transform": this.trans = new transform; break;
-                case "transform2D": this.trans = new transform2D; break;
-            }
-            
-            if(type != null)
-            io.deSerialize(jsonObj , this.trans, assetmgr, this.assetbundle);
+           return new threading.gdPromise((resolve) =>
+            {
+                this.jsonstr = jsonStr;
+                let jsonObj = JSON.parse(jsonStr);
+                let type = jsonObj["type"];
+                switch (type)
+                {
+                    case "transform": this.trans = new transform; break;
+                    case "transform2D": this.trans = new transform2D; break;
+                }
+
+                if (type != null)
+                    io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
+                resolve();
+            });
         }
     }
 }

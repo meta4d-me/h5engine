@@ -133,54 +133,58 @@ namespace gd3d.framework
          */
         Parse(txt: string, assetmgr: assetMgr)
         {
-            let _json = JSON.parse(txt);
-
-            this.rootNode = new transform();
-            this.rootNode.name = this.getName();
-            io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
-
-            this.lightmaps = [];
-            this.lightmapData = _json["lightmap"];
-            let lightmapCount = this.lightmapData.length;
-            for (let i = 0; i < lightmapCount; i++)
+            return new threading.gdPromise((resolve) =>
             {
-                if (this.lightmapData[i] == null)
+
+                let _json = JSON.parse(txt);
+                this.rootNode = new transform();
+                this.rootNode.name = this.getName();
+                io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
+
+                this.lightmaps = [];
+                this.lightmapData = _json["lightmap"];
+                let lightmapCount = this.lightmapData.length;
+                for (let i = 0; i < lightmapCount; i++)
                 {
-                    this.lightmaps.push(null);
+                    if (this.lightmapData[i] == null)
+                    {
+                        this.lightmaps.push(null);
+                    }
+                    else
+                    {
+                        let lightmapName = this.lightmapData[i].name;
+                        let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
+                        if (lightmap)
+                            lightmap.use();
+                        this.lightmaps.push(lightmap);
+                    }
                 }
-                else
+
+                let fogData = _json["fog"];
+                if (fogData != undefined)
                 {
-                    let lightmapName = this.lightmapData[i].name;
-                    let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
-                    if (lightmap)
-                        lightmap.use();
-                    this.lightmaps.push(lightmap);
+                    this.fog = new Fog();
+                    this.fog._Start = <number>fogData["_Start"];
+                    this.fog._End = <number>fogData["_End"];
+
+                    let cor: string = fogData["_Color"];
+                    if (typeof (cor) == "string")
+                    {
+                        let array: string[] = cor.split(",");
+                        this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                    } else
+                        this.fog._Color = cor;
+                    this.fog._Density = <number>fogData["_Density"];
                 }
-            }
 
-            let fogData = _json["fog"];
-            if (fogData != undefined)
-            {
-                this.fog = new Fog();
-                this.fog._Start = <number>fogData["_Start"];
-                this.fog._End = <number>fogData["_End"];
-
-                let cor: string = fogData["_Color"];
-                if (typeof (cor) == "string")
+                //navMesh
+                let nav = _json["navmesh"];
+                if (nav != undefined && nav.data != null)
                 {
-                    let array: string[] = cor.split(",");
-                    this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
-                } else
-                    this.fog._Color = cor;
-                this.fog._Density = <number>fogData["_Density"];
-            }
-
-            //navMesh
-            let nav = _json["navmesh"];
-            if (nav != undefined && nav.data != null)
-            {
-                this.navMeshJson = nav.data;
-            }
+                    this.navMeshJson = nav.data;
+                }
+                resolve();
+            });
         }
 
         /**

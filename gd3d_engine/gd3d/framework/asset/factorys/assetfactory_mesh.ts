@@ -19,11 +19,13 @@ namespace gd3d.framework
                         return;
 
                     let _mesh = asset ? asset : new mesh(filename);
-                    _mesh.onReadFinish=()=>{
+                    // _mesh.onReadFinish=()=>{
+                    //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                    // };
+                    // _mesh.Parse(_buffer, assetMgr.webgl);//在此方法中命名mesh的name（name存在bin文件中）     
+                    _mesh.Parse(_buffer,assetMgr.webgl).then(()=>{
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
-                    };
-                    _mesh.Parse(_buffer, assetMgr.webgl);//在此方法中命名mesh的name（name存在bin文件中）     
-                    // AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {
@@ -38,11 +40,13 @@ namespace gd3d.framework
             state.resstate[filename] = new ResourceState();
             let _buffer = respack[filename];
             let _mesh = asset ? asset : new mesh(filename);
-            _mesh.onReadFinish=()=>{
+            // _mesh.onReadFinish=()=>{
+            //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+            // };
+            // _mesh.Parse(_buffer, assetMgr.webgl);
+            _mesh.Parse(_buffer,assetMgr.webgl).then(()=>{
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
-            };
-            _mesh.Parse(_buffer, assetMgr.webgl);
-            // AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+            });
         }
     }
 }
