@@ -3575,7 +3575,7 @@ declare namespace gd3d.io {
         writeSymbolByte(num: number): void;
         writeShort(num: number): void;
         writeInt(num: number): void;
-        write(array: Uint8Array | number[] | number, offset?: number, length?: number): void;
+        write(array: Uint8Array | number[] | number | any, offset?: number, length?: number): void;
         dispose(): void;
         getBuffer(): Uint8Array;
         getUint8Array(): Uint8Array;

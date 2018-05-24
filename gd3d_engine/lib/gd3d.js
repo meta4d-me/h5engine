@@ -18742,7 +18742,7 @@ var gd3d;
             binTool.prototype.write = function (array, offset, length) {
                 if (offset === void 0) { offset = 0; }
                 if (length === void 0) { length = -1; }
-                if (array instanceof Uint8Array) {
+                if (array["byteLength"]) {
                     if (this.buffer.byteLength < array.length)
                         this.buffer = array;
                     else {
@@ -18757,7 +18757,7 @@ var gd3d;
                     }
                     this.w_offset += array.byteLength;
                 }
-                else if (array instanceof Array) {
+                else if (array["length"]) {
                     if (this.buffer.byteLength < array.length)
                         this.buffer = new Uint8Array(array);
                     else {

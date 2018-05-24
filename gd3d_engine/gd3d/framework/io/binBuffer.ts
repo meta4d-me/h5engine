@@ -1083,9 +1083,9 @@ namespace gd3d.io
             this.write(converter.Int32ToArray(num));
         }
 
-        write(array: Uint8Array | number[] | number, offset: number = 0, length: number = -1)
+        write(array: Uint8Array | number[] | number | any, offset: number = 0, length: number = -1)
         {
-            if (array instanceof Uint8Array)
+            if (array["byteLength"])//(array instanceof Uint8Array)
             {
                 if (this.buffer.byteLength < array.length)
                     this.buffer = array;
@@ -1102,7 +1102,7 @@ namespace gd3d.io
                     }
                 }
                 this.w_offset += array.byteLength;
-            } else if (array instanceof Array)
+            } else if (array["length"])//(array instanceof Array)
             {
                 if (this.buffer.byteLength < array.length)
                     this.buffer = new Uint8Array(array);
