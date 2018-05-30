@@ -68,7 +68,8 @@ namespace gd3d.framework
          * 当前节点依赖的prefab路径，如果不依赖，则为空
          * @version egret-gd3d 1.0
          */
-        prefab: string = null;
+        @gd3d.reflect.Field("string")
+        prefab: string = "";
 
         private aabbdirty: boolean = true;
 

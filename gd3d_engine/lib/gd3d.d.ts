@@ -1280,7 +1280,7 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         dispose(): void;
         caclByteLength(): number;
-        Parse(buf: ArrayBuffer): void;
+        Parse(buf: ArrayBuffer): threading.gdPromise<any>;
         fps: number;
         loop: boolean;
         readonly time: number;
@@ -1358,7 +1358,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         data: F14EffectData;
         delayTime: number;
-        Parse(jsonStr: string, assetmgr: assetMgr): void;
+        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
     }
 }
 declare namespace gd3d.framework {
@@ -1714,10 +1714,7 @@ declare namespace gd3d.framework {
         data: gd3d.render.meshData;
         submesh: subMeshInfo[];
         onReadFinish: () => void;
-        private reading;
-        private readProcess(read, data, objVF, vcount, vec10tpose, callback);
-        private readFinish(read, data, buf, objVF, webgl);
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): void;
+        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
     }
@@ -1783,7 +1780,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): void;
+        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
     }
 }
 declare namespace gd3d.framework {
@@ -1801,7 +1798,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         resetLightMap(assetmgr: assetMgr): void;
         private lightmapData;
-        Parse(txt: string, assetmgr: assetMgr): void;
+        Parse(txt: string, assetmgr: assetMgr): threading.gdPromise<{}>;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
         useFog(scene: scene): void;
@@ -2468,49 +2465,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class trailRender implements IRenderer {
-        layer: RenderLayerEnum;
-        renderLayer: number;
-        queue: number;
-        private width;
-        private _material;
-        private _color;
-        private mesh;
-        private vertexcount;
-        private dataForVbo;
-        private dataForEbo;
-        private sticks;
-        private active;
-        private reInit;
-        start(): void;
-        onPlay(): void;
-        private app;
-        private webgl;
-        private camerapositon;
-        extenedOneSide: boolean;
-        update(delta: number): void;
-        gameObject: gameObject;
-        material: gd3d.framework.material;
-        color: gd3d.math.color;
-        setspeed(upspeed: number): void;
-        setWidth(Width: number): void;
-        play(): void;
-        stop(): void;
-        lookAtCamera: boolean;
-        private initmesh();
-        private intidata();
-        private speed;
-        private updateTrailData();
-        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        clone(): void;
-        remove(): void;
-    }
-    class trailStick {
-        location: gd3d.math.vector3;
-        updir: gd3d.math.vector3;
-    }
-}
-declare namespace gd3d.framework {
     class trailRender_recorde implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: number;
@@ -2559,6 +2513,49 @@ declare namespace gd3d.framework {
         handle: gd3d.math.vector3;
         trailNodes: trailNode[];
         constructor(p: gd3d.math.vector3, updir: gd3d.math.vector3, t: number);
+    }
+}
+declare namespace gd3d.framework {
+    class trailRender implements IRenderer {
+        layer: RenderLayerEnum;
+        renderLayer: number;
+        queue: number;
+        private width;
+        private _material;
+        private _color;
+        private mesh;
+        private vertexcount;
+        private dataForVbo;
+        private dataForEbo;
+        private sticks;
+        private active;
+        private reInit;
+        start(): void;
+        onPlay(): void;
+        private app;
+        private webgl;
+        private camerapositon;
+        extenedOneSide: boolean;
+        update(delta: number): void;
+        gameObject: gameObject;
+        material: gd3d.framework.material;
+        color: gd3d.math.color;
+        setspeed(upspeed: number): void;
+        setWidth(Width: number): void;
+        play(): void;
+        stop(): void;
+        lookAtCamera: boolean;
+        private initmesh();
+        private intidata();
+        private speed;
+        private updateTrailData();
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        clone(): void;
+        remove(): void;
+    }
+    class trailStick {
+        location: gd3d.math.vector3;
+        updir: gd3d.math.vector3;
     }
 }
 declare namespace gd3d.framework {
@@ -2703,7 +2700,7 @@ declare namespace gd3d.framework {
         beloop: boolean;
         lifeTime: number;
         layers: F14LayerData[];
-        parsejson(json: any, assetmgr: assetMgr, assetbundle: string): void;
+        parsejson(json: any, assetmgr: assetMgr, assetbundle: string): threading.gdPromise<{}>;
     }
     class F14LayerData {
         Name: string;
@@ -2713,7 +2710,7 @@ declare namespace gd3d.framework {
             [frame: number]: F14FrameData;
         };
         constructor();
-        parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
+        parse(json: any, assetmgr: assetMgr, assetbundle: string): threading.gdPromise<{}>;
     }
     class F14FrameData {
         frameindex: number;
@@ -3514,10 +3511,10 @@ declare namespace gd3d.io {
         static ArrayToFloat64(buf: Uint8Array, offset?: number): number;
         static ArrayToFloat32(buf: Uint8Array, offset?: number): number;
         static ArrayToInt32(buf: Uint8Array, offset?: number): number;
-        static ArrayToInt16(buf: Uint8Array, offset?: number): number;
-        static ArrayToInt8(buf: Uint8Array, offset?: number): number;
         static ArrayToUint32(buf: Uint8Array, offset?: number): number;
+        static ArrayToInt16(buf: Uint8Array, offset?: number): number;
         static ArrayToUint16(buf: Uint8Array, offset?: number): number;
+        static ArrayToInt8(buf: Uint8Array, offset?: number): number;
         static ArrayToString(buf: Uint8Array, offset?: number): string;
     }
     class binTool {
@@ -5182,6 +5179,17 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.threading {
+    class gdPromise<T> {
+        private catchMethod;
+        private thenCall;
+        constructor(executor: (resolve: (value?: T) => void, reject: (reason?: any) => void) => void);
+        resolve(value?: T): void;
+        reject(reason?: any): void;
+        then(thenCall: (value?: T) => void): gdPromise<T>;
+        catch(callbcack: (val: any) => void): void;
+    }
+}
+declare namespace gd3d.threading {
     class thread {
         static workerInstance: Worker;
         private static instance;
@@ -5190,6 +5198,7 @@ declare namespace gd3d.threading {
         private callID;
         private callMap;
         constructor();
+        OnMessage(e: MessageEvent): void;
         Call(name: string, data: any, callback: (result) => void): void;
     }
 }
@@ -5923,17 +5932,6 @@ declare namespace gd3d.render {
         };
         static webgl: WebGLRenderingContext;
         static initApplyUnifmFunc(): void;
-    }
-}
-declare namespace gd3d.render {
-    class glWindow {
-        renderTarget: gd3d.render.glRenderTarget;
-        clearop_Color: boolean;
-        backColor: gd3d.math.color;
-        clearop_Depth: boolean;
-        clearop_Stencil: boolean;
-        viewport: gd3d.math.rect;
-        use(webgl: WebGLRenderingContext): void;
     }
 }
 declare namespace gd3d.render {
