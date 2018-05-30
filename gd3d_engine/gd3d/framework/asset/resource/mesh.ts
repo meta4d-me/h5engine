@@ -379,7 +379,7 @@ namespace gd3d.framework
             {
                 threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
                 {
-                    console.log(result);
+                    
                     let objVF = result.objVF;
                     let data = result.meshData;
                     data.originVF = objVF.vf;
