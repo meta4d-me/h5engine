@@ -119,7 +119,7 @@ namespace gd3d.framework
          * 包含自己和所有子物体的aabb
          * @version egret-gd3d 1.0
          */
-        aabbchild: aabb;
+        aabbchild: aabb=new gd3d.framework.aabb(math.pool.vector3_zero,math.pool.vector3_zero);
 
         /**
         * @private
@@ -133,7 +133,8 @@ namespace gd3d.framework
             if (this.aabb == null)
             {
                 this.aabb = this.buildAABB();
-                this.aabbchild = this.aabb.clone();
+                //this.aabbchild = this.aabb.clone();
+                this.aabb.cloneTo(this.aabbchild);
             }
             this.aabb.update(this.worldMatrix);
         }
@@ -147,7 +148,9 @@ namespace gd3d.framework
         caclAABBChild()
         {
             if (this.aabb == null) return;
-            this.aabbchild = this.aabb.clone();
+            //this.aabbchild = this.aabb.clone();
+            this.aabb.cloneTo(this.aabbchild);
+            
             if (this.children != null)
             {
                 for (var i = 0; i < this.children.length; i++)

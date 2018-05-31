@@ -391,7 +391,7 @@ namespace gd3d.framework
          */
         setTexture(_id: string, _texture: gd3d.framework.texture, resname: string = "")
         {
-            if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture)
+            if ((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture)||_id=="_LightmapTex")
             {
                 if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset))
                 {
