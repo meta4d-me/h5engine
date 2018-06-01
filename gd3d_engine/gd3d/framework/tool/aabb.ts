@@ -264,6 +264,15 @@
             return aabb;
         }
 
+        public cloneTo(to:aabb)
+        {
+            math.vec3Clone(this.minimum,to.minimum);
+            math.vec3Clone(this.minimum,to.srcmin);
+
+            math.vec3Clone(this.maximum,to.maximum);
+            math.vec3Clone(this.maximum,to.srcmax);
+        }
+
         /**
         * @public
         * @language zh_CN

@@ -205,6 +205,7 @@ namespace gd3d.framework
                                 if(!this.useGlobalLightMap)
                                 {
                                     drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
+                                    context.lightmap=usemat.statedMapUniforms["_LightmapTex"];
                                     context.lightmapOffset = this.lightmapScaleOffset;
                                     context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                                 }

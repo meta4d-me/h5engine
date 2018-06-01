@@ -477,7 +477,7 @@ namespace gd3d.io
 
         write(array: Uint8Array | number[] | number | any, offset: number = 0, length: number = -1)
         {
-            if (array["byteLength"])//(array instanceof Uint8Array)
+            if (array["byteLength"] !=undefined)//(array instanceof Uint8Array)
             {
                 if (this.buffer.byteLength < array.length)
                     this.buffer = array;
@@ -494,7 +494,7 @@ namespace gd3d.io
                     }
                 }
                 this.w_offset += array.byteLength;
-            } else if (array["length"])//(array instanceof Array)
+            } else if (array["length"] !=undefined)//(array instanceof Array)
             {
                 if (this.buffer.byteLength < array.length)
                     this.buffer = new Uint8Array(array);
