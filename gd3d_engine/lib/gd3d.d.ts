@@ -482,6 +482,7 @@ declare namespace gd3d.framework {
     }
     class transform2D {
         private _canvas;
+        prefab: string;
         canvas: canvas;
         layer: number;
         tag: string;

@@ -2455,6 +2455,7 @@ var gd3d;
         framework.C2DComponent = C2DComponent;
         var transform2D = (function () {
             function transform2D() {
+                this.prefab = "";
                 this.layer = framework.cullingmaskutil.maskTolayer(framework.CullingMask.default);
                 this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.name = "noname";
@@ -3116,6 +3117,10 @@ var gd3d;
             transform2D.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", String)
+            ], transform2D.prototype, "prefab", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 gd3d.reflect.UIStyle("enum"),
