@@ -93,6 +93,16 @@ namespace gd3d.framework {
         private _canvas: canvas;
 
         /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 当前节点依赖的prefab路径，如果不依赖，则为空
+        * @version egret-gd3d 1.0
+        */
+        @gd3d.reflect.Field("string")
+        prefab: string = "";
+
+        /**
          * @public
          * @language zh_CN
          * @classdesc
