@@ -10708,17 +10708,18 @@ var gd3d;
                 for (var item in this.statedMapUniforms) {
                     var __type = this.defaultMapUniform[item].type;
                     var val = this.statedMapUniforms;
-                    var jsonValue = void 0;
+                    var jsonValue = {};
+                    jsonValue["type"] = __type;
                     switch (__type) {
                         case gd3d.render.UniformTypeEnum.CubeTexture:
                         case gd3d.render.UniformTypeEnum.Texture:
-                            jsonValue = "" + val[item].name.name;
+                            jsonValue["value"] = "" + val[item].name.name;
                             break;
                         case gd3d.render.UniformTypeEnum.Float4:
-                            jsonValue = "(" + val[item].x + "," + val[item].y + "," + val[item].z + "," + val[item].w + ")";
+                            jsonValue["value"] = "(" + val[item].x + "," + val[item].y + "," + val[item].z + "," + val[item].w + ")";
                             break;
                         case gd3d.render.UniformTypeEnum.Float:
-                            jsonValue = val[item];
+                            jsonValue["value"] = val[item];
                             break;
                         default:
                             console.warn("\u65E0\u6CD5\u5B58\u50A8\u672A\u89E3\u6790\u7C7B\u578B:" + __type + "," + item);
@@ -19012,14 +19013,16 @@ var gd3d;
             }
             SerializeDependent.GetAssetContent = function (asset) {
                 var data = {};
-                if (asset instanceof gd3d.framework.material)
-                    return { "name": asset.getName() + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                if (asset instanceof gd3d.framework.material) {
+                    var names = asset.getName().split(".");
+                    return { "name": names[0] + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                }
             };
             SerializeDependent.GetAssetUrl = function (asset, assetMgr) {
                 if (!assetMgr || !asset)
                     return;
                 var url = assetMgr.getAssetUrl(asset);
-                if (url)
+                if (url && !(asset instanceof gd3d.framework.material))
                     SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                 else
                     SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));

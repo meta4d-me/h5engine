@@ -19,8 +19,10 @@ namespace gd3d.io
         static GetAssetContent(asset: any)
         {
             let data: any = {};
-            if (asset instanceof gd3d.framework.material)
-                return { "name": asset.getName() + ".mat.json", "value": (asset as gd3d.framework.material).save(), "type": SaveAssetType.NameAndContent };
+            if (asset instanceof gd3d.framework.material){
+                let names = asset.getName().split(".");
+                return { "name": names[0] + ".mat.json", "value": (asset as gd3d.framework.material).save(), "type": SaveAssetType.NameAndContent };
+            }
             // if (asset instanceof gd3d.framework.mesh)
             //     return { "name": asset.getName() + "_enginedefault.mesh.bin", "type": SaveAssetType.DefaultAssets };
             // if (asset instanceof gd3d.framework.texture)
@@ -34,7 +36,7 @@ namespace gd3d.io
             // if (!url)
             //     return;
             //为了序列化存储而修改的逻辑hjx
-            if (url)
+            if (url && !(asset instanceof gd3d.framework.material))  //material 资源 存在 编辑器中修改的情况 不能 走URL 保存原文件
                 SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
             else
                 SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
