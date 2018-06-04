@@ -632,10 +632,10 @@ namespace gd3d.framework
                         jsonValue = `${val[item].name.name}`;
                         break;
                     case render.UniformTypeEnum.Float4:
-                        jsonValue = `(${val.x},${val.y},${val.z},${val.w})`;
+                        jsonValue = `(${val[item].x},${val[item].y},${val[item].z},${val[item].w})`;
                         break;
                     case render.UniformTypeEnum.Float:
-                        jsonValue = val;
+                        jsonValue = val[item];
                         break;
                     default:
                         console.warn(`无法存储未解析类型:${__type},${item}`);
