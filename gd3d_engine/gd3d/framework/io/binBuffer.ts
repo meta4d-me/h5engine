@@ -46,18 +46,18 @@ namespace gd3d.io
         static Int16ToArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[]
         {
             converter.dataView.setInt16(0, value, true);
-            return new Uint8Array(converter.dataBuffer.subarray(0, 2));           
+            return new Uint8Array(converter.dataBuffer.subarray(0, 2));
         }
         static Uint32toArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[]
         {
             converter.dataView.setInt32(0, value, true);
 
-            return new Uint8Array(converter.dataBuffer.subarray(0, 4));           
+            return new Uint8Array(converter.dataBuffer.subarray(0, 4));
         }
         static Uint16ToArray(value: number, target: Uint8Array | number[] = null, offset: number = 0): Uint8Array | number[]
         {
             converter.dataView.setUint16(0, value, true);
-            return new Uint8Array(converter.dataBuffer.subarray(0, 2));          
+            return new Uint8Array(converter.dataBuffer.subarray(0, 2));
         }
         static StringToUtf8Array(str: string): Uint8Array 
         {
@@ -94,20 +94,20 @@ namespace gd3d.io
             return new Uint8Array(bstr);
         }
         static ArrayToLong(buf: Uint8Array, offset: number = 0): number
-        {           
+        {
             converter.dataBuffer.set(buf.subarray(offset, offset + 4));
             var n1 = converter.dataView.getInt32(0, true);
-           
+
             converter.dataBuffer.set(buf.subarray(offset + 4, offset + 8));
             var n2 = converter.dataView.getInt32(4, true);
             n1 += n2 * 0x100000000;
             return n1;
         }
         static ArrayToULong(buf: Uint8Array, offset: number = 0): number
-        {          
+        {
             converter.dataBuffer.set(buf.subarray(offset, offset + 4));
             var n1 = converter.dataView.getUint32(0, true);
-          
+
             converter.dataBuffer.set(buf.subarray(offset + 4, offset + 8));
             var n2 = converter.dataView.getUint32(4, true);
             n1 += n2 * 0x100000000;
@@ -120,17 +120,17 @@ namespace gd3d.io
             return converter.dataView.getFloat64(0, true);
         }
         static ArrayToFloat32(buf: Uint8Array, offset: number = 0): number
-        {   
+        {
             converter.dataBuffer.set(buf.subarray(offset, offset + 4))
             return converter.dataView.getFloat32(0, true);
         }
         static ArrayToInt32(buf: Uint8Array, offset: number = 0): number
-        {           
+        {
             converter.dataBuffer.set(buf.subarray(offset, offset + 4))
             return converter.dataView.getInt32(0, true);
         }
         static ArrayToUint32(buf: Uint8Array, offset: number = 0): number
-        {            
+        {
             converter.dataBuffer.set(buf.subarray(offset, offset + 4));
             return converter.dataView.getUint32(0, true);
         }
@@ -140,7 +140,7 @@ namespace gd3d.io
             return converter.dataView.getInt16(0, true);
         }
         static ArrayToUint16(buf: Uint8Array, offset: number = 0): number
-        {           
+        {
             converter.dataBuffer.set(buf.subarray(offset, offset + 2));
             return converter.dataView.getUint16(0, true);
         }
@@ -148,9 +148,9 @@ namespace gd3d.io
         {
             return buf[offset];
         }
-       
-       
-      
+
+
+
         static ArrayToString(buf: Uint8Array, offset: number = 0): string
         {
             var ret: string[] = [];
@@ -177,7 +177,7 @@ namespace gd3d.io
                     ret.push(String.fromCharCode(ct));
                 }
                 else if (cc > 0x80)
-                {                    
+                {
                     console.warn("InvalidCharacterError");
                     return "";
                 }
@@ -206,69 +206,84 @@ namespace gd3d.io
             this.buffer = memoryPool.Insance.newUint8Array();//new Uint8Array(1024);
         }
 
-
+        private ckl()
+        {
+            if (this.r_offset > this.w_offset)
+                throw Error("[binTool] 内存读取失败 请检查当前输入的内存");
+        }
         readSingle(): number
         {
+            this.ckl();
             let ret = converter.ArrayToFloat32(this.buffer, this.r_offset);
             this.r_offset += 4;
             return ret;
         }
         readLong(): number
         {
+            this.ckl();
             let ret = converter.ArrayToLong(this.buffer, this.r_offset);
             this.r_offset += 8;
             return ret;
         }
         readULong(): number
         {
+            this.ckl();
             let ret = converter.ArrayToULong(this.buffer, this.r_offset);
             this.r_offset += 8;
             return ret;
         }
         readDouble(): number
         {
+            this.ckl();
             let ret = converter.ArrayToFloat64(this.buffer, this.r_offset);
             this.r_offset += 8;
             return ret;
         }
         readInt8(): number
         {
+            this.ckl();
             let ret = this.buffer[this.r_offset];
             this.r_offset += 1;
             return ret;
         }
         readUInt8(): number
         {
+            this.ckl();
             let ret = this.buffer[this.r_offset];
             this.r_offset += 1;
             return ret;
         }
         readInt16(): number
         {
+            this.ckl();
             let ret = converter.ArrayToInt16(this.buffer, this.r_offset);
             this.r_offset += 2;
             return ret;
         }
         readUInt16(): number
         {
+            this.ckl();
             let ret = converter.ArrayToUint16(this.buffer, this.r_offset);
             this.r_offset += 2;
             return ret;
         }
         readInt32(): number
         {
+            this.ckl();
             let ret = converter.ArrayToInt32(this.buffer, this.r_offset);
             this.r_offset += 4;
             return ret;
         }
         readUInt32(): number
         {
+            this.ckl();
             let ret = converter.ArrayToUint32(this.buffer, this.r_offset);
             this.r_offset += 4;
             return ret;
         }
         readBoolean(): boolean
         {
+            this.ckl();
             let ret = this.buffer[this.r_offset] != 0;
             this.r_offset += 1;
             return ret;
@@ -283,6 +298,7 @@ namespace gd3d.io
         }
         readUnsignedInt(): number
         {
+            this.ckl();
             let ret = converter.ArrayToUint32(this.buffer, this.r_offset);
             this.r_offset += 4;
             return ret;
@@ -308,12 +324,14 @@ namespace gd3d.io
         }
         readBytes(length: number): Uint8Array
         {
+            this.ckl();
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
             return array;
         }
         readStringUtf8(): string
         {
+            this.ckl();
             let length = this.readInt8();
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
@@ -321,7 +339,7 @@ namespace gd3d.io
         }
         readUTFBytes(/*length: number*/): string
         {
-
+            this.ckl();
             let length = this.readUInt16();
             return this.readUTFByLen(length);
             // this.r_offset += length;
@@ -330,18 +348,21 @@ namespace gd3d.io
 
         readUTFByLen(length: number): string
         {
+            this.ckl();
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
             return converter.ArrayToString(array);
         }
         readStringUtf8FixLength(length: number): string
         {
+            this.ckl();
             let array = this.buffer.subarray(this.r_offset, this.r_offset + length);
             this.r_offset += length;
             return converter.ArrayToString(array);
         }
         readStringAnsi(): string
         {
+            this.ckl();
             let slen = this.readUInt8();
             var bs: string = "";
             for (var i = 0; i < slen; i++)
@@ -477,7 +498,7 @@ namespace gd3d.io
 
         write(array: Uint8Array | number[] | number | any, offset: number = 0, length: number = -1)
         {
-            if (array["byteLength"] !=undefined)//(array instanceof Uint8Array)
+            if (array["byteLength"] != undefined)//(array instanceof Uint8Array)
             {
                 if (this.buffer.byteLength < array.length)
                     this.buffer = array;
@@ -494,7 +515,7 @@ namespace gd3d.io
                     }
                 }
                 this.w_offset += array.byteLength;
-            } else if (array["length"] !=undefined)//(array instanceof Array)
+            } else if (array["length"] != undefined)//(array instanceof Array)
             {
                 if (this.buffer.byteLength < array.length)
                     this.buffer = new Uint8Array(array);
