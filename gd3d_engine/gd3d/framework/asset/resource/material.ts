@@ -624,18 +624,19 @@ namespace gd3d.framework
             {
                 let __type = this.defaultMapUniform[item].type;
                 let val = this.statedMapUniforms;
-                let jsonValue;
+                let jsonValue = {};
+                jsonValue["type"] = __type;
                 switch (__type)
                 {
                     case render.UniformTypeEnum.CubeTexture:
                     case render.UniformTypeEnum.Texture:
-                        jsonValue = `${val[item].name.name}`;
+                        jsonValue["value"] = `${val[item].name.name}`;
                         break;
                     case render.UniformTypeEnum.Float4:
-                        jsonValue = `(${val.x},${val.y},${val.z},${val.w})`;
+                        jsonValue["value"] = `(${val[item].x},${val[item].y},${val[item].z},${val[item].w})`;
                         break;
                     case render.UniformTypeEnum.Float:
-                        jsonValue = val;
+                        jsonValue["value"] = val[item];
                         break;
                     default:
                         console.warn(`无法存储未解析类型:${__type},${item}`);
