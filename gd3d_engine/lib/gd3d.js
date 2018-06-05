@@ -39,7 +39,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000077";
+                this.build = "b000075";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.canvasFixedType = CanvasFixedType.Free;
@@ -5556,103 +5556,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var fontAltnas = (function () {
-            function fontAltnas() {
-                this.charIndex = 0;
-                this.testData = new ImageData(1024, 1204);
-                var can2d = document.createElement("canvas");
-                can2d.className = "fontcanvas";
-                can2d.style.left = "0px";
-                can2d.style.top = "0px";
-                can2d.style.width = "400px";
-                can2d.style.height = "200px";
-                can2d.style.backgroundColor = "#000000";
-                can2d.style.position = "absolute";
-                gd3d.framework.sceneMgr.app.container.appendChild(can2d);
-                this.contex2d = can2d.getContext("2d");
-                this.font = new framework.font();
-                this.font.fontname = "dynamicfont";
-                this.font.pointSize = 30;
-                this.font.padding = 1;
-                this.font.lineHeight = 32.75;
-                this.font.baseline = 24.0625;
-                this.font.atlasWidth = 1024;
-                this.font.atlasHeight = 1024;
-                this.font.cmap = {};
-                this.fontTex = new framework.texture();
-                var gltexture = new gd3d.render.glTexture2D(gd3d.framework.sceneMgr.app.webgl, gd3d.render.TextureFormatEnum.RGBA, false, false);
-                this.fontTex.glTexture = gltexture;
-                this.font.texture = this.fontTex;
-                this.imagedata = new Uint8Array(1024 * 1024 * 4);
-                gltexture.uploadByteArray(false, false, 1024, 1024, this.imagedata, false, false, false);
-            }
-            Object.defineProperty(fontAltnas, "inc", {
-                get: function () {
-                    if (this._inc == null) {
-                        this._inc = new fontAltnas();
-                    }
-                    return this._inc;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            fontAltnas.prototype.checkText = function (str) {
-                for (var i = 0; i < str.length; i++) {
-                    var key = str.charAt(i);
-                    if (this.font.cmap[key])
-                        continue;
-                    this.adddNewChar(key);
-                }
-            };
-            fontAltnas.prototype.adddNewChar = function (key) {
-                var size = 32;
-                this.charlenInRow = Math.floor(1000 / 32);
-                this.contex2d.fillStyle = "#000000";
-                this.contex2d.fillRect(0, 0, size, size);
-                this.contex2d.font = size + "px MS Sans Serif,Arial,aa";
-                this.contex2d.fillStyle = "#ffffff";
-                this.contex2d.textBaseline = "bottom";
-                this.contex2d.fillText(key, 0, size);
-                var fontData = this.contex2d.getImageData(0, 0, size, size);
-                var curline = Math.floor(this.charIndex / this.charlenInRow);
-                var curcolumn = this.charIndex % this.charlenInRow;
-                for (var h = 0; h < size; h++) {
-                    for (var w = 0; w < size; w++) {
-                        var oindex = h * size + w;
-                        var newindex = (h + curline * size) * 1024 + w + curcolumn * size;
-                        this.imagedata[newindex * 4 + 0] = fontData.data[oindex * 4 + 0];
-                        this.imagedata[newindex * 4 + 1] = fontData.data[oindex * 4 + 1];
-                        this.imagedata[newindex * 4 + 2] = fontData.data[oindex * 4 + 2];
-                        this.imagedata[newindex * 4 + 3] = fontData.data[oindex * 4 + 3];
-                        this.testData.data[newindex * 4 + 0] = fontData.data[oindex * 4 + 0];
-                        this.testData.data[newindex * 4 + 1] = fontData.data[oindex * 4 + 1];
-                        this.testData.data[newindex * 4 + 2] = fontData.data[oindex * 4 + 2];
-                        this.testData.data[newindex * 4 + 3] = fontData.data[oindex * 4 + 3];
-                    }
-                }
-                this.fontTex.glTexture.uploadByteArray(false, false, 1024, 1024, this.imagedata, false, false, false);
-                this.contex2d.putImageData(this.testData, 100, 0);
-                var newchar = new framework.charinfo();
-                this.font.cmap[key] = newchar;
-                newchar.x = curcolumn * size / 1024.0;
-                newchar.y = curline * size / 1024.0;
-                newchar.w = size / 1024.0;
-                newchar.h = size / 1024.0;
-                newchar.yOffset = 25;
-                newchar.xSize = newchar.w;
-                newchar.ySize = newchar.h;
-                newchar.xAddvance = newchar.w;
-                this.charIndex++;
-            };
-            return fontAltnas;
-        }());
-        framework.fontAltnas = fontAltnas;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var resID = (function () {
             function resID() {
                 this.id = resID.next();
@@ -10805,17 +10708,18 @@ var gd3d;
                 for (var item in this.statedMapUniforms) {
                     var __type = this.defaultMapUniform[item].type;
                     var val = this.statedMapUniforms;
-                    var jsonValue = void 0;
+                    var jsonValue = {};
+                    jsonValue["type"] = __type;
                     switch (__type) {
                         case gd3d.render.UniformTypeEnum.CubeTexture:
                         case gd3d.render.UniformTypeEnum.Texture:
-                            jsonValue = "" + val[item].name.name;
+                            jsonValue["value"] = "" + val[item].name.name;
                             break;
                         case gd3d.render.UniformTypeEnum.Float4:
-                            jsonValue = "(" + val.x + "," + val.y + "," + val.z + "," + val.w + ")";
+                            jsonValue["value"] = "(" + val[item].x + "," + val[item].y + "," + val[item].z + "," + val[item].w + ")";
                             break;
                         case gd3d.render.UniformTypeEnum.Float:
-                            jsonValue = val;
+                            jsonValue["value"] = val[item];
                             break;
                         default:
                             console.warn("\u65E0\u6CD5\u5B58\u50A8\u672A\u89E3\u6790\u7C7B\u578B:" + __type + "," + item);
@@ -19109,14 +19013,16 @@ var gd3d;
             }
             SerializeDependent.GetAssetContent = function (asset) {
                 var data = {};
-                if (asset instanceof gd3d.framework.material)
-                    return { "name": asset.getName() + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                if (asset instanceof gd3d.framework.material) {
+                    var names = asset.getName().split(".");
+                    return { "name": names[0] + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                }
             };
             SerializeDependent.GetAssetUrl = function (asset, assetMgr) {
                 if (!assetMgr || !asset)
                     return;
                 var url = assetMgr.getAssetUrl(asset);
-                if (url)
+                if (url && !(asset instanceof gd3d.framework.material))
                     SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                 else
                     SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
