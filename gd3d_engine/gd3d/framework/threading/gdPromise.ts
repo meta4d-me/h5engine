@@ -30,7 +30,7 @@ namespace gd3d.threading
         public reject(reason?: any)
         {
             console.error(reason);
-            if (!this.catchMethod)
+            if (this.catchMethod)
                 return this.catchMethod(reason);
 
         }
