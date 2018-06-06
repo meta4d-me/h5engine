@@ -229,7 +229,9 @@ namespace gd3d.framework
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number=0)
         {         
-            if(!this.renderActive||!this.enableDraw) return;            
+            if(!this.renderActive||!this.enableDraw) return;
+            DrawCallInfo.inc.currentState=DrawCallEnum.EffectSystem;
+
             this._renderCamera=camera;
             let curCount = 0;
             context.updateModel(this.root);

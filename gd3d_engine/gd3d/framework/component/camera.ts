@@ -687,7 +687,14 @@ namespace gd3d.framework
                     {
                         context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
                         gd3d.render.glDrawPass.lastZWrite = true;
-                        context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                        if(scene.fog)
+                        {
+                            context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
+                        }else
+                        {
+                            context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                        }
+                        //context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                         context.webgl.clearDepth(1.0);
                         context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
                     }
@@ -700,7 +707,15 @@ namespace gd3d.framework
                     }
                     else if (this.clearOption_Color)
                     {
-                        context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                        if(scene.fog)
+                        {
+                            context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
+                        }else
+                        {
+                            context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                        }
+
+                        //context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                         context.webgl.clear(context.webgl.COLOR_BUFFER_BIT);
                     }
                     else

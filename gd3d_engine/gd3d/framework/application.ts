@@ -231,6 +231,8 @@ namespace gd3d.framework
             // this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
             //     <WebGLRenderingContext>canvas.getContext("experimental-webgl");
             this.startForCanvas(canvas, type, val, webglDebug);
+
+            //this.showDrawCall();
         }
 
         startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
@@ -387,6 +389,16 @@ namespace gd3d.framework
                 this.container.removeChild(this.stats.container);
             }
         }
+
+        showDrawCall()
+        {
+            DrawCallInfo.inc.showDrawcallInfo();
+        }
+        closeDrawCall()
+        {
+            DrawCallInfo.inc.closeDrawCallInfo();
+        }
+
         private beStepNumber = 0;
         //delta 单位秒
         private update(delta: number)
