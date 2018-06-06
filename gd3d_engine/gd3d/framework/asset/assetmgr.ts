@@ -1584,12 +1584,15 @@ namespace gd3d.framework {
             let navmeshJson = {data:navstr};
 
 
+            let cup = scene.fog._Color;
+            scene.fog._Color = `${scene.fog._Color.x},${scene.fog._Color.y},${scene.fog._Color.z},${scene.fog._Color.z}` as any;  //
+            _scene["fog"] = scene.fog;
             _scene["rootNode"] = _rootNode;
             _scene["lightmap"] = _lightmaps;
-            _scene["fog"] = scene.fog;
             _scene["navmesh"] = navmeshJson;
-
+            
             let _sceneStr = JSON.stringify(_scene);
+            scene.fog._Color = cup;
 
             var _rawscene: rawscene = this.getAssetByName(scene.name) as rawscene;
             _rawscene.Parse(_sceneStr, this);

@@ -1360,6 +1360,8 @@ declare namespace gd3d.framework {
         data: F14EffectData;
         delayTime: number;
         Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
+        getDependents(): IAsset[];
+        private doSearch(obj, arr);
     }
 }
 declare namespace gd3d.framework {

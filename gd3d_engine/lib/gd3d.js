@@ -6482,11 +6482,14 @@ var gd3d;
                 var navstr = framework.NavMeshLoadManager.Instance.navmeshJson;
                 navstr = navstr == null ? "" : navstr;
                 var navmeshJson = { data: navstr };
+                var cup = scene.fog._Color;
+                scene.fog._Color = scene.fog._Color.x + "," + scene.fog._Color.y + "," + scene.fog._Color.z + "," + scene.fog._Color.z;
+                _scene["fog"] = scene.fog;
                 _scene["rootNode"] = _rootNode;
                 _scene["lightmap"] = _lightmaps;
-                _scene["fog"] = scene.fog;
                 _scene["navmesh"] = navmeshJson;
                 var _sceneStr = JSON.stringify(_scene);
+                scene.fog._Color = cup;
                 var _rawscene = this.getAssetByName(scene.name);
                 _rawscene.Parse(_sceneStr, this);
                 var url = this.getAssetUrl(_rawscene);
@@ -8692,6 +8695,35 @@ var gd3d;
                 var json = JSON.parse(jsonStr);
                 this.data = new framework.F14EffectData();
                 return this.data.parsejson(json, assetmgr, this.assetbundle);
+            };
+            f14eff.prototype.getDependents = function () {
+                if (!this.data || !this.data.layers)
+                    return;
+                var result = [];
+                this.doSearch(this.data.layers, result);
+                return result;
+            };
+            f14eff.prototype.doSearch = function (obj, arr) {
+                var _this = this;
+                if (!obj)
+                    return;
+                if (obj instanceof framework.material || obj instanceof framework.mesh || obj instanceof framework.texture)
+                    arr.push(obj);
+                if (obj instanceof Array) {
+                    obj.forEach(function (element) {
+                        if (element && typeof (element) == "object") {
+                            _this.doSearch(element, arr);
+                        }
+                    });
+                }
+                else {
+                    var keys = Reflect["ownKeys"](obj);
+                    for (var i = 0; i < keys.length; i++) {
+                        if (typeof (obj[keys[i]]) == "object") {
+                            this.doSearch(obj[keys[i]], arr);
+                        }
+                    }
+                }
             };
             f14eff = __decorate([
                 gd3d.reflect.SerializeType,
@@ -15554,6 +15586,9 @@ var gd3d;
                 configurable: true
             });
             f14EffectSystem.prototype.start = function () {
+                if (this.data && this.data.beloop == true) {
+                    this.play();
+                }
             };
             f14EffectSystem.prototype.onPlay = function () {
             };
@@ -19022,8 +19057,32 @@ var gd3d;
                 if (!assetMgr || !asset)
                     return;
                 var url = assetMgr.getAssetUrl(asset);
-                if (url && !(asset instanceof gd3d.framework.material))
+                if (url && !(asset instanceof gd3d.framework.material)) {
                     SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+                    if ((asset instanceof gd3d.framework.f14eff)) {
+                        var assets = asset.getDependents();
+                        var note_1 = {};
+                        assets.forEach(function (asset) {
+                            if (asset) {
+                                var url_1 = assetMgr.getAssetUrl(asset);
+                                if (url_1) {
+                                    if (!note_1[url_1]) {
+                                        SerializeDependent.resourseDatas.push({ "url": url_1, "type": SaveAssetType.FullUrl });
+                                        if (asset instanceof gd3d.framework.texture && asset.realName && asset.realName != "") {
+                                            asset;
+                                            var idx = url_1.lastIndexOf("/");
+                                            if (idx != -1) {
+                                                var haed = url_1.substring(0, idx + 1);
+                                                SerializeDependent.resourseDatas.push({ "url": haed + asset.realName, "type": SaveAssetType.FullUrl });
+                                            }
+                                        }
+                                    }
+                                    note_1[url_1] = true;
+                                }
+                            }
+                        });
+                    }
+                }
                 else
                     SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
                 if (asset instanceof gd3d.framework.material) {
@@ -19462,15 +19521,18 @@ var gd3d;
                     if ((isArray_8 && arrayInst["__gdmeta__"] && arrayInst["__gdmeta__"]["class"] && arrayInst["__gdmeta__"]["class"]["custom"] && (arrayInst["__gdmeta__"]["class"]["custom"]["nodecomp"] || arrayInst["__gdmeta__"]["class"]["custom"]["2dcomp"])) ||
                         (!isArray_8 && instanceObj["__gdmeta__"] && instanceObj["__gdmeta__"]["class"] && instanceObj["__gdmeta__"]["class"]["custom"] && (instanceObj["__gdmeta__"]["class"]["custom"]["nodecomp"] || instanceObj["__gdmeta__"]["class"]["custom"]["2dcomp"]))) {
                         if (_meta["class"]["custom"]["nodecomp"]) {
-                            insid = instanceObj[key]["gameObject"]["transform"]["insId"].getInsID();
+                            if (instanceObj[key] && instanceObj[key]["gameObject"])
+                                insid = instanceObj[key]["gameObject"]["transform"]["insId"].getInsID();
                             isreference = true;
                         }
                         else if (_meta["class"]["custom"]["2dcomp"]) {
-                            insid = instanceObj[key]["transform"]["insId"].getInsID();
+                            if (instanceObj[key] && instanceObj[key]["transform"])
+                                insid = instanceObj[key]["transform"]["insId"].getInsID();
                             isreference = true;
                         }
                         else if (type == "transform" || type == "transform2D") {
-                            insid = instanceObj[key]["insId"].getInsID();
+                            if (instanceObj[key])
+                                insid = instanceObj[key]["insId"].getInsID();
                             isreference = true;
                         }
                     }
