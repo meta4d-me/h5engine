@@ -71,7 +71,7 @@ namespace gd3d.framework
          * 默认显示图像
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("reference")
+        @gd3d.reflect.Field("reference",null,"image2D")
         get targetImage()
         {
             return this._targetImage;

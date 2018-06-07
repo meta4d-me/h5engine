@@ -30,7 +30,7 @@ namespace gd3d.framework
          * 底框显示图像
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("reference")
+        @gd3d.reflect.Field("reference",null,"image2D")
         get frameImage()
         {
             return this._frameImage;
@@ -107,7 +107,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("reference")
+        @gd3d.reflect.Field("reference",null,"label")
         get TextLabel():label{
 
             return this._textLable;
@@ -125,7 +125,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("reference")
+        @gd3d.reflect.Field("reference",null,"label")
         get PlaceholderLabel():label{
 
             return this._placeholderLabel;

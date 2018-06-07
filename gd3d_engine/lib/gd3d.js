@@ -3519,7 +3519,7 @@ var gd3d;
                 __metadata("design:type", String)
             ], button.prototype, "_pressedSpriteName", void 0);
             __decorate([
-                gd3d.reflect.Field("reference"),
+                gd3d.reflect.Field("reference", null, "image2D"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [framework.image2D])
             ], button.prototype, "targetImage", null);
@@ -4826,7 +4826,7 @@ var gd3d;
                 }
             };
             __decorate([
-                gd3d.reflect.Field("reference"),
+                gd3d.reflect.Field("reference", null, "image2D"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [framework.image2D])
             ], inputField.prototype, "frameImage", null);
@@ -4846,12 +4846,12 @@ var gd3d;
                 __metadata("design:paramtypes", [Number])
             ], inputField.prototype, "ContentType", null);
             __decorate([
-                gd3d.reflect.Field("reference"),
+                gd3d.reflect.Field("reference", null, "label"),
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "TextLabel", null);
             __decorate([
-                gd3d.reflect.Field("reference"),
+                gd3d.reflect.Field("reference", null, "label"),
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "PlaceholderLabel", null);
@@ -5250,6 +5250,119 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var progressbar = (function () {
+            function progressbar() {
+                this._value = 0.6;
+            }
+            Object.defineProperty(progressbar.prototype, "cutPanel", {
+                get: function () {
+                    return this._cutPanel;
+                },
+                set: function (trans) {
+                    this._cutPanel = trans;
+                    this.refreshBar();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(progressbar.prototype, "barBg", {
+                get: function () {
+                    return this._barBg;
+                },
+                set: function (img) {
+                    this._barBg = img;
+                    this.refreshBar();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(progressbar.prototype, "barOverImg", {
+                get: function () {
+                    return this._barOverImg;
+                },
+                set: function (img) {
+                    this._barOverImg = img;
+                    this.refreshBar();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(progressbar.prototype, "value", {
+                get: function () {
+                    return this._value;
+                },
+                set: function (value) {
+                    this._value = value < 0 ? 0 : value > 1 ? 1 : value;
+                    if (!this._cutPanel || !this._barBg || !this._barBg.transform)
+                        return;
+                    this._cutPanel.width = this._value * this._barBg.transform.width;
+                    this._cutPanel.markDirty();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            progressbar.prototype.start = function () {
+            };
+            progressbar.prototype.onPlay = function () {
+            };
+            progressbar.prototype.update = function (delta) {
+                this.adjustOverImg();
+            };
+            progressbar.prototype.refreshBar = function () {
+                this.adjustOverImg();
+                this.value = this._value;
+            };
+            progressbar.prototype.adjustOverImg = function () {
+                if (!this._barOverImg || !this._barBg)
+                    return;
+                var tbg = this._barBg.transform;
+                var tover = this._barOverImg.transform;
+                if (!tbg || !tover)
+                    return;
+                if (tbg.width != tover.width) {
+                    tover.width = tbg.width;
+                    tover.markDirty();
+                }
+            };
+            progressbar.prototype.remove = function () {
+                this._barBg = null;
+                this._barOverImg = null;
+                this._cutPanel = null;
+            };
+            progressbar.prototype.onPointEvent = function (canvas, ev, oncap) {
+            };
+            __decorate([
+                gd3d.reflect.Field("reference", null, "transform2D"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.transform2D])
+            ], progressbar.prototype, "cutPanel", null);
+            __decorate([
+                gd3d.reflect.Field("reference", null, "image2D"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.image2D])
+            ], progressbar.prototype, "barBg", null);
+            __decorate([
+                gd3d.reflect.Field("reference", null, "image2D"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [framework.image2D])
+            ], progressbar.prototype, "barOverImg", null);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Number])
+            ], progressbar.prototype, "value", null);
+            progressbar = __decorate([
+                gd3d.reflect.node2DComponent
+            ], progressbar);
+            return progressbar;
+        }());
+        framework.progressbar = progressbar;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var rawImage2D = (function () {
             function rawImage2D() {
                 this.datar = [
@@ -5505,7 +5618,7 @@ var gd3d;
                 this.transform = null;
             };
             __decorate([
-                gd3d.reflect.Field("reference"),
+                gd3d.reflect.Field("reference", null, "transform2D"),
                 __metadata("design:type", framework.transform2D),
                 __metadata("design:paramtypes", [framework.transform2D])
             ], scrollRect.prototype, "content", null);

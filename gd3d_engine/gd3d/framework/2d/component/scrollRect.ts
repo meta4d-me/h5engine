@@ -21,7 +21,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("reference")
+        @gd3d.reflect.Field("reference",null,"transform2D")
         get content():transform2D{
             return this._content;
         }

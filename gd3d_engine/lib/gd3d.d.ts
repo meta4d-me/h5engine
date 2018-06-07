@@ -793,6 +793,26 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class progressbar implements I2DComponent {
+        private _cutPanel;
+        cutPanel: transform2D;
+        private _barBg;
+        barBg: image2D;
+        private _barOverImg;
+        barOverImg: image2D;
+        private _value;
+        value: number;
+        start(): void;
+        onPlay(): void;
+        update(delta: number): void;
+        private refreshBar();
+        private adjustOverImg();
+        transform: transform2D;
+        remove(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+    }
+}
+declare namespace gd3d.framework {
     class rawImage2D implements IRectRenderer {
         private datar;
         private _image;
