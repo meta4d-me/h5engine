@@ -480,6 +480,8 @@ namespace gd3d.framework
                 this.uploadUnifoms(pass, context);
 
                 mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+
+                DrawCallInfo.inc.add();
                 if (sm.useVertexIndex < 0)
                 {
                     if (sm.line)

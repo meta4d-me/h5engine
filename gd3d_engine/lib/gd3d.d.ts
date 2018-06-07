@@ -863,6 +863,22 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class fontAltnas {
+        private static _inc;
+        private contex2d;
+        font: font;
+        fontTex: texture;
+        static readonly inc: fontAltnas;
+        private imagedata;
+        private constructor();
+        checkText(str: string): void;
+        private charIndex;
+        private charlenInRow;
+        private testData;
+        private adddNewChar(key);
+    }
+}
+declare namespace gd3d.framework {
     class resID {
         constructor();
         private static idAll;

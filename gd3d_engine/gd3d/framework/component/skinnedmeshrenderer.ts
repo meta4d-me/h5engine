@@ -446,7 +446,7 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-
+            DrawCallInfo.inc.currentState=DrawCallEnum.SKinrender;
 
             if (this.player != null)
             {

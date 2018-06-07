@@ -170,7 +170,8 @@ namespace gd3d.framework
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            
+            DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
+
             context.updateLightMask(this.gameObject.layer);
             context.updateModel(this.gameObject.transform);
             if (this.filter != null)

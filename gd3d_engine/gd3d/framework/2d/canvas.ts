@@ -307,6 +307,7 @@ namespace gd3d.framework
             this.drawScene(this.rootNode, context, assetmgr);
             this.batcher.end(context.webgl);
 
+            DrawCallInfo.inc.currentState=DrawCallEnum.UI;
             if (this.afterRender != null)
                 this.afterRender();
         }

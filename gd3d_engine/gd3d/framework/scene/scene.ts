@@ -159,6 +159,8 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
+            
+
             //更新矩阵
             this.rootNode.updateTran(false);
             this.rootNode.updateAABBChild();//更新完tarn再更新子物体aabb 确保每个transform的aabb正确
@@ -201,6 +203,12 @@ namespace gd3d.framework
                 this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
             }
             this.webgl.flush();
+
+            if(DrawCallInfo.BeActived)
+            {
+                DrawCallInfo.inc.showPerFrame();
+                DrawCallInfo.inc.reset();
+            }
         }
 
         //更新和渲染 scene overlayers
