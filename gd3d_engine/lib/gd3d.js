@@ -12413,6 +12413,8 @@ var gd3d;
                 if (beRevert === void 0) { beRevert = false; }
                 if (this.clips[index] == undefined)
                     return;
+                if (this.onPlayEnd && this._playClip)
+                    this.onPlayEnd(this._playClip.getName());
                 this._playClip = this.clips[index];
                 this._playTimer = 0;
                 this._playFrameid = 0;
@@ -12464,6 +12466,8 @@ var gd3d;
                 }
             };
             aniplayer.prototype.stop = function () {
+                if (this.onPlayEnd && this._playClip)
+                    this.onPlayEnd(this._playClip.getName());
                 this._playClip = null;
             };
             aniplayer.prototype.isPlay = function () {
@@ -12528,6 +12532,8 @@ var gd3d;
                     this._playFrameid = this._playClip.frameCount - 1;
                 }
                 if (this.isStop()) {
+                    if (this.onPlayEnd && this._playClip)
+                        this.onPlayEnd(this._playClip.getName());
                     if (this.finishCallBack) {
                         this.finishCallBack(this.thisObject);
                         this.finishCallBack = null;

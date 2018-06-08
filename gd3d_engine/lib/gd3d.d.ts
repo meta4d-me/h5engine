@@ -2037,6 +2037,7 @@ declare namespace gd3d.framework {
         private finishCallBack;
         private thisObject;
         addFinishedEventListener(finishCallBack: Function, thisObject: any): void;
+        onPlayEnd: (clipname: string) => any;
         private checkFrameId(delay);
         fillPoseData(data: Float32Array, bones: transform[], efficient?: boolean): void;
         care(node: transform): void;

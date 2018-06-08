@@ -411,6 +411,7 @@ namespace gd3d.framework
         private playAniamtion(index: string, speed: number = 1.0, beRevert: boolean = false)
         {
             if (this.clips[index] == undefined) return;
+            if(this.onPlayEnd && this._playClip)    this.onPlayEnd(this._playClip.getName());
 
             this._playClip = this.clips[index];
             this._playTimer = 0;
@@ -491,6 +492,7 @@ namespace gd3d.framework
          */
         stop(): void
         {
+            if(this.onPlayEnd && this._playClip)    this.onPlayEnd(this._playClip.getName());
             this._playClip = null;
         }
         /**
@@ -565,6 +567,14 @@ namespace gd3d.framework
             this.thisObject = thisObject;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * clip播放end
+         * @param clipname 动画片段名
+         */
+        onPlayEnd:(clipname:string)=>any;
+
         private checkFrameId(delay: number): void 
         {
             if (this.playStyle == PlayStyle.NormalPlay)
@@ -601,6 +611,8 @@ namespace gd3d.framework
             }
             if (this.isStop())
             {
+                if(this.onPlayEnd && this._playClip)    this.onPlayEnd(this._playClip.getName());
+                
                 if (this.finishCallBack)
                 {
                     this.finishCallBack(this.thisObject);
