@@ -39,7 +39,7 @@ var gd3d;
             function application() {
                 this.limitFrame = true;
                 this.version = "v0.0.1";
-                this.build = "b000075";
+                this.build = "b000077";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.canvasFixedType = CanvasFixedType.Free;
@@ -166,6 +166,8 @@ var gd3d;
                 canvas.style.backgroundColor = "#1e1e1e";
                 canvas.setAttribute("tabindex", "1");
                 rotateDiv.appendChild(canvas);
+                this.ccWidth = canvas.clientWidth;
+                this.ccHeight = canvas.clientHeight;
                 this.startForCanvas(canvas, type, val, webglDebug);
             };
             application.prototype.startForCanvas = function (canvas, type, val, webglDebug) {
@@ -181,27 +183,27 @@ var gd3d;
                     throw Error("Failed to get webgl at the application.start()");
                 }
                 this.canvasFixedType = type;
-                if (this.outcontainer) {
+                {
                     switch (type) {
                         case CanvasFixedType.Free:
                             this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
-                            this.webgl.canvas.width = this.webgl.canvas.clientWidth;
-                            this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                            canvas.width = this.ccWidth;
+                            canvas.height = this.ccHeight;
                             this._scaleFromPandding = 1;
                             break;
                         case CanvasFixedType.FixedWidthType:
                             this.canvasFixWidth = val;
                             this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
-                            this.webgl.canvas.width = this._fixWidth;
-                            this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                            this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                            canvas.width = this._fixWidth;
+                            canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
+                            this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
                             break;
                         case CanvasFixedType.FixedHeightType:
                             this.canvasFixHeight = val;
                             this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
-                            this.webgl.canvas.height = this._fixHeight;
-                            this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                            this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                            canvas.height = this._fixHeight;
+                            canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
+                            this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
                             break;
                     }
                 }
@@ -273,6 +275,12 @@ var gd3d;
                     this.container.removeChild(this.stats.container);
                 }
             };
+            application.prototype.showDrawCall = function () {
+                framework.DrawCallInfo.inc.showDrawcallInfo();
+            };
+            application.prototype.closeDrawCall = function () {
+                framework.DrawCallInfo.inc.closeDrawCallInfo();
+            };
             application.prototype.update = function (delta) {
                 {
                     this.updateOrientationMode();
@@ -297,23 +305,27 @@ var gd3d;
             application.prototype.updateScreenAsp = function () {
                 if (!this.outcontainer)
                     return;
-                if (this.webgl.canvas.clientWidth != this._canvasClientWidth || this.webgl.canvas.clientHeight != this._canvasClientHeight) {
-                    this._canvasClientWidth = this.webgl.canvas.clientWidth;
-                    this._canvasClientHeight = this.webgl.canvas.clientHeight;
+                if (this.webgl && this.webgl.canvas) {
+                    this.ccWidth = this.webgl.canvas.clientWidth != null ? this.webgl.canvas.clientWidth : this.ccWidth;
+                    this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight : this.ccHeight;
+                }
+                if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) {
+                    this._canvasClientWidth = this.ccWidth;
+                    this._canvasClientHeight = this.ccHeight;
                     if (this.canvasFixedType == CanvasFixedType.Free) {
-                        this.webgl.canvas.width = this.webgl.canvas.clientWidth;
-                        this.webgl.canvas.height = this.webgl.canvas.clientHeight;
+                        this.webgl.canvas.width = this.ccWidth;
+                        this.webgl.canvas.height = this.ccHeight;
                         this._scaleFromPandding = 1;
                     }
                     else if (this.canvasFixedType == CanvasFixedType.FixedWidthType) {
                         this.webgl.canvas.width = this._fixWidth;
-                        this.webgl.canvas.height = this._fixWidth * this.webgl.canvas.clientHeight / this.webgl.canvas.clientWidth;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                        this.webgl.canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
+                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
                     }
                     else if (this.canvasFixedType == CanvasFixedType.FixedHeightType) {
                         this.webgl.canvas.height = this._fixHeight;
-                        this.webgl.canvas.width = this.webgl.canvas.clientWidth * this._fixHeight / this.webgl.canvas.clientHeight;
-                        this._scaleFromPandding = this.webgl.canvas.clientHeight / this.webgl.canvas.height;
+                        this.webgl.canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
+                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
                     }
                 }
             };
@@ -657,6 +669,107 @@ var gd3d;
             return DeviceInfo;
         }());
         framework.DeviceInfo = DeviceInfo;
+        var DrawCallEnum;
+        (function (DrawCallEnum) {
+            DrawCallEnum[DrawCallEnum["UI"] = 0] = "UI";
+            DrawCallEnum[DrawCallEnum["SKinrender"] = 1] = "SKinrender";
+            DrawCallEnum[DrawCallEnum["Meshrender"] = 2] = "Meshrender";
+            DrawCallEnum[DrawCallEnum["EffectSystem"] = 3] = "EffectSystem";
+        })(DrawCallEnum = framework.DrawCallEnum || (framework.DrawCallEnum = {}));
+        var DrawCallInfo = (function () {
+            function DrawCallInfo() {
+                this.data = [];
+                this.currentState = DrawCallEnum.Meshrender;
+            }
+            Object.defineProperty(DrawCallInfo, "inc", {
+                get: function () {
+                    if (this._inc == null) {
+                        this._inc = new DrawCallInfo();
+                    }
+                    return this._inc;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            DrawCallInfo.prototype.reset = function () {
+                this.data[DrawCallEnum.UI] = 0;
+                this.data[DrawCallEnum.SKinrender] = 0;
+                this.data[DrawCallEnum.Meshrender] = 0;
+                this.data[DrawCallEnum.EffectSystem] = 0;
+            };
+            DrawCallInfo.prototype.add = function () {
+                this.data[this.currentState] += 1;
+            };
+            DrawCallInfo.prototype.initShowPlane = function () {
+                var div = document.createElement("div");
+                this.rootdiv = div;
+                framework.sceneMgr.app.container.appendChild(div);
+                div.style.display = "inline-block";
+                div.style.position = "absolute";
+                div.style.left = "100px";
+                div.style.top = "0px";
+                div.style.height = "200px";
+                div.style.width = "200px";
+                var ul = document.createElement("ul");
+                div.appendChild(ul);
+                var li1 = document.createElement("li");
+                li1.textContent = "SkinMeshDrawcall: ";
+                li1.style.fontSize = "12px";
+                li1.style.color = "Aqua";
+                li1.style.height = "20px";
+                li1.style.width = "200px";
+                li1.style.left = "0px";
+                ul.appendChild(li1);
+                this.SKinrenderDraw = li1;
+                var li3 = document.createElement("li");
+                li3.textContent = "MeshrenderDrawcall: ";
+                li3.style.fontSize = "12px";
+                li3.style.color = "Aqua";
+                li3.style.height = "20px";
+                li3.style.width = "200px";
+                li3.style.left = "0px";
+                ul.appendChild(li3);
+                this.MeshrenderDraw = li3;
+                var li2 = document.createElement("li");
+                li2.textContent = "EffectrenderDrawcall: ";
+                li2.style.fontSize = "12px";
+                li2.style.color = "Aqua";
+                li2.style.height = "20px";
+                li2.style.width = "200px";
+                li2.style.left = "0px";
+                ul.appendChild(li2);
+                this.EffectrenderDraw = li2;
+                var li4 = document.createElement("li");
+                li4.textContent = "EffectrenderDrawcall: ";
+                li4.style.fontSize = "12px";
+                li4.style.color = "Aqua";
+                li4.style.height = "20px";
+                li4.style.width = "200px";
+                li4.style.left = "0px";
+                ul.appendChild(li4);
+                this.UIrenderDraw = li4;
+            };
+            DrawCallInfo.prototype.showPerFrame = function () {
+                this.MeshrenderDraw.textContent = "MeshrenderDrawcall: " + this.data[DrawCallEnum.Meshrender];
+                this.SKinrenderDraw.textContent = "SkinMeshDrawcall: " + this.data[DrawCallEnum.SKinrender];
+                this.EffectrenderDraw.textContent = "EffectrenderDrawcall: " + this.data[DrawCallEnum.EffectSystem];
+                this.UIrenderDraw.textContent = "UIrenderDrawcall: " + this.data[DrawCallEnum.UI];
+            };
+            DrawCallInfo.prototype.showDrawcallInfo = function () {
+                if (this.SKinrenderDraw == null) {
+                    this.initShowPlane();
+                }
+                DrawCallInfo.BeActived = true;
+                this.rootdiv.style.visibility = "visible";
+            };
+            DrawCallInfo.prototype.closeDrawCallInfo = function () {
+                DrawCallInfo.BeActived = false;
+                this.rootdiv.style.visibility = "hidden";
+            };
+            DrawCallInfo.BeActived = false;
+            return DrawCallInfo;
+        }());
+        framework.DrawCallInfo = DrawCallInfo;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -1179,6 +1292,7 @@ var gd3d;
                     this.beforeRender();
                 this.drawScene(this.rootNode, context, assetmgr);
                 this.batcher.end(context.webgl);
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.UI;
                 if (this.afterRender != null)
                     this.afterRender();
             };
@@ -9851,6 +9965,7 @@ var gd3d;
                 }
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.Meshrender;
                 context.updateLightMask(this.gameObject.layer);
                 context.updateModel(this.gameObject.transform);
                 if (this.filter != null) {
@@ -10186,6 +10301,7 @@ var gd3d;
                 }
             };
             skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.SKinrender;
                 if (this.player != null) {
                     context.updateLightMask(this.gameObject.layer);
                     context.updateModel(this.player.gameObject.transform);
@@ -10749,6 +10865,7 @@ var gd3d;
                     pass.use(context.webgl);
                     this.uploadUnifoms(pass, context);
                     mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                    framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
                             mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size);
@@ -13307,7 +13424,12 @@ var gd3d;
                         if (this.clearOption_Color && this.clearOption_Depth) {
                             context.webgl.depthMask(true);
                             gd3d.render.glDrawPass.lastZWrite = true;
-                            context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                            if (scene.fog) {
+                                context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
+                            }
+                            else {
+                                context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                            }
                             context.webgl.clearDepth(1.0);
                             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
                         }
@@ -13318,7 +13440,12 @@ var gd3d;
                             context.webgl.clear(context.webgl.DEPTH_BUFFER_BIT);
                         }
                         else if (this.clearOption_Color) {
-                            context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                            if (scene.fog) {
+                                context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
+                            }
+                            else {
+                                context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                            }
                             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT);
                         }
                         else {
@@ -14951,72 +15078,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var starCamCtr = (function () {
-            function starCamCtr() {
-                this.moveDuration = 1;
-                this.minSpeed = 5;
-                this.relativelocation = new gd3d.math.vector3(0, 6, 0);
-                this.relativeEuler = new gd3d.math.vector3(90, 0, 0);
-                this.relativeRot = new gd3d.math.quaternion();
-                this.starteCamRot = new gd3d.math.quaternion();
-                this.targetCamPos = new gd3d.math.vector3();
-                this.targetCamRot = new gd3d.math.quaternion();
-                this.movedir = new gd3d.math.vector3();
-                this.active = false;
-                this.moveDis = new gd3d.math.vector3();
-            }
-            starCamCtr.prototype.start = function () {
-            };
-            starCamCtr.prototype.onPlay = function () {
-            };
-            starCamCtr.prototype.update = function (delta) {
-                if (!this.active)
-                    return;
-                var pos = this.gameObject.transform.localTranslate;
-                var rot = this.gameObject.transform.localRotate;
-                var distanc = gd3d.math.vec3Distance(pos, this.targetCamPos);
-                var movedis = this.moveSpeed * delta;
-                if (distanc > movedis) {
-                    gd3d.math.vec3ScaleByNum(this.movedir, movedis, this.moveDis);
-                    gd3d.math.vec3Add(pos, this.moveDis, this.gameObject.transform.localTranslate);
-                    gd3d.math.quatLerp(this.starteCamRot, this.targetCamRot, this.gameObject.transform.localRotate, (this.distance - distanc) / this.distance);
-                    this.gameObject.transform.markDirty();
-                    this.gameObject.transform.updateWorldTran();
-                }
-                else {
-                    this.active = false;
-                }
-            };
-            starCamCtr.prototype.remove = function () {
-            };
-            starCamCtr.prototype.clone = function () {
-            };
-            starCamCtr.prototype.moveTo = function (to) {
-                gd3d.math.quatClone(this.gameObject.transform.localRotate, this.starteCamRot);
-                gd3d.math.quatFromEulerAngles(this.relativeEuler.x, this.relativeEuler.y, this.relativeEuler.z, this.relativeRot);
-                gd3d.math.quatTransformVector(to.localRotate, this.relativelocation, this.targetCamPos);
-                gd3d.math.vec3Add(to.localTranslate, this.targetCamPos, this.targetCamPos);
-                gd3d.math.quatMultiply(to.localRotate, this.relativeRot, this.targetCamRot);
-                var distanc = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(this.targetCamPos, this.gameObject.transform.localTranslate, distanc);
-                gd3d.math.vec3Normalize(distanc, this.movedir);
-                this.distance = gd3d.math.vec3Length(distanc);
-                this.moveSpeed = this.distance / this.moveDuration;
-                gd3d.math.pool.delete_vector3(distanc);
-                this.active = true;
-            };
-            starCamCtr = __decorate([
-                gd3d.reflect.nodeComponent
-            ], starCamCtr);
-            return starCamCtr;
-        }());
-        framework.starCamCtr = starCamCtr;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var trailRender = (function () {
             function trailRender() {
                 this.layer = framework.RenderLayerEnum.Common;
@@ -15814,6 +15875,7 @@ var gd3d;
                 if (Effqueue === void 0) { Effqueue = 0; }
                 if (!this.renderActive || !this.enableDraw)
                     return;
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.EffectSystem;
                 this._renderCamera = camera;
                 var curCount = 0;
                 context.updateModel(this.root);
@@ -17802,6 +17864,72 @@ var gd3d;
             return F14SingleMeshBaseData;
         }());
         framework.F14SingleMeshBaseData = F14SingleMeshBaseData;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var starCamCtr = (function () {
+            function starCamCtr() {
+                this.moveDuration = 1;
+                this.minSpeed = 5;
+                this.relativelocation = new gd3d.math.vector3(0, 6, 0);
+                this.relativeEuler = new gd3d.math.vector3(90, 0, 0);
+                this.relativeRot = new gd3d.math.quaternion();
+                this.starteCamRot = new gd3d.math.quaternion();
+                this.targetCamPos = new gd3d.math.vector3();
+                this.targetCamRot = new gd3d.math.quaternion();
+                this.movedir = new gd3d.math.vector3();
+                this.active = false;
+                this.moveDis = new gd3d.math.vector3();
+            }
+            starCamCtr.prototype.start = function () {
+            };
+            starCamCtr.prototype.onPlay = function () {
+            };
+            starCamCtr.prototype.update = function (delta) {
+                if (!this.active)
+                    return;
+                var pos = this.gameObject.transform.localTranslate;
+                var rot = this.gameObject.transform.localRotate;
+                var distanc = gd3d.math.vec3Distance(pos, this.targetCamPos);
+                var movedis = this.moveSpeed * delta;
+                if (distanc > movedis) {
+                    gd3d.math.vec3ScaleByNum(this.movedir, movedis, this.moveDis);
+                    gd3d.math.vec3Add(pos, this.moveDis, this.gameObject.transform.localTranslate);
+                    gd3d.math.quatLerp(this.starteCamRot, this.targetCamRot, this.gameObject.transform.localRotate, (this.distance - distanc) / this.distance);
+                    this.gameObject.transform.markDirty();
+                    this.gameObject.transform.updateWorldTran();
+                }
+                else {
+                    this.active = false;
+                }
+            };
+            starCamCtr.prototype.remove = function () {
+            };
+            starCamCtr.prototype.clone = function () {
+            };
+            starCamCtr.prototype.moveTo = function (to) {
+                gd3d.math.quatClone(this.gameObject.transform.localRotate, this.starteCamRot);
+                gd3d.math.quatFromEulerAngles(this.relativeEuler.x, this.relativeEuler.y, this.relativeEuler.z, this.relativeRot);
+                gd3d.math.quatTransformVector(to.localRotate, this.relativelocation, this.targetCamPos);
+                gd3d.math.vec3Add(to.localTranslate, this.targetCamPos, this.targetCamPos);
+                gd3d.math.quatMultiply(to.localRotate, this.relativeRot, this.targetCamRot);
+                var distanc = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(this.targetCamPos, this.gameObject.transform.localTranslate, distanc);
+                gd3d.math.vec3Normalize(distanc, this.movedir);
+                this.distance = gd3d.math.vec3Length(distanc);
+                this.moveSpeed = this.distance / this.moveDuration;
+                gd3d.math.pool.delete_vector3(distanc);
+                this.active = true;
+            };
+            starCamCtr = __decorate([
+                gd3d.reflect.nodeComponent
+            ], starCamCtr);
+            return starCamCtr;
+        }());
+        framework.starCamCtr = starCamCtr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -28236,6 +28364,10 @@ var gd3d;
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
                 }
                 this.webgl.flush();
+                if (framework.DrawCallInfo.BeActived) {
+                    framework.DrawCallInfo.inc.showPerFrame();
+                    framework.DrawCallInfo.inc.reset();
+                }
             };
             scene.prototype.updateSceneOverLay = function (delta) {
                 var _this = this;
@@ -28703,7 +28835,7 @@ var gd3d;
             };
             gdPromise.prototype.reject = function (reason) {
                 console.error(reason);
-                if (!this.catchMethod)
+                if (this.catchMethod)
                     return this.catchMethod(reason);
             };
             gdPromise.prototype.then = function (thenCall) {
