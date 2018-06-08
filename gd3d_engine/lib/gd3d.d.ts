@@ -1986,6 +1986,7 @@ declare namespace gd3d.framework {
         autoplay: boolean;
         private playIndex;
         private _playClip;
+        readonly playingClip: string;
         bones: tPoseInfo[];
         startPos: PoseBoneMatrix[];
         tpose: {
@@ -2021,6 +2022,7 @@ declare namespace gd3d.framework {
         private init();
         start(): void;
         onPlay(): void;
+        private clipHasPlay;
         update(delta: number): void;
         playByIndex(animIndex: number, speed?: number, beRevert?: boolean): void;
         playCrossByIndex(animIndex: number, crosstimer: number, speed?: number, beRevert?: boolean): void;

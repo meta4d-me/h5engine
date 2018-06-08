@@ -12233,6 +12233,7 @@ var gd3d;
                 this.mix = false;
                 this.isCache = false;
                 this._playCount = 0;
+                this.clipHasPlay = false;
             }
             aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
@@ -12246,6 +12247,15 @@ var gd3d;
                         }
                     }
                     return this._clipnames;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(aniplayer.prototype, "playingClip", {
+                get: function () {
+                    if (!this._playClip)
+                        return "";
+                    return this._playClip.getName();
                 },
                 enumerable: true,
                 configurable: true
@@ -12301,6 +12311,7 @@ var gd3d;
                 if (this._playClip == null)
                     return;
                 this.checkFrameId(delta);
+                this.clipHasPlay = true;
                 this.mix = false;
                 if (this.crossdelta > 0) {
                     this.crossdelta -= delta / this.speed * this.crossspeed;
@@ -12413,8 +12424,13 @@ var gd3d;
                 if (beRevert === void 0) { beRevert = false; }
                 if (this.clips[index] == undefined)
                     return;
-                if (this.onPlayEnd && this._playClip)
-                    this.onPlayEnd(this._playClip.getName());
+                var isp = this.isPlay();
+                var cname = isp ? this._playClip.getName() : "";
+                this._playClip = null;
+                if (this.onPlayEnd && isp) {
+                    this.clipHasPlay = false;
+                    this.onPlayEnd(cname);
+                }
                 this._playClip = this.clips[index];
                 this._playTimer = 0;
                 this._playFrameid = 0;
@@ -12428,6 +12444,7 @@ var gd3d;
                     var src = this.nowpose[key];
                     this.lerppose[key] = src.Clone();
                 }
+                this.clipHasPlay = false;
             };
             aniplayer.prototype.updateAnimation = function (animIndex, _frame) {
                 if (!this.clips)
@@ -12466,16 +12483,18 @@ var gd3d;
                 }
             };
             aniplayer.prototype.stop = function () {
-                if (this.onPlayEnd && this._playClip)
-                    this.onPlayEnd(this._playClip.getName());
+                var isp = this.isPlay();
+                var cname = isp ? this._playClip.getName() : "";
                 this._playClip = null;
+                if (this.onPlayEnd && isp)
+                    this.onPlayEnd(cname);
             };
             aniplayer.prototype.isPlay = function () {
-                return this._playClip != null;
+                return this._playClip && this.clipHasPlay;
             };
             aniplayer.prototype.isStop = function () {
                 if (this._playClip == null)
-                    return false;
+                    return true;
                 if (this.playStyle != PlayStyle.NormalPlay)
                     return false;
                 if (this._playClip.loop)
@@ -12532,8 +12551,11 @@ var gd3d;
                     this._playFrameid = this._playClip.frameCount - 1;
                 }
                 if (this.isStop()) {
-                    if (this.onPlayEnd && this._playClip)
-                        this.onPlayEnd(this._playClip.getName());
+                    var isp = this.isPlay();
+                    var cname = isp ? this._playClip.getName() : "";
+                    this._playClip = null;
+                    if (this.onPlayEnd && isp)
+                        this.onPlayEnd(cname);
                     if (this.finishCallBack) {
                         this.finishCallBack(this.thisObject);
                         this.finishCallBack = null;
