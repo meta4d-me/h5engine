@@ -30,32 +30,4 @@ namespace gd3d.framework
         eated: boolean;//事件是否被吃掉
         selected: transform2D;//是否有谁被选中
     }
-
-    /**
-     * @public
-     * @language zh_CN
-     * @classdesc
-     * ui事件
-     * @version egret-gd3d 1.0
-     */
-    export class UIEvent
-    {
-        funcs: Function[] = [];
-        addListener(func: Function)
-        {
-            this.funcs.push(func);
-        }
-        excute()
-        {
-            for (let key in this.funcs)
-            {
-                this.funcs[key]();
-            }
-        }
-        clear()
-        {
-            this.funcs.length = 0;
-        }
-    }
-
 }

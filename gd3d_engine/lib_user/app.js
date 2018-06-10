@@ -4413,7 +4413,7 @@ var testReload = (function () {
         btn.transition = gd3d.framework.TransitionType.ColorTint;
         var role_part;
         var role1_part;
-        btn.onClick.addListener(function () {
+        btn.addListener(gd3d.event.UIEventEnum.PointerClick, function () {
             if (role_part == null) {
                 var role_skinMeshRenders = role.gameObject.getComponentsInChildren("skinnedMeshRenderer");
                 var role1_skinMeshRenders = role1.gameObject.getComponentsInChildren("skinnedMeshRenderer");
@@ -4434,7 +4434,7 @@ var testReload = (function () {
             var role_part_player = role_part.player;
             role_part._player = role1_part.player;
             role1_part._player = role_part_player;
-        });
+        }, this);
         o2d.addChild(t2d_9);
         var lab = new gd3d.framework.transform2D();
         lab.name = "lab111";
@@ -5853,9 +5853,9 @@ var t;
                 img9_1.imageType = gd3d.framework.ImageType.Sliced;
                 btn.targetImage = img9_1;
                 btn.transition = gd3d.framework.TransitionType.ColorTint;
-                btn.onClick.addListener(function () {
+                btn.addListener(gd3d.event.UIEventEnum.PointerClick, function () {
                     console.log("按钮点下了");
-                });
+                }, this);
                 o2d.addChild(t2d_9);
                 var lab = new gd3d.framework.transform2D();
                 lab.name = "lab111";
@@ -6484,7 +6484,7 @@ var testLiChangeMesh = (function () {
         btn.transition = gd3d.framework.TransitionType.ColorTint;
         var role_part;
         var role1_part;
-        btn.onClick.addListener(function () {
+        btn.addListener(gd3d.event.UIEventEnum.PointerClick, function () {
             if (role_part == null) {
                 var role_skinMeshRenders = role.gameObject.getComponentsInChildren("skinnedMeshRenderer");
                 var role1_skinMeshRenders = role1.gameObject.getComponentsInChildren("skinnedMeshRenderer");
@@ -6505,7 +6505,7 @@ var testLiChangeMesh = (function () {
             var role_part_player = role_part.player;
             role_part._player = role1_part.player;
             role1_part._player = role_part_player;
-        });
+        }, this);
         o2d.addChild(t2d_9);
         var lab = new gd3d.framework.transform2D();
         lab.name = "lab111";
@@ -10149,7 +10149,7 @@ var test_UI_Component = (function () {
             spt.sprite = atlasComp.sprites["ui_lianji_" + nums[i]];
             numIconarr.push(spt);
         }
-        btn_b.onClick.addListener(function () {
+        btn_b.addListener(gd3d.event.UIEventEnum.PointerClick, function () {
             var temp = "";
             for (var i = 0; i < nums.length; i++) {
                 var num = Number(nums[i]);
@@ -10160,7 +10160,7 @@ var test_UI_Component = (function () {
                 temp += num.toString();
             }
             nums = temp;
-        });
+        }, this);
         var iptFrame_t = new gd3d.framework.transform2D;
         iptFrame_t.width = 120;
         iptFrame_t.height = 30;

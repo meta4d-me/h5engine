@@ -1645,24 +1645,6 @@ var gd3d;
             return PointEvent;
         }());
         framework.PointEvent = PointEvent;
-        var UIEvent = (function () {
-            function UIEvent() {
-                this.funcs = [];
-            }
-            UIEvent.prototype.addListener = function (func) {
-                this.funcs.push(func);
-            };
-            UIEvent.prototype.excute = function () {
-                for (var key in this.funcs) {
-                    this.funcs[key]();
-                }
-            };
-            UIEvent.prototype.clear = function () {
-                this.funcs.length = 0;
-            };
-            return UIEvent;
-        }());
-        framework.UIEvent = UIEvent;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -3422,7 +3404,7 @@ var gd3d;
                 this._normalColor = new gd3d.math.color(1, 1, 1, 1);
                 this._pressedColor = new gd3d.math.color(0.5, 0.5, 0.5, 1);
                 this._fadeDuration = 0.1;
-                this.onClick = new framework.UIEvent();
+                this.UIEventer = new gd3d.event.UIEvent();
                 this._downInThis = false;
                 this._dragOut = false;
             }
@@ -3553,7 +3535,7 @@ var gd3d;
                         else if (ev.type == framework.PointEventEnum.PointUp && this._downInThis) {
                             this._downInThis = false;
                             this.showNormal();
-                            this.onClick.excute();
+                            this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerClick);
                         }
                     }
                     else {
@@ -3568,6 +3550,12 @@ var gd3d;
                         }
                     }
                 }
+            };
+            button.prototype.addListener = function (eventEnum, func, thisArg) {
+                this.UIEventer.OnEnum(eventEnum, func, thisArg);
+            };
+            button.prototype.removeListener = function (eventEnum, func, thisArg) {
+                this.UIEventer.RemoveListener(gd3d.event.UIEventEnum[eventEnum], func, thisArg);
             };
             button.prototype.showNormal = function () {
                 if (this.transition == TransitionType.ColorTint) {
@@ -17959,6 +17947,108 @@ var gd3d;
         }());
         framework.starCamCtr = starCamCtr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var AEvent = (function () {
+        function AEvent() {
+            this.events = {};
+        }
+        AEvent.prototype.On = function (event, func, thisArg) {
+            var arr = this.events[event];
+            var FT;
+            if (!arr) {
+                arr = this.events[event] = [];
+            }
+            else {
+                for (var _i = 0, arr_3 = arr; _i < arr_3.length; _i++) {
+                    var ft = arr_3[_i];
+                    if (ft.func == func) {
+                        FT = ft;
+                        break;
+                    }
+                }
+            }
+            if (!FT)
+                arr.push({ func: func, thisArgs: [thisArg] });
+            else {
+                var idx = FT.thisArgs.lastIndexOf(thisArg);
+                if (idx == -1)
+                    FT.thisArgs.push(thisArg);
+            }
+        };
+        AEvent.prototype.Emit = function (event) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var arr = this.events[event];
+            if (!arr)
+                return;
+            for (var _a = 0, arr_4 = arr; _a < arr_4.length; _a++) {
+                var FT = arr_4[_a];
+                for (var _b = 0, _c = FT.thisArgs; _b < _c.length; _b++) {
+                    var thisArg = _c[_b];
+                    FT.func.apply(thisArg, args);
+                }
+            }
+        };
+        AEvent.prototype.RemoveListener = function (event, func, thisArg) {
+            var arr = this.events[event];
+            if (!arr)
+                return;
+            for (var i = 0, len = arr.length; i < len; ++i) {
+                if (func == arr[i].func) {
+                    var idx = arr[i].thisArgs.lastIndexOf(thisArg);
+                    if (idx != -1) {
+                        arr[i].thisArgs.splice(idx, 1);
+                        if (arr[i].thisArgs.length < 1)
+                            arr.splice(i, 1);
+                        if (arr.length < 1)
+                            delete this.events[event];
+                        break;
+                    }
+                }
+            }
+        };
+        AEvent.prototype.RemoveListenerAll = function () {
+            this.events = {};
+        };
+        return AEvent;
+    }());
+    gd3d.AEvent = AEvent;
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var event;
+    (function (event_1) {
+        var UIEventEnum;
+        (function (UIEventEnum) {
+            UIEventEnum[UIEventEnum["PointerDown"] = 0] = "PointerDown";
+            UIEventEnum[UIEventEnum["PointerUp"] = 1] = "PointerUp";
+            UIEventEnum[UIEventEnum["PointerClick"] = 2] = "PointerClick";
+            UIEventEnum[UIEventEnum["PointerEnter"] = 3] = "PointerEnter";
+            UIEventEnum[UIEventEnum["PointerExit"] = 4] = "PointerExit";
+        })(UIEventEnum = event_1.UIEventEnum || (event_1.UIEventEnum = {}));
+        var UIEvent = (function (_super) {
+            __extends(UIEvent, _super);
+            function UIEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            UIEvent.prototype.OnEnum = function (event, func, thisArg) {
+                this.On(UIEventEnum[event], func, thisArg);
+            };
+            UIEvent.prototype.EmitEnum = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, UIEventEnum[event], args);
+            };
+            return UIEvent;
+        }(gd3d.AEvent));
+        event_1.UIEvent = UIEvent;
+    })(event = gd3d.event || (gd3d.event = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {

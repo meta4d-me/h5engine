@@ -346,12 +346,6 @@ declare namespace gd3d.framework {
         eated: boolean;
         selected: transform2D;
     }
-    class UIEvent {
-        funcs: Function[];
-        addListener(func: Function): void;
-        excute(): void;
-        clear(): void;
-    }
 }
 declare namespace gd3d.framework {
     enum UIScaleMode {
@@ -640,7 +634,7 @@ declare namespace gd3d.framework {
         ColorTint = 1,
         SpriteSwap = 2,
     }
-    class button implements IRectRenderer {
+    class button implements IRectRenderer, event.IUIEventer {
         private _transition;
         transition: TransitionType;
         private _originalColor;
@@ -665,7 +659,9 @@ declare namespace gd3d.framework {
         transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        onClick: UIEvent;
+        private UIEventer;
+        addListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        removeListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         private _downInThis;
         private _dragOut;
         private showNormal();
@@ -3189,6 +3185,32 @@ declare namespace gd3d.framework {
         remove(): void;
         clone(): void;
         moveTo(to: transform): void;
+    }
+}
+declare namespace gd3d {
+    abstract class AEvent {
+        private events;
+        On(event: string, func: (...args: Array<any>) => void, thisArg: any): void;
+        Emit(event: string, ...args: Array<any>): void;
+        RemoveListener(event: string, func: Function, thisArg: any): void;
+        RemoveListenerAll(): void;
+    }
+}
+declare namespace gd3d.event {
+    interface IUIEventer {
+        addListener(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
+        removeListener(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
+    }
+    enum UIEventEnum {
+        PointerDown = 0,
+        PointerUp = 1,
+        PointerClick = 2,
+        PointerEnter = 3,
+        PointerExit = 4,
+    }
+    class UIEvent extends AEvent {
+        OnEnum(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum(event: UIEventEnum, ...args: Array<any>): void;
     }
 }
 declare namespace gd3d.framework {

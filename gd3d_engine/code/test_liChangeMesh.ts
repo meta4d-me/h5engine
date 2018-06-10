@@ -100,7 +100,7 @@ class testLiChangeMesh implements IState
 
         let role_part: gd3d.framework.skinnedMeshRenderer;
         let role1_part: gd3d.framework.skinnedMeshRenderer;
-        btn.onClick.addListener(() =>
+        btn.addListener(gd3d.event.UIEventEnum.PointerClick,() =>
         {
             if (role_part == null)
             {
@@ -131,7 +131,7 @@ class testLiChangeMesh implements IState
             role_part._player = role1_part.player;
             role1_part._player = role_part_player;
 
-        });
+        },this);
         o2d.addChild(t2d_9);
 
         var lab = new gd3d.framework.transform2D();

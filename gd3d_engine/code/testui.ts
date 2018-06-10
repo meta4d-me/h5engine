@@ -215,10 +215,10 @@ namespace t
                 img9.imageType = gd3d.framework.ImageType.Sliced;
                 btn.targetImage = img9;
                 btn.transition = gd3d.framework.TransitionType.ColorTint;//颜色变换
-                btn.onClick.addListener(() =>
+                btn.addListener(gd3d.event.UIEventEnum.PointerClick,() =>
                 {
                     console.log("按钮点下了");
-                });
+                },this);
                 o2d.addChild(t2d_9);
 
                 var lab = new gd3d.framework.transform2D();
