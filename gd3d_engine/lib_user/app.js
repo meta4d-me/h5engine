@@ -323,7 +323,7 @@ var demo_navigaionRVO = (function () {
             this.pickDown();
         }
         this.pointDown = this.inputMgr.point.touch;
-        if (this.inputMgr.keyboardMap[65]) {
+        if (this.inputMgr.GetKeyDown(65)) {
             this.isAKeyDown = true;
         }
         else {
@@ -7763,7 +7763,7 @@ var test_pick_boxcollider = (function () {
             this.pickDown();
         }
         this.pointDown = this.inputMgr.point.touch;
-        if (this.inputMgr.keyboardMap[65]) {
+        if (this.inputMgr.GetKeyDown(65)) {
             this.isAKeyDown = true;
         }
         else {

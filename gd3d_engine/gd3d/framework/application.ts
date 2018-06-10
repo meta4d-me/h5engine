@@ -434,6 +434,9 @@ namespace gd3d.framework
             }
             this.updateEditorCode(delta);
 
+            if(this._inputmgr)
+                this._inputmgr.update(delta);
+
             if (this._scene != null)
             {
                 this._scene.update(delta);

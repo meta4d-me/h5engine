@@ -389,7 +389,7 @@ namespace gd3d.framework
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
         {
             if(oncap == false ){
-                if(ev.type != PointEventEnum.PointDown )    return;
+                if(ev.type != event.PointEventEnum.PointDown )    return;
                 
                 var b = this.transform.ContainsCanvasPoint(new math.vector2(ev.x, ev.y));
                 if(b){

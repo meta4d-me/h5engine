@@ -190,11 +190,11 @@ namespace gd3d.framework
                 }
                 else if (this.pointDown == false && touch == true)//pointdown
                 {
-                    this.pointEvent.type = PointEventEnum.PointDown;
+                    this.pointEvent.type = event.PointEventEnum.PointDown;
                 }
                 else if (this.pointDown == true && touch == true)//pointhold
                 {
-                    this.pointEvent.type = PointEventEnum.PointHold;
+                    this.pointEvent.type = event.PointEventEnum.PointHold;
                     if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
                     {
                         // console.log("skip event");
@@ -203,7 +203,7 @@ namespace gd3d.framework
                 }
                 else if (this.pointDown == true && touch == false)//pointup
                 {
-                    this.pointEvent.type = PointEventEnum.PointUp;
+                    this.pointEvent.type = event.PointEventEnum.PointUp;
                 }
                 //事件走的是flash U型圈
                 if (!skip)

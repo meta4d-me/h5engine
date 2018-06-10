@@ -298,6 +298,8 @@ var gd3d;
                     }
                 }
                 this.updateEditorCode(delta);
+                if (this._inputmgr)
+                    this._inputmgr.update(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
@@ -1237,16 +1239,16 @@ var gd3d;
                         skip = true;
                     }
                     else if (this.pointDown == false && touch == true) {
-                        this.pointEvent.type = framework.PointEventEnum.PointDown;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointDown;
                     }
                     else if (this.pointDown == true && touch == true) {
-                        this.pointEvent.type = framework.PointEventEnum.PointHold;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointHold;
                         if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y) {
                             skip = true;
                         }
                     }
                     else if (this.pointDown == true && touch == false) {
-                        this.pointEvent.type = framework.PointEventEnum.PointUp;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointUp;
                     }
                     if (!skip) {
                         if (this.scene.app.bePlay) {
@@ -1632,13 +1634,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var PointEventEnum;
-        (function (PointEventEnum) {
-            PointEventEnum[PointEventEnum["PointNothing"] = 0] = "PointNothing";
-            PointEventEnum[PointEventEnum["PointDown"] = 1] = "PointDown";
-            PointEventEnum[PointEventEnum["PointHold"] = 2] = "PointHold";
-            PointEventEnum[PointEventEnum["PointUp"] = 3] = "PointUp";
-        })(PointEventEnum = framework.PointEventEnum || (framework.PointEventEnum = {}));
         var PointEvent = (function () {
             function PointEvent() {
             }
@@ -1728,9 +1723,6 @@ var gd3d;
                 var real_y = this.inputmgr.point.y - rect.y * this.app.height;
                 var sx = (real_x / this.viewPixelrect.w) * 2 - 1;
                 var sy = (real_y / this.viewPixelrect.h) * -2 + 1;
-                if (this.canvas["pointEvent"].type == framework.PointEventEnum.PointDown) {
-                    this.canvas;
-                }
                 this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
@@ -3522,27 +3514,27 @@ var gd3d;
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
                         ev.eated = true;
-                        if (ev.type == framework.PointEventEnum.PointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this._downInThis = true;
                             this.showPress();
                         }
-                        else if (ev.type == framework.PointEventEnum.PointHold && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == true) {
                                 this._dragOut = false;
                                 this.showPress();
                             }
                         }
-                        else if (ev.type == framework.PointEventEnum.PointUp && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointUp && this._downInThis) {
                             this._downInThis = false;
                             this.showNormal();
                             this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerClick);
                         }
                     }
                     else {
-                        if (ev.type == framework.PointEventEnum.PointUp) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                             this._downInThis = false;
                         }
-                        else if (ev.type == framework.PointEventEnum.PointHold && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == false) {
                                 this._dragOut = true;
                                 this.showNormal();
@@ -4912,7 +4904,7 @@ var gd3d;
             };
             inputField.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    if (ev.type != framework.PointEventEnum.PointDown)
+                    if (ev.type != gd3d.event.PointEventEnum.PointDown)
                         return;
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
@@ -5664,7 +5656,7 @@ var gd3d;
                         if (this.strPoint == null)
                             this.strPoint = new gd3d.math.vector2();
                         var sp = this.strPoint;
-                        if (ev.type == framework.PointEventEnum.PointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this.isPointDown = true;
                             sp.x = tempc.x;
                             sp.y = tempc.y;
@@ -5672,7 +5664,7 @@ var gd3d;
                                 this.strPos = new gd3d.math.vector2();
                             gd3d.math.vec2Clone(this._content.transform.localTranslate, this.strPos);
                         }
-                        if (ev.type == framework.PointEventEnum.PointHold && this.isPointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
                             if (this.lastPoint == null)
                                 this.lastPoint = new gd3d.math.vector2();
                             var lp = this.lastPoint;
@@ -5688,7 +5680,7 @@ var gd3d;
                         gd3d.math.pool.delete_vector2(tempc);
                     }
                 }
-                if (ev.type == framework.PointEventEnum.PointUp) {
+                if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                     this.isPointDown = false;
                 }
             };
@@ -18021,7 +18013,7 @@ var gd3d;
 var gd3d;
 (function (gd3d) {
     var event;
-    (function (event_1) {
+    (function (event) {
         var UIEventEnum;
         (function (UIEventEnum) {
             UIEventEnum[UIEventEnum["PointerDown"] = 0] = "PointerDown";
@@ -18029,220 +18021,20 @@ var gd3d;
             UIEventEnum[UIEventEnum["PointerClick"] = 2] = "PointerClick";
             UIEventEnum[UIEventEnum["PointerEnter"] = 3] = "PointerEnter";
             UIEventEnum[UIEventEnum["PointerExit"] = 4] = "PointerExit";
-        })(UIEventEnum = event_1.UIEventEnum || (event_1.UIEventEnum = {}));
-        var UIEvent = (function (_super) {
-            __extends(UIEvent, _super);
-            function UIEvent() {
-                return _super !== null && _super.apply(this, arguments) || this;
-            }
-            UIEvent.prototype.OnEnum = function (event, func, thisArg) {
-                this.On(UIEventEnum[event], func, thisArg);
-            };
-            UIEvent.prototype.EmitEnum = function (event) {
-                var args = [];
-                for (var _i = 1; _i < arguments.length; _i++) {
-                    args[_i - 1] = arguments[_i];
-                }
-                _super.prototype.Emit.call(this, UIEventEnum[event], args);
-            };
-            return UIEvent;
-        }(gd3d.AEvent));
-        event_1.UIEvent = UIEvent;
-    })(event = gd3d.event || (gd3d.event = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var pointinfo = (function () {
-            function pointinfo() {
-                this.touch = false;
-            }
-            return pointinfo;
-        }());
-        framework.pointinfo = pointinfo;
-        var inputMgr = (function () {
-            function inputMgr(app) {
-                var _this = this;
-                this.inputlast = null;
-                this.point = new pointinfo();
-                this.touches = {};
-                this.keyboardMap = {};
-                this.rMtr_90 = new gd3d.math.matrix3x2();
-                this.rMtr_n90 = new gd3d.math.matrix3x2();
-                this.app = app;
-                gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
-                gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
-                app.webgl.canvas.addEventListener("touchstart", function (ev) {
-                    _this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
-                    _this.point.touch = true;
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = true;
-                        _this.touches[id].x = touch.clientX;
-                        _this.touches[id].y = touch.clientY;
-                    }
-                });
-                app.webgl.canvas.addEventListener("touchmove", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = true;
-                        _this.touches[id].x = touch.clientX;
-                        _this.touches[id].y = touch.clientY;
-                    }
-                    var count = 0;
-                    var x = 0;
-                    var y = 0;
-                    for (var key in _this.touches) {
-                        if (_this.touches[key].touch == true) {
-                            x += _this.touches[key].x;
-                            y += _this.touches[key].y;
-                            count++;
-                        }
-                    }
-                    _this.CalcuPoint(x / count, y / count);
-                });
-                app.webgl.canvas.addEventListener("touchend", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = false;
-                    }
-                    for (var key in _this.touches) {
-                        if (_this.touches[key].touch == true)
-                            return;
-                    }
-                    _this.point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = false;
-                    }
-                    for (var key in _this.touches) {
-                        if (_this.touches[key].touch == true)
-                            return;
-                    }
-                    _this.point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                    _this.point.touch = true;
-                });
-                app.webgl.canvas.addEventListener("mouseup", function (ev) {
-                    _this.point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                });
-                app.webgl.canvas.addEventListener("keydown", function (ev) {
-                    _this.keyboardMap[ev.keyCode] = true;
-                }, false);
-                app.webgl.canvas.addEventListener("keyup", function (ev) {
-                    _this.keyboardMap[ev.keyCode] = false;
-                }, false);
-                app.webgl.canvas.addEventListener("blur", function (ev) {
-                    _this.point.touch = false;
-                }, false);
-            }
-            inputMgr.prototype.anyKey = function () {
-                if (this.point.touch)
-                    return true;
-                for (var key in this.keyboardMap) {
-                    if (this.keyboardMap.hasOwnProperty(key)) {
-                        var element = this.keyboardMap[key];
-                        if (element == true)
-                            return true;
-                    }
-                }
-                return false;
-            };
-            inputMgr.prototype.GetKeyDown = function (value) {
-                if (typeof (value) === "number") {
-                    if (this.keyboardMap[value] != null)
-                        return this.keyboardMap[value];
-                }
-                else if (typeof (value) === "string") {
-                    var id = framework.KeyCode[value];
-                    if (id != null && this.keyboardMap[id] != null)
-                        return this.keyboardMap[id];
-                }
-                return false;
-            };
-            inputMgr.prototype.GetKeyUP = function (value) {
-                if (typeof (value) === "number") {
-                    if (this.keyboardMap[value] != null)
-                        return !this.keyboardMap[value];
-                }
-                else if (typeof (value) === "string") {
-                    var id = framework.KeyCode[value];
-                    if (id != null && this.keyboardMap[id] != null)
-                        return !this.keyboardMap[id];
-                }
-                return false;
-            };
-            inputMgr.prototype.CalcuPoint = function (clientX, clientY) {
-                if (!this.app || isNaN(clientX) || isNaN(clientY))
-                    return;
-                if (!this.tempV2_0)
-                    this.tempV2_0 = gd3d.math.pool.new_vector2();
-                if (!this.tempV2_1)
-                    this.tempV2_1 = gd3d.math.pool.new_vector2();
-                this.tempV2_0.x = clientX / this.app.scaleFromPandding;
-                this.tempV2_0.y = clientY / this.app.scaleFromPandding;
-                gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
-                if (this.app.shouldRotate) {
-                    switch (this.app.orientation) {
-                        case gd3d.framework.OrientationMode.PORTRAIT:
-                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
-                            this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                            this.point.y = this.tempV2_1.y;
-                            break;
-                        case gd3d.framework.OrientationMode.LANDSCAPE:
-                            gd3d.math.matrix3x2TransformVector2(this.rMtr_n90, this.tempV2_0, this.tempV2_1);
-                            this.point.x = this.tempV2_1.x;
-                            this.point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
-                            break;
-                        case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
-                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
-                            this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                            this.point.y = this.tempV2_1.y;
-                            break;
-                    }
-                }
-                else {
-                    this.point.x = this.tempV2_0.x;
-                    this.point.y = this.tempV2_0.y;
-                }
-            };
-            return inputMgr;
-        }());
-        framework.inputMgr = inputMgr;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
+        })(UIEventEnum = event.UIEventEnum || (event.UIEventEnum = {}));
+        var PointEventEnum;
+        (function (PointEventEnum) {
+            PointEventEnum[PointEventEnum["PointDown"] = 0] = "PointDown";
+            PointEventEnum[PointEventEnum["PointHold"] = 1] = "PointHold";
+            PointEventEnum[PointEventEnum["PointUp"] = 2] = "PointUp";
+            PointEventEnum[PointEventEnum["PointMove"] = 3] = "PointMove";
+            PointEventEnum[PointEventEnum["PointClick"] = 4] = "PointClick";
+        })(PointEventEnum = event.PointEventEnum || (event.PointEventEnum = {}));
+        var KeyEventEnum;
+        (function (KeyEventEnum) {
+            KeyEventEnum[KeyEventEnum["KeyDown"] = 0] = "KeyDown";
+            KeyEventEnum[KeyEventEnum["KeyUp"] = 1] = "KeyUp";
+        })(KeyEventEnum = event.KeyEventEnum || (event.KeyEventEnum = {}));
         var KeyCode;
         (function (KeyCode) {
             KeyCode[KeyCode["None"] = 0] = "None";
@@ -18566,7 +18358,338 @@ var gd3d;
             KeyCode[KeyCode["Joystick8Button17"] = 507] = "Joystick8Button17";
             KeyCode[KeyCode["Joystick8Button18"] = 508] = "Joystick8Button18";
             KeyCode[KeyCode["Joystick8Button19"] = 509] = "Joystick8Button19";
-        })(KeyCode = framework.KeyCode || (framework.KeyCode = {}));
+        })(KeyCode = event.KeyCode || (event.KeyCode = {}));
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var event;
+    (function (event_1) {
+        var InputEvent = (function (_super) {
+            __extends(InputEvent, _super);
+            function InputEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            InputEvent.prototype.OnEnum_key = function (event, func, thisArg) {
+                this.On(event_1.KeyEventEnum[event], func, thisArg);
+            };
+            InputEvent.prototype.EmitEnum_key = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_1.KeyEventEnum[event], args);
+            };
+            InputEvent.prototype.OnEnum_point = function (event, func, thisArg) {
+                this.On(event_1.PointEventEnum[event], func, thisArg);
+            };
+            InputEvent.prototype.EmitEnum_point = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_1.PointEventEnum[event], args);
+            };
+            return InputEvent;
+        }(gd3d.AEvent));
+        event_1.InputEvent = InputEvent;
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var event;
+    (function (event_2) {
+        var UIEvent = (function (_super) {
+            __extends(UIEvent, _super);
+            function UIEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            UIEvent.prototype.OnEnum = function (event, func, thisArg) {
+                this.On(event_2.UIEventEnum[event], func, thisArg);
+            };
+            UIEvent.prototype.EmitEnum = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_2.UIEventEnum[event], args);
+            };
+            return UIEvent;
+        }(gd3d.AEvent));
+        event_2.UIEvent = UIEvent;
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var pointinfo = (function () {
+            function pointinfo() {
+                this.touch = false;
+            }
+            return pointinfo;
+        }());
+        framework.pointinfo = pointinfo;
+        var inputMgr = (function () {
+            function inputMgr(app) {
+                var _this = this;
+                this.eventer = new gd3d.event.InputEvent();
+                this.inputlast = null;
+                this._point = new pointinfo();
+                this._touches = {};
+                this.keyboardMap = {};
+                this.rMtr_90 = new gd3d.math.matrix3x2();
+                this.rMtr_n90 = new gd3d.math.matrix3x2();
+                this.moveTolerance = 2;
+                this.lastTouch = false;
+                this.hasPointDown = false;
+                this.hasPointUP = false;
+                this.hasPointMove = false;
+                this.downPoint = new gd3d.math.vector2();
+                this.lastPoint = new gd3d.math.vector2();
+                this.hasKeyDown = false;
+                this.hasKeyUp = false;
+                this.app = app;
+                gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
+                gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
+                app.webgl.canvas.addEventListener("touchstart", function (ev) {
+                    _this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
+                    _this._point.touch = true;
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = true;
+                        _this._touches[id].x = touch.clientX;
+                        _this._touches[id].y = touch.clientY;
+                    }
+                });
+                app.webgl.canvas.addEventListener("touchmove", function (ev) {
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = true;
+                        _this._touches[id].x = touch.clientX;
+                        _this._touches[id].y = touch.clientY;
+                    }
+                    var count = 0;
+                    var x = 0;
+                    var y = 0;
+                    for (var key in _this._touches) {
+                        if (_this._touches[key].touch == true) {
+                            x += _this._touches[key].x;
+                            y += _this._touches[key].y;
+                            count++;
+                        }
+                    }
+                    _this.CalcuPoint(x / count, y / count);
+                });
+                app.webgl.canvas.addEventListener("touchend", function (ev) {
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = false;
+                    }
+                    for (var key in _this._touches) {
+                        if (_this._touches[key].touch == true)
+                            return;
+                    }
+                    _this._point.touch = false;
+                });
+                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = false;
+                    }
+                    for (var key in _this._touches) {
+                        if (_this._touches[key].touch == true)
+                            return;
+                    }
+                    _this._point.touch = false;
+                });
+                app.webgl.canvas.addEventListener("mousedown", function (ev) {
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
+                    _this._point.touch = true;
+                });
+                app.webgl.canvas.addEventListener("mouseup", function (ev) {
+                    _this._point.touch = false;
+                });
+                app.webgl.canvas.addEventListener("mousemove", function (ev) {
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
+                });
+                app.webgl.canvas.addEventListener("keydown", function (ev) {
+                    _this.hasKeyDown = _this.keyboardMap[ev.keyCode] = true;
+                }, false);
+                app.webgl.canvas.addEventListener("keyup", function (ev) {
+                    delete _this.keyboardMap[ev.keyCode];
+                    _this.hasKeyUp = true;
+                }, false);
+                app.webgl.canvas.addEventListener("blur", function (ev) {
+                    _this._point.touch = false;
+                }, false);
+            }
+            Object.defineProperty(inputMgr.prototype, "point", {
+                get: function () { return this._point; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(inputMgr.prototype, "touches", {
+                get: function () { return this._touches; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            inputMgr.prototype.update = function (delta) {
+                this.pointCk();
+                this.keyCodeCk();
+            };
+            inputMgr.prototype.pointCk = function () {
+                var pt = this._point;
+                if (this.lastPoint.x != pt.x || this.lastPoint.y != pt.y) {
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointMove, pt.x, pt.y);
+                }
+                if (!this.lastTouch && pt.touch) {
+                    this.hasPointDown = true;
+                    this.downPoint.x = pt.x;
+                    this.downPoint.y = pt.y;
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointDown, pt.x, pt.y);
+                }
+                else if (this.lastTouch && !pt.touch) {
+                    this.hasPointUP = true;
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointUp, pt.x, pt.y);
+                }
+                if (this.hasPointUP && this.hasPointDown) {
+                    var isMoveTolerance = (Math.abs(this.downPoint.x - pt.x) > this.moveTolerance || Math.abs(this.downPoint.y - pt.y) > this.moveTolerance);
+                    if (isMoveTolerance) {
+                        this.hasPointDown = this.hasPointUP = false;
+                        this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointClick, pt.x, pt.y);
+                    }
+                }
+                if (!pt.touch) {
+                    this.hasPointDown = false;
+                }
+                this.lastTouch = pt.touch;
+                this.lastPoint.x = pt.x;
+                this.lastPoint.y = pt.y;
+            };
+            inputMgr.prototype.keyCodeCk = function () {
+                if (this.hasKeyDown)
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyDown, null);
+                if (this.hasKeyUp)
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyUp, null);
+                this.hasKeyDown = this.hasKeyUp = false;
+            };
+            inputMgr.prototype.addPointListener = function (eventEnum, func, thisArg) {
+                this.eventer.OnEnum_point(eventEnum, func, thisArg);
+            };
+            inputMgr.prototype.removePointListener = function (eventEnum, func, thisArg) {
+                this.eventer.RemoveListener(gd3d.event.PointEventEnum[eventEnum], func, thisArg);
+            };
+            inputMgr.prototype.addKeyListener = function (eventEnum, func, thisArg) {
+                this.eventer.OnEnum_key(eventEnum, func, thisArg);
+            };
+            inputMgr.prototype.removeKeyListener = function (eventEnum, func, thisArg) {
+                this.eventer.RemoveListener(gd3d.event.KeyEventEnum[eventEnum], func, thisArg);
+            };
+            inputMgr.prototype.anyKey = function () {
+                if (this._point.touch)
+                    return true;
+                for (var key in this.keyboardMap) {
+                    if (this.keyboardMap.hasOwnProperty(key)) {
+                        var element = this.keyboardMap[key];
+                        if (element == true)
+                            return true;
+                    }
+                }
+                return false;
+            };
+            inputMgr.prototype.GetKeyDown = function (value) {
+                if (typeof (value) === "number") {
+                    if (this.keyboardMap[value] != null)
+                        return this.keyboardMap[value];
+                }
+                else if (typeof (value) === "string") {
+                    var id = gd3d.event.KeyCode[value];
+                    if (id != null && this.keyboardMap[id] != null)
+                        return this.keyboardMap[id];
+                }
+                return false;
+            };
+            inputMgr.prototype.GetKeyUP = function (value) {
+                if (typeof (value) === "number") {
+                    return !this.keyboardMap[value];
+                }
+                else if (typeof (value) === "string") {
+                    var id = gd3d.event.KeyCode[value];
+                    if (id != null)
+                        return !this.keyboardMap[id];
+                }
+                return false;
+            };
+            inputMgr.prototype.KeyDownCount = function () {
+                var count = 0;
+                for (var key in this.keyboardMap) {
+                    if (this.keyboardMap.hasOwnProperty(key)) {
+                        if (this.keyboardMap[key] === true)
+                            count++;
+                    }
+                }
+                return count;
+            };
+            inputMgr.prototype.CalcuPoint = function (clientX, clientY) {
+                if (!this.app || isNaN(clientX) || isNaN(clientY))
+                    return;
+                if (!this.tempV2_0)
+                    this.tempV2_0 = gd3d.math.pool.new_vector2();
+                if (!this.tempV2_1)
+                    this.tempV2_1 = gd3d.math.pool.new_vector2();
+                this.tempV2_0.x = clientX / this.app.scaleFromPandding;
+                this.tempV2_0.y = clientY / this.app.scaleFromPandding;
+                gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
+                if (this.app.shouldRotate) {
+                    switch (this.app.orientation) {
+                        case gd3d.framework.OrientationMode.PORTRAIT:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
+                            this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            this._point.y = this.tempV2_1.y;
+                            break;
+                        case gd3d.framework.OrientationMode.LANDSCAPE:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_n90, this.tempV2_0, this.tempV2_1);
+                            this._point.x = this.tempV2_1.x;
+                            this._point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
+                            break;
+                        case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
+                            this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            this._point.y = this.tempV2_1.y;
+                            break;
+                    }
+                }
+                else {
+                    this._point.x = this.tempV2_0.x;
+                    this._point.y = this.tempV2_0.y;
+                }
+            };
+            return inputMgr;
+        }());
+        framework.inputMgr = inputMgr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

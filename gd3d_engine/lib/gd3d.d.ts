@@ -333,14 +333,8 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    enum PointEventEnum {
-        PointNothing = 0,
-        PointDown = 1,
-        PointHold = 2,
-        PointUp = 3,
-    }
     class PointEvent {
-        type: PointEventEnum;
+        type: event.PointEventEnum;
         x: number;
         y: number;
         eated: boolean;
@@ -3197,10 +3191,6 @@ declare namespace gd3d {
     }
 }
 declare namespace gd3d.event {
-    interface IUIEventer {
-        addListener(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
-        removeListener(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
-    }
     enum UIEventEnum {
         PointerDown = 0,
         PointerUp = 1,
@@ -3208,42 +3198,17 @@ declare namespace gd3d.event {
         PointerEnter = 3,
         PointerExit = 4,
     }
-    class UIEvent extends AEvent {
-        OnEnum(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
-        EmitEnum(event: UIEventEnum, ...args: Array<any>): void;
+    enum PointEventEnum {
+        PointDown = 0,
+        PointHold = 1,
+        PointUp = 2,
+        PointMove = 3,
+        PointClick = 4,
     }
-}
-declare namespace gd3d.framework {
-    class pointinfo {
-        id: number;
-        touch: boolean;
-        x: number;
-        y: number;
+    enum KeyEventEnum {
+        KeyDown = 0,
+        KeyUp = 1,
     }
-    class inputMgr {
-        private inputlast;
-        private app;
-        point: pointinfo;
-        touches: {
-            [id: number]: pointinfo;
-        };
-        keyboardMap: {
-            [id: number]: boolean;
-        };
-        private rMtr_90;
-        private rMtr_n90;
-        constructor(app: application);
-        anyKey(): boolean;
-        GetKeyDown(name: string): any;
-        GetKeyDown(key: KeyCode): any;
-        GetKeyUP(name: string): any;
-        GetKeyUP(key: KeyCode): any;
-        private tempV2_0;
-        private tempV2_1;
-        private CalcuPoint(clientX, clientY);
-    }
-}
-declare namespace gd3d.framework {
     enum KeyCode {
         None = 0,
         Backspace = 8,
@@ -3566,6 +3531,72 @@ declare namespace gd3d.framework {
         Joystick8Button17 = 507,
         Joystick8Button18 = 508,
         Joystick8Button19 = 509,
+    }
+}
+declare namespace gd3d.event {
+    class InputEvent extends AEvent {
+        OnEnum_key(event: KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum_key(event: KeyEventEnum, ...args: Array<any>): void;
+        OnEnum_point(event: PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum_point(event: PointEventEnum, ...args: Array<any>): void;
+    }
+}
+declare namespace gd3d.event {
+    interface IUIEventer {
+        addListener(eventEnum: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
+        removeListener(eventEnum: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
+    }
+    class UIEvent extends AEvent {
+        OnEnum(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum(event: UIEventEnum, ...args: Array<any>): void;
+    }
+}
+declare namespace gd3d.framework {
+    class pointinfo {
+        id: number;
+        touch: boolean;
+        x: number;
+        y: number;
+    }
+    class inputMgr {
+        private eventer;
+        private inputlast;
+        private app;
+        readonly point: pointinfo;
+        private _point;
+        readonly touches: {
+            [id: number]: pointinfo;
+        };
+        private _touches;
+        private keyboardMap;
+        private rMtr_90;
+        private rMtr_n90;
+        constructor(app: application);
+        private readonly moveTolerance;
+        private lastTouch;
+        private hasPointDown;
+        private hasPointUP;
+        private hasPointMove;
+        private downPoint;
+        private lastPoint;
+        update(delta: any): void;
+        private pointCk();
+        private hasKeyDown;
+        private hasKeyUp;
+        private keyCodeCk();
+        addPointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        removePointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        addKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        removeKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        anyKey(): boolean;
+        GetKeyDown(name: string): any;
+        GetKeyDown(key: event.KeyCode): any;
+        GetKeyUP(name: string): any;
+        GetKeyUP(key: event.KeyCode): any;
+        KeyDownCount(): number;
+        private tempV2_0;
+        private tempV2_1;
+        private CalcuPoint(clientX, clientY);
     }
 }
 declare namespace gd3d.io {
