@@ -30184,6 +30184,338 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var tweenUtil = (function () {
+            function tweenUtil() {
+            }
+            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
+                switch (ease_type) {
+                    case tweenMethod.Linear:
+                        return linear_progress;
+                    case tweenMethod.ExpoEaseOut:
+                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseIn:
+                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseOutIn:
+                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseInOut:
+                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOut:
+                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseIn:
+                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOutIn:
+                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseInOut:
+                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOut:
+                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseIn:
+                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOutIn:
+                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseInOut:
+                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOut:
+                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseIn:
+                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOutIn:
+                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseInOut:
+                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOut:
+                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseIn:
+                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOutIn:
+                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseInOut:
+                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOut:
+                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseIn:
+                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOutIn:
+                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseInOut:
+                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOut:
+                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseIn:
+                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOutIn:
+                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseInOut:
+                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOut:
+                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseIn:
+                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOutIn:
+                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseInOut:
+                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOut:
+                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseIn:
+                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOutIn:
+                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseInOut:
+                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOut:
+                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseIn:
+                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOutIn:
+                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseInOut:
+                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
+                    default:
+                        return linear_progress;
+                }
+            };
+            tweenUtil.Linear = function (t, b, c, d) {
+                return c * t / d + b;
+            };
+            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
+                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+            };
+            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
+                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+            };
+            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
+                if (t == 0)
+                    return b;
+                if (t == d)
+                    return b + c;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+            };
+            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CircEaseOut = function (t, b, c, d) {
+                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+            };
+            tweenUtil.CircEaseIn = function (t, b, c, d) {
+                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+            };
+            tweenUtil.CircEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+            };
+            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuadEaseOut = function (t, b, c, d) {
+                return -c * (t /= d) * (t - 2) + b;
+            };
+            tweenUtil.QuadEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t + b;
+            };
+            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t + b;
+                return -c / 2 * ((--t) * (t - 2) - 1) + b;
+            };
+            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.SineEaseOut = function (t, b, c, d) {
+                return c * Math.sin(t / d * (Math.PI / 2)) + b;
+            };
+            tweenUtil.SineEaseIn = function (t, b, c, d) {
+                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+            };
+            tweenUtil.SineEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
+                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
+            };
+            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CubicEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t + 1) + b;
+            };
+            tweenUtil.CubicEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t + b;
+            };
+            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t + 2) + b;
+            };
+            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuartEaseOut = function (t, b, c, d) {
+                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+            };
+            tweenUtil.QuartEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t + b;
+            };
+            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t + b;
+                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+            };
+            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuintEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+            };
+            tweenUtil.QuintEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t * t + b;
+            };
+            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+            };
+            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
+            };
+            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+            };
+            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) == 2)
+                    return b + c;
+                var p = d * (0.3 * 1.5);
+                var s = p / 4;
+                if (t < 1)
+                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
+            };
+            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BounceEaseOut = function (t, b, c, d) {
+                if ((t /= d) < (1 / 2.75))
+                    return c * (7.5625 * t * t) + b;
+                else if (t < (2 / 2.75))
+                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
+                else if (t < (2.5 / 2.75))
+                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
+                else
+                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
+            };
+            tweenUtil.BounceEaseIn = function (t, b, c, d) {
+                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
+            };
+            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
+                else
+                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+            };
+            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BackEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
+            };
+            tweenUtil.BackEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
+            };
+            tweenUtil.BackEaseInOut = function (t, b, c, d) {
+                var s = 1.70158;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
+            };
+            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            return tweenUtil;
+        }());
+        framework.tweenUtil = tweenUtil;
+        var tweenMethod;
+        (function (tweenMethod) {
+            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
+            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
+            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
+            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
+            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
+            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
+            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
+            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
+            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
+            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
+            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
+            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
+            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
+            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
+            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
+            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
+            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
+            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
+            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
+            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
+            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
+            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
+            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
+            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
+            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
+            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
+            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
+            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
+            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
+            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
+            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
+            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
+            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
+            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
+            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
+            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
+            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
+            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
+            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
+            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
+            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
+        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var WebGLDebugUtils = (function () {
             function WebGLDebugUtils() {
                 this.glEnums = null;

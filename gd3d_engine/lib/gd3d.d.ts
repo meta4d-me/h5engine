@@ -5542,6 +5542,95 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class tweenUtil {
+        static GetEaseProgress(ease_type: tweenMethod, linear_progress: number): number;
+        static Linear(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseOut(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseIn(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseInOut(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static CircEaseOut(t: number, b: number, c: number, d: number): number;
+        static CircEaseIn(t: number, b: number, c: number, d: number): number;
+        static CircEaseInOut(t: number, b: number, c: number, d: number): number;
+        static CircEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuadEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuadEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuadEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuadEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static SineEaseOut(t: number, b: number, c: number, d: number): number;
+        static SineEaseIn(t: number, b: number, c: number, d: number): number;
+        static SineEaseInOut(t: number, b: number, c: number, d: number): number;
+        static SineEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static CubicEaseOut(t: number, b: number, c: number, d: number): number;
+        static CubicEaseIn(t: number, b: number, c: number, d: number): number;
+        static CubicEaseInOut(t: number, b: number, c: number, d: number): number;
+        static CubicEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuartEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuartEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuartEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuartEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuintEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuintEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuintEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuintEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseOut(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseIn(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseInOut(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static BounceEaseOut(t: number, b: number, c: number, d: number): number;
+        static BounceEaseIn(t: number, b: number, c: number, d: number): number;
+        static BounceEaseInOut(t: number, b: number, c: number, d: number): number;
+        static BounceEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static BackEaseOut(t: number, b: number, c: number, d: number): number;
+        static BackEaseIn(t: number, b: number, c: number, d: number): number;
+        static BackEaseInOut(t: number, b: number, c: number, d: number): number;
+        static BackEaseOutIn(t: number, b: number, c: number, d: number): number;
+    }
+    enum tweenMethod {
+        Linear = 0,
+        ExpoEaseOut = 1,
+        ExpoEaseIn = 2,
+        ExpoEaseInOut = 3,
+        ExpoEaseOutIn = 4,
+        CircEaseOut = 5,
+        CircEaseIn = 6,
+        CircEaseInOut = 7,
+        CircEaseOutIn = 8,
+        QuadEaseOut = 9,
+        QuadEaseIn = 10,
+        QuadEaseInOut = 11,
+        QuadEaseOutIn = 12,
+        SineEaseOut = 13,
+        SineEaseIn = 14,
+        SineEaseInOut = 15,
+        SineEaseOutIn = 16,
+        CubicEaseOut = 17,
+        CubicEaseIn = 18,
+        CubicEaseInOut = 19,
+        CubicEaseOutIn = 20,
+        QuartEaseOut = 21,
+        QuartEaseIn = 22,
+        QuartEaseInOut = 23,
+        QuartEaseOutIn = 24,
+        QuintEaseOut = 25,
+        QuintEaseIn = 26,
+        QuintEaseInOut = 27,
+        QuintEaseOutIn = 28,
+        ElasticEaseOut = 29,
+        ElasticEaseIn = 30,
+        ElasticEaseInOut = 31,
+        ElasticEaseOutIn = 32,
+        BounceEaseOut = 33,
+        BounceEaseIn = 34,
+        BounceEaseInOut = 35,
+        BounceEaseOutIn = 36,
+        BackEaseOut = 37,
+        BackEaseIn = 38,
+        BackEaseInOut = 39,
+        BackEaseOutIn = 40,
+    }
+}
+declare namespace gd3d.framework {
     class WebGLDebugUtils {
         private log(msg);
         static readonly glValidEnumContexts: {
