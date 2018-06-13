@@ -157,7 +157,7 @@ class test_pick_boxcollider implements IState
             this.pickDown();
         }
         this.pointDown = this.inputMgr.point.touch;
-        if(this.inputMgr.keyboardMap[65]){
+        if(this.inputMgr.GetKeyDown(65)){
             this.isAKeyDown = true;
         }else{
             this.isAKeyDown = false;

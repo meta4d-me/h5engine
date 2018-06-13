@@ -333,24 +333,12 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    enum PointEventEnum {
-        PointNothing = 0,
-        PointDown = 1,
-        PointHold = 2,
-        PointUp = 3,
-    }
     class PointEvent {
-        type: PointEventEnum;
+        type: event.PointEventEnum;
         x: number;
         y: number;
         eated: boolean;
         selected: transform2D;
-    }
-    class UIEvent {
-        funcs: Function[];
-        addListener(func: Function): void;
-        excute(): void;
-        clear(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -640,7 +628,7 @@ declare namespace gd3d.framework {
         ColorTint = 1,
         SpriteSwap = 2,
     }
-    class button implements IRectRenderer {
+    class button implements IRectRenderer, event.IUIEventer {
         private _transition;
         transition: TransitionType;
         private _originalColor;
@@ -665,7 +653,9 @@ declare namespace gd3d.framework {
         transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        onClick: UIEvent;
+        private UIEventer;
+        addListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        removeListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         private _downInThis;
         private _dragOut;
         private showNormal();
@@ -1986,6 +1976,7 @@ declare namespace gd3d.framework {
         autoplay: boolean;
         private playIndex;
         private _playClip;
+        readonly playingClip: string;
         bones: tPoseInfo[];
         startPos: PoseBoneMatrix[];
         tpose: {
@@ -2021,6 +2012,7 @@ declare namespace gd3d.framework {
         private init();
         start(): void;
         onPlay(): void;
+        private clipHasPlay;
         update(delta: number): void;
         playByIndex(animIndex: number, speed?: number, beRevert?: boolean): void;
         playCrossByIndex(animIndex: number, crosstimer: number, speed?: number, beRevert?: boolean): void;
@@ -2037,6 +2029,7 @@ declare namespace gd3d.framework {
         private finishCallBack;
         private thisObject;
         addFinishedEventListener(finishCallBack: Function, thisObject: any): void;
+        onPlayEnd: (clipname: string) => any;
         private checkFrameId(delay);
         fillPoseData(data: Float32Array, bones: transform[], efficient?: boolean): void;
         care(node: transform): void;
@@ -3188,37 +3181,34 @@ declare namespace gd3d.framework {
         moveTo(to: transform): void;
     }
 }
-declare namespace gd3d.framework {
-    class pointinfo {
-        id: number;
-        touch: boolean;
-        x: number;
-        y: number;
-    }
-    class inputMgr {
-        private inputlast;
-        private app;
-        point: pointinfo;
-        touches: {
-            [id: number]: pointinfo;
-        };
-        keyboardMap: {
-            [id: number]: boolean;
-        };
-        private rMtr_90;
-        private rMtr_n90;
-        constructor(app: application);
-        anyKey(): boolean;
-        GetKeyDown(name: string): any;
-        GetKeyDown(key: KeyCode): any;
-        GetKeyUP(name: string): any;
-        GetKeyUP(key: KeyCode): any;
-        private tempV2_0;
-        private tempV2_1;
-        private CalcuPoint(clientX, clientY);
+declare namespace gd3d {
+    abstract class AEvent {
+        private events;
+        On(event: string, func: (...args: Array<any>) => void, thisArg: any): void;
+        Emit(event: string, ...args: Array<any>): void;
+        RemoveListener(event: string, func: Function, thisArg: any): void;
+        RemoveListenerAll(): void;
     }
 }
-declare namespace gd3d.framework {
+declare namespace gd3d.event {
+    enum UIEventEnum {
+        PointerDown = 0,
+        PointerUp = 1,
+        PointerClick = 2,
+        PointerEnter = 3,
+        PointerExit = 4,
+    }
+    enum PointEventEnum {
+        PointDown = 0,
+        PointHold = 1,
+        PointUp = 2,
+        PointMove = 3,
+        PointClick = 4,
+    }
+    enum KeyEventEnum {
+        KeyDown = 0,
+        KeyUp = 1,
+    }
     enum KeyCode {
         None = 0,
         Backspace = 8,
@@ -3541,6 +3531,72 @@ declare namespace gd3d.framework {
         Joystick8Button17 = 507,
         Joystick8Button18 = 508,
         Joystick8Button19 = 509,
+    }
+}
+declare namespace gd3d.event {
+    class InputEvent extends AEvent {
+        OnEnum_key(event: KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum_key(event: KeyEventEnum, ...args: Array<any>): void;
+        OnEnum_point(event: PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum_point(event: PointEventEnum, ...args: Array<any>): void;
+    }
+}
+declare namespace gd3d.event {
+    interface IUIEventer {
+        addListener(eventEnum: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
+        removeListener(eventEnum: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): any;
+    }
+    class UIEvent extends AEvent {
+        OnEnum(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum(event: UIEventEnum, ...args: Array<any>): void;
+    }
+}
+declare namespace gd3d.framework {
+    class pointinfo {
+        id: number;
+        touch: boolean;
+        x: number;
+        y: number;
+    }
+    class inputMgr {
+        private eventer;
+        private inputlast;
+        private app;
+        readonly point: pointinfo;
+        private _point;
+        readonly touches: {
+            [id: number]: pointinfo;
+        };
+        private _touches;
+        private keyboardMap;
+        private rMtr_90;
+        private rMtr_n90;
+        constructor(app: application);
+        private readonly moveTolerance;
+        private lastTouch;
+        private hasPointDown;
+        private hasPointUP;
+        private hasPointMove;
+        private downPoint;
+        private lastPoint;
+        update(delta: any): void;
+        private pointCk();
+        private hasKeyDown;
+        private hasKeyUp;
+        private keyCodeCk();
+        addPointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        removePointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        addKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        removeKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        anyKey(): boolean;
+        GetKeyDown(name: string): any;
+        GetKeyDown(key: event.KeyCode): any;
+        GetKeyUP(name: string): any;
+        GetKeyUP(key: event.KeyCode): any;
+        KeyDownCount(): number;
+        private tempV2_0;
+        private tempV2_1;
+        private CalcuPoint(clientX, clientY);
     }
 }
 declare namespace gd3d.io {
@@ -5483,6 +5539,95 @@ declare namespace gd3d.framework {
         private static create2D_image2D(img, app);
         private static create2D_label(label, app);
         private static create2D_button(btn, app);
+    }
+}
+declare namespace gd3d.framework {
+    class tweenUtil {
+        static GetEaseProgress(ease_type: tweenMethod, linear_progress: number): number;
+        static Linear(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseOut(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseIn(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseInOut(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static CircEaseOut(t: number, b: number, c: number, d: number): number;
+        static CircEaseIn(t: number, b: number, c: number, d: number): number;
+        static CircEaseInOut(t: number, b: number, c: number, d: number): number;
+        static CircEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuadEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuadEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuadEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuadEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static SineEaseOut(t: number, b: number, c: number, d: number): number;
+        static SineEaseIn(t: number, b: number, c: number, d: number): number;
+        static SineEaseInOut(t: number, b: number, c: number, d: number): number;
+        static SineEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static CubicEaseOut(t: number, b: number, c: number, d: number): number;
+        static CubicEaseIn(t: number, b: number, c: number, d: number): number;
+        static CubicEaseInOut(t: number, b: number, c: number, d: number): number;
+        static CubicEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuartEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuartEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuartEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuartEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuintEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuintEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuintEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuintEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseOut(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseIn(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseInOut(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static BounceEaseOut(t: number, b: number, c: number, d: number): number;
+        static BounceEaseIn(t: number, b: number, c: number, d: number): number;
+        static BounceEaseInOut(t: number, b: number, c: number, d: number): number;
+        static BounceEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static BackEaseOut(t: number, b: number, c: number, d: number): number;
+        static BackEaseIn(t: number, b: number, c: number, d: number): number;
+        static BackEaseInOut(t: number, b: number, c: number, d: number): number;
+        static BackEaseOutIn(t: number, b: number, c: number, d: number): number;
+    }
+    enum tweenMethod {
+        Linear = 0,
+        ExpoEaseOut = 1,
+        ExpoEaseIn = 2,
+        ExpoEaseInOut = 3,
+        ExpoEaseOutIn = 4,
+        CircEaseOut = 5,
+        CircEaseIn = 6,
+        CircEaseInOut = 7,
+        CircEaseOutIn = 8,
+        QuadEaseOut = 9,
+        QuadEaseIn = 10,
+        QuadEaseInOut = 11,
+        QuadEaseOutIn = 12,
+        SineEaseOut = 13,
+        SineEaseIn = 14,
+        SineEaseInOut = 15,
+        SineEaseOutIn = 16,
+        CubicEaseOut = 17,
+        CubicEaseIn = 18,
+        CubicEaseInOut = 19,
+        CubicEaseOutIn = 20,
+        QuartEaseOut = 21,
+        QuartEaseIn = 22,
+        QuartEaseInOut = 23,
+        QuartEaseOutIn = 24,
+        QuintEaseOut = 25,
+        QuintEaseIn = 26,
+        QuintEaseInOut = 27,
+        QuintEaseOutIn = 28,
+        ElasticEaseOut = 29,
+        ElasticEaseIn = 30,
+        ElasticEaseInOut = 31,
+        ElasticEaseOutIn = 32,
+        BounceEaseOut = 33,
+        BounceEaseIn = 34,
+        BounceEaseInOut = 35,
+        BounceEaseOutIn = 36,
+        BackEaseOut = 37,
+        BackEaseIn = 38,
+        BackEaseInOut = 39,
+        BackEaseOutIn = 40,
     }
 }
 declare namespace gd3d.framework {

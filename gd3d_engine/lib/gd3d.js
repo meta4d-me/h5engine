@@ -298,6 +298,8 @@ var gd3d;
                     }
                 }
                 this.updateEditorCode(delta);
+                if (this._inputmgr)
+                    this._inputmgr.update(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
@@ -305,6 +307,10 @@ var gd3d;
             application.prototype.updateScreenAsp = function () {
                 if (!this.outcontainer)
                     return;
+                if (this.webgl && this.webgl.canvas) {
+                    this.ccWidth = this.webgl.canvas.clientWidth != null ? this.webgl.canvas.clientWidth : this.ccWidth;
+                    this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight : this.ccHeight;
+                }
                 if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) {
                     this._canvasClientWidth = this.ccWidth;
                     this._canvasClientHeight = this.ccHeight;
@@ -1233,16 +1239,16 @@ var gd3d;
                         skip = true;
                     }
                     else if (this.pointDown == false && touch == true) {
-                        this.pointEvent.type = framework.PointEventEnum.PointDown;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointDown;
                     }
                     else if (this.pointDown == true && touch == true) {
-                        this.pointEvent.type = framework.PointEventEnum.PointHold;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointHold;
                         if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y) {
                             skip = true;
                         }
                     }
                     else if (this.pointDown == true && touch == false) {
-                        this.pointEvent.type = framework.PointEventEnum.PointUp;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointUp;
                     }
                     if (!skip) {
                         if (this.scene.app.bePlay) {
@@ -1628,37 +1634,12 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var PointEventEnum;
-        (function (PointEventEnum) {
-            PointEventEnum[PointEventEnum["PointNothing"] = 0] = "PointNothing";
-            PointEventEnum[PointEventEnum["PointDown"] = 1] = "PointDown";
-            PointEventEnum[PointEventEnum["PointHold"] = 2] = "PointHold";
-            PointEventEnum[PointEventEnum["PointUp"] = 3] = "PointUp";
-        })(PointEventEnum = framework.PointEventEnum || (framework.PointEventEnum = {}));
         var PointEvent = (function () {
             function PointEvent() {
             }
             return PointEvent;
         }());
         framework.PointEvent = PointEvent;
-        var UIEvent = (function () {
-            function UIEvent() {
-                this.funcs = [];
-            }
-            UIEvent.prototype.addListener = function (func) {
-                this.funcs.push(func);
-            };
-            UIEvent.prototype.excute = function () {
-                for (var key in this.funcs) {
-                    this.funcs[key]();
-                }
-            };
-            UIEvent.prototype.clear = function () {
-                this.funcs.length = 0;
-            };
-            return UIEvent;
-        }());
-        framework.UIEvent = UIEvent;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -1742,9 +1723,6 @@ var gd3d;
                 var real_y = this.inputmgr.point.y - rect.y * this.app.height;
                 var sx = (real_x / this.viewPixelrect.w) * 2 - 1;
                 var sy = (real_y / this.viewPixelrect.h) * -2 + 1;
-                if (this.canvas["pointEvent"].type == framework.PointEventEnum.PointDown) {
-                    this.canvas;
-                }
                 this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
@@ -3418,7 +3396,7 @@ var gd3d;
                 this._normalColor = new gd3d.math.color(1, 1, 1, 1);
                 this._pressedColor = new gd3d.math.color(0.5, 0.5, 0.5, 1);
                 this._fadeDuration = 0.1;
-                this.onClick = new framework.UIEvent();
+                this.UIEventer = new gd3d.event.UIEvent();
                 this._downInThis = false;
                 this._dragOut = false;
             }
@@ -3536,27 +3514,27 @@ var gd3d;
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
                         ev.eated = true;
-                        if (ev.type == framework.PointEventEnum.PointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this._downInThis = true;
                             this.showPress();
                         }
-                        else if (ev.type == framework.PointEventEnum.PointHold && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == true) {
                                 this._dragOut = false;
                                 this.showPress();
                             }
                         }
-                        else if (ev.type == framework.PointEventEnum.PointUp && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointUp && this._downInThis) {
                             this._downInThis = false;
                             this.showNormal();
-                            this.onClick.excute();
+                            this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerClick);
                         }
                     }
                     else {
-                        if (ev.type == framework.PointEventEnum.PointUp) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                             this._downInThis = false;
                         }
-                        else if (ev.type == framework.PointEventEnum.PointHold && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == false) {
                                 this._dragOut = true;
                                 this.showNormal();
@@ -3564,6 +3542,12 @@ var gd3d;
                         }
                     }
                 }
+            };
+            button.prototype.addListener = function (eventEnum, func, thisArg) {
+                this.UIEventer.OnEnum(eventEnum, func, thisArg);
+            };
+            button.prototype.removeListener = function (eventEnum, func, thisArg) {
+                this.UIEventer.RemoveListener(gd3d.event.UIEventEnum[eventEnum], func, thisArg);
             };
             button.prototype.showNormal = function () {
                 if (this.transition == TransitionType.ColorTint) {
@@ -4920,7 +4904,7 @@ var gd3d;
             };
             inputField.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    if (ev.type != framework.PointEventEnum.PointDown)
+                    if (ev.type != gd3d.event.PointEventEnum.PointDown)
                         return;
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
@@ -5672,7 +5656,7 @@ var gd3d;
                         if (this.strPoint == null)
                             this.strPoint = new gd3d.math.vector2();
                         var sp = this.strPoint;
-                        if (ev.type == framework.PointEventEnum.PointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this.isPointDown = true;
                             sp.x = tempc.x;
                             sp.y = tempc.y;
@@ -5680,7 +5664,7 @@ var gd3d;
                                 this.strPos = new gd3d.math.vector2();
                             gd3d.math.vec2Clone(this._content.transform.localTranslate, this.strPos);
                         }
-                        if (ev.type == framework.PointEventEnum.PointHold && this.isPointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
                             if (this.lastPoint == null)
                                 this.lastPoint = new gd3d.math.vector2();
                             var lp = this.lastPoint;
@@ -5696,7 +5680,7 @@ var gd3d;
                         gd3d.math.pool.delete_vector2(tempc);
                     }
                 }
-                if (ev.type == framework.PointEventEnum.PointUp) {
+                if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                     this.isPointDown = false;
                 }
             };
@@ -12229,6 +12213,7 @@ var gd3d;
                 this.mix = false;
                 this.isCache = false;
                 this._playCount = 0;
+                this.clipHasPlay = false;
             }
             aniplayer_1 = aniplayer;
             Object.defineProperty(aniplayer.prototype, "clipnames", {
@@ -12242,6 +12227,15 @@ var gd3d;
                         }
                     }
                     return this._clipnames;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(aniplayer.prototype, "playingClip", {
+                get: function () {
+                    if (!this._playClip)
+                        return "";
+                    return this._playClip.getName();
                 },
                 enumerable: true,
                 configurable: true
@@ -12297,6 +12291,7 @@ var gd3d;
                 if (this._playClip == null)
                     return;
                 this.checkFrameId(delta);
+                this.clipHasPlay = true;
                 this.mix = false;
                 if (this.crossdelta > 0) {
                     this.crossdelta -= delta / this.speed * this.crossspeed;
@@ -12409,6 +12404,13 @@ var gd3d;
                 if (beRevert === void 0) { beRevert = false; }
                 if (this.clips[index] == undefined)
                     return;
+                var isp = this.isPlay();
+                var cname = isp ? this._playClip.getName() : "";
+                this._playClip = null;
+                if (this.onPlayEnd && isp) {
+                    this.clipHasPlay = false;
+                    this.onPlayEnd(cname);
+                }
                 this._playClip = this.clips[index];
                 this._playTimer = 0;
                 this._playFrameid = 0;
@@ -12422,6 +12424,7 @@ var gd3d;
                     var src = this.nowpose[key];
                     this.lerppose[key] = src.Clone();
                 }
+                this.clipHasPlay = false;
             };
             aniplayer.prototype.updateAnimation = function (animIndex, _frame) {
                 if (!this.clips)
@@ -12460,14 +12463,18 @@ var gd3d;
                 }
             };
             aniplayer.prototype.stop = function () {
+                var isp = this.isPlay();
+                var cname = isp ? this._playClip.getName() : "";
                 this._playClip = null;
+                if (this.onPlayEnd && isp)
+                    this.onPlayEnd(cname);
             };
             aniplayer.prototype.isPlay = function () {
-                return this._playClip != null;
+                return this._playClip && this.clipHasPlay;
             };
             aniplayer.prototype.isStop = function () {
                 if (this._playClip == null)
-                    return false;
+                    return true;
                 if (this.playStyle != PlayStyle.NormalPlay)
                     return false;
                 if (this._playClip.loop)
@@ -12524,6 +12531,11 @@ var gd3d;
                     this._playFrameid = this._playClip.frameCount - 1;
                 }
                 if (this.isStop()) {
+                    var isp = this.isPlay();
+                    var cname = isp ? this._playClip.getName() : "";
+                    this._playClip = null;
+                    if (this.onPlayEnd && isp)
+                        this.onPlayEnd(cname);
                     if (this.finishCallBack) {
                         this.finishCallBack(this.thisObject);
                         this.finishCallBack = null;
@@ -17930,197 +17942,99 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    var framework;
-    (function (framework) {
-        var pointinfo = (function () {
-            function pointinfo() {
-                this.touch = false;
+    var AEvent = (function () {
+        function AEvent() {
+            this.events = {};
+        }
+        AEvent.prototype.On = function (event, func, thisArg) {
+            var arr = this.events[event];
+            var FT;
+            if (!arr) {
+                arr = this.events[event] = [];
             }
-            return pointinfo;
-        }());
-        framework.pointinfo = pointinfo;
-        var inputMgr = (function () {
-            function inputMgr(app) {
-                var _this = this;
-                this.inputlast = null;
-                this.point = new pointinfo();
-                this.touches = {};
-                this.keyboardMap = {};
-                this.rMtr_90 = new gd3d.math.matrix3x2();
-                this.rMtr_n90 = new gd3d.math.matrix3x2();
-                this.app = app;
-                gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
-                gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
-                app.webgl.canvas.addEventListener("touchstart", function (ev) {
-                    _this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
-                    _this.point.touch = true;
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = true;
-                        _this.touches[id].x = touch.clientX;
-                        _this.touches[id].y = touch.clientY;
+            else {
+                for (var _i = 0, arr_3 = arr; _i < arr_3.length; _i++) {
+                    var ft = arr_3[_i];
+                    if (ft.func == func) {
+                        FT = ft;
+                        break;
                     }
-                });
-                app.webgl.canvas.addEventListener("touchmove", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = true;
-                        _this.touches[id].x = touch.clientX;
-                        _this.touches[id].y = touch.clientY;
-                    }
-                    var count = 0;
-                    var x = 0;
-                    var y = 0;
-                    for (var key in _this.touches) {
-                        if (_this.touches[key].touch == true) {
-                            x += _this.touches[key].x;
-                            y += _this.touches[key].y;
-                            count++;
-                        }
-                    }
-                    _this.CalcuPoint(x / count, y / count);
-                });
-                app.webgl.canvas.addEventListener("touchend", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = false;
-                    }
-                    for (var key in _this.touches) {
-                        if (_this.touches[key].touch == true)
-                            return;
-                    }
-                    _this.point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this.touches[id] == null) {
-                            _this.touches[id] = new pointinfo();
-                            _this.touches[id].id = id;
-                        }
-                        _this.touches[id].touch = false;
-                    }
-                    for (var key in _this.touches) {
-                        if (_this.touches[key].touch == true)
-                            return;
-                    }
-                    _this.point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                    _this.point.touch = true;
-                });
-                app.webgl.canvas.addEventListener("mouseup", function (ev) {
-                    _this.point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                });
-                app.webgl.canvas.addEventListener("keydown", function (ev) {
-                    _this.keyboardMap[ev.keyCode] = true;
-                }, false);
-                app.webgl.canvas.addEventListener("keyup", function (ev) {
-                    _this.keyboardMap[ev.keyCode] = false;
-                }, false);
-                app.webgl.canvas.addEventListener("blur", function (ev) {
-                    _this.point.touch = false;
-                }, false);
+                }
             }
-            inputMgr.prototype.anyKey = function () {
-                if (this.point.touch)
-                    return true;
-                for (var key in this.keyboardMap) {
-                    if (this.keyboardMap.hasOwnProperty(key)) {
-                        var element = this.keyboardMap[key];
-                        if (element == true)
-                            return true;
+            if (!FT)
+                arr.push({ func: func, thisArgs: [thisArg] });
+            else {
+                var idx = FT.thisArgs.lastIndexOf(thisArg);
+                if (idx == -1)
+                    FT.thisArgs.push(thisArg);
+            }
+        };
+        AEvent.prototype.Emit = function (event) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var arr = this.events[event];
+            if (!arr)
+                return;
+            for (var _a = 0, arr_4 = arr; _a < arr_4.length; _a++) {
+                var FT = arr_4[_a];
+                for (var _b = 0, _c = FT.thisArgs; _b < _c.length; _b++) {
+                    var thisArg = _c[_b];
+                    FT.func.apply(thisArg, args);
+                }
+            }
+        };
+        AEvent.prototype.RemoveListener = function (event, func, thisArg) {
+            var arr = this.events[event];
+            if (!arr)
+                return;
+            for (var i = 0, len = arr.length; i < len; ++i) {
+                if (func == arr[i].func) {
+                    var idx = arr[i].thisArgs.lastIndexOf(thisArg);
+                    if (idx != -1) {
+                        arr[i].thisArgs.splice(idx, 1);
+                        if (arr[i].thisArgs.length < 1)
+                            arr.splice(i, 1);
+                        if (arr.length < 1)
+                            delete this.events[event];
+                        break;
                     }
                 }
-                return false;
-            };
-            inputMgr.prototype.GetKeyDown = function (value) {
-                if (typeof (value) === "number") {
-                    if (this.keyboardMap[value] != null)
-                        return this.keyboardMap[value];
-                }
-                else if (typeof (value) === "string") {
-                    var id = framework.KeyCode[value];
-                    if (id != null && this.keyboardMap[id] != null)
-                        return this.keyboardMap[id];
-                }
-                return false;
-            };
-            inputMgr.prototype.GetKeyUP = function (value) {
-                if (typeof (value) === "number") {
-                    if (this.keyboardMap[value] != null)
-                        return !this.keyboardMap[value];
-                }
-                else if (typeof (value) === "string") {
-                    var id = framework.KeyCode[value];
-                    if (id != null && this.keyboardMap[id] != null)
-                        return !this.keyboardMap[id];
-                }
-                return false;
-            };
-            inputMgr.prototype.CalcuPoint = function (clientX, clientY) {
-                if (!this.app || isNaN(clientX) || isNaN(clientY))
-                    return;
-                if (!this.tempV2_0)
-                    this.tempV2_0 = gd3d.math.pool.new_vector2();
-                if (!this.tempV2_1)
-                    this.tempV2_1 = gd3d.math.pool.new_vector2();
-                this.tempV2_0.x = clientX / this.app.scaleFromPandding;
-                this.tempV2_0.y = clientY / this.app.scaleFromPandding;
-                gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
-                if (this.app.shouldRotate) {
-                    switch (this.app.orientation) {
-                        case gd3d.framework.OrientationMode.PORTRAIT:
-                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
-                            this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                            this.point.y = this.tempV2_1.y;
-                            break;
-                        case gd3d.framework.OrientationMode.LANDSCAPE:
-                            gd3d.math.matrix3x2TransformVector2(this.rMtr_n90, this.tempV2_0, this.tempV2_1);
-                            this.point.x = this.tempV2_1.x;
-                            this.point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
-                            break;
-                        case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
-                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
-                            this.point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                            this.point.y = this.tempV2_1.y;
-                            break;
-                    }
-                }
-                else {
-                    this.point.x = this.tempV2_0.x;
-                    this.point.y = this.tempV2_0.y;
-                }
-            };
-            return inputMgr;
-        }());
-        framework.inputMgr = inputMgr;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
+            }
+        };
+        AEvent.prototype.RemoveListenerAll = function () {
+            this.events = {};
+        };
+        return AEvent;
+    }());
+    gd3d.AEvent = AEvent;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    var framework;
-    (function (framework) {
+    var event;
+    (function (event) {
+        var UIEventEnum;
+        (function (UIEventEnum) {
+            UIEventEnum[UIEventEnum["PointerDown"] = 0] = "PointerDown";
+            UIEventEnum[UIEventEnum["PointerUp"] = 1] = "PointerUp";
+            UIEventEnum[UIEventEnum["PointerClick"] = 2] = "PointerClick";
+            UIEventEnum[UIEventEnum["PointerEnter"] = 3] = "PointerEnter";
+            UIEventEnum[UIEventEnum["PointerExit"] = 4] = "PointerExit";
+        })(UIEventEnum = event.UIEventEnum || (event.UIEventEnum = {}));
+        var PointEventEnum;
+        (function (PointEventEnum) {
+            PointEventEnum[PointEventEnum["PointDown"] = 0] = "PointDown";
+            PointEventEnum[PointEventEnum["PointHold"] = 1] = "PointHold";
+            PointEventEnum[PointEventEnum["PointUp"] = 2] = "PointUp";
+            PointEventEnum[PointEventEnum["PointMove"] = 3] = "PointMove";
+            PointEventEnum[PointEventEnum["PointClick"] = 4] = "PointClick";
+        })(PointEventEnum = event.PointEventEnum || (event.PointEventEnum = {}));
+        var KeyEventEnum;
+        (function (KeyEventEnum) {
+            KeyEventEnum[KeyEventEnum["KeyDown"] = 0] = "KeyDown";
+            KeyEventEnum[KeyEventEnum["KeyUp"] = 1] = "KeyUp";
+        })(KeyEventEnum = event.KeyEventEnum || (event.KeyEventEnum = {}));
         var KeyCode;
         (function (KeyCode) {
             KeyCode[KeyCode["None"] = 0] = "None";
@@ -18444,7 +18358,338 @@ var gd3d;
             KeyCode[KeyCode["Joystick8Button17"] = 507] = "Joystick8Button17";
             KeyCode[KeyCode["Joystick8Button18"] = 508] = "Joystick8Button18";
             KeyCode[KeyCode["Joystick8Button19"] = 509] = "Joystick8Button19";
-        })(KeyCode = framework.KeyCode || (framework.KeyCode = {}));
+        })(KeyCode = event.KeyCode || (event.KeyCode = {}));
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var event;
+    (function (event_1) {
+        var InputEvent = (function (_super) {
+            __extends(InputEvent, _super);
+            function InputEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            InputEvent.prototype.OnEnum_key = function (event, func, thisArg) {
+                this.On(event_1.KeyEventEnum[event], func, thisArg);
+            };
+            InputEvent.prototype.EmitEnum_key = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_1.KeyEventEnum[event], args);
+            };
+            InputEvent.prototype.OnEnum_point = function (event, func, thisArg) {
+                this.On(event_1.PointEventEnum[event], func, thisArg);
+            };
+            InputEvent.prototype.EmitEnum_point = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_1.PointEventEnum[event], args);
+            };
+            return InputEvent;
+        }(gd3d.AEvent));
+        event_1.InputEvent = InputEvent;
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var event;
+    (function (event_2) {
+        var UIEvent = (function (_super) {
+            __extends(UIEvent, _super);
+            function UIEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            UIEvent.prototype.OnEnum = function (event, func, thisArg) {
+                this.On(event_2.UIEventEnum[event], func, thisArg);
+            };
+            UIEvent.prototype.EmitEnum = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_2.UIEventEnum[event], args);
+            };
+            return UIEvent;
+        }(gd3d.AEvent));
+        event_2.UIEvent = UIEvent;
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var pointinfo = (function () {
+            function pointinfo() {
+                this.touch = false;
+            }
+            return pointinfo;
+        }());
+        framework.pointinfo = pointinfo;
+        var inputMgr = (function () {
+            function inputMgr(app) {
+                var _this = this;
+                this.eventer = new gd3d.event.InputEvent();
+                this.inputlast = null;
+                this._point = new pointinfo();
+                this._touches = {};
+                this.keyboardMap = {};
+                this.rMtr_90 = new gd3d.math.matrix3x2();
+                this.rMtr_n90 = new gd3d.math.matrix3x2();
+                this.moveTolerance = 2;
+                this.lastTouch = false;
+                this.hasPointDown = false;
+                this.hasPointUP = false;
+                this.hasPointMove = false;
+                this.downPoint = new gd3d.math.vector2();
+                this.lastPoint = new gd3d.math.vector2();
+                this.hasKeyDown = false;
+                this.hasKeyUp = false;
+                this.app = app;
+                gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
+                gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
+                app.webgl.canvas.addEventListener("touchstart", function (ev) {
+                    _this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
+                    _this._point.touch = true;
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = true;
+                        _this._touches[id].x = touch.clientX;
+                        _this._touches[id].y = touch.clientY;
+                    }
+                });
+                app.webgl.canvas.addEventListener("touchmove", function (ev) {
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = true;
+                        _this._touches[id].x = touch.clientX;
+                        _this._touches[id].y = touch.clientY;
+                    }
+                    var count = 0;
+                    var x = 0;
+                    var y = 0;
+                    for (var key in _this._touches) {
+                        if (_this._touches[key].touch == true) {
+                            x += _this._touches[key].x;
+                            y += _this._touches[key].y;
+                            count++;
+                        }
+                    }
+                    _this.CalcuPoint(x / count, y / count);
+                });
+                app.webgl.canvas.addEventListener("touchend", function (ev) {
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = false;
+                    }
+                    for (var key in _this._touches) {
+                        if (_this._touches[key].touch == true)
+                            return;
+                    }
+                    _this._point.touch = false;
+                });
+                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
+                    for (var i = 0; i < ev.changedTouches.length; i++) {
+                        var touch = ev.changedTouches[i];
+                        var id = touch.identifier;
+                        if (_this._touches[id] == null) {
+                            _this._touches[id] = new pointinfo();
+                            _this._touches[id].id = id;
+                        }
+                        _this._touches[id].touch = false;
+                    }
+                    for (var key in _this._touches) {
+                        if (_this._touches[key].touch == true)
+                            return;
+                    }
+                    _this._point.touch = false;
+                });
+                app.webgl.canvas.addEventListener("mousedown", function (ev) {
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
+                    _this._point.touch = true;
+                });
+                app.webgl.canvas.addEventListener("mouseup", function (ev) {
+                    _this._point.touch = false;
+                });
+                app.webgl.canvas.addEventListener("mousemove", function (ev) {
+                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
+                });
+                app.webgl.canvas.addEventListener("keydown", function (ev) {
+                    _this.hasKeyDown = _this.keyboardMap[ev.keyCode] = true;
+                }, false);
+                app.webgl.canvas.addEventListener("keyup", function (ev) {
+                    delete _this.keyboardMap[ev.keyCode];
+                    _this.hasKeyUp = true;
+                }, false);
+                app.webgl.canvas.addEventListener("blur", function (ev) {
+                    _this._point.touch = false;
+                }, false);
+            }
+            Object.defineProperty(inputMgr.prototype, "point", {
+                get: function () { return this._point; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(inputMgr.prototype, "touches", {
+                get: function () { return this._touches; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            inputMgr.prototype.update = function (delta) {
+                this.pointCk();
+                this.keyCodeCk();
+            };
+            inputMgr.prototype.pointCk = function () {
+                var pt = this._point;
+                if (this.lastPoint.x != pt.x || this.lastPoint.y != pt.y) {
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointMove, pt.x, pt.y);
+                }
+                if (!this.lastTouch && pt.touch) {
+                    this.hasPointDown = true;
+                    this.downPoint.x = pt.x;
+                    this.downPoint.y = pt.y;
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointDown, pt.x, pt.y);
+                }
+                else if (this.lastTouch && !pt.touch) {
+                    this.hasPointUP = true;
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointUp, pt.x, pt.y);
+                }
+                if (this.hasPointUP && this.hasPointDown) {
+                    var isMoveTolerance = (Math.abs(this.downPoint.x - pt.x) > this.moveTolerance || Math.abs(this.downPoint.y - pt.y) > this.moveTolerance);
+                    if (isMoveTolerance) {
+                        this.hasPointDown = this.hasPointUP = false;
+                        this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointClick, pt.x, pt.y);
+                    }
+                }
+                if (!pt.touch) {
+                    this.hasPointDown = false;
+                }
+                this.lastTouch = pt.touch;
+                this.lastPoint.x = pt.x;
+                this.lastPoint.y = pt.y;
+            };
+            inputMgr.prototype.keyCodeCk = function () {
+                if (this.hasKeyDown)
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyDown, null);
+                if (this.hasKeyUp)
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyUp, null);
+                this.hasKeyDown = this.hasKeyUp = false;
+            };
+            inputMgr.prototype.addPointListener = function (eventEnum, func, thisArg) {
+                this.eventer.OnEnum_point(eventEnum, func, thisArg);
+            };
+            inputMgr.prototype.removePointListener = function (eventEnum, func, thisArg) {
+                this.eventer.RemoveListener(gd3d.event.PointEventEnum[eventEnum], func, thisArg);
+            };
+            inputMgr.prototype.addKeyListener = function (eventEnum, func, thisArg) {
+                this.eventer.OnEnum_key(eventEnum, func, thisArg);
+            };
+            inputMgr.prototype.removeKeyListener = function (eventEnum, func, thisArg) {
+                this.eventer.RemoveListener(gd3d.event.KeyEventEnum[eventEnum], func, thisArg);
+            };
+            inputMgr.prototype.anyKey = function () {
+                if (this._point.touch)
+                    return true;
+                for (var key in this.keyboardMap) {
+                    if (this.keyboardMap.hasOwnProperty(key)) {
+                        var element = this.keyboardMap[key];
+                        if (element == true)
+                            return true;
+                    }
+                }
+                return false;
+            };
+            inputMgr.prototype.GetKeyDown = function (value) {
+                if (typeof (value) === "number") {
+                    if (this.keyboardMap[value] != null)
+                        return this.keyboardMap[value];
+                }
+                else if (typeof (value) === "string") {
+                    var id = gd3d.event.KeyCode[value];
+                    if (id != null && this.keyboardMap[id] != null)
+                        return this.keyboardMap[id];
+                }
+                return false;
+            };
+            inputMgr.prototype.GetKeyUP = function (value) {
+                if (typeof (value) === "number") {
+                    return !this.keyboardMap[value];
+                }
+                else if (typeof (value) === "string") {
+                    var id = gd3d.event.KeyCode[value];
+                    if (id != null)
+                        return !this.keyboardMap[id];
+                }
+                return false;
+            };
+            inputMgr.prototype.KeyDownCount = function () {
+                var count = 0;
+                for (var key in this.keyboardMap) {
+                    if (this.keyboardMap.hasOwnProperty(key)) {
+                        if (this.keyboardMap[key] === true)
+                            count++;
+                    }
+                }
+                return count;
+            };
+            inputMgr.prototype.CalcuPoint = function (clientX, clientY) {
+                if (!this.app || isNaN(clientX) || isNaN(clientY))
+                    return;
+                if (!this.tempV2_0)
+                    this.tempV2_0 = gd3d.math.pool.new_vector2();
+                if (!this.tempV2_1)
+                    this.tempV2_1 = gd3d.math.pool.new_vector2();
+                this.tempV2_0.x = clientX / this.app.scaleFromPandding;
+                this.tempV2_0.y = clientY / this.app.scaleFromPandding;
+                gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
+                if (this.app.shouldRotate) {
+                    switch (this.app.orientation) {
+                        case gd3d.framework.OrientationMode.PORTRAIT:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
+                            this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            this._point.y = this.tempV2_1.y;
+                            break;
+                        case gd3d.framework.OrientationMode.LANDSCAPE:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_n90, this.tempV2_0, this.tempV2_1);
+                            this._point.x = this.tempV2_1.x;
+                            this._point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
+                            break;
+                        case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
+                            gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
+                            this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            this._point.y = this.tempV2_1.y;
+                            break;
+                    }
+                }
+                else {
+                    this._point.x = this.tempV2_0.x;
+                    this._point.y = this.tempV2_0.y;
+                }
+            };
+            return inputMgr;
+        }());
+        framework.inputMgr = inputMgr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -29933,6 +30178,338 @@ var gd3d;
             return TransformUtil;
         }());
         framework.TransformUtil = TransformUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var tweenUtil = (function () {
+            function tweenUtil() {
+            }
+            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
+                switch (ease_type) {
+                    case tweenMethod.Linear:
+                        return linear_progress;
+                    case tweenMethod.ExpoEaseOut:
+                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseIn:
+                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseOutIn:
+                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseInOut:
+                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOut:
+                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseIn:
+                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOutIn:
+                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseInOut:
+                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOut:
+                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseIn:
+                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOutIn:
+                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseInOut:
+                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOut:
+                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseIn:
+                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOutIn:
+                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseInOut:
+                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOut:
+                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseIn:
+                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOutIn:
+                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseInOut:
+                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOut:
+                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseIn:
+                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOutIn:
+                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseInOut:
+                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOut:
+                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseIn:
+                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOutIn:
+                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseInOut:
+                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOut:
+                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseIn:
+                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOutIn:
+                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseInOut:
+                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOut:
+                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseIn:
+                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOutIn:
+                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseInOut:
+                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOut:
+                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseIn:
+                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOutIn:
+                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseInOut:
+                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
+                    default:
+                        return linear_progress;
+                }
+            };
+            tweenUtil.Linear = function (t, b, c, d) {
+                return c * t / d + b;
+            };
+            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
+                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+            };
+            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
+                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+            };
+            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
+                if (t == 0)
+                    return b;
+                if (t == d)
+                    return b + c;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+            };
+            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CircEaseOut = function (t, b, c, d) {
+                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+            };
+            tweenUtil.CircEaseIn = function (t, b, c, d) {
+                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+            };
+            tweenUtil.CircEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+            };
+            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuadEaseOut = function (t, b, c, d) {
+                return -c * (t /= d) * (t - 2) + b;
+            };
+            tweenUtil.QuadEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t + b;
+            };
+            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t + b;
+                return -c / 2 * ((--t) * (t - 2) - 1) + b;
+            };
+            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.SineEaseOut = function (t, b, c, d) {
+                return c * Math.sin(t / d * (Math.PI / 2)) + b;
+            };
+            tweenUtil.SineEaseIn = function (t, b, c, d) {
+                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+            };
+            tweenUtil.SineEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
+                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
+            };
+            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CubicEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t + 1) + b;
+            };
+            tweenUtil.CubicEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t + b;
+            };
+            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t + 2) + b;
+            };
+            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuartEaseOut = function (t, b, c, d) {
+                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+            };
+            tweenUtil.QuartEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t + b;
+            };
+            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t + b;
+                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+            };
+            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuintEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+            };
+            tweenUtil.QuintEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t * t + b;
+            };
+            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+            };
+            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
+            };
+            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+            };
+            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) == 2)
+                    return b + c;
+                var p = d * (0.3 * 1.5);
+                var s = p / 4;
+                if (t < 1)
+                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
+            };
+            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BounceEaseOut = function (t, b, c, d) {
+                if ((t /= d) < (1 / 2.75))
+                    return c * (7.5625 * t * t) + b;
+                else if (t < (2 / 2.75))
+                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
+                else if (t < (2.5 / 2.75))
+                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
+                else
+                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
+            };
+            tweenUtil.BounceEaseIn = function (t, b, c, d) {
+                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
+            };
+            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
+                else
+                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+            };
+            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BackEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
+            };
+            tweenUtil.BackEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
+            };
+            tweenUtil.BackEaseInOut = function (t, b, c, d) {
+                var s = 1.70158;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
+            };
+            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            return tweenUtil;
+        }());
+        framework.tweenUtil = tweenUtil;
+        var tweenMethod;
+        (function (tweenMethod) {
+            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
+            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
+            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
+            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
+            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
+            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
+            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
+            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
+            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
+            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
+            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
+            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
+            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
+            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
+            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
+            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
+            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
+            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
+            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
+            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
+            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
+            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
+            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
+            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
+            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
+            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
+            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
+            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
+            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
+            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
+            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
+            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
+            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
+            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
+            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
+            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
+            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
+            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
+            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
+            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
+            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
+        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

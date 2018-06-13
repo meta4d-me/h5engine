@@ -123,7 +123,7 @@ class test_UI_Component implements IState {
             numIconarr.push(spt);
         }
         
-        btn_b.onClick.addListener(()=>{
+        btn_b.addListener(gd3d.event.UIEventEnum.PointerClick,()=>{
             let temp = "";
             for(var i=0;i<nums.length;i++){
                 let num = Number(nums[i]);
@@ -134,7 +134,7 @@ class test_UI_Component implements IState {
                 temp += num.toString();
             }
             nums = temp;
-        });
+        },this);
 
 
         //一个输入框

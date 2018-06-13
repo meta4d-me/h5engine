@@ -24,7 +24,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @reflect.node2DComponent
-    export class button implements IRectRenderer
+    export class button implements IRectRenderer ,event.IUIEventer
     {
         private _transition: TransitionType = TransitionType.ColorTint;
         /**
@@ -236,12 +236,12 @@ namespace gd3d.framework
                 if (b)
                 {
                     ev.eated = true;
-                    if (ev.type == PointEventEnum.PointDown)
+                    if (ev.type == event.PointEventEnum.PointDown)
                     {
                         this._downInThis = true;
                         this.showPress();
                     }
-                    else if (ev.type == PointEventEnum.PointHold && this._downInThis)
+                    else if (ev.type == event.PointEventEnum.PointHold && this._downInThis)
                     {
                         if (this._dragOut == true)
                         {
@@ -249,20 +249,21 @@ namespace gd3d.framework
                             this.showPress();
                         }
                     }
-                    else if (ev.type == PointEventEnum.PointUp && this._downInThis)
+                    else if (ev.type == event.PointEventEnum.PointUp && this._downInThis)
                     {
                         this._downInThis = false;
                         this.showNormal();
-                        this.onClick.excute();
+                        this.UIEventer.EmitEnum(event.UIEventEnum.PointerClick);
+                        //this.onClick.excute();
                     }
                 }
                 else
                 {
-                    if (ev.type == PointEventEnum.PointUp)
+                    if (ev.type == event.PointEventEnum.PointUp)
                     {//在区域外抬起
                         this._downInThis = false;
                     }
-                    else if (ev.type == PointEventEnum.PointHold && this._downInThis)
+                    else if (ev.type == event.PointEventEnum.PointHold && this._downInThis)
                     {
                         if (this._dragOut == false)
                         {
@@ -281,7 +282,27 @@ namespace gd3d.framework
          * 点击事件
          * @version egret-gd3d 1.0
          */
-        onClick: UIEvent = new UIEvent();
+        //onClick: UIEvent = new UIEvent();
+        private UIEventer: event.UIEvent = new event.UIEvent();
+
+        /**
+        * 添加UI事件监听者
+        * @param eventEnum 事件类型
+        * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+        * @param thisArg 回调方法执行者
+        */
+        addListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void , thisArg:any){
+            this.UIEventer.OnEnum(eventEnum,func,thisArg);
+        }
+        /**
+         * 移除事件监听者
+         * @param event 事件类型
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
+        removeListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void , thisArg:any){
+            this.UIEventer.RemoveListener(event.UIEventEnum[eventEnum],func,thisArg);
+        }
 
         private _downInThis = false;
         private _dragOut = false;
