@@ -6217,11 +6217,18 @@ declare namespace gd3d.render {
     }
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
-        width: number;
-        height: number;
-        data: Uint8Array;
-        gray: boolean;
+        private webgl;
+        private _width;
+        readonly width: number;
+        private _height;
+        readonly height: number;
+        private _data;
+        private _grayData;
+        readonly data: Uint8Array;
+        private _gray;
+        readonly gray: boolean;
         getPixel(u: number, v: number): any;
+        refresh(texRGBA: WebGLTexture): void;
     }
     interface ITexture {
         texture: WebGLTexture;

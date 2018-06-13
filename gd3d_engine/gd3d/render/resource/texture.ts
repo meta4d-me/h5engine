@@ -20,53 +20,74 @@
     {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray: boolean = true)
         {
-            this.gray = gray;
-            this.width = width;
-            this.height = height;
+            this._gray = gray;
+            this._width = width;
+            this._height = height;
+            this.webgl = webgl;
+            this._data = new Uint8Array(this._width * this._height * 4);
+            if(gray)
+                this._grayData = new Uint8Array(this._width * this._height);
 
-            var fbo = webgl.createFramebuffer();
-            var fbold = webgl.getParameter(webgl.FRAMEBUFFER_BINDING);
-            webgl.bindFramebuffer(webgl.FRAMEBUFFER, fbo);
-            webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D,
-                texRGBA, 0);
+            this.refresh(texRGBA);
+        }
 
-            var readData = new Uint8Array(this.width * this.height * 4);
-            readData[0] = 2;
-            webgl.readPixels(0, 0, this.width, this.height, webgl.RGBA, webgl.UNSIGNED_BYTE,
-                readData);
-            webgl.deleteFramebuffer(fbo);
-            webgl.bindFramebuffer(webgl.FRAMEBUFFER, fbold);
-
-            if (gray)
-            {
-                this.data = new Uint8Array(this.width * this.height);
-                for (var i = 0; i < width * height; i++)
-                {
-                    this.data[i] = readData[i * 4];
-                }
-            }
-            else
-            {
-                this.data = readData;
+        private webgl : WebGLRenderingContext;
+        private _width: number;
+        get width(){return this._width;}
+        private _height: number;
+        get height(){return this._height;}
+        private _data: Uint8Array;
+        private _grayData: Uint8Array;
+        get data (){
+            if(this._gray){
+                return this._grayData;
+            }else{
+                return this._data;
             }
         }
-        width: number;
-        height: number;
-        data: Uint8Array;
-        gray: boolean;
+        private _gray: boolean;
+        get gray(){return this._gray;}
         getPixel(u: number, v: number): any
         {
-            var x = (u * this.width) | 0;
-            var y = (v * this.height) | 0;
-            if (x < 0 || x >= this.width || y < 0 || y >= this.height) return 0;
-            if (this.gray)
+            var x = (u * this._width) | 0;
+            var y = (v * this._height) | 0;
+            if (x < 0 || x >= this._width || y < 0 || y >= this._height) return 0;
+            if (this._gray)
             {
-                return this.data[y * this.width + x];
+                return this._grayData[y * this._width + x];
             }
             else
             {
-                var i = (y * this.width + x) * 4;
-                return new math.color(this.data[i], this.data[i + 1], this.data[i + 2], this.data[i + 3]);
+                var i = (y * this._width + x) * 4;
+                return new math.color(this._data[i], this._data[i + 1], this._data[i + 2], this._data[i + 3]);
+            }
+        }
+
+        /** 刷新data数据 */
+        refresh( texRGBA: WebGLTexture ){
+            if(!texRGBA){
+                console.error(`texRGBA is null `);
+                return ;
+            }
+            var fbo = this.webgl.createFramebuffer();
+            var fbold = this.webgl.getParameter(this.webgl.FRAMEBUFFER_BINDING);
+            this.webgl.bindFramebuffer(this.webgl.FRAMEBUFFER, fbo);
+            this.webgl.framebufferTexture2D(this.webgl.FRAMEBUFFER, this.webgl.COLOR_ATTACHMENT0, this.webgl.TEXTURE_2D,
+                texRGBA, 0);
+
+            // var readData = new Uint8Array(this._width * this._height * 4);
+            this._data[0] = 2;
+            this.webgl.readPixels(0, 0, this._width, this._height, this.webgl.RGBA, this.webgl.UNSIGNED_BYTE,
+                this._data);
+            this.webgl.deleteFramebuffer(fbo);
+            this.webgl.bindFramebuffer(this.webgl.FRAMEBUFFER, fbold);
+
+            if (this._gray)
+            {
+                for (var i = 0; i < this._width * this._height; i++)
+                {
+                    this._grayData[i] = this._data[i * 4];  //now only rad pass
+                }
             }
         }
     }
