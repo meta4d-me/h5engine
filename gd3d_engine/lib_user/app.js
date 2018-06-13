@@ -1097,8 +1097,6 @@ var main = (function () {
     main.prototype.onStart = function (app) {
         console.log("i am here.");
         this.app = app;
-        this.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
-        this.addBtn("loadPrefab", function () { return new dome.loadPrefab(); });
         this.addBtn("test_ui", function () { return new t.test_ui(); });
         this.addBtn("test_load", function () { return new test_load(); });
         this.addBtn("test_loadScene", function () { return new test_loadScene(); });
