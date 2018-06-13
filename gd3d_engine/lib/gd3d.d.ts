@@ -34,6 +34,8 @@ declare namespace gd3d.framework {
         screenAdaptiveType: string;
         private _fixHeight;
         private _fixWidth;
+        ccWidth: number;
+        ccHeight: number;
         private canvasFixedType;
         private _canvasClientWidth;
         private _canvasClientHeight;
@@ -50,6 +52,8 @@ declare namespace gd3d.framework {
         checkFilter(trans: any): boolean;
         showFps(): void;
         closeFps(): void;
+        showDrawCall(): void;
+        closeDrawCall(): void;
         private beStepNumber;
         private update(delta);
         private updateScreenAsp();
@@ -131,6 +135,30 @@ declare namespace gd3d.framework {
         static readonly ScreenAdaptiveType: string;
         static readonly ScreenWidth: number;
         static readonly ScreenHeight: number;
+    }
+    enum DrawCallEnum {
+        UI = 0,
+        SKinrender = 1,
+        Meshrender = 2,
+        EffectSystem = 3,
+    }
+    class DrawCallInfo {
+        private static _inc;
+        static readonly inc: DrawCallInfo;
+        static BeActived: boolean;
+        data: number[];
+        currentState: DrawCallEnum;
+        reset(): void;
+        add(): void;
+        private SKinrenderDraw;
+        private MeshrenderDraw;
+        private EffectrenderDraw;
+        private UIrenderDraw;
+        private rootdiv;
+        private initShowPlane();
+        showPerFrame(): void;
+        showDrawcallInfo(): void;
+        closeDrawCallInfo(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -860,22 +888,6 @@ declare namespace gd3d.framework {
         transform: transform2D;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
-    }
-}
-declare namespace gd3d.framework {
-    class fontAltnas {
-        private static _inc;
-        private contex2d;
-        font: font;
-        fontTex: texture;
-        static readonly inc: fontAltnas;
-        private imagedata;
-        private constructor();
-        checkText(str: string): void;
-        private charIndex;
-        private charlenInRow;
-        private testData;
-        private adddNewChar(key);
     }
 }
 declare namespace gd3d.framework {
@@ -2479,31 +2491,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class starCamCtr implements INodeComponent {
-        moveDuration: number;
-        minSpeed: number;
-        relativelocation: math.vector3;
-        relativeEuler: math.vector3;
-        private relativeRot;
-        private starteCamRot;
-        private targetCamPos;
-        private targetCamRot;
-        private distance;
-        private movedir;
-        private moveSpeed;
-        private eulerSpeed;
-        private active;
-        start(): void;
-        onPlay(): void;
-        private moveDis;
-        update(delta: number): void;
-        gameObject: gameObject;
-        remove(): void;
-        clone(): void;
-        moveTo(to: transform): void;
-    }
-}
-declare namespace gd3d.framework {
     class trailRender implements IRenderer {
         layer: RenderLayerEnum;
         renderLayer: number;
@@ -3174,6 +3161,31 @@ declare namespace gd3d.framework {
         firtstFrame: number;
         constructor(firstFrame: number);
         parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    class starCamCtr implements INodeComponent {
+        moveDuration: number;
+        minSpeed: number;
+        relativelocation: math.vector3;
+        relativeEuler: math.vector3;
+        private relativeRot;
+        private starteCamRot;
+        private targetCamPos;
+        private targetCamRot;
+        private distance;
+        private movedir;
+        private moveSpeed;
+        private eulerSpeed;
+        private active;
+        start(): void;
+        onPlay(): void;
+        private moveDis;
+        update(delta: number): void;
+        gameObject: gameObject;
+        remove(): void;
+        clone(): void;
+        moveTo(to: transform): void;
     }
 }
 declare namespace gd3d.framework {
