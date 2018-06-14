@@ -260,6 +260,7 @@ namespace gd3d.framework
             math.vec3Clone(this.baseddata.position,this.position);
             math.vec3Clone(this.baseddata.scale,this.scale);
             math.vec3Clone(this.baseddata.euler,this.euler);
+            math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
             math.colorClone(this.baseddata.color,this.color);
             math.vec4Clone(this.baseddata.tex_ST,this.tex_ST);
         }

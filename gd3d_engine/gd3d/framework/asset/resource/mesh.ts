@@ -104,6 +104,7 @@ namespace gd3d.framework
          */
         glMesh: gd3d.render.glMesh;
 
+        updateByEffect:boolean=false;
         /**
          * @public
          * @language zh_CN
@@ -651,12 +652,12 @@ namespace gd3d.framework
      */
     export class subMeshInfo
     {
-        matIndex: number;
+        matIndex: number=0;
         useVertexIndex: number = 0;//-1 表示不用indexbuffer,>=0 表示第几个，
         //通常都是用第一个indexbuffer，只有用wireframe显示模式，使用第二个部分
         line: boolean = false;
-        start: number;
-        size: number;
+        start: number=0;
+        size: number=0;
     }
 
 

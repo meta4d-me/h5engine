@@ -163,22 +163,42 @@ namespace gd3d.framework
             if(this.noBatch)
             {
                 gd3d.math.matrixMultiply(this.effect.mvpMat, this.activemeshlist[0].targetMat, context.matrixModelViewProject);
-                if(!this.uploadData)
+                // if(!this.uploadData)
+                // {
+                //     this.uploadData=true;
+                //     this.dataForVbo=this.activemeshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
+                //     this.dataForEbo=this.activemeshlist[0].baseddata.mesh.data.genIndexDataArray();
+                //     this.mesh.glMesh.uploadVertexData(context.webgl,this.dataForVbo);
+                //     this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
+                //     this.mesh.submesh[0].size=this.dataForEbo.length;
+                // }
+                let singlemesh=this.activemeshlist[0].baseddata.mesh;
+                if(singlemesh.updateByEffect==false)
                 {
-                    this.dataForVbo=this.activemeshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
-                    this.dataForEbo=this.activemeshlist[0].baseddata.mesh.data.genIndexDataArray();
-                    this.mesh.glMesh.uploadVertexData(context.webgl,this.dataForVbo);
-                    this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
-                    this.mesh.submesh[0].size=this.dataForEbo.length;
+                    let newglmesh=new gd3d.render.glMesh();
+                    newglmesh.initBuffer(this.effect.webgl,this.effect.VF,singlemesh.data.pos.length,render.MeshTypeEnum.Static);
+                    newglmesh.uploadVertexData(this.effect.webgl, this.activemeshlist[0].dataforvbo);
+                    // newglmesh.addIndex(this.effect.webgl, this.activemeshlist[0].dataforebo.length);
+                    // newglmesh.uploadIndexData(this.effect.webgl, 0, this.activemeshlist[0].dataforebo);
+                    newglmesh.ebos=singlemesh.glMesh.ebos;
+                    newglmesh.indexCounts=singlemesh.glMesh.indexCounts;
+
+                    singlemesh.glMesh=newglmesh;
+                    singlemesh.submesh[0].size = this.activemeshlist[0].dataforebo.length;
+                    singlemesh.updateByEffect=true;
                 }
+
                 this.temptColorv4.x=this.activemeshlist[0].color.r;
                 this.temptColorv4.y=this.activemeshlist[0].color.g;
                 this.temptColorv4.z=this.activemeshlist[0].color.b;
                 this.temptColorv4.w=this.activemeshlist[0].color.a;
+                
                 // let basemesh=this.activemeshlist[0].baseddata.mesh;
                 this.ElementMat.setVector4("_Main_Color",this.temptColorv4);
                 this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
-                this.ElementMat.draw(context, this.mesh,this.mesh.submesh[0]);
+                singlemesh.glMesh.bindVboBuffer(context.webgl);
+                this.ElementMat.draw(context, singlemesh,singlemesh.submesh[0]);
+
             }
             // if(this.noBatch)
             // {

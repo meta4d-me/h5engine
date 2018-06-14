@@ -44,7 +44,11 @@
         // out.r = src.r;
         // out.g = src.g;
         // out.b = src.b;
-        out.rawData.set(src.rawData);
+        //out.rawData.set(src.rawData);
+        out.rawData[0]=src.rawData[0];
+        out.rawData[1]=src.rawData[1];
+        out.rawData[2]=src.rawData[2];
+        out.rawData[3]=src.rawData[3];
     }
 
     export function colorLerp(srca: color, srcb: color, t: number, out: color)

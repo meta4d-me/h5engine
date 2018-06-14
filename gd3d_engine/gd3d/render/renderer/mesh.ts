@@ -77,9 +77,6 @@
                 webgl.bindBuffer(webgl.ARRAY_BUFFER, this.vbo);
                 webgl.bufferData(webgl.ARRAY_BUFFER, vertexCount * this.vertexByteSize, this.mode);
             }
-
-
-
             this.indexCounts = []
             this.ebos = [];
         }

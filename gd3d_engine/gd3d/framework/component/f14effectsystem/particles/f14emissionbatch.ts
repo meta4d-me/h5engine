@@ -29,15 +29,16 @@ namespace gd3d.framework
             this.effect = effect;
             this.emission=element;
 
-            this.mesh=this.emission.baseddata.mesh;
+            let datamesh=this.emission.baseddata.mesh;
+            this.mesh=new mesh();
             this.mat=this.emission.baseddata.material;
             //---------------------
             this.vertexLength=gd3d.render.meshData.calcByteSize(this.effect.VF)/4;
 
             let maxParticlesCount=this.getMaxParticleCount();
             //this.maxcoun=maxParticlesCount;
-            let particleVertexCount=this.mesh.data.pos.length;
-            let particleIndexCount=this.mesh.data.trisindex.length;
+            let particleVertexCount=datamesh.data.pos.length;
+            let particleIndexCount=datamesh.data.trisindex.length;
             let totalVertex=maxParticlesCount*particleVertexCount;
             let totalIndex=maxParticlesCount*particleIndexCount;
 
@@ -123,11 +124,6 @@ namespace gd3d.framework
                 this.emission.particlelist[i].uploadMeshdata();
                 
             }
-            // if(this.maxcount<this.emission.particlelist.length)
-            // {
-            //     console.error("max:"+this.maxcount +"curPar:"+this.emission.particlelist.length);
-            // }
-            
             //---------------------render
             //this.mesh.glMesh.bindVboBuffer(context.webgl);      
 

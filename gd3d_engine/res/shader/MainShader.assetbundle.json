@@ -353,6 +353,10 @@
           "length":0
           },
       {
+          "name":"resources/using/particles_diffuse.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/using/particle_mask_add_tint.shader.json",
           "length":0
           },
