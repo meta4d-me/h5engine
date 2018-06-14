@@ -14,7 +14,9 @@ namespace gd3d.framework
         }
         queue: number=10;
         start() {
-
+            if(this.data && this.data.beloop == true){
+                this.play();
+            }
         }
 
         onPlay()

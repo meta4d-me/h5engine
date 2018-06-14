@@ -21,7 +21,7 @@ namespace gd3d.framework
          * 输入内容label
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("reference")
+        @gd3d.reflect.Field("reference",null,"transform2D")
         get content():transform2D{
             return this._content;
         }
@@ -80,14 +80,14 @@ namespace gd3d.framework
 
                     if(this.strPoint == null) this.strPoint = new math.vector2();
                     let sp = this.strPoint;
-                    if(ev.type == PointEventEnum.PointDown ) {
+                    if(ev.type == event.PointEventEnum.PointDown ) {
                         this.isPointDown = true;
                         sp.x = tempc.x;
                         sp.y = tempc.y;
                         if(this.strPos == null) this.strPos = new math.vector2();
                         math.vec2Clone(this._content.transform.localTranslate,this.strPos);
                     }
-                    if(ev.type == PointEventEnum.PointHold && this.isPointDown){
+                    if(ev.type == event.PointEventEnum.PointHold && this.isPointDown){
                         if(this.lastPoint == null) this.lastPoint = new math.vector2();
                         let lp = this.lastPoint;
                         if(lp.x != tempc.x || lp.y != tempc.y){
@@ -104,7 +104,7 @@ namespace gd3d.framework
                     math.pool.delete_vector2(tempc);
                 }
             }
-                if(ev.type == PointEventEnum.PointUp ) {
+                if(ev.type == event.PointEventEnum.PointUp ) {
                     this.isPointDown = false;
                 }
         }

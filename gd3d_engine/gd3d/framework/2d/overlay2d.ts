@@ -251,10 +251,6 @@ namespace gd3d.framework
             let sx = (real_x / this.viewPixelrect.w) * 2 - 1;
             let sy = (real_y / this.viewPixelrect.h) * -2 + 1;
             //用屏幕空间坐标系丢给canvas
-            
-            if(this.canvas["pointEvent"].type == PointEventEnum.PointDown){
-                this.canvas;
-            }
 
             //canvas de update 直接集成pointevent处理
             this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);

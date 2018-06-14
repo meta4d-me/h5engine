@@ -64,6 +64,14 @@ namespace gd3d.framework
         public autoplay: boolean = true;
         private playIndex: number = 0;
         private _playClip: animationClip = null;
+
+        /**
+         * 当前播放 动画片段名
+         */
+        get playingClip(){
+            if(!this._playClip) return "";
+            return this._playClip.getName();
+        }
         /**
          * @public
          * @language zh_CN
@@ -206,12 +214,15 @@ namespace gd3d.framework
 
         }
 
+        /** 片段有播放 */
+        private clipHasPlay = false;
         update(delta: number)
         {
             if (this._playClip == null)
                 return;
 
             this.checkFrameId(delta);
+            this.clipHasPlay = true;
 
             this.mix = false;
             if (this.crossdelta > 0)
@@ -411,6 +422,14 @@ namespace gd3d.framework
         private playAniamtion(index: string, speed: number = 1.0, beRevert: boolean = false)
         {
             if (this.clips[index] == undefined) return;
+            
+            let isp = this.isPlay();
+            let cname = isp ? this._playClip.getName(): "";
+            this._playClip = null;
+            if(this.onPlayEnd && isp){
+                this.clipHasPlay = false;
+                this.onPlayEnd(cname);
+            }
 
             this._playClip = this.clips[index];
             this._playTimer = 0;
@@ -428,6 +447,8 @@ namespace gd3d.framework
                 var src = this.nowpose[key];
                 this.lerppose[key] = src.Clone();
             }
+
+            this.clipHasPlay = false; //reset
         }
 
         public updateAnimation(animIndex: number, _frame: number)
@@ -491,7 +512,11 @@ namespace gd3d.framework
          */
         stop(): void
         {
+            let isp = this.isPlay();
+            let cname = isp ? this._playClip.getName(): "";
             this._playClip = null;
+            if(this.onPlayEnd && isp)
+                this.onPlayEnd(cname);
         }
         /**
          * @public
@@ -502,7 +527,7 @@ namespace gd3d.framework
          */
         isPlay(): boolean
         {
-            return this._playClip != null;
+            return this._playClip && this.clipHasPlay;
         }
         /**
          * @public
@@ -513,7 +538,7 @@ namespace gd3d.framework
          */
         isStop(): boolean
         {
-            if (this._playClip == null) return false;
+            if (this._playClip == null) return true;
             if (this.playStyle != PlayStyle.NormalPlay) return false;
             if (this._playClip.loop) return false;
             if (this._playFrameid == this._playClip.frameCount - 1)
@@ -565,6 +590,14 @@ namespace gd3d.framework
             this.thisObject = thisObject;
         }
 
+        /**
+         * @public
+         * @language zh_CN
+         * clip播放end
+         * @param clipname 动画片段名
+         */
+        onPlayEnd:(clipname:string)=>any;
+
         private checkFrameId(delay: number): void 
         {
             if (this.playStyle == PlayStyle.NormalPlay)
@@ -601,6 +634,12 @@ namespace gd3d.framework
             }
             if (this.isStop())
             {
+                let isp = this.isPlay();
+                let cname = isp ? this._playClip.getName(): "";
+                this._playClip = null;
+                if(this.onPlayEnd && isp)
+                    this.onPlayEnd(cname);
+
                 if (this.finishCallBack)
                 {
                     this.finishCallBack(this.thisObject);

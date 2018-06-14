@@ -36,8 +36,33 @@ namespace gd3d.io
             // if (!url)
             //     return;
             //为了序列化存储而修改的逻辑hjx
-            if (url && !(asset instanceof gd3d.framework.material))  //material 资源 存在 编辑器中修改的情况 不能 走URL 保存原文件
+            if (url && !(asset instanceof framework.material)){    //material 资源 存在 编辑器中修改的情况 不能 走URL 保存原文件
                 SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+
+                if((asset instanceof framework.f14eff)){  //f14eff 处理
+                    let assets = (asset as framework.f14eff).getDependents();
+                    let note = {};  //过滤重复
+                    assets.forEach(asset=>{
+                        if(asset){
+                            let url: string = assetMgr.getAssetUrl(asset);
+                            if(url){
+                                if(!note[url]){
+                                    SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
+                                    if(asset instanceof framework.texture && asset.realName && asset.realName != ""){
+                                        asset;
+                                        let idx = url.lastIndexOf("/"); 
+                                        if(idx != -1){
+                                            let haed = url.substring(0,idx+1);
+                                            SerializeDependent.resourseDatas.push({ "url": haed + asset.realName , "type": SaveAssetType.FullUrl });
+                                        }
+                                    }
+                                }
+                                note[url] = true;
+                            }
+                        }
+                    })
+                }
+            }
             else
                 SerializeDependent.resourseDatas.push(SerializeDependent.GetAssetContent(asset));
             if (asset instanceof gd3d.framework.material)
@@ -621,17 +646,20 @@ namespace gd3d.io
                     if (_meta["class"]["custom"]["nodecomp"])
                     {
                         //属性是组件
+                        if(instanceObj[key] && instanceObj[key]["gameObject"])
                         insid = instanceObj[key]["gameObject"]["transform"]["insId"].getInsID();
                         isreference = true;
                     }
                     else if (_meta["class"]["custom"]["2dcomp"])
                     {
+                        if(instanceObj[key] && instanceObj[key]["transform"])
                         insid = instanceObj[key]["transform"]["insId"].getInsID();
                         isreference = true;
                     }
                     else if (type == "transform" || type == "transform2D")
                     {
                         //属性是tranform
+                        if(instanceObj[key])
                         insid = instanceObj[key]["insId"].getInsID();
                         isreference = true;
                     }

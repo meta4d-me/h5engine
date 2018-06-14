@@ -73,7 +73,36 @@ namespace gd3d.framework
         //     f14node.f14Effect.setData(this.f14data);
         //     return f14node;
         // }
-    }
 
+        /** 获取依赖资源 （mesh 、material） */
+        getDependents():IAsset[]{
+            if(!this.data || !this.data.layers) return;
+            let result = [];
+            this.doSearch(this.data.layers,result);
+            return result;
+        }
+
+        private doSearch(obj:object, arr:any[]){
+            if(!obj) return;
+            if(obj instanceof material || obj instanceof framework.mesh || obj instanceof texture)
+                arr.push(obj);
+
+            if(obj instanceof Array){
+                (obj as Array<any>).forEach(element => {
+                    if(element && typeof(element) == "object"){
+                        this.doSearch(element,arr);
+                    }
+                });
+
+            }else{
+                let keys = Reflect["ownKeys"](obj) as string[];
+                for(var i=0;i< keys.length ;i++){
+                    if(typeof(obj[keys[i]]) == "object"){
+                        this.doSearch(obj[keys[i]],arr);
+                    }
+                }
+            }
+        }
+    }
 
 }

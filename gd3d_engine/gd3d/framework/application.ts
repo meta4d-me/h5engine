@@ -434,6 +434,9 @@ namespace gd3d.framework
             }
             this.updateEditorCode(delta);
 
+            if(this._inputmgr)
+                this._inputmgr.update(delta);
+
             if (this._scene != null)
             {
                 this._scene.update(delta);
@@ -444,6 +447,11 @@ namespace gd3d.framework
         {
             if (!this.outcontainer)
                 return;
+            if(this.webgl && this.webgl.canvas ){
+                this.ccWidth = this.webgl.canvas.clientWidth != null ?  this.webgl.canvas.clientWidth : this.ccWidth; 
+                this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight :this.ccHeight; 
+            }
+
             if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight)
             {
                 this._canvasClientWidth = this.ccWidth;
