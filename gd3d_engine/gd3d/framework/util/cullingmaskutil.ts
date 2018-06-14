@@ -15,9 +15,10 @@ namespace gd3d.framework
         default = 0x00000001,
         transparentFx = 0x00000002,
         IgnoreRaycast = 0x00000004,
-        editor = 0x00000008,
+        editor = 0x00000008,    //系统 编辑层
         water = 0x00000010,
         ui = 0x00000020,
+        preview = 0x00000040,  //系统 预览层
 
         builtin_0 = 0x00000001,
         builtin_1 = 0x00000002,
