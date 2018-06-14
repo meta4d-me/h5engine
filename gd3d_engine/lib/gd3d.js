@@ -33365,7 +33365,7 @@ var gd3d;
         })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
         var textureReader = (function () {
             function textureReader(webgl, texRGBA, width, height, gray) {
-                if (gray === void 0) { gray = true; }
+                if (gray === void 0) { gray = false; }
                 this._gray = gray;
                 this._width = width;
                 this._height = height;

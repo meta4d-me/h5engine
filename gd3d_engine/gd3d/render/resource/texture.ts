@@ -18,7 +18,7 @@
      */
     export class textureReader
     {
-        constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray: boolean = true)
+        constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray: boolean = false)
         {
             this._gray = gray;
             this._width = width;
