@@ -245,12 +245,13 @@ namespace gd3d.framework
             this.CalcuPoint(ev.offsetX,ev.offsetY);
         }
         private _mousewheel(ev:MouseWheelEvent){
+            this.hasWheel = true;
             if (ev.detail) {
-                this._wheel = -1 * ev.detail;
+                this.lastWheel = -1 * ev.detail;
             } else if (ev.wheelDelta) {
-                this._wheel = ev.wheelDelta / 120;
+                this.lastWheel = ev.wheelDelta / 120;
             } else {
-                this._wheel = 0;
+                this.lastWheel = 0;
             }
         }
 
@@ -373,9 +374,10 @@ namespace gd3d.framework
             this._lastbuttons[1] = this._buttons[1];
             this._lastbuttons[2] = this._buttons[2];
             this._wheel = 0;
-
-           this.pointCk();
-           this.keyCodeCk();
+            
+            this.mouseWheelCk();
+            this.pointCk();
+            this.keyCodeCk();
         }
 
         private pointCk(){
@@ -424,6 +426,18 @@ namespace gd3d.framework
                 this.eventer.EmitEnum_key(event.KeyEventEnum.KeyUp,null);
 
             this.hasKeyDown = this.hasKeyUp = false;
+        }
+
+        private hasWheel = false;
+        private lastWheel = 0;
+        private mouseWheelCk(){
+            if(this.hasWheel){
+                this._wheel = this.lastWheel;
+                this.eventer.EmitEnum_point(event.PointEventEnum.MouseWheel,null);
+            }
+
+            this.hasWheel = false;
+            this.lastWheel =0;
         }
 
         /**

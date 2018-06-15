@@ -294,12 +294,12 @@ var gd3d;
                         }
                     }
                     else {
+                        if (this._inputmgr)
+                            this._inputmgr.update(delta);
                         this.updateUserCode(delta);
                     }
                 }
                 this.updateEditorCode(delta);
-                if (this._inputmgr)
-                    this._inputmgr.update(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
@@ -9439,51 +9439,57 @@ var gd3d;
                 gd3d.math.pool.delete_matrix(invparentworld);
             };
             transform.prototype.setWorldPosition = function (pos) {
-                this.dirty = true;
+                if (gd3d.math.vec3Equal(pos, this.getWorldTranslate()))
+                    return;
                 this.updateWorldTran();
-                var pworld = gd3d.math.pool.new_matrix();
-                if (this.parent != null) {
-                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
-                }
-                else {
-                    gd3d.math.matrixMakeIdentity(pworld);
-                }
-                var invparentworld = gd3d.math.pool.new_matrix();
-                gd3d.math.matrixInverse(pworld, invparentworld);
                 this.worldMatrix.rawData[12] = pos.x;
                 this.worldMatrix.rawData[13] = pos.y;
                 this.worldMatrix.rawData[14] = pos.z;
-                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
-                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
-                this.markDirty();
-                gd3d.math.pool.delete_matrix(pworld);
-                gd3d.math.pool.delete_matrix(invparentworld);
+                var newWpos = gd3d.math.pool.clone_vector3(pos);
+                var deltaV3 = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(newWpos, this.getWorldTranslate(), deltaV3);
+                gd3d.math.vec3Add(this.localTranslate, deltaV3, this.localTranslate);
+                gd3d.math.vec3Clone(newWpos, this.worldTranslate);
+                gd3d.math.pool.delete_vector3(newWpos);
+                gd3d.math.pool.delete_vector3(deltaV3);
+            };
+            transform.prototype.setWorldRotate = function (rotate) {
+                if (gd3d.math.quatEqual(rotate, this.getWorldRotate()))
+                    return;
+                this.updateWorldTran();
+                var pworld = gd3d.math.pool.new_quaternion();
+                if (this.parent != null)
+                    gd3d.math.quatClone(this.parent.getWorldRotate(), pworld);
+                else
+                    gd3d.math.quatIdentity(pworld);
+                var invparentworld = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatInverse(pworld, invparentworld);
+                gd3d.math.quatMultiply(invparentworld, rotate, this.localRotate);
+                gd3d.math.quatClone(rotate, this.worldRotate);
+                gd3d.math.matrixMakeTransformRTS(this.getWorldTranslate(), this.worldScale, this.worldRotate, this.worldMatrix);
+                gd3d.math.pool.delete_quaternion(pworld);
+                gd3d.math.pool.delete_quaternion(invparentworld);
             };
             transform.prototype.lookat = function (trans) {
-                this.dirty = true;
-                trans.updateWorldTran();
-                this.updateWorldTran();
-                var p0 = this.getWorldTranslate();
-                var p1 = trans.getWorldTranslate();
-                var d = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(p1, p0, d);
-                var quatworld = gd3d.math.pool.new_quaternion();
-                var quat = gd3d.math.pool.new_quaternion();
-                gd3d.math.quatLookat(p0, p1, quatworld);
-                var quatworldCur = this.parent.getWorldRotate();
-                gd3d.math.quatInverse(quatworldCur, quat);
-                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
-                gd3d.math.pool.delete_vector3(d);
-                gd3d.math.pool.delete_quaternion(quatworld);
-                gd3d.math.pool.delete_quaternion(quat);
+                this.calcLookAt_(trans.getWorldTranslate());
             };
             transform.prototype.lookatPoint = function (point) {
+                this.calcLookAt_(point);
+            };
+            transform.prototype.calcLookAt_ = function (point) {
+                this.updateWorldTran();
+                var pos = this.getWorldTranslate();
+                var target = point;
+                var newquat = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatLookat(pos, target, newquat);
+                this.setWorldRotate(newquat);
+                gd3d.math.pool.delete_quaternion(newquat);
+            };
+            transform.prototype.calcLookAt = function (point) {
                 this.dirty = true;
                 this.updateWorldTran();
                 var p0 = this.getWorldTranslate();
                 var p1 = point;
-                var d = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(p1, p0, d);
                 var quatworld = gd3d.math.pool.new_quaternion();
                 var quat = gd3d.math.pool.new_quaternion();
                 gd3d.math.quatLookat(p0, p1, quatworld);
@@ -9491,7 +9497,6 @@ var gd3d;
                 gd3d.math.quatInverse(quatworldCur, quat);
                 gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
                 this.markDirty();
-                gd3d.math.pool.delete_vector3(d);
                 gd3d.math.pool.delete_quaternion(quatworld);
                 gd3d.math.pool.delete_quaternion(quat);
             };
@@ -18044,6 +18049,7 @@ var gd3d;
             PointEventEnum[PointEventEnum["PointUp"] = 2] = "PointUp";
             PointEventEnum[PointEventEnum["PointMove"] = 3] = "PointMove";
             PointEventEnum[PointEventEnum["PointClick"] = 4] = "PointClick";
+            PointEventEnum[PointEventEnum["MouseWheel"] = 5] = "MouseWheel";
         })(PointEventEnum = event.PointEventEnum || (event.PointEventEnum = {}));
         var KeyEventEnum;
         (function (KeyEventEnum) {
@@ -18469,6 +18475,8 @@ var gd3d;
                 this.lastPoint = new gd3d.math.vector2();
                 this.hasKeyDown = false;
                 this.hasKeyUp = false;
+                this.hasWheel = false;
+                this.lastWheel = 0;
                 this._contextMenu = function (ev) { ev.preventDefault(); };
                 this.app = app;
                 gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
@@ -18633,14 +18641,15 @@ var gd3d;
                 this.CalcuPoint(ev.offsetX, ev.offsetY);
             };
             inputMgr.prototype._mousewheel = function (ev) {
+                this.hasWheel = true;
                 if (ev.detail) {
-                    this._wheel = -1 * ev.detail;
+                    this.lastWheel = -1 * ev.detail;
                 }
                 else if (ev.wheelDelta) {
-                    this._wheel = ev.wheelDelta / 120;
+                    this.lastWheel = ev.wheelDelta / 120;
                 }
                 else {
-                    this._wheel = 0;
+                    this.lastWheel = 0;
                 }
             };
             inputMgr.prototype._touchstart = function (ev) {
@@ -18729,6 +18738,7 @@ var gd3d;
                 this._lastbuttons[1] = this._buttons[1];
                 this._lastbuttons[2] = this._buttons[2];
                 this._wheel = 0;
+                this.mouseWheelCk();
                 this.pointCk();
                 this.keyCodeCk();
             };
@@ -18767,6 +18777,14 @@ var gd3d;
                 if (this.hasKeyUp)
                     this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyUp, null);
                 this.hasKeyDown = this.hasKeyUp = false;
+            };
+            inputMgr.prototype.mouseWheelCk = function () {
+                if (this.hasWheel) {
+                    this._wheel = this.lastWheel;
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.MouseWheel, null);
+                }
+                this.hasWheel = false;
+                this.lastWheel = 0;
             };
             inputMgr.prototype.isPressed = function (button) {
                 return this._buttons[button];
@@ -21958,7 +21976,7 @@ var gd3d;
         }
         math.quatClone = quatClone;
         function quatEqual(quat, quat2, threshold) {
-            if (threshold === void 0) { threshold = 0.00001; }
+            if (threshold === void 0) { threshold = 0.000001; }
             if (Math.abs(quat.x - quat2.x) > threshold)
                 return false;
             if (Math.abs(quat.y - quat2.y) > threshold)
@@ -22145,9 +22163,9 @@ var gd3d;
             }
             var dirxz1 = math.pool.new_vector3(dir.x, 0, dir.z);
             var v3length = math.vec3Length(dirxz1);
-            if (v3length > 0.999)
+            if (v3length > 0.9999999999)
                 v3length = 1;
-            if (v3length < -0.999)
+            if (v3length < -0.9999999999)
                 v3length = -1;
             var pitch = Math.acos(v3length);
             if (dir.y > 0) {

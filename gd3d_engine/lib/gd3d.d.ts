@@ -1480,13 +1480,13 @@ declare namespace gd3d.framework {
         hasRendererComp: boolean;
         hasRendererCompChild: boolean;
         private dirtyWorldDecompose;
-        localRotate: gd3d.math.quaternion;
-        localTranslate: gd3d.math.vector3;
-        localPosition: gd3d.math.vector3;
-        localScale: gd3d.math.vector3;
+        localRotate: math.quaternion;
+        localTranslate: math.vector3;
+        localPosition: math.vector3;
+        localScale: math.vector3;
         private localMatrix;
         private _localEulerAngles;
-        localEulerAngles: gd3d.math.vector3;
+        localEulerAngles: math.vector3;
         private worldMatrix;
         private worldRotate;
         private worldTranslate;
@@ -1494,16 +1494,19 @@ declare namespace gd3d.framework {
         getWorldTranslate(): math.vector3;
         getWorldScale(): math.vector3;
         getWorldRotate(): math.quaternion;
-        getLocalMatrix(): gd3d.math.matrix;
+        getLocalMatrix(): math.matrix;
         private tempWorldMatrix;
-        getWorldMatrix(): gd3d.math.matrix;
-        getForwardInWorld(out: gd3d.math.vector3): void;
-        getRightInWorld(out: gd3d.math.vector3): void;
-        getUpInWorld(out: gd3d.math.vector3): void;
+        getWorldMatrix(): math.matrix;
+        getForwardInWorld(out: math.vector3): void;
+        getRightInWorld(out: math.vector3): void;
+        getUpInWorld(out: math.vector3): void;
         setWorldMatrix(mat: math.matrix): void;
         setWorldPosition(pos: math.vector3): void;
+        setWorldRotate(rotate: math.quaternion): void;
         lookat(trans: transform): void;
         lookatPoint(point: math.vector3): void;
+        private calcLookAt_(point);
+        private calcLookAt(point);
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
@@ -3205,6 +3208,7 @@ declare namespace gd3d.event {
         PointUp = 2,
         PointMove = 3,
         PointClick = 4,
+        MouseWheel = 5,
     }
     enum KeyEventEnum {
         KeyDown = 0,
@@ -3604,6 +3608,9 @@ declare namespace gd3d.framework {
         private hasKeyDown;
         private hasKeyUp;
         private keyCodeCk();
+        private hasWheel;
+        private lastWheel;
+        private mouseWheelCk();
         isPressed(button: number): boolean;
         wasPressed(button: number): boolean;
         private _contextMenu;
