@@ -222,6 +222,8 @@ namespace gd3d.framework
                 return;
 
             this.checkFrameId(delta);
+            if(!this._playClip) return;
+            
             this.clipHasPlay = true;
 
             this.mix = false;
