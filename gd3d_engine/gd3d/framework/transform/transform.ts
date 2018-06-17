@@ -444,6 +444,52 @@ namespace gd3d.framework
                 p = p.parent;
             }
         }
+
+        private helperLocalPos : math.vector3= new math.vector3();
+        private helperLocalSca : math.vector3 = new math.vector3();
+        private helperLocalRot : math.quaternion = new math.quaternion();
+        private _needremakeLocalMtx = true; //local RTS 有改动 需要  make localMatrix
+        private get needremakeLocalMtx (){
+            if(!this._needremakeLocalMtx) {
+                if(!math.vec3Equal(this.localTranslate,this.helperLocalPos,Number.MIN_VALUE))
+                this._needremakeLocalMtx = true;
+                else if(!math.vec3Equal(this.localScale,this.helperLocalSca,Number.MIN_VALUE))
+                this._needremakeLocalMtx = true;
+                else if(!math.quatEqual(this.localRotate,this.helperLocalRot,Number.MIN_VALUE))
+                this._needremakeLocalMtx = true;
+            }
+            return this._needremakeLocalMtx;
+        }
+
+        //刷新 helpers
+        private refreshHelper(){
+            math.vec3Clone(this.localTranslate,this.helperLocalPos);
+            math.vec3Clone(this.helperLocalSca,this.helperLocalSca);
+            math.quatClone(this.localRotate,this.helperLocalRot);
+        }
+
+        //刷新 local Matrix
+        private refreshlocalMtx(){
+            if(this.needremakeLocalMtx){
+                math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                this.refreshHelper();
+                this._needremakeLocalMtx = false;
+            }
+        }
+        //刷新 local and world matrix
+        private refreshMtxs(parentChange:boolean = false){
+            this.refreshlocalMtx();
+            if(parentChange || this.needremakeLocalMtx){
+                if (!this.parent)
+                    math.matrixClone(this.localMatrix, this.worldMatrix);
+                else
+                    math.matrixMultiply(this.parent.getWorldMatrix(), this.localMatrix, this.worldMatrix);
+                
+                this.needWorldDecompose = true;
+                this.markAABBDirty();
+            }
+        }
+
         /**
          * @public
          * @language zh_CN
@@ -458,23 +504,28 @@ namespace gd3d.framework
             if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                 return;
 
-            if (this.dirty)
-            {
-                math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
-            }
-            if (this.dirty || parentChange)
-            {
-                if (this.parent == null)
-                {
-                    math.matrixClone(this.localMatrix, this.worldMatrix);
-                }
-                else
-                {
-                    math.matrixMultiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
-                }
-                this.dirtyWorldDecompose = true;
-                this.markAABBDirty();
-            }
+            this.refreshHelper();
+
+            // if (this.dirty)
+            // {
+            //     math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+            // }
+            // if (this.dirty || parentChange)
+            // {
+            //     if (this.parent == null)
+            //     {
+            //         math.matrixClone(this.localMatrix, this.worldMatrix);
+            //     }
+            //     else
+            //     {
+            //         math.matrixMultiply(this.parent.getWorldMatrix(), this.localMatrix, this.worldMatrix);
+            //     }
+            //     this.needWorldDecompose = true;
+
+            //     this.markAABBDirty();
+            // }
+
+            this.refreshMtxs();
 
             if (this.children != null)
             {
@@ -549,7 +600,8 @@ namespace gd3d.framework
         public hasRendererComp:boolean = false; //自己是否有渲染器组件
         public hasRendererCompChild:boolean = false; //子对象是否有渲染器组件
 
-        private dirtyWorldDecompose: boolean = false;
+        private needWorldDecompose: boolean = true;  //需要 拆解 worldMatrix
+
         /**
          * @public
          * @language zh_CN
@@ -559,6 +611,7 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("quaternion")
         localRotate: math.quaternion = new math.quaternion();
+
         /**
          * @public
          * @language zh_CN
@@ -568,13 +621,14 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("vector3", new math.vector3(0, 0, 0))
         localTranslate: math.vector3 = new math.vector3(0, 0, 0);
-        set localPosition(position:math.vector3){
-            this.localTranslate = position;
-        }
 
         get localPosition(){
             return this.localTranslate;
         }
+        set localPosition(position:math.vector3){
+            this.localTranslate = position;
+        }
+
 
         /**
          * @public
@@ -585,8 +639,8 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("vector3", new math.vector3(1, 1, 1))
         localScale: math.vector3 = new math.vector3(1, 1, 1);
+        
         private localMatrix: math.matrix = new math.matrix();
-
         private _localEulerAngles: math.vector3 = new math.vector3(0, 0, 0);
         /**
          * @public
@@ -626,10 +680,10 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if (this.dirtyWorldDecompose)
+            if (this.needWorldDecompose)
             {
                 math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.dirtyWorldDecompose = false;
+                this.needWorldDecompose = false;
             }
             //math.vec3Format(this.worldTranslate, 4, this.worldTranslate);
             return this.worldTranslate;
@@ -643,10 +697,10 @@ namespace gd3d.framework
          */
         getWorldScale()
         {
-            if (this.dirtyWorldDecompose)
+            if (this.needWorldDecompose)
             {
                 math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.dirtyWorldDecompose = false;
+                this.needWorldDecompose = false;
             }
             //math.vec3Format(this.worldScale, 4, this.worldScale);
             return this.worldScale;
@@ -660,10 +714,10 @@ namespace gd3d.framework
          */
         getWorldRotate()
         {
-            if (this.dirtyWorldDecompose)
+            if (this.needWorldDecompose)
             {
                 math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.dirtyWorldDecompose = false;
+                this.needWorldDecompose = false;
             }
             //math.quaternionFormat(this.worldRotate, 4, this.worldRotate);
             return this.worldRotate;
@@ -677,10 +731,9 @@ namespace gd3d.framework
          */
         getLocalMatrix(): math.matrix
         {
-            if(this.dirty) math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+            this.refreshlocalMtx();
             return this.localMatrix;
         }
-        private tempWorldMatrix:math.matrix = new math.matrix();
         /**
          * @public
          * @language zh_CN
@@ -690,16 +743,10 @@ namespace gd3d.framework
          */
         getWorldMatrix(): math.matrix
         {
-            if(this.dirty){ //解决下一帧才刷worldMatrix的问题
-                if(!this.parent)
-                    math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
-                else
-                    math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
-                return this.tempWorldMatrix;
-            }
-            else
-                return this.worldMatrix;
+            this.refreshMtxs();
+            return this.worldMatrix;
         }
+
         /**
          * @public
          * @language zh_CN
@@ -763,32 +810,25 @@ namespace gd3d.framework
          */
         setWorldMatrix(mat: math.matrix)
         {
-            this.dirty = true;
-            this.updateWorldTran();
-
-            var pworld = math.pool.new_matrix();
+            //this.updateWorldTran();
+            let pworld = math.pool.new_matrix();
             if (this.parent != null)
-            {
                 math.matrixClone(this.parent.worldMatrix, pworld);
-            }
             else
-            {
                 math.matrixMakeIdentity(pworld);
-            }
-            var invparentworld = math.pool.new_matrix();
+
+            let invparentworld = math.pool.new_matrix();
             math.matrixInverse(pworld, invparentworld);
 
-
             math.matrixClone(mat, this.worldMatrix);
-            this.dirtyWorldDecompose = true;
-            //这个乘反了
             math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
             math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
-            this.markDirty();
+            this.needWorldDecompose = true;
 
             math.pool.delete_matrix(pworld);
             math.pool.delete_matrix(invparentworld);
         }
+
         /**
          * @public
          * @language zh_CN
@@ -797,20 +837,21 @@ namespace gd3d.framework
          * @param pos 世界空间下的坐标
          * @version egret-gd3d 1.0
          */
-        setWorldPosition(pos: math.vector3)
-        {
-            if(math.vec3Equal(pos,this.getWorldTranslate())) return;
-            this.updateWorldTran();
-            
-            this.worldMatrix.rawData[12] = pos.x;
-            this.worldMatrix.rawData[13] = pos.y;
-            this.worldMatrix.rawData[14] = pos.z;
-
+        setWorldPosition(pos: math.vector3){
             let newWpos = math.pool.clone_vector3(pos);
             let deltaV3 = math.pool.new_vector3();
             math.vec3Subtract(newWpos,this.getWorldTranslate(),deltaV3);
             math.vec3Add(this.localTranslate,deltaV3,this.localTranslate);
             math.vec3Clone(newWpos,this.worldTranslate);
+            //update matrix
+            this.worldMatrix.rawData[12] = pos.x;
+            this.worldMatrix.rawData[13] = pos.y;
+            this.worldMatrix.rawData[14] = pos.z;
+
+            let localmtx = this.getLocalMatrix();
+            localmtx.rawData[12] = this.localTranslate.x;
+            localmtx.rawData[13] = this.localTranslate.y;
+            localmtx.rawData[14] = this.localTranslate.z;
 
             math.pool.delete_vector3(newWpos);
             math.pool.delete_vector3(deltaV3);
@@ -824,9 +865,6 @@ namespace gd3d.framework
          * 
          */
         setWorldRotate(rotate:math.quaternion){
-            if(gd3d.math.quatEqual(rotate,this.getWorldRotate())) return ;
-            this.updateWorldTran();
-
             let pworld = math.pool.new_quaternion();
             if (this.parent != null)
             math.quatClone(this.parent.getWorldRotate(), pworld);
@@ -838,6 +876,8 @@ namespace gd3d.framework
             math.quatMultiply(invparentworld,rotate,this.localRotate);
             math.quatClone(rotate,this.worldRotate);
             math.matrixMakeTransformRTS(this.getWorldTranslate(),this.worldScale,this.worldRotate,this.worldMatrix);
+            //math.matrixMakeTransformRTS(this.localTranslate,this.localScale,this.localRotate,this.localMatrix);
+            this._needremakeLocalMtx = true;
             
             math.pool.delete_quaternion(pworld);
             math.pool.delete_quaternion(invparentworld);
@@ -852,7 +892,7 @@ namespace gd3d.framework
          */
         lookat(trans: transform)
         {
-            this.calcLookAt_(trans.getWorldTranslate());
+            this.calcLookAt(trans.getWorldTranslate());
         }
         /**
          * @public
@@ -864,11 +904,10 @@ namespace gd3d.framework
          */
         lookatPoint(point: math.vector3)
         {
-            this.calcLookAt_(point);
+            this.calcLookAt(point);
         }
 
-        private calcLookAt_(point: math.vector3){
-            this.updateWorldTran();
+        private calcLookAt(point: math.vector3){
             let pos = this.getWorldTranslate();
             let target = point;
             let newquat = math.pool.new_quaternion();
@@ -876,30 +915,6 @@ namespace gd3d.framework
             this.setWorldRotate(newquat);
 
             math.pool.delete_quaternion(newquat);
-        }
-
-        private calcLookAt(point: math.vector3){
-            this.dirty = true;
-            this.updateWorldTran();
-
-            var p0 = this.getWorldTranslate();
-            var p1 = point;
-
-            // var d = math.pool.new_vector3();//池化处理
-            // math.vec3Subtract(p1, p0, d);
-
-            var quatworld = math.pool.new_quaternion();
-            var quat = math.pool.new_quaternion();
-            math.quatLookat(p0, p1, quatworld);
-            var quatworldCur = this.parent.getWorldRotate();
-            math.quatInverse(quatworldCur, quat);
-            math.quatMultiply(quat, quatworld, this.localRotate);
-
-            this.markDirty();
-
-            // math.pool.delete_vector3(d);//归还vector3,不归还也没多大毛病，多几个gc而已，也许v8能搞定
-            math.pool.delete_quaternion(quatworld);
-            math.pool.delete_quaternion(quat);
         }
 
         private _gameObject: gameObject;

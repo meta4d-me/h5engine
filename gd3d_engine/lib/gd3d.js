@@ -9064,13 +9064,17 @@ var gd3d;
                 this.aabbdirty = true;
                 this.aabbchilddirty = true;
                 this.aabbchild = new gd3d.framework.aabb(gd3d.math.pool.vector3_zero, gd3d.math.pool.vector3_zero);
+                this.helperLocalPos = new gd3d.math.vector3();
+                this.helperLocalSca = new gd3d.math.vector3();
+                this.helperLocalRot = new gd3d.math.quaternion();
+                this._needremakeLocalMtx = true;
                 this.dirty = true;
                 this.dirtyChild = true;
                 this.hasComponent = false;
                 this.hasComponentChild = false;
                 this.hasRendererComp = false;
                 this.hasRendererCompChild = false;
-                this.dirtyWorldDecompose = false;
+                this.needWorldDecompose = true;
                 this.localRotate = new gd3d.math.quaternion();
                 this.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.localScale = new gd3d.math.vector3(1, 1, 1);
@@ -9080,7 +9084,6 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
-                this.tempWorldMatrix = new gd3d.math.matrix();
                 this._beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
@@ -9282,22 +9285,50 @@ var gd3d;
                     p = p.parent;
                 }
             };
+            Object.defineProperty(transform.prototype, "needremakeLocalMtx", {
+                get: function () {
+                    if (!this._needremakeLocalMtx) {
+                        if (!gd3d.math.vec3Equal(this.localTranslate, this.helperLocalPos, Number.MIN_VALUE))
+                            this._needremakeLocalMtx = true;
+                        else if (!gd3d.math.vec3Equal(this.localScale, this.helperLocalSca, Number.MIN_VALUE))
+                            this._needremakeLocalMtx = true;
+                        else if (!gd3d.math.quatEqual(this.localRotate, this.helperLocalRot, Number.MIN_VALUE))
+                            this._needremakeLocalMtx = true;
+                    }
+                    return this._needremakeLocalMtx;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform.prototype.refreshHelper = function () {
+                gd3d.math.vec3Clone(this.localTranslate, this.helperLocalPos);
+                gd3d.math.vec3Clone(this.helperLocalSca, this.helperLocalSca);
+                gd3d.math.quatClone(this.localRotate, this.helperLocalRot);
+            };
+            transform.prototype.refreshlocalMtx = function () {
+                if (this.needremakeLocalMtx) {
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                    this.refreshHelper();
+                    this._needremakeLocalMtx = false;
+                }
+            };
+            transform.prototype.refreshMtxs = function (parentChange) {
+                if (parentChange === void 0) { parentChange = false; }
+                this.refreshlocalMtx();
+                if (parentChange || this.needremakeLocalMtx) {
+                    if (!this.parent)
+                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
+                    else
+                        gd3d.math.matrixMultiply(this.parent.getWorldMatrix(), this.localMatrix, this.worldMatrix);
+                    this.needWorldDecompose = true;
+                    this.markAABBDirty();
+                }
+            };
             transform.prototype.updateTran = function (parentChange) {
                 if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                     return;
-                if (this.dirty) {
-                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
-                }
-                if (this.dirty || parentChange) {
-                    if (this.parent == null) {
-                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
-                    }
-                    else {
-                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
-                    }
-                    this.dirtyWorldDecompose = true;
-                    this.markAABBDirty();
-                }
+                this.refreshHelper();
+                this.refreshMtxs();
                 if (this.children != null) {
                     for (var i = 0; i < this.children.length; i++) {
                         this.children[i].updateTran(parentChange || this.dirty);
@@ -9355,41 +9386,33 @@ var gd3d;
                 configurable: true
             });
             transform.prototype.getWorldTranslate = function () {
-                if (this.dirtyWorldDecompose) {
+                if (this.needWorldDecompose) {
                     gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
+                    this.needWorldDecompose = false;
                 }
                 return this.worldTranslate;
             };
             transform.prototype.getWorldScale = function () {
-                if (this.dirtyWorldDecompose) {
+                if (this.needWorldDecompose) {
                     gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
+                    this.needWorldDecompose = false;
                 }
                 return this.worldScale;
             };
             transform.prototype.getWorldRotate = function () {
-                if (this.dirtyWorldDecompose) {
+                if (this.needWorldDecompose) {
                     gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
+                    this.needWorldDecompose = false;
                 }
                 return this.worldRotate;
             };
             transform.prototype.getLocalMatrix = function () {
-                if (this.dirty)
-                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                this.refreshlocalMtx();
                 return this.localMatrix;
             };
             transform.prototype.getWorldMatrix = function () {
-                if (this.dirty) {
-                    if (!this.parent)
-                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
-                    else
-                        gd3d.math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
-                    return this.tempWorldMatrix;
-                }
-                else
-                    return this.worldMatrix;
+                this.refreshMtxs();
+                return this.worldMatrix;
             };
             transform.prototype.getForwardInWorld = function (out) {
                 var forward = gd3d.math.pool.new_vector3();
@@ -9419,44 +9442,37 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(up);
             };
             transform.prototype.setWorldMatrix = function (mat) {
-                this.dirty = true;
-                this.updateWorldTran();
                 var pworld = gd3d.math.pool.new_matrix();
-                if (this.parent != null) {
+                if (this.parent != null)
                     gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
-                }
-                else {
+                else
                     gd3d.math.matrixMakeIdentity(pworld);
-                }
                 var invparentworld = gd3d.math.pool.new_matrix();
                 gd3d.math.matrixInverse(pworld, invparentworld);
                 gd3d.math.matrixClone(mat, this.worldMatrix);
-                this.dirtyWorldDecompose = true;
                 gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
                 gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
-                this.markDirty();
+                this.needWorldDecompose = true;
                 gd3d.math.pool.delete_matrix(pworld);
                 gd3d.math.pool.delete_matrix(invparentworld);
             };
             transform.prototype.setWorldPosition = function (pos) {
-                if (gd3d.math.vec3Equal(pos, this.getWorldTranslate()))
-                    return;
-                this.updateWorldTran();
-                this.worldMatrix.rawData[12] = pos.x;
-                this.worldMatrix.rawData[13] = pos.y;
-                this.worldMatrix.rawData[14] = pos.z;
                 var newWpos = gd3d.math.pool.clone_vector3(pos);
                 var deltaV3 = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Subtract(newWpos, this.getWorldTranslate(), deltaV3);
                 gd3d.math.vec3Add(this.localTranslate, deltaV3, this.localTranslate);
                 gd3d.math.vec3Clone(newWpos, this.worldTranslate);
+                this.worldMatrix.rawData[12] = pos.x;
+                this.worldMatrix.rawData[13] = pos.y;
+                this.worldMatrix.rawData[14] = pos.z;
+                var localmtx = this.getLocalMatrix();
+                localmtx.rawData[12] = this.localTranslate.x;
+                localmtx.rawData[13] = this.localTranslate.y;
+                localmtx.rawData[14] = this.localTranslate.z;
                 gd3d.math.pool.delete_vector3(newWpos);
                 gd3d.math.pool.delete_vector3(deltaV3);
             };
             transform.prototype.setWorldRotate = function (rotate) {
-                if (gd3d.math.quatEqual(rotate, this.getWorldRotate()))
-                    return;
-                this.updateWorldTran();
                 var pworld = gd3d.math.pool.new_quaternion();
                 if (this.parent != null)
                     gd3d.math.quatClone(this.parent.getWorldRotate(), pworld);
@@ -9467,38 +9483,23 @@ var gd3d;
                 gd3d.math.quatMultiply(invparentworld, rotate, this.localRotate);
                 gd3d.math.quatClone(rotate, this.worldRotate);
                 gd3d.math.matrixMakeTransformRTS(this.getWorldTranslate(), this.worldScale, this.worldRotate, this.worldMatrix);
+                this._needremakeLocalMtx = true;
                 gd3d.math.pool.delete_quaternion(pworld);
                 gd3d.math.pool.delete_quaternion(invparentworld);
             };
             transform.prototype.lookat = function (trans) {
-                this.calcLookAt_(trans.getWorldTranslate());
+                this.calcLookAt(trans.getWorldTranslate());
             };
             transform.prototype.lookatPoint = function (point) {
-                this.calcLookAt_(point);
+                this.calcLookAt(point);
             };
-            transform.prototype.calcLookAt_ = function (point) {
-                this.updateWorldTran();
+            transform.prototype.calcLookAt = function (point) {
                 var pos = this.getWorldTranslate();
                 var target = point;
                 var newquat = gd3d.math.pool.new_quaternion();
                 gd3d.math.quatLookat(pos, target, newquat);
                 this.setWorldRotate(newquat);
                 gd3d.math.pool.delete_quaternion(newquat);
-            };
-            transform.prototype.calcLookAt = function (point) {
-                this.dirty = true;
-                this.updateWorldTran();
-                var p0 = this.getWorldTranslate();
-                var p1 = point;
-                var quatworld = gd3d.math.pool.new_quaternion();
-                var quat = gd3d.math.pool.new_quaternion();
-                gd3d.math.quatLookat(p0, p1, quatworld);
-                var quatworldCur = this.parent.getWorldRotate();
-                gd3d.math.quatInverse(quatworldCur, quat);
-                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
-                this.markDirty();
-                gd3d.math.pool.delete_quaternion(quatworld);
-                gd3d.math.pool.delete_quaternion(quat);
             };
             Object.defineProperty(transform.prototype, "gameObject", {
                 get: function () {
@@ -12304,6 +12305,8 @@ var gd3d;
                 if (this._playClip == null)
                     return;
                 this.checkFrameId(delta);
+                if (!this._playClip)
+                    return;
                 this.clipHasPlay = true;
                 this.mix = false;
                 if (this.crossdelta > 0) {

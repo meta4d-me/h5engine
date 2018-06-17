@@ -7623,6 +7623,71 @@ var test_pbr_scene = (function () {
     };
     return test_pbr_scene;
 }());
+var demo;
+(function (demo) {
+    var test_performance = (function () {
+        function test_performance() {
+            this.cubes = [];
+            this.count = 500;
+            this.all = 0;
+        }
+        test_performance.prototype.start = function (app) {
+            this.app = app;
+            this.scene = app.getScene();
+            this.assetMgr = this.app.getAssetMgr();
+        };
+        test_performance.prototype.tryadd = function () {
+            var max = 2000;
+            var maxcc = 0;
+            var cc = 0;
+            var temp;
+            while (maxcc < max) {
+                var tran = new gd3d.framework.transform();
+                if (!temp) {
+                    temp = tran;
+                    this.scene.addChild(tran);
+                }
+                else {
+                    temp.addChild(tran);
+                    cc++;
+                    if (cc >= 10) {
+                        cc = 0;
+                        temp = null;
+                    }
+                }
+                this.cubes.push(tran);
+                maxcc++;
+            }
+            this.all += max;
+        };
+        test_performance.prototype.update = function (delta) {
+            if (this.count * this.count > this.all) {
+                this.tryadd();
+            }
+            else {
+                console.error(" \u6240\u6709 trans \u52A0\u8F09\u5B8C\u7562  new  ");
+            }
+            var c = 0;
+            while (c < 1500) {
+                this.randome();
+                c++;
+            }
+        };
+        test_performance.prototype.randome = function () {
+            var idx = Math.floor(Math.random() * this.cubes.length);
+            var cube = this.cubes[idx];
+            cube.localTranslate.x += Math.random() * 10;
+            var temp = cube.getWorldTranslate();
+            temp.y += Math.random() * 10;
+            cube.setWorldPosition(temp);
+            cube.localEulerAngles.x = Math.random() * 10;
+            cube.localEulerAngles = cube.localEulerAngles;
+            cube.markDirty();
+        };
+        return test_performance;
+    }());
+    demo.test_performance = test_performance;
+})(demo || (demo = {}));
 var test_pick_boxcollider = (function () {
     function test_pick_boxcollider() {
         this.cubesize = 0.5;

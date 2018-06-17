@@ -991,6 +991,22 @@ declare class test_pbr_scene implements IState {
     timer: number;
     update(delta: number): void;
 }
+declare namespace demo {
+    class test_performance implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        assetMgr: gd3d.framework.assetMgr;
+        camera: gd3d.framework.camera;
+        camTran: gd3d.framework.transform;
+        start(app: gd3d.framework.application): void;
+        cubes: gd3d.framework.transform[];
+        count: number;
+        all: number;
+        tryadd(): void;
+        update(delta: number): void;
+        randome(): void;
+    }
+}
 declare var RVO: any;
 declare class test_pick_boxcollider implements IState {
     app: gd3d.framework.application;

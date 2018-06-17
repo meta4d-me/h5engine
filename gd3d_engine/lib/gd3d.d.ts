@@ -1470,6 +1470,14 @@ declare namespace gd3d.framework {
         markDirty(): void;
         markHaveComponent(): void;
         markHaveRendererComp(): void;
+        private helperLocalPos;
+        private helperLocalSca;
+        private helperLocalRot;
+        private _needremakeLocalMtx;
+        private readonly needremakeLocalMtx;
+        private refreshHelper();
+        private refreshlocalMtx();
+        private refreshMtxs(parentChange?);
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
         updateAABBChild(): void;
@@ -1479,7 +1487,7 @@ declare namespace gd3d.framework {
         hasComponentChild: boolean;
         hasRendererComp: boolean;
         hasRendererCompChild: boolean;
-        private dirtyWorldDecompose;
+        private needWorldDecompose;
         localRotate: math.quaternion;
         localTranslate: math.vector3;
         localPosition: math.vector3;
@@ -1495,7 +1503,6 @@ declare namespace gd3d.framework {
         getWorldScale(): math.vector3;
         getWorldRotate(): math.quaternion;
         getLocalMatrix(): math.matrix;
-        private tempWorldMatrix;
         getWorldMatrix(): math.matrix;
         getForwardInWorld(out: math.vector3): void;
         getRightInWorld(out: math.vector3): void;
@@ -1505,7 +1512,6 @@ declare namespace gd3d.framework {
         setWorldRotate(rotate: math.quaternion): void;
         lookat(trans: transform): void;
         lookatPoint(point: math.vector3): void;
-        private calcLookAt_(point);
         private calcLookAt(point);
         private _gameObject;
         readonly gameObject: gameObject;
