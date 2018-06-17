@@ -18456,7 +18456,6 @@ var gd3d;
         framework.pointinfo = pointinfo;
         var inputMgr = (function () {
             function inputMgr(app) {
-                var _this = this;
                 this._element = null;
                 this._buttons = [false, false, false];
                 this._lastbuttons = [false, false, false];
@@ -18497,100 +18496,7 @@ var gd3d;
                 this.handlers.push(["keyup", this._keyup.bind(this)]);
                 this.handlers.push(["blur", this._blur.bind(this)]);
                 this.attach(app.webgl.canvas);
-                var test = true;
-                if (test)
-                    return;
-                app.webgl.canvas.addEventListener("touchstart", function (ev) {
-                    _this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
-                    _this._point.touch = true;
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = true;
-                        _this._touches[id].x = touch.clientX;
-                        _this._touches[id].y = touch.clientY;
-                    }
-                });
-                app.webgl.canvas.addEventListener("touchmove", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = true;
-                        _this._touches[id].x = touch.clientX;
-                        _this._touches[id].y = touch.clientY;
-                    }
-                    var count = 0;
-                    var x = 0;
-                    var y = 0;
-                    for (var key in _this._touches) {
-                        if (_this._touches[key].touch == true) {
-                            x += _this._touches[key].x;
-                            y += _this._touches[key].y;
-                            count++;
-                        }
-                    }
-                    _this.CalcuPoint(x / count, y / count);
-                });
-                app.webgl.canvas.addEventListener("touchend", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = false;
-                    }
-                    for (var key in _this._touches) {
-                        if (_this._touches[key].touch == true)
-                            return;
-                    }
-                    _this._point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = false;
-                    }
-                    for (var key in _this._touches) {
-                        if (_this._touches[key].touch == true)
-                            return;
-                    }
-                    _this._point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                    _this._point.touch = true;
-                });
-                app.webgl.canvas.addEventListener("mouseup", function (ev) {
-                    _this._point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                });
-                app.webgl.canvas.addEventListener("keydown", function (ev) {
-                    _this.hasKeyDown = _this.keyboardMap[ev.keyCode] = true;
-                }, false);
-                app.webgl.canvas.addEventListener("keyup", function (ev) {
-                    delete _this.keyboardMap[ev.keyCode];
-                    _this.hasKeyUp = true;
-                }, false);
-                app.webgl.canvas.addEventListener("blur", function (ev) {
-                    _this._point.touch = false;
-                }, false);
+                this.disableContextMenu();
             }
             Object.defineProperty(inputMgr.prototype, "wheel", {
                 get: function () { return this._wheel; },

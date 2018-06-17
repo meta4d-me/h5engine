@@ -165,7 +165,7 @@ declare class test_loadAsiprefab implements IState {
     scene: gd3d.framework.scene;
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
-    baihu: gd3d.framework.transform;
+    trans: gd3d.framework.transform;
     timer: number;
     update(delta: number): void;
 }
@@ -1472,6 +1472,42 @@ declare class test_effecteditor implements IState {
     bestop: boolean;
     bereplay: boolean;
     update(delta: number): void;
+}
+declare namespace gd3d.framework {
+    class HoverCameraScript extends gd3d.framework.behaviour {
+        lookAtPoint: gd3d.math.vector3;
+        lookAtTarget: gd3d.framework.transform;
+        distance: number;
+        minPanAngle: number;
+        maxPanAngle: number;
+        minTileAngle: number;
+        maxTileAngle: number;
+        scaleSpeed: number;
+        private inputMgr;
+        private _lastMouseX;
+        private _lastMouseY;
+        private _mouseDown;
+        private _lastTouchX;
+        private _lastTouchY;
+        private _fingerTwo;
+        private _lastDistance;
+        private _panAngle;
+        private _panRad;
+        panAngle: number;
+        private _tiltAngle;
+        private _tiltRad;
+        tiltAngle: number;
+        onPlay(): void;
+        start(): void;
+        private cupTargetV3;
+        update(delta: number): void;
+        private onPointDown();
+        private onPointUp();
+        private onPointMove();
+        private onWheel();
+        private onTouch();
+        remove(): void;
+    }
 }
 declare class UseAniplayClipDemo implements IState {
     app: gd3d.framework.application;

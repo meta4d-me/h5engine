@@ -20,15 +20,15 @@ class test_loadAsiprefab implements IState
                         {
                             var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName("0001_archangel@idle_none.prefab.json") as gd3d.framework.prefab;
                             
-                            this.baihu = _prefab.getCloneTrans();
-                            this.scene.addChild(this.baihu);
+                            this.trans = _prefab.getCloneTrans();
+                            this.scene.addChild(this.trans);
                             // this.baihu.localScale = new gd3d.math.vector3(20, 20, 20);
                             // this.baihu.localTranslate = new gd3d.math.vector3(2, 0, 0);
 
                             // this.baihu = _prefab.getCloneTrans();
                             // this.scene.addChild(this.baihu);
-                            var test=this.baihu;
-                            objCam.lookat(this.baihu);
+                            var test=this.trans;
+                            objCam.lookat(this.trans);
                             objCam.markDirty();
 
                             // var tex=this.app.getAssetMgr().getAssetByName("0001_archangel.imgdesc.json")as gd3d.framework.texture;
@@ -55,7 +55,7 @@ class test_loadAsiprefab implements IState
 
 
         //添加一个摄像机
-        var objCam = new gd3d.framework.transform();
+        let objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
@@ -63,10 +63,19 @@ class test_loadAsiprefab implements IState
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 5, 5);
         objCam.markDirty();//标记为需要刷新
+        let hov = objCam.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
+        hov.lookAtTarget = this.trans;
+        hov.panAngle = 180;
+        hov.tiltAngle = -10;
+        hov.distance = 8;
+        hov.scaleSpeed = 0.1;
+        hov.lookAtPoint.x = 0;
+        hov.lookAtPoint.y = 2.5;
+        hov.lookAtPoint.z = 0;
 
     }
     camera: gd3d.framework.camera;
-    baihu: gd3d.framework.transform;
+    trans: gd3d.framework.transform;
     timer: number = 0;
     update(delta: number)
     {
