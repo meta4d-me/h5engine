@@ -59,7 +59,7 @@ namespace demo
             }
 
             let c =0;
-            while(c< 1500){
+            while(c< 1000){
                 this.randome();
                 c++;
             }

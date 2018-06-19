@@ -1147,6 +1147,7 @@ var main = (function () {
         this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
+        this.addBtn("trans性能测试", function () { return new demo.test_performance(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -7680,7 +7681,7 @@ var demo;
                 console.error(" \u6240\u6709 trans \u52A0\u8F09\u5B8C\u7562  new  ");
             }
             var c = 0;
-            while (c < 1500) {
+            while (c < 1000) {
                 this.randome();
                 c++;
             }
