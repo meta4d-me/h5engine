@@ -490,6 +490,15 @@ namespace gd3d.framework
             }
         }
 
+        //刷新 worldRTS
+        private refreshWorldRTS(){
+            this.refreshMtxs();
+            if(this.needWorldDecompose){
+                math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                this.needWorldDecompose = false;
+            }
+        }
+
         /**
          * @public
          * @language zh_CN
@@ -680,12 +689,7 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if (this.needWorldDecompose)
-            {
-                math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.needWorldDecompose = false;
-            }
-            //math.vec3Format(this.worldTranslate, 4, this.worldTranslate);
+            this.refreshWorldRTS();
             return this.worldTranslate;
         }
         /**
@@ -697,12 +701,7 @@ namespace gd3d.framework
          */
         getWorldScale()
         {
-            if (this.needWorldDecompose)
-            {
-                math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.needWorldDecompose = false;
-            }
-            //math.vec3Format(this.worldScale, 4, this.worldScale);
+            this.refreshWorldRTS();
             return this.worldScale;
         }
         /**
@@ -714,12 +713,7 @@ namespace gd3d.framework
          */
         getWorldRotate()
         {
-            if (this.needWorldDecompose)
-            {
-                math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                this.needWorldDecompose = false;
-            }
-            //math.quaternionFormat(this.worldRotate, 4, this.worldRotate);
+            this.refreshWorldRTS();
             return this.worldRotate;
         }
         /**

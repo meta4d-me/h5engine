@@ -1478,6 +1478,7 @@ declare namespace gd3d.framework {
         private refreshHelper();
         private refreshlocalMtx();
         private refreshMtxs(parentChange?);
+        private refreshWorldRTS();
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
         updateAABBChild(): void;

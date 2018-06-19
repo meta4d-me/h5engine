@@ -1147,7 +1147,6 @@ var main = (function () {
         this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
-        this.addBtn("trans性能测试", function () { return new demo.test_performance(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;

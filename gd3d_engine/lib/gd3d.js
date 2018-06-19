@@ -9324,6 +9324,13 @@ var gd3d;
                     this.markAABBDirty();
                 }
             };
+            transform.prototype.refreshWorldRTS = function () {
+                this.refreshMtxs();
+                if (this.needWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.needWorldDecompose = false;
+                }
+            };
             transform.prototype.updateTran = function (parentChange) {
                 if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                     return;
@@ -9386,24 +9393,15 @@ var gd3d;
                 configurable: true
             });
             transform.prototype.getWorldTranslate = function () {
-                if (this.needWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.needWorldDecompose = false;
-                }
+                this.refreshWorldRTS();
                 return this.worldTranslate;
             };
             transform.prototype.getWorldScale = function () {
-                if (this.needWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.needWorldDecompose = false;
-                }
+                this.refreshWorldRTS();
                 return this.worldScale;
             };
             transform.prototype.getWorldRotate = function () {
-                if (this.needWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.needWorldDecompose = false;
-                }
+                this.refreshWorldRTS();
                 return this.worldRotate;
             };
             transform.prototype.getLocalMatrix = function () {
