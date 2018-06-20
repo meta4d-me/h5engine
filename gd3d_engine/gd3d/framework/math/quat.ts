@@ -61,7 +61,7 @@
         out.rawData[3]=src.rawData[3];
     }
 
-    export function quatEqual(quat:quaternion,quat2:quaternion,threshold = 0.00001){
+    export function quatEqual(quat:quaternion,quat2:quaternion,threshold = 0.000001){
         if (Math.abs(quat.x - quat2.x) > threshold)
         return false;
         if (Math.abs(quat.y - quat2.y) > threshold)
@@ -277,9 +277,9 @@
         //dir在xz面上的投影
         var dirxz1 = pool.new_vector3(dir.x, 0, dir.z);
         let v3length = math.vec3Length(dirxz1);
-        if (v3length > 0.999)
+        if (v3length > 0.9999999999)
             v3length = 1;
-        if (v3length < -0.999)
+        if (v3length < -0.9999999999)
             v3length = -1;
         var pitch = Math.acos(v3length);// / Math.PI * 180;
         if (dir.y > 0) {

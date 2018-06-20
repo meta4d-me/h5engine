@@ -294,12 +294,12 @@ var gd3d;
                         }
                     }
                     else {
+                        if (this._inputmgr)
+                            this._inputmgr.update(delta);
                         this.updateUserCode(delta);
                     }
                 }
                 this.updateEditorCode(delta);
-                if (this._inputmgr)
-                    this._inputmgr.update(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
@@ -9064,13 +9064,17 @@ var gd3d;
                 this.aabbdirty = true;
                 this.aabbchilddirty = true;
                 this.aabbchild = new gd3d.framework.aabb(gd3d.math.pool.vector3_zero, gd3d.math.pool.vector3_zero);
+                this.helperLocalPos = new gd3d.math.vector3();
+                this.helperLocalSca = new gd3d.math.vector3();
+                this.helperLocalRot = new gd3d.math.quaternion();
+                this._needremakeLocalMtx = true;
                 this.dirty = true;
                 this.dirtyChild = true;
                 this.hasComponent = false;
                 this.hasComponentChild = false;
                 this.hasRendererComp = false;
                 this.hasRendererCompChild = false;
-                this.dirtyWorldDecompose = false;
+                this.needWorldDecompose = true;
                 this.localRotate = new gd3d.math.quaternion();
                 this.localTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.localScale = new gd3d.math.vector3(1, 1, 1);
@@ -9080,7 +9084,6 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
-                this.tempWorldMatrix = new gd3d.math.matrix();
                 this._beDispose = false;
             }
             Object.defineProperty(transform.prototype, "scene", {
@@ -9282,22 +9285,57 @@ var gd3d;
                     p = p.parent;
                 }
             };
+            Object.defineProperty(transform.prototype, "needremakeLocalMtx", {
+                get: function () {
+                    if (!this._needremakeLocalMtx) {
+                        if (!gd3d.math.vec3Equal(this.localTranslate, this.helperLocalPos, Number.MIN_VALUE))
+                            this._needremakeLocalMtx = true;
+                        else if (!gd3d.math.vec3Equal(this.localScale, this.helperLocalSca, Number.MIN_VALUE))
+                            this._needremakeLocalMtx = true;
+                        else if (!gd3d.math.quatEqual(this.localRotate, this.helperLocalRot, Number.MIN_VALUE))
+                            this._needremakeLocalMtx = true;
+                    }
+                    return this._needremakeLocalMtx;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            transform.prototype.refreshHelper = function () {
+                gd3d.math.vec3Clone(this.localTranslate, this.helperLocalPos);
+                gd3d.math.vec3Clone(this.helperLocalSca, this.helperLocalSca);
+                gd3d.math.quatClone(this.localRotate, this.helperLocalRot);
+            };
+            transform.prototype.refreshlocalMtx = function () {
+                if (this.needremakeLocalMtx) {
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                    this.refreshHelper();
+                    this._needremakeLocalMtx = false;
+                }
+            };
+            transform.prototype.refreshMtxs = function (parentChange) {
+                if (parentChange === void 0) { parentChange = false; }
+                this.refreshlocalMtx();
+                if (parentChange || this.needremakeLocalMtx) {
+                    if (!this.parent)
+                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
+                    else
+                        gd3d.math.matrixMultiply(this.parent.getWorldMatrix(), this.localMatrix, this.worldMatrix);
+                    this.needWorldDecompose = true;
+                    this.markAABBDirty();
+                }
+            };
+            transform.prototype.refreshWorldRTS = function () {
+                this.refreshMtxs();
+                if (this.needWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.needWorldDecompose = false;
+                }
+            };
             transform.prototype.updateTran = function (parentChange) {
                 if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                     return;
-                if (this.dirty) {
-                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
-                }
-                if (this.dirty || parentChange) {
-                    if (this.parent == null) {
-                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
-                    }
-                    else {
-                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
-                    }
-                    this.dirtyWorldDecompose = true;
-                    this.markAABBDirty();
-                }
+                this.refreshHelper();
+                this.refreshMtxs();
                 if (this.children != null) {
                     for (var i = 0; i < this.children.length; i++) {
                         this.children[i].updateTran(parentChange || this.dirty);
@@ -9355,41 +9393,24 @@ var gd3d;
                 configurable: true
             });
             transform.prototype.getWorldTranslate = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
+                this.refreshWorldRTS();
                 return this.worldTranslate;
             };
             transform.prototype.getWorldScale = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
+                this.refreshWorldRTS();
                 return this.worldScale;
             };
             transform.prototype.getWorldRotate = function () {
-                if (this.dirtyWorldDecompose) {
-                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    this.dirtyWorldDecompose = false;
-                }
+                this.refreshWorldRTS();
                 return this.worldRotate;
             };
             transform.prototype.getLocalMatrix = function () {
-                if (this.dirty)
-                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                this.refreshlocalMtx();
                 return this.localMatrix;
             };
             transform.prototype.getWorldMatrix = function () {
-                if (this.dirty) {
-                    if (!this.parent)
-                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
-                    else
-                        gd3d.math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
-                    return this.tempWorldMatrix;
-                }
-                else
-                    return this.worldMatrix;
+                this.refreshMtxs();
+                return this.worldMatrix;
             };
             transform.prototype.getForwardInWorld = function (out) {
                 var forward = gd3d.math.pool.new_vector3();
@@ -9419,81 +9440,64 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(up);
             };
             transform.prototype.setWorldMatrix = function (mat) {
-                this.dirty = true;
-                this.updateWorldTran();
                 var pworld = gd3d.math.pool.new_matrix();
-                if (this.parent != null) {
+                if (this.parent != null)
                     gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
-                }
-                else {
+                else
                     gd3d.math.matrixMakeIdentity(pworld);
-                }
                 var invparentworld = gd3d.math.pool.new_matrix();
                 gd3d.math.matrixInverse(pworld, invparentworld);
                 gd3d.math.matrixClone(mat, this.worldMatrix);
-                this.dirtyWorldDecompose = true;
                 gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
                 gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
-                this.markDirty();
+                this.needWorldDecompose = true;
                 gd3d.math.pool.delete_matrix(pworld);
                 gd3d.math.pool.delete_matrix(invparentworld);
             };
             transform.prototype.setWorldPosition = function (pos) {
-                this.dirty = true;
-                this.updateWorldTran();
-                var pworld = gd3d.math.pool.new_matrix();
-                if (this.parent != null) {
-                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
-                }
-                else {
-                    gd3d.math.matrixMakeIdentity(pworld);
-                }
-                var invparentworld = gd3d.math.pool.new_matrix();
-                gd3d.math.matrixInverse(pworld, invparentworld);
+                var newWpos = gd3d.math.pool.clone_vector3(pos);
+                var deltaV3 = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(newWpos, this.getWorldTranslate(), deltaV3);
+                gd3d.math.vec3Add(this.localTranslate, deltaV3, this.localTranslate);
+                gd3d.math.vec3Clone(newWpos, this.worldTranslate);
                 this.worldMatrix.rawData[12] = pos.x;
                 this.worldMatrix.rawData[13] = pos.y;
                 this.worldMatrix.rawData[14] = pos.z;
-                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
-                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
-                this.markDirty();
-                gd3d.math.pool.delete_matrix(pworld);
-                gd3d.math.pool.delete_matrix(invparentworld);
+                var localmtx = this.getLocalMatrix();
+                localmtx.rawData[12] = this.localTranslate.x;
+                localmtx.rawData[13] = this.localTranslate.y;
+                localmtx.rawData[14] = this.localTranslate.z;
+                gd3d.math.pool.delete_vector3(newWpos);
+                gd3d.math.pool.delete_vector3(deltaV3);
+            };
+            transform.prototype.setWorldRotate = function (rotate) {
+                var pworld = gd3d.math.pool.new_quaternion();
+                if (this.parent != null)
+                    gd3d.math.quatClone(this.parent.getWorldRotate(), pworld);
+                else
+                    gd3d.math.quatIdentity(pworld);
+                var invparentworld = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatInverse(pworld, invparentworld);
+                gd3d.math.quatMultiply(invparentworld, rotate, this.localRotate);
+                gd3d.math.quatClone(rotate, this.worldRotate);
+                gd3d.math.matrixMakeTransformRTS(this.getWorldTranslate(), this.worldScale, this.worldRotate, this.worldMatrix);
+                this._needremakeLocalMtx = true;
+                gd3d.math.pool.delete_quaternion(pworld);
+                gd3d.math.pool.delete_quaternion(invparentworld);
             };
             transform.prototype.lookat = function (trans) {
-                this.dirty = true;
-                trans.updateWorldTran();
-                this.updateWorldTran();
-                var p0 = this.getWorldTranslate();
-                var p1 = trans.getWorldTranslate();
-                var d = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(p1, p0, d);
-                var quatworld = gd3d.math.pool.new_quaternion();
-                var quat = gd3d.math.pool.new_quaternion();
-                gd3d.math.quatLookat(p0, p1, quatworld);
-                var quatworldCur = this.parent.getWorldRotate();
-                gd3d.math.quatInverse(quatworldCur, quat);
-                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
-                gd3d.math.pool.delete_vector3(d);
-                gd3d.math.pool.delete_quaternion(quatworld);
-                gd3d.math.pool.delete_quaternion(quat);
+                this.calcLookAt(trans.getWorldTranslate());
             };
             transform.prototype.lookatPoint = function (point) {
-                this.dirty = true;
-                this.updateWorldTran();
-                var p0 = this.getWorldTranslate();
-                var p1 = point;
-                var d = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Subtract(p1, p0, d);
-                var quatworld = gd3d.math.pool.new_quaternion();
-                var quat = gd3d.math.pool.new_quaternion();
-                gd3d.math.quatLookat(p0, p1, quatworld);
-                var quatworldCur = this.parent.getWorldRotate();
-                gd3d.math.quatInverse(quatworldCur, quat);
-                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
-                this.markDirty();
-                gd3d.math.pool.delete_vector3(d);
-                gd3d.math.pool.delete_quaternion(quatworld);
-                gd3d.math.pool.delete_quaternion(quat);
+                this.calcLookAt(point);
+            };
+            transform.prototype.calcLookAt = function (point) {
+                var pos = this.getWorldTranslate();
+                var target = point;
+                var newquat = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatLookat(pos, target, newquat);
+                this.setWorldRotate(newquat);
+                gd3d.math.pool.delete_quaternion(newquat);
             };
             Object.defineProperty(transform.prototype, "gameObject", {
                 get: function () {
@@ -11002,6 +11006,7 @@ var gd3d;
                 if (assetName === void 0) { assetName = null; }
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this.updateByEffect = false;
                 this.submesh = [];
                 if (!assetName) {
                     assetName = "mesh_" + this.getGUID();
@@ -11222,8 +11227,11 @@ var gd3d;
         framework.mesh = mesh;
         var subMeshInfo = (function () {
             function subMeshInfo() {
+                this.matIndex = 0;
                 this.useVertexIndex = 0;
                 this.line = false;
+                this.start = 0;
+                this.size = 0;
             }
             return subMeshInfo;
         }());
@@ -12295,6 +12303,8 @@ var gd3d;
                 if (this._playClip == null)
                     return;
                 this.checkFrameId(delta);
+                if (!this._playClip)
+                    return;
                 this.clipHasPlay = true;
                 this.mix = false;
                 if (this.crossdelta > 0) {
@@ -16892,12 +16902,13 @@ var gd3d;
                 this.type = framework.F14TypeEnum.particlesType;
                 this.effect = effect;
                 this.emission = element;
-                this.mesh = this.emission.baseddata.mesh;
+                var datamesh = this.emission.baseddata.mesh;
+                this.mesh = new framework.mesh();
                 this.mat = this.emission.baseddata.material;
                 this.vertexLength = gd3d.render.meshData.calcByteSize(this.effect.VF) / 4;
                 var maxParticlesCount = this.getMaxParticleCount();
-                var particleVertexCount = this.mesh.data.pos.length;
-                var particleIndexCount = this.mesh.data.trisindex.length;
+                var particleVertexCount = datamesh.data.pos.length;
+                var particleIndexCount = datamesh.data.trisindex.length;
                 var totalVertex = maxParticlesCount * particleVertexCount;
                 var totalIndex = maxParticlesCount * particleIndexCount;
                 this.dataForVbo = new Float32Array(totalVertex * this.vertexLength);
@@ -17610,6 +17621,7 @@ var gd3d;
                 gd3d.math.vec3Clone(this.baseddata.position, this.position);
                 gd3d.math.vec3Clone(this.baseddata.scale, this.scale);
                 gd3d.math.vec3Clone(this.baseddata.euler, this.euler);
+                gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.localRotate);
                 gd3d.math.colorClone(this.baseddata.color, this.color);
                 gd3d.math.vec4Clone(this.baseddata.tex_ST, this.tex_ST);
             };
@@ -17739,12 +17751,16 @@ var gd3d;
                 this.ElementMat.setQueue(Effqueue);
                 if (this.noBatch) {
                     gd3d.math.matrixMultiply(this.effect.mvpMat, this.activemeshlist[0].targetMat, context.matrixModelViewProject);
-                    if (!this.uploadData) {
-                        this.dataForVbo = this.activemeshlist[0].baseddata.mesh.data.genVertexDataArray(this.effect.VF);
-                        this.dataForEbo = this.activemeshlist[0].baseddata.mesh.data.genIndexDataArray();
-                        this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
-                        this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
-                        this.mesh.submesh[0].size = this.dataForEbo.length;
+                    var singlemesh = this.activemeshlist[0].baseddata.mesh;
+                    if (singlemesh.updateByEffect == false) {
+                        var newglmesh = new gd3d.render.glMesh();
+                        newglmesh.initBuffer(this.effect.webgl, this.effect.VF, singlemesh.data.pos.length, gd3d.render.MeshTypeEnum.Static);
+                        newglmesh.uploadVertexData(this.effect.webgl, this.activemeshlist[0].dataforvbo);
+                        newglmesh.ebos = singlemesh.glMesh.ebos;
+                        newglmesh.indexCounts = singlemesh.glMesh.indexCounts;
+                        singlemesh.glMesh = newglmesh;
+                        singlemesh.submesh[0].size = this.activemeshlist[0].dataforebo.length;
+                        singlemesh.updateByEffect = true;
                     }
                     this.temptColorv4.x = this.activemeshlist[0].color.r;
                     this.temptColorv4.y = this.activemeshlist[0].color.g;
@@ -17752,7 +17768,8 @@ var gd3d;
                     this.temptColorv4.w = this.activemeshlist[0].color.a;
                     this.ElementMat.setVector4("_Main_Color", this.temptColorv4);
                     this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
-                    this.ElementMat.draw(context, this.mesh, this.mesh.submesh[0]);
+                    singlemesh.glMesh.bindVboBuffer(context.webgl);
+                    this.ElementMat.draw(context, singlemesh, singlemesh.submesh[0]);
                 }
                 else {
                     gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
@@ -18033,6 +18050,7 @@ var gd3d;
             PointEventEnum[PointEventEnum["PointUp"] = 2] = "PointUp";
             PointEventEnum[PointEventEnum["PointMove"] = 3] = "PointMove";
             PointEventEnum[PointEventEnum["PointClick"] = 4] = "PointClick";
+            PointEventEnum[PointEventEnum["MouseWheel"] = 5] = "MouseWheel";
         })(PointEventEnum = event.PointEventEnum || (event.PointEventEnum = {}));
         var KeyEventEnum;
         (function (KeyEventEnum) {
@@ -18436,12 +18454,16 @@ var gd3d;
         framework.pointinfo = pointinfo;
         var inputMgr = (function () {
             function inputMgr(app) {
-                var _this = this;
+                this._element = null;
+                this._buttons = [false, false, false];
+                this._lastbuttons = [false, false, false];
                 this.eventer = new gd3d.event.InputEvent();
                 this.inputlast = null;
+                this.keyboardMap = {};
+                this.handlers = [];
+                this._wheel = 0;
                 this._point = new pointinfo();
                 this._touches = {};
-                this.keyboardMap = {};
                 this.rMtr_90 = new gd3d.math.matrix3x2();
                 this.rMtr_n90 = new gd3d.math.matrix3x2();
                 this.moveTolerance = 2;
@@ -18453,101 +18475,33 @@ var gd3d;
                 this.lastPoint = new gd3d.math.vector2();
                 this.hasKeyDown = false;
                 this.hasKeyUp = false;
+                this.hasWheel = false;
+                this.lastWheel = 0;
+                this._contextMenu = function (ev) { ev.preventDefault(); };
                 this.app = app;
                 gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
                 gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
-                app.webgl.canvas.addEventListener("touchstart", function (ev) {
-                    _this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
-                    _this._point.touch = true;
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = true;
-                        _this._touches[id].x = touch.clientX;
-                        _this._touches[id].y = touch.clientY;
-                    }
-                });
-                app.webgl.canvas.addEventListener("touchmove", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = true;
-                        _this._touches[id].x = touch.clientX;
-                        _this._touches[id].y = touch.clientY;
-                    }
-                    var count = 0;
-                    var x = 0;
-                    var y = 0;
-                    for (var key in _this._touches) {
-                        if (_this._touches[key].touch == true) {
-                            x += _this._touches[key].x;
-                            y += _this._touches[key].y;
-                            count++;
-                        }
-                    }
-                    _this.CalcuPoint(x / count, y / count);
-                });
-                app.webgl.canvas.addEventListener("touchend", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = false;
-                    }
-                    for (var key in _this._touches) {
-                        if (_this._touches[key].touch == true)
-                            return;
-                    }
-                    _this._point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("touchcancel", function (ev) {
-                    for (var i = 0; i < ev.changedTouches.length; i++) {
-                        var touch = ev.changedTouches[i];
-                        var id = touch.identifier;
-                        if (_this._touches[id] == null) {
-                            _this._touches[id] = new pointinfo();
-                            _this._touches[id].id = id;
-                        }
-                        _this._touches[id].touch = false;
-                    }
-                    for (var key in _this._touches) {
-                        if (_this._touches[key].touch == true)
-                            return;
-                    }
-                    _this._point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousedown", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                    _this._point.touch = true;
-                });
-                app.webgl.canvas.addEventListener("mouseup", function (ev) {
-                    _this._point.touch = false;
-                });
-                app.webgl.canvas.addEventListener("mousemove", function (ev) {
-                    _this.CalcuPoint(ev.offsetX, ev.offsetY);
-                });
-                app.webgl.canvas.addEventListener("keydown", function (ev) {
-                    _this.hasKeyDown = _this.keyboardMap[ev.keyCode] = true;
-                }, false);
-                app.webgl.canvas.addEventListener("keyup", function (ev) {
-                    delete _this.keyboardMap[ev.keyCode];
-                    _this.hasKeyUp = true;
-                }, false);
-                app.webgl.canvas.addEventListener("blur", function (ev) {
-                    _this._point.touch = false;
-                }, false);
+                this.handlers.push(["touchstart", this._touchstart.bind(this)]);
+                this.handlers.push(["touchmove", this._touchmove.bind(this)]);
+                this.handlers.push(["touchend", this._touchend.bind(this)]);
+                this.handlers.push(["touchcancel", this._touchcancel.bind(this)]);
+                this.handlers.push(["mousedown", this._mousedown.bind(this)]);
+                this.handlers.push(["mouseup", this._mouseup.bind(this)]);
+                this.handlers.push(["mousemove", this._mousemove.bind(this)]);
+                this.handlers.push(["mousewheel", this._mousewheel.bind(this)]);
+                this.handlers.push(["DOMMouseScroll", this._mousewheel.bind(this)]);
+                this.handlers.push(["keydown", this._keydown.bind(this)]);
+                this.handlers.push(["keyup", this._keyup.bind(this)]);
+                this.handlers.push(["blur", this._blur.bind(this)]);
+                this.attach(app.webgl.canvas);
+                this.disableContextMenu();
             }
+            Object.defineProperty(inputMgr.prototype, "wheel", {
+                get: function () { return this._wheel; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             Object.defineProperty(inputMgr.prototype, "point", {
                 get: function () { return this._point; },
                 enumerable: true,
@@ -18560,7 +18514,138 @@ var gd3d;
                 configurable: true
             });
             ;
+            inputMgr.prototype.attach = function (element) {
+                var _this = this;
+                if (this._element) {
+                    this.detach();
+                }
+                this._element = element;
+                this.handlers.forEach(function (handler) {
+                    if (handler)
+                        _this._element.addEventListener(handler[0], handler[1], false);
+                });
+            };
+            inputMgr.prototype.detach = function () {
+                var _this = this;
+                if (!this._element)
+                    return;
+                this.handlers.forEach(function (handler) {
+                    if (handler)
+                        _this._element.removeEventListener(handler[0], handler[1], false);
+                });
+                this._element = null;
+            };
+            inputMgr.prototype._mousedown = function (ev) {
+                this.CalcuPoint(ev.offsetX, ev.offsetY);
+                this._buttons[ev.button] = true;
+                this._point.touch = true;
+            };
+            inputMgr.prototype._mouseup = function (ev) {
+                this._buttons[ev.button] = false;
+                this._point.touch = false;
+            };
+            inputMgr.prototype._mousemove = function (ev) {
+                this.CalcuPoint(ev.offsetX, ev.offsetY);
+            };
+            inputMgr.prototype._mousewheel = function (ev) {
+                this.hasWheel = true;
+                if (ev.detail) {
+                    this.lastWheel = -1 * ev.detail;
+                }
+                else if (ev.wheelDelta) {
+                    this.lastWheel = ev.wheelDelta / 120;
+                }
+                else {
+                    this.lastWheel = 0;
+                }
+            };
+            inputMgr.prototype._touchstart = function (ev) {
+                this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
+                this._point.touch = true;
+                for (var i = 0; i < ev.changedTouches.length; i++) {
+                    var touch = ev.changedTouches[i];
+                    var id = touch.identifier;
+                    if (this._touches[id] == null) {
+                        this._touches[id] = new pointinfo();
+                        this._touches[id].id = id;
+                    }
+                    this._touches[id].touch = true;
+                    this._touches[id].x = touch.clientX;
+                    this._touches[id].y = touch.clientY;
+                }
+            };
+            inputMgr.prototype._touchmove = function (ev) {
+                for (var i = 0; i < ev.changedTouches.length; i++) {
+                    var touch = ev.changedTouches[i];
+                    var id = touch.identifier;
+                    if (this._touches[id] == null) {
+                        this._touches[id] = new pointinfo();
+                        this._touches[id].id = id;
+                    }
+                    this._touches[id].touch = true;
+                    this._touches[id].x = touch.clientX;
+                    this._touches[id].y = touch.clientY;
+                }
+                var count = 0;
+                var x = 0;
+                var y = 0;
+                for (var key in this._touches) {
+                    if (this._touches[key].touch == true) {
+                        x += this._touches[key].x;
+                        y += this._touches[key].y;
+                        count++;
+                    }
+                }
+                this.CalcuPoint(x / count, y / count);
+            };
+            inputMgr.prototype._touchend = function (ev) {
+                for (var i = 0; i < ev.changedTouches.length; i++) {
+                    var touch = ev.changedTouches[i];
+                    var id = touch.identifier;
+                    if (this._touches[id] == null) {
+                        this._touches[id] = new pointinfo();
+                        this._touches[id].id = id;
+                    }
+                    this._touches[id].touch = false;
+                }
+                for (var key in this._touches) {
+                    if (this._touches[key].touch == true)
+                        return;
+                }
+                this._point.touch = false;
+            };
+            inputMgr.prototype._touchcancel = function (ev) {
+                for (var i = 0; i < ev.changedTouches.length; i++) {
+                    var touch = ev.changedTouches[i];
+                    var id = touch.identifier;
+                    if (this._touches[id] == null) {
+                        this._touches[id] = new pointinfo();
+                        this._touches[id].id = id;
+                    }
+                    this._touches[id].touch = false;
+                }
+                for (var key in this._touches) {
+                    if (this._touches[key].touch == true)
+                        return;
+                }
+                this._point.touch = false;
+            };
+            inputMgr.prototype._keydown = function (ev) {
+                this.hasKeyDown = this.keyboardMap[ev.keyCode] = true;
+            };
+            inputMgr.prototype._keyup = function (ev) {
+                delete this.keyboardMap[ev.keyCode];
+                this.hasKeyUp = true;
+            };
+            inputMgr.prototype._blur = function (ev) {
+                this._point.touch = false;
+            };
             inputMgr.prototype.update = function (delta) {
+                this._lastbuttons[0] = this._buttons[0];
+                this._lastbuttons[1] = this._buttons[1];
+                this._lastbuttons[2] = this._buttons[2];
+                this._wheel = 0;
+                this.mouseWheelCk();
                 this.pointCk();
                 this.keyCodeCk();
             };
@@ -18599,6 +18684,30 @@ var gd3d;
                 if (this.hasKeyUp)
                     this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyUp, null);
                 this.hasKeyDown = this.hasKeyUp = false;
+            };
+            inputMgr.prototype.mouseWheelCk = function () {
+                if (this.hasWheel) {
+                    this._wheel = this.lastWheel;
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.MouseWheel, null);
+                }
+                this.hasWheel = false;
+                this.lastWheel = 0;
+            };
+            inputMgr.prototype.isPressed = function (button) {
+                return this._buttons[button];
+            };
+            inputMgr.prototype.wasPressed = function (button) {
+                return (this._buttons[button] && !this._lastbuttons[button]);
+            };
+            inputMgr.prototype.disableContextMenu = function () {
+                if (!this._element)
+                    return;
+                this._element.addEventListener("contextmenu", this._contextMenu);
+            };
+            inputMgr.prototype.enableContextMenu = function () {
+                if (!this._element)
+                    return;
+                this._element.removeEventListener("contextmenu", this._contextMenu);
             };
             inputMgr.prototype.addPointListener = function (eventEnum, func, thisArg) {
                 this.eventer.OnEnum_point(eventEnum, func, thisArg);
@@ -20862,7 +20971,10 @@ var gd3d;
         }
         math.scaleToRef = scaleToRef;
         function colorClone(src, out) {
-            out.rawData.set(src.rawData);
+            out.rawData[0] = src.rawData[0];
+            out.rawData[1] = src.rawData[1];
+            out.rawData[2] = src.rawData[2];
+            out.rawData[3] = src.rawData[3];
         }
         math.colorClone = colorClone;
         function colorLerp(srca, srcb, t, out) {
@@ -21764,11 +21876,14 @@ var gd3d;
         }
         math.quatMagnitude = quatMagnitude;
         function quatClone(src, out) {
-            out.rawData.set(src.rawData);
+            out.rawData[0] = src.rawData[0];
+            out.rawData[1] = src.rawData[1];
+            out.rawData[2] = src.rawData[2];
+            out.rawData[3] = src.rawData[3];
         }
         math.quatClone = quatClone;
         function quatEqual(quat, quat2, threshold) {
-            if (threshold === void 0) { threshold = 0.00001; }
+            if (threshold === void 0) { threshold = 0.000001; }
             if (Math.abs(quat.x - quat2.x) > threshold)
                 return false;
             if (Math.abs(quat.y - quat2.y) > threshold)
@@ -21955,9 +22070,9 @@ var gd3d;
             }
             var dirxz1 = math.pool.new_vector3(dir.x, 0, dir.z);
             var v3length = math.vec3Length(dirxz1);
-            if (v3length > 0.999)
+            if (v3length > 0.9999999999)
                 v3length = 1;
-            if (v3length < -0.999)
+            if (v3length < -0.9999999999)
                 v3length = -1;
             var pitch = Math.acos(v3length);
             if (dir.y > 0) {
@@ -22233,7 +22348,8 @@ var gd3d;
         }
         math.vec2Add = vec2Add;
         function vec2Clone(from, to) {
-            to.rawData.set(from.rawData);
+            to.rawData[0] = from.rawData[0];
+            to.rawData[1] = from.rawData[1];
         }
         math.vec2Clone = vec2Clone;
         function vec2Distance(a, b) {
@@ -22255,7 +22371,10 @@ var gd3d;
         }
         math.vec2ScaleByVec2 = vec2ScaleByVec2;
         function vec4Clone(from, to) {
-            to.rawData.set(from.rawData);
+            to.rawData[0] = from.rawData[0];
+            to.rawData[1] = from.rawData[1];
+            to.rawData[2] = from.rawData[2];
+            to.rawData[3] = from.rawData[3];
         }
         math.vec4Clone = vec4Clone;
         function vec2Length(a) {
@@ -22310,7 +22429,9 @@ var gd3d;
     var math;
     (function (math) {
         function vec3Clone(from, to) {
-            to.rawData.set(from.rawData);
+            to.rawData[0] = from.rawData[0];
+            to.rawData[1] = from.rawData[1];
+            to.rawData[2] = from.rawData[2];
         }
         math.vec3Clone = vec3Clone;
         function vec3ToString(result) {

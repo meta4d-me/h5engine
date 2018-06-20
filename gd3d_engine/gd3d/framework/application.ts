@@ -429,13 +429,12 @@ namespace gd3d.framework
                 }
                 else
                 {
+                    if(this._inputmgr)
+                        this._inputmgr.update(delta);
                     this.updateUserCode(delta);
                 }
             }
             this.updateEditorCode(delta);
-
-            if(this._inputmgr)
-                this._inputmgr.update(delta);
 
             if (this._scene != null)
             {

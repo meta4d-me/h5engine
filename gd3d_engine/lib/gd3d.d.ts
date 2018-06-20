@@ -1470,6 +1470,15 @@ declare namespace gd3d.framework {
         markDirty(): void;
         markHaveComponent(): void;
         markHaveRendererComp(): void;
+        private helperLocalPos;
+        private helperLocalSca;
+        private helperLocalRot;
+        private _needremakeLocalMtx;
+        private readonly needremakeLocalMtx;
+        private refreshHelper();
+        private refreshlocalMtx();
+        private refreshMtxs(parentChange?);
+        private refreshWorldRTS();
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
         updateAABBChild(): void;
@@ -1479,14 +1488,14 @@ declare namespace gd3d.framework {
         hasComponentChild: boolean;
         hasRendererComp: boolean;
         hasRendererCompChild: boolean;
-        private dirtyWorldDecompose;
-        localRotate: gd3d.math.quaternion;
-        localTranslate: gd3d.math.vector3;
-        localPosition: gd3d.math.vector3;
-        localScale: gd3d.math.vector3;
+        private needWorldDecompose;
+        localRotate: math.quaternion;
+        localTranslate: math.vector3;
+        localPosition: math.vector3;
+        localScale: math.vector3;
         private localMatrix;
         private _localEulerAngles;
-        localEulerAngles: gd3d.math.vector3;
+        localEulerAngles: math.vector3;
         private worldMatrix;
         private worldRotate;
         private worldTranslate;
@@ -1494,16 +1503,17 @@ declare namespace gd3d.framework {
         getWorldTranslate(): math.vector3;
         getWorldScale(): math.vector3;
         getWorldRotate(): math.quaternion;
-        getLocalMatrix(): gd3d.math.matrix;
-        private tempWorldMatrix;
-        getWorldMatrix(): gd3d.math.matrix;
-        getForwardInWorld(out: gd3d.math.vector3): void;
-        getRightInWorld(out: gd3d.math.vector3): void;
-        getUpInWorld(out: gd3d.math.vector3): void;
+        getLocalMatrix(): math.matrix;
+        getWorldMatrix(): math.matrix;
+        getForwardInWorld(out: math.vector3): void;
+        getRightInWorld(out: math.vector3): void;
+        getUpInWorld(out: math.vector3): void;
         setWorldMatrix(mat: math.matrix): void;
         setWorldPosition(pos: math.vector3): void;
+        setWorldRotate(rotate: math.quaternion): void;
         lookat(trans: transform): void;
         lookatPoint(point: math.vector3): void;
+        private calcLookAt(point);
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
@@ -1752,6 +1762,7 @@ declare namespace gd3d.framework {
         dispose(): void;
         caclByteLength(): number;
         glMesh: gd3d.render.glMesh;
+        updateByEffect: boolean;
         data: gd3d.render.meshData;
         submesh: subMeshInfo[];
         onReadFinish: () => void;
@@ -3204,6 +3215,7 @@ declare namespace gd3d.event {
         PointUp = 2,
         PointMove = 3,
         PointClick = 4,
+        MouseWheel = 5,
     }
     enum KeyEventEnum {
         KeyDown = 0,
@@ -3559,19 +3571,38 @@ declare namespace gd3d.framework {
         y: number;
     }
     class inputMgr {
+        private app;
+        private _element;
+        private _buttons;
+        private _lastbuttons;
         private eventer;
         private inputlast;
-        private app;
-        readonly point: pointinfo;
+        private keyboardMap;
+        private handlers;
+        private _wheel;
+        readonly wheel: number;
         private _point;
+        readonly point: pointinfo;
+        private _touches;
         readonly touches: {
             [id: number]: pointinfo;
         };
-        private _touches;
-        private keyboardMap;
         private rMtr_90;
         private rMtr_n90;
         constructor(app: application);
+        private attach(element);
+        private detach();
+        private _mousedown(ev);
+        private _mouseup(ev);
+        private _mousemove(ev);
+        private _mousewheel(ev);
+        private _touchstart(ev);
+        private _touchmove(ev);
+        private _touchend(ev);
+        private _touchcancel(ev);
+        private _keydown(ev);
+        private _keyup(ev);
+        private _blur(ev);
         private readonly moveTolerance;
         private lastTouch;
         private hasPointDown;
@@ -3584,6 +3615,14 @@ declare namespace gd3d.framework {
         private hasKeyDown;
         private hasKeyUp;
         private keyCodeCk();
+        private hasWheel;
+        private lastWheel;
+        private mouseWheelCk();
+        isPressed(button: number): boolean;
+        wasPressed(button: number): boolean;
+        private _contextMenu;
+        disableContextMenu(): void;
+        enableContextMenu(): void;
         addPointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         removePointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         addKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;

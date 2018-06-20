@@ -24,14 +24,22 @@ namespace gd3d.framework
      */
     export class inputMgr
     {
+        private app:gd3d.framework.application;
+        private _element: HTMLElement | null = null;
+        private _buttons:boolean[] = [false, false, false];
+        private _lastbuttons:boolean[] = [false, false, false];
         private eventer:event.InputEvent = new event.InputEvent();
         private inputlast: HTMLInputElement = null;
-        private app:gd3d.framework.application;
-        get point (){return this._point;};
-        private _point: pointinfo = new pointinfo();
-        get touches (){return this._touches};
-        private _touches: { [id: number]: pointinfo } = {};
         private keyboardMap: { [id: number]: boolean } = {};
+        private handlers:Array<any> = [];
+
+        private _wheel:number = 0;
+        get wheel(){return this._wheel;};
+        private _point: pointinfo = new pointinfo();
+        get point (){return this._point;};
+        private _touches: { [id: number]: pointinfo } = {};
+        get touches (){return this._touches};
+
 
         private rMtr_90 =new gd3d.math.matrix3x2();
         private rMtr_n90 =new gd3d.math.matrix3x2();
@@ -41,21 +49,70 @@ namespace gd3d.framework
             gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180,this.rMtr_90);
             gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180,this.rMtr_n90);
 
-            app.webgl.canvas.addEventListener("touchstart", (ev: TouchEvent) =>
-            {
-                // console.log("引擎1111");
-                // if (this.inputlast != null)
-                // {
-                //     this.inputlast.blur();
-                // }
-                // if (ev.target instanceof HTMLInputElement)
-                // {
-                //     this.inputlast = ev.target as HTMLInputElement;
-                //     this.inputlast.focus();
-                //     ev.preventDefault();
-                //     // return;
-                // }
-                this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY);
+            this.handlers.push(["touchstart",this._touchstart.bind(this)]);
+            this.handlers.push(["touchmove",this._touchmove.bind(this)]);
+            this.handlers.push(["touchend",this._touchend.bind(this)]);
+            this.handlers.push(["touchcancel",this._touchcancel.bind(this)]);
+            this.handlers.push(["mousedown",this._mousedown.bind(this)]);
+            this.handlers.push(["mouseup",this._mouseup.bind(this)]);
+            this.handlers.push(["mousemove",this._mousemove.bind(this)]);
+            this.handlers.push(["mousewheel",this._mousewheel.bind(this)]);
+            this.handlers.push(["DOMMouseScroll",this._mousewheel.bind(this)]);
+            this.handlers.push(["keydown",this._keydown.bind(this)]);
+            this.handlers.push(["keyup",this._keyup.bind(this)]);
+            this.handlers.push(["blur",this._blur.bind(this)]);
+            
+            this.attach(app.webgl.canvas);
+            this.disableContextMenu();
+        }
+
+        private attach(element: HTMLElement) {
+            if (this._element) {
+                this.detach();
+            }
+            this._element = element;
+            this.handlers.forEach(handler=>{
+                if(handler)
+                    this._element.addEventListener(handler[0],handler[1],false);  //reg
+            });
+        }
+
+        private detach() {
+            if(!this._element) return;
+            this.handlers.forEach(handler=>{
+                if(handler)
+                    this._element.removeEventListener(handler[0],handler[1],false);  //unreg
+            });
+            this._element = null;
+        }
+
+        //mouse
+        private _mousedown(ev:MouseEvent){
+            this.CalcuPoint(ev.offsetX,ev.offsetY);
+            this._buttons[ev.button] = true;
+            this._point.touch = true;
+        }
+        private _mouseup(ev:MouseEvent){
+            this._buttons[ev.button] = false;
+            this._point.touch = false;
+        }
+        private _mousemove(ev:MouseEvent){
+            this.CalcuPoint(ev.offsetX,ev.offsetY);
+        }
+        private _mousewheel(ev:MouseWheelEvent){
+            this.hasWheel = true;
+            if (ev.detail) {
+                this.lastWheel = -1 * ev.detail;
+            } else if (ev.wheelDelta) {
+                this.lastWheel = ev.wheelDelta / 120;
+            } else {
+                this.lastWheel = 0;
+            }
+        }
+
+        //touch
+        private _touchstart(ev:TouchEvent){
+            this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY);
                 this._point.touch = true;
 
                 for (var i = 0; i < ev.changedTouches.length; i++)
@@ -71,11 +128,9 @@ namespace gd3d.framework
                     this._touches[id].x = touch.clientX;
                     this._touches[id].y = touch.clientY;
                 }
-            }
-            );
-            app.webgl.canvas.addEventListener("touchmove", (ev:any) =>
-            {
-                for (var i = 0; i < ev.changedTouches.length; i++)
+        }
+        private _touchmove(ev:TouchEvent){
+            for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
@@ -105,87 +160,62 @@ namespace gd3d.framework
                 // this.point.x = x / (count * app.scale);
                 // this.point.y = y / (count * app.scale);
                 this.CalcuPoint(x / count,y / count);
-            }
-            );
-            app.webgl.canvas.addEventListener("touchend", (ev:any) =>
-            {
-                for (var i = 0; i < ev.changedTouches.length; i++)
-                {
-                    var touch = ev.changedTouches[i];
-                    var id = touch.identifier;
-                    if (this._touches[id] == null)
-                    {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
-                    this._touches[id].touch = false;
-                }
-
-                //所有触点全放开，point.touch才false
-                for (var key in this._touches)
-                {
-                    if (this._touches[key].touch == true)
-                        return;
-                }
-                this._point.touch = false;
-            }
-            );
-            app.webgl.canvas.addEventListener("touchcancel", (ev:any) =>
-            {
-                for (var i = 0; i < ev.changedTouches.length; i++)
-                {
-                    var touch = ev.changedTouches[i];
-                    var id = touch.identifier;
-                    if (this._touches[id] == null)
-                    {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
-                    this._touches[id].touch = false;
-                }
-
-                //所有触点全放开，point.touch才false
-                for (var key in this._touches)
-                {
-                    if (this._touches[key].touch == true)
-                        return;
-                }
-                this._point.touch = false;
-            }
-            );
-            app.webgl.canvas.addEventListener("mousedown", (ev) =>
-            {
-                this.CalcuPoint(ev.offsetX,ev.offsetY);
-                this._point.touch = true;
-                
-            }
-            );
-            app.webgl.canvas.addEventListener("mouseup", (ev) =>
-            {
-                this._point.touch = false;
-            }
-            );
-
-            app.webgl.canvas.addEventListener("mousemove", (ev) =>
-            {
-                this.CalcuPoint(ev.offsetX,ev.offsetY);
-            }
-            );
-
-            app.webgl.canvas.addEventListener("keydown", (ev: KeyboardEvent) =>
-            {
-                this.hasKeyDown = this.keyboardMap[ev.keyCode] = true;
-            }, false);
-
-            app.webgl.canvas.addEventListener("keyup", (ev: KeyboardEvent) =>
-            {
-                delete this.keyboardMap[ev.keyCode];
-                this.hasKeyUp = true;
-            }, false);
-            app.webgl.canvas.addEventListener("blur",(ev:KeyboardEvent)=>{
-                this._point.touch = false;
-            },false);
         }
+        private _touchend(ev:TouchEvent){
+            for (var i = 0; i < ev.changedTouches.length; i++)
+                {
+                    var touch = ev.changedTouches[i];
+                    var id = touch.identifier;
+                    if (this._touches[id] == null)
+                    {
+                        this._touches[id] = new pointinfo();
+                        this._touches[id].id = id;
+                    }
+                    this._touches[id].touch = false;
+                }
+
+                //所有触点全放开，point.touch才false
+                for (var key in this._touches)
+                {
+                    if (this._touches[key].touch == true)
+                        return;
+                }
+                this._point.touch = false;
+        }
+        private _touchcancel(ev:TouchEvent){
+            for (var i = 0; i < ev.changedTouches.length; i++)
+                {
+                    var touch = ev.changedTouches[i];
+                    var id = touch.identifier;
+                    if (this._touches[id] == null)
+                    {
+                        this._touches[id] = new pointinfo();
+                        this._touches[id].id = id;
+                    }
+                    this._touches[id].touch = false;
+                }
+
+                //所有触点全放开，point.touch才false
+                for (var key in this._touches)
+                {
+                    if (this._touches[key].touch == true)
+                        return;
+                }
+                this._point.touch = false;
+        }
+        //key
+        private _keydown(ev:KeyboardEvent){
+            this.hasKeyDown = this.keyboardMap[ev.keyCode] = true;
+        }
+        private _keyup(ev:KeyboardEvent){
+            delete this.keyboardMap[ev.keyCode];
+            this.hasKeyUp = true;
+        }
+        //
+        private _blur(ev){
+            this._point.touch = false;
+        }
+        
 
         private readonly moveTolerance = 2;  //move 状态容忍值
         private lastTouch = false;
@@ -195,8 +225,14 @@ namespace gd3d.framework
         private downPoint = new gd3d.math.vector2();
         private lastPoint = new gd3d.math.vector2();
         update(delta){
-           this.pointCk();
-           this.keyCodeCk();
+            this._lastbuttons[0] = this._buttons[0];
+            this._lastbuttons[1] = this._buttons[1];
+            this._lastbuttons[2] = this._buttons[2];
+            this._wheel = 0;
+            
+            this.mouseWheelCk();
+            this.pointCk();
+            this.keyCodeCk();
         }
 
         private pointCk(){
@@ -245,6 +281,50 @@ namespace gd3d.framework
                 this.eventer.EmitEnum_key(event.KeyEventEnum.KeyUp,null);
 
             this.hasKeyDown = this.hasKeyUp = false;
+        }
+
+        private hasWheel = false;
+        private lastWheel = 0;
+        private mouseWheelCk(){
+            if(this.hasWheel){
+                this._wheel = this.lastWheel;
+                this.eventer.EmitEnum_point(event.PointEventEnum.MouseWheel,null);
+            }
+
+            this.hasWheel = false;
+            this.lastWheel =0;
+        }
+
+        /**
+         * 按键是否在按下状态
+         * @param button 按键, 0: 左键；1: 中键；2: 右键
+         */
+        public isPressed(button:number):boolean {
+            return this._buttons[button];
+        }
+
+        /**
+         * 按键被按下一次
+         * @param button 按键, 0: 左键；1: 中键；2: 右键
+         */
+        public wasPressed(button:number):boolean {
+            return (this._buttons[button] && !this._lastbuttons[button]);
+        }
+
+        private _contextMenu = (ev)=>{ev.preventDefault()};
+        /**
+         * 禁用右键菜单
+         */
+        public disableContextMenu() {
+            if(!this._element) return;
+            this._element.addEventListener("contextmenu", this._contextMenu);
+        }
+        /**
+         * 启用右键菜单
+         */
+        public enableContextMenu() {
+            if(!this._element) return;
+            this._element.removeEventListener("contextmenu", this._contextMenu);
         }
 
         /**

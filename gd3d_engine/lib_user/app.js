@@ -14,6 +14,9 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var demo_navigaionRVO = (function () {
     function demo_navigaionRVO() {
         this.cubesize = 0.5;
@@ -1388,10 +1391,10 @@ var test_loadAsiprefab = (function () {
                 _this.app.getAssetMgr().load("res/prefabs/0001_archangel@idle_none/0001_archangel@idle_none.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
                         var _prefab = _this.app.getAssetMgr().getAssetByName("0001_archangel@idle_none.prefab.json");
-                        _this.baihu = _prefab.getCloneTrans();
-                        _this.scene.addChild(_this.baihu);
-                        var test = _this.baihu;
-                        objCam.lookat(_this.baihu);
+                        _this.trans = _prefab.getCloneTrans();
+                        _this.scene.addChild(_this.trans);
+                        var test = _this.trans;
+                        objCam.lookat(_this.trans);
                         objCam.markDirty();
                     }
                 });
@@ -1405,6 +1408,15 @@ var test_loadAsiprefab = (function () {
         this.camera.far = 100;
         objCam.localTranslate = new gd3d.math.vector3(0, 5, 5);
         objCam.markDirty();
+        var hov = objCam.gameObject.addComponent("HoverCameraScript");
+        hov.lookAtTarget = this.trans;
+        hov.panAngle = 180;
+        hov.tiltAngle = -10;
+        hov.distance = 8;
+        hov.scaleSpeed = 0.1;
+        hov.lookAtPoint.x = 0;
+        hov.lookAtPoint.y = 2.5;
+        hov.lookAtPoint.z = 0;
     };
     test_loadAsiprefab.prototype.update = function (delta) {
     };
@@ -7623,6 +7635,71 @@ var test_pbr_scene = (function () {
     };
     return test_pbr_scene;
 }());
+var demo;
+(function (demo) {
+    var test_performance = (function () {
+        function test_performance() {
+            this.cubes = [];
+            this.count = 500;
+            this.all = 0;
+        }
+        test_performance.prototype.start = function (app) {
+            this.app = app;
+            this.scene = app.getScene();
+            this.assetMgr = this.app.getAssetMgr();
+        };
+        test_performance.prototype.tryadd = function () {
+            var max = 2000;
+            var maxcc = 0;
+            var cc = 0;
+            var temp;
+            while (maxcc < max) {
+                var tran = new gd3d.framework.transform();
+                if (!temp) {
+                    temp = tran;
+                    this.scene.addChild(tran);
+                }
+                else {
+                    temp.addChild(tran);
+                    cc++;
+                    if (cc >= 10) {
+                        cc = 0;
+                        temp = null;
+                    }
+                }
+                this.cubes.push(tran);
+                maxcc++;
+            }
+            this.all += max;
+        };
+        test_performance.prototype.update = function (delta) {
+            if (this.count * this.count > this.all) {
+                this.tryadd();
+            }
+            else {
+                console.error(" \u6240\u6709 trans \u52A0\u8F09\u5B8C\u7562  new  ");
+            }
+            var c = 0;
+            while (c < 1000) {
+                this.randome();
+                c++;
+            }
+        };
+        test_performance.prototype.randome = function () {
+            var idx = Math.floor(Math.random() * this.cubes.length);
+            var cube = this.cubes[idx];
+            cube.localTranslate.x += Math.random() * 10;
+            var temp = cube.getWorldTranslate();
+            temp.y += Math.random() * 10;
+            cube.setWorldPosition(temp);
+            cube.localEulerAngles.x = Math.random() * 10;
+            cube.localEulerAngles = cube.localEulerAngles;
+            cube.markDirty();
+        };
+        return test_performance;
+    }());
+    demo.test_performance = test_performance;
+})(demo || (demo = {}));
 var test_pick_boxcollider = (function () {
     function test_pick_boxcollider() {
         this.cubesize = 0.5;
@@ -11091,6 +11168,118 @@ var test_effecteditor = (function () {
     };
     return test_effecteditor;
 }());
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var HoverCameraScript = (function (_super) {
+            __extends(HoverCameraScript, _super);
+            function HoverCameraScript() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+                _this.distance = 30;
+                _this.minPanAngle = -Infinity;
+                _this.maxPanAngle = Infinity;
+                _this.minTileAngle = -90;
+                _this.maxTileAngle = 90;
+                _this.scaleSpeed = 0.2;
+                _this._mouseDown = false;
+                _this._fingerTwo = false;
+                _this._panAngle = 0;
+                _this._panRad = 0;
+                _this._tiltAngle = 0;
+                _this._tiltRad = 0;
+                _this.cupTargetV3 = new gd3d.math.vector3();
+                return _this;
+            }
+            Object.defineProperty(HoverCameraScript.prototype, "panAngle", {
+                get: function () {
+                    return this._panAngle;
+                },
+                set: function (value) {
+                    this._panAngle = Math.max(this.minPanAngle, Math.min(this.maxPanAngle, value));
+                    this._panRad = this._panAngle * Math.PI / 180;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(HoverCameraScript.prototype, "tiltAngle", {
+                get: function () {
+                    return this._tiltAngle;
+                },
+                set: function (value) {
+                    this._tiltAngle = Math.max(this.minTileAngle, Math.min(this.maxTileAngle, value));
+                    this._tiltRad = this._tiltAngle * Math.PI / 180;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            HoverCameraScript.prototype.onPlay = function () {
+            };
+            HoverCameraScript.prototype.start = function () {
+                this.inputMgr = this.gameObject.transform.scene.app.getInputMgr();
+                this.inputMgr.addPointListener(gd3d.event.PointEventEnum.PointDown, this.onPointDown, this);
+                this.inputMgr.addPointListener(gd3d.event.PointEventEnum.PointUp, this.onPointUp, this);
+                this.inputMgr.addPointListener(gd3d.event.PointEventEnum.PointMove, this.onPointMove, this);
+                this.inputMgr.addPointListener(gd3d.event.PointEventEnum.MouseWheel, this.onWheel, this);
+            };
+            HoverCameraScript.prototype.update = function (delta) {
+                var distanceX = this.distance * Math.sin(this._panRad) * Math.cos(this._tiltRad);
+                var distanceY = this.distance * (this._tiltRad == 0 ? 0 : Math.sin(this._tiltRad));
+                var distanceZ = this.distance * Math.cos(this._panRad) * Math.cos(this._tiltRad);
+                if (this.lookAtTarget) {
+                    gd3d.math.vec3Clone(this.lookAtTarget.getWorldTranslate(), this.cupTargetV3);
+                }
+                else {
+                    gd3d.math.vec3Clone(this.lookAtPoint, this.cupTargetV3);
+                }
+                var tempv3 = gd3d.math.pool.new_vector3(this.cupTargetV3.x + distanceX, this.cupTargetV3.y + distanceY, this.cupTargetV3.z + distanceZ);
+                this.gameObject.transform.setWorldPosition(tempv3);
+                this.gameObject.transform.lookatPoint(this.cupTargetV3);
+                this.gameObject.transform.markDirty();
+                gd3d.math.pool.delete_vector3(tempv3);
+            };
+            HoverCameraScript.prototype.onPointDown = function () {
+                this._mouseDown = true;
+                this._lastMouseX = this.inputMgr.point.x;
+                this._lastMouseY = this.inputMgr.point.y;
+            };
+            HoverCameraScript.prototype.onPointUp = function () {
+                this._mouseDown = false;
+            };
+            HoverCameraScript.prototype.onPointMove = function () {
+                if (!this._mouseDown)
+                    return;
+                var moveX = this.inputMgr.point.x - this._lastMouseX;
+                var moveY = this.inputMgr.point.y - this._lastMouseY;
+                this.panAngle += moveX;
+                this.tiltAngle += moveY;
+                this._lastMouseX = this.inputMgr.point.x;
+                this._lastMouseY = this.inputMgr.point.y;
+            };
+            HoverCameraScript.prototype.onWheel = function () {
+                this.distance = Math.max(this.distance - this.inputMgr.wheel * 2, 1);
+            };
+            HoverCameraScript.prototype.onTouch = function () {
+            };
+            HoverCameraScript.prototype.remove = function () {
+                this.inputMgr.removePointListener(gd3d.event.PointEventEnum.PointDown, this.onPointDown, this);
+                this.inputMgr.removePointListener(gd3d.event.PointEventEnum.PointUp, this.onPointUp, this);
+                this.inputMgr.removePointListener(gd3d.event.PointEventEnum.PointMove, this.onPointMove, this);
+                this.inputMgr.removePointListener(gd3d.event.PointEventEnum.MouseWheel, this.onWheel, this);
+            };
+            __decorate([
+                gd3d.reflect.Field("reference", null, "transform"),
+                __metadata("design:type", gd3d.framework.transform)
+            ], HoverCameraScript.prototype, "lookAtTarget", void 0);
+            HoverCameraScript = __decorate([
+                gd3d.reflect.nodeComponent
+            ], HoverCameraScript);
+            return HoverCameraScript;
+        }(gd3d.framework.behaviour));
+        framework.HoverCameraScript = HoverCameraScript;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
 var UseAniplayClipDemo = (function () {
     function UseAniplayClipDemo() {
         this.taskMgr = new gd3d.framework.taskMgr();
