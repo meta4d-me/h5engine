@@ -9302,7 +9302,7 @@ var gd3d;
             });
             transform.prototype.refreshHelper = function () {
                 gd3d.math.vec3Clone(this.localTranslate, this.helperLocalPos);
-                gd3d.math.vec3Clone(this.helperLocalSca, this.helperLocalSca);
+                gd3d.math.vec3Clone(this.localScale, this.helperLocalSca);
                 gd3d.math.quatClone(this.localRotate, this.helperLocalRot);
             };
             transform.prototype.refreshlocalMtx = function () {
@@ -9314,8 +9314,9 @@ var gd3d;
             };
             transform.prototype.refreshMtxs = function (parentChange) {
                 if (parentChange === void 0) { parentChange = false; }
+                var needLocalRemake = this.needremakeLocalMtx;
                 this.refreshlocalMtx();
-                if (parentChange || this.needremakeLocalMtx) {
+                if (parentChange || needLocalRemake) {
                     if (!this.parent)
                         gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
                     else
@@ -9480,8 +9481,7 @@ var gd3d;
                 gd3d.math.quatInverse(pworld, invparentworld);
                 gd3d.math.quatMultiply(invparentworld, rotate, this.localRotate);
                 gd3d.math.quatClone(rotate, this.worldRotate);
-                gd3d.math.matrixMakeTransformRTS(this.getWorldTranslate(), this.worldScale, this.worldRotate, this.worldMatrix);
-                this._needremakeLocalMtx = true;
+                this.refreshMtxs();
                 gd3d.math.pool.delete_quaternion(pworld);
                 gd3d.math.pool.delete_quaternion(invparentworld);
             };
@@ -33539,7 +33539,7 @@ var gd3d;
             };
             textureReader.prototype.refresh = function (texRGBA) {
                 if (!texRGBA) {
-                    console.error("texRGBA is null ");
+                    console.warn("texRGBA is null ");
                     return;
                 }
                 var fbo = this.webgl.createFramebuffer();

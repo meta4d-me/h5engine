@@ -464,7 +464,7 @@ namespace gd3d.framework
         //刷新 helpers
         private refreshHelper(){
             math.vec3Clone(this.localTranslate,this.helperLocalPos);
-            math.vec3Clone(this.helperLocalSca,this.helperLocalSca);
+            math.vec3Clone(this.localScale,this.helperLocalSca);
             math.quatClone(this.localRotate,this.helperLocalRot);
         }
 
@@ -478,8 +478,9 @@ namespace gd3d.framework
         }
         //刷新 local and world matrix
         private refreshMtxs(parentChange:boolean = false){
+            let needLocalRemake = this.needremakeLocalMtx;
             this.refreshlocalMtx();
-            if(parentChange || this.needremakeLocalMtx){
+            if(parentChange || needLocalRemake){
                 if (!this.parent)
                     math.matrixClone(this.localMatrix, this.worldMatrix);
                 else
@@ -869,9 +870,10 @@ namespace gd3d.framework
             math.quatInverse(pworld,invparentworld);
             math.quatMultiply(invparentworld,rotate,this.localRotate);
             math.quatClone(rotate,this.worldRotate);
-            math.matrixMakeTransformRTS(this.getWorldTranslate(),this.worldScale,this.worldRotate,this.worldMatrix);
+            //math.matrixMakeTransformRTS(this.getWorldTranslate(),this.worldScale,this.worldRotate,this.worldMatrix);
+            this.refreshMtxs();
             //math.matrixMakeTransformRTS(this.localTranslate,this.localScale,this.localRotate,this.localMatrix);
-            this._needremakeLocalMtx = true;
+            //this._needremakeLocalMtx = true;
             
             math.pool.delete_quaternion(pworld);
             math.pool.delete_quaternion(invparentworld);
