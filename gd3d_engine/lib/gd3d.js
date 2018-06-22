@@ -9336,7 +9336,7 @@ var gd3d;
                 if (this.dirtyChild == false && this.dirty == false && parentChange == false)
                     return;
                 this.refreshHelper();
-                this.refreshMtxs();
+                this.refreshMtxs(parentChange);
                 if (this.children != null) {
                     for (var i = 0; i < this.children.length; i++) {
                         this.children[i].updateTran(parentChange || this.dirty);
@@ -9443,7 +9443,7 @@ var gd3d;
             transform.prototype.setWorldMatrix = function (mat) {
                 var pworld = gd3d.math.pool.new_matrix();
                 if (this.parent != null)
-                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
+                    gd3d.math.matrixClone(this.parent.getWorldMatrix(), pworld);
                 else
                     gd3d.math.matrixMakeIdentity(pworld);
                 var invparentworld = gd3d.math.pool.new_matrix();
@@ -9451,6 +9451,7 @@ var gd3d;
                 gd3d.math.matrixClone(mat, this.worldMatrix);
                 gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
                 gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
+                this.refreshHelper();
                 this.needWorldDecompose = true;
                 gd3d.math.pool.delete_matrix(pworld);
                 gd3d.math.pool.delete_matrix(invparentworld);
@@ -9461,9 +9462,10 @@ var gd3d;
                 gd3d.math.vec3Subtract(newWpos, this.getWorldTranslate(), deltaV3);
                 gd3d.math.vec3Add(this.localTranslate, deltaV3, this.localTranslate);
                 gd3d.math.vec3Clone(newWpos, this.worldTranslate);
-                this.worldMatrix.rawData[12] = pos.x;
-                this.worldMatrix.rawData[13] = pos.y;
-                this.worldMatrix.rawData[14] = pos.z;
+                var worldMtx = this.getWorldMatrix();
+                worldMtx.rawData[12] = pos.x;
+                worldMtx.rawData[13] = pos.y;
+                worldMtx.rawData[14] = pos.z;
                 var localmtx = this.getLocalMatrix();
                 localmtx.rawData[12] = this.localTranslate.x;
                 localmtx.rawData[13] = this.localTranslate.y;
@@ -12465,6 +12467,7 @@ var gd3d;
                         var _newmatrix = gd3d.math.pool.new_matrix();
                         gd3d.math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
                         careobj.setWorldMatrix(_newmatrix);
+                        careobj.dirty = true;
                         careobj.updateTran(false);
                         gd3d.math.pool.delete_matrix(_matrix);
                         gd3d.math.pool.delete_matrix(_newmatrix);

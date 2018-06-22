@@ -1482,7 +1482,7 @@ declare namespace gd3d.framework {
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
         updateAABBChild(): void;
-        private dirty;
+        dirty: boolean;
         private dirtyChild;
         hasComponent: boolean;
         hasComponentChild: boolean;

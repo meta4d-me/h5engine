@@ -535,7 +535,7 @@ namespace gd3d.framework
             //     this.markAABBDirty();
             // }
 
-            this.refreshMtxs();
+            this.refreshMtxs(parentChange);
 
             if (this.children != null)
             {
@@ -601,7 +601,7 @@ namespace gd3d.framework
             }
         }
 
-        private dirty: boolean = true;//自己是否需要更新
+        dirty: boolean = true;//自己是否需要更新
         private dirtyChild: boolean = true;//子层是否需要更新
 
         public hasComponent: boolean = false; //自己是否有组件
@@ -808,7 +808,7 @@ namespace gd3d.framework
             //this.updateWorldTran();
             let pworld = math.pool.new_matrix();
             if (this.parent != null)
-                math.matrixClone(this.parent.worldMatrix, pworld);
+                math.matrixClone(this.parent.getWorldMatrix(), pworld);
             else
                 math.matrixMakeIdentity(pworld);
 
@@ -818,6 +818,7 @@ namespace gd3d.framework
             math.matrixClone(mat, this.worldMatrix);
             math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
             math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
+            this.refreshHelper();
             this.needWorldDecompose = true;
 
             math.pool.delete_matrix(pworld);
@@ -839,9 +840,10 @@ namespace gd3d.framework
             math.vec3Add(this.localTranslate,deltaV3,this.localTranslate);
             math.vec3Clone(newWpos,this.worldTranslate);
             //update matrix
-            this.worldMatrix.rawData[12] = pos.x;
-            this.worldMatrix.rawData[13] = pos.y;
-            this.worldMatrix.rawData[14] = pos.z;
+            let worldMtx = this.getWorldMatrix();
+            worldMtx.rawData[12] = pos.x;
+            worldMtx.rawData[13] = pos.y;
+            worldMtx.rawData[14] = pos.z;
 
             let localmtx = this.getLocalMatrix();
             localmtx.rawData[12] = this.localTranslate.x;
