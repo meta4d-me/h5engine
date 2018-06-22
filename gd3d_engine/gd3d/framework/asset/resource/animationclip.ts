@@ -245,6 +245,7 @@ namespace gd3d.framework
          */
         bones: string[];
 
+        indexDic:{[boneName:string]:number};
         /**
          * @private
          */

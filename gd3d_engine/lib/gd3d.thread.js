@@ -773,6 +773,7 @@ var gd3d;
                     loop: undefined,
                     boneCount: undefined,
                     bones: undefined,
+                    indexDic: undefined,
                     subclipCount: undefined,
                     subclips: undefined,
                     frameCount: undefined,
@@ -784,8 +785,11 @@ var gd3d;
                 result.loop = read.readBoolean();
                 result.boneCount = read.readInt();
                 result.bones = [];
+                result.indexDic = {};
                 for (var i = 0; i < result.boneCount; ++i) {
-                    result.bones.push(read.readStringAnsi());
+                    var bonename = read.readStringAnsi();
+                    result.bones.push(bonename);
+                    result.indexDic[bonename] = i;
                 }
                 result.subclipCount = read.readInt();
                 result.subclips = [];

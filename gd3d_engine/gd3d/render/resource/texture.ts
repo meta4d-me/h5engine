@@ -66,7 +66,7 @@
         /** 刷新data数据 */
         refresh( texRGBA: WebGLTexture ){
             if(!texRGBA){
-                console.error(`texRGBA is null `);
+                console.warn(`texRGBA is null `);
                 return ;
             }
             var fbo = this.webgl.createFramebuffer();
