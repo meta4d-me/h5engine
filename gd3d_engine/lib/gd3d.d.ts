@@ -1752,6 +1752,7 @@ declare namespace gd3d.framework {
         dispose(): void;
         caclByteLength(): number;
         glMesh: gd3d.render.glMesh;
+        updateByEffect: boolean;
         data: gd3d.render.meshData;
         submesh: subMeshInfo[];
         onReadFinish: () => void;
@@ -3204,6 +3205,7 @@ declare namespace gd3d.event {
         PointUp = 2,
         PointMove = 3,
         PointClick = 4,
+        MouseWheel = 5,
     }
     enum KeyEventEnum {
         KeyDown = 0,
@@ -3559,19 +3561,38 @@ declare namespace gd3d.framework {
         y: number;
     }
     class inputMgr {
+        private app;
+        private _element;
+        private _buttons;
+        private _lastbuttons;
         private eventer;
         private inputlast;
-        private app;
-        readonly point: pointinfo;
+        private keyboardMap;
+        private handlers;
+        private _wheel;
+        readonly wheel: number;
         private _point;
+        readonly point: pointinfo;
+        private _touches;
         readonly touches: {
             [id: number]: pointinfo;
         };
-        private _touches;
-        private keyboardMap;
         private rMtr_90;
         private rMtr_n90;
         constructor(app: application);
+        private attach(element);
+        private detach();
+        private _mousedown(ev);
+        private _mouseup(ev);
+        private _mousemove(ev);
+        private _mousewheel(ev);
+        private _touchstart(ev);
+        private _touchmove(ev);
+        private _touchend(ev);
+        private _touchcancel(ev);
+        private _keydown(ev);
+        private _keyup(ev);
+        private _blur(ev);
         private readonly moveTolerance;
         private lastTouch;
         private hasPointDown;
@@ -3584,6 +3605,14 @@ declare namespace gd3d.framework {
         private hasKeyDown;
         private hasKeyUp;
         private keyCodeCk();
+        private hasWheel;
+        private lastWheel;
+        private mouseWheelCk();
+        isPressed(button: number): boolean;
+        wasPressed(button: number): boolean;
+        private _contextMenu;
+        disableContextMenu(): void;
+        enableContextMenu(): void;
         addPointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         removePointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         addKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;

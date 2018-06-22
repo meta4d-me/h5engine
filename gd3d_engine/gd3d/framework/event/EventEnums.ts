@@ -20,7 +20,8 @@ namespace gd3d.event
         PointHold,
         PointUp,
         PointMove,
-        PointClick
+        PointClick,
+        MouseWheel     
     }
 
     /**
