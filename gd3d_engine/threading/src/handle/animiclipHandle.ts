@@ -11,6 +11,7 @@ namespace gd3d.threading
                 loop: undefined,
                 boneCount: undefined,
                 bones: undefined,
+                indexDic:undefined,
                 subclipCount: undefined,
                 subclips: undefined,
 
@@ -25,9 +26,12 @@ namespace gd3d.threading
 
             result.boneCount = read.readInt();
             result.bones = [];
+            result.indexDic={};
             for (let i = 0; i < result.boneCount; ++i)
             {
-                result.bones.push(read.readStringAnsi());
+                let bonename=read.readStringAnsi();
+                result.bones.push(bonename);
+                result.indexDic[bonename]=i;
             }
 
             result.subclipCount = read.readInt();
