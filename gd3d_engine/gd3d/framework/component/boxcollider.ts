@@ -213,7 +213,7 @@ namespace gd3d.framework
             this.gameObject.transform.addChild(this.subTran);
             this.gameObject.transform.markDirty();
             this.subTran.markDirty();//要标记自己脏了，才会更新
-            this.gameObject.transform.updateWorldTran();
+            //this.gameObject.transform.updateWorldTran();
         }
         /**
         * @private

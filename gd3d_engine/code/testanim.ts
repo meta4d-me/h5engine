@@ -70,7 +70,8 @@ class test_anim implements IState
                             }
                         }
 
-                        let wingroot = prefabObj.find("Bip001 Xtra17Nub");
+                        //let wingroot = prefabObj.find("Bip001 Xtra17Nub");
+                        let wingroot = prefabObj.find("Bip001 R Toe0");
 
                         if(wingroot){
                             wingroot.gameObject.addComponent("asbone") as gd3d.framework.asbone;

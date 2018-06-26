@@ -2,9 +2,10 @@
 {
     export function matrixGetTranslation(src: matrix, out: vector3)
     {
-        out.x = src.rawData[12];
-        out.y = src.rawData[13];
-        out.z = src.rawData[14];
+        // out.rawData[0] = src.rawData[12];
+        // out.rawData[1] = src.rawData[13];
+        // out.rawData[2] = src.rawData[14];
+        out.rawData.set(src.rawData.subarray(12, 15));
     }
 
     /**
@@ -123,6 +124,11 @@
         rotation.v = r1;
         return true;
     }
+
+    export function matrixGetRotation(matrix: matrix, result: quaternion):void{
+        matrix2Quaternion(matrix,result);
+    }
+
     export function matrix2Quaternion(matrix: matrix, result: quaternion): void 
     {
         var data = matrix.rawData;
@@ -412,9 +418,9 @@
     }
     export function matrixGetScale(src: matrix, scale: vector3): void
     {
-        scale.x = src.rawData[0];
-        scale.y = src.rawData[5];
-        scale.z = src.rawData[10];
+        scale.rawData[0] = src.rawData[0];
+        scale.rawData[1] = src.rawData[5];
+        scale.rawData[2] = src.rawData[10];
     }
     export function matrixMakeScale(xScale: number, yScale: number, zScale: number, out: matrix): void
     {
@@ -792,32 +798,32 @@
 
     export function matrixTransformVector3(vector: vector3, transformation: matrix, result: vector3): void
     {
-        var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]) + transformation.rawData[12];
-        var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]) + transformation.rawData[13];
-        var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]) + transformation.rawData[14];
-        var w = (vector.x * transformation.rawData[3]) + (vector.y * transformation.rawData[7]) + (vector.z * transformation.rawData[11]) + transformation.rawData[15];
+        let x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]) + transformation.rawData[12];
+        let y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]) + transformation.rawData[13];
+        let z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]) + transformation.rawData[14];
+        let w = (vector.x * transformation.rawData[3]) + (vector.y * transformation.rawData[7]) + (vector.z * transformation.rawData[11]) + transformation.rawData[15];
 
-        result.x = x / w;
-        result.y = y / w;
-        result.z = z / w;
+        result.rawData[0] = x / w;
+        result.rawData[1] = y / w;
+        result.rawData[2] = z / w;
     }
 
     //变换向量
     export function matrixTransformNormal(vector: vector3, transformation: matrix, result: vector3): void
     {
-        var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]);
-        var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
-        var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]);
+        let x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]);
+        let y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
+        let z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]);
 
-        result.x = x;
-        result.y = y;
-        result.z = z;
+        result.rawData[0] = x;
+        result.rawData[1] = y;
+        result.rawData[2] = z;
     }
     export function matrixGetVector3ByOffset(src: matrix, offset: number, result: vector3): void
     {
-        result.x = src.rawData[offset];
-        result.y = src.rawData[offset + 1];
-        result.z = src.rawData[offset + 2];
+        result.rawData[0] = src.rawData[offset];
+        result.rawData[1] = src.rawData[offset + 1];
+        result.rawData[2] = src.rawData[offset + 2];
     }
     export function matrixReset(mat: matrix)
     {

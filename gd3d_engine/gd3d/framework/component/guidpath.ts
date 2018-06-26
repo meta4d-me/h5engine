@@ -137,6 +137,7 @@ namespace gd3d.framework
             if(this.paths[0]!=null)
             {
                 gd3d.math.vec3Clone(this.paths[0],this.gameObject.transform.localTranslate);
+                this.gameObject.transform.setLocalPosition(this.gameObject.transform.localTranslate);
                 this.gameObject.transform.markDirty();
                 this.datasafe=true;
             }
@@ -175,6 +176,7 @@ namespace gd3d.framework
                     gd3d.math.vec3Clone(this.paths[this.folowindex],this.mystrans.localTranslate);
                     this.folowindex++;
                     this.adjustDir=true;
+                    this.mystrans.setLocalPosition(this.mystrans.localTranslate);
                     this.mystrans.markDirty();
                 }
                 else

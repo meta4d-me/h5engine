@@ -28,7 +28,7 @@ class test_ShadowMap implements IState
                             this.scene.addChild(_root);
                             // this.scene.getRoot().markDirty();
                             _root.markDirty();
-                            _root.updateTran(false);
+                            //_root.updateTran(false);
                             _root.updateAABBChild();
 
                             let _aabb = _root.aabbchild;

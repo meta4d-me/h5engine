@@ -297,7 +297,7 @@ namespace gd3d.framework
                     math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
 
                     careobj.setWorldMatrix(_newmatrix);
-                    careobj.updateTran(false);
+                    //careobj.updateTran(false);
                     math.pool.delete_matrix(_matrix);
                     math.pool.delete_matrix(_newmatrix);
                 }
@@ -492,7 +492,7 @@ namespace gd3d.framework
                     math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
 
                     careobj.setWorldMatrix(_newmatrix);
-                    careobj.updateTran(false);
+                    //careobj.updateTran(false);
                     math.pool.delete_matrix(_matrix);
                     math.pool.delete_matrix(_newmatrix);
                 }

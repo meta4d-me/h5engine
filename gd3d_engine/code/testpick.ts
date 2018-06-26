@@ -18,6 +18,7 @@
         cube.localScale.x = 10;
         cube.localScale.y = 0.1;
         cube.localScale.z = 10;
+        cube.setLocalScale(cube.localScale);
         this.scene.addChild(cube);
         var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
 
@@ -26,7 +27,6 @@
         var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
         cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
 
-        cube.markDirty();
         cuber = renderer;
 
 
@@ -38,6 +38,8 @@
             this.scene.addChild(this.cube2);
             this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 1;
             this.cube2.localTranslate.x = -5;
+            this.cube2.setLocalScale(this.cube2.localScale);
+            this.cube2.setLocalPosition(this.cube2.localTranslate);
             this.cube2.markDirty();
             var mesh = this.cube2.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
             mesh.mesh = (smesh);
@@ -60,6 +62,8 @@
             this.scene.addChild(this.cube3);
             this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
             this.cube3.localTranslate.x = -5;
+            this.cube3.setLocalScale(this.cube3.localScale);
+            this.cube3.setLocalPosition(this.cube3.localTranslate);
             this.cube3.markDirty();
             var mesh = this.cube3.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
             mesh.mesh =(smesh);
@@ -75,6 +79,8 @@
             this.scene.addChild(this.cube4);
             this.cube4.localScale.x = this.cube4.localScale.y = this.cube4.localScale.z = 1;
             this.cube4.localTranslate.x = 5;
+            this.cube4.setLocalScale(this.cube4.localScale);
+            this.cube4.setLocalPosition(this.cube4.localTranslate);
             this.cube4.markDirty();
             var mesh = this.cube4.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
             mesh.mesh = (smesh);
@@ -89,10 +95,12 @@
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        //objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0.5, -10);
+        objCam.setLocalPosition(objCam.localTranslate);
         objCam.lookat(this.cube);
         objCam.markDirty();//标记为需要刷新
-        CameraController.instance().init(this.app,this.camera);
+        //CameraController.instance().init(this.app,this.camera);
 
     }
     camera: gd3d.framework.camera;
@@ -133,6 +141,8 @@
 
         this.timer += delta;
         this.cube3.localTranslate.x += delta;
+        this.cube3.localTranslate = this.cube3.localTranslate;
+        this.cube3.setLocalPosition(this.cube3.localTranslate);
         this.cube3.markDirty();
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);
@@ -145,6 +155,7 @@
         var tv = new gd3d.math.vector3();
         gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
         this.cube2.localTranslate = this.movetarget;
+        this.cube2.setLocalPosition(this.movetarget);
         this.cube2.markDirty();
 
         

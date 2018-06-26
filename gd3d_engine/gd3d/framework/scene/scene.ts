@@ -162,7 +162,7 @@ namespace gd3d.framework
             
 
             //更新矩阵
-            this.rootNode.updateTran(false);
+            //this.rootNode.updateTran(false);
             this.rootNode.updateAABBChild();//更新完tarn再更新子物体aabb 确保每个transform的aabb正确
 
             //更新跑一遍，刷出渲染列表
