@@ -69,7 +69,7 @@ namespace gd3d.framework
             let basrat=this.emission.baseddata.rateOverTime;
             maxrate=basrat.isRandom?basrat._valueLimitMax:basrat._value;
             let liftime=this.emission.baseddata.lifeTime;        
-            let maxlife=liftime.isRandom?liftime._valueLimitMax:liftime._value;
+            let maxlife=liftime.isRandom?Math.max(liftime._valueLimitMax,liftime._valueLimitMin):liftime._value;
 
             if(!this.emission.baseddata.beloop)
             {
@@ -119,6 +119,7 @@ namespace gd3d.framework
             this.curIndexCount=0;
             this.curVertexcount=0;
             this.curRealVboCount=0;
+            // console.log("emissionCount:   "+this.emission.particlelist.length);
             for(let i=0,len=this.emission.particlelist.length;i<len;i++)
             {
                 this.emission.particlelist[i].uploadMeshdata();

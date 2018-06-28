@@ -3,11 +3,15 @@
         x: number = 0;
         y: number = 0;
         z: number = 0;
+
+        realy:number=0;
         clone(): navVec3 {
             var navVec: navVec3 = new navVec3();
             navVec.x = this.x;
             navVec.y = this.y;
             navVec.z = this.z;
+
+            navVec.realy=this.realy;
             return navVec;
         }
         static DistAZ(start: navVec3, end: navVec3): number {
@@ -51,7 +55,22 @@
             navVec2.x = start.x + navVec.x * <number>dist;
             navVec2.y = start.y + navVec.y * <number>dist;
             navVec2.z = start.z + navVec.z * <number>dist;
+
+            if(end.x==start.x)
+            {
+                navVec2.realy=start.y;
+            }else
+            {
+                navVec2.realy=start.y + navVec.x*(end.y-start.y)/(end.x-start.x);
+            }
             return navVec2;
+        }
+
+        static lerp(from:navVec3,to:navVec3,lerp:number,out:navVec3)
+        {
+            out.x=(to.x-from.x)*lerp+from.x;
+            out.y=(to.y-from.y)*lerp+from.y;
+            out.z=(to.z-from.z)*lerp+from.z;
         }
 
     }

@@ -170,7 +170,7 @@ namespace gd3d.framework
             this.renderLights.length = 0;
             this.renderList.clear();
 
-            aniplayer.playerCaches = [];
+            // aniplayer.playerCaches = [];
 
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);

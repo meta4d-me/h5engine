@@ -28,7 +28,7 @@
                 var wayPoints = gd3d.framework.pathFinding.calcWayPoints(this.navinfo, startVec, endVec, polyPath);
                 var navmeshWayPoints: Array<gd3d.math.vector3> = [];
                 for (var i: number = 0; i < wayPoints.length; i++) {
-                    navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].y, wayPoints[i].z);
+                    navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].realy, wayPoints[i].z);
                 }
                 return navmeshWayPoints;
             } else {
