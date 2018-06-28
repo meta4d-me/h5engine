@@ -1325,6 +1325,9 @@ declare namespace gd3d.framework {
         readonly time: number;
         boneCount: number;
         bones: string[];
+        indexDic: {
+            [boneName: string]: number;
+        };
         frameCount: number;
         frames: {
             [fid: string]: Float32Array;
