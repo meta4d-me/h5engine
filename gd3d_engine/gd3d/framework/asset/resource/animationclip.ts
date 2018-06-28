@@ -126,80 +126,82 @@ namespace gd3d.framework
          */
         Parse(buf: ArrayBuffer): threading.gdPromise<any>
         {
-            return new threading.gdPromise((resolve) =>
-            {
-                threading.thread.Instance.Call("animiclipHandle", buf, (result) =>
-                {
-                    // this.fps = math.Int16(result.fps);
-                    // this.loop = Boolean(result.loop);
-                    // this.boneCount = result.boneCount;
-
-                    // this.bones = result.bones.slice();
-
-                    // this.subclipCount = math.UInt16(result.subclipCount);
-                    // this.subclips = null;
-                    // this.subclips = result.subclips;
-                    // this.frameCount = math.UInt16(result.frameCount);
-                    // this.frames = {};
-                    // for (let key in result.frames)                     
-                    //     this.frames[key] = new Float32Array(result.frames[key]);                   
-                    for(let key in result)
-                        this[key] = result[key];
-                    resolve();
-                });
-            });
-
             // return new threading.gdPromise((resolve) =>
             // {
-            //     var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
-
-            //     var _name = read.readStringAnsi();
-
-            //     this.fps = read.readFloat();
-            //     this.loop = read.readBoolean();
-
-            //     this.boneCount = read.readInt();
-            //     this.bones = [];
-            //     for (let i = 0; i < this.boneCount; i++)
+            //     threading.thread.Instance.Call("animiclipHandle", buf, (result) =>
             //     {
-            //         this.bones.push(read.readStringAnsi());
-            //     }
+            //         // this.fps = math.Int16(result.fps);
+            //         // this.loop = Boolean(result.loop);
+            //         // this.boneCount = result.boneCount;
 
-            //     this.subclipCount = read.readInt();
-            //     this.subclips = [];
-            //     for (let i = 0; i < this.subclipCount; i++)
-            //     {
-            //         let _subClip = new subClip();
-            //         _subClip.name = read.readStringAnsi();
-            //         _subClip.loop = read.readBoolean();
-            //         this.subclips.push(_subClip);
-            //     }
+            //         // this.bones = result.bones.slice();
 
-            //     this.frameCount = read.readInt();
-            //     this.frames = {};
-            //     for (let i = 0; i < this.frameCount; i++)
-            //     {
-            //         let _fid = read.readInt().toString();
-            //         let _key = read.readBoolean();
-            //         let _frame = new Float32Array(this.boneCount * 7 + 1);
-            //         _frame[0] = _key ? 1 : 0;
-
-            //         let _boneInfo = new PoseBoneMatrix();
-            //         for (let i = 0; i < this.boneCount; i++)
-            //         {
-            //             _boneInfo.load(read);
-            //             _frame[i * 7 + 1] = _boneInfo.r.x;
-            //             _frame[i * 7 + 2] = _boneInfo.r.y;
-            //             _frame[i * 7 + 3] = _boneInfo.r.z;
-            //             _frame[i * 7 + 4] = _boneInfo.r.w;
-            //             _frame[i * 7 + 5] = _boneInfo.t.x;
-            //             _frame[i * 7 + 6] = _boneInfo.t.y;
-            //             _frame[i * 7 + 7] = _boneInfo.t.z;
-            //         }
-            //         this.frames[_fid] = _frame;
-            //     }
-            //     resolve();
+            //         // this.subclipCount = math.UInt16(result.subclipCount);
+            //         // this.subclips = null;
+            //         // this.subclips = result.subclips;
+            //         // this.frameCount = math.UInt16(result.frameCount);
+            //         // this.frames = {};
+            //         // for (let key in result.frames)                     
+            //         //     this.frames[key] = new Float32Array(result.frames[key]);                   
+            //         for(let key in result)
+            //             this[key] = result[key];
+            //         resolve();
+            //     });
             // });
+
+            return new threading.gdPromise((resolve) =>
+            {
+                var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
+
+                var _name = read.readStringAnsi();
+
+                this.fps = read.readFloat();
+                this.loop = read.readBoolean();
+
+                this.boneCount = read.readInt();
+                this.bones = [];
+                for (let i = 0; i < this.boneCount; i++)
+                {
+                    let bonename = read.readStringAnsi();
+                    this.bones.push(bonename);
+                    this.indexDic[bonename] = i;
+                }
+
+                this.subclipCount = read.readInt();
+                this.subclips = [];
+                for (let i = 0; i < this.subclipCount; i++)
+                {
+                    let _subClip = new subClip();
+                    _subClip.name = read.readStringAnsi();
+                    _subClip.loop = read.readBoolean();
+                    this.subclips.push(_subClip);
+                }
+
+                this.frameCount = read.readInt();
+                this.frames = {};
+                for (let i = 0; i < this.frameCount; i++)
+                {
+                    let _fid = read.readInt().toString();
+                    let _key = read.readBoolean();
+                    let _frame = new Float32Array(this.boneCount * 7 + 1);
+                    _frame[0] = _key ? 1 : 0;
+
+                    let _boneInfo = new PoseBoneMatrix();
+                    for (let i = 0; i < this.boneCount; i++)
+                    {
+                        _boneInfo.load(read);
+                        _frame[i * 7 + 1] = _boneInfo.r.x;
+                        _frame[i * 7 + 2] = _boneInfo.r.y;
+                        _frame[i * 7 + 3] = _boneInfo.r.z;
+                        _frame[i * 7 + 4] = _boneInfo.r.w;
+                        _frame[i * 7 + 5] = _boneInfo.t.x;
+                        _frame[i * 7 + 6] = _boneInfo.t.y;
+                        _frame[i * 7 + 7] = _boneInfo.t.z;
+                    }
+                    this.frames[_fid] = _frame;
+                }
+                resolve();
+            });
         }
 
         /**
@@ -245,7 +247,7 @@ namespace gd3d.framework
          */
         bones: string[];
 
-        indexDic:{[boneName:string]:number};
+        indexDic: { [boneName: string]: number }={};
         /**
          * @private
          */

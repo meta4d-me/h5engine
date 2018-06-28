@@ -376,57 +376,57 @@ namespace gd3d.framework
          */
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext)
         {
-            return new threading.gdPromise((reslove) =>
-            {
-                threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
-                {
-
-                    let objVF = result.objVF;
-                    let data = result.meshData;
-                    data.originVF = objVF.vf;
-                    // this.data = data;
-                    this.data = new gd3d.render.meshData();
-                    for (let k in data)
-                        this.data[k] = data[k];
-                    this.submesh = result.subMesh;
-
-                    this.glMesh = new gd3d.render.glMesh();
-                    var vertexs = this.data.genVertexDataArray(objVF.vf);
-                    var indices = this.data.genIndexDataArray();
-
-                    let __webgl = sceneMgr.app.getAssetMgr().webgl;
-                    this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
-                    this.glMesh.uploadVertexData(webgl, vertexs);
-                    this.glMesh.addIndex(webgl, indices.length);
-                    this.glMesh.uploadIndexData(webgl, 0, indices);
-                    reslove();
-                });
-            });
-
             // return new threading.gdPromise((reslove) =>
             // {
-
-                
-            //     var objVF = { vf: 0 };//顶点属性
-            //     var data: gd3d.render.meshData = new gd3d.render.meshData();
-            //     var read: gd3d.io.binReader = new gd3d.io.binReader(buf);              
-
-            //     var meshName = read.readStringAnsi();
-                
-            //     read.position = read.position + 24;
-
-            //     var vcount = read.readUInt32();
-
-            //     var vec10tpose: number[] = [];
-
-            //     //分片加载 
-            //     this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
+            //     threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
             //     {
-            //         this.readFinish(read, data, buf, objVF, webgl);
+
+            //         let objVF = result.objVF;
+            //         let data = result.meshData;
+            //         data.originVF = objVF.vf;
+            //         // this.data = data;
+            //         this.data = new gd3d.render.meshData();
+            //         for (let k in data)
+            //             this.data[k] = data[k];
+            //         this.submesh = result.subMesh;
+
+            //         this.glMesh = new gd3d.render.glMesh();
+            //         var vertexs = this.data.genVertexDataArray(objVF.vf);
+            //         var indices = this.data.genIndexDataArray();
+
+            //         let __webgl = sceneMgr.app.getAssetMgr().webgl;
+            //         this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
+            //         this.glMesh.uploadVertexData(webgl, vertexs);
+            //         this.glMesh.addIndex(webgl, indices.length);
+            //         this.glMesh.uploadIndexData(webgl, 0, indices);
             //         reslove();
             //     });
-
             // });
+
+            return new threading.gdPromise((reslove) =>
+            {
+
+                
+                var objVF = { vf: 0 };//顶点属性
+                var data: gd3d.render.meshData = new gd3d.render.meshData();
+                var read: gd3d.io.binReader = new gd3d.io.binReader(buf);              
+
+                var meshName = read.readStringAnsi();
+                
+                read.position = read.position + 24;
+
+                var vcount = read.readUInt32();
+
+                var vec10tpose: number[] = [];
+
+                //分片加载 
+                this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
+                {
+                    this.readFinish(read, data, buf, objVF, webgl);
+                    reslove();
+                });
+
+            });
 
         }
 
