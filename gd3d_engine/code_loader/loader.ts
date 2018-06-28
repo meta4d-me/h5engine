@@ -53,7 +53,7 @@ window.onload = () =>
             var gdapp = new gd3d.framework.application();
             var div = document.getElementById("drawarea") as HTMLDivElement;
             gdapp.start(div);
-            gdapp.showFps();
+            //gdapp.showFps();
             gdapp.bePlay = true;
             gdapp.addUserCode("main");
             

@@ -17,27 +17,15 @@ namespace gd3d.framework
         {
         }
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
          */
         gameObject: gameObject;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 场景渲染层级（common、transparent、overlay）
-         * @version egret-gd3d 1.0
          */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 渲染mask层级（和相机相对应）
-         * @version egret-gd3d 1.0
          */
         //renderLayer: CullingMask = CullingMask.default;
         get renderLayer() { return this.gameObject.layer; }
@@ -46,27 +34,16 @@ namespace gd3d.framework
             this.gameObject.layer = layer;
         }
         private issetq = false;
-        /**
-         * @private
-         */
         _queue: number = 0;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 返回此组件的场景渲染层级排序依据queue大小
-         * @version egret-gd3d 1.0
          */
         get queue(): number
         {
             return this._queue;
         }
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 设置此组件的场景渲染层级排序number大小
-         * @version egret-gd3d 1.0
          */
         set queue(value: number)
         {
@@ -74,11 +51,7 @@ namespace gd3d.framework
             this.issetq = true;
         }
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 材质数组
-         * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("material[]")
         materials: material[];
@@ -87,11 +60,7 @@ namespace gd3d.framework
          */
         _player: aniplayer;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 返回动画播放组件
-         * @version egret-gd3d 1.0
          */
         get player(): aniplayer
         {
@@ -104,11 +73,7 @@ namespace gd3d.framework
 
         private _mesh: mesh;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 返回mesh数据
-         * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("mesh")
         get mesh()
@@ -116,11 +81,7 @@ namespace gd3d.framework
             return this._mesh;
         }
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 设置mesh数据
-         * @version egret-gd3d 1.0
          */
         set mesh(mesh: mesh)
         {
@@ -155,27 +116,14 @@ namespace gd3d.framework
         // @gd3d.reflect.Field("vector3")
         size: math.vector3;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 最大骨骼数量
          * @version egret-gd3d 1.0
          */
-        maxBoneCount: number = 0;
-
-        //骨骼数据提交形态
-        private _skintype: number = 0;
-
-        //这个数据是扣掉tpose之后的
-        private _skeletonMatrixData: Float32Array;
-        /**
-         * @private
-         */
-        public static dataCaches: { key: string, data: Float32Array }[] = [];
-        private cacheData: Float32Array;
-
+        maxBoneCount: number = 55;
         //是否高效
         private _efficient: boolean = true;
+        //这个数据是扣掉tpose之后的
+        private _skeletonMatrixData: Float32Array;
         start()
         {
 
@@ -381,20 +329,9 @@ namespace gd3d.framework
         {
             if (this._skeletonMatrixData == null)
             {
-                //根据shader决定传什么数据
-                this._skintype = this.useBoneShader(this.materials[0]);
-                if (this._skintype == 1)
-                {
-                    this.maxBoneCount = 24;
-                    this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
-                    this._efficient = false;
-                }
-                else if (this._skintype == 2)
-                {
-                    this.maxBoneCount = 55;
-                    this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
-                    this._efficient = true;
-                }
+                this.maxBoneCount = 55;
+                this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
+                //this._efficient = true;
             }
 
             if (this.materials != null && this.materials.length > 0)
@@ -410,38 +347,8 @@ namespace gd3d.framework
 
             if (this.player != null)
             {
-                if (this.player.isCache && !this.player.mix)
-                {
-                    let cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
-                    let data: Float32Array = skinnedMeshRenderer.dataCaches[cacheKey];
-                    if (!data)
-                    {
-                        let _cachePlayer = aniplayer.playerCaches[this.player.cacheKey];
-                        if (_cachePlayer)
-                        {
-                            let baseSize = this._efficient ? 8 : 16;
-                            data = new Float32Array(this.maxBoneCount * baseSize);
-                            _cachePlayer.fillPoseData(data, this.bones, this._efficient);
-                            skinnedMeshRenderer.dataCaches[cacheKey] = data;
-                            this.cacheData = data;
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        this.cacheData = data;
-                        return;
-                    }
-                }
-                this.cacheData = null;
-
-                if (this._skeletonMatrixData != null)
-                {
-                    this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
-                }
+                this.player.fillPoseData(this._skeletonMatrixData, this.bones);
             }
-
-
         }
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
@@ -453,52 +360,18 @@ namespace gd3d.framework
                 context.updateLightMask(this.gameObject.layer);
                 context.updateModel(this.player.gameObject.transform);
             }
-
-
-            for (let i = 0; i < this.materials.length; i++)
-            {
-                if (this.materials[i] == null) continue;
-                if (this.cacheData != null && this._skintype > 0)
-                {
-                    if (this._efficient)
-                    {
-                        //this.materials[i].setVector4v("glstate_vec4_bones", this.cacheData);
-                        context.vec4_bones = this.cacheData;
-                    }
-                    else
-                    {
-                        //this.materials[i].setMatrixv("glstate_matrix_bones", this.cacheData);
-                        context.matrix_bones = this.cacheData;
-                    }
-                    continue;
-                }
-                if (this._skeletonMatrixData != null && this._skintype > 0)
-                {
-                    if (this._efficient)
-                    {
-                        //this.materials[i].setVector4v("glstate_vec4_bones", this._skeletonMatrixData);
-                        context.vec4_bones = this._skeletonMatrixData;
-
-                    }
-                    else
-                    {
-                        //this.materials[i].setMatrixv("glstate_matrix_bones", this._skeletonMatrixData);
-                        context.matrix_bones = this._skeletonMatrixData;
-
-                    }
-                }
-            }
+            context.vec4_bones = this._skeletonMatrixData;
             if (this._mesh && this.mesh.glMesh)
             {
                 this._mesh.glMesh.bindVboBuffer(context.webgl);
                 if (this._mesh.submesh != null)
                 {
-                    for (var i = 0; i < this._mesh.submesh.length; i++)
+                    for (let i = 0; i < this._mesh.submesh.length; i++)
                     {
-                        var sm = this._mesh.submesh[i];
+                        let sm = this._mesh.submesh[i];
 
-                        var mid = this._mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质
-                        var usemat = this.materials[mid];
+                        let mid = this._mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质
+                        let usemat = this.materials[mid];
                         if (usemat != null)
                         {
                             if (this.gameObject.transform.scene.fog)
@@ -513,7 +386,6 @@ namespace gd3d.framework
                     }
                 }
             }
-
         }
         /**
          * @private
@@ -527,6 +399,7 @@ namespace gd3d.framework
             if (this.mesh)
                 this.mesh.unuse(true);
             this.bones.length = 0;
+            this._skeletonMatrixData=null;
         }
         /**
          * @private
@@ -534,19 +407,6 @@ namespace gd3d.framework
         clone()
         {
 
-        }
-        /**
-         * @private
-         */
-        useBoneShader(mat: material): number
-        {
-            var matpasses: gd3d.render.glDrawPass[] = mat.getShader().passes["skin"];
-            if (matpasses == null || matpasses.length == 0) return 0;
-            if (matpasses[0].mapuniforms["glstate_vec4_bones"] != null)
-                return 2;
-            else if (matpasses[0].mapuniforms["glstate_matrix_bones"] != null)
-                return 1;
-            return 0;
         }
     }
 
