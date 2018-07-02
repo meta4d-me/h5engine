@@ -68,13 +68,20 @@ namespace demo
         randome(){
             let idx = Math.floor(Math.random() * this.cubes.length);
             let cube = this.cubes[idx];
+            //local 
             cube.localTranslate.x += Math.random()  * 10;
+            cube.localScale.x = cube.localScale.y;
+            cube.localRotate.z = cube.localRotate.x;
             let temp = cube.getWorldTranslate();
             temp.y += Math.random()  * 10;
+            //world 
+            cube.getWorldScale();
             cube.setWorldPosition(temp);
             cube.localEulerAngles.x = Math.random()  * 10;
             cube.localEulerAngles = cube.localEulerAngles;
+            cube.setWorldRotate(cube.getWorldRotate());
             cube.markDirty();
+            
         }
 
     }

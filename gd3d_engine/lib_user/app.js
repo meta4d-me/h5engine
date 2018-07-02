@@ -1147,6 +1147,7 @@ var main = (function () {
         this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
+        this.addBtn("trans性能测试", function () { return new demo.test_performance(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -2512,8 +2513,6 @@ var test_loadScene = (function () {
         var x2 = Math.sin(this.timer * 0.5);
         var z2 = Math.cos(this.timer * 0.5);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
-        objCam.markDirty();
     };
     return test_loadScene;
 }());
@@ -3481,7 +3480,6 @@ var test_pick = (function () {
         cube.localScale.x = 10;
         cube.localScale.y = 0.1;
         cube.localScale.z = 10;
-        cube.setLocalScale(cube.localScale);
         this.scene.addChild(cube);
         var mesh = cube.gameObject.addComponent("meshFilter");
         var smesh = this.app.getAssetMgr().getDefaultMesh("pyramid");
@@ -3496,8 +3494,6 @@ var test_pick = (function () {
             this.scene.addChild(this.cube2);
             this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 1;
             this.cube2.localTranslate.x = -5;
-            this.cube2.setLocalScale(this.cube2.localScale);
-            this.cube2.setLocalPosition(this.cube2.localTranslate);
             this.cube2.markDirty();
             var mesh = this.cube2.gameObject.addComponent("meshFilter");
             mesh.mesh = (smesh);
@@ -3513,8 +3509,6 @@ var test_pick = (function () {
             this.scene.addChild(this.cube3);
             this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 1;
             this.cube3.localTranslate.x = -5;
-            this.cube3.setLocalScale(this.cube3.localScale);
-            this.cube3.setLocalPosition(this.cube3.localTranslate);
             this.cube3.markDirty();
             var mesh = this.cube3.gameObject.addComponent("meshFilter");
             mesh.mesh = (smesh);
@@ -3528,8 +3522,6 @@ var test_pick = (function () {
             this.scene.addChild(this.cube4);
             this.cube4.localScale.x = this.cube4.localScale.y = this.cube4.localScale.z = 1;
             this.cube4.localTranslate.x = 5;
-            this.cube4.setLocalScale(this.cube4.localScale);
-            this.cube4.setLocalPosition(this.cube4.localTranslate);
             this.cube4.markDirty();
             var mesh = this.cube4.gameObject.addComponent("meshFilter");
             mesh.mesh = (smesh);
@@ -3543,10 +3535,10 @@ var test_pick = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 0.5, -10);
-        objCam.setLocalPosition(objCam.localTranslate);
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
         objCam.lookat(this.cube);
         objCam.markDirty();
+        CameraController.instance().init(this.app, this.camera);
     };
     test_pick.prototype.update = function (delta) {
         CameraController.instance().update(delta);
@@ -3570,7 +3562,6 @@ var test_pick = (function () {
         this.timer += delta;
         this.cube3.localTranslate.x += delta;
         this.cube3.localTranslate = this.cube3.localTranslate;
-        this.cube3.setLocalPosition(this.cube3.localTranslate);
         this.cube3.markDirty();
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);
@@ -3579,7 +3570,6 @@ var test_pick = (function () {
         var tv = new gd3d.math.vector3();
         gd3d.math.vec3SLerp(this.cube2.localTranslate, this.movetarget, this.timer, this.cube2.localTranslate);
         this.cube2.localTranslate = this.movetarget;
-        this.cube2.setLocalPosition(this.movetarget);
         this.cube2.markDirty();
     };
     return test_pick;
@@ -7697,11 +7687,15 @@ var demo;
             var idx = Math.floor(Math.random() * this.cubes.length);
             var cube = this.cubes[idx];
             cube.localTranslate.x += Math.random() * 10;
+            cube.localScale.x = cube.localScale.y;
+            cube.localRotate.z = cube.localRotate.x;
             var temp = cube.getWorldTranslate();
             temp.y += Math.random() * 10;
+            cube.getWorldScale();
             cube.setWorldPosition(temp);
             cube.localEulerAngles.x = Math.random() * 10;
             cube.localEulerAngles = cube.localEulerAngles;
+            cube.setWorldRotate(cube.getWorldRotate());
             cube.markDirty();
         };
         return test_performance;

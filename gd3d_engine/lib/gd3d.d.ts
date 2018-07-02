@@ -1443,12 +1443,17 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class transform {
+        private helpLRotate;
+        private helpLPos;
+        private helpLScale;
+        private checkLRTSChange();
         private _scene;
         scene: scene;
         name: string;
         insId: insID;
         prefab: string;
         updateWorldTran(): void;
+        updateTran(bool: boolean): void;
         private aabbdirty;
         markAABBDirty(): void;
         private aabbchilddirty;
@@ -1486,22 +1491,14 @@ declare namespace gd3d.framework {
         hasRendererCompChild: boolean;
         private _localRotate;
         localRotate: math.quaternion;
-        setLocalRotate(position: math.quaternion): any;
-        setLocalRotate(x: number, y: number, z: number, w?: number): any;
         private _localTranslate;
         localTranslate: math.vector3;
         localPosition: math.vector3;
-        setLocalPosition(position: math.vector3): any;
-        setLocalPosition(x: number, y: number, z: number): any;
         private _localScale;
         localScale: math.vector3;
-        setLocalScale(scale: math.vector3): any;
-        setLocalScale(x: number, y: number, z: number): any;
         private localMatrix;
         private _localEulerAngles;
         localEulerAngles: math.vector3;
-        setLocalEulerAngles(angles: math.vector3): any;
-        setLocalEulerAngles(x: number, y: number, z: number): any;
         private worldMatrix;
         private worldRotate;
         private worldTranslate;
@@ -1512,8 +1509,10 @@ declare namespace gd3d.framework {
         getWorldPosition(): math.vector3;
         setWorldPosition(pos: math.vector3): void;
         getWorldScale(): math.vector3;
+        setWorldScale(scale: math.vector3): void;
         getLocalMatrix(): math.matrix;
         getWorldMatrix(): math.matrix;
+        private checkToTop();
         getForwardInWorld(out: math.vector3): void;
         getRightInWorld(out: math.vector3): void;
         getUpInWorld(out: math.vector3): void;
@@ -3886,7 +3885,7 @@ declare namespace gd3d.math {
         v: number;
     }
     function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
-    function matrixGetRotation(matrix: matrix, result: quaternion): void;
+    function matrixGetRotation(src: matrix, result: quaternion): void;
     function matrix2Quaternion(matrix: matrix, result: quaternion): void;
     function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
     function matrixClone(src: matrix, out: matrix): void;

@@ -1121,8 +1121,10 @@ namespace gd3d.io
                     _newInstance = reflect.createInstance(componentType, null);
                     if (_isArray)
                         instanceObj.push(_newInstance);
-                    else
+                    else{
                         instanceObj[key] = _newInstance;
+                        _newInstance = instanceObj[key];
+                    }
                 }
                 deSerializeObj(serializedObj[key].value, _newInstance, assetMgr, bundlename);
                 let insid = serializedObj[key].insid;
@@ -1239,7 +1241,7 @@ namespace gd3d.io
         static regtypelist: string[] = [];
         static regDefaultType()
         {
-            referenceInfo.regType("vector3");
+            //referenceInfo.regType("vector3");
             referenceInfo.regType("vector4");
             referenceInfo.regType("color");
             referenceInfo.regType("border");

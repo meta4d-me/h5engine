@@ -5,7 +5,6 @@ namespace gd3d.framework
     let helpVec3 = new math.vector3();
     let helpVec3_1 = new math.vector3();
     let helpMtx4 = new math.matrix();
-    let helpMtx4_1 = new math.matrix();
     let helpQuat = new math.quaternion();
     let helpQuat_1 = new math.quaternion();
     let helpUp = new math.vector3(0, 1, 0);
@@ -21,6 +20,20 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class transform 
     {
+        private helpLRotate:math.quaternion = new math.quaternion();
+        private helpLPos:math.vector3 = new math.vector3();
+        private helpLScale:math.vector3 = new math.vector3(1,1,1);
+
+        private checkLRTSChange():boolean{
+            if(!math.vec3Equal(this.helpLPos,this._localTranslate,Number.MIN_VALUE))
+                return true;
+            if(!math.quatEqual(this.helpLRotate,this._localRotate,Number.MIN_VALUE))
+                return true;
+            if(!math.vec3Equal(this.helpLScale,this._localScale,Number.MIN_VALUE))
+                return true;
+            return false;
+        }
+
         private _scene: scene;
         /**
          * @public
@@ -87,6 +100,14 @@ namespace gd3d.framework
         updateWorldTran(){
         }
 
+        /**
+         * [过时接口,完全弃用]
+         * @param bool 
+         */
+        updateTran(bool:boolean){
+
+        }
+
         private aabbdirty: boolean = true;
 
         /**
@@ -130,6 +151,12 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         get aabb(){
+            if (this.aabbdirty)   //没考虑 aabb 阶段 改
+            {
+                //transform里只更新自己的aabb
+                this.caclAABB();
+                this.aabbdirty = false;
+            }
             return this._aabb;
         }
 
@@ -310,7 +337,7 @@ namespace gd3d.framework
             if(node.hasRendererComp || node.hasRendererCompChild)
                 this.markHaveRendererComp();
 
-            node.dirtify();   
+            node.dirtify(true);
         }
         /**
          * @public
@@ -458,6 +485,9 @@ namespace gd3d.framework
         private sync(){
             if (this.dirtyLocal) {
                 math.matrixMakeTransformRTS(this._localTranslate,this._localScale,this._localRotate,this.localMatrix);
+                math.vec3Clone(this._localTranslate,this.helpLPos);
+                math.vec3Clone(this._localScale,this.helpLScale);
+                math.quatClone(this._localRotate,this.helpLRotate);
                 this.dirtyLocal = false;
             }
 
@@ -549,30 +579,7 @@ namespace gd3d.framework
             return this._localRotate;
         }
         set localRotate(rotate:math.quaternion){
-            this._localRotate = rotate;
-            if (!this.dirtyLocal) {
-                this.dirtify(true);
-            }
-        }
-
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置本地旋转
-         * @version egret-gd3d 1.0
-         */
-        setLocalRotate(position:math.quaternion)
-        setLocalRotate(x:number,y:number,z:number,w?:number)
-        setLocalRotate(p1:number | math.vector3 ,y?:number,z?:number,w?:number){
-            if(p1.hasOwnProperty("rawData")){
-                this._localRotate = <math.quaternion>p1;
-            }else{
-                this._localRotate.x = <number>p1;
-                this._localRotate.y = y;
-                this._localRotate.z = z;
-                this._localRotate.w = w;
-            }
+            math.quatClone(rotate,this._localRotate);
             if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
@@ -586,12 +593,12 @@ namespace gd3d.framework
          * 本地位移
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("vector3", new math.vector3(0, 0, 0))
+        @gd3d.reflect.Field("vector3")
         get localTranslate(){
             return this._localTranslate;
         }
         set localTranslate(position:math.vector3){
-            this._localTranslate = position;
+            math.vec3Clone(position,this._localTranslate);
             if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
@@ -608,34 +615,11 @@ namespace gd3d.framework
             return this._localTranslate;
         }
         set localPosition(position:math.vector3){
-            this._localTranslate = position;
+            math.vec3Clone(position,this._localTranslate);
             if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
         }
-
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置本地位移
-         * @version egret-gd3d 1.0
-         */
-        setLocalPosition(position:math.vector3)
-        setLocalPosition(x:number,y:number,z:number)
-        setLocalPosition(p1:number | math.vector3 ,y?:number,z?:number){
-            if(p1.hasOwnProperty("rawData")){
-                this._localTranslate = <math.vector3>p1;
-            }else{
-                this._localTranslate.x = <number>p1;
-                this._localTranslate.y = y;
-                this._localTranslate.z = z;
-            }
-            if (!this.dirtyLocal) {
-                this.dirtify(true);
-            }
-        }
-
 
         private _localScale: math.vector3 = new math.vector3(1, 1, 1);
         /**
@@ -645,33 +629,12 @@ namespace gd3d.framework
          * 本地缩放
          * @version egret-gd3d 1.0
          */
-        @gd3d.reflect.Field("vector3", new math.vector3(1, 1, 1))
+        @gd3d.reflect.Field("vector3")
         get localScale(){
             return this._localScale;
         }
         set localScale(scale:math.vector3){
-            this._localScale = scale;
-            if (!this.dirtyLocal) {
-                this.dirtify(true);
-            }
-        }
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置本地缩放
-         * @version egret-gd3d 1.0
-         */
-        setLocalScale(scale:math.vector3)
-        setLocalScale(x:number,y:number,z:number)
-        setLocalScale(p1:number | math.vector3 ,y?:number,z?:number){
-            if(p1.hasOwnProperty("rawData")){
-                this._localScale = <math.vector3>p1;
-            }else{
-                this._localScale.x = <number>p1;
-                this._localScale.y = y;
-                this._localScale.z = z;
-            }
+            math.vec3Clone(scale,this._localScale);
             if (!this.dirtyLocal) {
                 this.dirtify(true);
             }
@@ -699,26 +662,6 @@ namespace gd3d.framework
             }
         }
 
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置本地旋转的欧拉角
-         * @version egret-gd3d 1.0
-         */
-        setLocalEulerAngles(angles: math.vector3)
-        setLocalEulerAngles(x:number,y:number,z:number)
-        setLocalEulerAngles(p1:number | math.vector3 ,y?:number,z?:number){
-            if(p1.hasOwnProperty("rawData")){
-                math.quatFromEulerAngles(p1["x"], p1["y"], p1["z"], this._localRotate);
-            }else{
-                math.quatFromEulerAngles(<number>p1, y, z, this._localRotate);
-            }
-            if (!this.dirtyLocal) {
-                this.dirtify(true);
-            }
-        }
-
         //这个是如果爹改了就要跟着算的
         private worldMatrix: math.matrix = new math.matrix();
         private worldRotate: math.quaternion = new math.quaternion();
@@ -733,9 +676,7 @@ namespace gd3d.framework
          */
         getWorldRotate()
         {
-
             math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);  
-            //this.refreshWorldRTS();
             return this.worldRotate;
         }
 
@@ -769,8 +710,7 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);
-            //this.refreshWorldRTS();
+            math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
             return this.worldTranslate;
         }
         /**
@@ -782,7 +722,7 @@ namespace gd3d.framework
          */
         getWorldPosition()
         {
-            math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);
+            math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
             return this.worldTranslate;
         }
 
@@ -798,9 +738,8 @@ namespace gd3d.framework
             if (!this._parent) {
                 math.vec3Clone(pos,this._localTranslate);
             } else{
-                let deltaV3 = helpVec3_1;
-                math.vec3Subtract(pos,helpVec3,deltaV3);
-                math.vec3Add(this._localTranslate,deltaV3,this._localTranslate);
+                math.matrixInverse(this._parent.getWorldMatrix(),helpMtx4);
+                math.matrixTransformVector3(pos,helpMtx4,this._localTranslate);
             }
 
             if (!this.dirtyLocal) {
@@ -818,8 +757,29 @@ namespace gd3d.framework
         getWorldScale()
         {
             math.matrixGetScale(this.getWorldMatrix(),this.worldScale);  
-            //this.refreshWorldRTS();
             return this.worldScale;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置世界坐标系下的缩放
+         * @version egret-gd3d 1.0
+         */
+        setWorldScale(scale:math.vector3){
+            if (!this._parent) {
+                math.vec3Clone(scale,this._localScale);
+            } else{
+                math.vec3Clone(this._parent.getWorldScale(),helpVec3);
+                this._localScale.x = scale.x / helpVec3.x;
+                this._localScale.y = scale.y / helpVec3.y;
+                this._localScale.z = scale.z / helpVec3.z;
+            }
+
+            if (!this.dirtyLocal) {
+                this.dirtify(true);
+            }
         }
 
         /**
@@ -833,6 +793,9 @@ namespace gd3d.framework
         {
             if (this.dirtyLocal) {
                 math.matrixMakeTransformRTS(this._localTranslate,this._localScale,this._localRotate,this.localMatrix);
+                math.vec3Clone(this._localTranslate,this.helpLPos);
+                math.vec3Clone(this._localScale,this.helpLScale);
+                math.quatClone(this._localRotate,this.helpLRotate);
                 this.dirtyLocal = false;
             }
             return this.localMatrix;
@@ -846,6 +809,16 @@ namespace gd3d.framework
          */
         getWorldMatrix(): math.matrix
         {
+            // if(!this.dirtyLocal){
+            //     if(this.checkLRTSChange()){
+            //         this.dirtify(true);
+            //     }
+            // }
+
+            if(!this.dirtyLocal && !this.dirtyWorld){
+                this.checkToTop();
+            }
+
             if (!this.dirtyLocal && !this.dirtyWorld) {
                 return this.worldMatrix;
             }
@@ -857,8 +830,25 @@ namespace gd3d.framework
 
             this.sync();
 
-            //this.refreshMtxs();
             return this.worldMatrix;
+        }
+
+        private checkToTop(){
+            let top : transform ;
+            let temp : transform = this;
+            while(true){
+                if(temp.checkLRTSChange()){
+                    temp.dirtyLocal = true;
+                    //temp.dirtify(true);
+                    top = temp;
+                }
+                
+                if(!temp._parent) break;
+                temp = temp._parent;
+            }
+            if(top){
+                top.dirtify(true);
+            }
         }
 
         /**
@@ -949,8 +939,8 @@ namespace gd3d.framework
         }
 
         private calcLookAt(point: math.vector3){
-            math.quatLookat(this.getWorldTranslate(), point, helpQuat);
-            this.setWorldRotate(helpQuat);
+            math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
+            this.setWorldRotate(this.worldRotate);
         }
 
         private _gameObject: gameObject;

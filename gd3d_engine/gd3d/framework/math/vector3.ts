@@ -17,10 +17,10 @@
         // to.x = from.x;
         // to.y = from.y;
         // to.z = from.z;
-        to.rawData.set(from.rawData);
-        // to.rawData[0]=from.rawData[0];
-        // to.rawData[1]=from.rawData[1];
-        // to.rawData[2]=from.rawData[2];
+        //to.rawData.set(from.rawData);
+        to.rawData[0]=from.rawData[0];
+        to.rawData[1]=from.rawData[1];
+        to.rawData[2]=from.rawData[2];
     }
     export function vec3ToString(result: string)
     {

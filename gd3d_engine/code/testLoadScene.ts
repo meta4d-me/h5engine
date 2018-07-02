@@ -80,8 +80,8 @@ class test_loadScene implements IState
         var x2 = Math.sin(this.timer * 0.5);
         var z2 = Math.cos(this.timer * 0.5);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
-        objCam.markDirty();//标记为需要刷新
+        // objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
+        // objCam.markDirty();//标记为需要刷新
 
     }
 }

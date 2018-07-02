@@ -9059,7 +9059,6 @@ var gd3d;
         var helpVec3 = new gd3d.math.vector3();
         var helpVec3_1 = new gd3d.math.vector3();
         var helpMtx4 = new gd3d.math.matrix();
-        var helpMtx4_1 = new gd3d.math.matrix();
         var helpQuat = new gd3d.math.quaternion();
         var helpQuat_1 = new gd3d.math.quaternion();
         var helpUp = new gd3d.math.vector3(0, 1, 0);
@@ -9067,6 +9066,9 @@ var gd3d;
         var helpFoward = new gd3d.math.vector3(0, 0, 1);
         var transform = (function () {
             function transform() {
+                this.helpLRotate = new gd3d.math.quaternion();
+                this.helpLPos = new gd3d.math.vector3();
+                this.helpLScale = new gd3d.math.vector3(1, 1, 1);
                 this.name = "noname";
                 this.insId = new insID();
                 this.prefab = "";
@@ -9091,6 +9093,15 @@ var gd3d;
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
                 this._beDispose = false;
             }
+            transform.prototype.checkLRTSChange = function () {
+                if (!gd3d.math.vec3Equal(this.helpLPos, this._localTranslate, Number.MIN_VALUE))
+                    return true;
+                if (!gd3d.math.quatEqual(this.helpLRotate, this._localRotate, Number.MIN_VALUE))
+                    return true;
+                if (!gd3d.math.vec3Equal(this.helpLScale, this._localScale, Number.MIN_VALUE))
+                    return true;
+                return false;
+            };
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
                     if (this._scene == null) {
@@ -9108,6 +9119,8 @@ var gd3d;
             });
             transform.prototype.updateWorldTran = function () {
             };
+            transform.prototype.updateTran = function (bool) {
+            };
             transform.prototype.markAABBDirty = function () {
                 this.aabbdirty = true;
                 this.markAABBChildDirty();
@@ -9122,6 +9135,10 @@ var gd3d;
             };
             Object.defineProperty(transform.prototype, "aabb", {
                 get: function () {
+                    if (this.aabbdirty) {
+                        this.caclAABB();
+                        this.aabbdirty = false;
+                    }
                     return this._aabb;
                 },
                 enumerable: true,
@@ -9225,7 +9242,7 @@ var gd3d;
                     this.markHaveComponent();
                 if (node.hasRendererComp || node.hasRendererCompChild)
                     this.markHaveRendererComp();
-                node.dirtify();
+                node.dirtify(true);
             };
             transform.prototype.removeAllChild = function () {
                 if (this._children == undefined)
@@ -9309,6 +9326,9 @@ var gd3d;
             transform.prototype.sync = function () {
                 if (this.dirtyLocal) {
                     gd3d.math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
+                    gd3d.math.vec3Clone(this._localTranslate, this.helpLPos);
+                    gd3d.math.vec3Clone(this._localScale, this.helpLScale);
+                    gd3d.math.quatClone(this._localRotate, this.helpLRotate);
                     this.dirtyLocal = false;
                 }
                 if (this.dirtyWorld) {
@@ -9355,7 +9375,7 @@ var gd3d;
                     return this._localRotate;
                 },
                 set: function (rotate) {
-                    this._localRotate = rotate;
+                    gd3d.math.quatClone(rotate, this._localRotate);
                     if (!this.dirtyLocal) {
                         this.dirtify(true);
                     }
@@ -9363,26 +9383,12 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            transform.prototype.setLocalRotate = function (p1, y, z, w) {
-                if (p1.hasOwnProperty("rawData")) {
-                    this._localRotate = p1;
-                }
-                else {
-                    this._localRotate.x = p1;
-                    this._localRotate.y = y;
-                    this._localRotate.z = z;
-                    this._localRotate.w = w;
-                }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
-                }
-            };
             Object.defineProperty(transform.prototype, "localTranslate", {
                 get: function () {
                     return this._localTranslate;
                 },
                 set: function (position) {
-                    this._localTranslate = position;
+                    gd3d.math.vec3Clone(position, this._localTranslate);
                     if (!this.dirtyLocal) {
                         this.dirtify(true);
                     }
@@ -9395,7 +9401,7 @@ var gd3d;
                     return this._localTranslate;
                 },
                 set: function (position) {
-                    this._localTranslate = position;
+                    gd3d.math.vec3Clone(position, this._localTranslate);
                     if (!this.dirtyLocal) {
                         this.dirtify(true);
                     }
@@ -9403,25 +9409,12 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            transform.prototype.setLocalPosition = function (p1, y, z) {
-                if (p1.hasOwnProperty("rawData")) {
-                    this._localTranslate = p1;
-                }
-                else {
-                    this._localTranslate.x = p1;
-                    this._localTranslate.y = y;
-                    this._localTranslate.z = z;
-                }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
-                }
-            };
             Object.defineProperty(transform.prototype, "localScale", {
                 get: function () {
                     return this._localScale;
                 },
                 set: function (scale) {
-                    this._localScale = scale;
+                    gd3d.math.vec3Clone(scale, this._localScale);
                     if (!this.dirtyLocal) {
                         this.dirtify(true);
                     }
@@ -9429,19 +9422,6 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            transform.prototype.setLocalScale = function (p1, y, z) {
-                if (p1.hasOwnProperty("rawData")) {
-                    this._localScale = p1;
-                }
-                else {
-                    this._localScale.x = p1;
-                    this._localScale.y = y;
-                    this._localScale.z = z;
-                }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
-                }
-            };
             Object.defineProperty(transform.prototype, "localEulerAngles", {
                 get: function () {
                     gd3d.math.quatToEulerAngles(this._localRotate, this._localEulerAngles);
@@ -9456,17 +9436,6 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            transform.prototype.setLocalEulerAngles = function (p1, y, z) {
-                if (p1.hasOwnProperty("rawData")) {
-                    gd3d.math.quatFromEulerAngles(p1["x"], p1["y"], p1["z"], this._localRotate);
-                }
-                else {
-                    gd3d.math.quatFromEulerAngles(p1, y, z, this._localRotate);
-                }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
-                }
-            };
             transform.prototype.getWorldRotate = function () {
                 gd3d.math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
                 return this.worldRotate;
@@ -9485,11 +9454,11 @@ var gd3d;
                 }
             };
             transform.prototype.getWorldTranslate = function () {
-                gd3d.math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
+                gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
                 return this.worldTranslate;
             };
             transform.prototype.getWorldPosition = function () {
-                gd3d.math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
+                gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
                 return this.worldTranslate;
             };
             transform.prototype.setWorldPosition = function (pos) {
@@ -9497,9 +9466,8 @@ var gd3d;
                     gd3d.math.vec3Clone(pos, this._localTranslate);
                 }
                 else {
-                    var deltaV3 = helpVec3_1;
-                    gd3d.math.vec3Subtract(pos, helpVec3, deltaV3);
-                    gd3d.math.vec3Add(this._localTranslate, deltaV3, this._localTranslate);
+                    gd3d.math.matrixInverse(this._parent.getWorldMatrix(), helpMtx4);
+                    gd3d.math.matrixTransformVector3(pos, helpMtx4, this._localTranslate);
                 }
                 if (!this.dirtyLocal) {
                     this.dirtify(true);
@@ -9509,14 +9477,34 @@ var gd3d;
                 gd3d.math.matrixGetScale(this.getWorldMatrix(), this.worldScale);
                 return this.worldScale;
             };
+            transform.prototype.setWorldScale = function (scale) {
+                if (!this._parent) {
+                    gd3d.math.vec3Clone(scale, this._localScale);
+                }
+                else {
+                    gd3d.math.vec3Clone(this._parent.getWorldScale(), helpVec3);
+                    this._localScale.x = scale.x / helpVec3.x;
+                    this._localScale.y = scale.y / helpVec3.y;
+                    this._localScale.z = scale.z / helpVec3.z;
+                }
+                if (!this.dirtyLocal) {
+                    this.dirtify(true);
+                }
+            };
             transform.prototype.getLocalMatrix = function () {
                 if (this.dirtyLocal) {
                     gd3d.math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
+                    gd3d.math.vec3Clone(this._localTranslate, this.helpLPos);
+                    gd3d.math.vec3Clone(this._localScale, this.helpLScale);
+                    gd3d.math.quatClone(this._localRotate, this.helpLRotate);
                     this.dirtyLocal = false;
                 }
                 return this.localMatrix;
             };
             transform.prototype.getWorldMatrix = function () {
+                if (!this.dirtyLocal && !this.dirtyWorld) {
+                    this.checkToTop();
+                }
                 if (!this.dirtyLocal && !this.dirtyWorld) {
                     return this.worldMatrix;
                 }
@@ -9525,6 +9513,22 @@ var gd3d;
                 }
                 this.sync();
                 return this.worldMatrix;
+            };
+            transform.prototype.checkToTop = function () {
+                var top;
+                var temp = this;
+                while (true) {
+                    if (temp.checkLRTSChange()) {
+                        temp.dirtyLocal = true;
+                        top = temp;
+                    }
+                    if (!temp._parent)
+                        break;
+                    temp = temp._parent;
+                }
+                if (top) {
+                    top.dirtify(true);
+                }
             };
             transform.prototype.getForwardInWorld = function (out) {
                 gd3d.math.matrixTransformNormal(helpFoward, this.getWorldMatrix(), out);
@@ -9558,8 +9562,8 @@ var gd3d;
                 this.calcLookAt(point);
             };
             transform.prototype.calcLookAt = function (point) {
-                gd3d.math.quatLookat(this.getWorldTranslate(), point, helpQuat);
-                this.setWorldRotate(helpQuat);
+                gd3d.math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
+                this.setWorldRotate(this.worldRotate);
             };
             Object.defineProperty(transform.prototype, "gameObject", {
                 get: function () {
@@ -9617,12 +9621,12 @@ var gd3d;
                 __metadata("design:paramtypes", [gd3d.math.quaternion])
             ], transform.prototype, "localRotate", null);
             __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
+                gd3d.reflect.Field("vector3"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [gd3d.math.vector3])
             ], transform.prototype, "localTranslate", null);
             __decorate([
-                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
+                gd3d.reflect.Field("vector3"),
                 __metadata("design:type", Object),
                 __metadata("design:paramtypes", [gd3d.math.vector3])
             ], transform.prototype, "localScale", null);
@@ -13564,6 +13568,9 @@ var gd3d;
                                     var matrixView = context.matrixView;
                                     var az = gd3d.math.pool.new_vector3();
                                     var bz = gd3d.math.pool.new_vector3();
+                                    if (a.gameObject.transform.name == "pasted__default001") {
+                                        a.gameObject.transform.getWorldTranslate();
+                                    }
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                     var result = bz.z - az.z;
@@ -14618,8 +14625,6 @@ var gd3d;
                 this.paths = pathasset.paths;
                 if (this.paths[0] != null) {
                     gd3d.math.vec3Clone(this.paths[0], this.gameObject.transform.localTranslate);
-                    this.gameObject.transform.setLocalPosition(this.gameObject.transform.localTranslate);
-                    this.gameObject.transform.markDirty();
                     this.datasafe = true;
                 }
                 this.mystrans = this.gameObject.transform;
@@ -14643,8 +14648,6 @@ var gd3d;
                         gd3d.math.vec3Clone(this.paths[this.folowindex], this.mystrans.localTranslate);
                         this.folowindex++;
                         this.adjustDir = true;
-                        this.mystrans.setLocalPosition(this.mystrans.localTranslate);
-                        this.mystrans.markDirty();
                     }
                     else {
                         this.folowindex = 0;
@@ -20516,8 +20519,10 @@ var gd3d;
                         _newInstance = gd3d.reflect.createInstance(componentType, null);
                         if (_isArray)
                             instanceObj.push(_newInstance);
-                        else
+                        else {
                             instanceObj[key] = _newInstance;
+                            _newInstance = instanceObj[key];
+                        }
                     }
                     deSerializeObj(serializedObj[key].value, _newInstance, assetMgr, bundlename);
                     var insid = serializedObj[key].insid;
@@ -20588,7 +20593,6 @@ var gd3d;
             function referenceInfo() {
             }
             referenceInfo.regDefaultType = function () {
-                referenceInfo.regType("vector3");
                 referenceInfo.regType("vector4");
                 referenceInfo.regType("color");
                 referenceInfo.regType("border");
@@ -21179,6 +21183,7 @@ var gd3d;
             mat.rawData[10] = src.rawData[10] / scale.z;
             mat.rawData[11] = 0;
             matrix2Quaternion(mat, rotation);
+            math.pool.delete_matrix(mat);
             return true;
         }
         math.matrixDecompose = matrixDecompose;
@@ -21208,8 +21213,28 @@ var gd3d;
             return true;
         }
         math.matrix3x2Decompose = matrix3x2Decompose;
-        function matrixGetRotation(matrix, result) {
-            matrix2Quaternion(matrix, result);
+        function matrixGetRotation(src, result) {
+            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+            var scale_x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+            var scale_y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+            var scale_z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+            var mat = math.pool.new_matrix();
+            mat.rawData[0] = src.rawData[0] / scale_x;
+            mat.rawData[1] = src.rawData[1] / scale_x;
+            mat.rawData[2] = src.rawData[2] / scale_x;
+            mat.rawData[3] = 0;
+            mat.rawData[4] = src.rawData[4] / scale_y;
+            mat.rawData[5] = src.rawData[5] / scale_y;
+            mat.rawData[6] = src.rawData[6] / scale_y;
+            mat.rawData[7] = 0;
+            mat.rawData[8] = src.rawData[8] / scale_z;
+            mat.rawData[9] = src.rawData[9] / scale_z;
+            mat.rawData[10] = src.rawData[10] / scale_z;
+            mat.rawData[11] = 0;
+            matrix2Quaternion(mat, result);
+            math.pool.delete_matrix(mat);
         }
         math.matrixGetRotation = matrixGetRotation;
         function matrix2Quaternion(matrix, result) {
@@ -21451,9 +21476,12 @@ var gd3d;
         }
         math.matrix3x2MakeTranslate = matrix3x2MakeTranslate;
         function matrixGetScale(src, scale) {
-            scale.rawData[0] = src.rawData[0];
-            scale.rawData[1] = src.rawData[5];
-            scale.rawData[2] = src.rawData[10];
+            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+            scale.rawData[0] = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+            scale.rawData[1] = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+            scale.rawData[2] = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
         }
         math.matrixGetScale = matrixGetScale;
         function matrixMakeScale(xScale, yScale, zScale, out) {
@@ -22493,7 +22521,9 @@ var gd3d;
     var math;
     (function (math) {
         function vec3Clone(from, to) {
-            to.rawData.set(from.rawData);
+            to.rawData[0] = from.rawData[0];
+            to.rawData[1] = from.rawData[1];
+            to.rawData[2] = from.rawData[2];
         }
         math.vec3Clone = vec3Clone;
         function vec3ToString(result) {

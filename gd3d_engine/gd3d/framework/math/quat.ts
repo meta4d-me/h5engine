@@ -73,7 +73,7 @@
 
         return true;
     }
-    
+
     export function quatToMatrix(src: quaternion, out: matrix) {
         var xy2: number = 2.0 * src.x * src.y, xz2: number = 2.0 * src.x * src.z, xw2: number = 2.0 * src.x * src.w;
         var yz2: number = 2.0 * src.y * src.z, yw2: number = 2.0 * src.y * src.w, zw2: number = 2.0 * src.z * src.w;
@@ -266,7 +266,7 @@
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
 
-        //dir在xz面上的单位投影             
+        //dir在xz面上的单位投影
         var dirxz = pool.new_vector3(dir.x, 0, dir.z);
         math.vec3Normalize(dirxz, dirxz);
 
@@ -337,7 +337,7 @@
             an_dz = 2*Math.PI -an_dz;
         }
         an_dz = 180 / Math.PI * an_dz;
-        
+
         quatFromAxisAngle(cdz, -an_dz, out);
 
         let y = gd3d.math.pool.new_vector3();
@@ -357,13 +357,13 @@
         // if(cos2Y>-0.001&&cos2Y<0.001){
         //     cos2Y=0;
         // }
-        
+
         let sin2Y = Math.sqrt(1 - cos2Y * cos2Y);
         console.log(vec3Dot(y,upwards));
         if(vec3Dot(y,upwards)<=0){
             sin2Y=-sin2Y;
         }
-        
+
         let siny = Math.sqrt((1 - sin2Y) / 2);
         let cosy = -Math.sqrt((sin2Y + 1) / 2);
         console.log(cos2Y);
@@ -387,7 +387,7 @@
         math.vec3Subtract(targetpos, pos, dir);
         math.vec3Normalize(dir, dir);
 
-        //dir在xz面上的单位投影             
+        //dir在xz面上的单位投影
         var dirxz = pool.new_vector3(dir.x, 0, dir.z);
         math.vec3Normalize(dirxz, dirxz);
 
@@ -429,7 +429,7 @@
             {
                 //vec3.cross(tmpvec3, yUnitVec3, from);
                 vec3Cross(yUnitVec3,from,tmpvec3);
-            } 
+            }
             // vec3.normalize(tmpvec3, tmpvec3);
             // quat.AxisAngle(tmpvec3, Math.PI,out);
             vec3Normalize(tmpvec3,tmpvec3);

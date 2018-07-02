@@ -38,9 +38,9 @@
         // translation.z = src.rawData[14];
         translation.rawData.set(src.rawData.subarray(12, 15));
 
-        var xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
-        var ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
-        var zs = sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+        let xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+        let ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+        let zs = sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
 
         scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
         scale.y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
@@ -55,7 +55,7 @@
             return false;
         }
 
-        var mat = pool.new_matrix();
+        let mat = pool.new_matrix();
         mat.rawData[0] = src.rawData[0] / scale.x;
         mat.rawData[1] = src.rawData[1] / scale.x;
         mat.rawData[2] = src.rawData[2] / scale.x;
@@ -72,6 +72,8 @@
         mat.rawData[11] = 0;
 
         matrix2Quaternion(mat, rotation);
+
+        pool.delete_matrix(mat);
         return true;
     }
     export class angelref
@@ -125,8 +127,33 @@
         return true;
     }
 
-    export function matrixGetRotation(matrix: matrix, result: quaternion):void{
-        matrix2Quaternion(matrix,result);
+    export function matrixGetRotation(src: matrix, result: quaternion):void{
+        let xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+        let ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+        let zs = sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+
+        let scale_x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+        let scale_y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+        let scale_z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+
+        let mat = pool.new_matrix();
+        mat.rawData[0] = src.rawData[0] / scale_x;
+        mat.rawData[1] = src.rawData[1] / scale_x;
+        mat.rawData[2] = src.rawData[2] / scale_x;
+        mat.rawData[3] = 0;
+
+        mat.rawData[4] = src.rawData[4] / scale_y;
+        mat.rawData[5] = src.rawData[5] / scale_y;
+        mat.rawData[6] = src.rawData[6] / scale_y;
+        mat.rawData[7] = 0;
+
+        mat.rawData[8] = src.rawData[8]   / scale_z;
+        mat.rawData[9] = src.rawData[9]   / scale_z;
+        mat.rawData[10] = src.rawData[10] / scale_z;
+        mat.rawData[11] = 0;
+
+        matrix2Quaternion(mat,result);
+        pool.delete_matrix(mat);
     }
 
     export function matrix2Quaternion(matrix: matrix, result: quaternion): void 
@@ -418,9 +445,17 @@
     }
     export function matrixGetScale(src: matrix, scale: vector3): void
     {
-        scale.rawData[0] = src.rawData[0];
-        scale.rawData[1] = src.rawData[5];
-        scale.rawData[2] = src.rawData[10];
+        let xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+        let ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+        let zs = sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+
+        scale.rawData[0] = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+        scale.rawData[1] = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+        scale.rawData[2] = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+
+        // scale.rawData[0] = src.rawData[0];
+        // scale.rawData[1] = src.rawData[5];
+        // scale.rawData[2] = src.rawData[10];
     }
     export function matrixMakeScale(xScale: number, yScale: number, zScale: number, out: matrix): void
     {

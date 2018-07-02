@@ -793,6 +793,12 @@ namespace gd3d.framework
 
                                 let az = math.pool.new_vector3();
                                 let bz = math.pool.new_vector3();
+
+                                if(a.gameObject.transform.name == "pasted__default001"){
+                                    a.gameObject.transform.getWorldTranslate();
+                                }
+
+
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                 let result = bz.z - az.z;
