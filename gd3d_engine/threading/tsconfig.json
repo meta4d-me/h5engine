@@ -1,7 +1,7 @@
 {
    
     "compilerOptions": {
-      "outFile": "../lib/gd3d.thread.js",
+      "outFile": "../lib/th.js",
       "module": "system",
       "experimentalDecorators": true,
       "sourceMap": true,

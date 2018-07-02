@@ -317,13 +317,6 @@ namespace gd3d.framework
         {
             this.r.rawData.set(src.r.rawData);
             this.t.rawData.set(src.t.rawData);
-            // this.r.x = src.r.x;
-            // this.r.y = src.r.y;
-            // this.r.z = src.r.z;
-            // this.r.w = src.r.w;
-            // this.t.x = src.t.x;
-            // this.t.y = src.t.y;
-            // this.t.z = src.t.z;
         }
         copyFromData(src: Float32Array, seek: number)
         {
@@ -407,6 +400,25 @@ namespace gd3d.framework
             math.pool.delete_vector3(dirtran);
             return target;
         }
+        static sMultiplytpose(left: PoseBoneMatrix, right: tPoseInfo, target: PoseBoneMatrix = null): PoseBoneMatrix
+        {
+            if (target == null)
+                target = PoseBoneMatrix.createDefault();
+            var dir = math.pool.new_vector3();
+            math.vec3Clone(right.tposep, dir);
+            var dirtran = math.pool.new_vector3();
+            math.quatTransformVector(left.r, dir, dirtran);
+
+            target.t.x = dirtran.x + left.t.x;
+            target.t.y = dirtran.y + left.t.y;
+            target.t.z = dirtran.z + left.t.z;
+            math.quatMultiply(left.r, right.tposeq, target.r);
+
+            math.pool.delete_vector3(dir);
+            math.pool.delete_vector3(dirtran);
+            return target;
+        }
+
         static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target: PoseBoneMatrix = null): PoseBoneMatrix
         {
             if (target == null)
@@ -435,6 +447,24 @@ namespace gd3d.framework
 
             math.quatLerp(left.r, right.r, target.r, v);
             return target;
+        }
+
+        private static poolmats:PoseBoneMatrix[]=[];
+        static recycle(mat:PoseBoneMatrix)
+        {
+            this.poolmats.push(mat);
+        }
+        static create():PoseBoneMatrix
+        {
+            let item=this.poolmats.pop();
+            if(item)
+            {
+                return item;
+            }else
+            {
+                item=PoseBoneMatrix.createDefault();
+                return item;
+            }
         }
     }
 

@@ -20,7 +20,7 @@ namespace gd3d.threading
         {
             if (!thread.workerInstance)
             {
-                this.worker = new Worker("lib/gd3d.thread.js");
+                this.worker = new Worker("lib/th.js");
                 this.worker.onmessage = (e: MessageEvent) =>
                 {
                     //e.data.id
