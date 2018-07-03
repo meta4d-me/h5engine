@@ -398,10 +398,18 @@ namespace gd3d.framework {
          */
         totalLength: number = 0;
 
+        loadLightMap:boolean=true;
+
         constructor(url: string) {
             this.url = url;
             var i = url.lastIndexOf("/");
             this.path = url.substring(0, i);
+
+            this.assetmgr=gd3d.framework.sceneMgr.app.getAssetMgr();
+            if(this.assetmgr.waitlightmapScene[url])
+            {
+                this.loadLightMap=false;
+            }
         }
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr) {
             state.totalByteLength = this.totalLength;
@@ -434,13 +442,18 @@ namespace gd3d.framework {
          * @param json 
          * @version egret-gd3d 1.0
          */
-        parse(json: any, totalLength: number = 0) {
+        parse(json: any,totalLength: number = 0) {
             var files = json["files"];
             for (var i = 0; i < files.length; i++) {
                 var item = files[i];
                 let packes = -1;
                 if (item.packes != undefined)
                     packes = item.packes;
+                if(!this.loadLightMap&&(item.name as string).indexOf("LightmapFar-")>=0)
+                {
+                    this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" +item.name);
+                    continue;
+                }
                 this.files.push({ name: item.name, length: item.length, packes: packes });
             }
             if (json["packes"] != undefined) {
@@ -1505,6 +1518,53 @@ namespace gd3d.framework {
             delete this.mapInLoad[name];
         }
 
+        waitlightmapScene:{[sceneurl:string]:string[]}={};
+        loadSceneAssetbundleWithoutLightMap(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
+        {
+            this.waitlightmapScene[url]=[];
+            this.load(url,type,onstate);
+        }
+
+        /**
+         * 
+         * @param scenename 场景名字 (***.scene.json)
+         */
+        loadSceneLightmap(sceneurl:string)
+        {
+            let arr=this.waitlightmapScene[sceneurl];
+            let scenename=this.getFileName(sceneurl).replace(".assetbundle.json",".scene.json");
+            let scene=this.getAssetByName(scenename) as rawscene;
+            let texarr:string[]=[];
+            let texcount=0;
+            if(arr)
+            {
+                for(let key in arr)
+                {
+                    let texurl=arr[key].replace(".imgdesc.json",".png");
+                    texarr.push(texurl);
+                    this.load(texurl,AssetTypeEnum.Texture,(state)=>{
+                        if(state.isfinish)
+                        {
+                            texcount++;
+                            if(texcount==arr.length)
+                            {
+                                for(let item in texarr)
+                                {
+                                    let texname=this.getFileName(texarr[item]);
+                                    let tex=this.getAssetByName(texname) as texture;
+                                    if(tex)
+                                    {
+                                        scene["lightmaps"].push(tex);
+                                        tex.use();
+                                    }
+                                }
+                                scene.useLightMap(this.app.getScene());
+                            }
+                        }
+                    });
+                }
+            }
+        }
         /**
          * @public
          * @language zh_CN

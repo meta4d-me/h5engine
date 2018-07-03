@@ -21,7 +21,7 @@ namespace gd3d.framework
                     let _texture = asset ? asset : new texture(filename);
                     var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
                     var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                    t2d.uploadImage(_tex, true, true, true, true);
+                    t2d.uploadImage(_tex, false, true, true, false);
                     _texture.glTexture = t2d;
 
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);

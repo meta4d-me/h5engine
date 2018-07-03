@@ -189,7 +189,7 @@ namespace gd3d.framework
                             var mid = mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质    
                             var usemat = this.materials[mid];
                             var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                            if (this.lightmapIndex >= 0)
+                            if (this.lightmapIndex >= 0&&this.gameObject.transform.scene.lightmaps.length>0)
                             {
                                 drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                 //usemat.shaderStatus = shaderStatus.Lightmap;
