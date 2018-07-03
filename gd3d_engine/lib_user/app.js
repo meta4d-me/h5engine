@@ -1147,6 +1147,7 @@ var main = (function () {
         this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
+        this.addBtn("trans性能测试", function () { return new demo.test_performance(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -7677,7 +7678,7 @@ var demo;
                 this.tryadd();
             }
             else {
-                console.error(" \u6240\u6709 trans \u52A0\u8F09\u5B8C\u7562  new  ");
+                console.error(" \u6240\u6709 trans \u52A0\u8F09\u5B8C\u7562  old  ");
             }
             var c = 0;
             while (c < 1000) {
@@ -7689,11 +7690,15 @@ var demo;
             var idx = Math.floor(Math.random() * this.cubes.length);
             var cube = this.cubes[idx];
             cube.localTranslate.x += Math.random() * 10;
+            cube.localScale.x = cube.localScale.y;
+            cube.localRotate.z = cube.localRotate.x;
             var temp = cube.getWorldTranslate();
             temp.y += Math.random() * 10;
+            cube.getWorldScale();
             cube.setWorldPosition(temp);
             cube.localEulerAngles.x = Math.random() * 10;
             cube.localEulerAngles = cube.localEulerAngles;
+            cube.getWorldRotate();
             cube.markDirty();
         };
         return test_performance;

@@ -9,7 +9,9 @@ namespace gd3d.framework {
 
             state.resstate[filename] = new RefResourceState();
             gd3d.io.loadText(url,
-                (txt, err) => {
+                (txt, err ,isloadFail) => {
+
+                    state.isloadFail = isloadFail ? true : false;
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
 
