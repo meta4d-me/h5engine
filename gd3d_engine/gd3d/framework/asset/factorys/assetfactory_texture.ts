@@ -13,8 +13,9 @@ namespace gd3d.framework
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadImg(url,
-                (_tex, _err) =>
+                (_tex, _err , isloadFail) =>
                 {
+                    state.isloadFail = isloadFail ? true : false;
                     if (AssetFactoryTools.catchError(_err, onstate, state))
                         return;
 

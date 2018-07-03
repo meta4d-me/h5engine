@@ -224,6 +224,14 @@ namespace gd3d.framework {
         /**
          * @public
          * @language zh_CN
+         * 加载是否失败
+         * @version egret-gd3d 1.0
+         */
+        isloadFail:boolean = false;
+
+        /**
+         * @public
+         * @language zh_CN
          * 加载是否遇到错误
          * @version egret-gd3d 1.0
          */

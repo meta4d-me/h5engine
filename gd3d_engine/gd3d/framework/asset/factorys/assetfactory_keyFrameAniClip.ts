@@ -13,8 +13,9 @@ namespace gd3d.framework
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadText(url,
-                (text, err) =>
+                (text, err , isloadFail) =>
                 {
+                    state.isloadFail = isloadFail ? true : false;
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
                     let _clip = asset ? asset : new keyFrameAniClip(filename);

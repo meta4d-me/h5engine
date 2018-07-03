@@ -12,8 +12,9 @@ namespace gd3d.framework
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            gd3d.io.loadText(url, (txt, err) =>
+            gd3d.io.loadText(url, (txt, err,isloadFail) =>
             {
+                state.isloadFail = isloadFail ? true : false;
                 if (AssetFactoryTools.catchError(err, onstate, state))
                     return;
 
