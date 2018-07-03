@@ -984,6 +984,7 @@ declare namespace gd3d.framework {
         url: string;
         path: string;
         totalLength: number;
+        loadLightMap: boolean;
         constructor(url: string);
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any, totalLength?: number): void;
@@ -1065,6 +1066,11 @@ declare namespace gd3d.framework {
         loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         unload(url: string, onstate?: () => void): void;
+        waitlightmapScene: {
+            [sceneurl: string]: string[];
+        };
+        loadSceneAssetbundleWithoutLightMap(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
+        loadSceneLightmap(sceneurl: string): void;
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;

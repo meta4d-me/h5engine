@@ -5915,10 +5915,15 @@ var gd3d;
                 this.packages = [];
                 this.bundlePackBin = {};
                 this.totalLength = 0;
+                this.loadLightMap = true;
                 this.mapNamed = {};
                 this.url = url;
                 var i = url.lastIndexOf("/");
                 this.path = url.substring(0, i);
+                this.assetmgr = gd3d.framework.sceneMgr.app.getAssetMgr();
+                if (this.assetmgr.waitlightmapScene[url]) {
+                    this.loadLightMap = false;
+                }
             }
             assetBundle.prototype.loadCompressBundle = function (url, onstate, state, assetmgr) {
                 var _this = this;
@@ -5948,6 +5953,10 @@ var gd3d;
                     var packes = -1;
                     if (item.packes != undefined)
                         packes = item.packes;
+                    if (!this.loadLightMap && item.name.indexOf("LightmapFar-") >= 0) {
+                        this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" + item.name);
+                        continue;
+                    }
                     this.files.push({ name: item.name, length: item.length, packes: packes });
                 }
                 if (json["packes"] != undefined) {
@@ -6249,6 +6258,7 @@ var gd3d;
                 this.waitQueueState = [];
                 this.loadingQueueState = [];
                 this.loadingCountLimit = 2;
+                this.waitlightmapScene = {};
                 this.app = app;
                 this.webgl = app.webgl;
                 this.shaderPool = new gd3d.render.shaderPool();
@@ -6644,6 +6654,42 @@ var gd3d;
                     state.resstate[key].res.unuse();
                 }
                 delete this.mapInLoad[name];
+            };
+            assetMgr.prototype.loadSceneAssetbundleWithoutLightMap = function (url, type, onstate) {
+                if (type === void 0) { type = AssetTypeEnum.Auto; }
+                if (onstate === void 0) { onstate = null; }
+                this.waitlightmapScene[url] = [];
+                this.load(url, type, onstate);
+            };
+            assetMgr.prototype.loadSceneLightmap = function (sceneurl) {
+                var _this = this;
+                var arr = this.waitlightmapScene[sceneurl];
+                var scenename = this.getFileName(sceneurl).replace(".assetbundle.json", ".scene.json");
+                var scene = this.getAssetByName(scenename);
+                var texarr = [];
+                var texcount = 0;
+                if (arr) {
+                    for (var key in arr) {
+                        var texurl = arr[key].replace(".imgdesc.json", ".png");
+                        texarr.push(texurl);
+                        this.load(texurl, AssetTypeEnum.Texture, function (state) {
+                            if (state.isfinish) {
+                                texcount++;
+                                if (texcount == arr.length) {
+                                    for (var item in texarr) {
+                                        var texname = _this.getFileName(texarr[item]);
+                                        var tex = _this.getAssetByName(texname);
+                                        if (tex) {
+                                            scene["lightmaps"].push(tex);
+                                            tex.use();
+                                        }
+                                    }
+                                    scene.useLightMap(_this.app.getScene());
+                                }
+                            }
+                        });
+                    }
+                }
             };
             assetMgr.prototype.loadScene = function (sceneName, onComplete) {
                 var firstChilds = new Array();
@@ -8386,7 +8432,7 @@ var gd3d;
                     var _texture = asset ? asset : new framework.texture(filename);
                     var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                     var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                    t2d.uploadImage(_tex, true, true, true, true);
+                    t2d.uploadImage(_tex, false, true, true, false);
                     _texture.glTexture = t2d;
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                 }, function (loadedLength, totalLength) {
@@ -10011,7 +10057,7 @@ var gd3d;
                                 var mid = mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
                                 var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                                if (this.lightmapIndex >= 0) {
+                                if (this.lightmapIndex >= 0 && this.gameObject.transform.scene.lightmaps.length > 0) {
                                     drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                     if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
                                         context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
@@ -11556,9 +11602,10 @@ var gd3d;
                         else {
                             var lightmapName = _this.lightmapData[i].name;
                             var lightmap = assetmgr.getAssetByName(lightmapName, _this.assetbundle);
-                            if (lightmap)
+                            if (lightmap) {
                                 lightmap.use();
-                            _this.lightmaps.push(lightmap);
+                                _this.lightmaps.push(lightmap);
+                            }
                         }
                     }
                     var fogData = _json["fog"];
