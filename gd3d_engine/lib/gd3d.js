@@ -1183,8 +1183,6 @@ var gd3d;
         var canvas = (function () {
             function canvas() {
                 this.is2dUI = true;
-                this.hasPlayed = false;
-                this.playDirty = false;
                 this.pointDown = false;
                 this.pointSelect = null;
                 this.pointEvent = new framework.PointEvent();
@@ -1262,15 +1260,11 @@ var gd3d;
                     }
                 }
                 if (this.scene.app.bePlay) {
-                    if (!this.hasPlayed)
-                        this.playDirty = true;
                     this.objupdate(this.rootNode, delta);
-                    this.playDirty = false;
-                    this.hasPlayed = true;
                 }
             };
             canvas.prototype.objupdate = function (node, delta) {
-                node.init(this.playDirty);
+                node.init(this.scene.app.bePlay);
                 if (node.components.length > 0) {
                     node.update(delta);
                 }
@@ -2570,6 +2564,7 @@ var gd3d;
                 this.worldScale = new gd3d.math.vector2(1, 1);
                 this.components = [];
                 this.componentsInit = [];
+                this.componentplayed = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
@@ -2906,16 +2901,24 @@ var gd3d;
                     this.components[i].comp.update(delta);
                 }
             };
-            transform2D.prototype.init = function (onPlay) {
-                if (onPlay === void 0) { onPlay = false; }
+            transform2D.prototype.init = function (bePlayed) {
+                if (bePlayed === void 0) { bePlayed = false; }
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
                         this.componentsInit[i].comp.start();
                         this.componentsInit[i].init = true;
-                        if (onPlay)
+                        if (bePlayed)
                             this.componentsInit[i].comp.onPlay();
+                        else
+                            this.componentplayed.push(this.componentsInit[i]);
                     }
                     this.componentsInit.length = 0;
+                }
+                if (this.componentplayed.length > 0 && bePlayed) {
+                    this.componentplayed.forEach(function (item) {
+                        item.comp.onPlay();
+                    });
+                    this.componentplayed.length = 0;
                 }
             };
             transform2D.prototype.addComponent = function (type) {
@@ -28261,6 +28264,7 @@ var gd3d;
                 this.isStatic = false;
                 this.components = [];
                 this.componentsInit = [];
+                this.componentsPlayed = [];
                 this._visible = true;
             }
             gameObject.prototype.getScene = function () {
@@ -28294,16 +28298,24 @@ var gd3d;
             gameObject.prototype.getName = function () {
                 return this.transform.name;
             };
-            gameObject.prototype.init = function (onPlay) {
-                if (onPlay === void 0) { onPlay = false; }
+            gameObject.prototype.init = function (bePlay) {
+                if (bePlay === void 0) { bePlay = false; }
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
                         this.componentsInit[i].comp.start();
                         this.componentsInit[i].init = true;
-                        if (onPlay && this.componentsInit[i].comp.onPlay)
+                        if (bePlay)
                             this.componentsInit[i].comp.onPlay();
+                        else
+                            this.componentsPlayed.push(this.componentsInit[i]);
                     }
                     this.componentsInit.length = 0;
+                }
+                if (this.componentsPlayed.length > 0 && bePlay) {
+                    this.componentsPlayed.forEach(function (item) {
+                        item.comp.onPlay();
+                    });
+                    this.componentsPlayed.length = 0;
                 }
             };
             gameObject.prototype.update = function (delta) {
@@ -28692,8 +28704,6 @@ var gd3d;
                 this.renderLights = [];
                 this.lightmaps = [];
                 this.RealCameraNumber = 0;
-                this.hasPlayed = false;
-                this.playDirty = false;
                 this.app = app;
                 this.webgl = app.webgl;
                 this.assetmgr = app.getAssetMgr();
@@ -28853,11 +28863,7 @@ var gd3d;
             };
             scene.prototype.updateScene = function (node, delta) {
                 if (this.app.bePlay) {
-                    if (!this.hasPlayed)
-                        this.playDirty = true;
                     this.objupdate(node, delta);
-                    this.playDirty = false;
-                    this.hasPlayed = true;
                 }
                 else {
                     this.objupdateInEditor(node, delta);
@@ -28882,7 +28888,7 @@ var gd3d;
             scene.prototype.objupdate = function (node, delta) {
                 if (node.hasComponent == false && node.hasComponentChild == false)
                     return;
-                node.gameObject.init(this.playDirty);
+                node.gameObject.init(this.app.bePlay);
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
                     this.collectCameraAndLight(node);

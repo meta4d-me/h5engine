@@ -258,8 +258,6 @@ declare namespace gd3d.framework {
         getChildren(): transform2D[];
         getChildCount(): number;
         getChild(index: number): transform2D;
-        private hasPlayed;
-        private playDirty;
         private pointDown;
         private pointSelect;
         private pointEvent;
@@ -557,8 +555,9 @@ declare namespace gd3d.framework {
         collider: ICollider2d;
         components: C2DComponent[];
         private componentsInit;
+        private componentplayed;
         update(delta: number): void;
-        init(onPlay?: boolean): void;
+        init(bePlayed?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
         removeComponent(comp: I2DComponent): void;
@@ -5151,6 +5150,7 @@ declare namespace gd3d.framework {
         transform: transform;
         components: nodeComponent[];
         private componentsInit;
+        private componentsPlayed;
         renderer: IRenderer;
         camera: camera;
         light: light;
@@ -5159,7 +5159,7 @@ declare namespace gd3d.framework {
         readonly visibleInScene: boolean;
         visible: boolean;
         getName(): string;
-        init(onPlay?: boolean): void;
+        init(bePlay?: boolean): void;
         update(delta: number): void;
         addComponentDirect(comp: INodeComponent): INodeComponent;
         getComponent(type: string): INodeComponent;
@@ -5266,8 +5266,6 @@ declare namespace gd3d.framework {
         private RealCameraNumber;
         private _renderCamera(camindex);
         private sortOverLays(lays);
-        private hasPlayed;
-        private playDirty;
         private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);

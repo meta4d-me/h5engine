@@ -674,15 +674,7 @@ var dome_loadaniplayer = (function () {
         });
     };
     dome_loadaniplayer.prototype.loadSkill = function (name) {
-        var _this = this;
         this.assetmgr.load("res/prefabs/roles/" + this.roleName + "/Resources/" + name, gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                var skill = _this.assetmgr.getAssetByName(name);
-                var j = _this.ani.clipnames[name];
-                if (j != null) {
-                    _this.ani.clips[j] = skill;
-                }
-            }
         });
     };
     dome_loadaniplayer.prototype.loadWeapon = function (name) {
@@ -757,7 +749,6 @@ var dome_loadaniplayer = (function () {
         var i = 0;
         play.onclick = function () {
             _this.ani.stop();
-            _this.ani.play(_this.skillName, speed);
         };
         stop.onclick = function () {
             _this.ani.stop();
@@ -1322,15 +1313,6 @@ var test_anim = (function () {
                         objCam.markDirty();
                         var ap = prefabObj.gameObject.getComponent("aniplayer");
                         document.onkeydown = function (ev) {
-                            if (ev.code == "KeyM") {
-                                ap.playCrossByIndex(0, 0.2);
-                            }
-                            else if (ev.code == "KeyN") {
-                                ap.playCrossByIndex(1, 0.2);
-                            }
-                            else if (ev.code == "KeyS") {
-                                ap.stop();
-                            }
                         };
                         var wingroot = prefabObj.find("Bip001 Xtra17Nub");
                         if (wingroot) {
@@ -2382,14 +2364,6 @@ var test_loadMulBundle = (function () {
         }
     };
     test_loadMulBundle.prototype.refreshAniclip = function (tran) {
-        var anipalyer = tran.gameObject.getComponentsInChildren("aniplayer");
-        for (var i = 0; i < anipalyer.length; i++) {
-            for (var j = 0; j < anipalyer[i].clips.length; j++) {
-                var v = anipalyer[i].clips[j];
-                anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName());
-            }
-            anipalyer[i].playByIndex(0);
-        }
     };
     test_loadMulBundle.prototype.refreshLightMap = function (scene, rawscene) {
         scene.lightmaps = [];
@@ -3046,9 +3020,6 @@ var test_multipleplayer_anim = (function () {
         cacheOpenCheckBox.type = "checkbox";
         cacheOpenCheckBox.checked = false;
         cacheOpenCheckBox.onchange = function () {
-            for (var key in _this.aniplayers) {
-                _this.aniplayers[key].isCache = cacheOpenCheckBox.checked;
-            }
         };
         cacheOpenCheckBox.style.top = "350px";
         cacheOpenCheckBox.style.position = "absolute";
@@ -4242,24 +4213,6 @@ var test_loadprefab = (function () {
         }
     };
     test_loadprefab.prototype.refreshAniclip = function (tran, name) {
-        var anipalyer = tran.gameObject.getComponentsInChildren("aniplayer");
-        for (var i = 0; i < anipalyer.length; i++) {
-            for (var key in anipalyer[i].clipnames) {
-                var j = anipalyer[i].clipnames[key];
-                var v = anipalyer[i].clips[j];
-                var clip = this.app.getAssetMgr().getAssetByName("gs_chuangjue_01_" + v.getName());
-                if (clip) {
-                    anipalyer[i].clips[j] = clip;
-                    if (anipalyer[i].clipnames[clip.getName()]) {
-                    }
-                    else {
-                        anipalyer[i].clipnames[clip.getName()] = j;
-                    }
-                }
-            }
-            anipalyer[i].playCross(name, 0.2);
-            anipalyer[i].playCross("gs_chuangjue_01_" + name, 0.2);
-        }
     };
     test_loadprefab.prototype.start = function (app) {
         var _this = this;
@@ -11290,17 +11243,7 @@ var UseAniplayClipDemo = (function () {
         this.taskMgr = new gd3d.framework.taskMgr();
     }
     UseAniplayClipDemo.prototype.loadAniplayClip = function (laststate, state) {
-        var _this = this;
         this.app.getAssetMgr().load("res/prefabs/roles/pc2/Resources/pc2_skill1.FBAni.aniclip.bin", gd3d.framework.AssetTypeEnum.Aniclip, function (s) {
-            if (s.isfinish) {
-                var clip = _this.app.getAssetMgr().getAssetByName("pc2_skill1.FBAni.aniclip.bin");
-                var j = _this.aniplayer.clipnames["pc2_skill1.FBAni.aniclip.bin"];
-                if (j != null) {
-                    _this.aniplayer.clips[j] = clip;
-                }
-                state.finish = true;
-                _this.aniplayer.play("pc2_skill1.FBAni.aniclip.bin", 1.0);
-            }
         });
     };
     UseAniplayClipDemo.prototype.loadRole = function (laststate, state) {

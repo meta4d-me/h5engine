@@ -11,18 +11,18 @@ class UseAniplayClipDemo implements IState {
     //加载一个动作
     private loadAniplayClip(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
         this.app.getAssetMgr().load(`res/prefabs/roles/pc2/Resources/pc2_skill1.FBAni.aniclip.bin`, gd3d.framework.AssetTypeEnum.Aniclip, (s) => {
-            if (s.isfinish) {
-                //取出一个动作的 IAsset对象
-                let clip = this.app.getAssetMgr().getAssetByName("pc2_skill1.FBAni.aniclip.bin") as gd3d.framework.animationClip;
-                //通过动作资源的名字找到对应动作的ID
-                let j = this.aniplayer.clipnames["pc2_skill1.FBAni.aniclip.bin"];
-                //如果ID存在就说明该aniplayer存在，然后绑定动作资源
-                if (j != null) {
-                    this.aniplayer.clips[j] = clip;
-                }
-                state.finish = true;
-                this.aniplayer.play("pc2_skill1.FBAni.aniclip.bin", 1.0);
-            }
+            // if (s.isfinish) {
+            //     //取出一个动作的 IAsset对象
+            //     let clip = this.app.getAssetMgr().getAssetByName("pc2_skill1.FBAni.aniclip.bin") as gd3d.framework.animationClip;
+            //     //通过动作资源的名字找到对应动作的ID
+            //     let j = this.aniplayer.clipnames["pc2_skill1.FBAni.aniclip.bin"];
+            //     //如果ID存在就说明该aniplayer存在，然后绑定动作资源
+            //     if (j != null) {
+            //         this.aniplayer.clips[j] = clip;
+            //     }
+            //     state.finish = true;
+            //     this.aniplayer.play("pc2_skill1.FBAni.aniclip.bin", 1.0);
+            // }
         });
     }
 
