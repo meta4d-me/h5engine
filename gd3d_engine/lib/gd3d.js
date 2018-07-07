@@ -18658,7 +18658,7 @@ var gd3d;
                 }
                 if (this.hasPointUP && this.hasPointDown) {
                     var isMoveTolerance = (Math.abs(this.downPoint.x - pt.x) > this.moveTolerance || Math.abs(this.downPoint.y - pt.y) > this.moveTolerance);
-                    if (isMoveTolerance) {
+                    if (!isMoveTolerance) {
                         this.hasPointDown = this.hasPointUP = false;
                         this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointClick, pt.x, pt.y);
                     }
