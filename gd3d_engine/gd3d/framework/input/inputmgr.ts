@@ -256,7 +256,7 @@ namespace gd3d.framework
 
             if(this.hasPointUP && this.hasPointDown){
                 let isMoveTolerance = (Math.abs(this.downPoint.x - pt.x)> this.moveTolerance || Math.abs(this.downPoint.y - pt.y)> this.moveTolerance)
-                if(isMoveTolerance){
+                if(!isMoveTolerance){
                     //on click
                     this.hasPointDown = this.hasPointUP = false;
                     this.eventer.EmitEnum_point(event.PointEventEnum.PointClick,pt.x,pt.y);
