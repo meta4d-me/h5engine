@@ -442,6 +442,7 @@ namespace gd3d.framework {
                     onstate(state);
                 });
         }
+
         /**
          * @public
          * @language zh_CN
@@ -1054,6 +1055,39 @@ namespace gd3d.framework {
                 return this.mapBundle[bundlename];
             return null;
         }
+
+        static useBinJs:boolean=false;
+        private static bin=".bin";
+        static correctFileName(name:string):string
+        {
+            if(name.indexOf(this.bin)<0)
+            {
+                return name;
+            }
+            let binlen=this.bin.length;
+            let substr=name.substring(name.length-binlen);
+            if(substr==this.bin)
+            {
+                return name+".js";
+            }
+            return name;
+        }
+        static txt=".txt";
+        static correctTxtFileName(name:string):string
+        {
+            if(name.indexOf(this.txt)<0)
+            {
+                return name;
+            }
+            let len=this.txt.length;
+            let substr=name.substring(name.length-len);
+            if(substr==this.txt)
+            {
+                return name+".js";
+            }
+            return name;
+        }
+
         /**
          * @public
          * @language zh_CN
@@ -1321,7 +1355,7 @@ namespace gd3d.framework {
 
         private waitQueueState: { state: stateLoad, type: AssetTypeEnum, onstate: (state: stateLoad) => void }[] = [];
         private loadingQueueState: { state: stateLoad, type: AssetTypeEnum, onstate: (state: stateLoad) => void }[] = [];
-        private loadingCountLimit: number = 2;
+        private loadingCountLimit: number = 10;
         private checkFreeChannel(): number {
             let freechannel = -1;
             for (let k = 0; k < this.loadingQueueState.length; k++) {
@@ -1505,6 +1539,28 @@ namespace gd3d.framework {
             this.loadByMulQueue();
         }
 
+        private loadForNoCache(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null) {
+            if (onstate == null)
+                onstate = () => { };
+
+            let name = this.getFileName(url);
+            var state = new stateLoad();
+            this.mapInLoad[name] = state;
+            state.url = url;
+            //确定资源类型
+            if (type == AssetTypeEnum.Auto) {
+                type = this.calcType(url);
+            }
+            if (type == AssetTypeEnum.Unknown) {
+                state.errs.push(new Error("can not sure about type:" + url));
+                state.iserror = true;
+                onstate(state);
+                this.doWaitState(url, state);
+                return;
+            }
+            this.waitQueueState.push({ state, type, onstate });
+            this.loadByMulQueue();
+        }
         /**
          * @public
          * @language zh_CN
@@ -1542,6 +1598,8 @@ namespace gd3d.framework {
             let arr=this.waitlightmapScene[sceneurl];
             let scenename=this.getFileName(sceneurl).replace(".assetbundle.json",".scene.json");
             let scene=this.getAssetByName(scenename) as rawscene;
+            if(scene==null) return;
+            scene["lightmaps"]=[];
             let texarr:string[]=[];
             let texcount=0;
             if(arr)
@@ -1550,7 +1608,7 @@ namespace gd3d.framework {
                 {
                     let texurl=arr[key].replace(".imgdesc.json",".png");
                     texarr.push(texurl);
-                    this.load(texurl,AssetTypeEnum.Texture,(state)=>{
+                    this.loadForNoCache(texurl,AssetTypeEnum.Texture,(state)=>{
                         if(state.isfinish)
                         {
                             texcount++;
@@ -1879,7 +1937,7 @@ namespace gd3d.framework {
                 else if (extname == ".png" || extname == ".jpg") {
                     return AssetTypeEnum.Texture;
                 }
-                else if (extname == ".pvr.bin" || extname == ".pvr") {
+                else if (extname == ".pvr.bin" || extname == ".pvr"||extname==".pvr.bin.js") {
                     return AssetTypeEnum.PVR;
                 }
                 else if (extname == ".imgdesc.json") {
@@ -1888,10 +1946,10 @@ namespace gd3d.framework {
                 else if (extname == ".mat.json") {
                     return AssetTypeEnum.Material;
                 }
-                else if (extname == ".mesh.bin") {
+                else if (extname == ".mesh.bin"||extname == ".mesh.bin.js") {
                     return AssetTypeEnum.Mesh;
                 }
-                else if (extname == ".aniclip.bin") {
+                else if (extname == ".aniclip.bin"||extname==".aniclip.bin.js") {
                     return AssetTypeEnum.Aniclip;
                 }
                 else if (extname == ".prefab.json") {
@@ -1909,7 +1967,7 @@ namespace gd3d.framework {
                 else if (extname == ".json" || extname == ".txt" || extname == ".effect.json") {
                     return AssetTypeEnum.TextAsset;
                 }
-                else if (extname == ".packs.bin") {
+                else if (extname == ".packs.bin"||extname == ".packs.bin.js") {
                     return AssetTypeEnum.PackBin;
                 }
                 else if (extname == ".packs.txt") {
