@@ -1183,8 +1183,6 @@ var gd3d;
         var canvas = (function () {
             function canvas() {
                 this.is2dUI = true;
-                this.hasPlayed = false;
-                this.playDirty = false;
                 this.pointDown = false;
                 this.pointSelect = null;
                 this.pointEvent = new framework.PointEvent();
@@ -1262,15 +1260,11 @@ var gd3d;
                     }
                 }
                 if (this.scene.app.bePlay) {
-                    if (!this.hasPlayed)
-                        this.playDirty = true;
                     this.objupdate(this.rootNode, delta);
-                    this.playDirty = false;
-                    this.hasPlayed = true;
                 }
             };
             canvas.prototype.objupdate = function (node, delta) {
-                node.init(this.playDirty);
+                node.init(this.scene.app.bePlay);
                 if (node.components.length > 0) {
                     node.update(delta);
                 }
@@ -2570,6 +2564,7 @@ var gd3d;
                 this.worldScale = new gd3d.math.vector2(1, 1);
                 this.components = [];
                 this.componentsInit = [];
+                this.componentplayed = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
@@ -2906,16 +2901,24 @@ var gd3d;
                     this.components[i].comp.update(delta);
                 }
             };
-            transform2D.prototype.init = function (onPlay) {
-                if (onPlay === void 0) { onPlay = false; }
+            transform2D.prototype.init = function (bePlayed) {
+                if (bePlayed === void 0) { bePlayed = false; }
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
                         this.componentsInit[i].comp.start();
                         this.componentsInit[i].init = true;
-                        if (onPlay)
+                        if (bePlayed)
                             this.componentsInit[i].comp.onPlay();
+                        else
+                            this.componentplayed.push(this.componentsInit[i]);
                     }
                     this.componentsInit.length = 0;
+                }
+                if (this.componentplayed.length > 0 && bePlayed) {
+                    this.componentplayed.forEach(function (item) {
+                        item.comp.onPlay();
+                    });
+                    this.componentplayed.length = 0;
                 }
             };
             transform2D.prototype.addComponent = function (type) {
@@ -5915,10 +5918,15 @@ var gd3d;
                 this.packages = [];
                 this.bundlePackBin = {};
                 this.totalLength = 0;
+                this.loadLightMap = true;
                 this.mapNamed = {};
                 this.url = url;
                 var i = url.lastIndexOf("/");
                 this.path = url.substring(0, i);
+                this.assetmgr = gd3d.framework.sceneMgr.app.getAssetMgr();
+                if (this.assetmgr.waitlightmapScene[url]) {
+                    this.loadLightMap = false;
+                }
             }
             assetBundle.prototype.loadCompressBundle = function (url, onstate, state, assetmgr) {
                 var _this = this;
@@ -5948,6 +5956,10 @@ var gd3d;
                     var packes = -1;
                     if (item.packes != undefined)
                         packes = item.packes;
+                    if (!this.loadLightMap && item.name.indexOf("LightmapFar-") >= 0) {
+                        this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" + item.name);
+                        continue;
+                    }
                     this.files.push({ name: item.name, length: item.length, packes: packes });
                 }
                 if (json["packes"] != undefined) {
@@ -6249,6 +6261,7 @@ var gd3d;
                 this.waitQueueState = [];
                 this.loadingQueueState = [];
                 this.loadingCountLimit = 2;
+                this.waitlightmapScene = {};
                 this.app = app;
                 this.webgl = app.webgl;
                 this.shaderPool = new gd3d.render.shaderPool();
@@ -6644,6 +6657,42 @@ var gd3d;
                     state.resstate[key].res.unuse();
                 }
                 delete this.mapInLoad[name];
+            };
+            assetMgr.prototype.loadSceneAssetbundleWithoutLightMap = function (url, type, onstate) {
+                if (type === void 0) { type = AssetTypeEnum.Auto; }
+                if (onstate === void 0) { onstate = null; }
+                this.waitlightmapScene[url] = [];
+                this.load(url, type, onstate);
+            };
+            assetMgr.prototype.loadSceneLightmap = function (sceneurl) {
+                var _this = this;
+                var arr = this.waitlightmapScene[sceneurl];
+                var scenename = this.getFileName(sceneurl).replace(".assetbundle.json", ".scene.json");
+                var scene = this.getAssetByName(scenename);
+                var texarr = [];
+                var texcount = 0;
+                if (arr) {
+                    for (var key in arr) {
+                        var texurl = arr[key].replace(".imgdesc.json", ".png");
+                        texarr.push(texurl);
+                        this.load(texurl, AssetTypeEnum.Texture, function (state) {
+                            if (state.isfinish) {
+                                texcount++;
+                                if (texcount == arr.length) {
+                                    for (var item in texarr) {
+                                        var texname = _this.getFileName(texarr[item]);
+                                        var tex = _this.getAssetByName(texname);
+                                        if (tex) {
+                                            scene["lightmaps"].push(tex);
+                                            tex.use();
+                                        }
+                                    }
+                                    scene.useLightMap(_this.app.getScene());
+                                }
+                            }
+                        });
+                    }
+                }
             };
             assetMgr.prototype.loadScene = function (sceneName, onComplete) {
                 var firstChilds = new Array();
@@ -8386,7 +8435,7 @@ var gd3d;
                     var _texture = asset ? asset : new framework.texture(filename);
                     var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                     var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                    t2d.uploadImage(_tex, true, true, true, true);
+                    t2d.uploadImage(_tex, false, true, true, false);
                     _texture.glTexture = t2d;
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                 }, function (loadedLength, totalLength) {
@@ -10011,7 +10060,7 @@ var gd3d;
                                 var mid = mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
                                 var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                                if (this.lightmapIndex >= 0) {
+                                if (this.lightmapIndex >= 0 && this.gameObject.transform.scene.lightmaps.length > 0) {
                                     drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                     if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
                                         context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
@@ -11556,9 +11605,10 @@ var gd3d;
                         else {
                             var lightmapName = _this.lightmapData[i].name;
                             var lightmap = assetmgr.getAssetByName(lightmapName, _this.assetbundle);
-                            if (lightmap)
+                            if (lightmap) {
                                 lightmap.use();
-                            _this.lightmaps.push(lightmap);
+                                _this.lightmaps.push(lightmap);
+                            }
                         }
                     }
                     var fogData = _json["fog"];
@@ -18608,7 +18658,7 @@ var gd3d;
                 }
                 if (this.hasPointUP && this.hasPointDown) {
                     var isMoveTolerance = (Math.abs(this.downPoint.x - pt.x) > this.moveTolerance || Math.abs(this.downPoint.y - pt.y) > this.moveTolerance);
-                    if (isMoveTolerance) {
+                    if (!isMoveTolerance) {
                         this.hasPointDown = this.hasPointUP = false;
                         this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointClick, pt.x, pt.y);
                     }
@@ -28214,6 +28264,7 @@ var gd3d;
                 this.isStatic = false;
                 this.components = [];
                 this.componentsInit = [];
+                this.componentsPlayed = [];
                 this._visible = true;
             }
             gameObject.prototype.getScene = function () {
@@ -28247,16 +28298,24 @@ var gd3d;
             gameObject.prototype.getName = function () {
                 return this.transform.name;
             };
-            gameObject.prototype.init = function (onPlay) {
-                if (onPlay === void 0) { onPlay = false; }
+            gameObject.prototype.init = function (bePlay) {
+                if (bePlay === void 0) { bePlay = false; }
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
                         this.componentsInit[i].comp.start();
                         this.componentsInit[i].init = true;
-                        if (onPlay && this.componentsInit[i].comp.onPlay)
+                        if (bePlay)
                             this.componentsInit[i].comp.onPlay();
+                        else
+                            this.componentsPlayed.push(this.componentsInit[i]);
                     }
                     this.componentsInit.length = 0;
+                }
+                if (this.componentsPlayed.length > 0 && bePlay) {
+                    this.componentsPlayed.forEach(function (item) {
+                        item.comp.onPlay();
+                    });
+                    this.componentsPlayed.length = 0;
                 }
             };
             gameObject.prototype.update = function (delta) {
@@ -28645,8 +28704,6 @@ var gd3d;
                 this.renderLights = [];
                 this.lightmaps = [];
                 this.RealCameraNumber = 0;
-                this.hasPlayed = false;
-                this.playDirty = false;
                 this.app = app;
                 this.webgl = app.webgl;
                 this.assetmgr = app.getAssetMgr();
@@ -28806,11 +28863,7 @@ var gd3d;
             };
             scene.prototype.updateScene = function (node, delta) {
                 if (this.app.bePlay) {
-                    if (!this.hasPlayed)
-                        this.playDirty = true;
                     this.objupdate(node, delta);
-                    this.playDirty = false;
-                    this.hasPlayed = true;
                 }
                 else {
                     this.objupdateInEditor(node, delta);
@@ -28835,7 +28888,7 @@ var gd3d;
             scene.prototype.objupdate = function (node, delta) {
                 if (node.hasComponent == false && node.hasComponentChild == false)
                     return;
-                node.gameObject.init(this.playDirty);
+                node.gameObject.init(this.app.bePlay);
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
                     this.collectCameraAndLight(node);

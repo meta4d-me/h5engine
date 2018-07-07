@@ -776,6 +776,7 @@ namespace gd3d.framework {
         components: C2DComponent[] = [];
 
         private componentsInit :C2DComponent[]=[];
+        private componentplayed :C2DComponent[]=[];
 
         /**
          * @public
@@ -800,17 +801,25 @@ namespace gd3d.framework {
          * 组件的初始化
          * @version egret-gd3d 1.0
          */
-        init(onPlay = false) {
+        init(bePlayed = false) {
             if(this.componentsInit.length>0)
             {
                 for(var i=0;i<this.componentsInit.length;i++)
                 {
                     this.componentsInit[i].comp.start();
                     this.componentsInit[i].init = true;
-                    if(onPlay)
+                    if(bePlayed)
                         this.componentsInit[i].comp.onPlay();
+                    else
+                        this.componentplayed.push(this.componentsInit[i]);
                 }
                 this.componentsInit.length=0;
+            }
+            if(this.componentplayed.length > 0 && bePlayed){
+                this.componentplayed.forEach(item=>{
+                    item.comp.onPlay();
+                });
+                this.componentplayed.length = 0;
             }
         }
 

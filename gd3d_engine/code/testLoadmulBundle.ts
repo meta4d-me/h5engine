@@ -42,17 +42,17 @@ class test_loadMulBundle implements IState
     
     refreshAniclip(tran:gd3d.framework.transform)
     {
-        let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
-        for(let i=0; i<anipalyer.length; i++)
-        {
-            for(let j=0; j<anipalyer[i].clips.length; j++)
-            {
-                let v = anipalyer[i].clips[j];
-                anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
-            }
+        // let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
+        // for(let i=0; i<anipalyer.length; i++)
+        // {
+        //     for(let j=0; j<anipalyer[i].clips.length; j++)
+        //     {
+        //         let v = anipalyer[i].clips[j];
+        //         anipalyer[i].clips[j] = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+        //     }
             
-            anipalyer[i].playByIndex(0);
-        }
+        //     anipalyer[i].playByIndex(0);
+        // }
     }
 
     refreshLightMap(scene:gd3d.framework.scene, rawscene:gd3d.framework.rawscene)

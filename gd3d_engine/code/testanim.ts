@@ -57,17 +57,17 @@ class test_anim implements IState
 
                         document.onkeydown = (ev) =>
                         {
-                            if (ev.code == "KeyM")
-                            {
-                                ap.playCrossByIndex(0, 0.2);
-                            }
-                            else if (ev.code == "KeyN")
-                            {
-                                ap.playCrossByIndex(1, 0.2);
-                            }
-                            else if(ev.code == "KeyS"){
-                                ap.stop();
-                            }
+                            // if (ev.code == "KeyM")
+                            // {
+                            //     ap.playCrossByIndex(0, 0.2);
+                            // }
+                            // else if (ev.code == "KeyN")
+                            // {
+                            //     ap.playCrossByIndex(1, 0.2);
+                            // }
+                            // else if(ev.code == "KeyS"){
+                            //     ap.stop();
+                            // }
                         }
 
                         let wingroot = prefabObj.find("Bip001 Xtra17Nub");
