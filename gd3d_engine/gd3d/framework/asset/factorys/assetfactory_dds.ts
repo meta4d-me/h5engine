@@ -25,7 +25,8 @@ namespace gd3d.framework {
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadArrayBuffer(url,
-                (_buffer, err) => {
+                (_buffer, err,isloadFail) => {
+                    state.isloadFail = isloadFail ? true : false;
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
                     let _texture = asset ? asset : new texture(filename);

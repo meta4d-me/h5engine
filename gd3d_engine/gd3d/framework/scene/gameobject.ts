@@ -155,6 +155,7 @@ namespace gd3d.framework
         @gd3d.reflect.Field("nodeComponent[]")
         components: nodeComponent[] = [];
         private componentsInit: nodeComponent[] = [];
+        private componentsPlayed: nodeComponent[] = [];
         /**
          * @public
          * @language zh_CN
@@ -258,7 +259,7 @@ namespace gd3d.framework
          * 初始化 主要是组件的初始化
          * @version egret-gd3d 1.0
          */
-        init(onPlay = false)
+        init(bePlay = false)
         {
             if (this.componentsInit.length > 0)
             {
@@ -266,10 +267,19 @@ namespace gd3d.framework
                 {
                     this.componentsInit[i].comp.start();
                     this.componentsInit[i].init = true;
-                    if (onPlay && this.componentsInit[i].comp.onPlay)
+                    if (bePlay)
                         this.componentsInit[i].comp.onPlay();
+                    else 
+                        this.componentsPlayed.push(this.componentsInit[i]);
                 }
                 this.componentsInit.length = 0;
+            }
+
+            if(this.componentsPlayed.length > 0 && bePlay){
+                this.componentsPlayed.forEach(item => {
+                    item.comp.onPlay();
+                });
+                this.componentsPlayed.length = 0;
             }
         }
 

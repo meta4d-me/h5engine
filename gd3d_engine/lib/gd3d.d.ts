@@ -258,8 +258,6 @@ declare namespace gd3d.framework {
         getChildren(): transform2D[];
         getChildCount(): number;
         getChild(index: number): transform2D;
-        private hasPlayed;
-        private playDirty;
         private pointDown;
         private pointSelect;
         private pointEvent;
@@ -557,8 +555,9 @@ declare namespace gd3d.framework {
         collider: ICollider2d;
         components: C2DComponent[];
         private componentsInit;
+        private componentplayed;
         update(delta: number): void;
-        init(onPlay?: boolean): void;
+        init(bePlayed?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
         removeComponent(comp: I2DComponent): void;
@@ -953,6 +952,7 @@ declare namespace gd3d.framework {
         refLoadedLength: number;
     }
     class stateLoad {
+        isloadFail: boolean;
         iserror: boolean;
         isfinish: boolean;
         resstate: {
@@ -983,6 +983,7 @@ declare namespace gd3d.framework {
         url: string;
         path: string;
         totalLength: number;
+        loadLightMap: boolean;
         constructor(url: string);
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any, totalLength?: number): void;
@@ -1064,6 +1065,11 @@ declare namespace gd3d.framework {
         loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         unload(url: string, onstate?: () => void): void;
+        waitlightmapScene: {
+            [sceneurl: string]: string[];
+        };
+        loadSceneAssetbundleWithoutLightMap(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
+        loadSceneLightmap(sceneurl: string): void;
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
@@ -1348,8 +1354,12 @@ declare namespace gd3d.framework {
         lerpInWorld(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, to: PoseBoneMatrix, v: number): void;
         lerpInWorldWithData(_tpose: PoseBoneMatrix, from: PoseBoneMatrix, todata: Float32Array, toseek: number, v: number): void;
         static sMultiply(left: PoseBoneMatrix, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
+        static sMultiplytpose(left: PoseBoneMatrix, right: tPoseInfo, target?: PoseBoneMatrix): PoseBoneMatrix;
         static sMultiplyDataAndMatrix(leftdata: Float32Array, leftseek: number, right: PoseBoneMatrix, target?: PoseBoneMatrix): PoseBoneMatrix;
         static sLerp(left: PoseBoneMatrix, right: PoseBoneMatrix, v: number, target?: PoseBoneMatrix): PoseBoneMatrix;
+        private static poolmats;
+        static recycle(mat: PoseBoneMatrix): void;
+        static create(): PoseBoneMatrix;
     }
     class subClip {
         name: string;
@@ -1626,14 +1636,8 @@ declare namespace gd3d.framework {
         center: math.vector3;
         size: math.vector3;
         maxBoneCount: number;
-        private _skintype;
-        private _skeletonMatrixData;
-        static dataCaches: {
-            key: string;
-            data: Float32Array;
-        }[];
-        private cacheData;
         private _efficient;
+        private _skeletonMatrixData;
         start(): void;
         onPlay(): void;
         getMatByIndex(index: number): math.matrix;
@@ -1642,7 +1646,6 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         remove(): void;
         clone(): void;
-        useBoneShader(mat: material): number;
     }
 }
 declare namespace gd3d.framework {
@@ -1971,73 +1974,63 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class aniplayer implements INodeComponent {
         gameObject: gameObject;
-        private _clipnameCount;
-        private _clipnames;
-        readonly clipnames: {
-            [key: string]: number;
-        };
         clips: animationClip[];
         autoplay: boolean;
-        private playIndex;
-        private _playClip;
-        readonly playingClip: string;
         bones: tPoseInfo[];
         startPos: PoseBoneMatrix[];
-        tpose: {
-            [key: string]: PoseBoneMatrix;
-        };
-        nowpose: {
-            [key: string]: PoseBoneMatrix;
-        };
-        lerppose: {
-            [key: string]: PoseBoneMatrix;
-        };
-        carelist: {
-            [id: string]: transform;
-        };
-        private _playFrameid;
-        readonly PlayFrameID: number;
-        private _playTimer;
+        private _playClip;
+        private clipnames;
+        private bePlay;
         speed: number;
-        crossdelta: number;
-        crossspeed: number;
+        private beCross;
         private beRevert;
-        private playStyle;
-        private percent;
-        mix: boolean;
-        isCache: boolean;
-        static playerCaches: {
-            key: string;
-            data: aniplayer;
-        }[];
+        private _playTimer;
+        private _playFrameid;
         private _playCount;
+        private crossTotalTime;
+        private crossRestTimer;
+        private crossPercentage;
+        private curFrame;
+        private lastFrame;
+        private carelist;
+        private careBoneMat;
+        private inversTpos;
+        private startepose;
+        readonly PlayFrameID: number;
+        readonly currentAniclipName: string;
+        readonly currentAniclip: animationClip;
         readonly playCount: number;
-        readonly cacheKey: string | number;
         private init();
+        addToCareList(bone: transform): void;
+        addClip(clip: animationClip): void;
+        haveClip(name: string): boolean;
         start(): void;
         onPlay(): void;
-        private clipHasPlay;
+        private temptMat;
         update(delta: number): void;
-        playByIndex(animIndex: number, speed?: number, beRevert?: boolean): void;
-        playCrossByIndex(animIndex: number, crosstimer: number, speed?: number, beRevert?: boolean): void;
-        play(animName: string, speed?: number, beRevert?: boolean): void;
-        getPlayName(): string;
-        playCross(animName: string, crosstimer: number, speed?: number, beRevert?: boolean): void;
-        private playAniamtion(index, speed?, beRevert?);
-        updateAnimation(animIndex: number, _frame: number): void;
+        private playEndDic;
+        play(animName: string, onPlayEnd?: () => void, speed?: number, beRevert?: boolean): void;
+        playCross(animName: string, crosstimer: number, onPlayEnd?: () => void, speed?: number, beRevert?: boolean): void;
+        private beActivedEndFrame;
+        private endFrame;
+        playToXFrame(animName: string, endframe: number, crosstimer?: number, onPlayEnd?: () => void, speed?: number): void;
+        private recordeLastFrameData();
+        private playAniclip(aniclip, onPlayEnd?, speed?, beRevert?);
         stop(): void;
+        pause(): void;
         isPlay(): boolean;
         isStop(): boolean;
         remove(): void;
         clone(): void;
-        private finishCallBack;
-        private thisObject;
-        addFinishedEventListener(finishCallBack: Function, thisObject: any): void;
-        onPlayEnd: (clipname: string) => any;
         private checkFrameId(delay);
-        fillPoseData(data: Float32Array, bones: transform[], efficient?: boolean): void;
-        care(node: transform): void;
+        private OnClipPlayEnd();
+        private beActived;
+        private boneCache;
+        private recyclecache();
+        fillPoseData(data: Float32Array, bones: transform[]): void;
     }
+}
+declare namespace gd3d.framework {
     class tPoseInfo {
         name: string;
         tposep: math.vector3;
@@ -4022,6 +4015,7 @@ declare namespace gd3d.framework {
         x: number;
         y: number;
         z: number;
+        realy: number;
         clone(): navVec3;
         static DistAZ(start: navVec3, end: navVec3): number;
         static NormalAZ(start: navVec3, end: navVec3): navVec3;
@@ -4029,6 +4023,7 @@ declare namespace gd3d.framework {
         static DotAZ(start: navVec3, end: navVec3): number;
         static Angle(start: navVec3, end: navVec3): number;
         static Border(start: navVec3, end: navVec3, dist: number): navVec3;
+        static lerp(from: navVec3, to: navVec3, lerp: number, out: navVec3): void;
     }
     class navNode {
         nodeID: number;
@@ -4103,6 +4098,7 @@ declare namespace gd3d.framework {
         private static NearAngle(a, b);
         static FindPath(info: navMeshInfo, startPos: navVec3, endPos: navVec3, offset?: number): navVec3[];
         static calcWayPoints(info: navMeshInfo, startPos: navVec3, endPos: navVec3, polyPath: number[], offset?: number): navVec3[];
+        static intersectBorder(a: navVec3, b: navVec3, c: navVec3, d: navVec3): navVec3;
     }
 }
 declare var RVO: any;
@@ -5154,6 +5150,7 @@ declare namespace gd3d.framework {
         transform: transform;
         components: nodeComponent[];
         private componentsInit;
+        private componentsPlayed;
         renderer: IRenderer;
         camera: camera;
         light: light;
@@ -5162,7 +5159,7 @@ declare namespace gd3d.framework {
         readonly visibleInScene: boolean;
         visible: boolean;
         getName(): string;
-        init(onPlay?: boolean): void;
+        init(bePlay?: boolean): void;
         update(delta: number): void;
         addComponentDirect(comp: INodeComponent): INodeComponent;
         getComponent(type: string): INodeComponent;
@@ -5269,8 +5266,6 @@ declare namespace gd3d.framework {
         private RealCameraNumber;
         private _renderCamera(camindex);
         private sortOverLays(lays);
-        private hasPlayed;
-        private playDirty;
         private updateScene(node, delta);
         private objupdateInEditor(node, delta);
         private objupdate(node, delta);

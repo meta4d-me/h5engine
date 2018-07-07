@@ -77,6 +77,10 @@
      */
     export function loadText(url: string, fun: (_txt: string, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
     {
+        if(framework.assetMgr.useBinJs)
+        {
+            url=framework.assetMgr.correctTxtFileName(url);
+        }
         gd3d.io.xhrLoad(url,fun,onprocess,"text",(req)=>{
             fun(req.responseText, null);
         });
@@ -95,6 +99,10 @@
      */
     export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
+        if(framework.assetMgr.useBinJs)
+        {
+            url=framework.assetMgr.correctFileName(url);
+        }
         //req.responseType = "arraybuffer";//ie 一定要在open之后修改responseType
         gd3d.io.xhrLoad(url,fun,onprocess,"arraybuffer", (req)=>{
             fun(req.response, null);
