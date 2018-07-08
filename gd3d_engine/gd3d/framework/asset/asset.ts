@@ -66,5 +66,6 @@ namespace gd3d.framework
         unuse(disposeNow?: boolean):void;
         dispose();
         caclByteLength(): number;
+        
     }
 }

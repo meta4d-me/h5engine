@@ -7,22 +7,25 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: textasset)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: textasset, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadText(url,
-                (txt, err ,  isloadFail) =>
+                (txt, err, isloadFail) =>
                 {
-                    state.isloadFail = isloadFail ? true : false;
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
+                    call(() =>
+                    {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
 
-                    let _textasset = asset ? asset : new textasset(filename);
-                    _textasset.content = txt;
+                        let _textasset = asset ? asset : new textasset(filename);
+                        _textasset.content = txt;
 
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {

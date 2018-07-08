@@ -7,7 +7,7 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: pathasset)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: pathasset, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
@@ -15,14 +15,17 @@ namespace gd3d.framework
             gd3d.io.loadText(url,
                 (txt, err, isloadFail) =>
                 {
-                    state.isloadFail = isloadFail ? true : false;
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
+                    call(() =>
+                    {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
 
-                    let _path = asset ? asset : new pathasset(filename);
-                    _path.Parse(JSON.parse(txt));
+                        let _path = asset ? asset : new pathasset(filename);
+                        _path.Parse(JSON.parse(txt));
 
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {

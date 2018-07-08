@@ -7,21 +7,24 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: atlas)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            gd3d.io.loadText(url, (txt, err,isloadFail) =>
+            gd3d.io.loadText(url, (txt, err, isloadFail) =>
             {
-                state.isloadFail = isloadFail ? true : false;
-                if (AssetFactoryTools.catchError(err, onstate, state))
-                    return;
+                call(() =>
+                {
+                    state.isloadFail = isloadFail ? true : false;
+                    if (AssetFactoryTools.catchError(err, onstate, state))
+                        return;
 
-                let _atlas = asset ? asset : new atlas(filename);
-                _atlas.Parse(txt, assetMgr);
+                    let _atlas = asset ? asset : new atlas(filename);
+                    _atlas.Parse(txt, assetMgr);
 
-                AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+                });
             },
                 (loadedLength, totalLength) =>
                 {

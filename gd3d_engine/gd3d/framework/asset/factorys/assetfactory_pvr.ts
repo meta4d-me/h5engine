@@ -7,23 +7,26 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadArrayBuffer(url,
-                (_buffer, err ,isloadFail) =>
+                (_buffer, err, isloadFail) =>
                 {
-                    state.isloadFail = isloadFail ? true : false;
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
+                    call(() =>
+                    {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
 
-                    let _texture = asset ? asset : new texture(filename);
-                    let pvr: PvrParse = new PvrParse(assetMgr.webgl);
-                    _texture.glTexture = pvr.parse(_buffer);
+                        let _texture = asset ? asset : new texture(filename);
+                        let pvr: PvrParse = new PvrParse(assetMgr.webgl);
+                        _texture.glTexture = pvr.parse(_buffer);
 
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {

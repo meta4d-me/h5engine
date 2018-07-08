@@ -7,26 +7,29 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: rawscene, call: (handle: () => void) => void)
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadText(url,
-                (txt, err , isloadFail) =>
+                (txt, err, isloadFail) =>
                 {
-                    state.isloadFail = isloadFail ? true : false;
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-
-                    let _scene = asset ? asset : new rawscene(filename);
-                    _scene.assetbundle = bundlename;
-                    // _scene.Parse(txt, assetMgr);
-                    // AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
-                    _scene.Parse(txt, assetMgr).then(() =>
+                    call(() =>
                     {
-                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+
+                        let _scene = asset ? asset : new rawscene(filename);
+                        _scene.assetbundle = bundlename;
+                        // _scene.Parse(txt, assetMgr);
+                        // AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                        _scene.Parse(txt, assetMgr).then(() =>
+                        {
+                            AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                        });
                     });
                 },
                 (loadedLength, totalLength) =>

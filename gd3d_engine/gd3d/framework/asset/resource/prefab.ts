@@ -167,8 +167,8 @@
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
-           return new threading.gdPromise((resolve) =>
-            {
+        //    return new threading.gdPromise((resolve) =>
+        //     {
                 this.jsonstr = jsonStr;
                 let jsonObj = JSON.parse(jsonStr);
                 let type = jsonObj["type"];
@@ -180,8 +180,8 @@
 
                 if (type != null)
                     io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
-                resolve();
-            });
+            //     resolve();
+            // });
         }
     }
 }

@@ -7,23 +7,26 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: material)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: material, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
             let assetbundleName = getFileName(state.url);
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadText(url,
-                (txt, err,isloadFail) =>
+                (txt, err, isloadFail) =>
                 {
-                    state.isloadFail = isloadFail ? true : false;
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
+                    call(() =>
+                    {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
 
-                    let _material = asset ? asset : new material(filename);
-                    _material.Parse(assetMgr, JSON.parse(txt),assetbundleName);
+                        let _material = asset ? asset : new material(filename);
+                        _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
 
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {
@@ -39,7 +42,7 @@ namespace gd3d.framework
             state.resstate[filename] = new ResourceState();
             let txt = respack[filename];
             let _material = asset ? asset : new material(filename);
-            _material.Parse(assetMgr, JSON.parse(txt),assetbundleName);
+            _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
 
             AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
         }

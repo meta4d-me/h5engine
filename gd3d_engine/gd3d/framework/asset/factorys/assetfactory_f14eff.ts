@@ -7,26 +7,30 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: f14eff)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: f14eff, call: (handle: () => void) => void)
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            gd3d.io.loadText(url, (txt, err,isloadFail) =>
+            gd3d.io.loadText(url, (txt, err, isloadFail) =>
             {
-                state.isloadFail = isloadFail ? true : false;
-                if (AssetFactoryTools.catchError(err, onstate, state))
-                    return;
+                call(() =>
+                {
+                    state.isloadFail = isloadFail ? true : false;
+                    if (AssetFactoryTools.catchError(err, onstate, state))
+                        return;
 
-                let _f14eff = asset ? asset : new f14eff(filename);
-                _f14eff.assetbundle = bundlename;
-                // _f14eff.Parse(txt, assetMgr);
-                // AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
-                _f14eff.Parse(txt, assetMgr).then(()=>{
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+                    let _f14eff = asset ? asset : new f14eff(filename);
+                    _f14eff.assetbundle = bundlename;
+                    // _f14eff.Parse(txt, assetMgr);
+                    // AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+                    _f14eff.Parse(txt, assetMgr).then(() =>
+                    {
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+                    });
                 });
-                
+
             },
                 (loadedLength, totalLength) =>
                 {
@@ -38,14 +42,15 @@ namespace gd3d.framework
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
-            
+
             state.resstate[filename] = new ResourceState();
             let txt = respack[filename];
             let _f14eff = asset ? asset : new f14eff(filename);
             _f14eff.assetbundle = bundlename;
             // _f14eff.Parse(txt, assetMgr);
             // AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
-            _f14eff.Parse(txt, assetMgr).then(()=>{
+            _f14eff.Parse(txt, assetMgr).then(() =>
+            {
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
             });
         }

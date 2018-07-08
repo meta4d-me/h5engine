@@ -7,7 +7,7 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
             let name = filename.substring(0, filename.indexOf("."));
@@ -16,17 +16,20 @@ namespace gd3d.framework
             gd3d.io.loadText(url,
                 (txt, err, isloadFail) =>
                 {
-                    state.isloadFail = isloadFail ? true : false;
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
+                    call(() =>
+                    {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
 
-                    state.resstate[filename].state = 1;//完成
+                        state.resstate[filename].state = 1;//完成
 
-                    state.logs.push("load a glshader:" + filename);
-                    assetMgr.shaderPool.mapVSString[name]=txt;
+                        state.logs.push("load a glshader:" + filename);
+                        assetMgr.shaderPool.mapVSString[name] = txt;
 
-                    //assetMgr.shaderPool.compileVS(assetMgr.webgl, name, txt);
-                    onstate(state);
+                        //assetMgr.shaderPool.compileVS(assetMgr.webgl, name, txt);
+                        onstate(state);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {
@@ -45,8 +48,8 @@ namespace gd3d.framework
             state.resstate[filename].state = 1;//完成
 
             state.logs.push("load a glshader:" + filename);
-            assetMgr.shaderPool.mapVSString[name]=txt;
-            
+            assetMgr.shaderPool.mapVSString[name] = txt;
+
             //assetMgr.shaderPool.compileVS(assetMgr.webgl, name, txt);
             onstate(state);
         }
