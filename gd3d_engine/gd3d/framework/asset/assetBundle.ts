@@ -214,21 +214,17 @@ namespace gd3d.framework
 
 
             //合并的包要先加载
-            // for (let i = 0; i < this.packages.length; i++) {
-            // let pack = this.packages[i];
+
             for (let pack of this.packages)
             {
                 let type: AssetTypeEnum = assetmgr.calcType(pack);
                 let url = this.path + "/" + pack;
                 packs.push({ url: url, type: type, asset: null });
             }
-            // }
-            // for (let i = 0; i < this.files.length; i++)
-            // {
-            //     let fitem = this.files[i];
+
             for (let fitem of this.files)
             {
-                // console.log("fitem:" + fitem.name);
+
                 let type: AssetTypeEnum = assetmgr.calcType(fitem.name);
                 let url = this.path + "/" + fitem.name;
                 let fileName = assetmgr.getFileName(url);
@@ -335,24 +331,16 @@ namespace gd3d.framework
                 }
             }
             realTotal = list.length;
-            // if (total > realTotal)
-            // {
-            //     console.log("assetBundle中某个file不是资源或后缀有问题");
-            // }
-
-            // state.totaltask = realTotal + 1;//自身也算一个task
-            // state.curtask = 1;
-            // onstate(state);         
 
             state.bundleLoadState = AssetBundleLoadState.None;
             let respackCall;
-            let binCount =0;
+            let binCount = 0;
             for (let item of list)
             {
-                let surl = item.url;//list[state.curtask - 1].url;
-                let type = item.type;//list[state.curtask - 1].type;
-                let asset = item.asset;//list[state.curtask - 1].asset;
-                // let _fileName = assetmgr.getFileName(surl);
+                let surl = item.url;
+                let type = item.type;
+                let asset = item.asset;
+
                 console.log(`开始下载:${surl}`);
                 let loadstate = item.state;
                 if (mapPackes[surl] != undefined)
@@ -372,7 +360,7 @@ namespace gd3d.framework
                             if (mapPackes[uitem.surl] == 0) respack = this.bundlePackJson;
                             else if (mapPackes[uitem.surl] == 1) respack = this.bundlePackBin;
                             else console.log("未识别的packnum: " + mapPackes[uitem.surl]);
-                            // let utype = assetmgr.calcType(uitem.surl);
+
                             assetmgr.loadResByPack(respack, uitem.surl, uitem.type, (s) =>
                             {
                                 if (s.progressCall)
@@ -390,9 +378,9 @@ namespace gd3d.framework
                         }
 
                     };
-
-                    if (--realTotal === 0)
-                        this.downloadFinsih(state, list, respackCall, onstate);
+                    --realTotal;
+                    // if (--realTotal === 0)
+                    //     this.downloadFinsih(state, list, respackCall, onstate);
                 }
                 else
                 {
@@ -407,7 +395,7 @@ namespace gd3d.framework
                                 state.iserror = true;
                                 state.errs.push(new Error(err.message));
                                 onstate(state);
-                                // assetmgr.loadByMulQueue();
+
                                 return;
                             }
                             let read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
@@ -429,26 +417,15 @@ namespace gd3d.framework
                             }
 
                             if (state != undefined)
-                                state.bundleLoadState |= loadstate;                          
+                                state.bundleLoadState |= loadstate;
 
-                            // if (--realTotal === 0)
-                            // {
-                            //     // state.isfinish = true;
-                            //     // onstate(state);
-                            //     // assetmgr.loadByMulQueue();
-                            //     this.downloadFinsih(state, list, respackCall, onstate);
-                            // }
-                            // else
-                            // {
-                            //     onstate(state);
-                            // }
-                            if(--binCount == 0)
+                            --realTotal;
+                            if (--binCount == 0)
                             {
-                                respackCall(()=>{
-                                    if(--realTotal === 0)
-                                    {
-                                        this.downloadFinsih(state, list, respackCall, onstate);
-                                    }
+                                respackCall(() =>
+                                {
+                                    if (realTotal === 0)                                    
+                                        this.downloadFinsih(state, list, respackCall, onstate);                                    
                                 });
                             }
                         },
@@ -465,7 +442,7 @@ namespace gd3d.framework
                             if (s.iserror)
                             {
                                 onstate(state);
-                                // assetmgr.loadByMulQueue();
+
                                 return;
                             }
 
@@ -478,21 +455,10 @@ namespace gd3d.framework
 
                             if (state != undefined)
                                 state.bundleLoadState |= loadstate;
-                            // realTotal--;                        
 
-                            // if (realTotal === 0)
-                            // {
-                            //     state.isfinish = true;
-                            //     onstate(state);
-                            // }
-                            // else
-                            // {
-                            //     onstate(state);
-                            // }
 
                         }, state, asset, (data) =>
                             {
-                                //handles.push(handle);
                                 list[handles[data.url]].handle = data.handle;
                                 console.log(`${surl} 下载完成`);
                                 if (--realTotal === 0)
@@ -514,20 +480,22 @@ namespace gd3d.framework
 
         downloadFinsih(state, list, respackCall, onstate)
         {
-            if (respackCall){
+            if (respackCall)
+            {
                 respackCall(() =>
                 {
-                    state.isfinish = true;
-                    console.log(`##state ${state.url} 下载完成`)
+
                     for (let hitem of list)
                     {
                         if (!hitem.handle)
                             break;
                         hitem.handle();
                     }
+                    state.isfinish = true;
+                    console.log(`##state ${state.url} 下载完成`)
                     onstate(state);
                 });
-            }               
+            }
             else
             {
                 state.isfinish = true;
