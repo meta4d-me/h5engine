@@ -18,15 +18,16 @@ namespace gd3d.framework
                 let jsonlayer = json.layers;
 
                 
-                let total = 0;
+                // let total = 0;
                 for (let i = 0, len = jsonlayer.length; i < len; ++i)
                 {
                     let layer = new F14LayerData();                    
-                    layer.parse(jsonlayer[i], assetmgr, assetbundle).then(() =>
-                    {
-                        if (++total >= len)
-                            resolve();
-                    });
+                    layer.parse(jsonlayer[i], assetmgr, assetbundle);
+                    // .then(() =>
+                    // {
+                    //     if (++total >= len)
+                    //         resolve();
+                    // });
                     this.layers.push(layer);
                 }
 
@@ -53,8 +54,8 @@ namespace gd3d.framework
 
         parse(json: any, assetmgr: assetMgr, assetbundle: string)
         {
-            return new threading.gdPromise((resolve) =>
-            {
+            // return new threading.gdPromise((resolve) =>
+            // {
 
                 this.Name = json.Name;
                 switch (json.type)
@@ -118,8 +119,8 @@ namespace gd3d.framework
                             frameitem.EmissionData = data;
                     }
                 }
-                resolve();
-            });
+            //     resolve();
+            // });
         }
     }
 

@@ -57,7 +57,7 @@ namespace gd3d.framework
         totalLength: number = 0;
 
         loadLightMap: boolean = true;
-
+        
         constructor(url: string)
         {
             this.url = url;
@@ -315,9 +315,10 @@ namespace gd3d.framework
                     }
                 }
             }
+
             let list: { url: string, type: AssetTypeEnum, asset: IAsset, state: AssetBundleLoadState, handle: () => void }[] = [];
             let handles = {};
-            let packlist = [];
+
             for (let i = 0, len = asslist.length; i < len; ++i)
             {
                 for (let j = 0, clen = asslist[i].length; j < clen; ++j)
@@ -335,61 +336,67 @@ namespace gd3d.framework
             state.bundleLoadState = AssetBundleLoadState.None;
             let respackCall;
             let binCount = 0;
+            let packlist = [];
             for (let item of list)
             {
                 let surl = item.url;
                 let type = item.type;
                 let asset = item.asset;
 
-                console.log(`开始下载:${surl}`);
+
                 let loadstate = item.state;
                 if (mapPackes[surl] != undefined)
                 {
                     packlist.push({ surl, type, asset });
-
-                    respackCall = (fcall: () => void) =>
-                    {
-                        if (packlist.length < 1)
-                            fcall();
-                        let count = 0;
-                        for (let uitem of packlist)
+                    // console.log(`lrb 开始下载:${surl}`);
+                    if (!respackCall)
+                        respackCall = (fcall: () => void) =>
                         {
-                            //在pack里
-                            let respack;
-
-                            if (mapPackes[uitem.surl] == 0) respack = this.bundlePackJson;
-                            else if (mapPackes[uitem.surl] == 1) respack = this.bundlePackBin;
-                            else console.log("未识别的packnum: " + mapPackes[uitem.surl]);
-
-                            assetmgr.loadResByPack(respack, uitem.surl, uitem.type, (s) =>
+                            if (packlist.length < 1)
+                                fcall();
+                            let count = 0;
+                            for (let uitem of packlist)
                             {
-                                if (s.progressCall)
+                                //在pack里
+                                let respack;
+
+                                if (mapPackes[uitem.surl] == 0) respack = this.bundlePackJson;
+                                else if (mapPackes[uitem.surl] == 1) respack = this.bundlePackBin;
+                                else console.log("未识别的packnum: " + mapPackes[uitem.surl]);
+
+                                assetmgr.loadResByPack(respack, uitem.surl, uitem.type, (s) =>
                                 {
-                                    s.progressCall = false;
-                                    onstate(state);
-                                    return;
-                                }
+                                    if (s.progressCall)
+                                    {
+                                        s.progressCall = false;
+                                        onstate(state);
+                                        return;
+                                    }
 
-                                if (state != undefined)
-                                    state.bundleLoadState |= loadstate;
-                                if (++count >= packlist.length)
-                                    fcall();
-                            }, state, uitem.asset);
-                        }
+                                    if (state != undefined)
+                                        state.bundleLoadState |= loadstate;
+                                    if (++count >= packlist.length)
+                                        fcall();
+                                }, state, uitem.asset);
+                            }
 
-                    };
+                        };
                     --realTotal;
+
                     // if (--realTotal === 0)
                     //     this.downloadFinsih(state, list, respackCall, onstate);
                 }
                 else
                 {
+
+                    // console.log(`lb 开始下载:${surl}`);
                     //把压缩后的txt bin下载放在bundle里
                     if (type == AssetTypeEnum.PackBin)
                     {
                         ++binCount;
                         gd3d.io.loadArrayBuffer(surl, (_buffer, err) =>
                         {
+                            // console.log(`lb ${surl} 下载完成`);
                             if (err != null)
                             {
                                 state.iserror = true;
@@ -422,11 +429,15 @@ namespace gd3d.framework
                             --realTotal;
                             if (--binCount == 0)
                             {
-                                respackCall(() =>
+                                setTimeout(() =>
                                 {
-                                    if (realTotal === 0)                                    
-                                        this.downloadFinsih(state, list, respackCall, onstate);                                    
-                                });
+                                    respackCall(() =>
+                                    {
+
+                                        if (realTotal === 0)
+                                            this.downloadFinsih(state, list, respackCall, onstate);
+                                    });
+                                }, 0);
                             }
                         },
                             (loadedLength, totalLength) =>
@@ -437,6 +448,7 @@ namespace gd3d.framework
                     }
                     else
                     {
+                        // console.log(`slg 开始下载:${surl} ${gd3d.framework.AssetTypeEnum[type]}`);
                         assetmgr.loadSingleRes(surl, type, (s) =>
                         {
                             if (s.iserror)
@@ -459,8 +471,9 @@ namespace gd3d.framework
 
                         }, state, asset, (data) =>
                             {
+                                // console.log(`${surl} 下载完成`);
                                 list[handles[data.url]].handle = data.handle;
-                                console.log(`${surl} 下载完成`);
+
                                 if (--realTotal === 0)
                                 {
                                     state.isfinish = true;
@@ -488,25 +501,32 @@ namespace gd3d.framework
                     for (let hitem of list)
                     {
                         if (!hitem.handle)
-                            break;
+                            continue;
                         hitem.handle();
                     }
-                    state.isfinish = true;
-                    console.log(`##state ${state.url} 下载完成`)
-                    onstate(state);
+                    setTimeout(() =>
+                    {
+                        state.isfinish = true;
+                        // console.log(`##state ${state.url} 下载完成`)
+                        onstate(state);
+                    }, 0);
                 });
             }
             else
             {
-                state.isfinish = true;
-                console.log(`##state ${state.url} 下载完成`)
+
                 for (let hitem of list)
                 {
                     if (!hitem.handle)
-                        break;
+                        continue;
                     hitem.handle();
                 }
-                onstate(state);
+                setTimeout(() =>
+                {
+                    state.isfinish = true;
+                    // console.log(`##state ${state.url} 下载完成`)
+                    onstate(state);
+                }, 0);
             }
 
         }

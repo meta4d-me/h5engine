@@ -133,8 +133,8 @@ namespace gd3d.framework
          */
         Parse(txt: string, assetmgr: assetMgr)
         {
-            return new threading.gdPromise((resolve) =>
-            {
+            // return new threading.gdPromise((resolve) =>
+            // {
 
                 let _json = JSON.parse(txt);
                 this.rootNode = new transform();
@@ -185,8 +185,8 @@ namespace gd3d.framework
                 {
                     this.navMeshJson = nav.data;
                 }
-                resolve();
-            });
+            //     resolve();
+            // });
         }
 
         /**

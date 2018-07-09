@@ -1269,9 +1269,10 @@ namespace gd3d.framework
                     state.curtask = 1;
                     s.isfinish = true;
                     onstate(s);
-                }, state, null, () =>
+                }, state, null, (data) =>
                     {
-
+                        if(data.handle)
+                            data.handle();
                     });
             }
         }
@@ -1728,178 +1729,178 @@ namespace gd3d.framework
          */
         calcType(url: string | any): AssetTypeEnum
         {
-            // var filei = url.lastIndexOf("/");
-            // var file = url.substr(filei + 1);
+            var filei = url.lastIndexOf("/");
+            var file = url.substr(filei + 1);
 
-            // var i = file.indexOf(".", 0);
-            // var extname = null;
-            // while (i >= 0)
+            var i = file.indexOf(".", 0);
+            var extname = null;
+            while (i >= 0)
+            {
+                extname = file.substr(i);
+                if (extname == ".vs.glsl")
+                {
+                    return AssetTypeEnum.GLVertexShader;
+                }
+                else if (extname == ".assetbundle.json")
+                {
+                    return AssetTypeEnum.Bundle;
+                }
+                else if (extname == ".fs.glsl")
+                {
+                    return AssetTypeEnum.GLFragmentShader;
+                }
+                else if (extname == ".shader.json")
+                {
+                    return AssetTypeEnum.Shader;
+                }
+                else if (extname == ".png" || extname == ".jpg")
+                {
+                    return AssetTypeEnum.Texture;
+                }
+                else if (extname == ".pvr.bin" || extname == ".pvr" || extname == ".pvr.bin.js")
+                {
+                    return AssetTypeEnum.PVR;
+                }
+                else if (extname == ".imgdesc.json")
+                {
+                    return AssetTypeEnum.TextureDesc;
+                }
+                else if (extname == ".mat.json")
+                {
+                    return AssetTypeEnum.Material;
+                }
+                else if (extname == ".mesh.bin" || extname == ".mesh.bin.js")
+                {
+                    return AssetTypeEnum.Mesh;
+                }
+                else if (extname == ".aniclip.bin" || extname == ".aniclip.bin.js")
+                {
+                    return AssetTypeEnum.Aniclip;
+                }
+                else if (extname == ".prefab.json")
+                {
+                    return AssetTypeEnum.Prefab;
+                }
+                else if (extname == ".scene.json")
+                {
+                    return AssetTypeEnum.Scene;
+                }
+                else if (extname == ".atlas.json")
+                {
+                    return AssetTypeEnum.Atlas;
+                }
+                else if (extname == ".font.json")
+                {
+                    return AssetTypeEnum.Font;
+                }
+                else if (extname == ".json" || extname == ".txt" || extname == ".effect.json")
+                {
+                    return AssetTypeEnum.TextAsset;
+                }
+                else if (extname == ".packs.bin" || extname == ".packs.bin.js")
+                {
+                    return AssetTypeEnum.PackBin;
+                }
+                else if (extname == ".packs.txt")
+                {
+                    return AssetTypeEnum.PackTxt;
+                }
+                else if (extname == ".path.json")
+                {
+                    return AssetTypeEnum.PathAsset;
+                }
+                else if (extname == ".f14effect.json")
+                {
+                    return AssetTypeEnum.F14Effect;
+                } else if (extname == ".dds" || extname == ".dds.bin")
+                {
+                    return AssetTypeEnum.DDS;
+                } else if (extname == ".keyframeAniclip.json")
+                {
+                    return AssetTypeEnum.KeyFrameAniclip;
+                }
+
+                i = file.indexOf(".", i + 1);
+            }
+
+            // if (url.endsWith(".vs.glsl"))
+            //     return AssetTypeEnum.GLVertexShader;
+            // else if (url.endsWith(".assetbundle.json"))
+            //     return AssetTypeEnum.Bundle;
+            // else if (url.endsWith(".fs.glsl"))
             // {
-            //     extname = file.substr(i);
-            //     if (extname == ".vs.glsl")
-            //     {
-            //         return AssetTypeEnum.GLVertexShader;
-            //     }
-            //     else if (extname == ".assetbundle.json")
-            //     {
-            //         return AssetTypeEnum.Bundle;
-            //     }
-            //     else if (extname == ".fs.glsl")
-            //     {
-            //         return AssetTypeEnum.GLFragmentShader;
-            //     }
-            //     else if (extname == ".shader.json")
-            //     {
-            //         return AssetTypeEnum.Shader;
-            //     }
-            //     else if (extname == ".png" || extname == ".jpg")
-            //     {
-            //         return AssetTypeEnum.Texture;
-            //     }
-            //     else if (extname == ".pvr.bin" || extname == ".pvr" || extname == ".pvr.bin.js")
-            //     {
-            //         return AssetTypeEnum.PVR;
-            //     }
-            //     else if (extname == ".imgdesc.json")
-            //     {
-            //         return AssetTypeEnum.TextureDesc;
-            //     }
-            //     else if (extname == ".mat.json")
-            //     {
-            //         return AssetTypeEnum.Material;
-            //     }
-            //     else if (extname == ".mesh.bin" || extname == ".mesh.bin.js")
-            //     {
-            //         return AssetTypeEnum.Mesh;
-            //     }
-            //     else if (extname == ".aniclip.bin" || extname == ".aniclip.bin.js")
-            //     {
-            //         return AssetTypeEnum.Aniclip;
-            //     }
-            //     else if (extname == ".prefab.json")
-            //     {
-            //         return AssetTypeEnum.Prefab;
-            //     }
-            //     else if (extname == ".scene.json")
-            //     {
-            //         return AssetTypeEnum.Scene;
-            //     }
-            //     else if (extname == ".atlas.json")
-            //     {
-            //         return AssetTypeEnum.Atlas;
-            //     }
-            //     else if (extname == ".font.json")
-            //     {
-            //         return AssetTypeEnum.Font;
-            //     }
-            //     else if (extname == ".json" || extname == ".txt" || extname == ".effect.json")
-            //     {
-            //         return AssetTypeEnum.TextAsset;
-            //     }
-            //     else if (extname == ".packs.bin" || extname == ".packs.bin.js")
-            //     {
-            //         return AssetTypeEnum.PackBin;
-            //     }
-            //     else if (extname == ".packs.txt")
-            //     {
-            //         return AssetTypeEnum.PackTxt;
-            //     }
-            //     else if (extname == ".path.json")
-            //     {
-            //         return AssetTypeEnum.PathAsset;
-            //     }
-            //     else if (extname == ".f14effect.json")
-            //     {
-            //         return AssetTypeEnum.F14Effect;
-            //     } else if (extname == ".dds" || extname == ".dds.bin")
-            //     {
-            //         return AssetTypeEnum.DDS;
-            //     } else if (extname == ".keyframeAniclip.json")
-            //     {
-            //         return AssetTypeEnum.KeyFrameAniclip;
-            //     }
-
-            //     i = file.indexOf(".", i + 1);
+            //     return AssetTypeEnum.GLFragmentShader;
             // }
-
-            if (url.endsWith(".vs.glsl"))
-                return AssetTypeEnum.GLVertexShader;
-            else if (url.endsWith(".assetbundle.json"))
-                return AssetTypeEnum.Bundle;
-            else if (url.endsWith(".fs.glsl"))
-            {
-                return AssetTypeEnum.GLFragmentShader;
-            }
-            else if (url.endsWith(".shader.json"))
-            {
-                return AssetTypeEnum.Shader;
-            }
-            else if (url.endsWith(".png") || url.endsWith(".jpg"))
-            {
-                return AssetTypeEnum.Texture;
-            }
-            else if (url.endsWith(".pvr.bin") || url.endsWith(".pvr") || url.endsWith(".pvr.bin.js"))
-            {
-                return AssetTypeEnum.PVR;
-            }
-            else if (url.endsWith(".imgdesc.json"))
-            {
-                return AssetTypeEnum.TextureDesc;
-            }
-            else if (url.endsWith(".mat.json"))
-            {
-                return AssetTypeEnum.Material;
-            }
-            else if (url.endsWith(".mesh.bin") || url.endsWith(".mesh.bin.js"))
-            {
-                return AssetTypeEnum.Mesh;
-            }
-            else if (url.endsWith(".aniclip.bin") || url.endsWith(".aniclip.bin.js"))
-            {
-                return AssetTypeEnum.Aniclip;
-            }
-            else if (url.endsWith(".prefab.json"))
-            {
-                return AssetTypeEnum.Prefab;
-            }
-            else if (url.endsWith(".scene.json"))
-            {
-                return AssetTypeEnum.Scene;
-            }
-            else if (url.endsWith(".atlas.json"))
-            {
-                return AssetTypeEnum.Atlas;
-            }
-            else if (url.endsWith(".font.json"))
-            {
-                return AssetTypeEnum.Font;
-            }
-            else if (url.endsWith(".json") || url.endsWith(".txt") || url.endsWith(".effect.json"))
-            {
-                return AssetTypeEnum.TextAsset;
-            }
-            else if (url.endsWith(".packs.bin") || url.endsWith(".packs.bin.js"))
-            {
-                return AssetTypeEnum.PackBin;
-            }
-            else if (url.endsWith(".packs.txt"))
-            {
-                return AssetTypeEnum.PackTxt;
-            }
-            else if (url.endsWith(".path.json"))
-            {
-                return AssetTypeEnum.PathAsset;
-            }
-            else if (url.endsWith(".f14effect.json"))
-            {
-                return AssetTypeEnum.F14Effect;
-            } else if (url.endsWith(".dds") || url.endsWith(".dds.bin"))
-            {
-                return AssetTypeEnum.DDS;
-            } else if (url.endsWith(".keyframeAniclip.json"))
-            {
-                return AssetTypeEnum.KeyFrameAniclip;
-            }
+            // else if (url.endsWith(".shader.json"))
+            // {
+            //     return AssetTypeEnum.Shader;
+            // }
+            // else if (url.endsWith(".png") || url.endsWith(".jpg"))
+            // {
+            //     return AssetTypeEnum.Texture;
+            // }
+            // else if (url.endsWith(".pvr.bin") || url.endsWith(".pvr") || url.endsWith(".pvr.bin.js"))
+            // {
+            //     return AssetTypeEnum.PVR;
+            // }
+            // else if (url.endsWith(".imgdesc.json"))
+            // {
+            //     return AssetTypeEnum.TextureDesc;
+            // }
+            // else if (url.endsWith(".mat.json"))
+            // {
+            //     return AssetTypeEnum.Material;
+            // }
+            // else if (url.endsWith(".mesh.bin") || url.endsWith(".mesh.bin.js"))
+            // {
+            //     return AssetTypeEnum.Mesh;
+            // }
+            // else if (url.endsWith(".aniclip.bin") || url.endsWith(".aniclip.bin.js"))
+            // {
+            //     return AssetTypeEnum.Aniclip;
+            // }
+            // else if (url.endsWith(".prefab.json"))
+            // {
+            //     return AssetTypeEnum.Prefab;
+            // }
+            // else if (url.endsWith(".scene.json"))
+            // {
+            //     return AssetTypeEnum.Scene;
+            // }
+            // else if (url.endsWith(".atlas.json"))
+            // {
+            //     return AssetTypeEnum.Atlas;
+            // }
+            // else if (url.endsWith(".font.json"))
+            // {
+            //     return AssetTypeEnum.Font;
+            // }
+            // else if (url.endsWith(".json") || url.endsWith(".txt") || url.endsWith(".effect.json"))
+            // {
+            //     return AssetTypeEnum.TextAsset;
+            // }
+            // else if (url.endsWith(".packs.bin") || url.endsWith(".packs.bin.js"))
+            // {
+            //     return AssetTypeEnum.PackBin;
+            // }
+            // else if (url.endsWith(".packs.txt"))
+            // {
+            //     return AssetTypeEnum.PackTxt;
+            // }
+            // else if (url.endsWith(".path.json"))
+            // {
+            //     return AssetTypeEnum.PathAsset;
+            // }
+            // else if (url.endsWith(".f14effect.json"))
+            // {
+            //     return AssetTypeEnum.F14Effect;
+            // } else if (url.endsWith(".dds") || url.endsWith(".dds.bin"))
+            // {
+            //     return AssetTypeEnum.DDS;
+            // } else if (url.endsWith(".keyframeAniclip.json"))
+            // {
+            //     return AssetTypeEnum.KeyFrameAniclip;
+            // }
             return AssetTypeEnum.Unknown;
         }
 

@@ -24,12 +24,12 @@ namespace gd3d.framework
 
                         let _scene = asset ? asset : new rawscene(filename);
                         _scene.assetbundle = bundlename;
-                        // _scene.Parse(txt, assetMgr);
-                        // AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
-                        _scene.Parse(txt, assetMgr).then(() =>
-                        {
-                            AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
-                        });
+                        _scene.Parse(txt, assetMgr);
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                        // _scene.Parse(txt, assetMgr).then(() =>
+                        // {
+                        //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                        // });
                     });
                 },
                 (loadedLength, totalLength) =>
@@ -47,12 +47,12 @@ namespace gd3d.framework
             let txt = respack[filename];
             let _scene = asset ? asset : new rawscene(filename);
             _scene.assetbundle = bundlename;
-            // _scene.Parse(txt, assetMgr);
-            // AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
-            _scene.Parse(txt, assetMgr).then(() =>
-            {
-                AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
-            });
+            _scene.Parse(txt, assetMgr);
+            AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+            // _scene.Parse(txt, assetMgr).then(() =>
+            // {
+            //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+            // });
         }
     }
 }
