@@ -2,9 +2,10 @@ namespace gd3d.threading
 {
     export class gdPromise<T>
     {
-        // private execQueue: Array<(value?: T) => void> = new Array<(value?: T) => void>();
+        private execQueue: Array<(value?: T) => void> = new Array<(value?: T) => void>();
         private catchMethod: (val: T) => void;
-        private thenCall: (val: T) => void;
+        // private thenCall: (val: T) => void;
+
         constructor(executor: (resolve: (value?: T) => void, reject: (reason?: any) => void) => void)
         {
             setTimeout(() =>
@@ -17,8 +18,10 @@ namespace gd3d.threading
         {
             try
             {
-                if (this.thenCall)
-                    this.thenCall(value);
+                // if (this.thenCall)
+                //     this.thenCall(value);
+                while (this.execQueue.length > 0)
+                    this.execQueue.shift()(value);
             } catch (e)
             {
                 this.reject(e);
@@ -37,13 +40,15 @@ namespace gd3d.threading
 
         public then(thenCall: (value?: T) => void): gdPromise<T>
         {
-            this.thenCall = thenCall;
+            // this.thenCall = thenCall;
+            this.execQueue.push(thenCall);
             return this;
         }
 
-        public catch(callbcack: (val: any) => void)
+        public catch(callbcack: (val: any) => void): gdPromise<T>
         {
             this.catchMethod = callbcack;
+            return this;
         }
     }
 }

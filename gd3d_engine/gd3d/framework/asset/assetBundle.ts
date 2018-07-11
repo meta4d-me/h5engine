@@ -510,19 +510,33 @@ namespace gd3d.framework
         }
         NextHandle(list, state, onstate)
         {
+            let waitArrs = [];
+            let count = 0;
             for (let hitem of list)
             {
                 if (!hitem.handle)
                     continue;
-                hitem.handle();
+                let waiting = hitem.handle();
+
+                if (waiting instanceof threading.gdPromise)
+                {
+                    waitArrs.push(waiting);
+                    waiting.then(() =>
+                    {
+                        if(count>= waitArrs.length)
+                        {
+                            state.isfinish = true;
+                            onstate(state);
+                        }
+                    });
+                }
             }
 
-            setTimeout(() =>
-            {
-                // console.log(`##state2 ${this.url} ${state.url} 下载完成`)
-                state.isfinish = true;
-                onstate(state);
-            },10);
+            // setTimeout(() =>
+            // {
+            //     // console.log(`##state2 ${this.url} ${state.url} 下载完成`)
+             
+            // }, 10);
         }
 
         private mapIsNull(map): boolean

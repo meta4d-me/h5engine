@@ -22,7 +22,7 @@ namespace gd3d.framework
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;
                         let _mesh = asset ? asset : new mesh(filename);
-                        _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
+                        return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
                         {
                             AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
                         });

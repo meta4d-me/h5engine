@@ -25,7 +25,7 @@ namespace gd3d.framework
                         // _clip.Parse(_buffer);
 
                         // AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
-                        _clip.Parse(_buffer).then(() =>
+                        return _clip.Parse(_buffer).then(() =>
                         {
                             AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                         });
